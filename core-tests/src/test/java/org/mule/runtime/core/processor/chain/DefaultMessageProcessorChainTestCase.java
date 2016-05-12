@@ -9,7 +9,6 @@ package org.mule.runtime.core.processor.chain;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
@@ -17,10 +16,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -39,7 +36,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -48,7 +44,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
-import org.mule.runtime.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
@@ -799,43 +794,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testOneWayOutboundEndpointWithService() throws Exception
-    {
-        MuleEvent event = getTestEventUsingFlow("");
-        when(event.getFlowConstruct()).thenReturn(mock(Flow.class));
-
-        MessageProcessor mp = mock(MessageProcessor.class,
-                withSettings().extraInterfaces(OutboundEndpoint.class));
-        OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
-        when(outboundEndpoint.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
-
-        MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
-        MuleEvent response = chain.process(event);
-        assertNull(response);
-
-        assertEquals(1, threads);
-    }
-
-    @Test
-    public void testOneWayOutboundEndpointWithFlow() throws Exception
-    {
-        MuleEvent event = getTestEventUsingFlow("");
-
-        MessageProcessor mp = mock(MessageProcessor.class,
-                withSettings().extraInterfaces(OutboundEndpoint.class));
-        OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
-        when(outboundEndpoint.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
-        when(mp.process(any(MuleEvent.class))).thenReturn(VoidMuleEvent.getInstance());
-
-        MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
-        MuleEvent response = chain.process(event);
-        assertThat(event.getId(), is(response.getId()));
-        assertThat(event.getMessage(), is(response.getMessage()));
-
-        assertEquals(1, threads);
-    }
-
-    @Test
     public void testResponseProcessor() throws MuleException, Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
@@ -927,7 +885,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     public void testExceptionAfter() throws MuleException, Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        builder.chain(getAppendingMP("1"), new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessor());
+        builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor());
         process(builder.build(), getTestEventUsingFlow("0"));
     }
 
@@ -935,7 +893,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     public void testExceptionBefore() throws MuleException, Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        builder.chain(new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessor(), getAppendingMP("1"));
+        builder.chain(new ExceptionThrowingMessageProcessor(), getAppendingMP("1"));
         process(builder.build(), getTestEventUsingFlow("0"));
     }
 
@@ -943,7 +901,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     public void testExceptionBetween() throws MuleException, Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        builder.chain(getAppendingMP("1"), new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessor(),
+        builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(),
                       getAppendingMP("2"));
         process(builder.build(), getTestEventUsingFlow("0"));
     }
@@ -952,7 +910,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     public void testExceptionInResponse() throws MuleException, Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        builder.chain(new ResponseMessageProcessorAdapter(new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessor()), getAppendingMP("1"));
+        builder.chain(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()), getAppendingMP("1"));
         process(builder.build(), getTestEventUsingFlow("0"));
     }
 
@@ -1318,6 +1276,15 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         when(event.isAllowNonBlocking()).thenReturn(!synchronous && nonBlocking);
         //when(event.isNonBlocking()).thenReturn(nonBlocking);
         return event;
+    }
+
+    public static class ExceptionThrowingMessageProcessor implements MessageProcessor
+    {
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            throw new IllegalStateException();
+        }
     }
 
 }

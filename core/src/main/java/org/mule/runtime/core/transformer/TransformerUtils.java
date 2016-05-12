@@ -10,15 +10,11 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.transport.service.TransportFactoryException;
-import org.mule.runtime.core.transport.service.TransportServiceDescriptor;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -78,93 +74,6 @@ public class TransformerUtils
             return null;
         }
     }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    public static boolean isSourceTypeSupportedByFirst(List<Transformer> transformers, Class clazz)
-    {
-        Transformer transformer = firstOrNull(transformers);
-        return null != transformer && transformer.isSourceDataTypeSupported(new DataTypeFactory().create(clazz));
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    protected static interface TransformerSource
-    {
-        public List<Transformer> getTransformers() throws TransportFactoryException;
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    protected static List<Transformer> getTransformersFromSource(TransformerSource source)
-    {
-        try
-        {
-            List<Transformer> transformers = source.getTransformers();
-            TransformerUtils.initialiseAllTransformers(transformers);
-            return transformers;
-        }
-        catch (MuleException e)
-        {
-            LOGGER.debug(e.getMessage(), e);
-            return null;
-        }
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    public static List<Transformer> getDefaultInboundTransformers(final TransportServiceDescriptor serviceDescriptor, final ImmutableEndpoint endpoint)
-    {
-        return getTransformersFromSource(new TransformerSource()
-        {
-            @Override
-            public List<Transformer> getTransformers() throws TransportFactoryException
-            {
-                return serviceDescriptor.createInboundTransformers(endpoint);
-            }
-        });
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    public static List<Transformer> getDefaultResponseTransformers(final TransportServiceDescriptor serviceDescriptor, final ImmutableEndpoint endpoint)
-    {
-        return getTransformersFromSource(new TransformerSource()
-        {
-            @Override
-            public List<Transformer> getTransformers() throws TransportFactoryException
-            {
-                return serviceDescriptor.createResponseTransformers(endpoint);
-            }
-        });
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    public static List<Transformer> getDefaultOutboundTransformers(final TransportServiceDescriptor serviceDescriptor, final ImmutableEndpoint endpoint)
-    {
-        return getTransformersFromSource(new TransformerSource()
-        {
-            @Override
-            public List<Transformer> getTransformers() throws TransportFactoryException
-            {
-                return serviceDescriptor.createOutboundTransformers(endpoint);
-            }
-        });
-    }
-
 
     /**
      * Builds a list of Transformers.

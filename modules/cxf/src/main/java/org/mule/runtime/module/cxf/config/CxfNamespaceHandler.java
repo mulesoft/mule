@@ -13,12 +13,10 @@ import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinition
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
-import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.module.cxf.CxfConfiguration;
 import org.mule.runtime.module.cxf.CxfConstants;
-import org.mule.runtime.module.cxf.component.WebServiceWrapperComponent;
 import org.mule.runtime.module.cxf.support.MuleSecurityManagerValidator;
 import org.mule.runtime.module.cxf.support.StaxFeature;
 
@@ -96,8 +94,6 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser(CxfConstants.OUT_FAULT_INTERCEPTORS, new ChildListDefinitionParser(CxfConstants.OUT_FAULT_INTERCEPTORS));
         
         registerBeanDefinitionParser("stax", new SimpleBeanDefinitionParser(StaxFeature.class));
-
-        registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
 
         registerMuleBeanDefinitionParser("properties", new ChildMapDefinitionParser("addProperties")).addCollection("addProperties");
         

@@ -10,16 +10,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.endpoint.EndpointBuilder;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
@@ -179,37 +173,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         final MuleEvent testEvent = getTestEvent("ERROR");
         assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
         ponderUntilEventAborted(testEvent);
-    }
-
-    @Test
-    public void testPermanentDeliveryFailureDLQ() throws Exception
-    {
-        targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.MAX_VALUE);
-        EndpointBuilder dlqEndpointBuilder = mock(EndpointBuilder.class);
-        final OutboundEndpoint dlqEndpoint = mock(OutboundEndpoint.class);
-        when(dlqEndpointBuilder.buildOutboundEndpoint()).thenReturn(dlqEndpoint);
-        untilSuccessful.setDeadLetterQueue(dlqEndpointBuilder);
-        untilSuccessful.initialise();
-        untilSuccessful.start();
-
-        final MuleEvent testEvent = getTestEvent("ERROR");
-        assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
-
-        pollingProber.check(new JUnitProbe()
-        {
-            @Override
-            protected boolean test() throws Exception
-            {
-                verify(dlqEndpoint).process(any(MuleEvent.class));
-                return true;
-            }
-
-            @Override
-            public String describeFailure()
-            {
-                return "Dead letter queue was not called";
-            }
-        });
     }
 
     @Test

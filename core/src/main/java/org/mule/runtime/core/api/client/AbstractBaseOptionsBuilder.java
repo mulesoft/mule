@@ -16,14 +16,23 @@ public abstract class AbstractBaseOptionsBuilder<BuilderType extends AbstractBas
 {
 
     private Long responseTimeout;
+    private boolean outbound = false;
 
     protected AbstractBaseOptionsBuilder()
     {
     }
 
+    @Override
     public BuilderType responseTimeout(final long timeout)
     {
         this.responseTimeout = timeout;
+        return (BuilderType) this;
+    }
+
+    // TODO MULE-9690 remove
+    public BuilderType outbound()
+    {
+        this.outbound = true;
         return (BuilderType) this;
     }
 
@@ -38,5 +47,11 @@ public abstract class AbstractBaseOptionsBuilder<BuilderType extends AbstractBas
     protected Long getResponseTimeout()
     {
         return responseTimeout;
+    }
+
+    // TODO MULE-9690 remove
+    public boolean isOutbound()
+    {
+        return outbound;
     }
 }

@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -31,7 +32,6 @@ import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
@@ -39,12 +39,12 @@ import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
+import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -181,7 +181,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
         List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
-        processors.add(new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessor());
+        processors.add(new ExceptionThrowingMessageProcessor());
         pipeline.setMessageProcessors(processors);
         pipeline.initialise();
 
@@ -212,7 +212,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
         List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
-        processors.add(new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessor());
+        processors.add(new ExceptionThrowingMessageProcessor());
         processors.add(new SensingNullMessageProcessor());
         pipeline.setMessageProcessors(processors);
         pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
@@ -248,7 +248,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
         List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
-        processors.add(new ResponseMessageProcessorAdapter(new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessor()));
+        processors.add(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()));
         processors.add(new SensingNullMessageProcessor());
         pipeline.setMessageProcessors(processors);
         pipeline.setProcessingStrategy(new NonBlockingProcessingStrategy());
@@ -287,7 +287,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
         List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
-        processors.add(new ResponseMessageProcessorAdapter(new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessor()));
+        processors.add(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()));
         pipeline.setMessageProcessors(processors);
         pipeline.initialise();
 
@@ -320,7 +320,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
         List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
-        processors.add(new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessor());
+        processors.add(new ExceptionThrowingMessageProcessor());
         pipeline.setMessageProcessors(processors);
         pipeline.initialise();
 
@@ -485,6 +485,15 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
                        && (this.event == null || this.event == notification.getSource());
             }
 
+        }
+    }
+
+    public static class ExceptionThrowingMessageProcessor implements MessageProcessor
+    {
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            throw new IllegalStateException();
         }
     }
 

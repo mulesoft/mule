@@ -7,8 +7,8 @@
 
 package org.mule.runtime.module.db.performance;
 
-import org.mule.runtime.core.api.client.LocalMuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -63,7 +63,7 @@ public class QueryPerformanceTestCase extends FunctionalTestCase
         @Override
         public void run()
         {
-            LocalMuleClient client = muleContext.getClient();
+            MuleClient client = muleContext.getClient();
             while (!Thread.currentThread().isInterrupted())
             {
                 try

@@ -24,7 +24,6 @@ public class JmxDomainAgent extends AbstractJmxAgent
     {
         registerWrapperService();
         registerMuleService();
-        registerConnectorServices();
         registerConfigurationService();
     }
 

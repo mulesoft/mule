@@ -56,7 +56,7 @@ public class JmsReconnectionActiveMQTestCase extends AbstractBrokerFunctionalTes
     @Test
     public void reconnectsAfterRestartingActiveMQBroker() throws Exception
     {
-        jmsConnector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
+        jmsConnector = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
 
         assertMessageRouted();
 

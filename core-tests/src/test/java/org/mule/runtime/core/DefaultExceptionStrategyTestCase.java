@@ -42,6 +42,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
 
         muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>()
         {
+            @Override
             public void onNotification(ExceptionNotification notification)
             {
                 if (notification.getAction() == ExceptionNotification.EXCEPTION_ACTION)
@@ -71,7 +72,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
 
         public InstrumentedExceptionStrategy(MuleContext muleContext)
         {
-            super(muleContext);
+            super();
         }
 
         @Override

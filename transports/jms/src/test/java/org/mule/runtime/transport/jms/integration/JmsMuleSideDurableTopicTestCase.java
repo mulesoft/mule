@@ -10,6 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.core.api.transport.Connector;
+
 import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -40,11 +42,11 @@ public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCa
         send(scenarioNoTx);
         receive(scenarioNoTx);
         receive(scenarioNoTx);
-        muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).stop();
-        assertEquals(muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).isStarted(), false);
+        ((Connector) muleContext.getRegistry().lookupObject(CONNECTOR1_NAME)).stop();
+        assertEquals(((Connector) muleContext.getRegistry().lookupObject(CONNECTOR1_NAME)).isStarted(), false);
         log.info(CONNECTOR1_NAME + " is stopped");
         send(scenarioNoTx);
-        muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).start();
+        ((Connector) muleContext.getRegistry().lookupObject(CONNECTOR1_NAME)).start();
         log.info(CONNECTOR1_NAME + " is started");
         receive(scenarioNoTx);
         receive(scenarioNoTx);

@@ -17,13 +17,13 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 
@@ -54,7 +54,7 @@ public class HttpListenerContentTypeTestCase extends FunctionalTestCase
     @Test
     public void returnsContentTypeInResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
 
         MuleMessage response = client.send(getUrl(), TEST_MESSAGE, null);
 

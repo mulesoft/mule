@@ -28,7 +28,7 @@ public class MuleMQJmsConnectorClusterTestCase extends FunctionalTestCase
     @Test
     public void testDefaultConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
         assertNotNull(c);
         assertTrue(c instanceof MuleMQJmsConnector);
         MuleMQJmsConnector mqc = (MuleMQJmsConnector)c;

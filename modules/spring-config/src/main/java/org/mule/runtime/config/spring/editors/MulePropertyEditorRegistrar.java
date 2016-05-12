@@ -10,8 +10,6 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.core.api.transport.Connector;
-import org.mule.runtime.core.endpoint.URIBuilder;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -47,8 +45,6 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
     @Override
     public void registerCustomEditors(PropertyEditorRegistry registry)
     {
-        registry.registerCustomEditor(Connector.class, new ConnectorPropertyEditor(muleContext));
-        registry.registerCustomEditor(URIBuilder.class, new URIBuilderPropertyEditor(muleContext));
         registry.registerCustomEditor(MessageExchangePattern.class,
             new MessageExchangePatternPropertyEditor());
         registry.registerCustomEditor(Date.class, new DatePropertyEditor(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"), new SimpleDateFormat("yyyy-MM-dd"), true));
@@ -62,7 +58,12 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
         {
             try
             {
-                registry.registerCustomEditor(entry.getKey(), ClassUtils.instanciateClass(entry.getValue()));
+                final PropertyEditor customEditor = ClassUtils.instanciateClass(entry.getValue());
+                if (customEditor instanceof MuleContextAware)
+                {
+                    ((MuleContextAware) customEditor).setMuleContext(muleContext);
+                }
+                registry.registerCustomEditor(entry.getKey(), customEditor);
             }
             catch (Exception e)
             {

@@ -180,7 +180,12 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         }
         else
         {
-            return registry.lookupObject(AbstractJmxAgent.class);
+            AbstractJmxAgent lookupObject = (AbstractJmxAgent) registry.lookupObject(AbstractJmxAgentExtension.class);
+            if (lookupObject == null)
+            {
+                lookupObject = registry.lookupObject(AbstractJmxAgent.class);
+            }
+            return lookupObject;
         }
     }
 

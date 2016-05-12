@@ -10,7 +10,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.transport.jms.JmsConnector;
 import org.mule.runtime.transport.jms.test.JmsTestContextFactory;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -48,7 +47,7 @@ public class JmsJndiReconnectionTestCase extends FunctionalTestCase
         JmsTestContextFactory.failWhenRetrievingInitialContext = true;
         try
         {
-            final JmsConnector jmsConnector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
+            final JmsConnector jmsConnector = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
             assertThat(jmsConnector.isConnected(), is(false));
             JmsTestContextFactory.failWhenRetrievingInitialContext = false;
             PollingProber prober = new PollingProber(RECEIVE_TIMEOUT,100);

@@ -15,7 +15,6 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -31,8 +30,6 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
 
         MuleSession session = mock(MuleSession.class);
 
-        InboundEndpoint endpoint1 = getTestInboundEndpoint("Test1Provider", "test://Test1Provider?exchangePattern=one-way");
-
         IdempotentMessageFilter ir = new IdempotentMessageFilter();
         ir.setIdExpression("#[message.inboundProperties.id]");
         ir.setFlowConstruct(flow);
@@ -42,8 +39,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
         okMessage.setOutboundProperty("id", "1");
-        DefaultMuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
-        event.populateFieldsFromInboundEndpoint(endpoint1);
+        MuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
 
         // This one will process the event on the target endpoint
         MuleEvent processedEvent = ir.process(event);
@@ -53,7 +49,6 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
         okMessage = new DefaultMuleMessage("OK", muleContext);
         okMessage.setOutboundProperty("id", "1");
         event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
-        event.populateFieldsFromInboundEndpoint(endpoint1);
         processedEvent = ir.process(event);
         assertNull(processedEvent);
     }

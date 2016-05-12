@@ -25,8 +25,6 @@ import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.RollbackSourceCallback;
-import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.construct.Flow;
@@ -67,7 +65,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     @Test
     public void testProcessOneWay() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        MuleEvent event = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
 
         assertAsync(messageProcessor, event);
     }
@@ -75,7 +73,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     @Test
     public void testProcessRequestResponse() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
 
         try
         {
@@ -90,7 +88,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     @Test
     public void testProcessOneWayWithTx() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        MuleEvent event = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -111,7 +109,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     @Test
     public void testProcessRequestResponseWithTx() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -273,23 +271,4 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         }
 
     }
-
-    private static class LatchedSystemExceptionHandler implements SystemExceptionHandler
-    {
-
-        Latch latch = new Latch();
-
-        @Override
-        public void handleException(Exception exception, RollbackSourceCallback rollbackMethod)
-        {
-            latch.countDown();
-        }
-
-        @Override
-        public void handleException(Exception exception)
-        {
-            latch.countDown();
-        }
-    }
-
 }

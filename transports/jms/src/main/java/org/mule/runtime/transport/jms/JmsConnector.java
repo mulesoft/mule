@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.transport.MessageReceiver;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.connector.EndpointConnectException;
 import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
@@ -529,7 +529,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             if (receiverReportedExceptionCount.incrementAndGet() >= expectedReceiverCount)
             {
                 receiverReportedExceptionCount.set(0);
-                muleContext.getExceptionListener().handleException(new ConnectException(jmsException, this));
+                muleContext.getExceptionListener().handleException(new EndpointConnectException(jmsException, this));
             }
         }
     }

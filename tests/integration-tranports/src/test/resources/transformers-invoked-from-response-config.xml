@@ -2,13 +2,15 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
            http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-           http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+           http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+           http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <jms:activemq-connector name="jmsConnector"/>
 
@@ -16,8 +18,8 @@
                   queue="testQueue" exchange-pattern="request-response"/>
 
     <flow name="test">
-        <inbound-endpoint ref="testJmsEndpoint">
-            <response>
+        <transports:inbound-endpoint ref="testJmsEndpoint">
+            <transports:response>
                 <scripting:transformer>
                     <scripting:script engine="groovy">
                         return payload + " transformed"
@@ -25,10 +27,10 @@
                 </scripting:transformer>
                 <custom-transformer
                         class="org.mule.TransformersInvokedFromResponseTestCase$InvocationCounterTransformer1"/>
-            </response>
-        </inbound-endpoint>
+            </transports:response>
+        </transports:inbound-endpoint>
         <echo-component/>
-        <outbound-endpoint address="vm://vmOutput"/>
+        <transports:outbound-endpoint address="vm://vmOutput"/>
     </flow>
 
     <flow name="output">

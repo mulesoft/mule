@@ -11,20 +11,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.AbstractConfigBuilderTestCase;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.routing.ExpressionMessageInfoMapping;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -55,25 +45,6 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
                 "org/mule/test/spring/config2/test-xml-mule2-config-split.xml",
                 "org/mule/test/spring/config2/test-xml-mule2-config-split-properties.xml"
         };
-    }
-
-    @Test
-    public void testMessageInfoMappingConfig() throws Exception
-    {
-        Flow d = (Flow) muleContext.getRegistry().lookupFlowConstruct("msgInfoMappingTestComponent");
-        assertNotNull(d);
-
-        final MessageInfoMapping mapping = d.getMessageInfoMapping();
-        assertTrue(mapping instanceof ExpressionMessageInfoMapping);
-
-        Map props = new HashMap();
-        props.put("id", "myID123");
-        props.put("correlation", "myCorrelationID456");
-        MuleMessage msg = new DefaultMuleMessage("foo", props, muleContext);
-        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, getTestFlow());
-
-        assertEquals("myID123", mapping.getMessageId(event));
-        assertEquals("myCorrelationID456", mapping.getCorrelationId(event));
     }
 
     @Test

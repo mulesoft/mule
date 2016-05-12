@@ -37,7 +37,7 @@ public class JmsXaSharedConnectorTestCase extends JmsSharedConnectorTestCase
     @Test
     public void connectionFactoryWrapperIsUsed()
     {
-        JmsConnector jmsConnector = (JmsConnector) getMuleContextForApp(CLIENT_APP).getRegistry().lookupConnector("sharedJmsConnector");
+        JmsConnector jmsConnector = (JmsConnector) getMuleContextForApp(CLIENT_APP).getRegistry().lookupObject("sharedJmsConnector");
         assertThat(jmsConnector.getConnectionFactory(), instanceOf(DefaultXAConnectionFactoryWrapper.class));
     }
 

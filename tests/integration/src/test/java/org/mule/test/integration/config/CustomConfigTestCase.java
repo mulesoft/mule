@@ -11,10 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.tck.testmodels.mule.TestConnector;
 
 import org.junit.Test;
 
@@ -24,26 +22,6 @@ public class CustomConfigTestCase extends FunctionalTestCase
     protected String getConfigFile()
     {
         return "org/mule/test/integration/config/custom-config.xml";
-    }
-
-    @Test
-    public void testCustomEndpointConfig() throws Exception
-    {
-        ImmutableEndpoint ep = muleContext.getEndpointFactory().getOutboundEndpoint(
-            "fooEndpoint");
-        assertNotNull("fooEndpoint should not be null", ep);
-        TestFilter tf = (TestFilter)ep.getFilter();
-        assertNotNull("the filter on the endpoint should not be null", tf);
-        assertEquals(tf.getFoo(), "goo");
-        assertEquals(tf.getBar(), 12);
-    }
-
-    @Test
-    public void testCustomConnectorConfig() throws Exception
-    {
-        TestConnector cnn = (TestConnector)muleContext.getRegistry().lookupConnector("customConnector");
-        assertNotNull("customConnector should not be null", cnn);
-        assertEquals(cnn.getSomeProperty(), "foo");
     }
 
     @Test

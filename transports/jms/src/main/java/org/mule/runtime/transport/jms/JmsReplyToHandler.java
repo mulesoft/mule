@@ -10,11 +10,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleEndpointProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.endpoint.EndpointBuilder;
+import org.mule.runtime.core.api.endpoint.EndpointFactory;
 import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.connector.DefaultReplyToHandler;
+import org.mule.runtime.core.connector.EndpointReplyToHandler;
 import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -41,7 +43,7 @@ import javax.jms.Topic;
  * receiving on the same replyTo if 'remoteSync' is set. The {@link JmsMessageDispatcher} never
  * writes to the 'replyTo' destination.
  */
-public class JmsReplyToHandler extends DefaultReplyToHandler
+public class JmsReplyToHandler extends EndpointReplyToHandler
 {
     /**
      * Serial version
@@ -81,7 +83,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
 
             EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(String.format("%s://temporary",connector.getProtocol()), muleContext);
             endpointBuilder.setConnector(jmsConnector);
-            OutboundEndpoint tempEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            OutboundEndpoint tempEndpoint = getEndpointFactory().getOutboundEndpoint(endpointBuilder);
             
             List<Transformer> defaultTransportTransformers = ((org.mule.runtime.core.transport.AbstractConnector) jmsConnector).getDefaultOutboundTransformers(tempEndpoint);
             
@@ -197,5 +199,10 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         super.initAfterDeserialisation(muleContext);
         this.toJmsMessage = new ObjectToJMSMessage();
         this.jmsConnector = (JmsConnector) this.connector;
+    }
+
+    public EndpointFactory getEndpointFactory()
+    {
+        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 }

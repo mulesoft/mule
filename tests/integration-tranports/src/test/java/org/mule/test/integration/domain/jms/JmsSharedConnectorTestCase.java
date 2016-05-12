@@ -127,4 +127,10 @@ public class JmsSharedConnectorTestCase extends DomainFunctionalTestCase
     {
         return "jms";
     }
+
+    // @Override
+    // protected ConfigurationBuilder getBuilder() throws Exception
+    // {
+    // return new TransportsConfigurationBuilder();
+    // }
 }

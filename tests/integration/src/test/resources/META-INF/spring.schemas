@@ -1,17 +1,3 @@
-http\://www.mulesoft.org/schema/mule/parsers-test/3.2/mule-parsers-test.xsd=META-INF/mule-parsers-test.xsd
-http\://www.mulesoft.org/schema/mule/parsers-test/3.3/mule-parsers-test.xsd=META-INF/mule-parsers-test.xsd
-http\://www.mulesoft.org/schema/mule/parsers-test/3.4/mule-parsers-test.xsd=META-INF/mule-parsers-test.xsd
-http\://www.mulesoft.org/schema/mule/parsers-test/3.5/mule-parsers-test.xsd=META-INF/mule-parsers-test.xsd
-http\://www.mulesoft.org/schema/mule/parsers-test/3.6/mule-parsers-test.xsd=META-INF/mule-parsers-test.xsd
-http\://www.mulesoft.org/schema/mule/parsers-test/3.7/mule-parsers-test.xsd=META-INF/mule-parsers-test.xsd
-http\://www.mulesoft.org/schema/mule/parsers-test/3.8/mule-parsers-test.xsd=META-INF/mule-parsers-test.xsd
-http\://www.mulesoft.org/schema/mule/pojo-test/3.2/mule-pojo-test.xsd=META-INF/mule-pojo-test.xsd
-http\://www.mulesoft.org/schema/mule/pojo-test/3.3/mule-pojo-test.xsd=META-INF/mule-pojo-test.xsd
-http\://www.mulesoft.org/schema/mule/pojo-test/3.4/mule-pojo-test.xsd=META-INF/mule-pojo-test.xsd
-http\://www.mulesoft.org/schema/mule/pojo-test/3.5/mule-pojo-test.xsd=META-INF/mule-pojo-test.xsd
-http\://www.mulesoft.org/schema/mule/pojo-test/3.6/mule-pojo-test.xsd=META-INF/mule-pojo-test.xsd
-http\://www.mulesoft.org/schema/mule/pojo-test/3.7/mule-pojo-test.xsd=META-INF/mule-pojo-test.xsd
-http\://www.mulesoft.org/schema/mule/pojo-test/3.8/mule-pojo-test.xsd=META-INF/mule-pojo-test.xsd
 http\://www.mulesoft.org/schema/mule/nest-example-base/3.2/nest-example-base.xsd=META-INF/nest-example-base.xsd
 http\://www.mulesoft.org/schema/mule/nest-example-base/3.3/nest-example-base.xsd=META-INF/nest-example-base.xsd
 http\://www.mulesoft.org/schema/mule/nest-example-base/3.4/nest-example-base.xsd=META-INF/nest-example-base.xsd

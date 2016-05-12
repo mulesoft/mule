@@ -9,9 +9,10 @@ package org.mule.runtime.module.db.integration.delete;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.module.db.integration.model.Planet.VENUS;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.runtime.module.db.integration.TestDbConfig;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
@@ -55,7 +56,7 @@ public class DeleteDefaultTestCase extends AbstractDbIntegrationTestCase
     {
         flowRunner("defaultDeleteOneWay").withPayload(VENUS.getName()).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
         assertEquals(1, response.getPayload());

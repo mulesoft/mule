@@ -13,9 +13,8 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -40,14 +39,12 @@ public class DefaultMuleEventContext implements MuleEventContext
     protected static final Log logger = LogFactory.getLog(DefaultMuleEventContext.class);
 
     private final MuleEvent event;
-    private final MuleSession session;
     private final MuleContext muleContext;
-    private final LocalMuleClient clientInterface;
+    private final MuleClient clientInterface;
 
     public DefaultMuleEventContext(MuleEvent event)
     {
         this.event = event;
-        this.session = event.getSession();
         this.muleContext = event.getMuleContext();
         this.clientInterface = muleContext.getClient();
     }
@@ -164,24 +161,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     public Transaction getCurrentTransaction()
     {
         return TransactionCoordination.getInstance().getTransaction();
-    }
-
-    /**
-     * Depending on the session state this methods either Passes an event synchronously to the next available Mule
-     * component in the pool or via the endpoint configured for the event
-     *
-     * @param message the event message payload to send
-     * @param endpoint The endpoint to disptch the event through.
-     * @return the return Message from the call or null if there was no result
-     * @throws org.mule.api.MuleException if the event fails to be processed by the service or the transport for the
-     *             endpoint
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Override
-    @Deprecated
-    public MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
-    {
-        return clientInterface.process(endpoint, message);
     }
 
     /**

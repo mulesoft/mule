@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;
@@ -20,10 +19,7 @@ public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleConte
     protected ThreadSafeAccess dummyEvent() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null, muleContext);
-        final DefaultMuleEvent event = new DefaultMuleEvent(message, getTestFlow());
-        event.populateFieldsFromInboundEndpoint(MuleTestUtils.getTestInboundEndpoint("test",
-                MessageExchangePattern.ONE_WAY, muleContext, null));
-        return event;
+        return new DefaultMuleEvent(message, getTestFlow());
     }
 
     protected void resetAccessControl(ThreadSafeAccess target) throws InterruptedException

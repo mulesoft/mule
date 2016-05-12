@@ -8,8 +8,6 @@
 
     <bean name="_muleMessageProcessingManager" class="org.mule.runtime.core.execution.MuleMessageProcessingManager"/>
 
-    <bean name="_muleEndpointFactory" class="org.mule.runtime.core.endpoint.DefaultEndpointFactory"/>
-
     <bean name="_muleStreamCloserService" class="org.mule.runtime.core.util.DefaultStreamCloserService"/>
 
     <bean name="_defaultThreadingProfile" class="org.mule.runtime.core.config.ChainedThreadingProfile"/>

@@ -3,10 +3,10 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-
-
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <!--// START SNIPPET: full-config -->
@@ -20,7 +20,7 @@
     <jms:endpoint queue="test.inbound" name="inboundEndpoint" exchange-pattern="request-response"/>
 
     <flow name="In-Out-Async-Service">
-        <inbound-endpoint ref="inboundEndpoint"/>
+        <transports:inbound-endpoint ref="inboundEndpoint"/>
         <script:component>
             <script:script engine="groovy">
                 message.setOutboundProperty("foo", "bar");

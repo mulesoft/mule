@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.component;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -37,7 +38,6 @@ import org.mule.runtime.core.context.notification.OptimisedNotificationHandler;
 import org.mule.runtime.core.management.stats.ComponentStatistics;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.transformer.TransformerTemplate;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.ArrayList;
@@ -67,6 +67,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
     protected ComponentLifecycleManager lifecycleManager;
     private MessagingExceptionHandler messagingExceptionHandler;
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -141,6 +142,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         }
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (interceptorChain == null)
@@ -192,11 +194,13 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         // nothing to do
     }
 
+    @Override
     public ComponentStatistics getStatistics()
     {
         return statistics;
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
@@ -207,6 +211,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         return flowConstruct;
     }
 
+    @Override
     public final void initialise() throws InitialisationException
     {
         if (flowConstruct == null)
@@ -218,6 +223,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
 
         lifecycleManager.fireInitialisePhase(new LifecycleCallback<Component>()
         {
+            @Override
             public void onTransition(String phaseName, Component object) throws MuleException
             {
                 DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(
@@ -229,6 +235,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
                 }
                 chainBuilder.chain(new MessageProcessor()
                 {
+                    @Override
                     public MuleEvent process(MuleEvent event) throws MuleException
                     {
                         return invokeInternal(event);
@@ -262,10 +269,12 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         // Default implementation is no-op
     }
 
+    @Override
     public void dispose()
     {
         lifecycleManager.fireDisposePhase(new LifecycleCallback<Component>()
         {
+            @Override
             public void onTransition(String phaseName, Component object) throws MuleException
             {
                 doDispose();
@@ -278,12 +287,14 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         // Default implementation is no-op
     }
 
+    @Override
     public void stop() throws MuleException
     {
         try
         {
             lifecycleManager.fireStopPhase(new LifecycleCallback<Component>()
             {
+                @Override
                 public void onTransition(String phaseName, Component object) throws MuleException
                 {
                     doStop();
@@ -302,10 +313,12 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         // Default implementation is no-op
     }
 
+    @Override
     public void start() throws MuleException
     {
         lifecycleManager.fireStartPhase(new LifecycleCallback<Component>()
         {
+            @Override
             public void onTransition(String phaseName, Component object) throws MuleException
             {
                 notificationHandler = new OptimisedNotificationHandler(muleContext.getNotificationManager(),
@@ -345,6 +358,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         return sb.toString();
     }
 
+    @Override
     public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler)
     {
         this.messagingExceptionHandler = messagingExceptionHandler;

@@ -27,8 +27,6 @@ public class JmxApplicationAgent extends AbstractJmxAgent
         registerMuleService();
         registerConfigurationService();
         registerFlowConstructServices();
-        registerEndpointServices();
-        registerConnectorServices();
         registerApplicationServices();
     }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.transport.jms.integration;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
@@ -17,6 +18,7 @@ public class JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase extends Abstr
     }
 
     @Test
+    @Ignore("MULE-9628")
     public void testSingleTransactionBeginOrJoinAndAlwaysBegin() throws Exception
     {
         send(scenarioCommit);

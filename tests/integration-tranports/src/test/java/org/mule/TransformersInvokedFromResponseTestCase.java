@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
@@ -30,7 +30,7 @@ public class TransformersInvokedFromResponseTestCase extends FunctionalTestCase
     @Test
     public void testTransformersAreCorrectlyInvoked() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage test = client.send("jms://testQueue", "TEST1", null);
         assertNotNull(test);
         assertEquals(1, counter1);

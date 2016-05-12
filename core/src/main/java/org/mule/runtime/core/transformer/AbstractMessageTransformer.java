@@ -107,7 +107,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
             else
             {
                 Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),
-                        endpoint, src.getClass());
+                        src.getClass());
                 /// FIXME
                 throw new TransformerMessagingException(msg, event, this);
             }

@@ -10,9 +10,10 @@ package org.mule.runtime.module.db.integration.update;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
 import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.runtime.module.db.integration.TestDbConfig;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
@@ -61,7 +62,7 @@ public class UpdateDefaultTestCase extends AbstractDbIntegrationTestCase
     {
         flowRunner("jdbcUpdateOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
         assertEquals(1, response.getPayload());

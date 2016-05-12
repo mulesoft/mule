@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.agent.EndpointNotificationLoggerAgent;
 import org.mule.runtime.core.agent.Log4jNotificationLoggerAgent;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.registry.Registry;
@@ -81,12 +80,6 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(lnlAgent.getChainsawPort(), CHAINSAW_PORT);
         assertEquals(lnlAgent.getChainsawHost(), "127.0.0.1");
 
-        agent = muleContext.getRegistry().lookupAgent("publish-notifications");
-        assertNotNull(agent);
-        assertEquals(EndpointNotificationLoggerAgent.class, agent.getClass());
-        EndpointNotificationLoggerAgent enlAgent = (EndpointNotificationLoggerAgent) agent;
-        assertEquals(enlAgent.getEndpoint().getEndpointURI().toString(), "test://test");
-
         agent = muleContext.getRegistry().lookupAgent("test-custom-agent");
         assertNotNull(agent);
         assertEquals(TestAgent.class, agent.getClass());
@@ -104,7 +97,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         Registry registry = muleContext.getRegistry();
         assertNotNull(registry);
         Collection<Agent> agents = registry.lookupObjects(Agent.class);
-        assertEquals(agents.size(), 8);
+        assertEquals(agents.size(), 7);
         
         Iterator<Agent> iter = agents.iterator();
         assertTrue(iter.next() instanceof Log4jAgent);
@@ -117,7 +110,6 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 
         log4jAgent = (Log4jNotificationLoggerAgent) iter.next();
         assertEquals(log4jAgent.getName(), "chainsaw-notifications");
-        assertTrue(iter.next() instanceof EndpointNotificationLoggerAgent);
         assertTrue(iter.next() instanceof JmxApplicationAgent);
     }
 

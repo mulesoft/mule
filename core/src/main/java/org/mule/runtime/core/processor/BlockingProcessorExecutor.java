@@ -8,16 +8,15 @@ package org.mule.runtime.core.processor;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.component.Component;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.ProcessorExecutor;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.routing.MessageFilter;
 
@@ -81,7 +80,9 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
 
         preProcess(processor);
 
-        if (copyOnVoidEvent && processorMayReturnVoidEvent(processor))
+        if (copyOnVoidEvent
+            && !(processor instanceof Transformer || processor instanceof MessageFilter || processor instanceof Component
+                 || (processor instanceof LegacyOutboundEndpoint && !((LegacyOutboundEndpoint) processor).mayReturnVoidEvent())))
         {
             MuleEvent copy = new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage()), event);
             MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
@@ -110,18 +111,6 @@ public class BlockingProcessorExecutor implements ProcessorExecutor
     protected MessageProcessor nextProcessor()
     {
         return processors.get(index++);
-    }
-
-    private boolean processorMayReturnVoidEvent(MessageProcessor processor)
-    {
-        if (processor instanceof OutboundEndpoint)
-        {
-            MessageExchangePattern exchangePattern = ((OutboundEndpoint) processor).getExchangePattern();
-            return exchangePattern == null ? true : !exchangePattern.hasResponse();
-        }
-        return !(processor instanceof Component || processor instanceof Transformer
-                 || processor instanceof MessageFilter);
-        //TODO See MULE-9307 - re-add behaviour when we know if a processor may return null
     }
 
 }

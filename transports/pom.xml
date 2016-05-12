@@ -11,10 +11,14 @@
     <name>Mule Transports</name>
 
     <modules>
+        <module>core</module>
+        <module>core-transports-tests</module>
+
 <!--         <module>file</module> -->
 <!--         <module>http</module> -->
         <module>jms</module>
         <module>vm</module>
+        <module>module-support</module>
     </modules>
 
     <build>

@@ -3,63 +3,65 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <endpoint name="in1" address="${inbound.destination1}" connector-ref="jmsConnector1"
+    <transports:endpoint name="in1" address="${inbound.destination1}" connector-ref="jmsConnector1"
               exchange-pattern="one-way">
         <jms:transaction action="BEGIN_OR_JOIN"/>
-    </endpoint>
-    <endpoint name="out1" address="${outbound.destination1}" connector-ref="jmsConnector2"
+    </transports:endpoint>
+    <transports:endpoint name="out1" address="${outbound.destination1}" connector-ref="jmsConnector2"
               exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
-    </endpoint>
+    </transports:endpoint>
 
-    <endpoint name="in2" address="${inbound.destination2}" connector-ref="jmsConnector1"
+    <transports:endpoint name="in2" address="${inbound.destination2}" connector-ref="jmsConnector1"
               exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
-    </endpoint>
+    </transports:endpoint>
 
-    <endpoint name="out2" address="${outbound.destination2}" connector-ref="jmsConnector2"
+    <transports:endpoint name="out2" address="${outbound.destination2}" connector-ref="jmsConnector2"
               exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
-    </endpoint>
+    </transports:endpoint>
 
-    <endpoint name="in3" address="${inbound.destination3}" connector-ref="jmsConnector1"
+    <transports:endpoint name="in3" address="${inbound.destination3}" connector-ref="jmsConnector1"
               exchange-pattern="one-way">
         <jms:transaction action="BEGIN_OR_JOIN"/>
-    </endpoint>
+    </transports:endpoint>
 
-    <endpoint name="out3" address="${outbound.destination3}" connector-ref="jmsConnector2"
+    <transports:endpoint name="out3" address="${outbound.destination3}" connector-ref="jmsConnector2"
               exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
-    </endpoint>
+    </transports:endpoint>
 
     <flow name="ConfigurationA">
-        <inbound-endpoint ref="in1"/>
+        <transports:inbound-endpoint ref="in1"/>
         <test:component>
             <test:return-data>OUTPUT MESSAGE</test:return-data>
         </test:component>
-        <outbound-endpoint ref="out1"/>
+        <transports:outbound-endpoint ref="out1"/>
     </flow>
 
     <flow name="ConfigurationB">
-        <inbound-endpoint ref="in2"/>
+        <transports:inbound-endpoint ref="in2"/>
         <test:component>
             <test:return-data>OUTPUT MESSAGE</test:return-data>
         </test:component>
-        <outbound-endpoint ref="out2"/>
+        <transports:outbound-endpoint ref="out2"/>
     </flow>
 
     <flow name="ConfigurationC">
-        <inbound-endpoint ref="in3"/>
+        <transports:inbound-endpoint ref="in3"/>
         <test:component>
             <test:return-data>OUTPUT MESSAGE</test:return-data>
         </test:component>
-        <outbound-endpoint ref="out3"/>
+        <transports:outbound-endpoint ref="out3"/>
     </flow>
 
 </mule>

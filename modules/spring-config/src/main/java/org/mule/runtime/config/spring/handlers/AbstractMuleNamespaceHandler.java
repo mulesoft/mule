@@ -7,8 +7,6 @@
 package org.mule.runtime.config.spring.handlers;
 
 import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
-import org.mule.runtime.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.runtime.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.runtime.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.DeprecatedBeanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
@@ -19,10 +17,6 @@ import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
-import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
@@ -94,12 +88,12 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
 
     protected MuleDefinitionParserConfiguration registerStandardTransportEndpoints(String protocol, String[] requiredAttributes)
     {
-        return new RegisteredMdps(protocol, AddressedEndpointDefinitionParser.PROTOCOL, requiredAttributes);
+        return new RegisteredMdps();
     }
 
     protected MuleDefinitionParserConfiguration registerMetaTransportEndpoints(String protocol)
     {
-        return new RegisteredMdps(protocol, AddressedEndpointDefinitionParser.META, new String[] {});
+        return new RegisteredMdps();
     }
 
     public static class IgnoredDefinitionParser implements BeanDefinitionParser
@@ -116,36 +110,11 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         }
     }
 
-    protected Class getInboundEndpointFactoryBeanClass()
-    {
-        return InboundEndpointFactoryBean.class;
-    }
-
-    protected Class getOutboundEndpointFactoryBeanClass()
-    {
-        return OutboundEndpointFactoryBean.class;
-    }
-
-    protected Class getGlobalEndpointBuilderBeanClass()
-    {
-        return EndpointURIEndpointBuilder.class;
-    }
-
-    private class RegisteredMdps implements MuleDefinitionParserConfiguration
+    protected class RegisteredMdps implements MuleDefinitionParserConfiguration
     {
         private Set bdps = new HashSet();
 
-        public RegisteredMdps(String protocol, boolean isMeta, String[] requiredAttributes)
-        {
-            registerBeanDefinitionParser("endpoint",
-                    add(new TransportGlobalEndpointDefinitionParser(protocol, isMeta, AbstractMuleNamespaceHandler.this.getGlobalEndpointBuilderBeanClass(), requiredAttributes, new String[] {})));
-            registerBeanDefinitionParser("inbound-endpoint",
-                    add(new TransportEndpointDefinitionParser(protocol, isMeta, AbstractMuleNamespaceHandler.this.getInboundEndpointFactoryBeanClass(), requiredAttributes, new String[] {})));
-            registerBeanDefinitionParser("outbound-endpoint",
-                    add(new TransportEndpointDefinitionParser(protocol, isMeta, AbstractMuleNamespaceHandler.this.getOutboundEndpointFactoryBeanClass(), requiredAttributes, new String[] {})));
-        }
-
-        private MuleDefinitionParser add(MuleDefinitionParser bdp)
+        protected MuleDefinitionParser add(MuleDefinitionParser bdp)
         {
             bdps.add(bdp);
             return bdp;

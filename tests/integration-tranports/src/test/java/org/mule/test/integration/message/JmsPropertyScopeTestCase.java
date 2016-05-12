@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     @Test
     public void testRequestResponse() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("foo", "fooValue");
         message.setReplyTo("jms://reply");

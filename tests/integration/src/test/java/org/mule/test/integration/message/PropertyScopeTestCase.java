@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
@@ -43,7 +43,7 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase
                             .asynchronously()
                             .run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.request("test://queueOut", RECEIVE_TIMEOUT);
         assertThat(result.getPayload(), is("test bar"));
         assertThat(result.<Object> getOutboundProperty("foo2"), is("fooValue"));
@@ -57,7 +57,7 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase
                                 .asynchronously()
                                 .run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage result = client.request("test://rrQueueOut", RECEIVE_TIMEOUT);
         assertThat(result.getPayload(), is("test baz"));
         assertThat(result.<Object> getOutboundProperty("foo2"), is("rrfooValue"));

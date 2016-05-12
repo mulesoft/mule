@@ -21,7 +21,7 @@ public class SimpleOptionsBuilder extends AbstractBaseOptionsBuilder<SimpleOptio
     @Override
     public OperationOptions build()
     {
-        return new SimpleOptions(getResponseTimeout());
+        return new SimpleOptions(getResponseTimeout(), isOutbound());
     }
 
     /**

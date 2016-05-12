@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.transport.jms.JmsConnector;
 import org.mule.runtime.transport.jms.test.TestConnectionFactory;
 
 import javax.jms.ConnectionFactory;
@@ -33,7 +32,7 @@ public class JmsConnectionFactoryTestCase extends FunctionalTestCase
     @Test
     public void testProviderPropertiesNotPassed() throws Exception
     {
-        JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector1");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector1");
         assertNotNull(c);
 
         ConnectionFactory cf = c.getConnectionFactory();
@@ -49,7 +48,7 @@ public class JmsConnectionFactoryTestCase extends FunctionalTestCase
     @Test
     public void testConnectionFactoryPropertiesPassed() throws Exception
     {
-        JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector2");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector2");
         assertNotNull(c);
 
         ConnectionFactory cf = c.getConnectionFactory();

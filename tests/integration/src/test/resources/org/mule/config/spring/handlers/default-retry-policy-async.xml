@@ -11,6 +11,4 @@
     <configuration>
         <reconnect blocking="false" count="3"/> 
     </configuration>
-
-    <test:connector name="testConnector"/>
 </mule>

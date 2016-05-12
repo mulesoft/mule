@@ -8,10 +8,11 @@ package org.mule.functional.junit4;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,6 +96,11 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase
     public MuleContext getMuleContextForDomain()
     {
         return domainContext;
+    }
+
+    protected ConfigurationBuilder getBuilder() throws Exception
+    {
+        return null;
     }
 
     public class ApplicationConfig

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -20,18 +19,9 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
 
     @Override
     @Test
-    public void testProcessOneWay() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
-
-        assertAsync(messageProcessor, event);
-    }
-
-    @Override
-    @Test
     public void testProcessRequestResponse() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
 
         assertSync(messageProcessor, event);
     }
@@ -40,7 +30,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
     @Test
     public void testProcessOneWayWithTx() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -58,7 +48,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
     @Test
     public void testProcessRequestResponseWithTx() throws Exception
     {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
         Transaction transaction = new TestTransaction(muleContext);
         TransactionCoordination.getInstance().bindTransaction(transaction);
 

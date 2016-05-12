@@ -15,15 +15,22 @@ public class SimpleOptions implements OperationOptions
 {
 
     private final Long responseTimeout;
+    private final boolean outbound;
 
-    public SimpleOptions(Long responseTimeout)
+    public SimpleOptions(Long responseTimeout, boolean outbound)
     {
         this.responseTimeout = responseTimeout;
+        this.outbound = outbound;
     }
     @Override
     public Long getResponseTimeout()
     {
         return responseTimeout;
+    }
+
+    public boolean isOutbound()
+    {
+        return outbound;
     }
 
     @Override

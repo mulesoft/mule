@@ -37,7 +37,7 @@ public class JmsSelectorDetectionTestCase extends FunctionalTestCase
         InboundEndpoint ep = null;
         ep = getEnpoint(source, ep);
 
-        JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
+        JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupObject("jmsConnector");
         JmsSelectorFilter selector = connector.getSelector(ep);
         assertNotNull(selector);
     }

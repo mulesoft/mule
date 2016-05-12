@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.exception;
 
-import org.mule.runtime.core.api.MuleContext;
-
 /**
  * This is the default exception handler for any exception which does not inherit from MessagingException, 
  * i.e, when no message is in play.  The exception handler will fire a notification, log exception, 
@@ -15,8 +13,4 @@ import org.mule.runtime.core.api.MuleContext;
  */
 public class DefaultSystemExceptionStrategy extends AbstractSystemExceptionStrategy
 {
-    public DefaultSystemExceptionStrategy(MuleContext muleContext)
-    {
-        super(muleContext);
-    }
 }

@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/jms"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             xmlns:spring="http://www.springframework.org/schema/beans"
             targetNamespace="http://www.mulesoft.org/schema/mule/jms"
@@ -12,9 +13,11 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/transports"
+                schemaLocation="http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/current/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>The JMS transport provides support for sending messages via JMS queues.</xsd:documentation>
@@ -40,7 +43,7 @@
     </xsd:element>
     <xsd:complexType name="genericConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:transactedConnectorType">
+            <xsd:extension base="transports:transactedConnectorType">
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:element ref="abstract-jndi-name-resolver" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
@@ -67,7 +70,7 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="mule:customConnectorType">
+                <xsd:extension base="transports:customConnectorType">
                     <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                         <xsd:element ref="abstract-jndi-name-resolver" minOccurs="0" maxOccurs="1" />
                     </xsd:sequence>
@@ -264,7 +267,7 @@
 
     <xsd:complexType name="vendorJmsConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:transactedConnectorType">
+            <xsd:extension base="transports:transactedConnectorType">
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:element ref="abstract-jndi-name-resolver" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
@@ -503,7 +506,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="transports:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
                 The inbound-endpoint element configures an endpoint on which JMS messages are received.
@@ -512,10 +515,10 @@
     </xsd:element>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractInboundEndpointType">
+            <xsd:extension base="transports:abstractInboundEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
-                <xsd:attributeGroup ref="mule:allExchangePatterns"/>
-                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
+                <xsd:attributeGroup ref="transports:allExchangePatterns"/>
+                <xsd:attributeGroup ref="transports:defaultEndpointAttributes"/>
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attribute name="durableName" type="xsd:string">
                     <xsd:annotation>
@@ -537,7 +540,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="transports:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
                 The inbound-endpoint element configures an endpoint to which JMS messages are sent.
@@ -546,10 +549,10 @@
     </xsd:element>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractOutboundEndpointType">
+            <xsd:extension base="transports:abstractOutboundEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
-                <xsd:attributeGroup ref="mule:allExchangePatterns"/>
-                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
+                <xsd:attributeGroup ref="transports:allExchangePatterns"/>
+                <xsd:attributeGroup ref="transports:defaultEndpointAttributes"/>
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -566,8 +569,8 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractGlobalEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
-                <xsd:attributeGroup ref="mule:allExchangePatterns"/>
-                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
+                <xsd:attributeGroup ref="transports:allExchangePatterns"/>
+                <xsd:attributeGroup ref="transports:defaultEndpointAttributes"/>
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -603,7 +606,7 @@
          normal filter to be set -->
     <xsd:group name="defaultEndpointElements">
         <xsd:sequence>
-            <xsd:group ref="mule:commonDefaultEndpointElements"/>
+            <xsd:group ref="transports:commonDefaultEndpointElements"/>
             <xsd:element ref="mule:abstract-xa-transaction" minOccurs="0"/>
             <xsd:choice>
                 <!--xsd:element ref="mule:abstract-filter" minOccurs="0"/>    -->

@@ -12,13 +12,13 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 
 public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester
     implements Startable, Stoppable
@@ -42,25 +42,10 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
         event.getMessage().setCorrelationId(correlation);
     }
 
-    private String getReplyTo()
+    protected String getReplyTo()
     {
         //TODO See MULE-9307 - re-add logic to get reply to destination for request-reply
-        InboundEndpoint endpoint = ((InboundEndpoint) replyMessageSource);
-        return endpoint.getConnector().getCanonicalURI(endpoint.getEndpointURI());
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    @Override
-    protected void verifyReplyMessageSource(MessageSource messageSource)
-    {
-        if (!(messageSource instanceof InboundEndpoint))
-        {
-            throw new IllegalArgumentException(
-                    "Only an InboundEndpoint reply MessageSource is supported with SimpleAsyncRequestReplyRequester");
-        }
+        return replyMessageSource instanceof LegacyInboundEndpoint ? ((LegacyInboundEndpoint) replyMessageSource).getCanonicalURI() : null;
     }
 
     public void setMessageProcessor(MessageProcessor processor)

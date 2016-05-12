@@ -12,32 +12,23 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NameableObject;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.endpoint.EndpointBuilder;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
-import org.mule.runtime.core.api.registry.AbstractServiceDescriptor;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryProvider;
 import org.mule.runtime.core.api.registry.ResolverException;
-import org.mule.runtime.core.api.registry.ServiceDescriptor;
-import org.mule.runtime.core.api.registry.ServiceDescriptorFactory;
-import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transport.Connector;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.Predicate;
-import org.mule.runtime.core.util.SpiUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.UUID;
 
@@ -49,7 +40,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
@@ -139,42 +129,9 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
         }
     }
 
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    @Override
-    public Connector lookupConnector(String name)
+    protected MuleContext getMuleContext()
     {
-        return (Connector) registry.lookupObject(name);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    @Override
-    public EndpointBuilder lookupEndpointBuilder(String name)
-    {
-        Object o = registry.lookupObject(name);
-        if (o instanceof EndpointBuilder)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Global endpoint EndpointBuilder for name: " + name + " found");
-            }
-            return (EndpointBuilder) o;
-        }
-        else
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("No endpoint builder with the name: " + name + " found.");
-            }
-            return null;
-        }
+        return muleContext;
     }
 
     /**
@@ -382,91 +339,12 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     }
 
     /**
-     * Looks up the service descriptor from a singleton cache and creates a new one if not found.
-     * 
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    @Override
-    public ServiceDescriptor lookupServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
-    {
-        String key = new AbstractServiceDescriptor.Key(name, overrides).getKey();
-        // TODO If we want these descriptors loaded form Spring we need to change the key mechanism
-        // and the scope, and then deal with circular reference issues.
-
-        synchronized (this)
-        {
-            ServiceDescriptor sd = registry.lookupObject(key);
-            if (sd == null)
-            {
-                sd = createServiceDescriptor(type, name, overrides);
-                try
-                {
-                    registry.registerObject(key, sd, ServiceDescriptor.class);
-                }
-                catch (RegistrationException e)
-                {
-                    throw new ServiceException(e.getI18nMessage(), e);
-                }
-            }
-            return sd;
-        }
-    }
-
-    /**
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    protected ServiceDescriptor createServiceDescriptor(ServiceType type, String name, Properties overrides) throws ServiceException
-    {
-        // Stripe off and use the meta-scheme if present
-        String scheme = name;
-        if (name.contains(":"))
-        {
-            scheme = name.substring(0, name.indexOf(":"));
-        }
-
-        Properties props = SpiUtils.findServiceDescriptor(type, scheme);
-        if (props == null)
-        {
-            throw new ServiceException(CoreMessages.failedToLoad(type + " " + scheme));
-        }
-
-        return ServiceDescriptorFactory.create(type, name, props, overrides, muleContext,
-                muleContext.getExecutionClassLoader());
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void registerAgent(Agent agent) throws MuleException
     {
         registry.registerObject(getName(agent), agent, Agent.class);
-    }
-
-    @Override
-    public void registerConnector(Connector connector) throws MuleException
-    {
-        registry.registerObject(getName(connector), connector, Connector.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException
-    {
-        registry.registerObject(getName(endpoint), endpoint, ImmutableEndpoint.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException
-    {
-        registry.registerObject(name, builder, EndpointBuilder.class);
     }
 
     /**

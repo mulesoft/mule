@@ -10,9 +10,10 @@ package org.mule.runtime.module.db.integration.config;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class DatasourcePoolingLimitTestCase extends AbstractDatasourcePoolingTes
             flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
             flowRunner("dataSourcePooling").withPayload(TEST_MESSAGE).asynchronously().run();
 
-            LocalMuleClient client = muleContext.getClient();
+            MuleClient client = muleContext.getClient();
             MuleMessage response = client.request("test://connectionError", RECEIVE_TIMEOUT);
 
             assertThat(response.getExceptionPayload().getException(), is(instanceOf(MessagingException.class)));

@@ -9,9 +9,10 @@ package org.mule.runtime.module.db.integration.select;
 
 import static org.mule.runtime.module.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.runtime.module.db.integration.TestRecordUtil.getAllPlanetRecords;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.runtime.module.db.integration.TestDbConfig;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
@@ -46,7 +47,7 @@ public class SelectDefaultTestCase extends AbstractDbIntegrationTestCase
     {
         flowRunner("defaultQueryOneWay").withPayload(TEST_MESSAGE).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
         assertMessageContains(response, getAllPlanetRecords());

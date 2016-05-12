@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.message.OutputHandler;
@@ -41,8 +40,6 @@ import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.ws.BindingProvider;
@@ -76,13 +73,11 @@ public class MuleUniversalConduit extends AbstractConduit
 
     private EndpointInfo endpoint;
 
-    private CxfConfiguration configuration;
+    protected CxfConfiguration configuration;
 
     private MuleUniversalTransport transport;
 
     private boolean closeInput = true;
-
-    private Map<String, OutboundEndpoint> endpoints = new HashMap<String, OutboundEndpoint>();
 
     /**
      * @param ei The Endpoint being invoked by this destination.
@@ -154,8 +149,6 @@ public class MuleUniversalConduit extends AbstractConduit
         // are we sending an out of band response for a server side request?
         boolean decoupled = event != null && message.getExchange().getInMessage() != null;
         
-        OutboundEndpoint ep = null;
-
         if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled)
         {
             // we've got an out of band WS-RM message or a message from a standalone client
@@ -163,12 +156,10 @@ public class MuleUniversalConduit extends AbstractConduit
             MuleMessage muleMsg = new DefaultMuleMessage(handler, muleContext);
             
             String url = setupURL(message);
-            
+
             try
             {
-                ep = getEndpoint(muleContext, url);
-                event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), (FlowConstruct) null);
-                // event = new DefaultMuleEvent(muleMsg, (FlowConstruct) null);
+                event = new DefaultMuleEvent(muleMsg, (FlowConstruct) null);
             }
             catch (Exception e)
             {
@@ -187,7 +178,6 @@ public class MuleUniversalConduit extends AbstractConduit
         message.put(CxfConstants.MULE_EVENT, event);
         
         final MuleEvent finalEvent = event;
-        final OutboundEndpoint finalEndpoint = ep;
         AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM)
         {
             @Override
@@ -195,7 +185,7 @@ public class MuleUniversalConduit extends AbstractConduit
             {
                 try
                 {
-                    dispatchMuleMessage(m, finalEvent, finalEndpoint);
+                    dispatchMuleMessage(m, finalEvent);
                 }
                 catch (MuleException e)
                 {
@@ -204,18 +194,6 @@ public class MuleUniversalConduit extends AbstractConduit
             }
         };
         message.getInterceptorChain().add(i);
-    }
-
-    protected synchronized OutboundEndpoint getEndpoint(MuleContext muleContext, String uri) throws MuleException
-    {
-        if (endpoints.get(uri) != null)
-        {
-            return endpoints.get(uri);
-        }
-
-        OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(uri);
-        endpoints.put(uri, endpoint);
-        return endpoint;
     }
 
     public String setupURL(Message message) throws MalformedURLException
@@ -247,7 +225,7 @@ public class MuleUniversalConduit extends AbstractConduit
         return result;
     }
     
-    protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws MuleException
+    protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent) throws MuleException
     {
         try
         {
@@ -282,7 +260,7 @@ public class MuleUniversalConduit extends AbstractConduit
             // Update RequestContext ThreadLocal for backwards compatibility
             OptimizedRequestContext.unsafeSetEvent(reqEvent);
 
-            MuleEvent resEvent = processNext(reqEvent, m.getExchange(), endpoint);
+            MuleEvent resEvent = processNext(reqEvent, m.getExchange());
 
             if (!resEvent.equals(NonBlockingVoidMuleEvent.getInstance()))
             {
@@ -299,7 +277,7 @@ public class MuleUniversalConduit extends AbstractConduit
         }
     }
 
-    private void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException
+    protected void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException
     {
         if (resEvent != null && !VoidMuleEvent.getInstance().equals(resEvent))
         {
@@ -377,27 +355,15 @@ public class MuleUniversalConduit extends AbstractConduit
         // template method
     }
     
-    protected MuleEvent processNext(MuleEvent event,
-                                    Exchange exchange, OutboundEndpoint endpoint) throws MuleException
+    protected MuleEvent processNext(MuleEvent event, Exchange exchange) throws MuleException
     {
         CxfOutboundMessageProcessor processor = (CxfOutboundMessageProcessor) exchange.get(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR);
         MuleEvent response;
-        if (processor == null)
-        {
-            response = endpoint.process(event);
-        }
-        else
-        {
-            response = processor.processNext(event);
+        response = processor.processNext(event);
 
-            Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
-            holder.value = response;
-        }
+        Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
+        holder.value = response;
 
-        // response = processor.processNext(event);
-        //
-        // Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
-        // holder.value = response;
         return response;
     }
 

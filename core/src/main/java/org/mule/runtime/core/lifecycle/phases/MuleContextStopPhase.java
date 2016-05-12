@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.lifecycle.LifecycleObject;
 import org.mule.runtime.core.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.util.queue.QueueManager;
@@ -60,7 +60,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         // Stop in the opposite order to start
         stopOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        stopOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Config.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));

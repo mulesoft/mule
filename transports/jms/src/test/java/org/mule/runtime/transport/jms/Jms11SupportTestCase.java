@@ -12,9 +12,7 @@ import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.transport.jms.Jms11Support;
-import org.mule.runtime.transport.jms.JmsConnector;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
@@ -23,7 +21,7 @@ import javax.jms.Topic;
 
 import org.junit.Test;
 
-public class Jms11SupportTestCase extends AbstractMuleContextTestCase
+public class Jms11SupportTestCase extends AbstractMuleContextEndpointTestCase
 {
     @Test
     public void testNoLocalCalledForDurableTopic() throws Exception

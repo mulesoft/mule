@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transport.Connector;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.connector.EndpointConnectException;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transaction.XaTransaction;
@@ -217,13 +217,13 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                 }
                 catch (JMSException e)
                 {
-                    throw new ConnectException(e, XaTransactedJmsMessageReceiver.this);
+                    throw new EndpointConnectException(e, XaTransactedJmsMessageReceiver.this);
                 }
                 catch (Exception e)
                 {
                     if (e.getCause() != null && e.getCause() instanceof JMSException)
                     {
-                        throw new ConnectException(e.getCause(), XaTransactedJmsMessageReceiver.this);
+                        throw new EndpointConnectException(e.getCause(), XaTransactedJmsMessageReceiver.this);
                     }
                     else
                     {
@@ -474,7 +474,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         }
         catch (JMSException e)
         {
-            throw new ConnectException(e, this);
+            throw new EndpointConnectException(e, this);
         }
     }
 }

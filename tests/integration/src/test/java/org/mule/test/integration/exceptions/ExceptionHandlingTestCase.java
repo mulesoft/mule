@@ -13,10 +13,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.LocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -24,8 +26,6 @@ import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
-import org.mule.functional.functional.FlowAssert;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,7 +34,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class ExceptionHandlingTestCase extends FunctionalTestCase
 {
@@ -71,7 +70,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     {
         flowRunner("outboundEndpointInFlow").withPayload(TEST_MESSAGE).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outFlow2", 3000);
         assertNotNull(response);
     }
@@ -81,7 +80,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     {
         flowRunner("outboundDynamicEndpointInFlow").withPayload(MESSAGE).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outFlow3", 3000);
         assertNotNull(response);
     }
@@ -91,7 +90,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     {
         flowRunner("asyncInFlow").withPayload(MESSAGE).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outFlow4", 3000);
         assertNotNull(response);
         assertTrue(injectedMessagingExceptionHandler instanceof CatchMessagingExceptionStrategy);
@@ -102,7 +101,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     {
         flowRunner("untilSuccessfulInFlow").withPayload(MESSAGE).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outFlow5", 3000);
 
         assertNotNull(response);
@@ -129,7 +128,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         list.add(MESSAGE);
         flowRunner("outboundEndpointInScope").withPayload(list).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outScope2", 3000);
 
         assertNotNull(response);
@@ -149,7 +148,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
                                                     .asynchronously()
                                                     .run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outScope3", 3000);
 
         assertNotNull(response);
@@ -164,7 +163,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     {
         flowRunner("customProcessorInTransactionalScope").withPayload(MESSAGE).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outTransactional1", 3000);
 
         assertNotNull(response);
@@ -204,7 +203,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
     {
         flowRunner("customProcessorInExceptionStrategy").withPayload(MESSAGE).asynchronously().run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://outStrategy1",3000);
 
         assertNotNull(response);
@@ -261,7 +260,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
                             .asynchronously()
                             .run();
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.request(expected, 3000);
 
         assertNotNull(response);

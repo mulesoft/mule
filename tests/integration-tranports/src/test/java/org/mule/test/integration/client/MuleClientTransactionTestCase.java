@@ -9,11 +9,14 @@ package org.mule.test.integration.client;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.registry.MuleRegistryTransportHelper.registerEndpoint;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleEndpointProperties;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.endpoint.EndpointBuilder;
+import org.mule.runtime.core.api.endpoint.EndpointFactory;
 import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -64,9 +67,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             new URIBuilder("jms://test.queue", muleContext));
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
-        ImmutableEndpoint inboundEndpoint = muleContext.getEndpointFactory()
-                .getOutboundEndpoint(endpointBuilder);
-        client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
+        ImmutableEndpoint inboundEndpoint = getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+        registerEndpoint(client.getMuleContext().getRegistry(), inboundEndpoint);
 
         ExecutionTemplate<Void> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, tc);
         executionTemplate.execute(new ExecutionCallback<Void>()
@@ -113,9 +115,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             new URIBuilder("jms://test.queue", muleContext));
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
-        ImmutableEndpoint inboundEndpoint = muleContext.getEndpointFactory()
-                .getOutboundEndpoint(endpointBuilder);
-        client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
+        ImmutableEndpoint inboundEndpoint = getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+        registerEndpoint(client.getMuleContext().getRegistry(), inboundEndpoint);
 
         ExecutionTemplate<Void> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, tc);
         try
@@ -168,9 +169,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             new URIBuilder("jms://test.queue", muleContext));
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
-        ImmutableEndpoint inboundEndpoint = muleContext.getEndpointFactory()
-                .getOutboundEndpoint(endpointBuilder);
-        client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
+        ImmutableEndpoint inboundEndpoint = getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+        registerEndpoint(client.getMuleContext().getRegistry(), inboundEndpoint);
 
         ExecutionTemplate<Void> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, tc);
         executionTemplate.execute(new ExecutionCallback<Void>()
@@ -214,6 +214,11 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
                 return null;
             }
         });
+    }
+
+    public EndpointFactory getEndpointFactory()
+    {
+        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
 }

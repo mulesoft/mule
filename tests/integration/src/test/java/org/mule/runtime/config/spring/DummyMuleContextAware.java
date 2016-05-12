@@ -11,7 +11,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -64,18 +63,6 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
     public Class getReturnClass()
     {
         return null;
-    }
-
-    @Override
-    public ImmutableEndpoint getEndpoint()
-    {
-        return null;
-    }
-
-    @Override
-    public void setEndpoint(ImmutableEndpoint endpoint)
-    {
-        // empty
     }
 
     @Override

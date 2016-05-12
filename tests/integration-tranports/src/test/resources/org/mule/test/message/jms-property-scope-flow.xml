@@ -3,10 +3,12 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <jms:activemq-connector name="test"/>
 
@@ -14,10 +16,10 @@
 
     <flow name="foo">
 
-        <inbound-endpoint ref="inbound">
+        <transports:inbound-endpoint ref="inbound">
             <append-string-transformer message=" bar"/>
             <set-property propertyName="foo" value="#[message.inboundProperties.foo]"/>
-        </inbound-endpoint>
+        </transports:inbound-endpoint>
 
 
         <echo-component/>

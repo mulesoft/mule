@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -52,7 +51,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         };
         processor.setListener(messageProcessor);
         
-        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        MuleEvent event = getTestEvent(msg);
         
         MuleEvent response = processor.process(event);
         
@@ -82,7 +81,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         };
         processor.setListener(messageProcessor);
         
-        MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        MuleEvent event = getTestEvent(msg);
         
         MuleEvent response = processor.process(event);
         
