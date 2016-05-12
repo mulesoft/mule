@@ -6,17 +6,17 @@
  */
 package org.mule.transport.http.components;
 
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.NonBlockingSupported;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.AbstractMessageProcessorOwner;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.transport.http.CacheControlHeader;
 import org.mule.transport.http.CookieHelper;
 import org.mule.transport.http.CookieWrapper;
@@ -85,11 +85,11 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
         propagateMessageProperties(httpResponse, msg);
         checkVersion(msg);
-        setStatus(httpResponse, msg);
-        setContentType(httpResponse, msg);
-        setHeaders(httpResponse, msg);
-        setCookies(httpResponse, msg);
-        setCacheControl(httpResponse, msg);
+        setStatus(httpResponse, event);
+        setContentType(httpResponse, event);
+        setHeaders(httpResponse, event);
+        setCookies(httpResponse, event);
+        setCacheControl(httpResponse, event);
         setDateHeader(httpResponse, new Date());
         setBody(httpResponse, msg, event);
 
@@ -230,11 +230,11 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     }
 
 
-    protected void setCacheControl(HttpResponse response, MuleMessage message)
+    protected void setCacheControl(HttpResponse response, MuleEvent event)
     {
         if(cacheControl != null)
         {
-            cacheControl.parse(message, muleContext.getExpressionManager());
+            cacheControl.parse(event, muleContext.getExpressionManager());
             String cacheControlValue = cacheControl.toString();
             if(!"".equals(cacheControlValue))
             {
@@ -251,7 +251,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         }
     }
 
-    protected void setCookies(HttpResponse response, MuleMessage message) throws MuleException
+    protected void setCookies(HttpResponse response, MuleEvent event) throws MuleException
     {
         if(!cookies.isEmpty())
         {
@@ -259,7 +259,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
             {
                 try
                 {
-                    cookie.parse(message, muleContext.getExpressionManager());
+                    cookie.parse(event, muleContext.getExpressionManager());
                     response.addHeader(new Header(HttpConstants.HEADER_COOKIE_SET,
                                                    CookieHelper.formatCookieForASetCookieHeader(cookie.createCookie())));
 
@@ -273,21 +273,21 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         }
     }
 
-    protected void setHeaders(HttpResponse response, MuleMessage message)
+    protected void setHeaders(HttpResponse response, MuleEvent event)
     {
         if(headers != null && !headers.isEmpty())
         {
             for(String headerName : headers.keySet())
             {
-                String name = parse(headerName, message);
+                String name = parse(headerName, event);
                 String value = headers.get(headerName);
                 if(HttpConstants.HEADER_EXPIRES.equals(name))
                 {
-                    response.setHeader(new Header(name, evaluateDate(value, message)));
+                    response.setHeader(new Header(name, evaluateDate(value, event)));
                 }
                 else
                 {
-                    response.setHeader(new Header(name, parse(value, message)));
+                    response.setHeader(new Header(name, parse(value, event)));
                 }
             }
         }
@@ -302,13 +302,13 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         }
     }
 
-    private void setStatus(HttpResponse response, MuleMessage message) throws MuleException
+    private void setStatus(HttpResponse response, MuleEvent event) throws MuleException
     {
         if(status != null)
         {
             try
             {
-                response.setStatusLine(HttpVersion.parse(version), Integer.valueOf(parse(status, message)));
+                response.setStatusLine(HttpVersion.parse(version), Integer.valueOf(parse(status, event)));
             }
             catch(ProtocolException e)
             {
@@ -317,32 +317,32 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         }
     }
 
-    protected void setContentType(HttpResponse response, MuleMessage message)
+    protected void setContentType(HttpResponse response, MuleEvent event)
     {
         if(contentType == null)
         {
-            contentType = getDefaultContentType(message);
+            contentType = getDefaultContentType(event.getMessage());
 
         }
-        response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, parse(contentType, message)));
+        response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, parse(contentType, event)));
     }
 
-    private String parse(String value, MuleMessage message)
+    private String parse(String value, MuleEvent event)
     {
         if(value != null)
         {
-            return muleContext.getExpressionManager().parse(value, message);
+            return muleContext.getExpressionManager().parse(value, event);
         }
         return value;
     }
 
-    private String evaluateDate(String value, MuleMessage message)
+    private String evaluateDate(String value, MuleEvent event)
     {
         Object realValue = value;
 
         if (value != null && muleContext.getExpressionManager().isExpression(value))
         {
-            realValue = muleContext.getExpressionManager().evaluate(value, message);
+            realValue = muleContext.getExpressionManager().evaluate(value, event);
         }
 
         if(realValue instanceof Date)

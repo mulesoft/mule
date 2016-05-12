@@ -6,9 +6,9 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.transport.NoReceiverForEndpointException;
+import org.mule.runtime.core.api.transport.NoReceiverForEndpointException;
+import org.mule.runtime.core.util.monitor.Expirable;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.util.monitor.Expirable;
 
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;

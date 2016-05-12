@@ -6,12 +6,12 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.transport.Connector;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.util.MapUtils;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.util.MapUtils;
 
 public class PollingHttpsMessageReceiver extends PollingHttpMessageReceiver
 {

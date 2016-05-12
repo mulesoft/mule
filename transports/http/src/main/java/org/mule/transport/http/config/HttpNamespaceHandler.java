@@ -7,21 +7,21 @@
 package org.mule.transport.http.config;
 
 
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
-import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.generic.TextDefinitionParser;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
-import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
-import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
-import org.mule.endpoint.URIBuilder;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.TextDefinitionParser;
+import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.FilterDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
+import org.mule.runtime.core.endpoint.URIBuilder;
 import org.mule.transport.http.CacheControlHeader;
 import org.mule.transport.http.CookieWrapper;
 import org.mule.transport.http.HttpConnector;
@@ -48,7 +48,7 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
  * This namespace handler now extends HttpNamespaceHandler from mule-module-http so that both projects can
  * register bean definition parsers for the same namespace (http).
  */
-public class HttpNamespaceHandler extends org.mule.module.http.internal.config.HttpNamespaceHandler
+public class HttpNamespaceHandler extends org.mule.runtime.module.http.internal.config.HttpNamespaceHandler
 {
     public static final String HTTP_TRANSPORT_DEPRECATION_MESSAGE = "HTTP transport is deprecated and will be removed in Mule 4.0. Use HTTP module instead.";
 

@@ -10,11 +10,11 @@ import static org.mule.transport.http.HttpConstants.FORM_URLENCODED_CONTENT_TYPE
 import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.METHOD_GET;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageTransformer;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -33,14 +33,14 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         Map<String, Object> paramMap = new HashMap<String, Object>();
 
         try
         {
-            String httpMethod = message.getInboundProperty("http.method");
-            String contentType = message.getInboundProperty(HEADER_CONTENT_TYPE);
+            String httpMethod = event.getMessage().getInboundProperty("http.method");
+            String contentType = event.getMessage().getInboundProperty(HEADER_CONTENT_TYPE);
 
             boolean isGet = METHOD_GET.equalsIgnoreCase(httpMethod);
             boolean isFormUrlEncoded = false;
@@ -57,12 +57,12 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
             String queryString;
             if (isGet)
             {
-                URI uri = new URI(muleContext.getTransformationService().getPayloadAsString(message, outputEncoding));
+                URI uri = new URI(event.getMessageAsString(outputEncoding));
                 queryString = uri.getRawQuery();
             }
             else
             {
-                queryString = new String(muleContext.getTransformationService().getPayloadAsBytes(message));
+                queryString = new String(event.getMessageAsString());
             }
 
             if (StringUtils.isNotBlank(queryString))

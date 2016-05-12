@@ -6,8 +6,8 @@
  */
 package org.mule.transport.http.filters;
 
-import org.mule.api.MuleMessage;
-import org.mule.routing.filters.WildcardFilter;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.transport.http.HttpConnector;
 
 /**

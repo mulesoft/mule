@@ -6,8 +6,8 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.util.Properties;
 

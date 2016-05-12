@@ -6,9 +6,9 @@
  */
 package org.mule.transport.http.servlet;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -46,76 +46,92 @@ public class MuleHttpServletResponse implements HttpServletResponse
         this.message = event.getMessage();
     }
     
+    @Override
     public String getCharacterEncoding()
     {
         return event.getEncoding();
     }
 
+    @Override
     public String getContentType()
     {
         return message.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
     }
 
+    @Override
     public ServletOutputStream getOutputStream() throws IOException
     {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public PrintWriter getWriter() throws IOException
     {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void setCharacterEncoding(String charset)
     {
         message.setEncoding(charset);
     }
 
+    @Override
     public void setContentLength(int len)
     {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void setContentType(String type)
     {
         message.setProperty(HttpConstants.HEADER_CONTENT_TYPE, type, PropertyScope.OUTBOUND);
     }
 
+    @Override
     public void setBufferSize(int size)
     {
     }
 
+    @Override
     public int getBufferSize()
     {
         return 0;
     }
 
+    @Override
     public void flushBuffer() throws IOException
     {
     }
 
+    @Override
     public void resetBuffer()
     {
     }
 
+    @Override
     public boolean isCommitted()
     {
         return false;
     }
 
+    @Override
     public void reset()
     {
     }
 
+    @Override
     public void setLocale(Locale loc)
     {
     }
 
+    @Override
     public Locale getLocale()
     {
         return null;
     }
 
+    @Override
     public void addCookie(Cookie cookie)
     {
         org.apache.commons.httpclient.Cookie internal = toHttpClientCookie(cookie);
@@ -149,45 +165,54 @@ public class MuleHttpServletResponse implements HttpServletResponse
         return internal;
     }
 
+    @Override
     public boolean containsHeader(String name)
     {
         return message.getOutboundProperty(name) != null;
     }
 
+    @Override
     public String encodeURL(String url)
     {
         return null;
     }
 
+    @Override
     public String encodeRedirectURL(String url)
     {
         return null;
     }
 
+    @Override
     public String encodeUrl(String url)
     {
         return null;
     }
 
+    @Override
     public String encodeRedirectUrl(String url)
     {
         return null;
     }
 
+    @Override
     public void sendError(int sc, String msg) throws IOException
     {
     }
 
+    @Override
     public void sendError(int sc) throws IOException
     {
     }
 
+    @Override
     public void sendRedirect(String location) throws IOException
     {
         setStatus(302);
         setHeader("Location", location);
     }
 
+    @Override
     public void setDateHeader(String name, long date)
     {
         StringBuilder buf = new StringBuilder();
@@ -197,6 +222,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
         message.setOutboundProperty(name, buf.toString());
     }
 
+    @Override
     public void addDateHeader(String name, long date)
     {
         setDateHeader(name, date);
@@ -262,31 +288,37 @@ public class MuleHttpServletResponse implements HttpServletResponse
         buf.append((char) (i % 10 + 48));
     }
     
+    @Override
     public void setHeader(String name, String value)
     {
         message.setOutboundProperty(name, value);
     }
 
+    @Override
     public void addHeader(String name, String value)
     {
         message.setOutboundProperty(name, value);
     }
 
+    @Override
     public void setIntHeader(String name, int value)
     {
         message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, value);
     }
 
+    @Override
     public void addIntHeader(String name, int value)
     {
         message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, value);
     }
 
+    @Override
     public void setStatus(int sc)
     {
         message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, sc);
     }
 
+    @Override
     public void setStatus(int sc, String sm)
     {
         message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, sc);

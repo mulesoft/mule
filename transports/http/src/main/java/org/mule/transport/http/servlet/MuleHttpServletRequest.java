@@ -6,8 +6,8 @@
  */
 package org.mule.transport.http.servlet;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
@@ -53,36 +53,43 @@ public class MuleHttpServletRequest implements HttpServletRequest
         this.message = event.getMessage();
     }
 
+    @Override
     public Object getAttribute(String name)
     {
         return null;
     }
 
+    @Override
     public Enumeration getAttributeNames()
     {
         return null;
     }
 
+    @Override
     public String getCharacterEncoding()
     {
         return event.getEncoding();
     }
 
+    @Override
     public void setCharacterEncoding(String env) throws UnsupportedEncodingException
     {
         message.setEncoding(env);
     }
 
+    @Override
     public int getContentLength()
     {
         return -1;
     }
 
+    @Override
     public String getContentType()
     {
         return message.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
     }
 
+    @Override
     public ServletInputStream getInputStream() throws IOException
     {
         return new ServletInputStream()
@@ -96,119 +103,143 @@ public class MuleHttpServletRequest implements HttpServletRequest
         };
     }
 
+    @Override
     public String getParameter(String name)
     {
         return null;
     }
 
+    @Override
     public Enumeration getParameterNames()
     {
         return null;
     }
 
+    @Override
     public String[] getParameterValues(String name)
     {
         return null;
     }
 
+    @Override
     public Map getParameterMap()
     {
         return null;
     }
 
+    @Override
     public String getProtocol()
     {
         return null;
     }
 
+    @Override
     public String getScheme()
     {
         return event.getMessageSourceURI().getScheme();
     }
 
+    @Override
     public String getServerName()
     {
         return message.getInboundProperty(HttpConstants.HEADER_HOST);
     }
 
+    @Override
     public int getServerPort()
     {
         return 0;
     }
 
+    @Override
     public BufferedReader getReader() throws IOException
     {
         return null;
     }
 
+    @Override
     public String getRemoteAddr()
     {
         return null;
     }
 
+    @Override
     public String getRemoteHost()
     {
         return null;
     }
 
+    @Override
     public void setAttribute(String name, Object o)
     {
     }
 
+    @Override
     public void removeAttribute(String name)
     {
     }
 
+    @Override
     public Locale getLocale()
     {
         return null;
     }
 
+    @Override
     public Enumeration getLocales()
     {
         return null;
     }
 
+    @Override
     public boolean isSecure()
     {
         return false;
     }
 
+    @Override
     public RequestDispatcher getRequestDispatcher(String path)
     {
         return null;
     }
 
+    @Override
     public String getRealPath(String path)
     {
         return null;
     }
 
+    @Override
     public int getRemotePort()
     {
         return 0;
     }
 
+    @Override
     public String getLocalName()
     {
         return null;
     }
 
+    @Override
     public String getLocalAddr()
     {
         return null;
     }
 
+    @Override
     public int getLocalPort()
     {
         return 0;
     }
 
+    @Override
     public String getAuthType()
     {
         return null;
     }
 
+    @Override
     public Cookie[] getCookies()
     {
         org.apache.commons.httpclient.Cookie[] cookies = message.getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
@@ -226,37 +257,44 @@ public class MuleHttpServletRequest implements HttpServletRequest
         return servletCookies;
     }
 
+    @Override
     public long getDateHeader(String name)
     {
         return 0;
     }
 
+    @Override
     public String getHeader(String name)
     {
         return message.getInboundProperty(name);
     }
 
+    @Override
     public Enumeration getHeaders(String name)
     {
         return new IteratorEnumeration(Arrays.asList(getHeader(name)).iterator());
     }
 
+    @Override
     public Enumeration getHeaderNames()
     {
         Iterator<String> iterator = message.getInboundPropertyNames().iterator();
         return new IteratorEnumeration(iterator);
     }
 
+    @Override
     public int getIntHeader(String name)
     {
         return 0;
     }
 
+    @Override
     public String getMethod()
     {
         return message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
     }
 
+    @Override
     public String getPathInfo()
     {
         String req = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
@@ -269,16 +307,19 @@ public class MuleHttpServletRequest implements HttpServletRequest
         return pathInfo;
     }
 
+    @Override
     public String getPathTranslated()
     {
         return null;
     }
 
+    @Override
     public String getContextPath()
     {
         return message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
     }
 
+    @Override
     public String getQueryString()
     {
         String req = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
@@ -291,67 +332,80 @@ public class MuleHttpServletRequest implements HttpServletRequest
         return null;
     }
 
+    @Override
     public String getRemoteUser()
     {
         return null;
     }
 
+    @Override
     public boolean isUserInRole(String role)
     {
         return false;
     }
 
+    @Override
     public Principal getUserPrincipal()
     {
         return null;
     }
 
+    @Override
     public String getRequestedSessionId()
     {
         return null;
     }
 
+    @Override
     public String getRequestURI()
     {
         return message.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
     }
 
+    @Override
     public StringBuffer getRequestURL()
     {
         return null;
     }
 
+    @Override
     public String getServletPath()
     {
         // assume contextpath as we have no servlet path
         return message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
     }
 
+    @Override
     public HttpSession getSession(boolean create)
     {
         return null;
     }
 
+    @Override
     public HttpSession getSession()
     {
         return null;
     }
 
+    @Override
     public boolean isRequestedSessionIdValid()
     {
         return false;
     }
 
+    @Override
     public boolean isRequestedSessionIdFromCookie()
     {
         return false;
     }
 
+    @Override
     public boolean isRequestedSessionIdFromURL()
     {
         return false;
     }
 
+    @Override
     public boolean isRequestedSessionIdFromUrl()
     {
         return false;

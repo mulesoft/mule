@@ -7,7 +7,9 @@
 package org.mule.transport.http;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.endpoint.EndpointURI;
@@ -15,17 +17,19 @@ import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transport.MessageDispatcher;
 import org.mule.runtime.core.api.transport.MessageReceiver;
 import org.mule.runtime.core.api.transport.NoReceiverForEndpointException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transport.MessageDispatcherUtils;
+import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.OneTimeWarning;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.transport.http.config.HttpNamespaceHandler;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.ntlm.NTLMScheme;
-import org.mule.transport.tcp.TcpConnector;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -117,7 +121,7 @@ public class HttpConnector extends TcpConnector
     /**
      * The path and query portions of the URL being accessed.
      */
-    public static final String HTTP_REQUEST_PROPERTY = HTTP_PREFIX + "request";
+    public static final String HTTP_REQUEST_PROPERTY = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PROPERTY;
 
     /**
      * The path portion of the URL being accessed. No query string is included.
@@ -128,7 +132,7 @@ public class HttpConnector extends TcpConnector
      * The context path of the endpoint being accessed. This is the path that the
      * HTTP endpoint is listening on.
      */
-    public static final String HTTP_CONTEXT_PATH_PROPERTY = HTTP_PREFIX + "context.path";
+    public static final String HTTP_CONTEXT_PATH_PROPERTY = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_CONTEXT_PATH_PROPERTY;
 
     /**
      * The context URI of the endpoint being accessed. This is the address that the
@@ -154,7 +158,7 @@ public class HttpConnector extends TcpConnector
     public static final String DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY = "body";
     public static final String HTTP_POST_BODY_PARAM_PROPERTY = HTTP_PREFIX + "post.body.param";
 
-    public static final String HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK = HTTP_PREFIX + "disable.status.code.exception.check";
+    public static final String HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
     public static final String HTTP_ENCODE_PARAMVALUE = HTTP_PREFIX + "encode.paramvalue";
 
     public static final Set<String> HTTP_INBOUND_PROPERTIES;

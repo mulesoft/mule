@@ -19,7 +19,7 @@ package org.mule.transport.http.multipart;
 // ========================================================================
 
 
-import org.mule.model.streaming.DeleteOnCloseFileInputStream;
+import org.mule.runtime.core.model.streaming.DeleteOnCloseFileInputStream;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -158,6 +158,7 @@ public class MultiPartInputStream
         /**
          * @see Part#getContentType()
          */
+        @Override
         public String getContentType()
         {
             return _contentType;
@@ -166,6 +167,7 @@ public class MultiPartInputStream
         /**
          * @see Part#getHeader(java.lang.String)
          */
+        @Override
         public String getHeader(String name)
         {
             return (String)_headers.getValue(name, 0);
@@ -174,6 +176,7 @@ public class MultiPartInputStream
         /**
          * @see Part#getHeaderNames()
          */
+        @Override
         public Collection<String> getHeaderNames()
         {
             return _headers.keySet();
@@ -182,6 +185,7 @@ public class MultiPartInputStream
         /**
          * @see Part#getHeaders(java.lang.String)
          */
+        @Override
         public Collection<String> getHeaders(String name)
         {
            return _headers.getValues(name);
@@ -190,6 +194,7 @@ public class MultiPartInputStream
         /**
          * @see Part#getInputStream()
          */
+        @Override
         public InputStream getInputStream() throws IOException
         {
            if (_file != null)
@@ -207,6 +212,7 @@ public class MultiPartInputStream
         /**
          * @see Part#getName()
          */
+        @Override
         public String getName()
         {
            return _name;
@@ -215,6 +221,7 @@ public class MultiPartInputStream
         /**
          * @see Part#getSize()
          */
+        @Override
         public long getSize()
         {
             return _size;
@@ -223,6 +230,7 @@ public class MultiPartInputStream
         /**
          * @see Part#write(java.lang.String)
          */
+        @Override
         public void write(String fileName) throws IOException
         {
             if (_file == null)
@@ -252,6 +260,7 @@ public class MultiPartInputStream
         /**
          * @see Part#delete()
          */
+        @Override
         public void delete() throws IOException
         {
             if (_file != null)

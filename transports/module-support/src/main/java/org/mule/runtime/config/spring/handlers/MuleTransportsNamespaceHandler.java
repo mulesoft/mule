@@ -19,6 +19,7 @@ import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefi
 import org.mule.runtime.config.spring.parsers.specific.ExceptionStrategyDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ResponseDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
@@ -39,6 +40,7 @@ import org.mule.runtime.module.cxf.component.WebServiceWrapperComponent;
 import org.mule.runtime.module.cxf.config.JaxWsClientWithDecoupledEndpointFactoryBean;
 import org.mule.runtime.module.cxf.config.ProxyClientWithDecoupledEndpointFactoryBean;
 import org.mule.runtime.module.cxf.config.SimpleClientWithDecoupledEndpointFactoryBean;
+import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
 
 public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
 {

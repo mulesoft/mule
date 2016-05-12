@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.transport.http.HttpConnector;
+import org.mule.runtime.module.http.api.HttpConstants;
 
 public class HttpTransportRequestPropertyManager extends HttpRequestPropertyManager
 {
@@ -17,7 +17,7 @@ public class HttpTransportRequestPropertyManager extends HttpRequestPropertyMana
     @Override
     public String getRequestPath(MuleMessage message)
     {
-        String requestPath = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY);
+        String requestPath = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY);
         if (requestPath.equals(StringUtils.EMPTY))
         {
             requestPath = super.getRequestPath(message);
@@ -39,7 +39,7 @@ public class HttpTransportRequestPropertyManager extends HttpRequestPropertyMana
     @Override
     public String getBasePath(MuleMessage message)
     {
-        String basePath = message.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
+        String basePath = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_CONTEXT_PATH_PROPERTY);
         if (basePath == null)
         {
             basePath = super.getBasePath(message);

@@ -6,9 +6,9 @@
  */
 package org.mule.transport.http.transformers;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -26,11 +26,11 @@ public class FormTransformer extends AbstractMessageTransformer
 {
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         try
         {
-            String v = muleContext.getTransformationService().getPayloadAsString(message);
+            String v = event.getMessageAsString();
             Map<String, Object> values = new HashMap<String, Object>();
 
             for (StringTokenizer st = new StringTokenizer(v, "&"); st.hasMoreTokens();)

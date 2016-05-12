@@ -35,8 +35,8 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-http</artifactId>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -129,6 +129,11 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

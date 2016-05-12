@@ -6,13 +6,13 @@
  */
 package org.mule.transport.http.transformers;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.transformer.DiscoverableTransformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.OutputHandler;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +38,7 @@ public class ServletRequestToOutputHandler extends AbstractTransformer implement
     {
             return new OutputHandler()
             {
+                @Override
                 public void write(MuleEvent event, OutputStream out) throws IOException
                 {
                     InputStream is = ((HttpServletRequest) src).getInputStream();
@@ -59,6 +60,7 @@ public class ServletRequestToOutputHandler extends AbstractTransformer implement
      * @return the priority weighting for this transformer. This is a value between
      *         {@link #MIN_PRIORITY_WEIGHTING} and {@link #MAX_PRIORITY_WEIGHTING}.
      */
+    @Override
     public int getPriorityWeighting()
     {
         return priorityWeighting;
@@ -70,6 +72,7 @@ public class ServletRequestToOutputHandler extends AbstractTransformer implement
      * @param weighting the priority weighting for this transformer. This is a value between
      *                  {@link #MIN_PRIORITY_WEIGHTING} and {@link #MAX_PRIORITY_WEIGHTING}.
      */
+    @Override
     public void setPriorityWeighting(int weighting)
     {
         priorityWeighting = weighting;

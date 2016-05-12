@@ -7,7 +7,7 @@
 package org.mule.transport.http;
 
 
-import org.mule.util.IOUtils;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

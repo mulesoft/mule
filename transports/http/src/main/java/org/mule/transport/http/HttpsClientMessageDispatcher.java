@@ -6,7 +6,7 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 
 import java.net.URI;
 import java.security.GeneralSecurityException;

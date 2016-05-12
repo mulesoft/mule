@@ -6,7 +6,7 @@
  */
 package org.mule.transport.http;
 
-import org.mule.model.streaming.DelegatingInputStream;
+import org.mule.runtime.core.model.streaming.DelegatingInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +24,7 @@ public class ReleasingInputStream extends DelegatingInputStream
         this.method = method;
     }
 
+    @Override
     public void close() throws IOException 
     {
         super.close();

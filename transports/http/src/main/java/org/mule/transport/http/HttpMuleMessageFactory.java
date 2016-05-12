@@ -6,15 +6,15 @@
  */
 package org.mule.transport.http;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleMessage;
-import org.mule.api.transport.MessageTypeNotSupportedException;
-import org.mule.transport.AbstractMuleMessageFactory;
-import org.mule.util.CaseInsensitiveHashMap;
-import org.mule.util.IOUtils;
-import org.mule.util.PropertiesUtils;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transport.MessageTypeNotSupportedException;
+import org.mule.runtime.core.transport.AbstractMuleMessageFactory;
+import org.mule.runtime.core.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.PropertiesUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

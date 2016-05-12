@@ -6,10 +6,10 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.context.WorkManager;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.transport.http.i18n.HttpMessages;
 
 import java.util.concurrent.TimeUnit;

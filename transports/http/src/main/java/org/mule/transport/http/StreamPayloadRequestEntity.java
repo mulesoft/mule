@@ -6,8 +6,8 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.transport.OutputHandler;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.message.OutputHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,22 +25,26 @@ public class StreamPayloadRequestEntity implements RequestEntity
         this.event = event;
     }
 
+    @Override
     public boolean isRepeatable()
     {
         return false;
     }
 
+    @Override
     public void writeRequest(OutputStream outputStream) throws IOException
     {
         outputHandler.write(event, outputStream);
         outputStream.flush();
     }
 
+    @Override
     public long getContentLength()
     {
         return -1L;
     }
 
+    @Override
     public String getContentType()
     {
         return event.getMessage().getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE);

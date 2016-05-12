@@ -6,26 +6,26 @@
  */
 package org.mule.transport.http;
 
-import org.mule.VoidMuleEvent;
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.DataType;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.DispatchException;
-import org.mule.api.transport.OutputHandler;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.message.DefaultExceptionPayload;
-import org.mule.transformer.TransformerChain;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.transformer.TransformerChain;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transport.AbstractMessageDispatcher;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
-import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -373,11 +373,13 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
      */
     protected boolean returnException(MuleEvent event, HttpMethod httpMethod)
     {
-        String disableCheck = event.getMessage().getInvocationProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
-        if (disableCheck == null)
-        {
-            disableCheck = event.getMessage().getOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
-        }
+        // TODO
+        // String disableCheck =
+        // event.getMessage().getInvocationProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
+        // if (disableCheck == null)
+        // {
+        String disableCheck = event.getMessage().getOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
+        // }
 
         boolean throwException;
         if (disableCheck == null)

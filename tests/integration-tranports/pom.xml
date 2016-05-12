@@ -102,6 +102,7 @@
 			<scope>test</scope>
 		</dependency>
         
+        <!-- Transports under test -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
@@ -110,6 +111,11 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jms</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
             <version>${project.version}</version>
         </dependency>
         

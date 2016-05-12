@@ -53,12 +53,15 @@ public abstract class HttpConstants
         public static final String HTTP_QUERY_STRING = HTTP_PREFIX + "query.string";
         public static final String HTTP_METHOD_PROPERTY = HTTP_PREFIX + "method";
         public static final String HTTP_RELATIVE_PATH = HTTP_PREFIX + "relative.path";
+        public static final String HTTP_REQUEST_PROPERTY = HTTP_PREFIX + "request";
         public static final String HTTP_REQUEST_PATH_PROPERTY = HTTP_PREFIX + "request.path";
+        public static final String HTTP_CONTEXT_PATH_PROPERTY = HTTP_PREFIX + "context.path";
         public static final String HTTP_REQUEST_URI = HTTP_PREFIX + "request.uri";
         public static final String HTTP_REMOTE_ADDRESS = HTTP_PREFIX + "remote.address";
         public static final String HTTP_LISTENER_PATH = HTTP_PREFIX + "listener.path";
         public static final String HTTP_SCHEME = HTTP_PREFIX + "scheme";
         public static final String HTTP_CLIENT_CERTIFICATE = HTTP_PREFIX + "client.cert";
+        public static final String HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK = HTTP_PREFIX + "disable.status.code.exception.check";
     }
 
     public static final class ResponseProperties

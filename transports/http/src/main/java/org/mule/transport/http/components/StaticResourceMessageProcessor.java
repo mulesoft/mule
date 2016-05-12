@@ -6,20 +6,20 @@
  */
 package org.mule.transport.http.components;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.transport.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -62,7 +62,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         }
 
         String path = event.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
-        String contextPath = event.getMessage().getInboundProperty(org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH);
+        String contextPath = event.getMessage().getInboundProperty(org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH);
         if (contextPath == null)
         {
             //If not found then try the transport property

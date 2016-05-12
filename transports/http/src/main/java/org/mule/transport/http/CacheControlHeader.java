@@ -6,8 +6,8 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 
 import java.util.Arrays;
 
@@ -35,17 +35,17 @@ public class CacheControlHeader
     /**
      * Evaluates all the properties in case there are expressions
      *
-     * @param message MuleMessage
+     * @param event MuleEvent
      * @param expressionManager
      */
-    public void parse(MuleMessage message, ExpressionManager expressionManager)
+    public void parse(MuleEvent event, ExpressionManager expressionManager)
     {
-        directive = parse(directive, message, expressionManager);
+        directive = parse(directive, event, expressionManager);
         checkDirective(directive);
-        noCache = parse(noCache, message, expressionManager);
-        noStore = parse(noStore, message, expressionManager);
-        mustRevalidate = parse(mustRevalidate, message, expressionManager);
-        maxAge = parse(maxAge, message, expressionManager);
+        noCache = parse(noCache, event, expressionManager);
+        noStore = parse(noStore, event, expressionManager);
+        mustRevalidate = parse(mustRevalidate, event, expressionManager);
+        maxAge = parse(maxAge, event, expressionManager);
     }
 
     private void checkDirective(String directive)
@@ -89,11 +89,11 @@ public class CacheControlHeader
         return value;
     }
 
-    private String parse(String value, MuleMessage message, ExpressionManager expressionManager)
+    private String parse(String value, MuleEvent event, ExpressionManager expressionManager)
     {
         if(value != null)
         {
-            return expressionManager.parse(value, message);
+            return expressionManager.parse(value, event);
         }
         return value;
     }

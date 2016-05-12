@@ -2,6 +2,8 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:https="http://www.mulesoft.org/schema/mule/https"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
@@ -9,16 +11,13 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
-<!--       xmlns:http="http://www.mulesoft.org/schema/mule/http" -->
-<!--       xmlns:https="http://www.mulesoft.org/schema/mule/https" -->
-<!--        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd -->
-<!--        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd -->
-
-<!--     <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/> -->
-<!--     <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/> -->
+    <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
+    <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
 
     <jms:activemq-connector name="activeMq" maxRedelivery="-1"/>
     <jms:activemq-connector name="activeMqRedelivery" maxRedelivery="${maxRedelivery}"/>
@@ -97,21 +96,21 @@
        </rollback-exception-strategy>
     </flow>
 
-<!--     <flow name="httpRollbackOnly"> -->
-<!--         <http:listener path="*" config-ref="listenerConfig1"/> -->
-<!--         <test:component throwException="true"/> -->
-<!--         <rollback-exception-strategy/> -->
-<!--     </flow> -->
+    <flow name="httpRollbackOnly">
+        <http:listener path="*" config-ref="listenerConfig1"/>
+        <test:component throwException="true"/>
+        <rollback-exception-strategy/>
+    </flow>
 
-<!--     <flow name="httpWithRedeliveryExhausted"> -->
-<!--         <http:listener path="*" config-ref="listenerConfig2"/> -->
-<!--         <test:component throwException="true"/> -->
-<!--         <rollback-exception-strategy maxRedeliveryAttempts="${shortMaxRedelivery}"> -->
-<!--             <on-redelivery-attempts-exceeded> -->
-<!--                 <append-string-transformer message=" consumed successfully"/> -->
-<!--             </on-redelivery-attempts-exceeded> -->
-<!--         </rollback-exception-strategy> -->
-<!--     </flow> -->
+    <flow name="httpWithRedeliveryExhausted">
+        <http:listener path="*" config-ref="listenerConfig2"/>
+        <test:component throwException="true"/>
+        <rollback-exception-strategy maxRedeliveryAttempts="${shortMaxRedelivery}">
+            <on-redelivery-attempts-exceeded>
+                <append-string-transformer message=" consumed successfully"/>
+            </on-redelivery-attempts-exceeded>
+        </rollback-exception-strategy>
+    </flow>
 
     <flow name="fullyDefinedRollbackExceptionStrategy">
         <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>

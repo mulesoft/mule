@@ -6,13 +6,14 @@
  */
 package org.mule.transport.http.construct.support;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.transformer.TransformerTemplate.TransformerCallback;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.transformer.TransformerTemplate.TransformerCallback;
+import org.mule.runtime.core.util.StringUtils;
 
 public final class CopyInboundToOutboundPropertiesTransformerCallback implements TransformerCallback
 {
+    @Override
     public Object doTransform(final MuleMessage message) throws Exception
     {
         for (final String inboundPropertyName : message.getInboundPropertyNames())

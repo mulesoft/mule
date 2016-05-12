@@ -9,6 +9,7 @@ package org.mule.transport.http.filters;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.transport.http.HttpConstants;
@@ -41,7 +42,7 @@ public class HttpBasicAuthenticationFilter extends org.mule.runtime.module.http.
      * @throws org.mule.api.security.SecurityException if authentication fails
      */
     public void authenticateOutbound(MuleEvent event)
-        throws SecurityException, SecurityProviderNotFoundException
+            throws SecurityException, SecurityProviderNotFoundException
     {
         SecurityContext securityContext = event.getSession().getSecurityContext();
         if (securityContext == null)

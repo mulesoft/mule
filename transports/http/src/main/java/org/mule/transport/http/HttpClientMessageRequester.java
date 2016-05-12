@@ -6,14 +6,14 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.ReceiveException;
-import org.mule.transport.AbstractMessageRequester;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transport.ReceiveException;
+import org.mule.runtime.core.transport.AbstractMessageRequester;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.transformers.HttpClientMethodResponseToObject;
-import org.mule.util.StringUtils;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -38,6 +38,7 @@ public class HttpClientMessageRequester extends AbstractMessageRequester
         this.receiveTransformer.setMuleContext(getEndpoint().getMuleContext());
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         if (client == null)
@@ -46,6 +47,7 @@ public class HttpClientMessageRequester extends AbstractMessageRequester
         }
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         client = null;
@@ -62,6 +64,7 @@ public class HttpClientMessageRequester extends AbstractMessageRequester
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
+    @Override
     protected MuleMessage doRequest(long timeout) throws Exception
     {
         HttpMethod httpMethod = new GetMethod(endpoint.getEndpointURI().getAddress());
@@ -109,6 +112,7 @@ public class HttpClientMessageRequester extends AbstractMessageRequester
         }
     }
 
+    @Override
     protected void doDispose()
     {
         // template method

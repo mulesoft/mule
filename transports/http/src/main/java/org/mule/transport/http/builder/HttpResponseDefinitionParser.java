@@ -6,7 +6,7 @@
  */
 package org.mule.transport.http.builder;
 
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 
 import org.springframework.beans.factory.config.MapFactoryBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -22,6 +22,7 @@ public class HttpResponseDefinitionParser extends ChildDefinitionParser
         super(setterMethod, ManagedMap.class);
     }
 
+    @Override
     protected Class getBeanClass(Element element)
     {
         return MapFactoryBean.class;

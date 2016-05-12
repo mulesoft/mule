@@ -6,11 +6,12 @@
  */
 package org.mule.transport.http.servlet;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
-import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.transport.http.HttpConnector;
 
 /**
@@ -27,14 +28,15 @@ public class ServletTransformer extends AbstractMessageTransformer
     {
         MuleMessage message = (MuleMessage) src;
         
-        message.setInvocationProperty(HttpConnector.HTTP_SERVLET_REQUEST_PROPERTY, new MuleHttpServletRequest(event));
-        message.setInvocationProperty(HttpConnector.HTTP_SERVLET_RESPONSE_PROPERTY, new MuleHttpServletResponse(event));
+        // TODO: these were invocation properties!
+        message.setProperty(HttpConnector.HTTP_SERVLET_REQUEST_PROPERTY, new MuleHttpServletRequest(event), PropertyScope.INBOUND);
+        message.setProperty(HttpConnector.HTTP_SERVLET_RESPONSE_PROPERTY, new MuleHttpServletResponse(event), PropertyScope.INBOUND);
         
         return message;
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
         throw new IllegalStateException();
     }

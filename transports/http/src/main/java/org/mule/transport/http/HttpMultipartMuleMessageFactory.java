@@ -6,7 +6,7 @@
  */
 package org.mule.transport.http;
 
-import org.mule.DefaultMuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.transport.http.multipart.MultiPartInputStream;
 import org.mule.transport.http.multipart.Part;
 import org.mule.transport.http.multipart.PartDataSource;

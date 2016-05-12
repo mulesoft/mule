@@ -6,13 +6,13 @@
  */
 package org.mule.transport.http.builder;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser;
-import org.mule.module.http.internal.HttpParamType;
-import org.mule.module.http.internal.HttpSingleParam;
-import org.mule.module.http.internal.config.HttpMessageSingleParamDefinitionParser;
+import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
+import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.runtime.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser;
+import org.mule.runtime.module.http.internal.HttpParamType;
+import org.mule.runtime.module.http.internal.HttpSingleParam;
+import org.mule.runtime.module.http.internal.config.HttpMessageSingleParamDefinitionParser;
 
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -26,6 +26,7 @@ import org.w3c.dom.Node;
 public class HttpHeaderDefinitionParser extends AbstractParallelDelegatingDefinitionParser
 {
 
+    @Override
     protected MuleDefinitionParser getDelegate(Element element, ParserContext parserContext)
     {
         Node parentNode = element.getParentNode();

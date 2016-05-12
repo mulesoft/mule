@@ -6,13 +6,13 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.transport.Connector;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transport.ConnectException;
-import org.mule.util.StringUtils;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.util.StringUtils;
 
 public class HttpsMessageReceiver extends HttpMessageReceiver
 {

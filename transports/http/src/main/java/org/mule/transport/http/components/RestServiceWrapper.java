@@ -6,26 +6,25 @@
  */
 package org.mule.transport.http.components;
 
-import org.mule.DefaultMuleEventContext;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.expression.RequiredValueException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.routing.filter.Filter;
-import org.mule.component.AbstractComponent;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.routing.filters.ExpressionFilter;
-import org.mule.transport.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.DefaultMuleEventContext;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.endpoint.EndpointBuilder;
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.api.expression.RequiredValueException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.component.AbstractComponent;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.runtime.core.routing.filters.ExpressionFilter;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.util.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -181,8 +180,8 @@ public class RestServiceWrapper extends AbstractComponent
         {
             requestBody = NullPayload.getInstance();
 
-            setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, null);
-            setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, null);
+            setRESTParams(urlBuffer, event, request, requiredParams, false, null);
+            setRESTParams(urlBuffer, event, request, optionalParams, true, null);
         }
         // if post
         else
@@ -193,8 +192,8 @@ public class RestServiceWrapper extends AbstractComponent
             }
 
             StringBuilder requestBodyBuffer = new StringBuilder();
-            setRESTParams(urlBuffer, event.getMessage(), request, requiredParams, false, requestBodyBuffer);
-            setRESTParams(urlBuffer, event.getMessage(), request, optionalParams, true, requestBodyBuffer);
+            setRESTParams(urlBuffer, event, request, requiredParams, false, requestBodyBuffer);
+            setRESTParams(urlBuffer, event, request, optionalParams, true, requestBodyBuffer);
             requestBody = requestBodyBuffer.toString();
         }
 
@@ -209,7 +208,7 @@ public class RestServiceWrapper extends AbstractComponent
 
         MuleEventContext eventContext = new DefaultMuleEventContext(event);
         result = eventContext.sendEvent(
-            new DefaultMuleMessage(requestBody, event.getMessage(), muleContext), outboundEndpoint);
+                new DefaultMuleMessage(requestBody, event.getMessage(), muleContext), outboundEndpoint.getEndpointURI().toString());
         if (isErrorPayload(result))
         {
             handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl),
@@ -250,7 +249,7 @@ public class RestServiceWrapper extends AbstractComponent
     // requestBodyBuffer must contain the body of the http method at the end of this
     // function call
     private void setRESTParams(StringBuilder url,
-                               MuleMessage msg,
+                               MuleEvent event,
                                Object body,
                                Map args,
                                boolean optional,
@@ -283,7 +282,7 @@ public class RestServiceWrapper extends AbstractComponent
                 muleContext.getExpressionManager().validateExpression(exp);
                 try
                 {
-                    value = muleContext.getExpressionManager().evaluate(exp, msg);
+                    value = muleContext.getExpressionManager().evaluate(exp, event);
                 }
                 catch (RequiredValueException e)
                 {

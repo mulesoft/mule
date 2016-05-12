@@ -6,10 +6,10 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.MuleException;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transport.MessageDispatcher;
-import org.mule.transport.AbstractMessageDispatcherFactory;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.api.transport.MessageDispatcher;
+import org.mule.runtime.core.transport.AbstractMessageDispatcherFactory;
 
 /**
  * Creates a HttpClientMessageDispatcher to make client requests
@@ -17,6 +17,7 @@ import org.mule.transport.AbstractMessageDispatcherFactory;
 public class HttpClientMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     /** {@inheritDoc} */
+    @Override
     public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         return new HttpClientMessageDispatcher(endpoint);

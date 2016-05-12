@@ -6,11 +6,11 @@
  */
 package org.mule.transport.http.transformers;
 
-import org.mule.RequestContext;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.OutputHandler;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 import org.mule.transport.http.ResponseWriter;

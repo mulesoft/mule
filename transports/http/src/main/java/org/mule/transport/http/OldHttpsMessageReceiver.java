@@ -6,16 +6,16 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.MessagingException;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.transport.Connector;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transport.ConnectException;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -102,6 +102,7 @@ public class OldHttpsMessageReceiver extends OldHttpMessageReceiver
             }
         }
 
+        @Override
         public void handshakeCompleted(HandshakeCompletedEvent event)
         {
             try

@@ -6,11 +6,11 @@
  */
 package org.mule.transport.http.transformers;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.ReleasingInputStream;
 

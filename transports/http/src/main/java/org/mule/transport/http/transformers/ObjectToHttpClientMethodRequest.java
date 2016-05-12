@@ -6,18 +6,21 @@
  */
 package org.mule.transport.http.transformers;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.PropertyScope;
-import org.mule.message.ds.StringDataSource;
-import org.mule.transformer.AbstractMessageTransformer;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transformer.types.MimeTypes;
-import org.mule.transport.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.message.ds.StringDataSource;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.transformer.types.MimeTypes;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.PatchMethod;
@@ -25,9 +28,6 @@ import org.mule.transport.http.StreamPayloadRequestEntity;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.multipart.MultiPartInputStream;
 import org.mule.transport.http.multipart.PartDataSource;
-import org.mule.util.IOUtils;
-import org.mule.util.ObjectUtils;
-import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -80,8 +80,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage msg, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
+        final MuleMessage msg = event.getMessage();
         String method = detectHttpMethod(msg);
         try
         {
@@ -93,11 +94,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             else if (HttpConstants.METHOD_POST.equalsIgnoreCase(method))
             {
-                httpMethod = createPostMethod(msg, outputEncoding);
+                httpMethod = createPostMethod(event, outputEncoding);
             }
             else if (HttpConstants.METHOD_PUT.equalsIgnoreCase(method))
             {
-                httpMethod = createPutMethod(msg, outputEncoding);
+                httpMethod = createPutMethod(event, outputEncoding);
             }
             else if (HttpConstants.METHOD_DELETE.equalsIgnoreCase(method))
             {
@@ -117,7 +118,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             else if (HttpConstants.METHOD_PATCH.equalsIgnoreCase(method))
             {
-                httpMethod = createPatchMethod(msg, outputEncoding);
+                httpMethod = createPatchMethod(event, outputEncoding);
             }
             else
             {
@@ -159,10 +160,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
     protected String detectHttpMethod(MuleMessage msg)
     {
         String method = msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, null);
-        if (method == null)
-        {
-            method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
-        }
+        // TODO
+        // if (method == null)
+        // {
+        // method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
+        // }
         return method;
     }
 
@@ -183,11 +185,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             paramName = URLEncoder.encode(paramName, outputEncoding);
 
             String paramValue;
-            Boolean encode = msg.getInvocationProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE);
-            if (encode == null)
-            {
-                encode = msg.getOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true);
-            }
+            // TODO
+            // Boolean encode = msg.getInvocationProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE);
+            // if (encode == null)
+            // {
+            Boolean encode = msg.getOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true);
+            // }
 
             if (encode)
             {
@@ -215,8 +218,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         return httpMethod;
     }
 
-    protected HttpMethod createPostMethod(MuleMessage msg, String outputEncoding) throws Exception
+    protected HttpMethod createPostMethod(MuleEvent event, String outputEncoding) throws Exception
     {
+        final MuleMessage msg = event.getMessage();
         URI uri = getURI(msg);
         PostMethod postMethod = new PostMethod(uri.toString());
 
@@ -236,7 +240,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         }
         else
         {
-            setupEntityMethod(src, outputEncoding, msg, postMethod);
+            setupEntityMethod(src, outputEncoding, event, postMethod);
         }
         checkForContentType(msg, postMethod);
 
@@ -246,7 +250,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
     private void checkForContentType(MuleMessage msg, EntityEnclosingMethod method)
     {
         // if a content type was specified on the endpoint, use it
-        String outgoingContentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        String outgoingContentType = msg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        // TODO
+        // String outgoingContentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
         if (outgoingContentType != null)
         {
             method.setRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, outgoingContentType);
@@ -256,20 +262,22 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
     protected String getBodyParameterName(MuleMessage message)
     {
         String bodyParameter = message.getOutboundProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
-        if (bodyParameter == null)
-        {
-            bodyParameter = message.getInvocationProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
-        }
+        // TODO
+        // if (bodyParameter == null)
+        // {
+        // bodyParameter = message.getInvocationProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
+        // }
         return bodyParameter;
     }
 
-    protected HttpMethod createPutMethod(MuleMessage msg, String outputEncoding) throws Exception
+    protected HttpMethod createPutMethod(MuleEvent event, String outputEncoding) throws Exception
     {
+        final MuleMessage msg = event.getMessage();
         URI uri = getURI(msg);
         PutMethod putMethod = new PutMethod(uri.toString());
 
         Object payload = msg.getPayload();
-        setupEntityMethod(payload, outputEncoding, msg, putMethod);
+        setupEntityMethod(payload, outputEncoding, event, putMethod);
         checkForContentType(msg, putMethod);
         return putMethod;
     }
@@ -298,13 +306,14 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         return new TraceMethod(uri.toString());
     }
 
-    protected HttpMethod createPatchMethod(MuleMessage message, String outputEncoding) throws Exception
+    protected HttpMethod createPatchMethod(MuleEvent event, String outputEncoding) throws Exception
     {
+        final MuleMessage message = event.getMessage();
         URI uri = getURI(message);
         PatchMethod patchMethod = new PatchMethod(uri.toString());
 
         Object payload = message.getPayload();
-        setupEntityMethod(payload, outputEncoding, message, patchMethod);
+        setupEntityMethod(payload, outputEncoding, event, patchMethod);
         checkForContentType(message, patchMethod);
         return patchMethod;
     }
@@ -323,10 +332,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 
     protected void setupEntityMethod(Object src,
                                      String encoding,
-                                     MuleMessage msg,
+                                     MuleEvent event,
                                      EntityEnclosingMethod postMethod)
         throws UnsupportedEncodingException, TransformerException
     {
+        final MuleMessage msg = event.getMessage();
         // Dont set a POST payload if the body is a Null Payload.
         // This way client calls can control if a POST body is posted explicitly
         if (!(msg.getPayload() instanceof NullPayload))
@@ -367,7 +377,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             {
                 try
                 {
-                    src = muleContext.getTransformationService().getPayloadAsBytes(msg);
+                    src = event.getMessageAsBytes();
                 }
                 catch (final Exception e)
                 {
@@ -379,7 +389,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             {
                 try
                 {
-                    postMethod.setRequestEntity(createMultiPart(msg, postMethod));
+                    postMethod.setRequestEntity(createMultiPart(event, postMethod));
                     return;
                 }
                 catch (final Exception e)
@@ -404,8 +414,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             else if (src instanceof OutputHandler)
             {
-                final MuleEvent event = RequestContext.getEvent();
-                postMethod.setRequestEntity(new StreamPayloadRequestEntity((OutputHandler) src, event));
+                final MuleEvent eventFromContext = RequestContext.getEvent();
+                postMethod.setRequestEntity(new StreamPayloadRequestEntity((OutputHandler) src, eventFromContext));
             }
             else
             {
@@ -417,7 +427,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         {
             try
             {
-                postMethod.setRequestEntity(createMultiPart(msg, postMethod));
+                postMethod.setRequestEntity(createMultiPart(event, postMethod));
             }
             catch (Exception e)
             {
@@ -450,9 +460,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         }
     }
 
-    protected MultipartRequestEntity createMultiPart(MuleMessage msg, EntityEnclosingMethod method)
+    protected MultipartRequestEntity createMultiPart(MuleEvent event, EntityEnclosingMethod method)
         throws Exception
     {
+        final MuleMessage msg = event.getMessage();
         Part[] parts;
         int i = 0;
         if (msg.getPayload() instanceof NullPayload)
@@ -462,7 +473,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         else
         {
             parts = new Part[msg.getOutboundAttachmentNames().size() + 1];
-            parts[i++] = new FilePart("payload", new ByteArrayPartSource("payload", muleContext.getTransformationService().getPayloadAsBytes(msg)));
+            parts[i++] = new FilePart("payload", new ByteArrayPartSource("payload", event.getMessageAsBytes()));
         }
 
         for (final Iterator<String> iterator = msg.getOutboundAttachmentNames().iterator(); iterator.hasNext(); i++)

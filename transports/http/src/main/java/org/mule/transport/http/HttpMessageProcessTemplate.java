@@ -6,31 +6,31 @@
  */
 package org.mule.transport.http;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.OptimizedRequestContext;
-import org.mule.RequestContext;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transport.PropertyScope;
-import org.mule.config.ExceptionHelper;
-import org.mule.execution.EndPhaseTemplate;
-import org.mule.execution.RequestResponseFlowProcessingPhaseTemplate;
-import org.mule.execution.ResponseDispatchException;
-import org.mule.execution.ThrottlingPhaseTemplate;
-import org.mule.module.http.internal.listener.HttpMessageProcessorTemplate;
-import org.mule.module.http.internal.listener.HttpThrottlingHeadersMapBuilder;
-import org.mule.transport.AbstractTransportMessageProcessTemplate;
-import org.mule.transport.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
+import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.execution.EndPhaseTemplate;
+import org.mule.runtime.core.execution.RequestResponseFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.execution.ResponseDispatchException;
+import org.mule.runtime.core.execution.ThrottlingPhaseTemplate;
+import org.mule.runtime.core.transport.AbstractTransportMessageProcessTemplate;
+import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.module.http.internal.listener.HttpMessageProcessorTemplate;
+import org.mule.runtime.module.http.internal.listener.HttpThrottlingHeadersMapBuilder;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.util.ArrayUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
 import java.util.Map;
@@ -284,6 +284,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                 .getResponseTransportTransformers(), HttpResponse.class).getPayload();
     }
 
+    @Override
     protected MuleMessage createMessageFromSource(Object message) throws MuleException
     {
         MuleMessage muleMessage = super.createMessageFromSource(message);
@@ -392,6 +393,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         return request;
     }
 
+    @Override
     public boolean validateMessage()
     {
         try

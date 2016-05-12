@@ -8,6 +8,7 @@ package org.mule.transport.http;
 
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.util.BackwardsCompatibilityPropertyChecker;
+import org.mule.runtime.core.util.MapUtils;
 
 import com.google.common.net.HttpHeaders;
 

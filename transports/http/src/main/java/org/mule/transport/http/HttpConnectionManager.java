@@ -6,9 +6,9 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.context.WorkManager;
-import org.mule.api.endpoint.EndpointURI;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.endpoint.EndpointURI;
 
 import java.net.ServerSocket;
 import java.util.HashMap;

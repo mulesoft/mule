@@ -6,21 +6,21 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.execution.MessageProcessContext;
-import org.mule.transport.AbstractMessageReceiver;
-import org.mule.transport.ConnectException;
-import org.mule.transport.TransportMessageProcessContext;
-import org.mule.util.MapUtils;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.execution.MessageProcessContext;
+import org.mule.runtime.core.transport.AbstractMessageReceiver;
+import org.mule.runtime.core.transport.TransportMessageProcessContext;
+import org.mule.runtime.core.util.MapUtils;
 
 import java.util.List;
 

@@ -6,11 +6,11 @@
  */
 package org.mule.transport.http;
 
-import org.mule.RequestContext;
-import org.mule.api.transport.Connector;
-import org.mule.api.transport.OutputHandler;
-import org.mule.util.SystemUtils;
-import org.mule.util.concurrent.Latch;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.util.SystemUtils;
+import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;

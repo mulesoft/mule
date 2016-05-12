@@ -6,9 +6,9 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 
 import java.net.URI;
 import java.net.URISyntaxException;

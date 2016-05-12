@@ -6,25 +6,27 @@
  */
 package org.mule.transport.http;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.VoidMuleEvent;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.transport.Connector;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleEndpointProperties;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.endpoint.EndpointBuilder;
+import org.mule.runtime.core.api.endpoint.EndpointFactory;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.runtime.core.transport.AbstractPollingMessageReceiver;
+import org.mule.runtime.core.util.MapUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.util.MapUtils;
-import org.mule.util.StringUtils;
 
 import java.util.Collections;
 
@@ -107,7 +109,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>emptyList());
             endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 
-            outboundEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
+            outboundEndpoint = getEndpointFactory(muleContext).getOutboundEndpoint(
                     endpointBuilder);
         }
 
@@ -143,5 +145,10 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         {
             routeMessage(message);
         }
+    }
+
+    public EndpointFactory getEndpointFactory(MuleContext muleContext)
+    {
+        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 }

@@ -6,15 +6,15 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.WorkManager;
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
-import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.transport.Connector;
-import org.mule.config.MutableThreadingProfile;
-import org.mule.transport.ConnectException;
-import org.mule.util.concurrent.ThreadNameHelper;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.config.MutableThreadingProfile;
+import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -92,6 +92,7 @@ class HttpRequestDispatcher implements Work
                 {
                     retryTemplate.execute(new RetryCallback()
                     {
+                        @Override
                         public void doWork(RetryContext context) throws Exception
                         {
                             Socket socket = null;
@@ -115,6 +116,7 @@ class HttpRequestDispatcher implements Work
                             }
                         }
 
+                        @Override
                         public String getWorkDescription()
                         {
                             String hostName = ((InetSocketAddress) serverSocket.getLocalSocketAddress()).getHostName();

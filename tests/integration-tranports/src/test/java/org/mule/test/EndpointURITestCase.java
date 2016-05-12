@@ -8,22 +8,23 @@ package org.mule.test;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.endpoint.DynamicOutboundEndpoint;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.endpoint.EndpointBuilder;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.endpoint.DynamicOutboundEndpoint;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 
-public class EndpointURITestCase extends AbstractMuleContextTestCase
+public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase
 {
     @Test
     public void testEndpoints() throws Exception
@@ -41,13 +42,12 @@ public class EndpointURITestCase extends AbstractMuleContextTestCase
         {
             if (!uri.isDynamic())
             {
-                InboundEndpoint ei = muleContext.getEndpointFactory().getInboundEndpoint(uri.getUri());
+                InboundEndpoint ei = getEndpointFactory().getInboundEndpoint(uri.getUri());
                 uri.checkResultUri(ei);
             }
-            EndpointBuilder endpointBuilder =
-                muleContext.getEndpointFactory().getEndpointBuilder(uri.getUri());
+            EndpointBuilder endpointBuilder = getEndpointFactory().getEndpointBuilder(uri.getUri());
             endpointBuilder.setExchangePattern(MessageExchangePattern.ONE_WAY);
-            OutboundEndpoint oi =muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            OutboundEndpoint oi = getEndpointFactory().getOutboundEndpoint(endpointBuilder);
             uri.checkResultUri(oi);
         }
     }
@@ -89,12 +89,12 @@ public class EndpointURITestCase extends AbstractMuleContextTestCase
             return isDynamic;
         }
 
-        public void checkResultUri(ImmutableEndpoint ep)
+        public void checkResultUri(ImmutableEndpoint ep) throws Exception
         {
             String epUri;
             if (ep instanceof DynamicOutboundEndpoint)
             {
-                epUri = muleContext.getExpressionManager().parse(ep.getAddress(), message, true);
+                epUri = muleContext.getExpressionManager().parse(ep.getAddress(), new DefaultMuleEvent(message, getTestFlow()), true);
             }
             else
             {

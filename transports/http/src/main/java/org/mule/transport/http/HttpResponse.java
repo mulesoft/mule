@@ -6,12 +6,12 @@
  */
 package org.mule.transport.http;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.transport.OutputHandler;
-import org.mule.transformer.types.DataTypeFactory;
-import org.mule.transport.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -123,6 +123,7 @@ public class HttpResponse
      * @deprecated use {@link #getStatusCode()} instead
      * @return HTTP status code
      */
+    @Deprecated
     public int getStatuscode()
     {
         return this.getStatusCode();
@@ -325,6 +326,7 @@ public class HttpResponse
         
         this.outputHandler = new OutputHandler() {
 
+            @Override
             public void write(MuleEvent event, OutputStream out) throws IOException
             {
                 out.write(raw);
