@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/tcp"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             targetNamespace="http://www.mulesoft.org/schema/mule/tcp"
             elementFormDefault="qualified"
@@ -9,9 +10,11 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/transports"
+                schemaLocation="http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/current/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -67,7 +70,7 @@
 
     <xsd:complexType name="noProtocolTcpConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="mule:connectorType">
+            <xsd:extension base="transports:connectorType">
                 <xsd:attribute name="sendBufferSize" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -331,7 +334,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="transports:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
                 The inbound-endpoint element configures the endpoint on which the messages are received.
@@ -340,13 +343,13 @@
     </xsd:element>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
+            <xsd:extension base="transports:inboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="transports:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
                 The outbound-endpoint element configures the endpoint where the messages are sent.
@@ -355,7 +358,7 @@
     </xsd:element>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointType">
+            <xsd:extension base="transports:outboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -370,7 +373,7 @@
     </xsd:element>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointType">
+            <xsd:extension base="transports:globalEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>

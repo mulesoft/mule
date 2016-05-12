@@ -2,37 +2,27 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+       xmlns:transport-tls="http://www.mulesoft.org/schema/mule/transport-tls"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+       http://www.mulesoft.org/schema/mule/transport-tls http://www.mulesoft.org/schema/mule/transport-tls/current/mule-transport-tls.xsd">
 
-    <tls:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
-        <tls:client
+    <transport-tls:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
+        <transport-tls:client
                 path="clientKeystore"
                 storePassword="mulepassword"/>
-        <tls:key-store
+        <transport-tls:key-store
                 keyAlias="muleserver"
                 keyPassword="mulepassword"
                 path="serverKeystore"
                 storePassword="mulepassword"/>
-        <tls:server
+        <transport-tls:server
                 path="trustStore"
                 storePassword="mulepassword"
                 explicitOnly="true"
                 requireClientAuthentication="true"/>
-        <tls:protocol-handler property="foo"/>
-    </tls:connector>
-
-
-    <tls:context name="tlsContext" >
-        <tls:trust-store path="trustStore" password="testTrustStorePassword"
-                         type="testTrustStoreType" algorithm="testTrustStoreAlgorithm"/>
-
-        <tls:key-store path="serverKeystore" keyPassword="testKeyPassword" password="testKeyStorePassword"
-                       algorithm="testKeyStoreAlgorithm" alias="testKeyStoreAlias" type="testKeyStoreType"/>
-    </tls:context>
-
+        <transport-tls:protocol-handler property="foo"/>
+    </transport-tls:connector>
 
 </mule>

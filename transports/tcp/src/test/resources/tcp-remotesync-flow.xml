@@ -12,7 +12,7 @@
     <flow name="Echo1">
 
         <tcp:inbound-endpoint host="localhost"
-            port="${port1}" exchange-pattern="request-response" name="echoInTcp" />
+            port="${port1}" exchange-pattern="request-response" />
 
 
         <tcp:outbound-endpoint host="localhost"
@@ -23,7 +23,7 @@
     <flow name="Echo2">
 
         <tcp:inbound-endpoint host="localhost"
-            port="${port3}" exchange-pattern="request-response" name="echo2InTcp" />
+            port="${port3}" exchange-pattern="request-response" />
 
         <vm:outbound-endpoint path="sync"
             exchange-pattern="request-response" />

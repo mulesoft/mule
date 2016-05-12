@@ -20,7 +20,7 @@
     <flow name="service">
 
         <tcp:inbound-endpoint address="${test.endpoint}"
-            exchange-pattern="request-response" name="inService" />
+            exchange-pattern="request-response"/>
 
         <echo-component />
     </flow>

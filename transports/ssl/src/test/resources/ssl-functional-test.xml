@@ -3,9 +3,11 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:ssl="http://www.mulesoft.org/schema/mule/ssl"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
        http://www.mulesoft.org/schema/mule/ssl http://www.mulesoft.org/schema/mule/ssl/current/mule-ssl.xsd">
 
     <!-- keepSendSocketOpen is required for the Async test case?  see TCP -->
@@ -36,7 +38,7 @@
     </flow>
 
     <flow name="testComponent3">
-        <inbound-endpoint ref="asyncEndpoint"/>
+        <transports:inbound-endpoint ref="asyncEndpoint"/>
         <test:component appendString=" Received">
             <test:callback class="org.mule.functional.functional.ResponseWriterCallback"/>
         </test:component>

@@ -24,7 +24,7 @@
 
         <test:component appendString=" Received">
             <test:callback
-                class="org.mule.transport.ssl.SaveCertificatesCallback" />
+                class="org.mule.runtime.transport.ssl.SaveCertificatesCallback" />
         </test:component>
     </flow>
 

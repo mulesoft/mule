@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.transport.jms.integration;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Send and recieve JmsMessage without any tx
  */
+@Ignore("MULE-9628")
 public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestCase
 {
 

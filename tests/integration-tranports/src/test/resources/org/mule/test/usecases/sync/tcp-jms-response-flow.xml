@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+    xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
     xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
+               http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
                http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <tcp:connector name="tcpConnector" keepSendSocketOpen="true">
@@ -18,25 +20,25 @@
 
     <flow name="TcpReceiver">
 
-        <inbound-endpoint address="tcp://localhost:${port}"
+        <transports:inbound-endpoint address="tcp://localhost:${port}"
             exchange-pattern="request-response" />
 
-        <component class="org.mule.component.simple.EchoComponent" />
+        <component class="org.mule.runtime.core.component.simple.EchoComponent" />
 
         <request-reply>
-            <outbound-endpoint address="jms://queue_in"
+            <transports:outbound-endpoint address="jms://queue_in"
                 exchange-pattern="one-way" />
-            <inbound-endpoint address="jms://queue_out" />
+            <transports:inbound-endpoint address="jms://queue_out" />
         </request-reply>
 
     </flow>
 
     <flow name="JMSReplyProvider">
-        <inbound-endpoint address="jms://queue_in"
+        <transports:inbound-endpoint address="jms://queue_in"
             exchange-pattern="one-way">
             <transformer ref="bytearray-to-object" />
-        </inbound-endpoint>
-        <custom-processor class="org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier"/>
+        </transports:inbound-endpoint>
+        <custom-processor class="org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier"/>
         <component>
             <singleton-object
                 class="org.mule.functional.testmodels.services.TestReceiver" />

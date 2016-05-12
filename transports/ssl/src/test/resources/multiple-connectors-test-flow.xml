@@ -2,10 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:ssl="http://www.mulesoft.org/schema/mule/ssl" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
     xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
        http://www.mulesoft.org/schema/mule/ssl http://www.mulesoft.org/schema/mule/ssl/current/mule-ssl.xsd">
 
     <ssl:connector name="SslConnector">
@@ -21,7 +23,7 @@
 
     <flow name="testComponent1">
 
-        <inbound-endpoint ref="clientEndpoint" />
+        <transports:inbound-endpoint ref="clientEndpoint" />
 
         <test:component appendString=" Received" />
     </flow>

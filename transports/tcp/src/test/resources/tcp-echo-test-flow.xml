@@ -14,7 +14,7 @@
     <flow name="BounceTcpMMP">
 
         <tcp:inbound-endpoint host="localhost"
-            port="${port1}" exchange-pattern="request-response" name="inBounceTcpMMP" />
+            port="${port1}" exchange-pattern="request-response"/>
 
         <echo-component />
     </flow>

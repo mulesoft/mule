@@ -26,11 +26,11 @@
     <flow name="testComponent">
 
         <tcp:inbound-endpoint host="localhost"
-            port="${port2}" exchange-pattern="one-way" name="testInbound" />
+            port="${port2}" exchange-pattern="one-way"/>
 
         <component>
             <singleton-object
-                class="org.mule.transport.tcp.integration.EOFStreamingTestComponent" />
+                class="org.mule.runtime.transport.tcp.integration.EOFStreamingTestComponent" />
         </component>
     </flow>
 
