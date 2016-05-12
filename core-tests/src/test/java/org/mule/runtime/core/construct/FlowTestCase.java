@@ -14,22 +14,29 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
-import org.mule.tck.MuleTestUtils;
-import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.SensingNullMessageProcessor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -226,5 +233,31 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
         flow.dynamicPipeline(pipelineId).reset();
         response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
         assertEquals("helloabcdef", response.getMessageAsString());
+    }
+
+    @Test
+    public void testFailStartingMessageSourceOnLifecycleShouldStopStartedPipelineProcesses() throws Exception
+    {
+        MessageSource mockMessageSource = mock(MessageSource.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+        doThrow(new LifecycleException(mock(Message.class), "Error starting component")).when(((Startable) mockMessageSource)).start();
+        flow.setMessageSource(mockMessageSource);
+
+        MessageProcessor mockMessageProcessor = mock(MessageProcessor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+        flow.getMessageProcessors().add(mockMessageProcessor);
+
+        flow.initialise();
+        try
+        {
+            flow.start();
+            fail();
+        } catch (LifecycleException e)
+        {
+        }
+
+        verify((Startable) mockMessageProcessor, times(1)).start();
+        verify((Stoppable) mockMessageProcessor, times(1)).stop();
+
+        verify((Startable) mockMessageSource, times(1)).start();
+        verify((Stoppable) mockMessageSource, times(1)).stop();
     }
 }

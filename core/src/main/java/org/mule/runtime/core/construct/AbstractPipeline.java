@@ -7,7 +7,6 @@
 package org.mule.runtime.core.construct;
 
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
-
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -34,6 +33,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.exception.ChoiceMessagingExceptionStrategy;
@@ -355,7 +355,22 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         super.doStart();
         startIfStartable(pipeline);
         canProcessMessage = true;
-        startIfStartable(messageSource);
+        try
+        {
+            startIfStartable(messageSource);
+        }
+        // Let connection exceptions bubble up to trigger the reconnection strategy.
+        catch (ConnectException ce)
+        {
+            throw ce;
+        }
+        catch(MuleException e)
+        {
+            // If the messageSource couldn't be started we would need to stop the pipeline (if possible) in order to leave
+            // its LifeciclyManager also as initialise phase so the flow can be disposed later
+            doStop();
+            throw e;
+        }
     }
 
     private void createFlowMap()
