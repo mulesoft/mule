@@ -39,6 +39,7 @@ import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.source.ClusterizableMessageSourceWrapper;
+import org.mule.transport.ConnectException;
 import org.mule.util.NotificationUtils;
 
 import java.util.ArrayList;
@@ -314,7 +315,22 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         super.doStart();
         startIfStartable(pipeline);
         canProcessMessage = true;
-        startIfStartable(messageSource);
+        try
+        {
+            startIfStartable(messageSource);
+        }
+        // Let connection exceptions bubble up to trigger the reconnection strategy.
+        catch (ConnectException ce)
+        {
+            throw ce;
+        }
+        catch(MuleException e)
+        {
+            // If the messageSource couldn't be started we would need to stop the pipeline (if possible) in order to leave
+            // its LifeciclyManager also as initialise phase so the flow can be disposed later
+            doStop();
+            throw e;
+        }
         createFlowMap();
     }
 
