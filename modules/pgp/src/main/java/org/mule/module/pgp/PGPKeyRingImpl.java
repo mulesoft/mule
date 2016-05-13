@@ -13,7 +13,6 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
@@ -24,6 +23,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.pgp.i18n.PGPMessages;
+import org.mule.module.pgp.util.BouncyCastleUtil;
 import org.mule.util.IOUtils;
 import org.mule.util.SecurityUtils;
 
@@ -67,7 +67,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
     private void readPublicKeyRing() throws Exception
     {
         InputStream in = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
-        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in, new BcKeyFingerprintCalculator());
+        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in, BouncyCastleUtil.keyFingerprintCalculator);
         in.close();
 
         for (Iterator iterator = collection.getKeyRings(); iterator.hasNext();)
@@ -90,7 +90,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
     private void readPrivateKeyBundle() throws Exception
     {
         InputStream in = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
-        PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in, new BcKeyFingerprintCalculator());
+        PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in, BouncyCastleUtil.keyFingerprintCalculator);
         in.close();
         secretKey = collection.getSecretKey(Long.valueOf(getSecretAliasId()));
         
