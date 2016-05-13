@@ -98,6 +98,7 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         // i don't
         // know of anything better.
         // if these fail in practice i guess we just remove them.
+        runtime.gc();
         long freeEnd = runtime.freeMemory();
         long delta = freeStart - freeEnd;
         long timeEnd = System.currentTimeMillis();

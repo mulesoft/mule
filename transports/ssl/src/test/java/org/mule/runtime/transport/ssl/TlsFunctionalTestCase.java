@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.transport.ssl;
 
+import org.junit.Ignore;
+
+@Ignore("MULE-9628")
 public class TlsFunctionalTestCase extends SslFunctionalTestCase
 {
     @Override
