@@ -13,6 +13,7 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
@@ -66,7 +67,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
     private void readPublicKeyRing() throws Exception
     {
         InputStream in = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
-        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in);
+        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in, new BcKeyFingerprintCalculator());
         in.close();
 
         for (Iterator iterator = collection.getKeyRings(); iterator.hasNext();)
@@ -89,7 +90,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
     private void readPrivateKeyBundle() throws Exception
     {
         InputStream in = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
-        PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in);
+        PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in, new BcKeyFingerprintCalculator());
         in.close();
         secretKey = collection.getSecretKey(Long.valueOf(getSecretAliasId()));
         

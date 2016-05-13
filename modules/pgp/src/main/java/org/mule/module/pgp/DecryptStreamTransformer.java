@@ -16,6 +16,10 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.Validate;
+import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator;
+import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyDecryptorBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
+import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataList;
 import org.bouncycastle.openpgp.PGPException;
@@ -70,7 +74,9 @@ public class DecryptStreamTransformer implements StreamTransformer
     public void initialize(OutputStream out) throws Exception
     {
         InputStream decodedInputStream = PGPUtil.getDecoderStream(this.toBeDecrypted);
-        PGPObjectFactory pgpF = new PGPObjectFactory(decodedInputStream);
+        BcKeyFingerprintCalculator calculator = new BcKeyFingerprintCalculator();
+
+        PGPObjectFactory pgpF = new PGPObjectFactory(decodedInputStream, calculator);
         Object pgpObject = pgpF.nextObject();
 
         if (pgpObject == null)
@@ -105,8 +111,8 @@ public class DecryptStreamTransformer implements StreamTransformer
             }
         }
 
-        clearStream = pbe.getDataStream(privateKey, provider);
-        PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(clearStream);
+        clearStream = pbe.getDataStream(new BcPublicKeyDataDecryptorFactory(privateKey));
+        PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(clearStream, calculator);
 
         pgpObject = pgpObjectFactory.nextObject();
 
@@ -121,7 +127,7 @@ public class DecryptStreamTransformer implements StreamTransformer
             {
                 PGPCompressedData cData = (PGPCompressedData) pgpObject;
                 compressedStream = new BufferedInputStream(cData.getDataStream());
-                pgpObjectFactory = new PGPObjectFactory(compressedStream);
+                pgpObjectFactory = new PGPObjectFactory(compressedStream, calculator);
                 pgpObject = pgpObjectFactory.nextObject();
             }
             else
@@ -173,7 +179,10 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
         else
         {
-            return pgpSecKey.extractPrivateKey(pass.toCharArray(), provider);
+            BcPGPDigestCalculatorProvider calculatorProvider = new BcPGPDigestCalculatorProvider();
+            BcPBESecretKeyDecryptorBuilder decryptorBuilder = new BcPBESecretKeyDecryptorBuilder(calculatorProvider);
+
+            return pgpSecKey.extractPrivateKey(decryptorBuilder.build(pass.toCharArray()));
         }
     }
 }
