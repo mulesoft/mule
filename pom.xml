@@ -156,7 +156,7 @@
         <asyncHttpClientVersion>1.9.37</asyncHttpClientVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
-        <bouncycastleVersion>1.50</bouncycastleVersion>
+        <bouncycastleVersion>1.54</bouncycastleVersion>
         <c3p0Version>0.9.5</c3p0Version>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
@@ -172,11 +172,6 @@
         <commonsJxpathVersion>1.3</commonsJxpathVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
         <commonsNetVersion>2.2</commonsNetVersion>
-        <!-- TODO There is a more modern version of cryptix available:
-        http://mirrors.ibiblio.org/pub/mirrors/maven2/cryptix/cryptix/3.2.0/cryptix-3.2.0.jar
-        but the PGP module would need some work in order to use it -->
-        <cryptixJceVersion>20050328</cryptixJceVersion>
-        <cryptixVersion>20050405</cryptixVersion>
         <cxfVersion>2.7.15</cxfVersion>
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
