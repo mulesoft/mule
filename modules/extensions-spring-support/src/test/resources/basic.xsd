@@ -17,44 +17,44 @@
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="required-pojo-default">
                             <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/basic" base="org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner"></xs:extension>
-                                </xs:complexContent>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" minOccurs="0" maxOccurs="1" ref="basic:abstract-owner"></xs:element>
+                                </xs:sequence>
                             </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="required-pojo-no-expression">
                             <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/basic" base="org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner"></xs:extension>
-                                </xs:complexContent>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" minOccurs="0" maxOccurs="1" ref="basic:abstract-owner"></xs:element>
+                                </xs:sequence>
                             </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="required-pojo-expression-supported">
                             <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/basic" base="org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner"></xs:extension>
-                                </xs:complexContent>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" minOccurs="0" maxOccurs="1" ref="basic:abstract-owner"></xs:element>
+                                </xs:sequence>
                             </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="optional-pojo-default">
                             <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/basic" base="org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner"></xs:extension>
-                                </xs:complexContent>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" minOccurs="0" maxOccurs="1" ref="basic:abstract-owner"></xs:element>
+                                </xs:sequence>
                             </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="optional-pojo-no-expression">
                             <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/basic" base="org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner"></xs:extension>
-                                </xs:complexContent>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" minOccurs="0" maxOccurs="1" ref="basic:abstract-owner"></xs:element>
+                                </xs:sequence>
                             </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="optional-pojo-expression-supported">
                             <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns="http://www.mulesoft.org/schema/mule/basic" base="org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner"></xs:extension>
-                                </xs:complexContent>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" minOccurs="0" maxOccurs="1" ref="basic:abstract-owner"></xs:element>
+                                </xs:sequence>
                             </xs:complexType>
                         </xs:element>
                     </xs:sequence>
@@ -82,18 +82,12 @@
                 <xs:attribute type="xs:string" use="optional" name="optionalFieldExpressionNotSupported"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="requiredFieldExpressionRequired"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="optionalFieldExpressionSupported"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="owner">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/basic" base="org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-owner"></xs:element>
+    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" type="basic:org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner" substitutionGroup="basic:abstract-owner" name="owner"></xs:element>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/basic" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FooType" substitutionGroup="mule:abstract-message-processor" name="foo"></xs:element>
     <xs:complexType name="FooType">
         <xs:complexContent>

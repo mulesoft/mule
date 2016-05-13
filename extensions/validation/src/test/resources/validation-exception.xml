@@ -10,15 +10,19 @@
     <spring:beans>
         <spring:bean id="customExceptionFactory" class="org.mule.extension.validation.ValidationExceptionTestCase$TestExceptionFactory" />
     </spring:beans>
-    
+
     <validation:exception-factory name="globalExceptionFactory" class="org.mule.extension.validation.ValidationExceptionTestCase$TestExceptionFactory" />
 
     <validation:config name="byClassExceptionFactoryValidator">
-        <validation:exception-factory class="org.mule.extension.validation.ValidationExceptionTestCase$TestExceptionFactory" />
+        <validation:exception-factory>
+            <validation:exception-factory class="org.mule.extension.validation.ValidationExceptionTestCase$TestExceptionFactory"/>
+        </validation:exception-factory>
     </validation:config>
 
     <validation:config name="byRefExceptionFactoryValidator">
-        <validation:exception-factory ref="customExceptionFactory" />
+        <validation:exception-factory>
+            <validation:exception-factory ref="customExceptionFactory"/>
+        </validation:exception-factory>
     </validation:config>
 
     <validation:config name="standard" />

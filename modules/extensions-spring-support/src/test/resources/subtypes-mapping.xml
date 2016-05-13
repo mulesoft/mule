@@ -15,18 +15,21 @@
                 <subtypes:triangle-alias height="2" area="1"/>
             </subtypes:abstract-shape>
             <subtypes:door-interface>
-                <subtypes:house-door locked="true"/>
+                <subtypes:house-door isLocked="true"/>
             </subtypes:door-interface>
         </subtypes:connection>
-
         <subtypes:abstract-shape>
             <subtypes:square side="1" area="1"/>
         </subtypes:abstract-shape>
         <subtypes:door-interface>
             <subtypes:car-door color="red"/>
         </subtypes:door-interface>
-        <subtypes:explicit-square side="2" area="4"/>
-        <subtypes:final-pojo someString="message"/>
+        <subtypes:explicit-square>
+            <subtypes:square side="2" area="4"/>
+        </subtypes:explicit-square>
+        <subtypes:final-pojo>
+            <subtypes:final-pojo someString="message"/>
+        </subtypes:final-pojo>
         <subtypes:imported-ricin>
             <heisenberg:ricin microgramsPerKilo="2"/>
         </subtypes:imported-ricin>
@@ -65,9 +68,11 @@
                 <subtypes:shape area="2"/>
             </subtypes:base-shape>
             <subtypes:door>
-                <subtypes:house-door locked="false"/>
+                <subtypes:house-door isLocked="false"/>
             </subtypes:door>
-            <subtypes:final-pojo-param someString="asChild"/>
+            <subtypes:final-pojo-param>
+                <subtypes:final-pojo someString="asChild"/>
+            </subtypes:final-pojo-param>
             <subtypes:cook-book>
                 <vegan:vegan-cook-book numberOfPages="1"/>
             </subtypes:cook-book>
@@ -81,7 +86,7 @@
     </flow>
 
     <subtypes:car-door name="global-car-door" color="white"/>
-    <subtypes:house-door name="global-house-door" locked="true"/>
+    <subtypes:house-door name="global-house-door" isLocked="true"/>
     <subtypes:shape name="global-shape" area="9"/>
     <subtypes:square name="global-square" side="3" area="9"/>
     <subtypes:triangle-alias name="global-triangle" height="6" area="3"/>

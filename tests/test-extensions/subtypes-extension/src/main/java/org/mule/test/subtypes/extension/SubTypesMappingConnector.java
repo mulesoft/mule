@@ -6,6 +6,7 @@
  */
 package org.mule.test.subtypes.extension;
 
+import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -25,6 +26,7 @@ import org.mule.test.vegan.extension.VeganExtension;
 @SubTypeMapping(baseType = Door.class, subTypes = {HouseDoor.class, CarDoor.class})
 @Import(type = Ricin.class, from = HeisenbergExtension.class)
 @Import(type = VeganCookBook.class, from = VeganExtension.class)
+@Export(classes = {Revolver.class})
 @Xml(namespace = "subtypes", namespaceLocation = "http://www.mulesoft.org/schema/mule/subtypes")
 public class SubTypesMappingConnector
 {

@@ -15,6 +15,8 @@
 
 package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
+import org.mule.runtime.core.util.StringUtils;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -98,4 +100,29 @@ public class Import
         this.schemaLocation = value;
     }
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        Import anImport = (Import) o;
+        return StringUtils.equals(getNamespace(), anImport.getNamespace()) &&
+               StringUtils.equals(getSchemaLocation(), anImport.getSchemaLocation());
+
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = getNamespace() != null ? getNamespace().hashCode() : 0;
+        result = 31 * result + (getSchemaLocation() != null ? getSchemaLocation().hashCode() : 0);
+        return result;
+    }
 }

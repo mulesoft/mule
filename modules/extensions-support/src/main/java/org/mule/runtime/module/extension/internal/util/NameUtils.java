@@ -7,11 +7,10 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.java.utils.JavaTypeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +25,6 @@ import org.apache.commons.lang.StringUtils;
  */
 public class NameUtils
 {
-
-    private NameUtils()
-    {
-    }
 
     private static final List<Inflection> plural = new ArrayList<>();
     private static final List<Inflection> singular = new ArrayList<>();
@@ -97,6 +92,10 @@ public class NameUtils
         uncountable("series");
         uncountable("fish");
         uncountable("sheep");
+    }
+
+    private NameUtils()
+    {
     }
 
     /**
@@ -262,16 +261,27 @@ public class NameUtils
      * {@link Alias#value()} is used. Otherwise, the class name will
      * be considered.
      *
-     * @param metadataType the {@link ObjectType} which name you want
+     * @param metadataType the {@link MetadataType} which name you want
      * @return the hypenized name for the given {@code type}
      */
-    public static String getTopLevelTypeName(ObjectType metadataType)
+    public static String getTopLevelTypeName(MetadataType metadataType)
     {
         Class<?> type = JavaTypeUtils.getType(metadataType);
         Alias alias = type.getAnnotation(Alias.class);
         String name = alias != null ? alias.value() : type.getSimpleName();
 
         return hyphenize(name);
+    }
+
+    /**
+     * Removes everything that's not a word, a dot nor a hyphen
+     *
+     * @param originalName name that needs the removal of invalid characters
+     * @return name without invalid characters
+     */
+    public static String sanitizeName(String originalName)
+    {
+        return originalName.replaceAll("[^\\w|\\.\\-]", EMPTY);
     }
 
     private static class Inflection
@@ -325,15 +335,5 @@ public class NameUtils
             }
             return java.util.regex.Pattern.compile(pattern, flags).matcher(word).replaceAll(replacement);
         }
-    }
-
-    /**
-     * Removes everything that's not a word, a dot nor a hyphen
-     * @param originalName name that needs the removal of invalid characters
-     * @return name without invalid characters
-     */
-    public static String sanitizeName(String originalName)
-    {
-        return originalName.replaceAll("[^\\w|\\.\\-]", EMPTY);
     }
 }
