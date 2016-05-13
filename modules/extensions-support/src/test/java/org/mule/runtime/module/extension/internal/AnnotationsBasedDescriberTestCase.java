@@ -462,7 +462,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(operation.getParameters(), "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
 
         operation = getOperation(extensionDeclaration, KNOCK);
-        assertParameter(operation.getParameters(), "door", "", toMetadataType(KnockeableDoor.class), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "knockedDoor", "", toMetadataType(KnockeableDoor.class), true, SUPPORTED, null);
 
         operation = getOperation(extensionDeclaration, KNOCK_MANY);
         assertParameter(operation.getParameters(), "doors", "", arrayOf(List.class, objectTypeBuilder(KnockeableDoor.class)), true, SUPPORTED, null);

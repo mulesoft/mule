@@ -54,7 +54,7 @@ public class ValidationExtension extends AbstractAnnotatedObject implements Conf
 {
 
     public static final String DEFAULT_LOCALE = Locale.getDefault().getLanguage();
-    private static final String EXCEPTION_FACTORY_PARAMETER_NAME = "exceptionFactory";
+    private static final String EXCEPTION_FACTORY_PARAMETER_NAME = "exceptionProvider";
 
     private ValidationMessages messageFactory;
     private ExceptionFactory exceptionFactory;
@@ -66,7 +66,6 @@ public class ValidationExtension extends AbstractAnnotatedObject implements Conf
     private ExceptionFactorySource exceptionFactorySource;
 
     @Parameter
-    @Alias("i18n")
     @Optional
     private I18NConfig i18nConfig;
 

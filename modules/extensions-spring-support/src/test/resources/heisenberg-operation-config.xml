@@ -130,25 +130,25 @@
 
     <flow name="knockStaticInlineDoor">
         <heisenberg:knock>
-            <heisenberg:door>
+            <heisenberg:knocked-door>
                 <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
-            </heisenberg:door>
+            </heisenberg:knocked-door>
         </heisenberg:knock>
     </flow>
 
     <flow name="knockStaticTopLevelDoor">
-        <heisenberg:knock door="door"/>
+        <heisenberg:knock knockedDoor="door"/>
     </flow>
 
     <flow name="knockDynamicTopLevelDoor">
-        <heisenberg:knock door="dynamicDoor"/>
+        <heisenberg:knock knockedDoor="dynamicDoor"/>
     </flow>
 
     <flow name="knockDynamicInlineDoor">
         <heisenberg:knock>
-            <heisenberg:door>
+            <heisenberg:knocked-door>
                 <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane"/>
-            </heisenberg:door>
+            </heisenberg:knocked-door>
         </heisenberg:knock>
     </flow>
 
