@@ -166,7 +166,7 @@
         <aspectjVersion>1.6.11</aspectjVersion>
         <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
-        <bouncycastleVersion>1.50</bouncycastleVersion>
+        <bouncycastleVersion>1.54</bouncycastleVersion>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.8.0</commonsBeanUtilsVersion>
@@ -180,17 +180,12 @@
         <commonsJxpathVersion>1.3</commonsJxpathVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
         <commonsNetVersion>2.0</commonsNetVersion>
-        <!-- TODO There is a more modern version of cryptix available:
-        http://mirrors.ibiblio.org/pub/mirrors/maven2/cryptix/cryptix/3.2.0/cryptix-3.2.0.jar
-        but the PGP module would need some work in order to use it -->
-        <cryptixJceVersion>20050328</cryptixJceVersion>
-        <cryptixVersion>20050405</cryptixVersion>
         <cxfVersion>2.5.9</cxfVersion>
         <derbyVersion>10.9.1.0</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
-		<geronimoSpecsJ2eeManagementVersion>1.1</geronimoSpecsJ2eeManagementVersion>
+	<geronimoSpecsJ2eeManagementVersion>1.1</geronimoSpecsJ2eeManagementVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
         <geronimoSpecsAnnotationVersion>1.0.1</geronimoSpecsAnnotationVersion>

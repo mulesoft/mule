@@ -521,11 +521,11 @@
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.6.11.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-api-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-impl-1.2.5.jar
-/mule-standalone-${productVersion}/lib/opt/bcmail-jdk15on-1.50.jar
-/mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.50.jar
-/mule-standalone-${productVersion}/lib/opt/bcpkix-jdk15on-1.50.jar
-/mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.50.jar
-/mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.50.jar
+/mule-standalone-${productVersion}/lib/opt/bcmail-jdk15on-1.54.jar
+/mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.54.jar
+/mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.54.jar
+/mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.54.jar
+/mule-standalone-${productVersion}/lib/opt/bcpkix-jdk15on-1.54.jar
 /mule-standalone-${productVersion}/lib/opt/cglib-nodep-2.2.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-api-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-server-6.1.26.jar

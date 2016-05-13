@@ -10,12 +10,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Provider;
-import java.security.SecureRandom;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
+import org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPCompressedDataGenerator;
 import org.bouncycastle.openpgp.PGPEncryptedData;
@@ -56,9 +57,11 @@ public class EncryptStreamTransformer implements StreamTransformer
     public void initialize(OutputStream out) throws Exception
     {
         armoredOut = new ArmoredOutputStream(out);
-        PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(PGPEncryptedData.CAST5, false,
-            new SecureRandom(), provider);
-        encrDataGen.addMethod(this.publicKey);
+        BcPGPDataEncryptorBuilder encryptorBuilder = new BcPGPDataEncryptorBuilder(PGPEncryptedData.CAST5);
+        PGPEncryptedDataGenerator encrDataGen = new PGPEncryptedDataGenerator(encryptorBuilder, false);
+
+        BcPublicKeyKeyEncryptionMethodGenerator methodGenerator = new BcPublicKeyKeyEncryptionMethodGenerator(this.publicKey);
+        encrDataGen.addMethod(methodGenerator);
         encryptedOutputStream = encrDataGen.open(armoredOut, new byte[1 << 16]);
 
         PGPCompressedDataGenerator comprDataGen = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
