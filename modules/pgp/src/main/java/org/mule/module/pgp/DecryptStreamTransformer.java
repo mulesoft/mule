@@ -6,6 +6,9 @@
  */
 package org.mule.module.pgp;
 
+import static org.mule.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULATOR;
+import static org.mule.module.pgp.util.BouncyCastleUtil.PBE_SECRET_KEY_DECRYPTOR_BUILDER;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +31,7 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyEncryptedData;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPUtil;
-import org.mule.module.pgp.util.BouncyCastleUtil;
+
 
 public class DecryptStreamTransformer implements StreamTransformer
 {
@@ -73,7 +76,7 @@ public class DecryptStreamTransformer implements StreamTransformer
     {
         InputStream decodedInputStream = PGPUtil.getDecoderStream(this.toBeDecrypted);
 
-        PGPObjectFactory pgpF = new PGPObjectFactory(decodedInputStream, BouncyCastleUtil.keyFingerprintCalculator);
+        PGPObjectFactory pgpF = new PGPObjectFactory(decodedInputStream, KEY_FINGERPRINT_CALCULATOR);
         Object pgpObject = pgpF.nextObject();
 
         if (pgpObject == null)
@@ -109,7 +112,7 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
 
         clearStream = pbe.getDataStream(new BcPublicKeyDataDecryptorFactory(privateKey));
-        PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(clearStream, BouncyCastleUtil.keyFingerprintCalculator);
+        PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(clearStream, KEY_FINGERPRINT_CALCULATOR);
 
         pgpObject = pgpObjectFactory.nextObject();
 
@@ -124,7 +127,7 @@ public class DecryptStreamTransformer implements StreamTransformer
             {
                 PGPCompressedData cData = (PGPCompressedData) pgpObject;
                 compressedStream = new BufferedInputStream(cData.getDataStream());
-                pgpObjectFactory = new PGPObjectFactory(compressedStream, BouncyCastleUtil.keyFingerprintCalculator);
+                pgpObjectFactory = new PGPObjectFactory(compressedStream, KEY_FINGERPRINT_CALCULATOR);
                 pgpObject = pgpObjectFactory.nextObject();
             }
             else
@@ -176,7 +179,7 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
         else
         {
-            return pgpSecKey.extractPrivateKey(BouncyCastleUtil.pbeSecretKeyDecryptorBuilder.build(pass.toCharArray()));
+            return pgpSecKey.extractPrivateKey(PBE_SECRET_KEY_DECRYPTOR_BUILDER.build(pass.toCharArray()));
         }
     }
 }

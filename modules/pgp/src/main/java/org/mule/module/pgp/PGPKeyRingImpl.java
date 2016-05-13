@@ -6,6 +6,14 @@
  */
 package org.mule.module.pgp;
 
+import static org.mule.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULATOR;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.module.pgp.i18n.PGPMessages;
+import org.mule.util.IOUtils;
+import org.mule.util.SecurityUtils;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,13 +27,7 @@ import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.module.pgp.i18n.PGPMessages;
-import org.mule.module.pgp.util.BouncyCastleUtil;
-import org.mule.util.IOUtils;
-import org.mule.util.SecurityUtils;
+
 
 public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 {
@@ -67,7 +69,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
     private void readPublicKeyRing() throws Exception
     {
         InputStream in = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
-        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in, BouncyCastleUtil.keyFingerprintCalculator);
+        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in, KEY_FINGERPRINT_CALCULATOR);
         in.close();
 
         for (Iterator iterator = collection.getKeyRings(); iterator.hasNext();)
@@ -90,7 +92,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
     private void readPrivateKeyBundle() throws Exception
     {
         InputStream in = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
-        PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in, BouncyCastleUtil.keyFingerprintCalculator);
+        PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in, KEY_FINGERPRINT_CALCULATOR);
         in.close();
         secretKey = collection.getSecretKey(Long.valueOf(getSecretAliasId()));
         
