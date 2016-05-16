@@ -41,6 +41,17 @@ public interface LifecycleRegistry extends Registry
     Object applyLifecycle(Object object, String phase) throws MuleException;
 
     /**
+     * Applies lifecycle phase to an object independent of the current lifecycle phase. All phases between the
+     * {@code startPhase} and the {@code endPhase} will be executed.
+     *
+     * @param object     the object to apply lifecycle to
+     * @param startPhase the lifecycle phase the object is currently in. Must not be null.
+     * @param toPhase    the lifecycle phase to transition the object to. Must not be null.
+     * @throws MuleException if there is an exception while invoking lifecycle on the object
+     */
+    void applyLifecycle(Object object, String startPhase, String toPhase) throws MuleException;
+
+    /**
      * Look up a single object by name.
      * <p/>
      * Because {@link #lookupObject(String)} will
@@ -59,6 +70,4 @@ public interface LifecycleRegistry extends Registry
      * @return object or {@code null} if not found
      */
     <T> T lookupObject(String key, boolean applyLifecycle);
-
-
 }

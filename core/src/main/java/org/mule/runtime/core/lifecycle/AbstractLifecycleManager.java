@@ -7,6 +7,7 @@
 package org.mule.runtime.core.lifecycle;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
@@ -46,13 +47,13 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
     protected String lifecycleManagerId;
     protected String currentPhase = NotInLifecyclePhase.PHASE_NAME;
     protected String executingPhase = null;
-    private Set<String> directTransitions = new HashSet<String>();
-    protected Set<String> phaseNames = new LinkedHashSet<String>(4);
-    protected Set<String> completedPhases = new LinkedHashSet<String>(4);
+    private Set<String> directTransitions = new HashSet<>();
+    protected Set<String> phaseNames = new LinkedHashSet<>(4);
+    protected Set<String> completedPhases = new LinkedHashSet<>(4);
     protected O object;
     protected LifecycleState state;
 
-    private TreeMap<String, LifecycleCallback> callbacks = new TreeMap<String, LifecycleCallback>();
+    private TreeMap<String, LifecycleCallback> callbacks = new TreeMap<>();
 
     public AbstractLifecycleManager(String id, O object)
     {
@@ -158,7 +159,71 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
         {
             setExecutingPhase(null);
         }
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void applyPhase(Object object, String startPhase, String toPhase) throws LifecycleException
+    {
+        if (startPhase == null || toPhase == null)
+        {
+            throw new IllegalArgumentException("toPhase and fromPhase must be null");
+        }
+        if (!phaseNames.contains(startPhase))
+        {
+            throw new IllegalArgumentException("fromPhase '" + startPhase + "' not a valid phase.");
+        }
+        if (!phaseNames.contains(toPhase))
+        {
+            throw new IllegalArgumentException("toPhase '" + startPhase + "' not a valid phase.");
+        }
+        boolean started = false;
+        for (String phaseName : phaseNames)
+        {
+            if (started)
+            {
+                invokePhase(object, phaseName);
+            }
+            if (toPhase.equals(phaseName))
+            {
+                break;
+            }
+            if (phaseName.equals(startPhase))
+            {
+                started = true;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void applyCompletedPhases(Object object) throws LifecycleException
+    {
+        String lastPhase = NotInLifecyclePhase.PHASE_NAME;
+        for (String phase : completedPhases)
+        {
+            if (isDirectTransition(lastPhase, phase))
+            {
+                invokePhase(object, phase);
+                lastPhase = phase;
+            }
+        }
+    }
+
+    private void invokePhase(Object object, String phase) throws LifecycleException
+    {
+        try
+        {
+            callbacks.get(phase).onTransition(phase, object);
+        }
+        catch (MuleException e)
+        {
+            throw new LifecycleException(e, object);
+        }
     }
 
     @Override

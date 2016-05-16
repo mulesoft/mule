@@ -61,6 +61,9 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
         return lookupObject(key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doRegisterObject(String key, Object object, Object metadata) throws RegistrationException
     {
@@ -87,6 +90,9 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object applyLifecycle(Object object) throws MuleException
     {
@@ -94,6 +100,9 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
         return object;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object applyLifecycle(Object object, String phase) throws MuleException
     {
@@ -108,12 +117,27 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
         return object;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void applyLifecycle(Object object, String startPhase, String toPhase) throws MuleException
+    {
+        getLifecycleManager().applyPhase(object, startPhase, toPhase);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T inject(T object)
     {
         return (T) applyProcessors(object, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Object applyProcessors(Object object, Object metadata)
     {

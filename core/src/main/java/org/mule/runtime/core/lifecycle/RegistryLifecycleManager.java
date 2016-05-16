@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
-import org.mule.runtime.core.api.lifecycle.RegistryLifecycleHelpers;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.registry.Registry;
@@ -33,7 +32,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 
-public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry> implements RegistryLifecycleHelpers
+public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
 {
 
 
@@ -116,7 +115,6 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
         checkPhase(destinationPhase);
         if (isDirectTransition(destinationPhase))
         {
-
             // transition to phase without going through other phases first
             invokePhase(destinationPhase, object, callbacks.get(destinationPhase));
         }
@@ -164,31 +162,30 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
         }
     }
 
-
-    //-------------------------------------------------------------------------------------------//
-    //-                     LIFECYCLE HELPER METHODS
-    //-------------------------------------------------------------------------------------------//
-
-
-    public void applyPhase(Object object, String fromPhase, String toPhase) throws LifecycleException
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void applyPhase(Object object, String startPhase, String toPhase) throws LifecycleException
     {
         //TODO i18n
-        if (fromPhase == null || toPhase == null)
+        if (startPhase == null || toPhase == null)
         {
             throw new IllegalArgumentException("toPhase and fromPhase must be null");
         }
-        if (!phaseNames.contains(fromPhase))
+        if (!phaseNames.contains(startPhase))
         {
-            throw new IllegalArgumentException("fromPhase '" + fromPhase + "' not a valid phase.");
+            throw new IllegalArgumentException("fromPhase '" + startPhase + "' not a valid phase.");
         }
         if (!phaseNames.contains(toPhase))
         {
-            throw new IllegalArgumentException("toPhase '" + fromPhase + "' not a valid phase.");
+            throw new IllegalArgumentException("toPhase '" + startPhase + "' not a valid phase.");
         }
-        boolean start = false;
+
+        boolean started = false;
         for (String phaseName : phaseNames)
         {
-            if (start)
+            if (started)
             {
                 phases.get(phaseName).applyLifecycle(object);
             }
@@ -196,14 +193,17 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
             {
                 break;
             }
-            if (phaseName.equals(fromPhase))
+            if (phaseName.equals(startPhase))
             {
-                start = true;
+                started = true;
             }
-
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void applyCompletedPhases(Object object) throws LifecycleException
     {
         String lastPhase = NotInLifecyclePhase.PHASE_NAME;

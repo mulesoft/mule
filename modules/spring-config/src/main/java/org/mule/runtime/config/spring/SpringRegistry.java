@@ -288,6 +288,9 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         return object;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object applyLifecycle(Object object, String phase) throws MuleException
     {
@@ -302,6 +305,18 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         return object;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void applyLifecycle(Object object, String startPhase, String toPhase) throws MuleException
+    {
+        getLifecycleManager().applyPhase(object, startPhase, toPhase);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T inject(T object)
     {
