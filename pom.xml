@@ -103,7 +103,6 @@
         <module>buildtools</module>
         <module>core</module>
         <module>core-tests</module>
-        <module>distributions</module>
         <module>modules</module>
         <module>tests</module>
         <module>extensions</module>
@@ -123,7 +122,6 @@
         <skipDistributions>true</skipDistributions>
         <skipVerifications>false</skipVerifications>
         <skipInstalls>false</skipInstalls>
-        <skipGpg>true</skipGpg>
 
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <coberturaVersion>2.5</coberturaVersion>
@@ -1984,20 +1982,26 @@
             </properties>
         </profile>
         <profile>
-            <id>release</id>
-            <activation>
-                <property>
-                    <name>buildDistributions</name>
-                    <value>true</value>
-                </property>
-            </activation>
+            <id>distributions</id>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
                 <skipDistributions>false</skipDistributions>
-                <skipVerifications>true</skipVerifications>
+                <skipVerifications>false</skipVerifications>
+                <skipInstalls>false</skipInstalls>
+            </properties>
+            <modules>
+                <module>distributions</module>
+            </modules>
+        </profile>
+		<profile>
+            <id>release</id>
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipVerifications>false</skipVerifications>
                 <skipInstalls>false</skipInstalls>
                 <skipTests>true</skipTests>
                 <skipSystemTests>true</skipSystemTests>
+                <skipGpg>false</skipGpg>
             </properties>
             <build>
                 <defaultGoal>deploy</defaultGoal>
