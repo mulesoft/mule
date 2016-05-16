@@ -18,12 +18,13 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
@@ -75,6 +76,7 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
+import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
@@ -135,6 +137,7 @@ public final class SchemaBuilder
 {
 
     private static final String UNBOUNDED = "unbounded";
+    private static final String ABSTRACT_ELEMENT_MASK = "abstract-%s";
 
     private final Set<Class<? extends Enum>> registeredEnums = new LinkedHashSet<>();
     private final Map<Class<?>, ComplexTypeHolder> registeredComplexTypesHolders = new LinkedHashMap<>();
@@ -150,24 +153,29 @@ public final class SchemaBuilder
     private boolean requiresTls = false;
     private SubTypesMappingContainer subTypesMapping;
     private Map<MetadataType, MetadataType> importedTypes;
+    private XmlModelProperty xmlProperties;
 
-    public static SchemaBuilder newSchema(ExtensionModel extensionModel, String targetNamespace)
+    public static SchemaBuilder newSchema(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty)
     {
         SchemaBuilder builder = new SchemaBuilder();
         builder.schema = new Schema();
-        builder.schema.setTargetNamespace(targetNamespace);
+        builder.schema.setTargetNamespace(xmlModelProperty.getNamespaceUri());
         builder.schema.setElementFormDefault(FormChoice.QUALIFIED);
         builder.schema.setAttributeFormDefault(FormChoice.UNQUALIFIED);
         builder.importXmlNamespace()
                 .importSpringFrameworkNamespace()
                 .importMuleNamespace()
                 .importMuleExtensionNamespace();
+        builder.withXmlDeclaration(xmlModelProperty);
+
+        Optional<Map<MetadataType, MetadataType>> importedTypes = extensionModel.getModelProperty(ImportedTypesModelProperty.class).map(ImportedTypesModelProperty::getImportedTypes);
+        builder.withImportedTypes(importedTypes.orElse(ImmutableMap.of()));
 
         Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
         builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : ImmutableMap.of());
 
-        Optional<Map<MetadataType, MetadataType>> importedTypes = extensionModel.getModelProperty(ImportedTypesModelProperty.class).map(ImportedTypesModelProperty::getImportedTypes);
-        builder.withImportedTypes(importedTypes.isPresent() ? importedTypes.get() : ImmutableMap.of());
+        extensionModel.getModelProperty(ExportModelProperty.class).ifPresent(e -> builder.withExportedTypes(e.getExportedClasses()));
+
 
         return builder;
     }
@@ -175,6 +183,8 @@ public final class SchemaBuilder
     private SchemaBuilder withTypeMapping(Map<MetadataType, List<MetadataType>> subTypesMapping)
     {
         this.subTypesMapping = new SubTypesMappingContainer(subTypesMapping);
+        subTypesMapping.forEach(this::registerPojoSubtypes);
+
         return this;
     }
 
@@ -184,9 +194,24 @@ public final class SchemaBuilder
         return this;
     }
 
+    private SchemaBuilder withExportedTypes(List<Class> exportedTypes)
+    {
+        exportedTypes.stream()
+                .filter(this::isInstantiableWithParameters)
+                .map(c -> getMetadataType(c, ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(c.getClassLoader())))
+                .forEach(t -> registerPojoType(t, t.getDescription().orElse(EMPTY)));
+        return this;
+    }
+
     public Schema build()
     {
         return schema;
+    }
+
+    private SchemaBuilder withXmlDeclaration(XmlModelProperty xmlModelProperty)
+    {
+        this.xmlProperties = xmlModelProperty;
+        return this;
     }
 
     private SchemaBuilder importXmlNamespace()
@@ -271,7 +296,6 @@ public final class SchemaBuilder
         return this;
     }
 
-
     void registerParameters(ExtensionType type, ExplicitGroup choice, Collection<ParameterModel> parameterModels)
     {
         for (final ParameterModel parameterModel : getSortedParameterModels(parameterModels))
@@ -323,7 +347,7 @@ public final class SchemaBuilder
         return sortedParameters;
     }
 
-    private String registerPojoType(ObjectType metadataType, String description)
+    private String registerPojoType(MetadataType metadataType, String description)
     {
         return registerPojoType(metadataType, null, description);
     }
@@ -333,11 +357,12 @@ public final class SchemaBuilder
      * top level type while assigning it a name. This method will not register
      * the same type twice even if requested to
      *
-     * @param metadataType a {@link ObjectType} describing a pojo type
+     * @param metadataType a {@link MetadataType} describing a pojo type
+     * @param metadataType a {@link MetadataType} describing a pojo's base type
      * @param description  the type's description
      * @return the reference name of the complexType
      */
-    private String registerPojoType(ObjectType metadataType, ObjectType baseType, String description)
+    String registerPojoType(MetadataType metadataType, MetadataType baseType, String description)
     {
         ComplexTypeHolder alreadyRegisteredType = registeredComplexTypesHolders.get(getType(metadataType));
         if (alreadyRegisteredType != null)
@@ -345,18 +370,18 @@ public final class SchemaBuilder
             return alreadyRegisteredType.getComplexType().getName();
         }
 
-        registerBasePojoType(metadataType, baseType, description);
-        registerPojoGlobalElement(metadataType, description);
+        registerPojoAsTypeWithBase((ObjectType) metadataType, (ObjectType) baseType, description);
+        registerPojoGlobalElement((ObjectType) metadataType, (ObjectType) baseType, description);
 
         return getBaseTypeName(metadataType);
     }
 
     private String getBaseTypeName(MetadataType type)
     {
-        return NameUtils.sanitizeName(getType(type).getName());
+        return sanitizeName(getType(type).getName());
     }
 
-    private ComplexType registerBasePojoType(ObjectType metadataType, ObjectType baseType, String description)
+    private ComplexType registerPojoAsTypeWithBase(ObjectType metadataType, ObjectType baseType, String description)
     {
         final Class<?> clazz = getType(metadataType);
         if (registeredComplexTypesHolders.get(clazz) != null)
@@ -364,29 +389,48 @@ public final class SchemaBuilder
             return registeredComplexTypesHolders.get(clazz).getComplexType();
         }
 
-        if (baseType != null && registeredComplexTypesHolders.get(getType(baseType)) == null)
+        ComplexType complexType;
+        if (baseType == null)
         {
-            throw new IllegalArgumentException(
-                    String.format("Base type [%s] is not registered as a Pojo type", getType(baseType).getSimpleName()));
+            complexType = declarePojoAsType(clazz, metadataType, MULE_ABSTRACT_EXTENSION_TYPE, description, metadataType.getFields());
+            complexType.getComplexContent().getExtension().getAttributeOrAttributeGroup().add(createNameAttribute(false));
+        }
+        else
+        {
+            XmlModelProperty baseTypeXml = getTypeXmlProperties(baseType);
+
+            QName base = new QName(baseTypeXml.getNamespaceUri(), getBaseTypeName(baseType), baseTypeXml.getNamespace());
+            Collection<ObjectFieldType> fields = metadataType.getFields().stream()
+                    .filter(f -> !baseType.getFields().contains(f)).collect(toList());
+
+            complexType = declarePojoAsType(clazz, metadataType, base, description, fields);
         }
 
+        schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
+        return complexType;
+    }
+
+    private XmlModelProperty getTypeXmlProperties(ObjectType baseType)
+    {
+        return importedTypes.get(baseType) == null ? xmlProperties
+                                                   : registerExtensionImport(getType(importedTypes.get(baseType)));
+    }
+
+    private ComplexType declarePojoAsType(Class<?> clazz, ObjectType metadataType, QName base, String description, Collection<ObjectFieldType> fields)
+    {
         final TopLevelComplexType complexType = new TopLevelComplexType();
         registeredComplexTypesHolders.put(clazz, new ComplexTypeHolder(complexType, metadataType));
 
-        complexType.setName(NameUtils.sanitizeName(clazz.getName()));
+        complexType.setName(sanitizeName(clazz.getName()));
         complexType.setAnnotation(createDocAnnotation(description));
 
         ComplexContent complexContent = new ComplexContent();
         complexType.setComplexContent(complexContent);
 
         final ExtensionType extension = new ExtensionType();
-        extension.setBase(baseType == null ? MULE_ABSTRACT_EXTENSION_TYPE :
-                          new QName(schema.getTargetNamespace(), NameUtils.sanitizeName(getType(baseType).getName())));
+        extension.setBase(base);
 
         complexContent.setExtension(extension);
-
-        Collection<ObjectFieldType> fields = baseType == null ? metadataType.getFields() :
-                                             metadataType.getFields().stream().filter(f -> !baseType.getFields().contains(f)).collect(toList());
 
         for (ObjectFieldType field : fields)
         {
@@ -399,7 +443,6 @@ public final class SchemaBuilder
             }
         }
 
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
         return complexType;
     }
 
@@ -423,7 +466,7 @@ public final class SchemaBuilder
     private void registerEnum(Schema schema, Class<? extends Enum> enumType)
     {
         TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
-        enumSimpleType.setName(NameUtils.sanitizeName(enumType.getName()) + SchemaConstants.ENUM_TYPE_SUFFIX);
+        enumSimpleType.setName(sanitizeName(enumType.getName()) + SchemaConstants.ENUM_TYPE_SUFFIX);
 
         Union union = new Union();
         union.getSimpleType().add(createEnumSimpleType(enumType));
@@ -463,47 +506,39 @@ public final class SchemaBuilder
         return enumValues;
     }
 
-    private void registerComplexTypeChildElement(ExplicitGroup all,
-                                                 String name,
-                                                 String description,
-                                                 ObjectType objectType,
-                                                 boolean required)
+    private void registerPojoGlobalElement(ObjectType metadataType, ObjectType baseType, String description)
     {
-        name = hyphenize(name);
+        String abstractElementName = getTopLevelAbstractTypeName(metadataType);
 
-        // this top level element is for declaring the object inside a config or operation
-        TopLevelElement objectElement = createTopLevelElement(name, required ? ONE : ZERO, "1");
-        objectElement.setComplexType(newLocalComplexTypeWithBase(objectType, description));
-        objectElement.setAnnotation(createDocAnnotation(description));
+        TopLevelElement abstractElement = new TopLevelElement();
+        abstractElement.setName(abstractElementName);
 
-        all.getParticle().add(objectFactory.createElement(objectElement));
+        XmlModelProperty baseTypeXml = getTypeXmlProperties(baseType);
+        abstractElement.setSubstitutionGroup(baseType == null ? MULE_ABSTRACT_EXTENSION :
+                                             new QName(baseTypeXml.getNamespaceUri(), getTopLevelAbstractTypeName(baseType), baseTypeXml.getNamespace()));
+        abstractElement.setAbstract(true);
+
+        schema.getSimpleTypeOrComplexTypeOrGroup().add(abstractElement);
+
+        QName typeRef = new QName(schema.getTargetNamespace(), registerPojoType(metadataType, description), xmlProperties.getNamespace());
+        if (!isInstantiableWithParameters(getType(metadataType)))
+        {
+            abstractElement.setType(typeRef);
+        }
+        else
+        {
+            TopLevelElement objectElement = new TopLevelElement();
+            objectElement.setName(getTopLevelTypeName(metadataType));
+            objectElement.setType(typeRef);
+            objectElement.setSubstitutionGroup(new QName(xmlProperties.getNamespaceUri(), abstractElementName, xmlProperties.getNamespace()));
+            objectElement.setAnnotation(createDocAnnotation(description));
+            schema.getSimpleTypeOrComplexTypeOrGroup().add(objectElement);
+        }
     }
 
-    private void registerPojoGlobalElement(ObjectType metadataType, String description)
+    private String getTopLevelAbstractTypeName(MetadataType type)
     {
-        TopLevelElement objectElement = new TopLevelElement();
-        objectElement.setName(getTopLevelTypeName(metadataType));
-
-        LocalComplexType complexContent = newLocalComplexTypeWithBase(metadataType, description);
-        complexContent.getComplexContent().getExtension().getAttributeOrAttributeGroup().add(createNameAttribute(false));
-        objectElement.setComplexType(complexContent);
-
-        objectElement.setSubstitutionGroup(MULE_ABSTRACT_EXTENSION);
-        objectElement.setAnnotation(createDocAnnotation(description));
-
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(objectElement);
-    }
-
-    private LocalComplexType newLocalComplexTypeWithBase(ObjectType type, String description)
-    {
-        LocalComplexType objectComplexType = new LocalComplexType();
-        objectComplexType.setComplexContent(new ComplexContent());
-        objectComplexType.getComplexContent().setExtension(new ExtensionType());
-        objectComplexType.getComplexContent().getExtension().setBase(
-                new QName(schema.getTargetNamespace(), registerPojoType(type, description))
-        ); // base to the pojo type
-
-        return objectComplexType;
+        return String.format(ABSTRACT_ELEMENT_MASK, getTopLevelTypeName(type));
     }
 
     Attribute createAttribute(String name, MetadataType type, boolean required, ExpressionSupport expressionSupport)
@@ -553,7 +588,7 @@ public final class SchemaBuilder
                     throw new IllegalParameterModelDefinitionException(String.format("Parameter '%s' refers to an enum class which couldn't be loaded.", name), e);
                 }
 
-                attribute.setType(new QName(schema.getTargetNamespace(), NameUtils.sanitizeName(enumType.getName()) + SchemaConstants.ENUM_TYPE_SUFFIX));
+                attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(enumType.getName()) + SchemaConstants.ENUM_TYPE_SUFFIX));
                 registeredEnums.add(enumType);
             }
 
@@ -574,7 +609,7 @@ public final class SchemaBuilder
 
         BigInteger minOccurs = required ? ONE : ZERO;
         String collectionName = hyphenize(NameUtils.singularize(name));
-        LocalComplexType collectionComplexType = generateCollectionComplexType(collectionName, description, metadataType);
+        LocalComplexType collectionComplexType = generateCollectionComplexType(collectionName, metadataType);
 
         TopLevelElement collectionElement = createTopLevelElement(name, minOccurs, "1");
         collectionElement.setAnnotation(createDocAnnotation(description));
@@ -583,13 +618,11 @@ public final class SchemaBuilder
         collectionElement.setComplexType(collectionComplexType);
     }
 
-    private LocalComplexType generateCollectionComplexType(String name, final String description, final ArrayType metadataType)
+    private LocalComplexType generateCollectionComplexType(String name, final ArrayType metadataType)
     {
         final LocalComplexType collectionComplexType = new LocalComplexType();
         final ExplicitGroup sequence = new ExplicitGroup();
         collectionComplexType.setSequence(sequence);
-
-        final TopLevelElement collectionItemElement = createTopLevelElement(name, ZERO, SchemaConstants.UNBOUNDED);
 
         final MetadataType genericType = metadataType.getType();
 
@@ -598,7 +631,9 @@ public final class SchemaBuilder
             @Override
             public void visitObject(ObjectType objectType)
             {
-                collectionItemElement.setComplexType(newLocalComplexTypeWithBase(objectType, description));
+                TopLevelElement collectionItemElement = createRefToLocalElement(objectType);
+                collectionItemElement.setMaxOccurs(UNBOUNDED);
+                sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
             }
 
             @Override
@@ -606,15 +641,14 @@ public final class SchemaBuilder
             {
                 LocalComplexType complexType = new LocalComplexType();
                 complexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, genericType, true, SUPPORTED));
+                TopLevelElement collectionItemElement = createTopLevelElement(name, ZERO, SchemaConstants.UNBOUNDED);
                 collectionItemElement.setComplexType(complexType);
+                sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
             }
         });
 
-        sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
-
         return collectionComplexType;
     }
-
 
     private void generateMapElement(ExplicitGroup all, String name, String description, DictionaryType metadataType, boolean required)
     {
@@ -622,7 +656,7 @@ public final class SchemaBuilder
 
         BigInteger minOccurs = required ? ONE : ZERO;
         String mapName = hyphenize(NameUtils.pluralize(name));
-        LocalComplexType mapComplexType = generateMapComplexType(mapName, description, metadataType);
+        LocalComplexType mapComplexType = generateMapComplexType(mapName, metadataType);
 
         TopLevelElement mapElement = createTopLevelElement(mapName, minOccurs, "1");
         mapElement.setAnnotation(createDocAnnotation(description));
@@ -631,7 +665,7 @@ public final class SchemaBuilder
         mapElement.setComplexType(mapComplexType);
     }
 
-    private LocalComplexType generateMapComplexType(String name, final String description, final DictionaryType metadataType)
+    private LocalComplexType generateMapComplexType(String name, final DictionaryType metadataType)
     {
         final LocalComplexType mapComplexType = new LocalComplexType();
         final ExplicitGroup mapEntrySequence = new ExplicitGroup();
@@ -653,7 +687,7 @@ public final class SchemaBuilder
             @Override
             public void visitObject(ObjectType objectType)
             {
-                final boolean shouldGenerateChildElement = shouldGeneratePojoChildElements(getType(objectType));
+                final boolean shouldGenerateChildElement = isInstantiableWithParameters(getType(objectType));
 
                 entryComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, valueType, !shouldGenerateChildElement, SUPPORTED));
 
@@ -662,9 +696,7 @@ public final class SchemaBuilder
                     ExplicitGroup singleItemSequence = new ExplicitGroup();
                     singleItemSequence.setMaxOccurs("1");
 
-                    LocalComplexType itemComplexType = newLocalComplexTypeWithBase(objectType, description);
-                    TopLevelElement itemElement = createTopLevelElement(NameUtils.getTopLevelTypeName(objectType), ZERO, "1", itemComplexType);
-                    singleItemSequence.getParticle().add(objectFactory.createElement(itemElement));
+                    singleItemSequence.getParticle().add(objectFactory.createElement(createRefToLocalElement(objectType)));
 
                     entryComplexType.setSequence(singleItemSequence);
                 }
@@ -861,29 +893,22 @@ public final class SchemaBuilder
 
                 defaultVisit(objectType);
 
-                if (importedTypes.get(objectType) != null)
-                {
-                    addImportedTypeRef(getType(importedTypes.get(objectType)), name, description, objectType, all);
-                    return;
-                }
-
                 if (ExpressionSupport.REQUIRED != expressionSupport)
                 {
-                    List<MetadataType> subTypes = subTypesMapping.getSubTypes(objectType);
-                    if (!subTypes.isEmpty())
+                    if (importedTypes.get(objectType) != null)
                     {
-                        registerPojoSubtypes(name, description, objectType, clazz, subTypes, all);
+                        addImportedTypeRef(getType(importedTypes.get(objectType)), name, description, objectType, all);
                     }
                     else
                     {
-                        if (shouldGeneratePojoChildElements(clazz))
-                        {
-                            registerComplexTypeChildElement(all,
-                                                            name,
-                                                            description,
-                                                            objectType,
-                                                            false);
-                        }
+                        registerPojoType(objectType, description);
+                        addAbstractTypeRef(name, description, objectType, all);
+                    }
+
+                    List<MetadataType> subTypes = subTypesMapping.getSubTypes(objectType);
+                    if (!subTypes.isEmpty())
+                    {
+                        registerPojoSubtypes(objectType, subTypes);
                     }
                 }
                 else
@@ -911,12 +936,7 @@ public final class SchemaBuilder
                 Class<?> clazz = getType(metadataType);
                 boolean isPrimitive = clazz.isPrimitive() || ClassUtils.isPrimitiveWrapper(clazz);
 
-                return !isExpressionRequired && (isPrimitive || (isPojo && shouldGeneratePojoChildElements(clazz)) || (!isPojo && isInstantiable(clazz)));
-            }
-
-            private boolean shouldGeneratePojoChildElements(Class<?> type)
-            {
-                return isInstantiable(type) && !getExposedFields(type).isEmpty();
+                return !isExpressionRequired && (isPrimitive || (isPojo && isInstantiableWithParameters(clazz)) || (!isPojo && isInstantiable(clazz)));
             }
 
             private boolean shouldForceOptional(Class<?> type)
@@ -933,11 +953,6 @@ public final class SchemaBuilder
         };
     }
 
-    private void addImportedTypeRef(Class<?> extensionType, ParameterModel parameterModel, ExplicitGroup all)
-    {
-        addImportedTypeRef(extensionType, parameterModel.getName(), parameterModel.getDescription(), parameterModel.getType(), all);
-    }
-
     private void addImportedTypeRef(Class<?> extensionType, String name, String description, MetadataType metadataType, ExplicitGroup all)
     {
         TopLevelElement objectElement = createTopLevelElement(hyphenize(name), ZERO, "1");
@@ -948,15 +963,9 @@ public final class SchemaBuilder
         sequence.setMinOccurs(ONE);
         sequence.setMaxOccurs("1");
 
-        XmlModelProperty xml = createXmlModelProperty(getAnnotation(extensionType, Xml.class),
-                                                      getAnnotation(extensionType, Extension.class).name(), "");
+        XmlModelProperty baseTypeXml = registerExtensionImport(extensionType);
 
-        Import schemaImport = new Import();
-        schemaImport.setNamespace(xml.getNamespaceUri());
-        schemaImport.setSchemaLocation(xml.getSchemaLocation());
-        schema.getIncludeOrImportOrRedefine().add(schemaImport);
-
-        QName qName = new QName(xml.getNamespaceUri(), hyphenize(getAliasName(metadataType)), xml.getNamespace());
+        QName qName = new QName(baseTypeXml.getNamespaceUri(), getTopLevelAbstractTypeName(metadataType), baseTypeXml.getNamespace());
         sequence.getParticle().add(objectFactory.createElement(createRefElement(qName, false)));
 
         objectElement.getComplexType().setSequence(sequence);
@@ -964,31 +973,64 @@ public final class SchemaBuilder
         all.getParticle().add(objectFactory.createElement(objectElement));
     }
 
-    private void registerPojoSubtypes(String name, String description, MetadataType metadataType, Class<?> parameterClass, List<MetadataType> subTypes, ExplicitGroup all)
+    private XmlModelProperty registerExtensionImport(Class<?> extensionType)
     {
-        TopLevelElement objectElement = createTopLevelElement(hyphenize(name), ZERO, "1");
-        objectElement.setComplexType(new LocalComplexType());
-        objectElement.setAnnotation(createDocAnnotation(description));
+        XmlModelProperty importedExtensionXml = createXmlModelProperty(getAnnotation(extensionType, Xml.class),
+                                                                       getAnnotation(extensionType, Extension.class).name(), "");
 
-        ExplicitGroup choice = new ExplicitGroup();
-        choice.setMinOccurs(ONE);
-        choice.setMaxOccurs("1");
-
-        registerPojoType((ObjectType) metadataType, EMPTY);
-        if (shouldGeneratePojoChildElements(parameterClass))
+        Import schemaImport = new Import();
+        schemaImport.setNamespace(importedExtensionXml.getNamespaceUri());
+        schemaImport.setSchemaLocation(importedExtensionXml.getSchemaLocation());
+        if (!schema.getIncludeOrImportOrRedefine().contains(schemaImport))
         {
-            TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(getAliasName(metadataType))), false);
-            choice.getParticle().add(objectFactory.createElement(refElement));
+            schema.getIncludeOrImportOrRedefine().add(schemaImport);
+        }
+        return importedExtensionXml;
+    }
+
+    private void registerPojoSubtypes(MetadataType baseType, List<MetadataType> subTypes)
+    {
+        if (importedTypes.get(baseType) != null)
+        {
+            registerExtensionImport(getType(importedTypes.get(baseType)));
+        }
+        else
+        {
+            registerPojoType(baseType, EMPTY);
         }
 
-        subTypes.forEach(subtype -> {
-            registerPojoType((ObjectType) subtype, (ObjectType) metadataType, EMPTY);
-            TopLevelElement refElement = createRefElement(new QName(schema.getTargetNamespace(), hyphenize(getAliasName(subtype))), false);
-            choice.getParticle().add(objectFactory.createElement(refElement));
-        });
+        subTypes.forEach(subtype -> registerPojoType(subtype, baseType, EMPTY));
+    }
 
-        objectElement.getComplexType().setChoice(choice);
+    private void addAbstractTypeRef(String parameterName, String description, MetadataType metadataType, ExplicitGroup all)
+    {
+        TopLevelElement objectElement = createTopLevelElement(hyphenize(parameterName), ZERO, "1");
+        objectElement.setAnnotation(createDocAnnotation(description));
+        objectElement.setComplexType(createComplexTypeWithAbstractElementRef(metadataType));
+
         all.getParticle().add(objectFactory.createElement(objectElement));
+    }
+
+    private LocalComplexType createComplexTypeWithAbstractElementRef(MetadataType metadataType)
+    {
+        ExplicitGroup sequence = new ExplicitGroup();
+        sequence.setMinOccurs(ONE);
+        sequence.setMaxOccurs("1");
+
+        registerPojoType(metadataType, EMPTY);
+
+        sequence.getParticle().add(objectFactory.createElement(createRefToLocalElement(metadataType)));
+
+        LocalComplexType complexType = new LocalComplexType();
+        complexType.setSequence(sequence);
+
+        return complexType;
+    }
+
+    private TopLevelElement createRefToLocalElement(MetadataType metadataType)
+    {
+        QName qName = new QName(xmlProperties.getNamespaceUri(), getTopLevelAbstractTypeName(metadataType), xmlProperties.getNamespace());
+        return createRefElement(qName, false);
     }
 
     private boolean isOperation(MetadataType type)
@@ -1046,7 +1088,7 @@ public final class SchemaBuilder
         return element;
     }
 
-    private boolean shouldGeneratePojoChildElements(Class<?> type)
+    private boolean isInstantiableWithParameters(Class<?> type)
     {
         return isInstantiable(type) && !getExposedFields(type).isEmpty();
     }

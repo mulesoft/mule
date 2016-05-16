@@ -7,7 +7,7 @@
                http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
 
-    <context:property-placeholder location="heisenberg.properties" />
+    <context:property-placeholder location="heisenberg.properties"/>
 
     <heisenberg:config name="heisenberg"
                        myName="Heisenberg"
@@ -26,12 +26,18 @@
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin-pack microgramsPerKilo="22">
-                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
-            </heisenberg:ricin-pack>
+            <heisenberg:ricin microgramsPerKilo="22">
+                <heisenberg:destination>
+                    <heisenberg:door victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:destination>
+            </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        <heisenberg:next-door>
+            <heisenberg:door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous>
+                    <heisenberg:door victim="Krazy-8" address="Jesse's"/>
+                </heisenberg:previous>
+            </heisenberg:door>
         </heisenberg:next-door>
     </heisenberg:config>
 
@@ -52,17 +58,23 @@
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin-pack microgramsPerKilo="22">
-                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
-            </heisenberg:ricin-pack>
+            <heisenberg:ricin microgramsPerKilo="22">
+                <heisenberg:destination>
+                    <heisenberg:door victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:destination>
+            </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        <heisenberg:next-door>
+            <heisenberg:door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous>
+                    <heisenberg:door victim="Krazy-8" address="Jesse's"/>
+                </heisenberg:previous>
+            </heisenberg:door>
         </heisenberg:next-door>
     </heisenberg:config>
 
     <flow name="sayMyName">
-        <heisenberg:say-my-name />
+        <heisenberg:say-my-name/>
     </flow>
 
 </mule>

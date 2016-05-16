@@ -10,4 +10,6 @@ public interface Door
 {
 
     void open();
+
+    String getHandle();
 }

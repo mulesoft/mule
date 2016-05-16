@@ -31,16 +31,26 @@
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
-        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        <heisenberg:next-door>
+            <heisenberg:door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous>
+                    <heisenberg:door victim="Krazy-8" address="Jesse's"/>
+                </heisenberg:previous>
+            </heisenberg:door>
         </heisenberg:next-door>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin-pack microgramsPerKilo="22">
-                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
-            </heisenberg:ricin-pack>
+            <heisenberg:ricin microgramsPerKilo="22">
+                <heisenberg:destination>
+                    <heisenberg:door victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:destination>
+            </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        <heisenberg:next-door>
+            <heisenberg:door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous>
+                    <heisenberg:door victim="Krazy-8" address="Jesse's"/>
+                </heisenberg:previous>
+            </heisenberg:door>
         </heisenberg:next-door>
         <heisenberg:deaths-by-seasons>
             <heisenberg:deaths-by-season key="s01">
@@ -53,7 +63,9 @@
         <heisenberg:labeled-ricins>
             <heisenberg:labeled-ricin key="pojo">
                 <heisenberg:ricin microgramsPerKilo="22">
-                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                    <heisenberg:destination>
+                        <heisenberg:door victim="Lidia" address="Stevia coffe shop"/>
+                    </heisenberg:destination>
                 </heisenberg:ricin>
             </heisenberg:labeled-ricin>
         </heisenberg:labeled-ricins>
@@ -90,12 +102,18 @@
             <heisenberg:enemy value="${hank}"/>
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin-pack microgramsPerKilo="${microgramsPerKilo}">
-                <heisenberg:destination victim="${lidia}" address="${steviaCoffeShop}"/>
-            </heisenberg:ricin-pack>
+            <heisenberg:ricin microgramsPerKilo="${microgramsPerKilo}">
+                <heisenberg:destination>
+                    <heisenberg:door victim="${lidia}" address="${steviaCoffeShop}"/>
+                </heisenberg:destination>
+            </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door address="${pollosHermanos}" victim="${fring}">
-            <heisenberg:previous victim="${krazy8}" address="${jesseAddress}"/>
+        <heisenberg:next-door>
+            <heisenberg:door address="${pollosHermanos}" victim="${fring}">
+                <heisenberg:previous>
+                    <heisenberg:door victim="${krazy8}" address="${jesseAddress}"/>
+                </heisenberg:previous>
+            </heisenberg:door>
         </heisenberg:next-door>
         <heisenberg:monthly-incomes>
             <heisenberg:monthly-income value="12000"/>
@@ -146,12 +164,18 @@
             <heisenberg:enemy value="#[hank]"/>
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin-pack microgramsPerKilo="#[microgramsPerKilo]">
-                <heisenberg:destination victim="#[lidia]" address="#[steviaCoffeShop]"/>
-            </heisenberg:ricin-pack>
+            <heisenberg:ricin microgramsPerKilo="#[microgramsPerKilo]">
+                <heisenberg:destination>
+                    <heisenberg:door victim="#[lidia]" address="#[steviaCoffeShop]"/>
+                </heisenberg:destination>
+            </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door address="#[pollosHermanos]" victim="#[gustavoFring]">
-            <heisenberg:previous victim="#[krazy8]" address="#[jesses]"/>
+        <heisenberg:next-door>
+            <heisenberg:door address="#[pollosHermanos]" victim="#[gustavoFring]">
+                <heisenberg:previous>
+                    <heisenberg:door victim="#[krazy8]" address="#[jesses]"/>
+                </heisenberg:previous>
+            </heisenberg:door>
         </heisenberg:next-door>
     </heisenberg:config>
 
@@ -225,11 +249,15 @@
     </spring:beans>
 
     <heisenberg:door victim="Gustavo Fring" address="pollos hermanos" name="door">
-        <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        <heisenberg:previous>
+            <heisenberg:door victim="Krazy-8" address="Jesse's"/>
+        </heisenberg:previous>
     </heisenberg:door>
 
     <heisenberg:ricin microgramsPerKilo="22" name="ricin">
-        <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+        <heisenberg:destination>
+            <heisenberg:door victim="Lidia" address="Stevia coffe shop"/>
+        </heisenberg:destination>
     </heisenberg:ricin>
 
     <heisenberg:door victim="Skyler" address="308 Negra Arroyo Lane" name="skylerDoor"/>

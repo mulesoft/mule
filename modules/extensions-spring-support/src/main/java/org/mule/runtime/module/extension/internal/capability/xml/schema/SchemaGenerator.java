@@ -47,7 +47,7 @@ public class SchemaGenerator
     public String generate(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty)
     {
         validate(extensionModel, xmlModelProperty);
-        SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(extensionModel, xmlModelProperty.getNamespaceUri());
+        SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(extensionModel, xmlModelProperty);
 
         extensionModel.getConfigurationModels().forEach(conf -> schemaBuilder.registerConfigElement((RuntimeConfigurationModel) conf));
         extensionModel.getOperationModels().forEach(schemaBuilder::registerOperation);

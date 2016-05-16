@@ -27,14 +27,13 @@ import org.w3c.dom.Element;
  *
  * @since 3.7.0
  */
-public final class ElementDescriptor
+final class ElementDescriptor
 {
 
     private final String name;
     private final Map<String, String> attributes;
     private final ListMultimap<String, ElementDescriptor> childs;
     private final Element sourceElement;
-    private final List<ElementDescriptor> childsAux;
 
     /**
      * Creates a new instance which describes an XML element
@@ -53,7 +52,6 @@ public final class ElementDescriptor
         this.childs = LinkedListMultimap.create();
         childs.forEach(child -> this.childs.put(child.getName(), child));
         this.sourceElement = sourceElement;
-        childsAux = childs;
     }
 
     public String getName()
@@ -80,21 +78,6 @@ public final class ElementDescriptor
     public Collection<ElementDescriptor> getChildsByName(String childName)
     {
         return childs.get(childName);
-    }
-
-    public Collection<ElementDescriptor> getChilds() {
-        return childsAux;
-    }
-
-    public ElementDescriptor getChildByIndex(int index)
-    {
-        if (childs.entries().size() <= index)
-        {
-            return null;
-        }
-
-        Collection<ElementDescriptor> values = (Collection<ElementDescriptor>) ((LinkedListMultimap) childs).values().get(index);
-        return CollectionUtils.isEmpty(values) ? null : values.iterator().next();
     }
 
     public Element getSourceElement()

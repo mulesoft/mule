@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -56,6 +57,7 @@ import javax.inject.Inject;
 @Providers(HeisenbergConnectionProvider.class)
 @Sources(HeisenbergSource.class)
 @Export(classes = {HeisenbergException.class})
+@SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
 public class HeisenbergExtension implements Lifecycle, MuleContextAware
 {
 

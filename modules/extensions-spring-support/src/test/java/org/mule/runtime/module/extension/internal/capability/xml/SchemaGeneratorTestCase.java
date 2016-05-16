@@ -51,14 +51,12 @@ import org.junit.runners.Parameterized;
 public class SchemaGeneratorTestCase extends AbstractMuleTestCase
 {
 
-    private SchemaGenerator generator;
-    private ExtensionFactory extensionFactory;
-
     @Parameterized.Parameter(0)
     public Class<?> extensionUnderTest;
-
     @Parameterized.Parameter(1)
     public String expectedXSD;
+    private SchemaGenerator generator;
+    private ExtensionFactory extensionFactory;
 
     @Parameterized.Parameters(name = "{1}")
     public static Collection<Object[]> data()

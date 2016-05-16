@@ -6,38 +6,25 @@
  */
 package org.mule.test.subtypes.extension;
 
+import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.test.heisenberg.extension.model.Weapon;
 
-public class CarDoor implements Door
+public class Revolver implements Weapon
 {
 
-    private String color;
+    @Parameter
+    @Optional(defaultValue = "6")
+    private int bullets;
 
-    @Optional(defaultValue = "button")
-    private String handle;
-
-    @Override
-    public void open()
+    public int getBullets()
     {
-    }
-
-    public void raiseWindow()
-    {
-    }
-
-    public String getColor()
-    {
-        return color;
-    }
-
-    public void setColor(String color)
-    {
-        this.color = color;
+        return bullets;
     }
 
     @Override
-    public String getHandle()
+    public String kill()
     {
-        return this.handle;
+        return bullets > 0 ? "BANG" : "LUCKY";
     }
 }

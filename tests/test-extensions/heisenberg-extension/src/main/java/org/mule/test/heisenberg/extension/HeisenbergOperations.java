@@ -89,9 +89,9 @@ public class HeisenbergOperations
         return String.format("%s, %s", goodbyeMessage, victim);
     }
 
-    public String knock(KnockeableDoor door)
+    public String knock(KnockeableDoor knockedDoor)
     {
-        return door.knock();
+        return knockedDoor.knock();
     }
 
     public String killWithWeapon(Weapon weapon, WeaponType type, Weapon.WeaponAttributes weaponAttributes)

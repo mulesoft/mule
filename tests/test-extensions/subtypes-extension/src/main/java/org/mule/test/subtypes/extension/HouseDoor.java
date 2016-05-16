@@ -6,10 +6,18 @@
  */
 package org.mule.test.subtypes.extension;
 
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+
 public class HouseDoor implements Door
 {
 
+    @Parameter
     private boolean isLocked;
+
+    @Parameter
+    @Optional(defaultValue = "pivotal")
+    private String handle;
 
     @Override
     public void open()
@@ -24,5 +32,11 @@ public class HouseDoor implements Door
     public void setLocked(boolean locked)
     {
         isLocked = locked;
+    }
+
+    @Override
+    public String getHandle()
+    {
+        return this.handle;
     }
 }

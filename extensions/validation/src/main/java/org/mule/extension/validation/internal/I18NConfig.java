@@ -7,6 +7,7 @@
 package org.mule.extension.validation.internal;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -15,6 +16,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 3.7.0
  */
+@Alias("i18n")
 public final class I18NConfig
 {
 

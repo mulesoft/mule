@@ -170,11 +170,6 @@ public final class ParameterModelValidator implements ModelValidator
 
     private void validateNameCollisionWithTypes(ParameterModel parameterModel, String ownerName, String ownerModelType, String extensionName, List<String> parameterNames)
     {
-        if (subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty() && !importedTypes.containsKey(parameterModel.getType()))
-        {
-            return;
-        }
-
         if (parameterNames.contains(getAliasName(parameterModel.getType())))
         {
             throw new IllegalParameterModelDefinitionException(
@@ -192,7 +187,6 @@ public final class ParameterModelValidator implements ModelValidator
                                   getAliasName(subTypeWithNameCollision.get()), ownerModelType, ownerName, extensionName,
                                   getType(subTypeWithNameCollision.get()).getSimpleName(), parameterModel.getName()));
         }
-
     }
 
 }

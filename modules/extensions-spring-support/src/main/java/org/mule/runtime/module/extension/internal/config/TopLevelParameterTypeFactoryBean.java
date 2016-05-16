@@ -8,13 +8,13 @@ package org.mule.runtime.module.extension.internal.config;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import org.springframework.beans.factory.FactoryBean;
@@ -63,7 +63,7 @@ final class TopLevelParameterTypeFactoryBean extends ExtensionComponentFactoryBe
     {
         if (valueResolver == null)
         {
-            valueResolver = parserDelegate.parseElement(element, EMPTY, EMPTY, metadataType, null);
+            valueResolver = parserDelegate.parseElement(new ParameterParsingDescriptor(element, EMPTY, EMPTY, metadataType, null));
         }
 
         return valueResolver;

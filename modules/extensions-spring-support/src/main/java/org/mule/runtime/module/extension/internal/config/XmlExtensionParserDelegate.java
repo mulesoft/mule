@@ -10,7 +10,6 @@ import static org.mule.metadata.java.utils.JavaTypeUtils.getGenericTypeAt;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.pluralize;
@@ -68,6 +67,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -162,34 +162,38 @@ final class XmlExtensionParserDelegate
             return new StaticValueResolver<>(getAttributeValue(componentRootElement, parameterModel.getName(), parameterModel.getDefaultValue()));
         }
 
-        ElementDescriptor paramChildElement = componentRootElement.getChildByName(hyphenize(parameterModel.getName()));
+        return parseElement(getParameterParsingDescriptor(componentRootElement, parameterModel.getName(),
+                                                          parameterModel.getType(), parameterModel.getDefaultValue()));
+    }
+
+    private ParameterParsingDescriptor getParameterParsingDescriptor(ElementDescriptor componentRootElement, final String name, MetadataType type, Object defaultValue)
+    {
+        ElementDescriptor paramChildElement = componentRootElement.getChildByName(hyphenize(name));
         if (paramChildElement != null)
         {
-            if (importedTypes.get(parameterModel.getType()) != null)
+            if (!subTypesMapping.getSubTypes(type).isEmpty())
             {
-                return parseElement(paramChildElement, parameterModel.getName(),
-                                    hyphenize(getAliasName(parameterModel.getType())),
-                                    parameterModel.getType(),
-                                    parameterModel.getDefaultValue());
-            }
-
-            if (!subTypesMapping.getSubTypes(parameterModel.getType()).isEmpty())
-            {
-                Optional<MetadataType> childTypeFromSubtype = subTypesMapping.getSubTypes(parameterModel.getType()).stream()
-                        .filter(s -> paramChildElement.getChildByName(hyphenize(getAliasName(s))) != null)
+                Optional<MetadataType> childTypeFromSubtype = subTypesMapping.getSubTypes(type).stream()
+                        .filter(s -> paramChildElement.getChildByName(getTopLevelTypeName(s)) != null)
                         .findFirst();
 
-                MetadataType childType = childTypeFromSubtype.isPresent() ? childTypeFromSubtype.get() : parameterModel.getType();
+                if (childTypeFromSubtype.isPresent())
+                {
+                    return new ParameterParsingDescriptor(paramChildElement, name,
+                                                          getTopLevelTypeName(childTypeFromSubtype.get()),
+                                                          childTypeFromSubtype.get(), defaultValue);
+                }
+            }
 
-                return parseElement(paramChildElement, parameterModel.getName(),
-                                    hyphenize(getAliasName(childType)),
-                                    childType,
-                                    parameterModel.getDefaultValue());
+            if (paramChildElement.getChildByName(getTopLevelTypeName(type)) != null ||
+                importedTypes.containsKey(type))
+            {
+                return new ParameterParsingDescriptor(paramChildElement, name, getTopLevelTypeName(type),
+                                                      type, defaultValue);
             }
         }
 
-        return parseElement(componentRootElement, parameterModel.getName(), hyphenize(parameterModel.getName()),
-                            parameterModel.getType(), parameterModel.getDefaultValue());
+        return new ParameterParsingDescriptor(componentRootElement, name, hyphenize(name), type, defaultValue);
     }
 
     /**
@@ -197,22 +201,18 @@ final class XmlExtensionParserDelegate
      * {@code metadataType}. It then returns a {@link ValueResolver} which will provide
      * the actual value extracted from the {@code element}
      *
-     * @param element      a {@link ElementDescriptor}
-     * @param fieldName    the name of the variable in which the value is to be stored
-     * @param metadataType the {@link MetadataType} that describes the type of the value to be extracted
-     * @param defaultValue a default value in case that the {@code element} does not contain an actual value
+     * @param parameterDescriptor a {@link ParameterParsingDescriptor}                  //TODO FIXME
      * @return a {@link ValueResolver}
      */
-    ValueResolver parseElement(final ElementDescriptor element,
-                               final String fieldName,
-                               final String elementName,
-                               final MetadataType metadataType,
-                               final Object defaultValue)
+    ValueResolver parseElement(ParameterParsingDescriptor parameterDescriptor)
     {
-        final String singularName = singularize(elementName);
         final ValueHolder<ValueResolver> resolverReference = new ValueHolder<>();
+        final ElementDescriptor element = parameterDescriptor.getElement();
+        final String elementName = parameterDescriptor.getChildElementName();
+        final String fieldName = parameterDescriptor.getFieldName();
+        final Object defaultValue = parameterDescriptor.getDefaultValue();
 
-        metadataType.accept(new MetadataTypeVisitor()
+        parameterDescriptor.getMetadataType().accept(new MetadataTypeVisitor()
         {
             /**
              * An attribute of a generic type
@@ -230,7 +230,7 @@ final class XmlExtensionParserDelegate
             @Override
             public void visitArrayType(ArrayType arrayType)
             {
-                resolverReference.set(parseCollection(element, fieldName, elementName, singularName, defaultValue, arrayType));
+                resolverReference.set(parseCollection(element, fieldName, elementName, singularize(elementName), defaultValue, arrayType));
             }
 
             /**
@@ -246,7 +246,7 @@ final class XmlExtensionParserDelegate
                 if (StringUtils.equals(pluralName, elementName))
                 {
                     parentName = elementName;
-                    childname = singularName;
+                    childname = singularize(elementName);
                 }
                 else
                 {
@@ -399,7 +399,9 @@ final class XmlExtensionParserDelegate
         final MetadataType itemsType = collectionType.getType();
         final List<ValueResolver<Object>> resolvers = new LinkedList<>();
 
-        for (final ElementDescriptor item : collectionElement.getChildsByName(childElementName))
+        Collection<ElementDescriptor> items = collectionElement.getChildsByName(childElementName);
+        items = items.isEmpty() ? collectionElement.getChildsByName(getTopLevelTypeName(itemsType)) : items;
+        for (final ElementDescriptor item : items)
         {
             itemsType.accept(new MetadataTypeVisitor()
             {
@@ -686,7 +688,7 @@ final class XmlExtensionParserDelegate
                 if (childElement != null)
                 {
                     // recursive parsing for object fields
-                    resolver = parseElement(element, parameterName, childElement.getName(), fieldType, null);
+                    resolver = parseElement(getParameterParsingDescriptor(element, parameterName, fieldType, null));
                 }
             }
 

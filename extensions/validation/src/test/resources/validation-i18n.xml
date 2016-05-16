@@ -6,7 +6,9 @@
         http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 
     <validation:config name="ar">
-        <validation:i18n bundlePath="test-messages" locale="ar"/>
+        <validation:i18n-config>
+            <validation:i18n bundlePath="test-messages" locale="ar"/>
+        </validation:i18n-config>
     </validation:config>
 
     <flow name="localizedMessage">
