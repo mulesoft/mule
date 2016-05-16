@@ -111,7 +111,6 @@
     <modules>
         <module>buildtools</module>
         <module>core</module>
-        <module>distributions</module>
         <module>examples</module>
         <module>modules</module>
         <module>patterns</module>
@@ -134,7 +133,6 @@
         <skipDistributions>true</skipDistributions>
         <skipVerifications>false</skipVerifications>
         <skipInstalls>false</skipInstalls>
-        <skipGpg>true</skipGpg>
 
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <licensePath>LICENSE_HEADER.txt</licensePath>
@@ -2134,20 +2132,26 @@
             </properties>
         </profile>
         <profile>
-            <id>release</id>
-            <activation>
-                <property>
-                    <name>buildDistributions</name>
-                    <value>true</value>
-                </property>
-            </activation>
+            <id>distributions</id>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
                 <skipDistributions>false</skipDistributions>
-                <skipVerifications>true</skipVerifications>
+                <skipVerifications>false</skipVerifications>
+                <skipInstalls>false</skipInstalls>
+            </properties>
+            <modules>
+                <module>distributions</module>
+            </modules>
+        </profile>
+		<profile>
+            <id>release</id>
+            <properties>
+                <skipIntegrationTests>true</skipIntegrationTests>
+                <skipVerifications>false</skipVerifications>
                 <skipInstalls>false</skipInstalls>
                 <skipTests>true</skipTests>
                 <skipSystemTests>true</skipSystemTests>
+                <skipGpg>false</skipGpg>
             </properties>
             <build>
                 <defaultGoal>deploy</defaultGoal>
