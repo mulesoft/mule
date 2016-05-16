@@ -29,7 +29,11 @@ The following table lists common goals to execute for building Mule. These goals
 |Command | Description |
 |:----------|:-------------|
 | `mvn clean`	 | purges any built artifacts or intermediate files (such as .class) from the target directory |
-| `mvn install` | installs the artifact to your local repository, will run all tests but the ones that have external dependencies. |
+| `mvn install` | installs all modules but the distributions to your local repository, will run all tests but the ones that have external dependencies. |
+| `mvn install -Pdistributions` | installs all modules and distributions to your local repository. |
+| `mvn install -Prelease` | same as `mvn install` including sources, tests, javadocs and GPG signatures. |
+| `mvn install -Prelease -DskipGpg=true` | same as `mvn install -Prelease` without GPG signatures. |
+| `mvn install -Pdistributions,release` | installs all jars, distributions including sources, tests, javadocs and GPG signatures. |
 | `mvn test`    | runs any unit tests for this sub-project |
 | `mvn -DskipTests install` |	By default, Maven runs all unit tests for each project for each build which, depending on the project, can take a long time to complete. If you wish, you can skip the tests using this command.|
  
