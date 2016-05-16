@@ -11,22 +11,23 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 
 /**
- * This {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} implementation is designed to track the lifecycle of objects
- * that support the {@link org.mule.runtime.core.api.lifecycle.Initialisable#PHASE_NAME}, {@link org.mule.runtime.core.api.lifecycle.Startable#PHASE_NAME},
- * {@link org.mule.runtime.core.api.lifecycle.Stoppable#PHASE_NAME} and {@link org.mule.runtime.core.api.lifecycle.Disposable#PHASE_NAME} phases and
- * adds convenience methods for firing these phases by callbacks.  
- * 
- * This is an internal class used by Mule for managing state for objects such as {@link org.mule.runtime.core.api.service.Service},
- * {@link org.mule.runtime.core.api.transport.Connector} and {@link org.mule.runtime.core.api.agent.Agent}, all of which can be controlled externally via JMX
- * @param <O> the object type being managed by this {@link org.mule.runtime.core.api.lifecycle.LifecycleManager}
+ * This {@link LifecycleManager} implementation is designed to track the lifecycle of objects
+ * that implement any of the {@link Initialisable}, {@link Startable}, {@link Stoppable} or
+ * {@link Disposable} interfaces.
+ * <p>
+ * Also, adds convenience methods for firing these phases by callbacks.
+ *
+ * @param <O> the object type being managed by this {@link LifecycleManager}
  */
 public abstract class SimpleLifecycleManager<O> extends AbstractLifecycleManager<O>
 {
+
     public SimpleLifecycleManager(String id, O object)
     {
         super(id, object);

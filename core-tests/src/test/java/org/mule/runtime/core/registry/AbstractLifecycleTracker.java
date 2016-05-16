@@ -22,7 +22,7 @@ public abstract class AbstractLifecycleTracker implements Lifecycle,
         MuleContextAware
 {
 
-    private final List<String> tracker = new ArrayList<String>();
+    private final List<String> tracker = new ArrayList<>();
 
     public List<String> getTracker() {
         return tracker;

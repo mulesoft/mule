@@ -55,6 +55,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
 {
+
     protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
 
     /**
@@ -222,7 +223,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
             return results;
         }
 
-        results = new ArrayList<Transformer>(2);
+        results = new ArrayList<>(2);
 
         Lock readLock = transformersLock.readLock();
         readLock.lock();
@@ -440,13 +441,34 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     @Override
     public Object applyLifecycle(Object object, String phase) throws MuleException
     {
+        return withLifecycleRegistry(object, registry -> registry.applyLifecycle(object, phase));
+    }
+
+    @Override
+    public void applyLifecycle(Object object, String startPhase, String toPhase) throws MuleException
+    {
+        withLifecycleRegistry(object, registry -> {
+            registry.applyLifecycle(object, startPhase, toPhase);
+            return object;
+        });
+    }
+
+    private Object withLifecycleRegistry(Object object, LifecycleDelegate delegate) throws MuleException
+    {
         LifecycleRegistry lifecycleRegistry = registry.getLifecycleRegistry();
         if (lifecycleRegistry != null)
         {
-            return lifecycleRegistry.applyLifecycle(object, phase);
+            return delegate.apply(lifecycleRegistry);
         }
 
         return object;
+    }
+
+    @FunctionalInterface
+    private interface LifecycleDelegate
+    {
+
+        Object apply(LifecycleRegistry registry) throws MuleException;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -538,7 +560,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
 
         if (value instanceof Converter)
         {
-            notifyTransformerResolvers((Converter) value,  TransformerResolver.RegistryAction.ADDED);
+            notifyTransformerResolvers((Converter) value, TransformerResolver.RegistryAction.ADDED);
         }
     }
 

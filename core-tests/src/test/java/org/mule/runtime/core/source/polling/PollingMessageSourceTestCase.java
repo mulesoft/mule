@@ -13,19 +13,17 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.schedule.Scheduler;
-import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
+import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Collection;
 
@@ -37,13 +35,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     @Test
     public void nullResponseFromNestedMP() throws Exception
     {
-        PollingMessageSource pollingMessageSource = createMessageSource(new MessageProcessor()
-        {
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return null;
-            }
-        });
+        PollingMessageSource pollingMessageSource = createMessageSource(event -> null);
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);
@@ -57,14 +49,8 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     public void nullPayloadResponseFromNestedMP() throws Exception
     {
 
-        PollingMessageSource pollingMessageSource = createMessageSource(new MessageProcessor()
-        {
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), muleContext),
-                    event);
-            }
-        });
+        PollingMessageSource pollingMessageSource = createMessageSource(event -> new DefaultMuleEvent(
+                new DefaultMuleMessage(NullPayload.getInstance(), muleContext), event));
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);
@@ -78,13 +64,8 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     public void emptyStringResponseFromNestedMP() throws Exception
     {
 
-        PollingMessageSource pollingMessageSource = createMessageSource(new MessageProcessor()
-        {
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return new DefaultMuleEvent(new DefaultMuleMessage("", muleContext), event);
-            }
-        });
+        PollingMessageSource pollingMessageSource = createMessageSource(event ->
+            new DefaultMuleEvent(new DefaultMuleMessage("", muleContext), event));
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);
@@ -98,13 +79,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     public void disposeScheduler() throws Exception
     {
 
-        PollingMessageSource pollinMessageSource = createMessageSource(new MessageProcessor()
-        {
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return null;
-            }
-        });
+        PollingMessageSource pollinMessageSource = createMessageSource(event -> null);
 
         Collection<Scheduler> allSchedulers = getAllSchedulers();
         assertThat(allSchedulers.size(), is(1));
