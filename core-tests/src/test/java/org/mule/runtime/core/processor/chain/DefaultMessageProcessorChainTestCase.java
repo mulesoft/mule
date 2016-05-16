@@ -18,7 +18,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -317,9 +316,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         builder.chain(new AppendingInterceptingMP("1"), new ReturnVoidMPInterceptongMP(),
                       getAppendingMP("2"), getAppendingMP("3"), new AppendingInterceptingMP("4"),
                       getAppendingMP("5"));
-        assertSame("0", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload());
+        assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload(), equalTo("0before1after1"));
 
-        assertEquals(1, threads);
+        assertThat(threads, equalTo(1));
     }
 
     @Test
@@ -612,12 +611,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
                                                                 new ReturnVoidMPInterceptongMP(), new
                                 AppendingInterceptingMP("b")).build(),
                 new AppendingInterceptingMP("2"));
-        assertEquals("0before1before2after2after1", process(builder.build()
-                , getTestEventUsingFlow("0"))
-                .getMessage()
-                .getPayload());
+        assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload(),
+                   equalTo("0before1beforeaafterabefore2after2after1"));
 
-        assertEquals(1, threads);
+        assertThat(threads, equalTo(1));
     }
 
     @Test
