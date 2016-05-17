@@ -32,6 +32,8 @@ import org.mule.endpoint.MuleEndpointURI;
 import org.mule.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.MuleTransactionConfig;
+import org.mule.transformer.types.SimpleDataType;
+import org.mule.transformer.types.TypedValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -99,12 +101,13 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
     @Test
     public void aggregateMultipleEvents() throws Exception
     {
+    	SimpleDataType simpleDateType1 = new SimpleDataType(java.lang.String.class,"text/plain");
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        message1.setInvocationProperty("key1", "value1");
+        message1.setInvocationProperty("key1", "value1",simpleDateType1.cloneDataType());
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        message2.setInvocationProperty("key2", "value2");
+        message2.setInvocationProperty("key2", "value2",simpleDateType1.cloneDataType());
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
-        message3.setInvocationProperty("key3", "value3");
+        message3.setInvocationProperty("key3", "value3",simpleDateType1.cloneDataType());
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, flow);
         MuleSession session = event1.getSession();
         MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, flow, session);
@@ -130,7 +133,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         // Because a new MuleMessageCollection is created, propagate properties from
         // original event
         // TODO DF
-        // assertEquals("value1", result.getMessage().getInvocationProperty("key1"));
+        assertEquals("value1", result.getMessage().getInvocationProperty("key1"));
+        assertTrue(simpleDateType1.equals(result.getFlowVariableDataType("key1")));
         assertNull(result.getMessage().getInvocationProperty("key2"));
         assertNull(result.getMessage().getInvocationProperty("key3"));
 

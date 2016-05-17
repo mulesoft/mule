@@ -904,7 +904,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
         assertEquals(1, threads);
     }
-
+    
     @Test
     public void testChoice() throws MuleException, Exception
     {
