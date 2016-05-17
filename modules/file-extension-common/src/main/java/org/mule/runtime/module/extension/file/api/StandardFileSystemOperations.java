@@ -279,6 +279,7 @@ public class StandardFileSystemOperations
      * @param to         the file's new name
      * @param event      The current {@link MuleEvent}
      */
+    //TODO: MULE-9715
     public void rename(@Connection FileSystem fileSystem, @Optional String path, String to, MuleEvent event)
     {
         path = resolvePath(path, event, "path");

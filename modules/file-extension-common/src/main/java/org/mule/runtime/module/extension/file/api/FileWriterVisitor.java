@@ -7,7 +7,8 @@
 package org.mule.runtime.module.extension.file.api;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
@@ -27,6 +28,7 @@ public class FileWriterVisitor implements FileContentVisitor
 
     private final OutputStream outputStream;
     private final MuleEvent event;
+    private final MuleContext muleContext;
 
     /**
      * Creates a new instance
@@ -34,10 +36,11 @@ public class FileWriterVisitor implements FileContentVisitor
      * @param outputStream the stream to write into
      * @param event        a {@link MuleEvent} to be used to power the {@link #visit(OutputHandler)} case
      */
-    public FileWriterVisitor(OutputStream outputStream, MuleEvent event)
+    public FileWriterVisitor(OutputStream outputStream, MuleEvent event, MuleContext muleContext)
     {
         this.outputStream = outputStream;
         this.event = event;
+        this.muleContext = muleContext;
     }
 
     @Override
@@ -61,7 +64,7 @@ public class FileWriterVisitor implements FileContentVisitor
     @Override
     public void visit(OutputHandler handler) throws Exception
     {
-        handler.write(event, outputStream);
+        handler.write((org.mule.runtime.core.api.MuleEvent) event, outputStream);
     }
 
     @Override
@@ -95,7 +98,7 @@ public class FileWriterVisitor implements FileContentVisitor
             }
             try
             {
-                new FileContentWrapper(item, event).accept(this);
+                new FileContentWrapper(item, event, muleContext).accept(this);
             }
             catch (Exception e)
             {

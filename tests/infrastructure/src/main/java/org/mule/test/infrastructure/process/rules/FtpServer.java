@@ -6,10 +6,10 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
+import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.infrastructure.server.ftp.EmbeddedFtpServer;
-import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 
@@ -56,15 +56,20 @@ public class FtpServer extends ExternalResource
         return super.apply(base, description);
     }
 
-    @Override
-    protected void before() throws Throwable
+    public void start() throws Exception
     {
-        createFtpServerBaseDir();
-        startServer();
+        try
+        {
+            createFtpServerBaseDir();
+            startServer();
+        }
+        catch (Throwable e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Override
-    protected void after()
+    public void stop()
     {
         stopServer();
         deleteFtpServerBaseDir();

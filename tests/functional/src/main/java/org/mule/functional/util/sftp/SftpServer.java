@@ -6,13 +6,12 @@
  */
 package org.mule.functional.util.sftp;
 
+import static java.util.Arrays.asList;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.Security;
-import java.util.Arrays;
 
-import org.apache.sshd.common.NamedFactory;
-import org.apache.sshd.server.Command;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.command.ScpCommandFactory;
@@ -43,12 +42,11 @@ public class SftpServer
         sshdServer.setPasswordAuthenticator(passwordAuthenticator);
     }
 
-    private void configureSshdServer(SftpSubsystemFactory factory,
-                                     PasswordAuthenticator passwordAuthenticator)
+    private void configureSshdServer(SftpSubsystemFactory factory, PasswordAuthenticator passwordAuthenticator)
     {
         sshdServer.setPort(port);
         sshdServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File("hostkey.ser")));
-        sshdServer.setSubsystemFactories(Arrays.<NamedFactory<Command>>asList(factory));
+        sshdServer.setSubsystemFactories(asList(factory));
         sshdServer.setCommandFactory(new ScpCommandFactory());
         sshdServer.setShellFactory(new ProcessShellFactory());
         sshdServer.setPasswordAuthenticator(passwordAuthenticator);

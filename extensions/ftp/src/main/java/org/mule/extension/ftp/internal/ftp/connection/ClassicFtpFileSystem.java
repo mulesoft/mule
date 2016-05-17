@@ -4,22 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ftp.api;
+package org.mule.extension.ftp.internal.ftp.connection;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.extension.ftp.api.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.extension.ftp.api.FtpConnector;
+import org.mule.extension.ftp.api.ftp.FtpFileSystem;
+import org.mule.extension.ftp.api.ftp.FtpTransferMode;
+import org.mule.extension.ftp.internal.ftp.command.FtpCopyCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpCreateDirectoryCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpDeleteCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpListCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpMoveCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpReadCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpRenameCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpWriteCommand;
+import org.mule.runtime.api.connection.ConnectionExceptionCode;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.extension.ftp.internal.command.FtpCopyCommand;
-import org.mule.extension.ftp.internal.command.FtpCreateDirectoryCommand;
-import org.mule.extension.ftp.internal.command.FtpDeleteCommand;
-import org.mule.extension.ftp.internal.command.FtpListCommand;
-import org.mule.extension.ftp.internal.command.FtpMoveCommand;
-import org.mule.extension.ftp.internal.command.FtpReadCommand;
-import org.mule.extension.ftp.internal.command.FtpRenameCommand;
-import org.mule.extension.ftp.internal.command.FtpWriteCommand;
 import org.mule.runtime.module.extension.file.api.AbstractFileSystem;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
@@ -40,28 +47,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
-import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link AbstractFileSystem} for files residing on a
- * FTP server
+ * Implementation of {@link FtpFileSystem} for files residing on a FTP server
  *
  * @since 4.0
  */
-public final class FtpFileSystem extends AbstractFileSystem
+public final class ClassicFtpFileSystem extends AbstractFileSystem implements FtpFileSystem
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FtpFileSystem.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassicFtpFileSystem.class);
 
-    @Inject
-    private MuleContext muleContext;
-
+    private final MuleContext muleContext;
     private final FtpConnector config;
     private final FTPClient client;
     private final CopyCommand copyCommand;
@@ -80,10 +81,11 @@ public final class FtpFileSystem extends AbstractFileSystem
      * @param config the {@link FtpConnector} through which {@code this} instance is used
      * @param client a ready to use {@link FTPClient}
      */
-    FtpFileSystem(FtpConnector config, FTPClient client)
+    ClassicFtpFileSystem(FtpConnector config, FTPClient client, MuleContext muleContext)
     {
         this.config = config;
         this.client = client;
+        this.muleContext = muleContext;
 
         copyCommand = new FtpCopyCommand(this, config, client);
         createDirectoryCommand = new FtpCreateDirectoryCommand(this, config, client);
@@ -92,7 +94,7 @@ public final class FtpFileSystem extends AbstractFileSystem
         moveCommand = new FtpMoveCommand(this, config, client);
         readCommand = new FtpReadCommand(this, config, client);
         renameCommand = new FtpRenameCommand(this, config, client);
-        writeCommand = new FtpWriteCommand(this, config, client);
+        writeCommand = new FtpWriteCommand(this, config, client, muleContext);
     }
 
     /**
@@ -103,7 +105,8 @@ public final class FtpFileSystem extends AbstractFileSystem
      * {@link FTPClient#logout()} fails. This method will never throw
      * exception. Any errors will be logged.
      */
-    void disconnect()
+    @Override
+    public void disconnect()
     {
         try
         {
@@ -131,19 +134,43 @@ public final class FtpFileSystem extends AbstractFileSystem
     }
 
     /**
+     * Validates the connection by sending a {@code NoOp} command
+     *
+     * @return a {@link ConnectionValidationResult}
+     */
+    @Override
+    public ConnectionValidationResult validateConnection()
+    {
+        try
+        {
+            if (client.sendNoOp())
+            {
+                return ConnectionValidationResult.success();
+            }
+            else
+            {
+                return ConnectionValidationResult.failure("NoOp did not complete", ConnectionExceptionCode.UNKNOWN, null);
+            }
+        }
+        catch (IOException e)
+        {
+            return ConnectionValidationResult.failure("Found exception trying to perform validation", ConnectionExceptionCode.UNKNOWN, e);
+        }
+    }
+
+    /**
      * Sets the transfer mode on the {@link #client}
      *
      * @param mode a {@link FtpTransferMode}
      */
-    void setTransferMode(FtpTransferMode mode)
+    public void setTransferMode(FtpTransferMode mode)
     {
         try
         {
-            if (!client.setFileType(FTP.BINARY_FILE_TYPE))
+            if (!client.setFileType(mode.getCode()))
             {
                 throw new IOException(String.format("Failed to set %s transfer type. FTP reply code is: ", mode.getDescription(), client.getReplyCode()));
             }
-            client.setFileType(mode.getCode());
         }
         catch (Exception e)
         {
@@ -153,12 +180,12 @@ public final class FtpFileSystem extends AbstractFileSystem
     }
 
     /**
-     * Sets the response timeout on the {@link #client}
+     * Sets the data timeout property on the underlying {@link #client}
      *
-     * @param timeout  a scalar timeout value
+     * @param timeout  a timeout scalar
      * @param timeUnit a {@link TimeUnit} which qualifies the {@code timeout}
      */
-    void setResponseTimeout(Integer timeout, TimeUnit timeUnit)
+    public void setResponseTimeout(Integer timeout, TimeUnit timeUnit)
     {
         client.setDataTimeout(new Long(timeUnit.toMillis(timeout)).intValue());
     }
@@ -169,7 +196,7 @@ public final class FtpFileSystem extends AbstractFileSystem
      *
      * @param passive whether to go passive mode or not
      */
-    void setPassiveMode(boolean passive)
+    public void setPassiveMode(boolean passive)
     {
         if (passive)
         {
@@ -184,17 +211,10 @@ public final class FtpFileSystem extends AbstractFileSystem
     }
 
     /**
-     * Returns an InputStream which obtains the content for the
-     * file of the given {@code filePayload}.
-     * <p>
-     * The invoked <b>MUST</b> make sure that the returned stream
-     * is closed in order for the underlying connection
-     * to be closed.
-     *
-     * @param filePayload a {@link FtpFileAttributes} referencing to a FTP file
-     * @return an {@link InputStream}
+     * {@inheritDoc}
      */
-    InputStream retrieveFileContent(FtpFileAttributes filePayload)
+    @Override
+    public InputStream retrieveFileContent(FileAttributes filePayload)
     {
         try
         {
@@ -216,7 +236,7 @@ public final class FtpFileSystem extends AbstractFileSystem
      * Awaits for the underlying {@link #client} to complete
      * any pending commands. This is necessary for certain
      * operations such as write. Using the {@link #client}
-     * before that can result in unexpected behavior
+     * before tnhat can result in unexpected behavior
      */
     public void awaitCommandCompletion()
     {
@@ -246,23 +266,22 @@ public final class FtpFileSystem extends AbstractFileSystem
 
     private URL toURL(Path path)
     {
-        URL url;
         try
         {
-            url = new URL("ftp", client.getRemoteAddress().toString(), client.getRemotePort(), path != null ? path.toString() : EMPTY);
+            return new URL(FTP_PROTOCOL, client.getRemoteAddress().toString(), client.getRemotePort(), path != null ? path.toString() : EMPTY);
         }
         catch (MalformedURLException e)
         {
             throw new MuleRuntimeException(createStaticMessage("Could not get URL for FTP server"), e);
         }
-        return url;
     }
 
     /**
      * Changes the {@link #client}'s current working directory to
      * the {@link #config}'s {@link FtpConnector#getBaseDir()}
      */
-    protected void changeToBaseDir()
+    @Override
+    public void changeToBaseDir()
     {
         if (config.getBaseDir() != null)
         {
@@ -347,10 +366,5 @@ public final class FtpFileSystem extends AbstractFileSystem
     protected CreateDirectoryCommand getCreateDirectoryCommand()
     {
         return createDirectoryCommand;
-    }
-
-    public FtpConnector getConfig()
-    {
-        return config;
     }
 }

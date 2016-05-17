@@ -7,6 +7,8 @@
 package org.mule.extension.ftp.api;
 
 import org.mule.extension.ftp.internal.FtpFilePredicateBuilder;
+import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpConnectionProvider;
+import org.mule.extension.ftp.internal.sftp.connection.SftpConnectionProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -23,45 +25,30 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 /**
- * FTP connector used to manipulate files in a FTP server.
- * <p>
- * This class serves as both extension definition and configuration.
- * Operations are based on the standard {@link StandardFileSystemOperations}
+ * Allows manipulating files through the FTP, SFTP and FTPS protocols
  *
  * @since 4.0
  */
 @Extension(name = "Ftp Connector", description = "Connector to manipulate Files on a FTP/SFTP server")
 @Operations({StandardFileSystemOperations.class})
-@Providers({FtpConnectionProvider.class})
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = FtpFilePredicateBuilder.class)
+@Providers({ClassicFtpConnectionProvider.class, SftpConnectionProvider.class})
 public class FtpConnector implements FileConnectorConfig
 {
+
+    public static final String FTP_PROTOCOL = "ftp";
 
     @Inject
     private ConnectionManager connectionManager;
 
     /**
-     * The FTP server host, such as www.mulesoft.com, localhost, or 192.168.0.1, etc
-     */
-    @Parameter
-    private String host;
-
-    /**
-     * The port number to connect on
+     * The directory to be considered as the root of every
+     * relative path used with this connector. If not provided,
+     * it will default to the remote server default.
      */
     @Parameter
     @Optional
-    private Integer port;
-
-    /**
-     * The transfer mode to be used. Currently {@code BINARY}
-     * and {@code ASCII} are supported.
-     * <p>
-     * Defaults to {@code BINARY}
-     */
-    @Parameter
-    @Optional(defaultValue = "BINARY")
-    private FtpTransferMode transferMode;
+    private String baseDir = null;
 
     /**
      * A scalar value representing the amount of time to wait
@@ -106,25 +93,6 @@ public class FtpConnector implements FileConnectorConfig
     private TimeUnit responseTimeoutUnit;
 
     /**
-     * Whether to use passive mode. Set to {@code false} to
-     * switch to active mode.
-     * <p>
-     * Defaults to {@code true}.
-     */
-    @Parameter
-    @Optional(defaultValue = "true")
-    private boolean passive = true;
-
-    /**
-     * The directory to be considered as the root of every
-     * relative path used with this connector. If not provided,
-     * it will default to the remote server default.
-     */
-    @Parameter
-    @Optional
-    private String baseDir = null;
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -133,44 +101,24 @@ public class FtpConnector implements FileConnectorConfig
         return baseDir;
     }
 
-    String getHost()
-    {
-        return host;
-    }
-
-    Integer getPort()
-    {
-        return port;
-    }
-
-    Integer getConnectionTimeout()
+    public Integer getConnectionTimeout()
     {
         return connectionTimeout;
     }
 
-    TimeUnit getConnectionTimeoutUnit()
+    public TimeUnit getConnectionTimeoutUnit()
     {
         return connectionTimeoutUnit;
     }
 
-    Integer getResponseTimeout()
+    public Integer getResponseTimeout()
     {
         return responseTimeout;
     }
 
-    TimeUnit getResponseTimeoutUnit()
+    public TimeUnit getResponseTimeoutUnit()
     {
         return responseTimeoutUnit;
-    }
-
-    FtpTransferMode getTransferMode()
-    {
-        return transferMode;
-    }
-
-    boolean isPassive()
-    {
-        return passive;
     }
 
     public ConnectionManager getConnectionManager()

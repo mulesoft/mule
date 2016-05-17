@@ -8,6 +8,9 @@ package org.mule.extension.ftp;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.FtpTestHarness.HELLO_PATH;
+import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+import org.mule.extension.FtpTestHarness;
 
 import org.junit.Test;
 
@@ -17,6 +20,11 @@ public class FtpDeleteTestCase extends FtpConnectorTestCase
     private static final String SUB_FOLDER = "files/subfolder";
     private static final String SUB_FOLDER_FILE = "grandChild";
     private static final String SUB_FOLDER_FILE_PATH = String.format("%s/%s", SUB_FOLDER, SUB_FOLDER_FILE);
+
+    public FtpDeleteTestCase(String name, FtpTestHarness testHarness)
+    {
+        super(name, testHarness);
+    }
 
     @Override
     protected String getConfigFile()
@@ -28,9 +36,9 @@ public class FtpDeleteTestCase extends FtpConnectorTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        createHelloWorldFile();
-        ftpClient.makeDir(SUB_FOLDER);
-        ftpClient.putFile(SUB_FOLDER_FILE, SUB_FOLDER, HELLO_WORLD);
+        testHarness.createHelloWorldFile();
+        testHarness.makeDir(SUB_FOLDER);
+        testHarness.write(String.format("%s/%s", SUB_FOLDER, SUB_FOLDER_FILE), HELLO_WORLD);
 
         assertExists(true, HELLO_PATH, SUB_FOLDER, SUB_FOLDER_FILE_PATH);
     }
@@ -38,19 +46,19 @@ public class FtpDeleteTestCase extends FtpConnectorTestCase
     @Test
     public void deleteFile() throws Exception
     {
-        assertThat(ftpClient.fileExists(HELLO_PATH), is(true));
+        assertThat(testHarness.fileExists(HELLO_PATH), is(true));
         doDelete(HELLO_PATH);
 
-        assertThat(ftpClient.fileExists(HELLO_PATH), is(false));
+        assertThat(testHarness.fileExists(HELLO_PATH), is(false));
     }
 
     @Test
     public void deleteReadFile() throws Exception
     {
-        assertThat(ftpClient.fileExists(HELLO_PATH), is(true));
+        assertThat(testHarness.fileExists(HELLO_PATH), is(true));
         flowRunner("delete").withFlowVariable("delete", HELLO_PATH).run();
 
-        assertThat(ftpClient.fileExists(HELLO_PATH), is(false));
+        assertThat(testHarness.fileExists(HELLO_PATH), is(false));
     }
 
     @Test
@@ -70,9 +78,9 @@ public class FtpDeleteTestCase extends FtpConnectorTestCase
     @Test
     public void deleteOnBaseDirParent() throws Exception
     {
-        doDelete("/" + BASE_DIR);
-        ftpClient.changeWorkingDirectory("/");
-        assertThat(ftpClient.getFileList(".").length, is(0));
+        final String path = ".";
+        doDelete(path);
+        testHarness.assertDeleted(path);
     }
 
     private void doDelete(String path) throws Exception
@@ -84,7 +92,7 @@ public class FtpDeleteTestCase extends FtpConnectorTestCase
     {
         for (String path : paths)
         {
-            assertThat(ftpClient.fileExists(path), is(exists));
+            assertThat(testHarness.fileExists(path), is(exists));
         }
     }
 }

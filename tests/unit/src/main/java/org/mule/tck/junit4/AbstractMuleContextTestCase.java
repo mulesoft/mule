@@ -9,6 +9,7 @@ package org.mule.tck.junit4;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -525,19 +526,33 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * Uses {@link org.mule.runtime.core.TransformationService} to get a {@link String} representation of a message.
+     * Uses {@link TransformationService} to get a {@link String} representation of a message.
      *
      * @param message message to get payload from
      * @return String representation of the message payload
      * @throws Exception if there is an unexpected error obtaining the payload representation
+     * @deprecated use {@link #getPayloadAsString(org.mule.runtime.api.message.MuleMessage)} instead
      */
+    @Deprecated
     protected String getPayloadAsString(MuleMessage message) throws Exception
     {
         return getPayload(message, DataTypeFactory.STRING);
     }
 
     /**
-     * Uses {@link org.mule.runtime.core.TransformationService} to get byte[] representation of a message.
+     * Uses {@link TransformationService} to get a {@link String} representation of a message.
+     *
+     * @param message message to get payload from
+     * @return String representation of the message payload
+     * @throws Exception if there is an unexpected error obtaining the payload representation
+     */
+    protected String getPayloadAsString(org.mule.runtime.api.message.MuleMessage message) throws Exception
+    {
+        return getPayloadAsString((MuleMessage) message);
+    }
+
+    /**
+     * Uses {@link TransformationService} to get byte[] representation of a message.
      *
      * @param message message to get payload from
      * @return byte[] representation of the message payload
@@ -549,7 +564,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * Uses {@link org.mule.runtime.core.TransformationService} to get representation of a message for a given {@link DataType}
+     * Uses {@link TransformationService} to get representation of a message for a given {@link DataType}
      *
      * @param message message to get payload from
      * @param dataType dataType to be transformed to
@@ -562,7 +577,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * Uses {@link org.mule.runtime.core.TransformationService} to get representation of a message for a given {@link Class}
+     * Uses {@link TransformationService} to get representation of a message for a given {@link Class}
      *
      * @param message message to get payload from
      * @param clazz type of the payload to be transformed to

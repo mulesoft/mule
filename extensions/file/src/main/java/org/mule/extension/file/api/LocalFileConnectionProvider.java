@@ -10,7 +10,10 @@ import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.file.api.FileSystem;
+
+import javax.inject.Inject;
 
 /**
  * A {@link ConnectionProvider} which provides instances of
@@ -20,6 +23,8 @@ import org.mule.runtime.module.extension.file.api.FileSystem;
  */
 public final class LocalFileConnectionProvider implements ConnectionProvider<FileConnector, FileSystem>
 {
+    @Inject
+    private MuleContext muleContext;
 
     /**
      * Creates and returns a new instance of {@link LocalFileSystem}
@@ -30,7 +35,7 @@ public final class LocalFileConnectionProvider implements ConnectionProvider<Fil
     @Override
     public FileSystem connect(FileConnector fileConnector)
     {
-        return new LocalFileSystem(fileConnector);
+        return new LocalFileSystem(fileConnector, muleContext);
     }
 
     /**

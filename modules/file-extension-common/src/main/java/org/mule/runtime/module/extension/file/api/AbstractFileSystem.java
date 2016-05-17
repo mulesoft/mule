@@ -7,9 +7,10 @@
 package org.mule.runtime.module.extension.file.api;
 
 import static java.lang.String.format;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
@@ -23,9 +24,11 @@ import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Predicate;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.inject.Inject;
 
 /**
  * Base class for implementations of {@link FileSystem}
@@ -36,6 +39,9 @@ public abstract class AbstractFileSystem implements FileSystem
 {
 
     private final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+
+    @Inject
+    private MuleContext muleContext;
 
     /**
      * @return a {@link ListCommand}
@@ -135,7 +141,7 @@ public abstract class AbstractFileSystem implements FileSystem
      * {@inheritDoc}
      */
     @Override
-    public void rename(String filePath, String newName)
+    public final void rename(String filePath, String newName)
     {
         getRenameCommand().rename(filePath, newName);
     }
@@ -210,4 +216,13 @@ public abstract class AbstractFileSystem implements FileSystem
     }
 
     protected abstract PathLock createLock(Path path, Object... params);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Lock createMuleLock(String lockId)
+    {
+        return muleContext.getLockFactory().createLock(lockId);
+    }
 }

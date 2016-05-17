@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Spliterator;
 
 /**
  * Represents a node on a file system tree.
@@ -29,12 +31,17 @@ import java.util.List;
  * The node can also optionally have a {@link #getContent() content}, which
  * will return {@code null} if the node points to a directory.
  * <p>
+ * This class also implements the {@link Iterable} interface making
+ * it suitable for use with componets such as {@code foreach} or {@code batch}.
+ * The methods in such interface are implemented by delegating into the
+ * {@link #getChilds()} list.
+ * <p>
  * Instances are immutable and are to be created through a {@link Builder}
- * instance
+ * instance.
  *
  * @since 4.0
  */
-public class TreeNode implements Serializable
+public class TreeNode implements Serializable, Iterable
 {
 
     /**
@@ -157,5 +164,23 @@ public class TreeNode implements Serializable
         }
 
         return null;
+    }
+
+    /**
+     * @return the {@link #getChilds()} {@link Iterator}
+     */
+    @Override
+    public Iterator iterator()
+    {
+        return getChilds().iterator();
+    }
+
+    /**
+     * @return the {@link #getChilds()} {@link Spliterator}
+     */
+    @Override
+    public Spliterator spliterator()
+    {
+        return getChilds().spliterator();
     }
 }

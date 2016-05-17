@@ -8,15 +8,18 @@ package org.mule.extension.ftp;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+import org.mule.extension.FtpTestHarness;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.extension.file.api.FileWriteMode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,18 +30,28 @@ public class FtpWriteTypeTestCase extends FtpConnectorTestCase
 {
 
     @Parameterized.Parameters(name = "{0}")
-    public static Iterable<Object[]> data()
+    public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][] {
-                {"String", HELLO_WORLD, HELLO_WORLD},
-                {"native byte", "A".getBytes()[0], "A"},
-                {"Object byte", new Byte("A".getBytes()[0]), "A"},
-                {"byte[]", HELLO_WORLD.getBytes(), HELLO_WORLD},
-                {"OutputHandler", new TestOutputHandler(), HELLO_WORLD},
-                {"InputStream", new ByteArrayInputStream(HELLO_WORLD.getBytes()), HELLO_WORLD},
-                {"Iterable", Arrays.asList(HELLO_WORLD, new HelloWorld()), HELLO_WORLD + HELLO_WORLD},
-                {"Iterator", Arrays.asList(HELLO_WORLD, new HelloWorld()).iterator(), HELLO_WORLD + HELLO_WORLD},
-                {"Fallback", new HelloWorld(), HELLO_WORLD}
+                {"Ftp - String", new ClassicFtpTestHarness(), HELLO_WORLD, HELLO_WORLD},
+                {"Ftp - native byte", new ClassicFtpTestHarness(), "A".getBytes()[0], "A"},
+                {"Ftp - Object byte", new ClassicFtpTestHarness(), new Byte("A".getBytes()[0]), "A"},
+                {"Ftp - byte[]", new ClassicFtpTestHarness(), HELLO_WORLD.getBytes(), HELLO_WORLD},
+                {"Ftp - OutputHandler", new ClassicFtpTestHarness(), new TestOutputHandler(), HELLO_WORLD},
+                {"Ftp - InputStream", new ClassicFtpTestHarness(), new ByteArrayInputStream(HELLO_WORLD.getBytes()), HELLO_WORLD},
+                {"Ftp - Iterable", new ClassicFtpTestHarness(), Arrays.asList(HELLO_WORLD, new HelloWorld()), HELLO_WORLD + HELLO_WORLD},
+                {"Ftp - Iterator", new ClassicFtpTestHarness(), Arrays.asList(HELLO_WORLD, new HelloWorld()).iterator(), HELLO_WORLD + HELLO_WORLD},
+                {"Ftp - Fallback", new ClassicFtpTestHarness(), new HelloWorld(), HELLO_WORLD},
+
+                {"Sftp - String", new SftpTestHarness(), HELLO_WORLD, HELLO_WORLD},
+                {"Sftp - native byte", new SftpTestHarness(), "A".getBytes()[0], "A"},
+                {"Sftp - Object byte", new SftpTestHarness(), new Byte("A".getBytes()[0]), "A"},
+                {"Sftp - byte[]", new SftpTestHarness(), HELLO_WORLD.getBytes(), HELLO_WORLD},
+                {"Sftp - OutputHandler", new SftpTestHarness(), new TestOutputHandler(), HELLO_WORLD},
+                {"Sftp - InputStream", new SftpTestHarness(), new ByteArrayInputStream(HELLO_WORLD.getBytes()), HELLO_WORLD},
+                {"Sftp - Iterable", new SftpTestHarness(), Arrays.asList(HELLO_WORLD, new HelloWorld()), HELLO_WORLD + HELLO_WORLD},
+                {"Sftp - Iterator", new SftpTestHarness(), Arrays.asList(HELLO_WORLD, new HelloWorld()).iterator(), HELLO_WORLD + HELLO_WORLD},
+                {"Sftp - Fallback", new SftpTestHarness(), new HelloWorld(), HELLO_WORLD}
         });
     }
 
@@ -46,8 +59,9 @@ public class FtpWriteTypeTestCase extends FtpConnectorTestCase
     private final String expected;
     private String path;
 
-    public FtpWriteTypeTestCase(String name, Object content, String expected)
+    public FtpWriteTypeTestCase(String name, FtpTestHarness testHarness, Object content, String expected)
     {
+        super(name, testHarness);
         this.content = content;
         this.expected = expected;
     }
@@ -64,7 +78,7 @@ public class FtpWriteTypeTestCase extends FtpConnectorTestCase
     {
         super.doSetUp();
         final String folder = "test";
-        ftpClient.makeDir(folder);
+        testHarness.makeDir(folder);
         path = folder + "/test.txt";
     }
 

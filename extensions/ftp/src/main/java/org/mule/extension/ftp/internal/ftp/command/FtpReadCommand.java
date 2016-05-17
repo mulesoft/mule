@@ -4,15 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ftp.internal.command;
+package org.mule.extension.ftp.internal.ftp.command;
 
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.api.FtpFileSystem;
-import org.mule.extension.ftp.api.FtpInputStream;
+import org.mule.extension.ftp.internal.ftp.ClassicFtpFileAttributes;
+import org.mule.extension.ftp.internal.ftp.ClassicFtpInputStream;
+import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.command.ReadCommand;
 import org.mule.runtime.module.extension.file.api.lock.NullPathLock;
@@ -25,17 +26,17 @@ import java.nio.file.Paths;
 import org.apache.commons.net.ftp.FTPClient;
 
 /**
- * A {@link FtpCommand} which implements the {@link FtpReadCommand}
+ * A {@link ClassicFtpCommand} which implements the {@link FtpReadCommand}
  *
  * @since 4.0
  */
-public final class FtpReadCommand extends FtpCommand implements ReadCommand
+public final class FtpReadCommand extends ClassicFtpCommand implements ReadCommand
 {
 
     /**
      * {@inheritDoc}
      */
-    public FtpReadCommand(FtpFileSystem fileSystem, FtpConnector config, FTPClient client)
+    public FtpReadCommand(ClassicFtpFileSystem fileSystem, FtpConnector config, FTPClient client)
     {
         super(fileSystem, config, client);
     }
@@ -54,11 +55,11 @@ public final class FtpReadCommand extends FtpCommand implements ReadCommand
 
         try
         {
-            attributes = new FtpFileAttributes(resolvePath(filePath), client.listFiles(filePath)[0]);
+            attributes = new ClassicFtpFileAttributes(resolvePath(filePath), client.listFiles(filePath)[0]);
         }
         catch (Exception e)
         {
-            throw exception("Found exception while trying to list path " + filePath, e);
+            throw exception("Found exception while trying to read path " + filePath, e);
         }
 
         Path path = Paths.get(attributes.getPath());
@@ -76,9 +77,9 @@ public final class FtpReadCommand extends FtpCommand implements ReadCommand
 
         try
         {
-            return new DefaultMuleMessage(FtpInputStream.newInstance(config, attributes, pathLock),
-                                                               fileSystem.getFileMessageDataType(message.getDataType(), attributes),
-                                                               attributes).asNewMessage();
+            return new DefaultMuleMessage(ClassicFtpInputStream.newInstance(config, attributes, pathLock),
+                                          fileSystem.getFileMessageDataType(message.getDataType(), attributes),
+                                          attributes).asNewMessage();
         }
         catch (ConnectionException e)
         {

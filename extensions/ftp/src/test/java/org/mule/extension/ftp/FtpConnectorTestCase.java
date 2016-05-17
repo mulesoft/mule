@@ -6,69 +6,44 @@
  */
 package org.mule.extension.ftp;
 
-import static org.junit.rules.ExpectedException.none;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import static org.mule.extension.FtpTestHarness.HELLO_PATH;
+import org.mule.extension.FtpTestHarness;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.infrastructure.client.ftp.FTPTestClient;
-import org.mule.test.infrastructure.process.rules.FtpServer;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public abstract class FtpConnectorTestCase extends ExtensionFunctionalTestCase
 {
 
-    protected static final String HELLO_WORLD = "Hello World!";
-    protected static final String HELLO_FILE_NAME = "hello.json";
-    protected static final String HELLO_PATH = "files/" + HELLO_FILE_NAME;
-    protected static final String DEFAULT_FTP_HOST = "localhost";
-    protected static final String FTP_SERVER_BASE_DIR = "target/ftpserver";
-    protected static final String BASE_DIR = "base";
+    private final String name;
 
     @Rule
-    public ExpectedException expectedException = none();
+    public final FtpTestHarness testHarness;
 
-    @Rule
-    public SystemProperty baseDirSystemProperty = new SystemProperty("baseDir", BASE_DIR);
-
-    @Rule
-    public FtpServer ftpServer = new FtpServer("ftpPort", new File(FTP_SERVER_BASE_DIR, BASE_DIR));
-
-    private String ftpUser = "anonymous";
-    private String ftpPassword = "password";
-    protected FTPTestClient ftpClient;
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        ftpClient = new FTPTestClient(DEFAULT_FTP_HOST, ftpServer.getPort(), this.ftpUser, this.ftpPassword);
-        // make sure we start out with a clean ftp server base
-
-        if (!ftpClient.testConnection())
-        {
-            throw new IOException("could not connect to ftp server");
-        }
-        ftpClient.changeWorkingDirectory(BASE_DIR);
+    @Parameters(name ="{0}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][] {
+                {"ftp", new ClassicFtpTestHarness()},
+                {"sftp", new SftpTestHarness()}
+        });
     }
 
-    @Override
-    protected void doTearDown() throws Exception
+    public FtpConnectorTestCase(String name, FtpTestHarness testHarness)
     {
-        if (ftpClient.isConnected())
-        {
-            ftpClient.disconnect();
-        }
-
-        super.doTearDown();
+        this.name = name;
+        this.testHarness = testHarness;
     }
 
     @Override
@@ -77,18 +52,12 @@ public abstract class FtpConnectorTestCase extends ExtensionFunctionalTestCase
         return new Class<?>[] {FtpConnector.class};
     }
 
-    protected void createHelloWorldFile() throws IOException
-    {
-        ftpClient.makeDir("files");
-        ftpClient.putFile(HELLO_FILE_NAME, "files", HELLO_WORLD);
-    }
-
     protected MuleEvent readHelloWorld() throws Exception
     {
         return getPath(HELLO_PATH);
     }
 
-    protected org.mule.runtime.core.api.MuleMessage readPath(String path) throws Exception
+    protected MuleMessage readPath(String path) throws Exception
     {
         return getPath(path).getMessage();
     }

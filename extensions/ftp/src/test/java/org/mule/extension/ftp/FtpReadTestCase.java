@@ -10,23 +10,26 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.FtpTestHarness.HELLO_PATH;
+import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
 import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.extension.FtpTestHarness;
 import org.mule.extension.ftp.api.FtpFileAttributes;
+import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 
 import java.io.InputStream;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Calendar;
 
-import org.apache.commons.net.ftp.FTPFile;
 import org.junit.Test;
 
 public class FtpReadTestCase extends FtpConnectorTestCase
 {
+
+    public FtpReadTestCase(String name, FtpTestHarness testHarness)
+    {
+        super(name, testHarness);
+    }
 
     @Override
     protected String getConfigFile()
@@ -38,7 +41,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        createHelloWorldFile();
+        testHarness.createHelloWorldFile();
     }
 
     @Test
@@ -63,14 +66,14 @@ public class FtpReadTestCase extends FtpConnectorTestCase
     @Test
     public void readUnexisting() throws Exception
     {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         readPath("files/not-there.txt");
     }
 
     @Test
     public void readDirectory() throws Exception
     {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         readPath("files");
     }
 
@@ -96,20 +99,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase
     public void getProperties() throws Exception
     {
         FtpFileAttributes fileAttributes = (FtpFileAttributes) readHelloWorld().getMessage().getAttributes();
-        FTPFile file = ftpClient.get(HELLO_PATH);
-
-        assertThat(fileAttributes.getName(), equalTo(file.getName()));
-        assertThat(fileAttributes.getPath(), equalTo(Paths.get("/", BASE_DIR, HELLO_PATH).toString()));
-        assertThat(fileAttributes.getSize(), is(file.getSize()));
-        assertTime(fileAttributes.getTimestamp(), file.getTimestamp());
-        assertThat(fileAttributes.isDirectory(), is(false));
-        assertThat(fileAttributes.isSymbolicLink(), is(false));
-        assertThat(fileAttributes.isRegularFile(), is(true));
-    }
-
-    private void assertTime(LocalDateTime dateTime, Calendar calendar)
-    {
-        assertThat(dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), is(calendar.toInstant().toEpochMilli()));
+        testHarness.assertAttributes(HELLO_PATH, fileAttributes);
     }
 
     private MuleMessage readWithLock() throws Exception

@@ -4,18 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ftp.internal.command;
+package org.mule.extension.ftp.internal.ftp.command;
 
-import static java.lang.String.format;
 import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.api.FtpFileSystem;
+import org.mule.extension.ftp.internal.ftp.ClassicFtpFileAttributes;
+import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 import org.mule.runtime.module.extension.file.api.command.FileCommand;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Stack;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -26,7 +27,7 @@ import org.apache.commons.net.ftp.FTPFile;
  *
  * @since 4.0
  */
-abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
+abstract class ClassicFtpCommand extends FtpCommand<FtpConnector, ClassicFtpFileSystem>
 {
 
     protected final FTPClient client;
@@ -38,7 +39,7 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
      * @param config     the config which configures the operation
      * @param client     a ready to use {@link FTPClient} to perform the operations
      */
-    FtpCommand(FtpFileSystem fileSystem, FtpConnector config, FTPClient client)
+    ClassicFtpCommand(ClassicFtpFileSystem fileSystem, FtpConnector config, FTPClient client)
     {
         super(fileSystem, config);
         this.client = client;
@@ -46,51 +47,20 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
 
     /**
      * {@inheritDoc}
+     *
      * @return A {@link Path} derived from the the {@link #client}'s current working directory
      */
     @Override
     protected Path getBasePath()
     {
-        String cwd;
-        try
-        {
-            cwd = client.printWorkingDirectory();
-        }
-        catch (Exception e)
-        {
-            throw exception("Failed to determine current working directory");
-        }
-
-        return Paths.get(cwd);
+        return Paths.get(getCurrentWorkingDirectory());
     }
 
     /**
-     * Similar to {@link #getFile(String)} but throwing
-     * an {@link IllegalArgumentException} if the {@code filePath}
-     * doesn't exists
-     *
-     * @param filePath the path to the file you want
-     * @return a {@link FtpFileAttributes}
-     * @throws IllegalArgumentException if the {@code filePath} doesn't exists
+     * {@inheritDoc}
      */
-    protected FtpFileAttributes getExistingFile(String filePath)
-    {
-        return getFile(filePath, true);
-    }
-
-    /**
-     * Obtains a {@link FtpFileAttributes} for the given {@code filePath}
-     * by using the {@link FTPClient#mlistFile(String)} FTP command
-     *
-     * @param filePath the path to the file you want
-     * @return a {@link FtpFileAttributes} or {@code null} if it doesn't exists
-     */
-    protected FtpFileAttributes getFile(String filePath)
-    {
-        return getFile(filePath, false);
-    }
-
-    private FtpFileAttributes getFile(String filePath, boolean requireExistence)
+    @Override
+    protected FtpFileAttributes getFile(String filePath, boolean requireExistence)
     {
         Path path = resolvePath(filePath);
         FTPFile ftpFile;
@@ -105,7 +75,7 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
 
         if (ftpFile != null)
         {
-            return new FtpFileAttributes(path, ftpFile);
+            return new ClassicFtpFileAttributes(path, ftpFile);
         }
         else
         {
@@ -121,33 +91,33 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
     }
 
     /**
-     * {@inheritDoc}
-     */
-    protected boolean exists(Path path)
-    {
-        return getFile(path.toString()) != null;
-    }
-
-    /**
      * Creates the directory pointed by {@code directoryPath} also creating
      * any missing parent directories
      *
      * @param directoryPath the {@link Path} to the directory you want to create
      */
-    protected void mkdirs(Path directoryPath)
+    @Override
+    protected void doMkDirs(Path directoryPath)
     {
         String cwd = getCurrentWorkingDirectory();
+        Stack<Path> fragments = new Stack<>();
         try
         {
-            changeWorkingDirectory("/");
-            for (int i = 0; i < directoryPath.getNameCount(); i++)
+            for (int i = directoryPath.getNameCount(); i >= 0; i--)
             {
-                String fragment = directoryPath.getName(i).toString();
-                if (!tryChangeWorkingDirectory(fragment))
+                Path subPath = Paths.get("/").resolve(directoryPath.subpath(0, i));
+                if (tryChangeWorkingDirectory(subPath.toString()))
                 {
-                    makeDirectory(fragment);
-                    changeWorkingDirectory(fragment);
+                    break;
                 }
+                fragments.push(subPath);
+            }
+
+            while (!fragments.isEmpty())
+            {
+                Path fragment = fragments.pop();
+                makeDirectory(fragment.toString());
+                changeWorkingDirectory(fragment);
             }
         }
         catch (Exception e)
@@ -169,6 +139,7 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
      * @param path the path to which you wish to move
      * @return {@code true} if the CWD was changed. {@code false} otherwise
      */
+    @Override
     protected boolean tryChangeWorkingDirectory(String path)
     {
         try
@@ -178,33 +149,6 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
         catch (IOException e)
         {
             throw exception("Exception was found while trying to change working directory to " + path, e);
-        }
-    }
-
-    /**
-     * Changes the FTP {@link #client} current working directory
-     * to the given {@code path}
-     *
-     * @param path the {@link Path} to which you wish to move
-     * @throws IllegalArgumentException if the CWD could not be changed
-     */
-    protected void changeWorkingDirectory(Path path)
-    {
-        changeWorkingDirectory(path.toString());
-    }
-
-    /**
-     * Changes the FTP {@link #client} current working directory
-     * to the given {@code path}
-     *
-     * @param path the path to which you wish to move
-     * @throws IllegalArgumentException if the CWD could not be changed
-     */
-    protected void changeWorkingDirectory(String path)
-    {
-        if (!tryChangeWorkingDirectory(path))
-        {
-            throw new IllegalArgumentException(format("Could not change working directory to '%s'. Path doesn't exists or is not a directory", path.toString()));
         }
     }
 
@@ -232,6 +176,7 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
     /**
      * @return the {@link #client}'s working directory
      */
+    @Override
     protected String getCurrentWorkingDirectory()
     {
         try
@@ -240,25 +185,26 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
         }
         catch (Exception e)
         {
-            throw exception("Could not obtain CWD", e);
+            throw exception("Failed to determine current working directory");
         }
     }
 
     /**
-     * @param fileName the name of a file
-     * @return {@code true} if {@code fileName} equals to &quot;.&quot; or &quot;..&quot;
+     * {@inheritDoc}
      */
-    protected boolean isVirtualDirectory(String fileName)
+    @Override
+    protected void doRename(String filePath, String newName) throws Exception
     {
-        return ".".equals(fileName) || "..".equals(fileName);
+        client.rename(filePath, newName);
     }
+
 
     /**
      * {@inheritDoc}
      * Same as the super method but adding the FTP rely code
      */
     @Override
-    protected RuntimeException exception(String message)
+    public RuntimeException exception(String message)
     {
         return super.exception(enrichExceptionMessage(message));
     }
@@ -268,7 +214,7 @@ abstract class FtpCommand extends FileCommand<FtpConnector, FtpFileSystem>
      * Same as the super method but adding the FTP rely code
      */
     @Override
-    protected RuntimeException exception(String message, Exception cause)
+    public RuntimeException exception(String message, Exception cause)
     {
         return super.exception(enrichExceptionMessage(message), cause);
     }

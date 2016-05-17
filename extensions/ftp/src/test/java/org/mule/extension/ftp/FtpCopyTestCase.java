@@ -10,6 +10,9 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+
+import org.mule.extension.FtpTestHarness;
 
 import java.nio.file.Paths;
 
@@ -25,6 +28,11 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
 
     protected String sourcePath;
 
+    public FtpCopyTestCase(String name, FtpTestHarness testHarness)
+    {
+        super(name, testHarness);
+    }
+
     @Override
     protected String getConfigFile()
     {
@@ -33,21 +41,21 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
 
     private String getPath(String... path) throws Exception
     {
-        return Paths.get(ftpClient.getWorkingDirectory(), path).toString();
+        return Paths.get(testHarness.getWorkingDirectory(), path).toString();
     }
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        ftpClient.putFile(SOURCE_FILE_NAME, ".", HELLO_WORLD);
+        testHarness.write(SOURCE_FILE_NAME, HELLO_WORLD);
         sourcePath = getPath(SOURCE_FILE_NAME);
     }
 
     @Test
     public void toExistingFolder() throws Exception
     {
-        ftpClient.makeDir(TARGET_DIRECTORY);
+        testHarness.makeDir(TARGET_DIRECTORY);
         final String path = getPath(TARGET_DIRECTORY);
         doExecute(path, false, false);
 
@@ -57,7 +65,7 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
     @Test
     public void toNonExistingFolder() throws Exception
     {
-        ftpClient.makeDir(TARGET_DIRECTORY);
+        testHarness.makeDir(TARGET_DIRECTORY);
         String target = format("%s/%s", TARGET_DIRECTORY, "a/b/c");
         doExecute(target, false, true);
 
@@ -67,7 +75,7 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
     @Test
     public void copyReadFile() throws Exception
     {
-        ftpClient.makeDir(TARGET_DIRECTORY);
+        testHarness.makeDir(TARGET_DIRECTORY);
         final String path = getPath(TARGET_DIRECTORY);
         doExecute("readAndDo", path, false, false);
 
@@ -77,9 +85,9 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
     @Test
     public void toNonExistingFolderWithoutCreateParent() throws Exception
     {
-        ftpClient.makeDir(TARGET_DIRECTORY);
+        testHarness.makeDir(TARGET_DIRECTORY);
         String target = format("%s/%s", TARGET_DIRECTORY, "a/b/c");
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doExecute(target, false, false);
     }
 
@@ -87,7 +95,7 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
     public void overwrite() throws Exception
     {
         final String existingFileName = "existing";
-        ftpClient.putFile(existingFileName, ".", EXISTING_CONTENT);
+        testHarness.write(existingFileName, EXISTING_CONTENT);
 
         final String target = getPath(existingFileName);
 
@@ -99,10 +107,10 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
     public void withoutOverwrite() throws Exception
     {
         final String existingFileName = "existing";
-        ftpClient.putFile(existingFileName, ".", EXISTING_CONTENT);
+        testHarness.write(existingFileName, EXISTING_CONTENT);
         final String target = getPath(existingFileName);
 
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doExecute(target, false, false);
     }
 
@@ -111,7 +119,7 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
     {
         sourcePath = buildSourceDirectory();
         final String target = "target";
-        ftpClient.makeDir(target);
+        testHarness.makeDir(target);
         doExecute(target, false, false);
         assertCopy(format("%s/source/%s", target, SOURCE_FILE_NAME));
     }
@@ -133,12 +141,12 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
         sourcePath = buildSourceDirectory();
 
         final String target = "target";
-        ftpClient.makeDir(target);
-        ftpClient.changeWorkingDirectory(target);
-        ftpClient.makeDir(SOURCE_DIRECTORY_NAME);
-        ftpClient.putFile(SOURCE_FILE_NAME, SOURCE_DIRECTORY_NAME, EXISTING_CONTENT);
+        testHarness.makeDir(target);
+        testHarness.changeWorkingDirectory(target);
+        testHarness.makeDir(SOURCE_DIRECTORY_NAME);
+        testHarness.write(SOURCE_DIRECTORY_NAME, SOURCE_FILE_NAME, EXISTING_CONTENT);
 
-        ftpClient.changeWorkingDirectory("../");
+        testHarness.changeWorkingDirectory("../");
 
         doExecute(target, true, false);
         assertCopy(format("%s/%s/%s", target, SOURCE_DIRECTORY_NAME, SOURCE_FILE_NAME));
@@ -150,20 +158,20 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
         sourcePath = buildSourceDirectory();
 
         final String target = "target";
-        ftpClient.makeDir(target);
-        ftpClient.changeWorkingDirectory(target);
-        ftpClient.makeDir(SOURCE_DIRECTORY_NAME);
-        ftpClient.putFile(SOURCE_FILE_NAME, SOURCE_DIRECTORY_NAME, EXISTING_CONTENT);
-        ftpClient.changeWorkingDirectory("../");
+        testHarness.makeDir(target);
+        testHarness.changeWorkingDirectory(target);
+        testHarness.makeDir(SOURCE_DIRECTORY_NAME);
+        testHarness.write(SOURCE_DIRECTORY_NAME, SOURCE_FILE_NAME, EXISTING_CONTENT);
+        testHarness.changeWorkingDirectory("../");
 
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doExecute(format("%s/%s", target, SOURCE_DIRECTORY_NAME), false, false);
     }
 
     @Test
     public void copyWithDifferentName() throws Exception
     {
-        ftpClient.makeDir(TARGET_DIRECTORY);
+        testHarness.makeDir(TARGET_DIRECTORY);
         String target = getPath(TARGET_DIRECTORY) + "/test.json";
         doExecute(target, false, false);
 
@@ -172,8 +180,8 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
 
     private String buildSourceDirectory() throws Exception
     {
-        ftpClient.makeDir(SOURCE_DIRECTORY_NAME);
-        ftpClient.putFile(SOURCE_FILE_NAME, SOURCE_DIRECTORY_NAME, HELLO_WORLD);
+        testHarness.makeDir(SOURCE_DIRECTORY_NAME);
+        testHarness.write(SOURCE_DIRECTORY_NAME, SOURCE_FILE_NAME, HELLO_WORLD);
 
         return getPath(SOURCE_DIRECTORY_NAME);
     }

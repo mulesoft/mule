@@ -6,25 +6,14 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.api.config.HasPoolingProfile;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.policies.AbstractPolicyTemplate;
 
 import java.util.Optional;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConnectionProviderWrapper} which decorates the {@link #delegate}
@@ -37,16 +26,12 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public final class PooledConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection> implements Lifecycle, HasPoolingProfile
+public final class PooledConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection>
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PooledConnectionProviderWrapper.class);
     private final PoolingProfile poolingProfile;
     private final boolean disableValidation;
     private final RetryPolicyTemplate retryPolicyTemplate;
-
-    @Inject
-    MuleContext muleContext;
 
     /**
      * Creates a new instance
@@ -90,30 +75,6 @@ public final class PooledConnectionProviderWrapper<Config, Connection> extends C
     public RetryPolicyTemplate getRetryPolicyTemplate()
     {
         return retryPolicyTemplate;
-    }
-
-    @Override
-    public void dispose()
-    {
-        LifecycleUtils.disposeIfNeeded(retryPolicyTemplate, LOGGER);
-    }
-
-    @Override
-    public void initialise() throws InitialisationException
-    {
-        LifecycleUtils.initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
-    }
-
-    @Override
-    public void start() throws MuleException
-    {
-        LifecycleUtils.startIfNeeded(retryPolicyTemplate);
-    }
-
-    @Override
-    public void stop() throws MuleException
-    {
-        LifecycleUtils.stopIfNeeded(retryPolicyTemplate);
     }
 
     @Override

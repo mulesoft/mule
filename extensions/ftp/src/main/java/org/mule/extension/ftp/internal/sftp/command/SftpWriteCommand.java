@@ -4,37 +4,45 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ftp.internal.command;
+package org.mule.extension.ftp.internal.sftp.command;
 
 import static java.lang.String.format;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.ftp.api.FtpConnector;
-import org.mule.extension.ftp.api.FtpFileSystem;
+import org.mule.extension.ftp.api.sftp.SftpFileSystem;
+import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
-import org.mule.runtime.module.extension.file.api.command.WriteCommand;
 import org.mule.runtime.module.extension.file.api.FileContentWrapper;
+import org.mule.runtime.module.extension.file.api.FileWriteMode;
 import org.mule.runtime.module.extension.file.api.FileWriterVisitor;
+import org.mule.runtime.module.extension.file.api.command.WriteCommand;
 
 import java.io.OutputStream;
 import java.nio.file.Path;
 
-import org.apache.commons.net.ftp.FTPClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A {@link FtpCommand} which implements the {@link WriteCommand} contract
+ * A {@link SftpCommand} which implements the {@link WriteCommand} contract
  *
  * @since 4.0
  */
-public final class FtpWriteCommand extends FtpCommand implements WriteCommand
+public final class SftpWriteCommand extends SftpCommand implements WriteCommand
 {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SftpWriteCommand.class);
+
+    private final MuleContext muleContext;
 
     /**
      * {@inheritDoc}
      */
-    public FtpWriteCommand(FtpFileSystem fileSystem, FtpConnector config, FTPClient client)
+    public SftpWriteCommand(SftpFileSystem fileSystem, FtpConnector config, SftpClient client, MuleContext muleContext)
     {
         super(fileSystem, config, client);
+        this.muleContext = muleContext;
     }
 
     /**
@@ -57,59 +65,28 @@ public final class FtpWriteCommand extends FtpCommand implements WriteCommand
                 throw new IllegalArgumentException(String.format("Cannot write to path '%s' because it already exists and write mode '%s' was selected. " +
                                                                  "Use a different write mode or point to a path which doesn't exists", path, mode));
             }
-            else if (mode == FileWriteMode.OVERWRITE)
-            {
-                fileSystem.delete(file.getPath());
-            }
         }
 
-        try (OutputStream outputStream = getOutputStream(path.toString(), mode))
+        try (OutputStream outputStream = getOutputStream(path, mode))
         {
-            new FileContentWrapper(content, event).accept(new FileWriterVisitor(outputStream, event));
+            new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(outputStream, event, muleContext));
+            LOGGER.debug("Successfully wrote to path {}", path.toString());
         }
         catch (Exception e)
         {
             throw exception(format("Exception was found writing to file '%s'", path), e);
         }
-        finally
-        {
-            fileSystem.awaitCommandCompletion();
-        }
     }
 
-    private OutputStream getOutputStream(String path, FileWriteMode mode)
+    private OutputStream getOutputStream(Path path, FileWriteMode mode)
     {
         try
         {
-            return mode == FileWriteMode.APPEND
-                   ? client.appendFileStream(path)
-                   : client.storeFileStream(path);
+            return client.getOutputStream(path.toString(), mode);
         }
         catch (Exception e)
         {
             throw exception(String.format("Could not open stream to write to path '%s' using mode '%s'", path, mode), e);
-        }
-    }
-
-    private void assureParentFolderExists(Path filePath, boolean createParentFolder)
-    {
-        Path parentFolderPath = filePath.getParent();
-        if (parentFolderPath == null)
-        {
-            return;
-        }
-
-        FileAttributes parentFolder = getFile(parentFolderPath.toString());
-        if (parentFolder == null)
-        {
-            if (createParentFolder)
-            {
-                mkdirs(parentFolderPath);
-            }
-            else
-            {
-                throw new IllegalArgumentException(format("Cannot write to file '%s' because path to it doesn't exist. Consider setting the 'createParentFolder' attribute to 'true'", filePath));
-            }
         }
     }
 }

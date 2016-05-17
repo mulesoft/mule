@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ftp;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -14,13 +15,13 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import org.mule.extension.FtpTestHarness;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.TreeNode;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -29,6 +30,11 @@ public class FtpListTestCase extends FtpConnectorTestCase
     private static final String TEST_FILE_PATTERN = "test-file-%d.html";
     private static final String SUB_DIRECTORY_NAME = "subDirectory";
     private static final String CONTENT = "foo";
+
+    public FtpListTestCase(String name, FtpTestHarness testHarness)
+    {
+        super(name, testHarness);
+    }
 
     @Override
     protected String getConfigFile()
@@ -64,7 +70,7 @@ public class FtpListTestCase extends FtpConnectorTestCase
 
         List<TreeNode> subDirectories = childs.stream()
                 .filter(child -> child.getAttributes().isDirectory())
-                .collect(Collectors.toList());
+                .collect(toList());
 
         assertThat(subDirectories, hasSize(1));
         TreeNode subDirectory = subDirectories.get(0);
@@ -75,14 +81,14 @@ public class FtpListTestCase extends FtpConnectorTestCase
     @Test
     public void notDirectory() throws Exception
     {
-        expectedException.expectCause(is(instanceOf(IllegalArgumentException.class)));
+        testHarness.expectedException().expectCause(is(instanceOf(IllegalArgumentException.class)));
         doList(String.format(TEST_FILE_PATTERN, 0), false);
     }
 
     @Test
     public void notExistingPath() throws Exception
     {
-        expectedException.expectCause(is(instanceOf(IllegalArgumentException.class)));
+        testHarness.expectedException().expectCause(is(instanceOf(IllegalArgumentException.class)));
         doList(String.format("whatever", 0), false);
     }
 
@@ -114,7 +120,7 @@ public class FtpListTestCase extends FtpConnectorTestCase
     {
         TreeNode node = (TreeNode) flowRunner("listWithoutPath").run().getMessage().getPayload();
 
-        assertThat(node.getAttributes().getPath(), is(equalTo(Paths.get("/", BASE_DIR).toAbsolutePath().toString())));
+        assertThat(node.getAttributes().getPath(), is(equalTo(Paths.get(testHarness.getWorkingDirectory()).toAbsolutePath().toString())));
         assertThat(node.getChilds(), hasSize(6));
     }
 
@@ -159,7 +165,7 @@ public class FtpListTestCase extends FtpConnectorTestCase
 
         FileAttributes attributes = node.getAttributes();
         assertThat(attributes.isDirectory(), is(true));
-        assertThat(attributes.getPath(), equalTo(Paths.get("/", BASE_DIR).resolve(path).toString()));
+        assertThat(attributes.getPath(), equalTo(Paths.get(testHarness.getWorkingDirectory()).resolve(path).toString()));
         assertThat(attributes.isDirectory(), is(true));
 
         return node;
@@ -173,7 +179,7 @@ public class FtpListTestCase extends FtpConnectorTestCase
 
     private void createSubDirectory() throws Exception
     {
-        ftpClient.makeDir(SUB_DIRECTORY_NAME);
+        testHarness.makeDir(SUB_DIRECTORY_NAME);
         createTestFiles(SUB_DIRECTORY_NAME, 5, 7);
     }
 
@@ -182,7 +188,7 @@ public class FtpListTestCase extends FtpConnectorTestCase
         for (int i = startIndex; i < endIndex; i++)
         {
             String name = String.format(TEST_FILE_PATTERN, i);
-            ftpClient.putFile(name, parentFolder, CONTENT);
+            testHarness.write(parentFolder, name, CONTENT);
         }
     }
 }

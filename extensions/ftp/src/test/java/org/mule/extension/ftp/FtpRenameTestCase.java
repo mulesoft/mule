@@ -9,6 +9,11 @@ package org.mule.extension.ftp;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.FtpTestHarness.HELLO_FILE_NAME;
+import static org.mule.extension.FtpTestHarness.HELLO_PATH;
+import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+
+import org.mule.extension.FtpTestHarness;
 
 import java.nio.file.Paths;
 
@@ -19,6 +24,11 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
 
     private static final String RENAME_TO = "renamed";
 
+    public FtpRenameTestCase(String name, FtpTestHarness testHarness)
+    {
+        super(name, testHarness);
+    }
+
     @Override
     protected String getConfigFile()
     {
@@ -28,7 +38,7 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     @Test
     public void renameFile() throws Exception
     {
-        createHelloWorldFile();
+        testHarness.createHelloWorldFile();
         doRename(HELLO_PATH);
         assertRenamedFile();
     }
@@ -36,7 +46,7 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     @Test
     public void renameReadFile() throws Exception
     {
-        createHelloWorldFile();
+        testHarness.createHelloWorldFile();
         doRename("readAndRename", HELLO_PATH);
         assertRenamedFile();
     }
@@ -44,12 +54,12 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     @Test
     public void renameDirectory() throws Exception
     {
-        createHelloWorldFile();
+        testHarness.createHelloWorldFile();
         final String sourcePath = Paths.get(HELLO_PATH).getParent().toString();
         doRename(sourcePath);
 
-        assertThat(ftpClient.dirExists(sourcePath), is(false));
-        assertThat(ftpClient.dirExists(RENAME_TO), is(true));
+        assertThat(testHarness.dirExists(sourcePath), is(false));
+        assertThat(testHarness.dirExists(RENAME_TO), is(true));
 
         assertThat(readPathAsString(String.format("%s/%s", RENAME_TO, HELLO_FILE_NAME)), is(HELLO_WORLD));
     }
@@ -57,7 +67,7 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     @Test
     public void renameUnexisting() throws Exception
     {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doRename("not-there.txt");
     }
 
@@ -65,19 +75,19 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     public void targetAlreadyExists() throws Exception
     {
         final String sourceFile = "renameme.txt";
-        ftpClient.putFile(sourceFile, ".", "rename me");
-        ftpClient.putFile(RENAME_TO, ".", "I was here first");
+        testHarness.write(sourceFile, "rename me");
+        testHarness.write(RENAME_TO, "I was here first");
 
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doRename(sourceFile);
     }
 
     private void assertRenamedFile() throws Exception
     {
-        final String targetPath = Paths.get(HELLO_PATH).getParent().resolve(RENAME_TO).toString();
+        final String targetPath = Paths.get(testHarness.getWorkingDirectory()).resolve(HELLO_PATH).getParent().resolve(RENAME_TO).toString();
 
-        assertThat(ftpClient.fileExists(targetPath), is((true)));
-        assertThat(ftpClient.fileExists(HELLO_PATH), is((false)));
+        assertThat(testHarness.fileExists(targetPath), is((true)));
+        assertThat(testHarness.fileExists(HELLO_PATH), is((false)));
         assertThat(readPathAsString(targetPath), is(HELLO_WORLD));
     }
 

@@ -16,6 +16,7 @@ import org.mule.extension.file.internal.command.LocalReadCommand;
 import org.mule.extension.file.internal.command.LocalRenameCommand;
 import org.mule.extension.file.internal.command.LocalWriteCommand;
 import org.mule.extension.file.internal.lock.LocalPathLock;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.module.extension.file.api.AbstractFileSystem;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
@@ -63,7 +64,7 @@ public final class LocalFileSystem extends AbstractFileSystem
      *
      * @param config a {@link FileConnector} which acts as a config
      */
-    public LocalFileSystem(FileConnector config)
+    public LocalFileSystem(FileConnector config, MuleContext muleContext)
     {
         copyCommand = new LocalCopyCommand(this, config);
         createDirectoryCommand = new LocalCreateDirectoryCommand(this, config);
@@ -72,7 +73,7 @@ public final class LocalFileSystem extends AbstractFileSystem
         moveCommand = new LocalMoveCommand(this, config);
         readCommand = new LocalReadCommand(this, config);
         renameCommand = new LocalRenameCommand(this, config);
-        writeCommand = new LocalWriteCommand(this, config);
+        writeCommand = new LocalWriteCommand(this, config, muleContext);
     }
 
     @Override

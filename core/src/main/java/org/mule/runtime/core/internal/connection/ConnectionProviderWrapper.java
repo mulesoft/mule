@@ -6,13 +6,26 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.config.HasPoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for wrappers for {@link ConnectionProvider} instances
@@ -21,8 +34,12 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
  * @param <Connection> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public abstract class ConnectionProviderWrapper<Config, Connection> implements ConnectionProvider<Config, Connection>, HasPoolingProfile
+public abstract class ConnectionProviderWrapper<Config, Connection> implements ConnectionProvider<Config, Connection>, HasPoolingProfile, Lifecycle
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionProviderWrapper.class);
+
+    @Inject
+    protected MuleContext muleContext;
 
     private final ConnectionProvider<Config, Connection> delegate;
 
@@ -76,4 +93,32 @@ public abstract class ConnectionProviderWrapper<Config, Connection> implements C
      */
     public abstract RetryPolicyTemplate getRetryPolicyTemplate();
 
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        initialiseIfNeeded(delegate, true, muleContext);
+        initialiseIfNeeded(getRetryPolicyTemplate(), true, muleContext);
+    }
+
+    @Override
+    public void start() throws MuleException
+    {
+        startIfNeeded(delegate);
+        startIfNeeded(getRetryPolicyTemplate());
+    }
+
+    @Override
+    public void stop() throws MuleException
+    {
+        stopIfNeeded(delegate);
+        stopIfNeeded(getRetryPolicyTemplate());
+    }
+
+    @Override
+    public void dispose()
+    {
+        disposeIfNeeded(delegate, LOGGER);
+        disposeIfNeeded(getRetryPolicyTemplate(), LOGGER);
+    }
 }

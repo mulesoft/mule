@@ -65,7 +65,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,7 +73,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.xmlbeans.impl.tool.Extension;
 import org.springframework.core.ResolvableType;
 
 /**
@@ -258,7 +256,15 @@ public final class IntrospectionUtils
                     break;
                 }
             }
-            searchClass = searchClass.getSuperclass();
+
+            if (interfaceType != null)
+            {
+                break;
+            }
+            else
+            {
+                searchClass = searchClass.getSuperclass();
+            }
         }
 
         if (interfaceType == null)
@@ -266,7 +272,18 @@ public final class IntrospectionUtils
             throw new IllegalArgumentException(String.format("Class '%s' does not implement the '%s' interface", type.getName(), implementedInterface.getName()));
         }
 
-        return Arrays.stream(interfaceType.getGenerics()).map(ResolvableType::getRawClass).collect(toList());
+        List<? super Class<?>> generics = toRawClasses(interfaceType.getGenerics());
+        if (generics.stream().anyMatch(c -> c == null))
+        {
+            generics = getSuperClassGenerics(type, searchClass);
+        }
+
+        return (List<Class<?>>) generics;
+    }
+
+    private static List<Class<?>> toRawClasses(ResolvableType... types)
+    {
+        return stream(types).map(ResolvableType::getRawClass).collect(toList());
     }
 
     public static List<Type> getSuperClassGenerics(Class<?> type, Class<?> superClass)
@@ -282,7 +299,7 @@ public final class IntrospectionUtils
                 Type superType = searchClass.getGenericSuperclass();
                 if (superType instanceof ParameterizedType)
                 {
-                    return Arrays.stream(((ParameterizedType) superType).getActualTypeArguments()).collect(toList());
+                    return stream(((ParameterizedType) superType).getActualTypeArguments()).collect(toList());
                 }
             }
             searchClass = searchClass.getSuperclass();
@@ -367,7 +384,7 @@ public final class IntrospectionUtils
     public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType)
     {
         return getDescendingHierarchy(clazz).stream()
-                .flatMap(type -> Arrays.stream(type.getDeclaredFields()))
+                .flatMap(type -> stream(type.getDeclaredFields()))
                 .filter(field -> field.getAnnotation(annotationType) != null)
                 .collect(new ImmutableListCollector<>());
     }
@@ -394,7 +411,7 @@ public final class IntrospectionUtils
         try
         {
             PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(extensionType).getPropertyDescriptors();
-            return Arrays.stream(propertyDescriptors)
+            return stream(propertyDescriptors)
                     .filter(p -> getField(extensionType, p.getName(), p.getPropertyType()) != null)
                     .map(p -> getField(extensionType, p.getName(), p.getPropertyType()))
                     .collect(toSet());
