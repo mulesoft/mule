@@ -62,10 +62,9 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
     {
         MuleEvent responseEvent = flowRunner("shapeRetriever").withPayload("").run();
 
-        assertThat(responseEvent.getMessage().getPayload(), instanceOf(Square.class));
+        assertThat(responseEvent.getMessage().getPayload(), instanceOf(Shape.class));
 
         Square payload = (Square) responseEvent.getMessage().getPayload();
-        assertThat(payload.getSide(), is(4));
         assertThat(payload.getArea(), is(16));
     }
 

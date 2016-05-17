@@ -40,9 +40,9 @@
 
     <flow name="shapeRetriever">
         <subtypes:shape-retriever>
-            <subtypes:shape>
-                <subtypes:square side="4" area="16"/>
-            </subtypes:shape>
+            <subtypes:some-shape>
+                <subtypes:shape area="16"/>
+            </subtypes:some-shape>
         </subtypes:shape-retriever>
     </flow>
 

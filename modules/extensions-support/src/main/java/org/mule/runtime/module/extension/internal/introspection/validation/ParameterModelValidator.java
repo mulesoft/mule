@@ -12,6 +12,7 @@ import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.introspection.parameter.ParameterModel.RESERVED_NAMES;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -170,23 +171,24 @@ public final class ParameterModelValidator implements ModelValidator
 
     private void validateNameCollisionWithTypes(ParameterModel parameterModel, String ownerName, String ownerModelType, String extensionName, List<String> parameterNames)
     {
-        if (parameterNames.contains(getAliasName(parameterModel.getType())))
-        {
-            throw new IllegalParameterModelDefinitionException(
-                    String.format("The parameter [%s] in the %s [%s] from the extension [%s] can't have the same name as the ClassName or Alias of its declared type [%s]",
-                                  getAliasName(parameterModel.getType()), ownerModelType, ownerName, extensionName,
-                                  getType(parameterModel.getType()).getSimpleName()));
-        }
-
         Optional<MetadataType> subTypeWithNameCollision = subTypesMapping.getSubTypes(parameterModel.getType()).stream()
-                .filter(subtype -> parameterNames.contains(getAliasName(subtype))).findFirst();
+                .filter(subtype -> parameterNames.contains(getTopLevelTypeName(subtype))).findFirst();
         if (subTypeWithNameCollision.isPresent())
         {
             throw new IllegalParameterModelDefinitionException(
                     String.format("The parameter [%s] in the %s [%s] from the extension [%s] can't have the same name as the ClassName or Alias of the declared subType [%s] for parameter [%s]",
-                                  getAliasName(subTypeWithNameCollision.get()), ownerModelType, ownerName, extensionName,
+                                  getTopLevelTypeName(subTypeWithNameCollision.get()), ownerModelType, ownerName, extensionName,
                                   getType(subTypeWithNameCollision.get()).getSimpleName(), parameterModel.getName()));
         }
+
+        if (isInstantiable(getType(parameterModel.getType())) && parameterNames.contains(getTopLevelTypeName(parameterModel.getType())))
+        {
+            throw new IllegalParameterModelDefinitionException(
+                    String.format("The parameter [%s] in the %s [%s] from the extension [%s] can't have the same name as the ClassName or Alias of its declared type [%s]",
+                                  getTopLevelTypeName(parameterModel.getType()), ownerModelType, ownerName, extensionName,
+                                  getType(parameterModel.getType()).getSimpleName()));
+        }
+
     }
 
 }
