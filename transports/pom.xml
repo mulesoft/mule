@@ -17,6 +17,8 @@
 <!--         <module>file</module> -->
 <!--         <module>http</module> -->
         <module>jms</module>
+        <module>ssl</module>
+        <module>tcp</module>
         <module>vm</module>
         <module>module-support</module>
     </modules>

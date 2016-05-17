@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:ssl="http://www.mulesoft.org/schema/mule/ssl"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/ssl http://www.mulesoft.org/schema/mule/ssl/current/mule-ssl.xsd">
+
+    <ssl:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">
+        <ssl:client
+                path="clientKeystore"
+                storePassword="mulepassword"/>
+        <ssl:key-store
+                keyAlias="muleserver"
+                keyPassword="mulepassword"
+                path="serverKeystore"
+                storePassword="mulepassword"/>
+        <ssl:server
+                path="trustStore"
+                storePassword="mulepassword"
+                explicitOnly="true"
+                requireClientAuthentication="true"/>
+        <ssl:protocol-handler property="foo"/>
+    </ssl:connector>
+</mule>

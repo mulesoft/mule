@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
+            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <tcp:connector name="tcpConnector" connectionTimeout="1"/>
+
+    <flow name="testConnectionTimeout">
+        <vm:inbound-endpoint path="testInput" exchange-pattern="request-response"/>
+
+        <!-- Uses a big responseTimeout so it' clear that the connection timeout is caused by the connectionTimeout attribute -->
+        <tcp:outbound-endpoint address="tcp://1.2.3.4:9003" exchange-pattern="request-response" responseTimeout="500000"/>
+    </flow>
+
+</mule>
