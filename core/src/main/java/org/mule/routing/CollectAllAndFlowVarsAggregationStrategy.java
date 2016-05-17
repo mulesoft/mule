@@ -1,8 +1,8 @@
 /*
- *(c) 2003-2016 MuleSoft, Inc. This software is protected under international copyright
- *law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- *(or other master license agreement) separately entered into in writing between you and
- *MuleSoft. If such an agreement is not in place, you may not use the software.
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 
 package org.mule.routing;
@@ -16,6 +16,15 @@ import org.mule.routing.DefaultRouterResultsHandler;
 import org.mule.routing.CompositeRoutingException;
 import org.mule.api.transformer.DataType;
 
+/**
+ * If no routes generated exeption then it returns a new {@link MuleEvent} under the
+ * rules of {@link DefaultRouterResultsHandler} (you can change this behaviour by
+ * overriding {@link #aggregateWithoutFailedRoutes(AggregationContext)}. Otherwise, a
+ * {@link CompositeRoutingException} is thrown (override
+ * {@link #aggregateWithFailedRoutes(AggregationContext) to customize}
+ * 
+ * @since 3.5.0
+ */
 public class CollectAllAndFlowVarsAggregationStrategy extends CollectAllAggregationStrategy
 {
 

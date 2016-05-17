@@ -60,6 +60,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.ObjectUtils;
+import org.mule.routing.CollectAllAndFlowVarsAggregationStrategy;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -887,6 +888,29 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     public void testAll() throws MuleException, Exception
     {
         ScatterGatherRouter scatterGatherRouter = new ScatterGatherRouter();
+        scatterGatherRouter.addRoute(getAppendingMP("1"));
+        scatterGatherRouter.addRoute(getAppendingMP("2"));
+        scatterGatherRouter.addRoute(getAppendingMP("3"));
+        ThreadingProfile tp = ThreadingProfile.DEFAULT_THREADING_PROFILE;
+        tp.setMuleContext(muleContext);
+        scatterGatherRouter.setThreadingProfile(tp);
+        scatterGatherRouter.setMuleContext(muleContext);
+        scatterGatherRouter.initialise();
+        scatterGatherRouter.start();
+
+        MuleEvent event = getTestEventUsingFlow("0");
+        assertThat(((List) process(DefaultMessageProcessorChain.from(scatterGatherRouter), new DefaultMuleEvent(event.getMessage(), event)
+        ).getMessage().getPayload()).toArray(), CoreMatchers.<Object>equalTo
+                (new String[] {"01", "02", "03"}));
+
+        assertEquals(1, threads);
+    }
+    
+    @Test
+    public void testScatterGatherRouterWithCollectAllAndFlowVarsAggregationStrategy() throws MuleException, Exception
+    {
+        ScatterGatherRouter scatterGatherRouter = new ScatterGatherRouter();
+        scatterGatherRouter.setAggregationStrategy(new CollectAllAndFlowVarsAggregationStrategy());
         scatterGatherRouter.addRoute(getAppendingMP("1"));
         scatterGatherRouter.addRoute(getAppendingMP("2"));
         scatterGatherRouter.addRoute(getAppendingMP("3"));
