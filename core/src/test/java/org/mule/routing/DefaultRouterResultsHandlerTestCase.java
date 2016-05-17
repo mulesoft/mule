@@ -134,7 +134,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         // original event
         // TODO DF
         assertEquals("value1", result.getMessage().getInvocationProperty("key1"));
-        assertEquals(simpleDateType1.getMimeType(), result.getFlowVariableDataType("key1").getMimeType());
+        assertTrue(simpleDateType1.equals(result.getFlowVariableDataType("key1")));
         assertNull(result.getMessage().getInvocationProperty("key2"));
         assertNull(result.getMessage().getInvocationProperty("key3"));
 
