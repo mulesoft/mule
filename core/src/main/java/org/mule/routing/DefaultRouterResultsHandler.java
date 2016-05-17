@@ -142,7 +142,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
         for (String name : previous.getFlowVariableNames())
         {
-            resultEvent.setFlowVariable(name, previous.getFlowVariable(name));
+            resultEvent.setFlowVariable(name, previous.getFlowVariable(name),previous.getFlowVariableDataType(name));
         }
         return OptimizedRequestContext.unsafeSetEvent(resultEvent);
     }
