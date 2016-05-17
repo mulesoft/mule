@@ -7,8 +7,9 @@
 package org.mule.test.integration.transport.file;
 
 import static org.junit.Assert.assertFalse;
-import org.mule.api.client.MuleClient;
-import org.mule.util.FileUtils;
+
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 

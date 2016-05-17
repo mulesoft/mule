@@ -6,8 +6,8 @@
  */
 package org.mule.test.integration;
 
-import org.mule.transport.file.filters.FilenameWildcardFilter;
-import org.mule.util.FileUtils;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.transport.file.filters.FilenameWildcardFilter;
 
 import java.io.File;
 
@@ -108,6 +108,7 @@ public class ServerTools
         java.createWatchdog();
         new Thread()
         {
+            @Override
             public void run()
             {
                 java.execute();
@@ -136,12 +137,14 @@ public class ServerTools
         public KillableWatchdog watchDog;
         private Long timeout = new Long(Long.MAX_VALUE);
 
+        @Override
         public void setTimeout(Long value)
         {
             this.timeout = value;
             super.setTimeout(value);
         }
 
+        @Override
         protected ExecuteWatchdog createWatchdog() throws BuildException
         {
             if (watchDog == null)
@@ -160,11 +163,13 @@ public class ServerTools
             super(timeout);
         }
 
+        @Override
         public void timeoutOccured(Watchdog w)
         {
             // ignore
         }
 
+        @Override
         public synchronized void start(Process process)
         {
             super.start(process);

@@ -7,11 +7,14 @@
 package org.mule.test.integration.transport.file;
 
 import static org.junit.Assert.fail;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.util.FileUtils;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.transport.file.ExpressionFilenameParser;
 
 import java.io.File;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class FileRuntimeExceptionStrategyFunctionalTestCase extends FunctionalTestCase
@@ -21,6 +24,12 @@ public class FileRuntimeExceptionStrategyFunctionalTestCase extends FunctionalTe
     protected String getConfigFile()
     {
         return "org/mule/test/integration/providers/file/file-runtime-exception-strategy-flow.xml";
+    }
+
+    @Before
+    public void before()
+    {
+        ExpressionFilenameParser.resetCount();
     }
 
     @Test

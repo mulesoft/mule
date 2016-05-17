@@ -6,9 +6,9 @@
  */
 package org.mule.test.construct;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.transport.file.FileMessageDispatcher;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.transport.file.FileMessageDispatcher;
 
 public class SleepyFileMessageDispatcher extends FileMessageDispatcher
 {
@@ -20,7 +20,8 @@ public class SleepyFileMessageDispatcher extends FileMessageDispatcher
     @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
-        String sleepTime = event.getMessage().getInvocationProperty(
+        // TODO
+        String sleepTime = event.getMessage().getOutboundProperty(
             FlowSyncAsyncProcessingStrategyTestCase.SLEEP_TIME);
 
         Thread.sleep(Integer.valueOf(sleepTime));

@@ -2,18 +2,20 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-    xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xmlns:file="http://www.mulesoft.org/schema/mule/transports/file"
+    xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
     xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-               http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+               http://www.mulesoft.org/schema/mule/transports/file http://www.mulesoft.org/schema/mule/transports/file/current/mule-transport-file.xsd
+               http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
     <file:connector name="SleepyFileConnector"
         outputAppend="true" outputPattern="testfile.txt">
 
-        <service-overrides
+        <transports:service-overrides
             dispatcherFactory="org.mule.test.construct.SleepyFileMessageDispatcherFactory" />
     </file:connector>
 
@@ -35,34 +37,28 @@
 
     <flow name="testFlow">
     
-        <expression-transformer evaluator="groovy"
+        <expression-transformer
             expression="payload.split(';')" />
 
         <file:outbound-endpoint connector-ref="SleepyFileConnector"
             path="./test">
 
-            <expression-transformer evaluator="groovy"
+            <expression-transformer
                 expression="payload[0]" />
 
-            <message-properties-transformer
-                scope="invocation">
-                <add-message-property key="sleepTime"
+            <set-property propertyName="sleepTime"
                     value="3000" />
-            </message-properties-transformer>
 
         </file:outbound-endpoint>
 
         <file:outbound-endpoint connector-ref="SleepyFileConnector"
             path="./test">
 
-            <expression-transformer evaluator="groovy"
+            <expression-transformer
                 expression="payload[1]" />
 
-            <message-properties-transformer
-                scope="invocation">
-                <add-message-property key="sleepTime"
+            <set-property propertyName="sleepTime"
                     value="1000" />
-            </message-properties-transformer>
 
         </file:outbound-endpoint>
 

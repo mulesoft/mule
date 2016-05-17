@@ -4,13 +4,13 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:file="http://www.mulesoft.org/schema/mule/transports/file"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+       http://www.mulesoft.org/schema/mule/transports/file http://www.mulesoft.org/schema/mule/transports/file/current/mule-transport-file.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">

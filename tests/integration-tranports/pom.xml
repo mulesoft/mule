@@ -45,6 +45,11 @@
             <artifactId>mule-transport-tcp</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-file</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.mule</groupId>
 			<artifactId>mule-core-tests</artifactId>
@@ -80,6 +85,13 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jms</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-pgp</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>

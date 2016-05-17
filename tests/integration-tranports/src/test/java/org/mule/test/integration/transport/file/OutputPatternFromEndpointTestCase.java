@@ -8,21 +8,23 @@ package org.mule.test.integration.transport.file;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.mule.api.client.MuleClient;
-import org.mule.api.context.notification.EndpointMessageNotificationListener;
-import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.context.notification.EndpointMessageNotificationListener;
+import org.mule.runtime.core.context.notification.EndpointMessageNotification;
+import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.AssertionFailedError;
 import org.junit.Test;
+
+import junit.framework.AssertionFailedError;
 
 public class OutputPatternFromEndpointTestCase extends FunctionalTestCase implements EndpointMessageNotificationListener<EndpointMessageNotification>
 {

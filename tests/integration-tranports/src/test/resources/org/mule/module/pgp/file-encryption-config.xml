@@ -2,15 +2,15 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:file="http://www.mulesoft.org/schema/mule/transports/file"
       xmlns:pgp="http://www.mulesoft.org/schema/mule/pgp"
       xsi:schemaLocation="
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-          http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+          http://www.mulesoft.org/schema/mule/transports/file http://www.mulesoft.org/schema/mule/transports/file/current/mule-transport-file.xsd
           http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/current/mule-pgp.xsd
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl"
+    <spring:bean id="pgpKeyManager" class="org.mule.runtime.module.pgp.PGPKeyRingImpl"
                  init-method="initialise">
         <spring:property name="publicKeyRingFileName"
                          value="./serverPublic.gpg" />
@@ -21,7 +21,7 @@
     </spring:bean>
 
     <spring:bean id="fakeCredentialAccessor"
-                 class="org.mule.module.pgp.FakeCredentialAccessor">
+                 class="org.mule.runtime.module.pgp.FakeCredentialAccessor">
         <spring:property name="credentials"
                          value="Mule server &lt;mule_server@mule.com&gt;" />
     </spring:bean>
@@ -40,7 +40,7 @@
                     streaming="true"
                     pollingFrequency="1800000"/>
     <flow name="testFLow">
-        <file:inbound-endpoint name="fileIn" path="${workingDirectory}/testData"/>
+        <file:inbound-endpoint path="${workingDirectory}/testData"/>
 
         <transformer ref="encryptTransformer"/>
 

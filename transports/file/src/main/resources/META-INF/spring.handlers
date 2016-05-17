@@ -1,1 +1,1 @@
-http\://www.mulesoft.org/schema/mule/file=org.mule.transport.file.config.FileNamespaceHandler
+http\://www.mulesoft.org/schema/mule/transports/file=org.mule.runtime.transport.file.config.FileNamespaceHandler

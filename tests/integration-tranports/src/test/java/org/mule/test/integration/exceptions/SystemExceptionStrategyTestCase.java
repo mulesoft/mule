@@ -9,13 +9,13 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.junit.Ignore;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.construct.Flow;
+import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("BL-186")
@@ -32,7 +32,7 @@ public class SystemExceptionStrategyTestCase extends AbstractExceptionStrategyTe
     {
         try
         {
-            TestConnector c = (TestConnector) muleContext.getRegistry().lookupConnector("testConnector");
+            TestConnector c = (TestConnector) muleContext.getRegistry().lookupObject("testConnector");
             c.setInitialStateStopped(false);
             c.start();
             fail("Connector should have thrown an exception");

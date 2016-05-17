@@ -50,6 +50,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
 {
 
     private static final String ENDPOINT_MESSAGE_NOTIFICATION_CLASS = "org.mule.runtime.core.context.notification.EndpointMessageNotification";
+    private static final String ENDPOINT_MESSAGE_NOTIFICATION_LISTENER_CLASS = "org.mule.runtime.core.api.context.notification.EndpointMessageNotificationListener";
     public static final Map EVENT_MAP;
     public static final Map INTERFACE_MAP;
     public static final String INTERFACE = "interface";
@@ -95,7 +96,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         INTERFACE_MAP.put("CONNECTION", ConnectionNotificationListener.class.getName());
         INTERFACE_MAP.put("REGISTRY", RegistryNotificationListener.class.getName());
         INTERFACE_MAP.put("CUSTOM", CustomNotificationListener.class.getName());
-        INTERFACE_MAP.put("ENDPOINT-MESSAGE", ENDPOINT_MESSAGE_NOTIFICATION_CLASS);
+        INTERFACE_MAP.put("ENDPOINT-MESSAGE", ENDPOINT_MESSAGE_NOTIFICATION_LISTENER_CLASS);
         INTERFACE_MAP.put("CONNECTOR-MESSAGE", ConnectorMessageNotificationListener.class.getName());
         INTERFACE_MAP.put("COMPONENT-MESSAGE", ComponentMessageNotificationListener.class.getName());
         INTERFACE_MAP.put("EXCEPTION", ExceptionNotificationListener.class.getName());

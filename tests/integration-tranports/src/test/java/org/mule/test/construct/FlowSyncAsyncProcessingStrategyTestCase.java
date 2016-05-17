@@ -6,24 +6,23 @@
  */
 package org.mule.test.construct;
 
-import org.junit.After;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.listener.FlowExecutionListener;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.listener.FlowExecutionListener;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.Assert;
-
+import org.junit.After;
 import org.junit.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import junit.framework.Assert;
 
 public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
 {
@@ -77,6 +76,7 @@ public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
     {
         private String output;
 
+        @Override
         public boolean isSatisfied()
         {
             if(file.exists())
@@ -97,6 +97,7 @@ public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
             }
         }
 
+        @Override
         public String describeFailure()
         {
             return "Expected output was 'Part2Part 1' but actual one was: " + output;
