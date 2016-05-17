@@ -525,7 +525,7 @@
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" name="weapon-attributes">
+                    <xs:element minOccurs="0" maxOccurs="1" name="attributes-of-weapon">
                         <xs:complexType>
                             <xs:sequence minOccurs="1" maxOccurs="1">
                                 <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon-attributes"></xs:element>
@@ -540,7 +540,7 @@
                 </xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="weapon"></xs:attribute>
                 <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.WeaponTypeEnumType" use="required" name="type"></xs:attribute>
-                <xs:attribute type="mule:expressionObject" use="optional" name="weaponAttributes"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="attributesOfWeapon"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

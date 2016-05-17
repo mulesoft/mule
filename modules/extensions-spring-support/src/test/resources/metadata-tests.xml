@@ -125,8 +125,8 @@
     </flow>
 
     <flow name="typeWithDeclaredSubtypesMetadata">
-        <metadata:type-with-declared-subtypes-metadata config-ref="config" shape="#[new org.mule.test.metadata.extension.model.shapes.Circle()]"
-                                                       rectangle="#[new org.mule.test.metadata.extension.model.shapes.Rectangle()]"
+        <metadata:type-with-declared-subtypes-metadata config-ref="config" plainShape="#[new org.mule.test.metadata.extension.model.shapes.Circle()]"
+                                                       rectangleSubtype="#[new org.mule.test.metadata.extension.model.shapes.Rectangle()]"
                                                        animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
     </flow>
 </mule>

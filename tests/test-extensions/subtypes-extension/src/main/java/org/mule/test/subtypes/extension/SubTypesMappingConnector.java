@@ -19,10 +19,12 @@ import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.vegan.extension.VeganCookBook;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import java.util.List;
+
 @Extension(name = "SubtypesConnector", description = "Test connector for pojo subtype mapping")
 @Operations(TestOperationsWithSubTypeMapping.class)
 @Providers(SubTypesConnectionProvider.class)
-@SubTypeMapping(baseType = Shape.class, subTypes = {Square.class, Triangle.class})
+@SubTypeMapping(baseType = ParentShape.class, subTypes = {Square.class, Triangle.class})
 @SubTypeMapping(baseType = Door.class, subTypes = {HouseDoor.class, CarDoor.class})
 @Import(type = Ricin.class, from = HeisenbergExtension.class)
 @Import(type = VeganCookBook.class, from = VeganExtension.class)
@@ -32,7 +34,7 @@ public class SubTypesMappingConnector
 {
 
     @Parameter
-    private Shape abstractShape;
+    private ParentShape abstractShape;
 
     @Parameter
     private Door doorInterface;
@@ -41,15 +43,31 @@ public class SubTypesMappingConnector
     private Square explicitSquare;
 
     @Parameter
-    private FinalPojo finalPojo;
+    private FinalPojo simplePojo;
 
     @Parameter
     private Ricin importedRicin;
 
     @Parameter
-    private Shape triangle;
+    private ParentShape triangle;
 
-    public Shape getAbstractShape()
+    @Parameter
+    private List<PojoForList> pojoListOne;
+
+    @Parameter
+    private List<PojoForList> pojoListTwo;
+
+    public List<PojoForList> getPojoListOne()
+    {
+        return pojoListOne;
+    }
+
+    public List<PojoForList> getPojoListTwo()
+    {
+        return pojoListTwo;
+    }
+
+    public ParentShape getAbstractShape()
     {
         return abstractShape;
     }
@@ -66,10 +84,10 @@ public class SubTypesMappingConnector
 
     public FinalPojo getFinalPojo()
     {
-        return finalPojo;
+        return simplePojo;
     }
 
-    public Shape getTriangle()
+    public ParentShape getTriangle()
     {
         return triangle;
     }

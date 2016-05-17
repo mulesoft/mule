@@ -171,9 +171,9 @@
 
     <flow name="killWithWeapon">
         <heisenberg:kill-with-weapon weapon="#[weapon]" type="MELEE_WEAPON">
-            <heisenberg:weapon-attributes>
+            <heisenberg:attributes-of-weapon>
                 <heisenberg:weapon-attributes brand="Pizza on the rooftop"/>
-            </heisenberg:weapon-attributes>
+            </heisenberg:attributes-of-weapon>
         </heisenberg:kill-with-weapon>
     </flow>
 

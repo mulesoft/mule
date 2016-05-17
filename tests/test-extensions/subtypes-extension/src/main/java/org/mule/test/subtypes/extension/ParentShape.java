@@ -6,22 +6,17 @@
  */
 package org.mule.test.subtypes.extension;
 
-
-import org.mule.runtime.extension.api.annotation.Alias;
-
-@Alias("triangleAlias")
-public class Triangle extends ParentShape
+public class ParentShape
 {
+    private Integer area;
 
-    private Integer height;
-
-    public Integer getHeight()
+    public Integer getArea()
     {
-        return height;
+        return area;
     }
 
-    public void setHeight(Integer height)
+    public void setArea(Integer area)
     {
-        this.height = height;
+        this.area = area;
     }
 }

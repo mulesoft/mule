@@ -17,9 +17,9 @@ import java.util.List;
 public class TestOperationsWithSubTypeMapping
 {
 
-    public Shape shapeRetriever(Shape someShape)
+    public ParentShape shapeRetriever(ParentShape shape)
     {
-        return someShape;
+        return shape;
     }
 
     public Door doorRetriever(Door door)
@@ -37,8 +37,8 @@ public class TestOperationsWithSubTypeMapping
         return connection;
     }
 
-    public List<Object> subtypedAndConcreteParameters(Shape baseShape, Door door, FinalPojo finalPojoParam,
-                                                      VeganCookBook cookBook, Shape squareShape, Shape triangle)
+    public List<Object> subtypedAndConcreteParameters(ParentShape baseShape, Door door, FinalPojo finalPojoParam,
+                                                      VeganCookBook cookBook, ParentShape squareShape, ParentShape triangle)
     {
         return Arrays.asList(baseShape, door, finalPojoParam, cookBook, squareShape, triangle);
     }

@@ -438,7 +438,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         assertThat(metadata.isSuccess(), is(true));
 
         TypeMetadataDescriptor shapeMetadata = metadata.get().getParametersMetadata().get(0);
-        assertThat(shapeMetadata.getName(), is("shape"));
+        assertThat(shapeMetadata.getName(), is("plainShape"));
 
         MetadataType shapeType = shapeMetadata.getType();
         assertThat(shapeType, is(instanceOf(DefaultUnionType.class)));
@@ -454,7 +454,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         assertThat(metadata.isSuccess(), is(true));
 
         TypeMetadataDescriptor rectangleMetadata = metadata.get().getParametersMetadata().get(1);
-        assertThat(rectangleMetadata.getName(), is("rectangle"));
+        assertThat(rectangleMetadata.getName(), is("rectangleSubtype"));
 
         MetadataType shapeType = rectangleMetadata.getType();
         assertThat(shapeType, is(instanceOf(DefaultUnionType.class)));
