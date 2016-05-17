@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -206,6 +207,12 @@ public final class AnnotationsBasedDescriber implements Describer
 
         if (!typeMappings.isEmpty())
         {
+            if (typeMappings.stream().map(SubTypeMapping::baseType).distinct().collect(toList()).size() != typeMappings.size())
+            {
+                throw new IllegalModelDefinitionException(String.format("There should be only one SubtypeMapping for any given base type in extension [%s]." +
+                                                                        " Duplicated base types are not allowed", declaration.getExtensionDeclaration().getName()));
+            }
+
             Map<MetadataType, List<MetadataType>> subTypesMap = typeMappings.stream().collect(
                     new ImmutableMapCollector<>(mapping -> getMetadataType(mapping.baseType(), typeLoader),
                                                 mapping -> stream(mapping.subTypes())
@@ -222,6 +229,12 @@ public final class AnnotationsBasedDescriber implements Describer
 
         if (!importTypes.isEmpty())
         {
+            if (importTypes.stream().map(Import::type).distinct().collect(toList()).size() != importTypes.size())
+            {
+                throw new IllegalModelDefinitionException(String.format("There should be only one Import declaration for any given type in extension [%s]." +
+                                                                        " Multiple imports of the same type are not allowed", declaration.getExtensionDeclaration().getName()));
+            }
+
             Map<MetadataType, MetadataType> importedTypes = importTypes.stream().collect(
                     new ImmutableMapCollector<>(imports -> getMetadataType(imports.type(), typeLoader),
                                                 imports -> getMetadataType(imports.from(), typeLoader)));

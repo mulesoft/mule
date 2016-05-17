@@ -17,9 +17,9 @@ import java.util.List;
 public class TestOperationsWithSubTypeMapping
 {
 
-    public Shape shapeRetriever(Shape shape)
+    public Shape shapeRetriever(Shape someShape)
     {
-        return shape;
+        return someShape;
     }
 
     public Door doorRetriever(Door door)

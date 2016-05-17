@@ -213,7 +213,7 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
                 <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="shape">
+                    <xs:element minOccurs="0" maxOccurs="1" name="some-shape">
                         <xs:complexType>
                             <xs:sequence minOccurs="1" maxOccurs="1">
                                 <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-shape"></xs:element>
@@ -226,7 +226,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionObject" use="optional" name="shape"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="someShape"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

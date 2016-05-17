@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -16,11 +17,16 @@ import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelP
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * {@link ModelValidator} which applies to {@link ExtensionModel}s.
@@ -43,6 +49,7 @@ public final class SubtypesModelValidator implements ModelValidator
         {
             validateNonAbstractSubtypes(model, typesMapping.get());
             validateSubtypesExtendOrImplementBaseType(model, typesMapping.get());
+            validateSubtypesNameClashing(model, typesMapping.get());
         }
     }
 
@@ -83,6 +90,29 @@ public final class SubtypesModelValidator implements ModelValidator
                         String.format("All the declared Subtypes in extension %s should be concrete implementations of the give baseType," +
                                       " but [%s] are not implementations of [%s]",
                                       model.getName(), Arrays.toString(invalidTypes.toArray()), baseType.getSimpleName())
+                );
+            }
+        }
+    }
+
+    private void validateSubtypesNameClashing(ExtensionModel model, Map<MetadataType, List<MetadataType>> typesMapping)
+    {
+
+        ImmutableList<MetadataType> mappedTypes = ImmutableList.<MetadataType>builder()
+                .addAll(typesMapping.keySet())
+                .addAll(typesMapping.values().stream().flatMap(Collection::stream).collect(Collectors.toList())).build();
+
+        Map<String, MetadataType> typesByName = new HashMap<>();
+        for (MetadataType type: mappedTypes)
+        {
+            MetadataType previousType = typesByName.put(getTopLevelTypeName(type), type);
+            if (previousType != null  && !previousType.equals(type))
+            {
+                throw new IllegalModelDefinitionException(
+                        String.format("Subtypes mapped Type [%s] with alias [%s] in extension [%s] should have a different alias name " +
+                                      "than the previous mapped type [%s]",
+                                      getType(type).getSimpleName(), getTopLevelTypeName(type),
+                                      model.getName(), getType(previousType).getSimpleName())
                 );
             }
         }
