@@ -128,6 +128,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-metadata-model-java-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-metadata-model-persistence-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-builders-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-client-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-db-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-spring-support-${productVersion}.jar
