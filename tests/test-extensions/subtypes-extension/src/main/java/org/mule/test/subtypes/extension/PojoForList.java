@@ -6,17 +6,18 @@
  */
 package org.mule.test.subtypes.extension;
 
-public class Shape
+public class PojoForList
 {
-    private Integer area;
 
-    public Integer getArea()
+    private String id;
+
+    public String getId()
     {
-        return area;
+        return id;
     }
 
-    public void setArea(Integer area)
+    public void setId(String id)
     {
-        this.area = area;
+        this.id = id;
     }
 }

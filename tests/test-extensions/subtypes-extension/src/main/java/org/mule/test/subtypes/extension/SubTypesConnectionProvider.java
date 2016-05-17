@@ -18,7 +18,7 @@ public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesMa
 {
 
     @Parameter
-    private Shape abstractShape;
+    private ParentShape abstractShape;
 
     @Parameter
     private Door doorInterface;

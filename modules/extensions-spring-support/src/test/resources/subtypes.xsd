@@ -7,7 +7,7 @@
     <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
     <xs:import namespace="http://www.mulesoft.org/schema/mule/heisenberg" schemaLocation="http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd"></xs:import>
     <xs:import namespace="http://www.mulesoft.org/schema/mule/vegan" schemaLocation="http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd"></xs:import>
-    <xs:complexType name="org.mule.test.subtypes.extension.Shape">
+    <xs:complexType name="org.mule.test.subtypes.extension.ParentShape">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionInt" use="optional" name="area"></xs:attribute>
@@ -15,25 +15,25 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-shape"></xs:element>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Shape" substitutionGroup="subtypes:abstract-shape" name="shape"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-parent-shape"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ParentShape" substitutionGroup="subtypes:abstract-parent-shape" name="parent-shape"></xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.Square">
         <xs:complexContent>
-            <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.Shape">
+            <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.ParentShape">
                 <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="side"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-shape" abstract="true" name="abstract-square"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-parent-shape" abstract="true" name="abstract-square"></xs:element>
     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Square" substitutionGroup="subtypes:abstract-square" name="square"></xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.Triangle">
         <xs:complexContent>
-            <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.Shape">
+            <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.ParentShape">
                 <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="height"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-shape" abstract="true" name="abstract-triangle-alias"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-parent-shape" abstract="true" name="abstract-triangle-alias"></xs:element>
     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Triangle" substitutionGroup="subtypes:abstract-triangle-alias" name="triangle-alias"></xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.Door">
         <xs:complexContent>
@@ -86,7 +86,7 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
                             <xs:complexType>
                                 <xs:sequence minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-shape"></xs:element>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -104,7 +104,7 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="final-pojo">
+                        <xs:element minOccurs="0" maxOccurs="1" name="simple-pojo">
                             <xs:complexType>
                                 <xs:sequence minOccurs="1" maxOccurs="1">
                                     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-final-pojo"></xs:element>
@@ -121,7 +121,21 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="triangle">
                             <xs:complexType>
                                 <xs:sequence minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-shape"></xs:element>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="pojo-list-one">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="unbounded" ref="subtypes:abstract-pojo-for-list"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="pojo-list-two">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="unbounded" ref="subtypes:abstract-pojo-for-list"></xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -130,9 +144,11 @@
                     <xs:attribute type="mule:expressionObject" use="optional" name="abstractShape"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="doorInterface"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="explicitSquare"></xs:attribute>
-                    <xs:attribute type="mule:expressionObject" use="optional" name="finalPojo"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="simplePojo"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="importedRicin"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="triangle"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="pojoListOne"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="pojoListTwo"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -147,6 +163,16 @@
     </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-final-pojo"></xs:element>
     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.FinalPojo" substitutionGroup="subtypes:abstract-final-pojo" name="final-pojo"></xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.PojoForList">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionString" use="optional" name="id"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-pojo-for-list"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.PojoForList" substitutionGroup="subtypes:abstract-pojo-for-list" name="pojo-for-list"></xs:element>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConfigRetrieverType" substitutionGroup="mule:abstract-message-processor" name="config-retriever"></xs:element>
     <xs:complexType name="ConfigRetrieverType">
         <xs:complexContent>
@@ -213,10 +239,10 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
                 <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="some-shape">
+                    <xs:element minOccurs="0" maxOccurs="1" name="shape">
                         <xs:complexType>
                             <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-shape"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
@@ -226,7 +252,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionObject" use="optional" name="someShape"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="shape"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -243,7 +269,7 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="base-shape">
                         <xs:complexType>
                             <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-shape"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
@@ -271,14 +297,14 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="square-shape">
                         <xs:complexType>
                             <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-shape"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" name="triangle">
                         <xs:complexType>
                             <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-shape"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
@@ -312,7 +338,7 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
                             <xs:complexType>
                                 <xs:sequence minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-shape"></xs:element>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>

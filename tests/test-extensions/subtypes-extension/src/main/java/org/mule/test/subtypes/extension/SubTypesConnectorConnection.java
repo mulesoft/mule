@@ -9,17 +9,17 @@ package org.mule.test.subtypes.extension;
 public class SubTypesConnectorConnection
 {
 
-    private Shape shape;
+    private ParentShape shape;
     private Door door;
 
 
-    public SubTypesConnectorConnection(Shape shape, Door door)
+    public SubTypesConnectorConnection(ParentShape shape, Door door)
     {
         this.shape = shape;
         this.door = door;
     }
 
-    public Shape getShape()
+    public ParentShape getShape()
     {
         return shape;
     }

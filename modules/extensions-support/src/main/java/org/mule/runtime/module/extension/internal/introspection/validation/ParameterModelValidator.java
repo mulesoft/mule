@@ -13,6 +13,7 @@ import static org.mule.runtime.extension.api.introspection.parameter.ParameterMo
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -20,7 +21,6 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.Described;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
@@ -145,7 +145,7 @@ public final class ParameterModelValidator implements ModelValidator
         parameters.stream().forEach(parameterModel -> {
             validateParameter(parameterModel, visitor, ownerName, ownerModelType, extensionName);
             validateNameCollisionWithTypes(parameterModel, ownerName, ownerModelType, extensionName,
-                                           parameters.stream().map(Described::getName).collect(toList()));
+                                           parameters.stream().map(p -> hyphenize(p.getName())).collect(toList()));
         });
     }
 

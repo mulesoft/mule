@@ -18,7 +18,8 @@ import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.subtypes.extension.CarDoor;
 import org.mule.test.subtypes.extension.FinalPojo;
 import org.mule.test.subtypes.extension.HouseDoor;
-import org.mule.test.subtypes.extension.Shape;
+import org.mule.test.subtypes.extension.ParentShape;
+import org.mule.test.subtypes.extension.PojoForList;
 import org.mule.test.subtypes.extension.Square;
 import org.mule.test.subtypes.extension.SubTypesConnectorConnection;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
@@ -46,25 +47,13 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
     }
 
     @Test
-    public void importedType() throws Exception
-    {
-        MuleEvent responseEvent = flowRunner("shapeRetriever").withPayload("").run();
-
-        assertThat(responseEvent.getMessage().getPayload(), instanceOf(Square.class));
-
-        Square payload = (Square) responseEvent.getMessage().getPayload();
-        assertThat(payload.getSide(), is(4));
-        assertThat(payload.getArea(), is(16));
-    }
-
-    @Test
     public void shapeRetriever() throws Exception
     {
         MuleEvent responseEvent = flowRunner("shapeRetriever").withPayload("").run();
 
-        assertThat(responseEvent.getMessage().getPayload(), instanceOf(Shape.class));
+        assertThat(responseEvent.getMessage().getPayload(), instanceOf(ParentShape.class));
 
-        Square payload = (Square) responseEvent.getMessage().getPayload();
+        ParentShape payload = (ParentShape) responseEvent.getMessage().getPayload();
         assertThat(payload.getArea(), is(16));
     }
 
@@ -98,6 +87,11 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
 
         assertThat(payload.getRicin(), instanceOf(Ricin.class));
         assertThat(payload.getTriangle(), instanceOf(Triangle.class));
+
+        assertThat(payload.getPojoListOne(), is(notNullValue()));
+        assertThat(payload.getPojoListOne(), hasSize(1));
+        assertThat(payload.getPojoListOne().get(0), instanceOf(PojoForList.class));
+        assertThat(payload.getPojoListOne().get(0).getId(), is("inner"));
     }
 
 
@@ -124,8 +118,8 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
         List<Object> payload = (List<Object>) responseEvent.getMessage().getPayload();
         assertThat(payload, hasSize(6));
 
-        assertThat(payload.get(0), instanceOf(Shape.class));
-        assertThat(((Shape) payload.get(0)).getArea(), is(2));
+        assertThat(payload.get(0), instanceOf(ParentShape.class));
+        assertThat(((ParentShape) payload.get(0)).getArea(), is(2));
 
         assertThat(payload.get(1), instanceOf(HouseDoor.class));
         assertThat(((HouseDoor) payload.get(1)).isLocked(), is(false));
@@ -155,8 +149,8 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
         List<Object> payload = (List<Object>) responseEvent.getMessage().getPayload();
         assertThat(payload, hasSize(6));
 
-        assertThat(payload.get(0), instanceOf(Shape.class));
-        assertThat(((Shape) payload.get(0)).getArea(), is(9));
+        assertThat(payload.get(0), instanceOf(ParentShape.class));
+        assertThat(((ParentShape) payload.get(0)).getArea(), is(9));
 
         assertThat(payload.get(1), instanceOf(CarDoor.class));
         assertThat(((CarDoor) payload.get(1)).getColor(), is("white"));

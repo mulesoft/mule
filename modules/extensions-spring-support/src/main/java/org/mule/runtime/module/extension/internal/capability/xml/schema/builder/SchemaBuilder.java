@@ -1017,8 +1017,6 @@ public final class SchemaBuilder
         sequence.setMinOccurs(ONE);
         sequence.setMaxOccurs("1");
 
-        registerPojoType(metadataType, EMPTY);
-
         sequence.getParticle().add(objectFactory.createElement(createRefToLocalElement(metadataType)));
 
         LocalComplexType complexType = new LocalComplexType();
@@ -1029,6 +1027,7 @@ public final class SchemaBuilder
 
     private TopLevelElement createRefToLocalElement(MetadataType metadataType)
     {
+        registerPojoType(metadataType, EMPTY);
         QName qName = new QName(xmlProperties.getNamespaceUri(), getTopLevelAbstractTypeName(metadataType), xmlProperties.getNamespace());
         return createRefElement(qName, false);
     }

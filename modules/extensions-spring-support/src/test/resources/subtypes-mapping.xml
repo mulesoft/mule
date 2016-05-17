@@ -27,22 +27,25 @@
         <subtypes:explicit-square>
             <subtypes:square side="2" area="4"/>
         </subtypes:explicit-square>
-        <subtypes:final-pojo>
+        <subtypes:simple-pojo>
             <subtypes:final-pojo someString="message"/>
-        </subtypes:final-pojo>
+        </subtypes:simple-pojo>
         <subtypes:imported-ricin>
             <heisenberg:ricin microgramsPerKilo="2"/>
         </subtypes:imported-ricin>
         <subtypes:triangle>
             <subtypes:triangle-alias height="4" area="2"/>
         </subtypes:triangle>
+        <subtypes:pojo-list-one>
+            <subtypes:pojo-for-list id="inner"/>
+        </subtypes:pojo-list-one>
     </subtypes:config>
 
     <flow name="shapeRetriever">
         <subtypes:shape-retriever>
-            <subtypes:some-shape>
-                <subtypes:shape area="16"/>
-            </subtypes:some-shape>
+            <subtypes:shape>
+                <subtypes:parent-shape area="16"/>
+            </subtypes:shape>
         </subtypes:shape-retriever>
     </flow>
 
@@ -65,7 +68,7 @@
     <flow name="subtypedAndConcreteParameters">
         <subtypes:subtyped-and-concrete-parameters>
             <subtypes:base-shape>
-                <subtypes:shape area="2"/>
+                <subtypes:parent-shape area="2"/>
             </subtypes:base-shape>
             <subtypes:door>
                 <subtypes:house-door isLocked="false"/>
@@ -87,7 +90,7 @@
 
     <subtypes:car-door name="global-car-door" color="white"/>
     <subtypes:house-door name="global-house-door" isLocked="true"/>
-    <subtypes:shape name="global-shape" area="9"/>
+    <subtypes:parent-shape name="global-shape" area="9"/>
     <subtypes:square name="global-square" side="3" area="9"/>
     <subtypes:triangle-alias name="global-triangle" height="6" area="3"/>
     <subtypes:final-pojo name="global-final-pojo" someString="globalString"/>

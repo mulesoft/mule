@@ -6,7 +6,8 @@
  */
 package org.mule.test.subtypes.extension;
 
-public class Square extends Shape
+
+public class Square extends ParentShape
 {
 
     private Integer side;

@@ -128,7 +128,7 @@ public class MetadataOperations extends MetadataOperationsParent
         return null;
     }
 
-    public boolean typeWithDeclaredSubtypesMetadata(Shape shape, Rectangle rectangle, Animal animal)
+    public boolean typeWithDeclaredSubtypesMetadata(Shape plainShape, Rectangle rectangleSubtype, Animal animal)
     {
         return false;
     }
