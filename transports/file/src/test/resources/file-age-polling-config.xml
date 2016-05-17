@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <!-- NOTE: bug occurs only when polling frequency is less than fileAge -->
+    <file:connector name="fileConnector"
+                    streaming="false"
+                    fileAge="20000"
+                    pollingFrequency="500">
+        <service-overrides messageReceiver="org.mule.transport.file.FileAgeAndPollingFrequencyInteractionTestCase$TestFileMessageReceiver"/>
+    </file:connector>
+
+    <flow name="test">
+        <file:inbound-endpoint path="${workingDirectory}/in"/>
+
+        <vm:outbound-endpoint path="testOut"/>
+    </flow>
+</mule>

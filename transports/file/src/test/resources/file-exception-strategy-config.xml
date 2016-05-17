@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <file:connector name="fileConnectorWithWorkDir" streaming="false" workDirectory="${workingDirectory}/temp/work-directory" pollingFrequency="500"/>
+    <file:connector name="fileConnector" streaming="false" pollingFrequency="1000" />
+    <file:connector name="fileConnectorStreaming" streaming="true" pollingFrequency="100" />
+    <file:connector name="fileConnectorStreamingLongPolling" streaming="true" pollingFrequency="5000" />
+    
+    <flow name="moveFile">
+        <file:inbound-endpoint path="${workingDirectory}/temp/input-move-file" moveToDirectory="${workingDirectory}/temp/output-directory" connector-ref="fileConnector"/>
+        <test:component throwException="true"/>
+    </flow>
+
+    <flow name="moveFileWithWorkDir">
+        <file:inbound-endpoint path="${workingDirectory}/temp/input-move-file-wd" moveToDirectory="${workingDirectory}/temp/output-directory" connector-ref="fileConnectorWithWorkDir"/>
+        <test:component throwException="true"/>
+    </flow>
+
+    <flow name="copyFile">
+        <file:inbound-endpoint path="${workingDirectory}/temp/input-copy-file" connector-ref="fileConnector"/>
+        <test:component throwException="true"/>
+        <file:outbound-endpoint path="${workingDirectory}/temp/output-directory" connector-ref="fileConnector"/>
+    </flow>
+
+    <flow name="copyFileWithWorkDir">
+        <file:inbound-endpoint path="${workingDirectory}/temp/input-copy-file-with-work-directory" connector-ref="fileConnectorWithWorkDir"/>
+        <test:component throwException="true"/>
+        <file:outbound-endpoint path="${workingDirectory}/temp/output-directory" connector-ref="fileConnectorWithWorkDir"/>
+    </flow>
+
+    <flow name="consumeFileWithStreamingAndCatch" processingStrategy="synchronous">
+        <file:inbound-endpoint path="${workingDirectory}/temp/input-streaming-catch" connector-ref="fileConnectorStreaming"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy/>
+    </flow>
+
+    <flow name="consumeFileWithStreamingAndRollback" processingStrategy="synchronous">
+        <file:inbound-endpoint path="${workingDirectory}/temp/input-streaming-rollback" connector-ref="fileConnectorStreaming"/>
+        <test:component/>
+        <rollback-exception-strategy/>
+    </flow>
+
+    <flow name="consumeFileWithStreamingAndRollbackWithRedelivery" processingStrategy="synchronous">
+        <file:inbound-endpoint path="${workingDirectory}/temp/input-streaming-rollback-with-redelivery" connector-ref="fileConnectorStreaming">
+            <idempotent-redelivery-policy idExpression="#['fixedValue']"/>
+        </file:inbound-endpoint>
+        <test:component/>
+        <rollback-exception-strategy maxRedeliveryAttempts="2"/>
+    </flow>
+
+    <flow name="consumefileWithStreamingAndAsyncProcessingStrategy" processingStrategy="asynchronous">
+        <file:inbound-endpoint path="${workingDirectory}/temp/input-streaming-and-async-processing-strategy" connector-ref="fileConnectorStreamingLongPolling"/>
+        <custom-processor class="org.mule.transport.file.FileExceptionStrategyFunctionalTestCase$BeforeCloseStream"/>
+        <object-to-byte-array-transformer/>
+        <custom-processor class="org.mule.transport.file.FileExceptionStrategyFunctionalTestCase$AfterCloseStream"/>
+    </flow>
+
+</mule>

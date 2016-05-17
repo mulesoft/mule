@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+               http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+
+    <file:connector name="SleepyFileConnector"
+        outputAppend="true" outputPattern="testfile.txt">
+
+        <service-overrides
+            dispatcherFactory="org.mule.test.construct.SleepyFileMessageDispatcherFactory" />
+    </file:connector>
+
+    <flow name="synchFlow" processingStrategy="synchronous">
+
+        <vm:inbound-endpoint path="testSynch"
+            exchange-pattern="one-way" />
+
+        <flow-ref name="testFlow" />
+    </flow>
+
+    <flow name="asynchFlow">
+
+        <vm:inbound-endpoint path="testAsynch"
+            exchange-pattern="one-way" />
+
+        <flow-ref name="testFlow" />
+    </flow>
+
+    <flow name="testFlow">
+    
+        <expression-transformer evaluator="groovy"
+            expression="payload.split(';')" />
+
+        <file:outbound-endpoint connector-ref="SleepyFileConnector"
+            path="./test">
+
+            <expression-transformer evaluator="groovy"
+                expression="payload[0]" />
+
+            <message-properties-transformer
+                scope="invocation">
+                <add-message-property key="sleepTime"
+                    value="3000" />
+            </message-properties-transformer>
+
+        </file:outbound-endpoint>
+
+        <file:outbound-endpoint connector-ref="SleepyFileConnector"
+            path="./test">
+
+            <expression-transformer evaluator="groovy"
+                expression="payload[1]" />
+
+            <message-properties-transformer
+                scope="invocation">
+                <add-message-property key="sleepTime"
+                    value="1000" />
+            </message-properties-transformer>
+
+        </file:outbound-endpoint>
+
+    </flow>
+
+</mule>

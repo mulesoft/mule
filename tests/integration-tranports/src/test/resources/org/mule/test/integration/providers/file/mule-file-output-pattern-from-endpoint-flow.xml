@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <notifications dynamic="true">
+        <notification event="ENDPOINT-MESSAGE"/>
+    </notifications>
+
+    <flow name="TestUMO">
+        <inbound-endpoint address="vm://filesend" exchange-pattern="request-response"/>
+        <all>
+            <outbound-endpoint address="file://FirstWrite">
+                <property key="outputPattern" value="export.txt"/>
+            </outbound-endpoint>
+            <outbound-endpoint  address="file://SecondWrite">
+                <property key="outputPattern" value="export.txt.OK"/>
+            </outbound-endpoint>
+        </all>
+        <echo-component/>
+    </flow>
+
+</mule>
+

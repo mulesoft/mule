@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <file:connector name="fileConnector"
+                    moveToDirectory="${workingDirectory}/output"
+                    streaming="true"
+                    pollingFrequency="100"
+                    workDirectory="${workingDirectory}/work"
+                    moveToPattern="processed-#[message.inboundProperties['originalFilename']]"
+                    autoDelete="false" />
+
+    <file:endpoint path="${workingDirectory}/input"
+                   name="get"
+                   connector-ref="fileConnector" />
+
+    <flow name="relay" >
+        <inbound-endpoint ref="get" />
+        <set-property propertyName="aux-originalFilename" value="#[message.inboundProperties['originalFilename']]" />
+        <set-property propertyName="aux-originalDirectory" value="#[message.inboundProperties['originalDirectory']]" />
+        <echo-component/>
+        <outbound-endpoint address="vm://file.outbox" />
+    </flow>
+</mule>

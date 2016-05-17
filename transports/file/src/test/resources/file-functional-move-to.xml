@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <file:connector name="FileConnector"
+                    autoDelete="false"
+                    streaming="true"
+                    validateConnections="true" />
+
+    <file:endpoint name="InputEndpoint"
+                   path="${FileMoveToFunctionalTestCase-inputDirectory}"
+                   moveToDirectory="${FileMoveToFunctionalTestCase-moveToDirectory}"
+                   pollingFrequency="1000"
+                   moveToPattern="#[message.inboundProperties.originalFilename]_#[message.id]"
+                   fileAge="1000" responseTimeout="10000"
+                   connector-ref="FileConnector"/>
+
+    <flow name="uploaddocument_fileinput_processing_flow" >
+        <file:inbound-endpoint ref="InputEndpoint" />
+        <byte-array-to-string-transformer />
+    </flow>
+
+</mule>

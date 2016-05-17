@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+           http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <!-- Endpoint configuration to have only one poll invocation per test -->
+    <file:connector name="fileConnector" autoDelete="true"
+                    pollingFrequency="60000"
+                    streaming="true"/>
+
+    <flow name="fileTest" processingStrategy="synchronous">
+        <file:inbound-endpoint connector-ref="fileConnector" path="${workingDirectory}/testData1"/>
+
+        <test:component throwException="true"/>
+
+        <!-- Stops flow after processing the exception (used in the test to check that the exception was processed)-->
+        <default-exception-strategy stopMessageProcessing="true"/>
+    </flow>
+
+    <flow name="fileTestWithTransformation" processingStrategy="synchronous">
+        <file:inbound-endpoint connector-ref="fileConnector" path="${workingDirectory}/testData2">
+            <file:file-to-string-transformer/>
+        </file:inbound-endpoint>
+
+        <test:component throwException="true"/>
+
+        <!-- Stops flow after processing the exception (used in the test to check that the exception was processed)-->
+        <default-exception-strategy stopMessageProcessing="true"/>
+    </flow>
+</mule>

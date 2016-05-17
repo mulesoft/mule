@@ -1,0 +1,8 @@
+http\://www.mulesoft.org/schema/mule/file/3.1/mule-file.xsd=META-INF/mule-file.xsd
+http\://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd=META-INF/mule-file.xsd
+http\://www.mulesoft.org/schema/mule/file/3.3/mule-file.xsd=META-INF/mule-file.xsd
+http\://www.mulesoft.org/schema/mule/file/3.4/mule-file.xsd=META-INF/mule-file.xsd
+http\://www.mulesoft.org/schema/mule/file/3.5/mule-file.xsd=META-INF/mule-file.xsd
+http\://www.mulesoft.org/schema/mule/file/3.6/mule-file.xsd=META-INF/mule-file.xsd
+http\://www.mulesoft.org/schema/mule/file/3.7/mule-file.xsd=META-INF/mule-file.xsd
+http\://www.mulesoft.org/schema/mule/file/current/mule-file.xsd=META-INF/mule-file.xsd

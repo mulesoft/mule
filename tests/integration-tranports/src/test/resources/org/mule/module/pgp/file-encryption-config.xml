@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:pgp="http://www.mulesoft.org/schema/mule/pgp"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+          http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/current/mule-pgp.xsd
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+    <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl"
+                 init-method="initialise">
+        <spring:property name="publicKeyRingFileName"
+                         value="./serverPublic.gpg" />
+        <spring:property name="secretKeyRingFileName"
+                         value="./serverPrivate.gpg" />
+        <spring:property name="secretAliasId" value="6247672658342245276" />
+        <spring:property name="secretPassphrase" value="TestingPassphrase" />
+    </spring:bean>
+
+    <spring:bean id="fakeCredentialAccessor"
+                 class="org.mule.module.pgp.FakeCredentialAccessor">
+        <spring:property name="credentials"
+                         value="Mule server &lt;mule_server@mule.com&gt;" />
+    </spring:bean>
+
+    <pgp:security-manager>
+        <pgp:security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
+        <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy"
+                                          credentialsAccessor-ref="fakeCredentialAccessor"
+                                          keyManager-ref="pgpKeyManager"/>
+    </pgp:security-manager>
+
+    <encrypt-transformer name="encryptTransformer" strategy-ref="keyBasedEncryptionStrategy"/>
+
+    <file:connector name="output"
+                    autoDelete="true"
+                    streaming="true"
+                    pollingFrequency="1800000"/>
+    <flow name="testFLow">
+        <file:inbound-endpoint name="fileIn" path="${workingDirectory}/testData"/>
+
+        <transformer ref="encryptTransformer"/>
+
+        <echo-component/>
+    </flow>
+</mule>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <file:connector name="fileConnector" moveToDirectory="${workingDirectory}/files/processed" streaming="true"
+        pollingFrequency="100" workDirectory="${workingDirectory}/work" moveToPattern="test/file.txt"/>
+
+    <file:endpoint path="${workingDirectory}/files" name="get" connector-ref="fileConnector" />
+
+    <flow name="relay" >
+        <inbound-endpoint ref="get" />
+        <echo-component/>
+        <outbound-endpoint address="vm://file.outbox" />
+    </flow>
+</mule>

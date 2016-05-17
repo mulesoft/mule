@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <file:connector name="fileConnector"
+            autoDelete="false"
+            fileAge="1234"
+            moveToDirectory="abc"
+            moveToPattern="bcd"
+            outputAppend="true"
+            outputPattern="cde"
+            pollingFrequency="2345"
+            serialiseObjects="true"
+            streaming="false"
+            readFromDirectory="${workingDirectory}/readFromDirectory"
+            writeToDirectory="${workingDirectory}/writeToDirectory"
+            workDirectory="${workingDirectory}/workDirectory"
+            workFileNamePattern="#[function:uuid]"
+            recursive="true">
+        <file:custom-filename-parser class="org.mule.transport.file.DummyFilenameParser"/>
+    </file:connector>
+
+    <file:connector name="thirdConnector">
+        <file:expression-filename-parser/>
+    </file:connector>
+    
+    <endpoint name="ep1" address="test://ep1" exchange-pattern="one-way">
+        <file:file-to-byte-array-transformer ignoreBadInput="true" name="test1" returnClass="java.lang.Object"/>
+    </endpoint>
+
+    <endpoint name="ep2" address="test://ep2" exchange-pattern="one-way">
+        <file:file-to-string-transformer ignoreBadInput="true" name="test2" returnClass="java.lang.Object"/>
+    </endpoint>
+
+    <flow name="Test">
+        <file:inbound-endpoint path="./target" connector-ref="thirdConnector">
+            <file:filename-regex-filter pattern="(^SemDirector_Report-\d)(.*)(tab$)"
+                caseSensitive="false"/>
+        </file:inbound-endpoint>
+        <echo-component/>
+    </flow>
+    
+</mule>

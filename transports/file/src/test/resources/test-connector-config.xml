@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <file:connector name="fileConnector1"/>
+
+    <file:connector name="fileConnector2">
+        <service-overrides
+                outboundTransformer="org.mule.transformer.simple.SerializableToByteArray"
+                inboundTransformer="org.mule.transformer.simple.ByteArrayToSerializable"/>
+    </file:connector>
+
+    <file:connector name="fileConnector3"/>
+</mule>
+        

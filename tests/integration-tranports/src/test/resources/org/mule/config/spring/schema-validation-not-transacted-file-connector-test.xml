@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+   <file:connector name="fileConnector" autoDelete="true" fileAge="1000" numberOfConcurrentTransactedReceivers="1"/>
+
+    <flow name="main">
+       <file:inbound-endpoint path="./target" pollingFrequency="1000" >
+            <file:filename-wildcard-filter pattern="*.txt"/>
+        </file:inbound-endpoint>
+    </flow>
+</mule>

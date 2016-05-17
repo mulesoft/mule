@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <file:connector name="fileConnector" autoDelete="true" streaming="true" validateConnections="true" workDirectory="${temp}/work" recursive="true"/>
+
+    <flow name="main" >
+        <file:inbound-endpoint path="${temp}" pollingFrequency="1000"/>
+
+        <echo-component/>
+    </flow>
+</mule>

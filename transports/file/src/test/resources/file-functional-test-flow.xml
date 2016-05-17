@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <!-- access this from test code to set destination directory -->
+    <file:connector name="sendConnector" outputAppend="true" outputPattern="#[header:TARGET_FILE]"/>
+
+    <!-- access this from test code to set destination directory -->
+    <file:connector name="receiveConnector" fileAge="500" autoDelete="true" pollingFrequency="100"/>
+
+    <file:connector name="recursiveConnector" fileAge="0" autoDelete="true" pollingFrequency="10"
+        recursive="true"/>
+
+    <file:file-to-string-transformer name="FileToString"/>
+
+    <file:endpoint path="${workingDirectory}/in" name="get" connector-ref="recursiveConnector"/>
+
+    <file:endpoint path="test" name="send" connector-ref="sendConnector"/>
+
+    <vm:connector name="vmQueue"/>
+
+    <endpoint address="vm://receive" name="receive" exchange-pattern="one-way"/>
+
+    <flow name="relay">
+        <!-- will be set at runtime, once connector has readFromDirectory -->
+        <!-- mule:endpoint address="file:///tmp/foo"/ -->
+        <!-- composite source is required otherwise DefaultInboundEndpoint attempts to initialise flow while the flow is 
+            in the starting phase -->
+        <mule:composite-source>
+            <inbound-endpoint address="vm://dummy"/>
+        </mule:composite-source>
+        <outbound-endpoint ref="receive"/>
+    </flow>
+
+    <flow name="recursiveService">
+        <file:inbound-endpoint ref="get" comparator="org.mule.transport.file.comparator.OlderFirstComparator"
+            reverseOrder="true">
+            <file:file-to-byte-array-transformer/>
+        </file:inbound-endpoint>
+        <outbound-endpoint ref="receive"/>
+    </flow>
+
+</mule>

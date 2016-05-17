@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file" 
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+      xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+       http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <tcp:connector name="tcpConnector" validateConnections="false">
+        <tcp:streaming-protocol/>
+    </tcp:connector>
+
+    <flow name="bridge1">
+        <file:inbound-endpoint path="${workingDirectory}/test-data/in" moveToDirectory=".mule/test-data/processing"
+                               pollingFrequency="10000000"/>
+        <tcp:outbound-endpoint host="localhost" port="${port1}" exchange-pattern="one-way"/>
+    </flow>
+
+    <flow name="bridge2">
+        <tcp:inbound-endpoint host="localhost" port="${port1}" exchange-pattern="one-way"/>
+        <component class="org.mule.test.integration.streaming.SimpleStreamingBean"/>
+        <all>
+            <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way">
+                <auto-transformer returnClass="java.lang.String"/>
+            </stdio:outbound-endpoint>
+            <file:outbound-endpoint path="${workingDirectory}/test-data/out" encoding="UTF8" outputPattern="foo.txt.processed"/>
+        </all>
+    </flow>
+
+</mule>
