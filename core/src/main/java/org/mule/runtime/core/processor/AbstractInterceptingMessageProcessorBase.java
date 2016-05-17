@@ -8,24 +8,19 @@ package org.mule.runtime.core.processor;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
-import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
-import org.mule.runtime.core.processor.chain.ProcessorExecutorFactory;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,15 +37,11 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
 
     protected Log logger = LogFactory.getLog(getClass());
 
-    protected ServerNotificationHandler notificationHandler;
-    private MessageProcessorExecutionTemplate messageProcessorExecutorWithoutNotifications = MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate();
-    private MessageProcessorExecutionTemplate messageProcessorExecutorWithNotifications = MessageProcessorExecutionTemplate.createExecutionTemplate();
     protected MuleContext muleContext;
 
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
-        notificationHandler = muleContext.getNotificationManager();
     }
 
     public final MessageProcessor getListener()
@@ -90,19 +81,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
             {
                 logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
             }
-
-            MessageProcessorExecutionTemplate executionTemplate = (!(next instanceof MessageProcessorChain)) ? messageProcessorExecutorWithNotifications : messageProcessorExecutorWithoutNotifications;
-
-            try
-            {
-                return new ProcessorExecutorFactory().createProcessorExecutor(event, Collections.singletonList(next),
-                                                                              executionTemplate, false).execute();
-            }
-            catch (MessagingException e)
-            {
-                event.getSession().setValid(false);
-                throw e;
-            }
+            return next.process(event);
         }
     }
 

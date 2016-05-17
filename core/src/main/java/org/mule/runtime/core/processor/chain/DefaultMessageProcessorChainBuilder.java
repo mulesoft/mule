@@ -68,12 +68,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                 // Processor is intercepting so we can't simply iterate
                 if (i + 1 < processors.size())
                 {
-                    // The current processor is not the last in the list
-                    if (tempList.isEmpty())
-                    {
-                        interceptingProcessor.setListener(initializeMessageProcessor(processors.get(i + 1)));
-                    }
-                    else if (tempList.size() == 1)
+                    // Wrap processors in chain, unless single processor that is already a chain
+                    if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain)
                     {
                         interceptingProcessor.setListener(tempList.get(0));
                     }
