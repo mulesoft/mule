@@ -78,7 +78,6 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<FtpCon
      */
     @Parameter
     @Optional
-    //private String preferredAuthenticationMethods;
     private Set<SftpAuthenticationMethod> preferredAuthenticationMethods;
 
     /**
