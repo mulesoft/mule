@@ -15,10 +15,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.runtime.transport.tcp.TcpConnector;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.size.SmallTest;
-import org.mule.transport.tcp.TcpConnector;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -46,7 +46,7 @@ import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class HttpServerConnectionTestCase extends AbstractMuleContextTestCase
+public class HttpServerConnectionTestCase extends AbstractMuleContextEndpointTestCase
 {
 
     private final static boolean SEND_TCP_NO_DELAY = false;

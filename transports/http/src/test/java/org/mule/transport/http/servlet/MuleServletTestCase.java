@@ -15,17 +15,18 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.EndpointException;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.registry.MuleRegistry;
-import org.mule.api.transaction.TransactionConfig;
-import org.mule.endpoint.MuleEndpointURI;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleEventEndpointUtils;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.endpoint.EndpointException;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.endpoint.MuleEndpointURI;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -186,7 +187,8 @@ public class MuleServletTestCase extends AbstractMuleTestCase
         when(ep.getTransactionConfig()).thenReturn(txConfig);
         when(ep.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
 
-        DefaultMuleEvent event = new DefaultMuleEvent(message, ep, (FlowConstruct)null);
+        DefaultMuleEvent event = new DefaultMuleEvent(message, (FlowConstruct) null);
+        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, ep);
         return event;
     }
 }

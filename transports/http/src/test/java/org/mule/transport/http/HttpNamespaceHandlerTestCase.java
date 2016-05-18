@@ -9,8 +9,11 @@ package org.mule.transport.http;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.routing.filter.Filter;
+
+import org.mule.runtime.core.api.config.MuleEndpointProperties;
+import org.mule.runtime.core.api.endpoint.EndpointFactory;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.transport.http.filters.HttpRequestWildcardFilter;
 import org.mule.transport.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.transport.http.transformers.HttpResponseToString;
@@ -31,7 +34,7 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
     public void testConnectorProperties()
     {
         HttpConnector connector =
-                (HttpConnector) muleContext.getRegistry().lookupConnector("httpConnector");
+                (HttpConnector) muleContext.getRegistry().lookupObject("httpConnector");
         testBasicProperties(connector);
     }
 
@@ -39,7 +42,7 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
     public void testPollingProperties()
     {
          HttpPollingConnector connector =
-                (HttpPollingConnector) muleContext.getRegistry().lookupConnector("polling");
+                (HttpPollingConnector) muleContext.getRegistry().lookupObject("polling");
         assertNotNull(connector);
         assertEquals(3456, connector.getPollingFrequency());
         assertFalse(connector.isCheckEtag());
@@ -78,8 +81,13 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
     
     private InboundEndpoint lookupInboundEndpoint(String endpointName) throws Exception
     {
-        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointName);
+        InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(endpointName);
         assertNotNull(endpoint);
         return endpoint;
+    }
+
+    public EndpointFactory getEndpointFactory()
+    {
+        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 }

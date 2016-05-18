@@ -8,7 +8,7 @@ package org.mule.transport.http;
 
 import static junit.framework.Assert.assertEquals;
 
-import org.mule.module.http.internal.listener.HttpThrottlingHeadersMapBuilder;
+import org.mule.runtime.module.http.internal.listener.HttpThrottlingHeadersMapBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Map;

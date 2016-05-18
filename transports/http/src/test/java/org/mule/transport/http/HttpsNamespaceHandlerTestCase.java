@@ -7,12 +7,12 @@
 package org.mule.transport.http;
 
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
 {
@@ -26,7 +26,7 @@ public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
     public void testConnectorProperties()
     {
         HttpsConnector connector =
-                (HttpsConnector) muleContext.getRegistry().lookupConnector("httpsConnector");
+                (HttpsConnector) muleContext.getRegistry().lookupObject("httpsConnector");
         testBasicProperties(connector);
 
         //The full path gets resolved, we're just checking that the property got set
@@ -48,7 +48,7 @@ public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
     public void testPollingProperties()
     {
          HttpsPollingConnector connector =
-                (HttpsPollingConnector) muleContext.getRegistry().lookupConnector("polling");
+                (HttpsPollingConnector) muleContext.getRegistry().lookupObject("polling");
         assertNotNull(connector);
         assertEquals(3456, connector.getPollingFrequency());
         assertFalse(connector.isCheckEtag());

@@ -6,9 +6,9 @@
  */
 package org.mule.transport.http.functional;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
-import org.mule.transformer.types.DataTypeFactory;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 
@@ -17,8 +17,8 @@ public class PartialReadComponent implements Callable
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
-        InputStream stream = eventContext.getMuleContext().getTransformationService().getPayload(eventContext.getMessage(),
-                                                                                                 DataTypeFactory.create(InputStream.class));
+        InputStream stream = (InputStream) eventContext.getMuleContext().getTransformationService().transform(eventContext.getMessage(),
+                DataTypeFactory.create(InputStream.class)).getPayload();
         stream.read();
         return "Hello";
     }

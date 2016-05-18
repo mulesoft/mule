@@ -8,12 +8,13 @@ package org.mule.transport.http.functional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpRequest;
-import org.mule.util.concurrent.Latch;
 
 import java.util.HashMap;
 import java.util.Map;

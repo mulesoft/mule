@@ -8,9 +8,9 @@ package org.mule.transport.http;
 
 import static org.junit.Assert.fail;
 
-import org.mule.api.MuleContext;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.runtime.core.api.MuleContext;
 
 import java.util.HashSet;
 import java.util.Set;

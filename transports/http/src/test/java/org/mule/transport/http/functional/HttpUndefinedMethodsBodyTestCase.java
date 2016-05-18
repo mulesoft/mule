@@ -8,13 +8,14 @@ package org.mule.transport.http.functional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.module.http.api.HttpConstants.Methods.DELETE;
-import static org.mule.module.http.api.HttpConstants.Methods.GET;
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.DELETE;
+import static org.mule.runtime.module.http.api.HttpConstants.Methods.GET;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Arrays;

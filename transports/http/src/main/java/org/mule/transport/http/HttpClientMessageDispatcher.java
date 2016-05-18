@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.EndpointAwareTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
@@ -68,7 +69,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             this.sendTransformer = new ObjectToHttpClientMethodRequest();
             this.sendTransformer.setMuleContext(getEndpoint().getMuleContext());
-            this.sendTransformer.setEndpoint(endpoint);
+            if (this.sendTransformer instanceof EndpointAwareTransformer)
+            {
+                ((EndpointAwareTransformer) this.sendTransformer).setEndpoint(endpoint);
+            }
         }
         else
         {

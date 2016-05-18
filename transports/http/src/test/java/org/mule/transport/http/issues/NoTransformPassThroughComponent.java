@@ -6,12 +6,13 @@
  */
 package org.mule.transport.http.issues;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
 
 public class NoTransformPassThroughComponent implements Callable
 {
 
+    @Override
     public Object onCall(MuleEventContext context) throws Exception
     {
         return context.getMessage();

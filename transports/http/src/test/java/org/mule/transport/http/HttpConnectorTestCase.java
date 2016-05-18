@@ -19,20 +19,21 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.Connector;
-import org.mule.api.transport.ConnectorException;
-import org.mule.api.transport.MessageDispatcher;
-import org.mule.api.transport.MessageReceiver;
-import org.mule.api.transport.NoReceiverForEndpointException;
-import org.mule.construct.Flow;
-import org.mule.endpoint.DefaultOutboundEndpoint;
+
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.api.transport.ConnectorException;
+import org.mule.runtime.core.api.transport.MessageDispatcher;
+import org.mule.runtime.core.api.transport.MessageReceiver;
+import org.mule.runtime.core.api.transport.NoReceiverForEndpointException;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.endpoint.DefaultOutboundEndpoint;
+import org.mule.runtime.core.transport.AbstractConnectorTestCase;
+import org.mule.runtime.transport.tcp.TcpConnector;
 import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.tcp.TcpConnector;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -89,11 +90,13 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         return c;
     }
 
+    @Override
     public String getTestEndpointURI()
     {
         return "http://localhost:60127";
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         return "Hello".getBytes();
@@ -102,7 +105,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void testValidListener() throws Exception
     {
-        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
+        InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(
                 getTestEndpointURI());
 
         getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), mock(Flow.class));
@@ -126,12 +129,12 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         thrown.expectMessage(startsWith(LISTENER_ALREADY_REGISTERED));
 
         Flow service = getTestFlow("orange", Orange.class);
-        InboundEndpoint allInterfacesEndpoint = muleContext.getEndpointFactory().getInboundEndpoint(
+        InboundEndpoint allInterfacesEndpoint = getEndpointFactory().getInboundEndpoint(
                 existingEndpointUri);
 
         getConnector().registerListener(allInterfacesEndpoint, getSensingNullMessageProcessor(), service);
 
-        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
+        InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(
                 addedEndpointURI);
 
         getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), service);
@@ -436,7 +439,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
                                        HttpConnector httpConnector = (HttpConnector) createConnector();
                                        httpConnector.initialise();
 
-                                       OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
+                        OutboundEndpoint endpoint = getEndpointFactory().getOutboundEndpoint(
                                                "http://localhost:8080");
                                        httpConnector.createDispatcherMessageProcessor(endpoint);
 
@@ -451,7 +454,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void dispatchersAreRemoved() throws Exception
     {
-        DefaultOutboundEndpoint endpoint = (DefaultOutboundEndpoint) muleContext.getEndpointFactory().getOutboundEndpoint("http://localhost:8080");
+        DefaultOutboundEndpoint endpoint = (DefaultOutboundEndpoint) getEndpointFactory().getOutboundEndpoint("http://localhost:8080");
         HttpConnector httpConnector = (HttpConnector) endpoint.getConnector();
         httpConnector.start();
 

@@ -11,8 +11,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -32,12 +33,14 @@ public class CacheControlTestCase extends AbstractMuleTestCase
     private static final String HEADER_NO_CACHE = "#[header:noCache]";
     private static final String HEADER_NO_STORE = "#[header:noStore]";
     private MuleMessage muleMessage;
+    private MuleEvent muleEvent;
     private ExpressionManager expressionManager;
 
     @Before
     public void setUp()
     {
         muleMessage = mock(MuleMessage.class);
+        muleEvent = mock(MuleEvent.class);
         expressionManager = mock(ExpressionManager.class);
     }
 
@@ -45,7 +48,7 @@ public class CacheControlTestCase extends AbstractMuleTestCase
     public void testCacheControlByDefault()
     {
         CacheControlHeader cacheControl = new CacheControlHeader();
-        cacheControl.parse(muleMessage, expressionManager);
+        cacheControl.parse(muleEvent, expressionManager);
         assertEquals("", cacheControl.toString());
     }
 
@@ -59,7 +62,7 @@ public class CacheControlTestCase extends AbstractMuleTestCase
         cacheControl.setNoCache("true");
         cacheControl.setNoStore("true");
         mockParse();
-        cacheControl.parse(muleMessage, expressionManager);
+        cacheControl.parse(muleEvent, expressionManager);
         assertEquals("public,no-cache,no-store,must-revalidate,max-age=3600", cacheControl.toString());
     }
 
@@ -69,7 +72,7 @@ public class CacheControlTestCase extends AbstractMuleTestCase
         CacheControlHeader cacheControl = new CacheControlHeader();
         cacheControl.setDirective("anyDirective");
         mockParse();
-        cacheControl.parse(muleMessage, expressionManager);
+        cacheControl.parse(muleEvent, expressionManager);
     }
 
     @Test
@@ -82,19 +85,19 @@ public class CacheControlTestCase extends AbstractMuleTestCase
         cacheControl.setNoCache(HEADER_NO_CACHE);
         cacheControl.setNoStore(HEADER_NO_STORE);
 
-        when(expressionManager.parse(HEADER_DIRECTIVE, muleMessage)).thenReturn("public");
-        when(expressionManager.parse(HEADER_MAX_AGE, muleMessage)).thenReturn("3600");
-        when(expressionManager.parse(HEADER_MUST_REVALIDATE, muleMessage)).thenReturn("true");
-        when(expressionManager.parse(HEADER_NO_CACHE, muleMessage)).thenReturn("true");
-        when(expressionManager.parse(HEADER_NO_STORE, muleMessage)).thenReturn("true");
+        when(expressionManager.parse(HEADER_DIRECTIVE, muleEvent)).thenReturn("public");
+        when(expressionManager.parse(HEADER_MAX_AGE, muleEvent)).thenReturn("3600");
+        when(expressionManager.parse(HEADER_MUST_REVALIDATE, muleEvent)).thenReturn("true");
+        when(expressionManager.parse(HEADER_NO_CACHE, muleEvent)).thenReturn("true");
+        when(expressionManager.parse(HEADER_NO_STORE, muleEvent)).thenReturn("true");
 
-        cacheControl.parse(muleMessage, expressionManager);
+        cacheControl.parse(muleEvent, expressionManager);
         assertEquals("public,no-cache,no-store,must-revalidate,max-age=3600", cacheControl.toString());
     }
 
     private void mockParse()
     {
-         when(expressionManager.parse(anyString(), Mockito.any(MuleMessage.class))).thenAnswer(
+        when(expressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(
                  new Answer<Object>()
                  {
                      @Override

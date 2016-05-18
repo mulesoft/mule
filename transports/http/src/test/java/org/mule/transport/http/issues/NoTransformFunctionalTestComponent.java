@@ -6,14 +6,14 @@
  */
 package org.mule.transport.http.issues;
 
-import org.mule.RequestContext;
-import org.mule.api.DefaultMuleException;
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestNotification;
-import org.mule.util.StringMessageUtils;
+import org.mule.functional.functional.EventCallback;
+import org.mule.functional.functional.FunctionalTestNotification;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.StringMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +46,7 @@ public class NoTransformFunctionalTestComponent implements Callable
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object onCall(MuleEventContext context) throws Exception
     {
         String contents = context.getMessageAsString();
@@ -100,6 +101,7 @@ public class NoTransformFunctionalTestComponent implements Callable
      *
      * @deprecated Not sure why we have this duplicate method here. Need to investigate...
      */
+    @Deprecated
     public Object onReceive(Object data) throws Exception
     {
         MuleEventContext context = RequestContext.getEventContext();

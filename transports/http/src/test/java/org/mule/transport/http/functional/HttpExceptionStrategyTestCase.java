@@ -11,13 +11,13 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.exception.AbstractMessagingExceptionStrategy;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.NullPayload;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsInstanceOf;

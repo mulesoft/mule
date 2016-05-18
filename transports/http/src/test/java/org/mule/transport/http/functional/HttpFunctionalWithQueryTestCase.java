@@ -9,10 +9,11 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.expression.RequiredValueException;
-import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.expression.RequiredValueException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;

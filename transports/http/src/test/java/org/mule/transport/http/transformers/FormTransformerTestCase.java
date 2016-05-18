@@ -9,16 +9,17 @@ package org.mule.transport.http.transformers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
-public class FormTransformerTestCase extends AbstractMuleContextTestCase
+public class FormTransformerTestCase extends AbstractMuleContextEndpointTestCase
 {
     private FormTransformer transformer;
 

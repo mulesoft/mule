@@ -8,13 +8,14 @@ package org.mule.transport.http;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import org.mule.api.MuleContext;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.Connector;
-import org.mule.construct.Flow;
-import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.tcp.TcpConnector;
+
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.transport.AbstractConnectorTestCase;
+import org.mule.runtime.transport.tcp.TcpConnector;
 
 import java.io.IOException;
 
@@ -51,11 +52,13 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         return cnn;
     }
 
+    @Override
     public String getTestEndpointURI()
     {
         return "https://localhost:60127";
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         return "Hello".getBytes();
@@ -64,7 +67,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
     @Test
     public void testValidListener() throws Exception
     {
-        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
+        InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(
             getTestEndpointURI());
 
         getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), mock(Flow.class));

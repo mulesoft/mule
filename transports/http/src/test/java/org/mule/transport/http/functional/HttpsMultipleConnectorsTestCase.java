@@ -10,10 +10,11 @@ package org.mule.transport.http.functional;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
-import org.mule.api.transport.DispatchException;
-import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 

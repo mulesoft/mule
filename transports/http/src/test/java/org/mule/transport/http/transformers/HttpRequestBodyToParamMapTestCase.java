@@ -17,11 +17,15 @@ import static org.mule.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.transport.http.HttpConstants.METHOD_PUT;
-import org.mule.DefaultMuleMessage;
-import org.mule.TransformationService;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
+
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -48,9 +52,9 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
     public void setup() throws Exception
     {
         when(muleContext.getTransformationService()).thenReturn(transformationService);
-        when(transformationService.getPayloadAsString(any(MuleMessage.class), any(String.class))).thenAnswer
+        when(transformationService.getPayloadForLogging(any(MuleMessage.class), any(String.class))).thenAnswer
                 (inv -> ((MuleMessage) inv.getArguments()[0]).getPayload());
-        when(transformationService.getPayloadAsBytes(any(MuleMessage.class))).thenAnswer
+        when(transformationService.getPayloadForLogging(any(MuleMessage.class))).thenAnswer
                 (inv -> (((String) ((MuleMessage) inv.getArguments()[0]).getPayload()).getBytes()));
     }
 
@@ -58,35 +62,35 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
     public void validGet() throws TransformerException
     {
         MuleMessage msg = createMessage(METHOD_GET, DEFAULT_CONTENT_TYPE);
-        verifyTransformation(transform(msg));
+        verifyTransformation(transform(new DefaultMuleEvent(msg, (FlowConstruct) null)));
     }
 
     @Test
     public void validPost() throws TransformerException
     {
         MuleMessage msg = createMessage(METHOD_POST, FORM_URLENCODED_CONTENT_TYPE);
-        verifyTransformation(transform(msg));
+        verifyTransformation(transform(new DefaultMuleEvent(msg, (FlowConstruct) null)));
     }
 
     @Test
     public void validPut() throws TransformerException
     {
         MuleMessage msg = createMessage(METHOD_PUT, FORM_URLENCODED_CONTENT_TYPE);
-        verifyTransformation(transform(msg));
+        verifyTransformation(new DefaultMuleEvent(msg, (FlowConstruct) null));
     }
 
     @Test(expected = TransformerException.class)
     public void invalidContentType() throws TransformerException
     {
         MuleMessage msg = createMessage(METHOD_POST, "application/json");
-        transform(msg);
+        transform(new DefaultMuleEvent(msg, (FlowConstruct) null));
     }
 
-    private Object transform(MuleMessage msg) throws TransformerException
+    private Object transform(MuleEvent event) throws TransformerException
     {
         HttpRequestBodyToParamMap transformer = new HttpRequestBodyToParamMap();
         transformer.setMuleContext(muleContext);
-        return transformer.transformMessage(msg, "UTF-8");
+        return transformer.transformMessage(event, "UTF-8");
     }
 
     private void verifyTransformation(Object payload) throws TransformerException

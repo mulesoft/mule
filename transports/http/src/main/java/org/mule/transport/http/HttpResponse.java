@@ -290,7 +290,7 @@ public class HttpResponse
         }
         else 
         {
-            setBody(msg.getMuleContext().getTransformationService().getPayload(msg, DataTypeFactory.create(OutputHandler.class)));
+            setBody(msg.getMuleContext().getTransformationService().transform(msg, DataTypeFactory.create(OutputHandler.class)));
         }
     }
     

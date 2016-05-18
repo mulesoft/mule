@@ -9,11 +9,11 @@ package org.mule.transport.http;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.connector.ConnectException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
-import org.mule.transport.ConnectException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,6 +51,7 @@ public class HttpsInvalidKeystoreTestCase extends FunctionalTestCase implements 
         assertTrue(exceptionFromSystemExceptionHandler.getMessage().contains("tls-key-store"));
     }
 
+    @Override
     public void onException(Throwable t)
     {
         exceptionFromSystemExceptionHandler = t;

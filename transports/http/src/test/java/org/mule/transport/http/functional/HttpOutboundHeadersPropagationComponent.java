@@ -6,15 +6,13 @@
  */
 package org.mule.transport.http.functional;
 
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.Callable;
+
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
-import org.mule.transport.http.CookieHelper;
-
-import org.apache.commons.httpclient.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +21,7 @@ public class HttpOutboundHeadersPropagationComponent implements Callable
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Override
     public Object onCall(MuleEventContext muleEventContext) throws Exception
     {
         MuleMessage m = muleEventContext.getMessage();

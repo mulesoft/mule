@@ -6,17 +6,18 @@
  */
 package org.mule.transport.http.functional;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.util.StringUtils;
 
-public class ETagComponent implements org.mule.api.lifecycle.Callable
+public class ETagComponent implements org.mule.runtime.core.api.lifecycle.Callable
 {
     private static String ETAG_VALUE = "0123456789";
     
+    @Override
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
         MuleMessage message = eventContext.getMessage();

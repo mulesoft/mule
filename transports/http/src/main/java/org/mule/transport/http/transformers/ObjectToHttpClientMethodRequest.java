@@ -12,6 +12,8 @@ import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
+import org.mule.runtime.core.api.transformer.EndpointAwareTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.message.ds.StringDataSource;
@@ -65,7 +67,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
  * <code>ObjectToHttpClientMethodRequest</code> transforms a MuleMessage into a
  * HttpClient HttpMethod that represents an HttpRequest.
  */
-public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
+public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer implements EndpointAwareTransformer
 {
     public ObjectToHttpClientMethodRequest()
     {
@@ -521,5 +523,22 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         }
 
         return new MultipartRequestEntity(parts, method.getParams());
+    }
+
+    /**
+     * The endpoint that this transformer instance is configured on
+     */
+    protected ImmutableEndpoint endpoint = null;
+
+    @Override
+    public ImmutableEndpoint getEndpoint()
+    {
+        return endpoint;
+    }
+
+    @Override
+    public void setEndpoint(ImmutableEndpoint endpoint)
+    {
+        this.endpoint = endpoint;
     }
 }

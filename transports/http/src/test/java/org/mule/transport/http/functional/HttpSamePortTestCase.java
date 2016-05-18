@@ -6,10 +6,10 @@
  */
 package org.mule.transport.http.functional;
 
-import org.mule.api.MuleContext;
-import org.mule.tck.junit4.ApplicationContextBuilder;
+import org.mule.functional.junit4.ApplicationContextBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.ExceptionUtils;
 
 import java.net.BindException;
 

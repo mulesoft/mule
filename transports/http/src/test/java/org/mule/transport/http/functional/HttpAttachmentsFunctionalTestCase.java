@@ -8,17 +8,18 @@ package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.config.MuleProperties;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.mule.functional.functional.EventCallback;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.message.ds.StringDataSource;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
-import org.mule.util.StringDataSource;
 
 import javax.activation.DataHandler;
 
@@ -43,6 +44,7 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase
         FunctionalTestComponent ftc = getFunctionalTestComponent("testComponent");
         assertNotNull(ftc);
         ftc.setEventCallback(new EventCallback(){
+            @Override
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
                 assertEquals("application/octet-stream; charset=ISO-8859-1", context.getMessage().getInboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY));
@@ -54,7 +56,7 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase
             }
         });
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         MuleMessage msg = new DefaultMuleMessage("test",  muleContext);
         msg.addOutboundAttachment("attach1", new DataHandler(new StringDataSource("foo", "attach1")));
 

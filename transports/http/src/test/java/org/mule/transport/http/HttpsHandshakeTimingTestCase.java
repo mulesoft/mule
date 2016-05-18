@@ -9,18 +9,19 @@ package org.mule.transport.http;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.lifecycle.CreateException;
-import org.mule.api.transport.Connector;
-import org.mule.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transport.ssl.MockHandshakeCompletedEvent;
-import org.mule.transport.ssl.MockSslSocket;
+
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.transport.ssl.MockHandshakeCompletedEvent;
+import org.mule.runtime.transport.ssl.MockSslSocket;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
@@ -40,7 +41,7 @@ import org.mockito.Answers;
  * work. Yes, this is hacky and fragile but this seems to be the only reasonable alternative
  * for now.
  */
-public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
+public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTestCase
 {
 
     @Test(expected = MessagingException.class)

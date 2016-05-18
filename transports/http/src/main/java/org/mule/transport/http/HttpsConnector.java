@@ -13,6 +13,8 @@ import org.mule.runtime.core.api.security.TlsDirectKeyStore;
 import org.mule.runtime.core.api.security.TlsDirectTrustStore;
 import org.mule.runtime.core.api.security.TlsIndirectKeyStore;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
+import org.mule.runtime.transport.ssl.SslServerSocketFactory;
+import org.mule.runtime.transport.ssl.SslSocketFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;

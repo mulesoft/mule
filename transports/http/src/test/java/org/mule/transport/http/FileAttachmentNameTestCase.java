@@ -9,11 +9,12 @@ package org.mule.transport.http;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.message.ds.ByteArrayDataSource;
-import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.activation.DataHandler;
@@ -40,7 +41,7 @@ public class FileAttachmentNameTestCase extends FunctionalTestCase
     @Test
     public void keepsAttachmentAndFileNames() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         DataHandler dataHandler = new DataHandler(new ByteArrayDataSource(TEST_MESSAGE.getBytes(), "text/xml", "testAttachment.txt"));
         MuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         msg.addOutboundAttachment("testAttachment", dataHandler);

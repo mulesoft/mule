@@ -7,7 +7,8 @@
 package org.mule.transport.http.components;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.api.client.MuleClient;
+
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpRequest;

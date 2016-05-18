@@ -9,9 +9,9 @@ package org.mule.transport.http;
 
 import static junit.framework.Assert.assertNotNull;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -31,7 +31,7 @@ public class NullSessionHandlerTestCase extends FunctionalTestCase
     @Test
     public void verifiesNoMuleSessionHeader() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
 
         client.dispatch("vm://testInput", TEST_MESSAGE, null);
         MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);

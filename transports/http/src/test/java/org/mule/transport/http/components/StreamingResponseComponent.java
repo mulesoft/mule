@@ -6,16 +6,17 @@
  */
 package org.mule.transport.http.components;
 
-import java.io.ByteArrayInputStream;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
+import java.io.ByteArrayInputStream;
 
 /**
  * A simple component which returns a stream.
  */
 public class StreamingResponseComponent implements Callable 
 {
+    @Override
     public Object onCall(MuleEventContext eventContext) throws Exception 
     {
         return new ByteArrayInputStream("hello".getBytes());

@@ -10,14 +10,15 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.lifecycle.Callable;
-import org.mule.construct.Flow;
-import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.ArrayList;
@@ -71,6 +72,7 @@ public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTe
 
     public static class TestSplitterComponent implements Callable
     {
+        @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
             ArrayList<String> elements = new ArrayList<String>();

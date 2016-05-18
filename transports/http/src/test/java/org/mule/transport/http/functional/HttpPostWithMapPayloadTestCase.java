@@ -8,9 +8,9 @@ package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
@@ -37,7 +37,7 @@ public class HttpPostWithMapPayloadTestCase extends FunctionalTestCase
         mapPayload.put("key1", "value1");
         mapPayload.put("key2", "value2");
 
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://testInput", mapPayload, null);
 
         MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);

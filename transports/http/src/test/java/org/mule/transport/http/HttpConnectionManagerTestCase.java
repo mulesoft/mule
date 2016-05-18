@@ -12,14 +12,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.context.WorkManager;
-import org.mule.api.endpoint.EndpointException;
-import org.mule.endpoint.MuleEndpointURI;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.endpoint.EndpointException;
+import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.endpoint.MuleEndpointURI;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.transport.ConnectException;
 
 import java.io.IOException;
 import java.net.URI;

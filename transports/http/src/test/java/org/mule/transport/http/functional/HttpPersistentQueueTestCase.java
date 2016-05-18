@@ -10,11 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.mule.functional.functional.EventCallback;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 
@@ -91,6 +92,7 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
             messageDidArrive = latch;
         }
         
+        @Override
         public void eventReceived(MuleEventContext context, Object component) throws Exception
         {
             MuleMessage message = context.getMessage();
@@ -98,11 +100,11 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
             Object httpMethod = message.getInboundProperty("http.method");
             if (HttpConstants.METHOD_GET.equals(httpMethod))
             {
-                assertEquals("/services/Echo?foo=bar", muleContext.getTransformationService().getPayloadAsString(message));
+                assertEquals("/services/Echo?foo=bar", muleContext.getTransformationService().getPayloadForLogging(message));
             }
             else if (HttpConstants.METHOD_POST.equals(httpMethod))
             {
-                assertEquals("foo=bar", muleContext.getTransformationService().getPayloadAsString(message));
+                assertEquals("foo=bar", muleContext.getTransformationService().getPayloadForLogging(message));
             }
             else
             {

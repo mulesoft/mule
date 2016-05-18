@@ -7,7 +7,8 @@
 package org.mule.transport.http.components;
 
 import static org.mockito.Mockito.mock;
-import org.mule.api.MuleContext;
+
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.transport.http.AbstractDateHeaderTestCase;
 import org.mule.transport.http.HttpResponse;
 

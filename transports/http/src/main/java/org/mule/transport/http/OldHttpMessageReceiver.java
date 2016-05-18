@@ -8,6 +8,7 @@ package org.mule.transport.http;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleEventEndpointUtils;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.PropertyScope;
@@ -34,6 +35,8 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.monitor.Expirable;
+import org.mule.runtime.transport.tcp.TcpConnector;
+import org.mule.runtime.transport.tcp.TcpMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
 
 import java.io.IOException;
@@ -396,7 +399,8 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
         protected HttpResponse doOtherValid(RequestLine requestLine, String method) throws MuleException
         {
             MuleMessage message = createMuleMessage(null);
-            MuleEvent event = new DefaultMuleEvent(message, (InboundEndpoint) endpoint, flowConstruct);
+            DefaultMuleEvent event = new DefaultMuleEvent(message, flowConstruct);
+            DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, (InboundEndpoint) endpoint);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_METHOD_NOT_ALLOWED);
@@ -407,7 +411,8 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
         protected HttpResponse doBad(RequestLine requestLine) throws MuleException
         {
             MuleMessage message = createMuleMessage(null);
-            MuleEvent event = new DefaultMuleEvent(message, (InboundEndpoint) endpoint, flowConstruct);
+            DefaultMuleEvent event = new DefaultMuleEvent(message, flowConstruct);
+            DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, (InboundEndpoint) endpoint);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
@@ -435,7 +440,8 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
                         HttpResponse expected = new HttpResponse();
                         expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
                         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
-                                                                                                   getEndpoint().getMuleContext()), (InboundEndpoint) endpoint, flowConstruct);
+                                getEndpoint().getMuleContext()), flowConstruct);
+                        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, (InboundEndpoint) endpoint);
                         RequestContext.setEvent(event);
                         conn.writeResponse(transformResponse(expected, event));
                     }
@@ -456,7 +462,8 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             response.setStatusLine(version, statusCode);
             response.setBody(description);
             DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(response,
-                                                                                 getEndpoint().getMuleContext()), (InboundEndpoint) endpoint, flowConstruct);
+                    getEndpoint().getMuleContext()), flowConstruct);
+            DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, (InboundEndpoint) endpoint);
             RequestContext.setEvent(event);
             // The DefaultResponseTransformer will set the necessary headers
             return transformResponse(response, event);
@@ -556,7 +563,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class
         return (HttpResponse) connector.getMuleContext().getTransformationService().applyTransformers(message, null,
-                                                                                                      defaultResponseTransformers, HttpResponse.class).getPayload();
+                defaultResponseTransformers).getPayload();
     }
 
     public static MessageReceiver findReceiverByStem(Map<Object, MessageReceiver> receivers, String uriStr)

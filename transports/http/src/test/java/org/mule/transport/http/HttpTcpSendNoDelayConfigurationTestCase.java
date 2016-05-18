@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class HttpTcpSendNoDelayConfigurationTestCase extends FunctionalTestCase
 
     protected HttpConnector lookupConnector(String name)
     {
-        return (HttpConnector) muleContext.getRegistry().lookupConnector(name);
+        return (HttpConnector) muleContext.getRegistry().lookupObject(name);
     }
 
     protected boolean getDefaultSendTcpNoDelay()

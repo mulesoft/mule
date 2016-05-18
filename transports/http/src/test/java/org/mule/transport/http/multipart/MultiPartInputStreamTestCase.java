@@ -9,9 +9,9 @@ package org.mule.transport.http.multipart;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

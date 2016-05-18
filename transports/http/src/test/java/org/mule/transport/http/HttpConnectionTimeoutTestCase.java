@@ -10,11 +10,12 @@ package org.mule.transport.http;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import org.mule.api.FutureMessageResult;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.transport.NullPayload;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.api.FutureMessageResult;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.module.client.MuleClient;
 
 import java.util.concurrent.TimeoutException;
 
@@ -32,7 +33,6 @@ public class HttpConnectionTimeoutTestCase extends FunctionalTestCase
     @Test
     public void usesConnectionTimeout() throws Exception
     {
-
         final MuleClient client = new MuleClient(muleContext);
         FutureMessageResult result = client.sendAsync("vm://testInput", TEST_MESSAGE, null);
 

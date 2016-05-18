@@ -6,7 +6,7 @@
  */
 package org.mule.transport.http.functional;
 
-import org.mule.session.SerializeAndEncodeSessionHandler;
+import org.mule.runtime.core.session.SerializeAndEncodeSessionHandler;
 
 /**
  * This is a custom subclass of the regular SerializeAndEncodeSessionHandler that's used in

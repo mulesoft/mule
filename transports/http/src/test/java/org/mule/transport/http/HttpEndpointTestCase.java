@@ -6,16 +6,16 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.endpoint.EndpointURI;
-import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class HttpEndpointTestCase extends AbstractMuleContextTestCase
+import org.mule.runtime.core.api.endpoint.EndpointURI;
+import org.mule.runtime.core.endpoint.MuleEndpointURI;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
+
+import org.junit.Test;
+
+public class HttpEndpointTestCase extends AbstractMuleContextEndpointTestCase
 {
 
     @Test

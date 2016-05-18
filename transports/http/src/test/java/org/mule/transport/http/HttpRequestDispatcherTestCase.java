@@ -7,23 +7,24 @@
 package org.mule.transport.http;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.api.context.WorkManager;
-import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.retry.RetryCallback;
-import org.mule.api.retry.RetryContext;
-import org.mule.api.retry.RetryPolicyTemplate;
+
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.transport.AbstractConnector;
+import org.mule.runtime.core.transport.ConnectorLifecycleManager;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
-import org.mule.transport.AbstractConnector;
-import org.mule.transport.ConnectorLifecycleManager;
-import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -126,6 +127,7 @@ public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase
             Prober prober = new PollingProber(100, 1);
             prober.check(new Probe()
             {
+                @Override
                 public boolean isSatisfied()
                 {
                     try
@@ -139,6 +141,7 @@ public class HttpRequestDispatcherTestCase extends AbstractMuleTestCase
                     }
                 }
 
+                @Override
                 public String describeFailure()
                 {
                     return "Exception listener was not invoked";

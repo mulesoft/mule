@@ -9,8 +9,9 @@ package org.mule.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
 

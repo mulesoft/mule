@@ -10,12 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.component.Component;
-import org.mule.api.expression.ExpressionManager;
-import org.mule.construct.Flow;
-import org.mule.routing.filters.WildcardFilter;
-import org.mule.routing.filters.logic.NotFilter;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
+import org.mule.runtime.core.routing.filters.logic.NotFilter;
 
 import java.text.MessageFormat;
 

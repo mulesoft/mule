@@ -8,7 +8,8 @@
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.api.MuleException;
+
+import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

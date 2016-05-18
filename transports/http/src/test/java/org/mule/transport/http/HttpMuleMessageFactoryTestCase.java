@@ -13,11 +13,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleMessage;
-import org.mule.api.transport.MessageTypeNotSupportedException;
-import org.mule.api.transport.MuleMessageFactory;
-import org.mule.transport.AbstractMuleMessageFactoryTestCase;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transport.MessageTypeNotSupportedException;
+import org.mule.runtime.core.api.transport.MuleMessageFactory;
+import org.mule.runtime.core.transport.AbstractMuleMessageFactoryTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

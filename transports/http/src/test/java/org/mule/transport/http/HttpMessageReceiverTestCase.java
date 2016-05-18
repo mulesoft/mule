@@ -10,16 +10,17 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageReceiver;
-import org.mule.construct.Flow;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.execution.MessageProcessContext;
-import org.mule.transport.AbstractMessageReceiverTestCase;
+
+import org.mule.runtime.core.api.endpoint.EndpointBuilder;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.api.transport.MessageReceiver;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.runtime.core.execution.MessageProcessContext;
+import org.mule.runtime.core.transport.AbstractMessageReceiverTestCase;
+import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
-import org.mule.util.CollectionUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("http://localhost:6789", muleContext);
         endpointBuilder.setResponseTransformers(CollectionUtils.singletonList(new MuleMessageToHttpResponse()));
-        endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
+        endpoint = getEndpointFactory().getInboundEndpoint(endpointBuilder);
         return endpoint;
     }
 

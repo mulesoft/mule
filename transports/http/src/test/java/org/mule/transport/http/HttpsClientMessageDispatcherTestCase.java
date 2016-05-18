@@ -6,8 +6,8 @@
  */
 package org.mule.transport.http;
 
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transport.Connector;
+import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.api.transport.Connector;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

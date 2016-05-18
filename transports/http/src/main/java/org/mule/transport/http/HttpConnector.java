@@ -26,7 +26,7 @@ import org.mule.runtime.core.transport.MessageDispatcherUtils;
 import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.OneTimeWarning;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.transport.tcp.TcpConnector;
 import org.mule.transport.http.config.HttpNamespaceHandler;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.ntlm.NTLMScheme;
@@ -80,7 +80,7 @@ import org.slf4j.LoggerFactory;
 public class HttpConnector extends TcpConnector
 {
 
-    public static final String HTTP = HttpConstants.Protocols.HTTP;
+    public static final String HTTP = org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP.getScheme();
     public static final String HTTP_PREFIX = "http.";
     public static final String DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
                                                                                 + "transport."
@@ -112,27 +112,27 @@ public class HttpConnector extends TcpConnector
      * Stores the HTTP query parameters received, supports multiple values per key and both query parameter key and
      * value are unescaped
      */
-    public static final String HTTP_QUERY_PARAMS = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
+    public static final String HTTP_QUERY_PARAMS = org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
 
-    public static final String HTTP_QUERY_STRING = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_STRING;
+    public static final String HTTP_QUERY_STRING = org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_STRING;
 
-    public static final String HTTP_METHOD_PROPERTY = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
+    public static final String HTTP_METHOD_PROPERTY = org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 
     /**
      * The path and query portions of the URL being accessed.
      */
-    public static final String HTTP_REQUEST_PROPERTY = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PROPERTY;
+    public static final String HTTP_REQUEST_PROPERTY = org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PROPERTY;
 
     /**
      * The path portion of the URL being accessed. No query string is included.
      */
-    public static final String HTTP_REQUEST_PATH_PROPERTY = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
+    public static final String HTTP_REQUEST_PATH_PROPERTY = org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
 
     /**
      * The context path of the endpoint being accessed. This is the path that the
      * HTTP endpoint is listening on.
      */
-    public static final String HTTP_CONTEXT_PATH_PROPERTY = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_CONTEXT_PATH_PROPERTY;
+    public static final String HTTP_CONTEXT_PATH_PROPERTY = org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_CONTEXT_PATH_PROPERTY;
 
     /**
      * The context URI of the endpoint being accessed. This is the address that the
@@ -158,7 +158,7 @@ public class HttpConnector extends TcpConnector
     public static final String DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY = "body";
     public static final String HTTP_POST_BODY_PARAM_PROPERTY = HTTP_PREFIX + "post.body.param";
 
-    public static final String HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK = org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
+    public static final String HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK = org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
     public static final String HTTP_ENCODE_PARAMVALUE = HTTP_PREFIX + "encode.paramvalue";
 
     public static final Set<String> HTTP_INBOUND_PROPERTIES;
@@ -199,7 +199,7 @@ public class HttpConnector extends TcpConnector
 
     private String proxyHostname = null;
 
-    private int proxyPort = HttpConstants.DEFAULT_HTTP_PORT;
+    private int proxyPort = org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP.getDefaultPort();
 
     private String proxyUsername = null;
 

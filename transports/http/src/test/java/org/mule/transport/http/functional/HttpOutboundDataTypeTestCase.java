@@ -11,13 +11,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.api.config.MuleProperties;
-import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transformer.types.MimeTypes;
 
 import java.nio.charset.StandardCharsets;
 
@@ -39,7 +40,7 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase
     @Test
     public void propagatesDataType() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
+        MuleClient client = muleContext.getClient();
 
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         muleMessage.setOutboundProperty("Content-Type", MimeTypes.TEXT + "; charset=" + StandardCharsets.UTF_16.name());

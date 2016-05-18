@@ -6,10 +6,13 @@
  */
 package org.mule.transport.http.transformers;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transformer.types.DataTypeFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 import org.mule.transport.http.ResponseWriter;
@@ -18,10 +21,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-public class HttpResponseToStringTestCase extends AbstractMuleContextTestCase
+public class HttpResponseToStringTestCase extends AbstractMuleContextEndpointTestCase
 {
     private final String _statusLine = "HTTP/1.1 200 OK";
     private final String _headerCT = "Content-Type: text/plain";

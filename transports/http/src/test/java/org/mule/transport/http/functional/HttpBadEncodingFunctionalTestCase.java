@@ -8,7 +8,7 @@ package org.mule.transport.http.functional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -18,6 +18,7 @@ import org.junit.Test;
 public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase
 {
 
+    @Override
     @Test
     public void testSend() throws Exception
     {

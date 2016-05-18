@@ -6,6 +6,27 @@
  */
 package org.mule.transport.http;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
+import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.core.endpoint.MuleEndpointURI;
+import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -15,26 +36,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.security.Credentials;
-import org.mule.endpoint.MuleEndpointURI;
-import org.mule.security.MuleCredentials;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.util.StringUtils;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContextTestCase
+public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContextEndpointTestCase
 {
     private static final String CREDENTIALS_USER = "myUser";
 

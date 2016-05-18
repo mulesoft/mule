@@ -7,9 +7,10 @@
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.mule.functional.functional.CounterCallback;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.atomic.AtomicInteger;

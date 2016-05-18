@@ -11,15 +11,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.transport.DispatchException;
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.ExceptionUtils;
 
 import java.util.Date;
 import java.util.concurrent.TimeoutException;

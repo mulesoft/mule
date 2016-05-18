@@ -8,8 +8,9 @@ package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
+
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 

@@ -8,9 +8,9 @@ package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.transport.Connector;
-import org.mule.api.transport.SessionHandler;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.transport.Connector;
+import org.mule.runtime.core.message.SessionHandler;
 import org.mule.transport.http.HttpConnector;
 
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class HttpServiceOverridesTestCase extends FunctionalTestCase
     @Test
     public void testSessionHandler()
     {
-        Connector connector = muleContext.getRegistry().lookupConnector("httpConnector");
+        Connector connector = muleContext.getRegistry().lookupObject("httpConnector");
         assertTrue(connector instanceof HttpConnector);
         
         HttpConnector httpConnector = (HttpConnector) connector;

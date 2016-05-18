@@ -6,9 +6,9 @@
  */
 package org.mule.transport.http.functional;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.transport.http.CookieHelper;
 
 import org.apache.commons.httpclient.Cookie;
@@ -20,6 +20,7 @@ public class HttpMultipleCookiesInEndpointTestComponent implements Callable
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Override
     public Object onCall(MuleEventContext muleEventContext) throws Exception
     {
         String response = "NO COOKIE FOUND!";

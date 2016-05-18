@@ -9,11 +9,11 @@ package org.mule.transport.http;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.MessageExchangePattern;
-import org.mule.api.MuleMessage;
-import org.mule.api.transport.MuleMessageFactory;
-import org.mule.transport.AbstractMuleMessageFactoryTestCase;
-import org.mule.transport.NullPayload;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transport.MuleMessageFactory;
+import org.mule.runtime.core.transport.AbstractMuleMessageFactoryTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

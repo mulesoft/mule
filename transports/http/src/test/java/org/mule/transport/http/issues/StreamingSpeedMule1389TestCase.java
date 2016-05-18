@@ -6,9 +6,9 @@
  */
 package org.mule.transport.http.issues;
 
+import org.mule.runtime.core.util.SystemUtils;
+import org.mule.runtime.transport.tcp.integration.AbstractStreamingCapacityTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.transport.tcp.integration.AbstractStreamingCapacityTestCase;
-import org.mule.util.SystemUtils;
 
 import org.junit.Rule;
 

@@ -7,12 +7,13 @@
 package org.mule.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
-import org.mule.tck.junit4.FunctionalTestCase;
+import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.http.HttpConstants;
-import org.mule.util.ClassUtils;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;

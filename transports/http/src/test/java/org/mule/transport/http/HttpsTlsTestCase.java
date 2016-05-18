@@ -10,8 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.api.transport.Connector;
-import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.transport.Connector;
 
 import org.junit.Test;
 
@@ -26,7 +26,7 @@ public class HttpsTlsTestCase extends FunctionalTestCase
     @Test
     public void testConfig() throws Exception
     {
-        Connector connector = muleContext.getRegistry().lookupConnector("httpsConnector");
+        Connector connector = muleContext.getRegistry().lookupObject("httpsConnector");
         assertNotNull(connector);
         assertTrue(connector instanceof HttpsConnector);
         HttpsConnector https = (HttpsConnector) connector;

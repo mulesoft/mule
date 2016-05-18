@@ -8,6 +8,7 @@ package org.mule.transport.http;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleEventEndpointUtils;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.PropertyScope;
@@ -245,7 +246,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                     HttpResponse expected = new HttpResponse();
                     expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
                     final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
-                                                  getMuleContext()), getInboundEndpoint(), getFlowConstruct());
+                            getMuleContext()), getFlowConstruct());
+                    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
+
                     RequestContext.setEvent(event);
                     httpServerConnection.writeResponse(transformResponse(expected));
                 }
@@ -281,7 +284,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class
         return (HttpResponse) getMuleContext().getTransformationService().applyTransformers(message, null, getMessageReceiver()
-                .getResponseTransportTransformers(), HttpResponse.class).getPayload();
+                                                                                                    .getResponseTransportTransformers())
+                                              .getPayload();
     }
 
     @Override
@@ -446,7 +450,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     protected HttpResponse doBad(RequestLine requestLine) throws MuleException
     {
         MuleMessage message = getMessageReceiver().createMuleMessage(null);
-        MuleEvent event = new DefaultMuleEvent(message, getInboundEndpoint(), getFlowConstruct());
+        DefaultMuleEvent event = new DefaultMuleEvent(message, getFlowConstruct());
+        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
         OptimizedRequestContext.unsafeSetEvent(event);
         HttpResponse response = new HttpResponse();
         response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);

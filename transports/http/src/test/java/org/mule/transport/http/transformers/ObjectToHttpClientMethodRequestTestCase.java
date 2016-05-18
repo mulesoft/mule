@@ -9,14 +9,15 @@ package org.mule.transport.http.transformers;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transport.NullPayload;
+
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpRequest;
@@ -35,7 +36,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 
-public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContextTestCase
+public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContextEndpointTestCase
 {
     
     private InboundEndpoint endpoint;
@@ -44,7 +45,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     {
         HttpRequest request = new HttpRequest(new RequestLine(method, url, HttpVersion.HTTP_1_1), null, "UTF-8");
         
-        endpoint = muleContext.getEndpointFactory().getInboundEndpoint(url);
+        endpoint = getEndpointFactory().getInboundEndpoint(url);
         
         MuleEvent event = getTestEvent(request, endpoint);
         MuleMessage message = event.getMessage();
@@ -60,7 +61,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     {
         HttpRequest request = new HttpRequest(new RequestLine(method, url, HttpVersion.HTTP_1_1), null, "UTF-8");
         
-        endpoint = muleContext.getEndpointFactory().getInboundEndpoint(url);
+        endpoint = getEndpointFactory().getInboundEndpoint(url);
         
         MuleEvent event = getTestEvent(request, endpoint);
         MuleMessage message = new DefaultMuleMessage(messages, muleContext);
@@ -177,7 +178,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     	final String contentType = "text/plain";
 
         message.setPayload("I'm a payload");
-        message.setInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
+        message.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
 
         final ObjectToHttpClientMethodRequest transformer = createTransformer();
         final Object response = transformer.transform(message);
@@ -195,7 +196,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     	final String contentType = "text/plain";
 
         message.setPayload("I'm a payload");
-        message.setInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
+        message.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
 
         final ObjectToHttpClientMethodRequest transformer = createTransformer();
         final Object response = transformer.transform(message);
@@ -215,7 +216,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
 
         String payload = "I'm a payload";
         message.setPayload(payload);
-        message.setInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
+        message.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
         message.setOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP10);
 
         final ObjectToHttpClientMethodRequest transformer = createTransformer();
@@ -237,7 +238,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
         
         String payload = "I'm a payload";
         messageOne.setPayload(payload);
-        message.setInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
+        message.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
         message.setOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP10);
         
         final ObjectToHttpClientMethodRequest transformer = createTransformer();
