@@ -170,11 +170,11 @@ public class SftpClient
     {
         if (passphrase == null || "".equals(passphrase))
         {
-            jsch.addIdentity(new File(identityFile).getAbsolutePath());
+            jsch.addIdentity(identityFile);
         }
         else
         {
-            jsch.addIdentity(new File(identityFile).getAbsolutePath(), passphrase);
+            jsch.addIdentity(identityFile, passphrase);
         }
     }
 
