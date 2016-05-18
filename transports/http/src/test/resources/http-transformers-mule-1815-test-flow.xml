@@ -2,7 +2,7 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
         xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
@@ -10,7 +10,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd">
 
     <http:endpoint name="base" host="localhost" port="${port1}" exchange-pattern="request-response"/>
     <http:endpoint name="adapted" host="localhost" port="${port2}" exchange-pattern="request-response"/>
@@ -38,7 +38,7 @@
     <!-- next, the same flows but with adapted components that call getMessage() rather than getTransformedMessage() -->
     <flow name="adaptedService1">
         <inbound-endpoint ref="adapted"/>
-        <component class="org.mule.transport.http.issues.NoTransformPassThroughComponent"/>
+        <component class="org.mule.runtime.transport.http.issues.NoTransformPassThroughComponent"/>
         <outbound-endpoint address="vm://echo2" exchange-pattern="request-response"/>
     </flow>
 
@@ -54,7 +54,7 @@
         <http:inbound-endpoint ref="ignored">
             <transformer ref="appendString"/>
         </http:inbound-endpoint>
-        <component class="org.mule.transport.http.issues.NoTransformPassThroughComponent">
+        <component class="org.mule.runtime.transport.http.issues.NoTransformPassThroughComponent">
             <callable-entry-point-resolver/>
         </component>
         <outbound-endpoint address="vm://echo3" exchange-pattern="request-response"/>

@@ -2,13 +2,15 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+        http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <http:connector name="httpConnector" reuseAddress="true"/>
     
@@ -27,66 +29,54 @@
 
     <flow name="testComponent">
         <http:inbound-endpoint ref="clientEndpoint">
-            <response>
-                <message-properties-transformer name="setResponseType">
-                    <add-message-property key="content-type" value="text/baz;charset=UTF-16BE"/>
-                </message-properties-transformer>
-            </response>
+            <transports:response>
+                <set-property propertyName="content-type" value="text/baz;charset=UTF-16BE"/>
+            </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
     </flow>
 
     <flow name="testComponent.US-ASCII">
         <http:inbound-endpoint ref="clientEndpoint.US-ASCII">
-            <response>
-                <message-properties-transformer name="setResponseType.US-ASCII">
-                    <add-message-property key="Content-Type" value="text/plain;charset=US-ASCII"/>
-                </message-properties-transformer>
-            </response>
+            <transports:response>
+                <set-property propertyName="Content-Type" value="text/plain;charset=US-ASCII"/>
+            </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
     </flow>
 
     <flow name="testComponent.UTF-8">
         <http:inbound-endpoint ref="clientEndpoint.UTF-8">
-            <response>
-                <message-properties-transformer name="setResponseType.UTF-8">
-                    <add-message-property key="Content-Type" value="text/plain;charset=UTF-8"/>
-                </message-properties-transformer>
-            </response>
+            <transports:response>
+                <set-property propertyName="Content-Type" value="text/plain;charset=UTF-8"/>
+            </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
     </flow>
 
     <flow name="testComponent.Shift_JIS">
         <http:inbound-endpoint ref="clientEndpoint.Shift_JIS">
-            <response>
-                <message-properties-transformer name="setResponseType.Shift_JIS">
-                    <add-message-property key="Content-Type" value="text/plain;charset=Shift_JIS"/>
-                </message-properties-transformer>
-            </response>
+            <transports:response>
+                <set-property propertyName="Content-Type" value="text/plain;charset=Shift_JIS"/>
+            </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
     </flow>
 
     <flow name="testComponent.Windows-31J">
         <http:inbound-endpoint ref="clientEndpoint.Windows-31J">
-            <response>
-                <message-properties-transformer name="setResponseType.Windows-31J">
-                    <add-message-property key="Content-Type" value="text/plain;charset=Windows-31J"/>
-                </message-properties-transformer>
-            </response>
+            <transports:response>
+                <set-property propertyName="Content-Type" value="text/plain;charset=Windows-31J"/>
+            </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
     </flow>
 
     <flow name="testComponent.EUC-JP">
         <http:inbound-endpoint ref="clientEndpoint.EUC-JP">
-            <response>
-                <message-properties-transformer name="setResponseType.EUC-JP">
-                    <add-message-property key="Content-Type" value="text/plain;charset=EUC-JP"/>
-                </message-properties-transformer>
-            </response>
+            <transports:response>
+                <set-property propertyName="Content-Type" value="text/plain;charset=EUC-JP"/>
+            </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
     </flow>

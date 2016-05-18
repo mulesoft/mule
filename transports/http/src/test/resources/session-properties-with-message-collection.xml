@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
@@ -20,9 +20,9 @@
 
    <flow name="main">
         <vm:inbound-endpoint path="inVM" exchange-pattern="request-response"/>
-        <message-properties-transformer name="InitVar" scope="session">
-            <add-message-property key="initialPayload" value="TEST" />
-        </message-properties-transformer>
+<!--         <message-properties-transformer name="InitVar" scope="session"> -->
+        <set-property propertyName="initialPayload" value="TEST" />
+<!--         </message-properties-transformer> -->
         <vm:outbound-endpoint path="secondVM" exchange-pattern="request-response"/>
     </flow>
 
@@ -45,7 +45,7 @@
 
     <flow name="httpFlow">
     	<http:inbound-endpoint address="http://localhost:${port1}/test" exchange-pattern="request-response" />
-    	<component class="org.mule.transport.http.functional.SessionPropertiesWithMessageCollectionTestCase$TestSplitterComponent" />
+    	<component class="org.mule.runtime.transport.http.functional.SessionPropertiesWithMessageCollectionTestCase$TestSplitterComponent" />
     	<vm:outbound-endpoint path="inVM" exchange-pattern="request-response" />
     </flow>
 

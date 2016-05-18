@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/http"
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/transport/http"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
             xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
-            targetNamespace="http://www.mulesoft.org/schema/mule/http"
+            targetNamespace="http://www.mulesoft.org/schema/mule/transport/http"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.7/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/tcp"
-                schemaLocation="http://www.mulesoft.org/schema/mule/tcp/3.7/mule-tcp.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/transports"
+                schemaLocation="http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
                 schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
 
     <!--
     We include all the elements defined in the schema of the new HTTP connector into this namespace.
     -->
-    <xsd:include schemaLocation="http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd" />
+<!--     <xsd:include schemaLocation="http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd" /> -->
 
     <xsd:annotation>
         <xsd:documentation>The HTTP transport provides support for exposing services over HTTP and making HTTP client requests from Mule services to external services as part of service event flows. Mule supports inbound, outbound, and polling HTTP endpooints. These endpoints support all common features of the HTTP spec, such as ETag processing, cookies, and keepalive. Both HTTP 1.0 and 1.1 are supported.</xsd:documentation>
@@ -270,7 +273,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="transports:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
             An inbound HTTP endpoint exposes a service over HTTP, essentially making it an HTTP server. If polling of a remote HTTP service is required, this endpoint should be configured with a polling HTTP connector.
@@ -279,7 +282,7 @@
     </xsd:element>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
+            <xsd:extension base="transports:inboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="propertyAttributes"/>
             </xsd:extension>
@@ -287,7 +290,7 @@
     </xsd:complexType>
 
     <xsd:element name="outbound-endpoint" type="outboundEndpointType"
-                 substitutionGroup="mule:abstract-outbound-endpoint">
+                 substitutionGroup="transports:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
                 The HTTP outbound endpoint allows Mule to send requests to external servers or Mule inbound HTTP endpoints using the HTTP protocol.
@@ -296,7 +299,7 @@
     </xsd:element>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointType">
+            <xsd:extension base="transports:outboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="propertyAttributes"/>
                 <xsd:attribute name="followRedirects" type="xsd:boolean">
@@ -329,7 +332,7 @@
 
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointType">
+            <xsd:extension base="transports:globalEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="propertyAttributes"/>
                 <xsd:attribute name="followRedirects" type="xsd:boolean">

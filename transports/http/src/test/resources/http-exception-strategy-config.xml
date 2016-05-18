@@ -4,12 +4,12 @@
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
     xmlns:file="http://www.mulesoft.org/schema/mule/file"
     xsi:schemaLocation="
     http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
     http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+    http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
 
@@ -26,7 +26,7 @@
     <flow name="flowWithtCESAndStatusCode">
         <http:inbound-endpoint port="${port1}" host="localhost" path="flowWithtCESAndStatusCode" exchange-pattern="request-response"/>
         <test:component throwException="true"/>
-        <custom-exception-strategy class="org.mule.transport.http.functional.HttpExceptionStrategyTestCase$CustomExceptionStrategy"/>
+        <custom-exception-strategy class="org.mule.runtime.transport.http.functional.HttpExceptionStrategyTestCase$CustomExceptionStrategy"/>
     </flow>
 
 </mule>

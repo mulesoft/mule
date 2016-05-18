@@ -2,12 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd">
 
     <flow name="NoException">
         <http:inbound-endpoint address="http://localhost:${port1}/noException" />
@@ -42,7 +42,7 @@
             <test:return-data>Here you go</test:return-data>
         </test:component>
         <custom-exception-strategy
-                class="org.mule.transport.http.reliability.InboundMessageLossTestCase$Handler"/>
+                class="org.mule.runtime.transport.http.reliability.InboundMessageLossTestCase$Handler"/>
     </flow>
 
     <flow name="FailToHandledTransformerException">
@@ -52,6 +52,6 @@
             <test:return-data>Here you go</test:return-data>
         </test:component>
         <custom-exception-strategy
-                class="org.mule.transport.http.reliability.InboundMessageLossTestCase$BadHandler"/>
+                class="org.mule.runtime.transport.http.reliability.InboundMessageLossTestCase$BadHandler"/>
     </flow>
 </mule>

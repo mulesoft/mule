@@ -32,12 +32,12 @@ public class UnsupportedConnectorsMuleArtifactTestCase
     public void unsupportedConnectors() throws SAXException, IOException, MuleArtifactFactoryException
     {
         //HTTP
-        checkUnsupportedConnector("<http:connector name=\"HttpConnector\" xmlns:http=\"http://www.mulesoft.org/schema/mule/http\"/>");
+        checkUnsupportedConnector("<http:connector name=\"HttpConnector\" xmlns:http=\"http://www.mulesoft.org/schema/mule/transport/http\"/>");
         //Polling HTTP
         checkUnsupportedConnector("<http:polling-connector name=\"PollingHttpConnector\"\n" +
-                                  "        pollingFrequency=\"30000\" reuseAddress=\"true\" xmlns:http=\"http://www.mulesoft.org/schema/mule/http\"/>");
+                                  "        pollingFrequency=\"30000\" reuseAddress=\"true\" xmlns:http=\"http://www.mulesoft.org/schema/mule/transport/http\"/>");
         //HTTPS
-        checkUnsupportedConnector("<https:connector name=\"httpConnector\" xmlns:https=\"http://www.mulesoft.org/schema/mule/https\">\n" +
+        checkUnsupportedConnector("<https:connector name=\"httpConnector\" xmlns:https=\"http://www.mulesoft.org/schema/mule/transport/https\">\n" +
                                   "        <https:tls-key-store path=\"~/ce/tests/integration/src/test/resources/muletest.keystore\" keyPassword=\"mulepassword\" storePassword=\"mulepassword\"/>\n" +
                                   "</https:connector>");
         //JMS

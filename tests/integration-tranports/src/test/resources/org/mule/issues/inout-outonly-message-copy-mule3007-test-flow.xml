@@ -4,12 +4,12 @@
       xmlns:spring="http://www.springframework.org/schema/beans" 
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms" 
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd">
 
     <jms:activemq-connector name="activemqConnector"/>
 
