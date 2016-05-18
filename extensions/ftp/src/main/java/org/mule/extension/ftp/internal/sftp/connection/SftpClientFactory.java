@@ -9,7 +9,7 @@ package org.mule.extension.ftp.internal.sftp.connection;
 import com.jcraft.jsch.JSch;
 
 /**
- * Creates instances of {@link SftpClientFactory}
+ * Creates instances of {@link SftpClient}
  *
  * @since 4.0
  */
