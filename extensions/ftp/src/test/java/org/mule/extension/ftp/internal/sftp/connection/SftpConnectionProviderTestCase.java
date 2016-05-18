@@ -47,6 +47,7 @@ public class SftpConnectionProviderTestCase extends AbstractMuleTestCase
 
     private static final String HOST = "localhost";
     private static final int TIMEOUT = 10;
+    private static final String PASSPHRASE = "francis";
 
     private File hostFile;
     private File identityFile;
@@ -67,7 +68,7 @@ public class SftpConnectionProviderTestCase extends AbstractMuleTestCase
     private ChannelSftp channel;
 
     private SftpConnectionProvider provider = new SftpConnectionProvider();
-    public static final String PASSPHRASE = "francis";
+
 
     @Before
     public void before() throws Exception
@@ -101,14 +102,12 @@ public class SftpConnectionProviderTestCase extends AbstractMuleTestCase
     @Test
     public void identityFileWithPassPhrase() throws Exception
     {
-        final String passphrase = "francis";
-
         provider.setIdentityFile(identityFile.getAbsolutePath());
-        provider.setPassphrase(passphrase);
+        provider.setPassphrase(PASSPHRASE);
 
         login();
 
-        verify(jsch).addIdentity(identityFile.getAbsolutePath(), passphrase);
+        verify(jsch).addIdentity(identityFile.getAbsolutePath(), PASSPHRASE);
     }
 
     @Test
