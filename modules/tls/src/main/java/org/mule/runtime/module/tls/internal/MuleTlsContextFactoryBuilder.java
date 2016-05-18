@@ -7,14 +7,16 @@
 package org.mule.runtime.module.tls.internal;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @DefaultTlsContextFactoryBuilder
 public class MuleTlsContextFactoryBuilder implements TlsContextFactoryBuilder, Initialisable, MuleContextAware
@@ -22,6 +24,7 @@ public class MuleTlsContextFactoryBuilder implements TlsContextFactoryBuilder, I
 
     private TlsContextFactory defaultTlsContextFactory;
     private MuleContext muleContext;
+    private final AtomicBoolean initialised = new AtomicBoolean(false);
 
     /**
      * Creates a default {@link TlsContextFactory} and registers it under key
@@ -32,6 +35,11 @@ public class MuleTlsContextFactoryBuilder implements TlsContextFactoryBuilder, I
     @Override
     public void initialise() throws InitialisationException
     {
+        if (!initialised.compareAndSet(false, true))
+        {
+            return;
+        }
+
         try
         {
             defaultTlsContextFactory = new DefaultTlsContextFactory();

@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 /**
- * Allows manipulating files through the FTP, SFTP and FTPS protocols
+ * Allows manipulating files through the FTP and SFTP
  *
  * @since 4.0
  */

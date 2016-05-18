@@ -17,7 +17,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.config.spring.MuleArtifactContext;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -27,6 +26,7 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 
 import com.google.common.collect.HashMultimap;
@@ -47,12 +47,11 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Generic implementation of {@link NamespaceHandler} capable of parsing configurations and operations
- * for any given {@link ExtensionModel} which supports the given namespace.
+ * Generic implementation of {@link NamespaceHandler} capable of parsing components
+ * from any given {@link ExtensionModel} which supports the given namespace.
  * <p>
- * For this namespace handler to function, an instance of {@link ExtensionManager}
- * has to be accessible and the {@link ExtensionManager#discoverExtensions(ClassLoader)}
- * needs to have successfully discovered and register extensions.
+ * For this namespace handler to function, such {@link ExtensionModel}
+ * needs to have been registered through {@link ExtensionManager#registerExtension(ExtensionManifest, ClassLoader)}
  *
  * @since 3.7.0
  */

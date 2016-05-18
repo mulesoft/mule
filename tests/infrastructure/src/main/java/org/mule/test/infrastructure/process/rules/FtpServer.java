@@ -30,7 +30,7 @@ public class FtpServer extends ExternalResource
 {
 
     private final File baseDir;
-    private final DynamicPort dynamicPort;
+    protected final DynamicPort dynamicPort;
     private final SystemProperty dynamicPortSystemProperty;
 
     private EmbeddedFtpServer server = null;
@@ -61,7 +61,8 @@ public class FtpServer extends ExternalResource
         try
         {
             createFtpServerBaseDir();
-            startServer();
+            server = createServer();
+            server.start();
         }
         catch (Throwable e)
         {
@@ -75,9 +76,9 @@ public class FtpServer extends ExternalResource
         deleteFtpServerBaseDir();
     }
 
-    private void startServer() throws Exception
+    protected EmbeddedFtpServer createServer() throws Exception
     {
-        server = new EmbeddedFtpServer(dynamicPort.getNumber());
+        return new EmbeddedFtpServer(dynamicPort.getNumber());
     }
 
     private void stopServer()

@@ -110,7 +110,6 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -332,7 +331,7 @@ public final class AnnotationsBasedDescriber implements Describer
         //TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
         SourceDeclarer source = declarer.withMessageSource(getSourceName(sourceType));
 
-        List<Type> sourceGenerics = getSuperClassGenerics(sourceType, Source.class);
+        List<Class<?>> sourceGenerics = (List) getSuperClassGenerics(sourceType, Source.class);
 
         if (sourceGenerics.size() != 2)
         {

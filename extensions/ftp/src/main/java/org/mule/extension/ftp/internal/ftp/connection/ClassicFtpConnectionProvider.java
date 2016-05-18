@@ -28,7 +28,7 @@ import org.apache.commons.net.ftp.FTPReply;
  *
  * @since 4.0
  */
-public final class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<FtpConnector, ClassicFtpFileSystem>
+public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<FtpConnector, ClassicFtpFileSystem>
 {
 
     /**
@@ -80,12 +80,12 @@ public final class ClassicFtpConnectionProvider extends AbstractFtpConnectionPro
     @Override
     public ClassicFtpFileSystem connect(FtpConnector config) throws ConnectionException
     {
-        return new ClassicFtpFileSystem(config, createClient(config), muleContext);
+        return new ClassicFtpFileSystem(config, setupClient(config), muleContext);
     }
 
-    private FTPClient createClient(FtpConnector config) throws ConnectionException
+    private FTPClient setupClient(FtpConnector config) throws ConnectionException
     {
-        FTPClient client = new FTPClient();
+        FTPClient client = createClient();
         if (config.getConnectionTimeout() != null && config.getConnectionTimeoutUnit() != null)
         {
             client.setConnectTimeout(new Long(config.getConnectionTimeoutUnit().toMillis(config.getConnectionTimeout())).intValue());
@@ -109,6 +109,11 @@ public final class ClassicFtpConnectionProvider extends AbstractFtpConnectionPro
         }
 
         return client;
+    }
+
+    protected FTPClient createClient()
+    {
+        return new FTPClient();
     }
 
     /**
