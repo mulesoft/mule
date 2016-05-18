@@ -428,7 +428,9 @@ public class SftpClient
 
     public void setKnownHostsFile(String knownHostsFile)
     {
-        this.knownHostsFile = knownHostsFile;
+        this.knownHostsFile = !StringUtils.isEmpty(knownHostsFile)
+                              ? new File(knownHostsFile).getAbsolutePath()
+                              : knownHostsFile;
     }
 
     public void setPassword(String password)
@@ -440,8 +442,8 @@ public class SftpClient
     {
         if (!StringUtils.isEmpty(identityFilePath))
         {
+            this.identityFile = new File(identityFilePath).getAbsolutePath();
             checkExists(identityFilePath);
-            this.identityFile = identityFilePath;
         }
         this.passphrase = passphrase;
     }
