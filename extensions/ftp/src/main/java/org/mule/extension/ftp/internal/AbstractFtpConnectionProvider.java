@@ -64,4 +64,9 @@ public abstract class AbstractFtpConnectionProvider<Config extends FtpConnector,
     {
         return host;
     }
+
+    public void setHost(String host)
+    {
+        this.host = host;
+    }
 }

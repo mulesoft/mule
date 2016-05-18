@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ftp.internal.sftp.connection;
 
+import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.extension.ftp.internal.sftp.SftpFileAttributes;
@@ -14,6 +15,7 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 
+import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -43,18 +45,22 @@ import org.slf4j.LoggerFactory;
 public class SftpClient
 {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(SftpClient.class);
+
     public static final String CHANNEL_SFTP = "sftp";
     public static final String STRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
     public static final String PREFERRED_AUTHENTICATION_METHODS = "PreferredAuthentications";
 
-    private Logger LOGGER = LoggerFactory.getLogger(SftpClient.class);
 
     private ChannelSftp sftp;
     private JSch jsch;
     private Session session;
     private final String host;
     private int port = 22;
-    private File knownHostsFile;
+    private String password;
+    private String identityFile;
+    private String passphrase;
+    private String knownHostsFile;
     private String preferredAuthenticationMethods;
     private long connectionTimeoutMillis = 0; // No timeout by default
 
@@ -62,15 +68,16 @@ public class SftpClient
      * Creates a new instance which connects to a server on a given
      * {@code host} and {@code port}
      *
-     * @param host the host address
-     * @param port the remote connection port
+     * @param host         the host address
+     * @param port         the remote connection port
+     * @param jSchSupplier a {@link Supplier} for obtaining a {@link JSch} client
      */
-    public SftpClient(String host, int port)
+    public SftpClient(String host, int port, Supplier<JSch> jSchSupplier)
     {
         this.host = host;
         this.port = port;
 
-        jsch = new JSch();
+        jsch = jSchSupplier.get();
     }
 
     /**
@@ -130,18 +137,27 @@ public class SftpClient
     }
 
     /**
-     * Performs a login operation using the given credentials
+     * Performs a login operation for the given {@code user}
+     * using the connection options and additional credentials
+     * optionally set on this client
      *
-     * @param user     the authentication user
-     * @param password the authentication password
+     * @param user the authentication user
      */
-    public void login(String user, String password) throws IOException
+    public void login(String user) throws IOException
     {
         try
         {
             configureSession(user);
+            if (!StringUtils.isEmpty(password))
+            {
+                session.setPassword(password);
+            }
 
-            session.setPassword(password);
+            if (!StringUtils.isEmpty(identityFile))
+            {
+                setupIdentity();
+            }
+
             connect();
         }
         catch (Exception e)
@@ -150,38 +166,23 @@ public class SftpClient
         }
     }
 
-    /**
-     * Performs a login operation using a identity file and a passphrase
-     *
-     * @param user         the authentication user
-     * @param identityFile the path to an identity file
-     * @param passphrase   the authentication passphrase
-     */
-    public void login(String user, String identityFile, String passphrase) throws IOException
+    private void setupIdentity() throws JSchException
     {
-        // Lets first check that the identityFile exist
-        if (!new File(identityFile).exists())
+        if (passphrase == null || "".equals(passphrase))
         {
-            throw new IOException("IdentityFile '" + identityFile + "' not found");
+            jsch.addIdentity(identityFile);
         }
-
-        try
+        else
         {
-            if (passphrase == null || "".equals(passphrase))
-            {
-                jsch.addIdentity(new File(identityFile).getAbsolutePath());
-            }
-            else
-            {
-                jsch.addIdentity(new File(identityFile).getAbsolutePath(), passphrase);
-            }
-
-            configureSession(user);
-            connect();
+            jsch.addIdentity(identityFile, passphrase);
         }
-        catch (JSchException e)
+    }
+
+    private void checkExists(String path)
+    {
+        if (!new File(path).exists())
         {
-            throw loginException(user, e);
+            throw new IllegalArgumentException(format("File '%s' not found", path));
         }
     }
 
@@ -211,14 +212,15 @@ public class SftpClient
 
     private void configureHostChecking(Properties hash) throws JSchException
     {
-        if (getKnownHostsFile() == null)
+        if (knownHostsFile == null)
         {
             hash.put(STRICT_HOST_KEY_CHECKING, "no");
         }
         else
         {
+            checkExists(knownHostsFile);
             hash.put(STRICT_HOST_KEY_CHECKING, "ask");
-            jsch.setKnownHosts(getKnownHostsFile().getAbsolutePath());
+            jsch.setKnownHosts(knownHostsFile);
         }
     }
 
@@ -236,7 +238,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw exception(String.format("Could not rename path '%s' to '%s'", sourcePath, target), e);
+            throw exception(format("Could not rename path '%s' to '%s'", sourcePath, target), e);
         }
     }
 
@@ -421,17 +423,29 @@ public class SftpClient
 
     private RuntimeException loginException(String user, Exception e)
     {
-        return exception(String.format("Error during login to %s@%s", user, host), e);
+        return exception(format("Error during login to %s@%s", user, host), e);
     }
 
-    public File getKnownHostsFile()
+    public void setKnownHostsFile(String knownHostsFile)
     {
-        return knownHostsFile;
+        this.knownHostsFile = !StringUtils.isEmpty(knownHostsFile)
+                              ? new File(knownHostsFile).getAbsolutePath()
+                              : knownHostsFile;
     }
 
-    public void setKnownHostsFile(File knownHostsFile)
+    public void setPassword(String password)
     {
-        this.knownHostsFile = knownHostsFile;
+        this.password = password;
+    }
+
+    public void setIdentity(String identityFilePath, String passphrase)
+    {
+        if (!StringUtils.isEmpty(identityFilePath))
+        {
+            this.identityFile = new File(identityFilePath).getAbsolutePath();
+            checkExists(identityFilePath);
+        }
+        this.passphrase = passphrase;
     }
 
     public int getPort()
