@@ -6,9 +6,10 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="true"/>
-    </configuration>
+<!--     <configuration> -->
+<!--         TODO MULE-9720 -->
+<!--         <http:config useTransportForUris="true"/> -->
+<!--     </configuration> -->
 
     <flow name="test">
         <http:inbound-endpoint address="http://localhost:${httpPort}" exchange-pattern="request-response"/>

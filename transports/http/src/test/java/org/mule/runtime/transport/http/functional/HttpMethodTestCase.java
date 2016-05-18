@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.transport.http.HttpConstants;
 import org.mule.runtime.transport.http.PatchMethod;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -110,7 +111,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
 
     private String getHttpEndpointAddress()
     {
-        InboundEndpoint httpEndpoint = muleContext.getRegistry().lookupObject("inHttpIn");
+        InboundEndpoint httpEndpoint = (InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource();
         return httpEndpoint.getAddress();
     }
 

@@ -11,6 +11,7 @@
        http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd">
 
 <!--     <configuration> -->
+<!--         TODO MULE-9720 -->
 <!--         <http:config useTransportForUris="true"/> -->
 <!--     </configuration> -->
 

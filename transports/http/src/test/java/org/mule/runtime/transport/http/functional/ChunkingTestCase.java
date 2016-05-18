@@ -12,6 +12,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.transport.http.HttpConnector;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -36,7 +37,7 @@ public class ChunkingTestCase extends FunctionalTestCase
 
         byte[] msg = new byte[100*1024];
 
-        MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inMain")).getAddress(),
+        MuleMessage result = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("/foo")).getMessageSource()).getAddress(),
             msg, null);
         assertEquals("Hello", getPayloadAsString(result));
         int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);

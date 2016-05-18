@@ -4,18 +4,20 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
         xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <http:endpoint name="base" host="localhost" port="${port1}" exchange-pattern="request-response"/>
     <http:endpoint name="adapted" host="localhost" port="${port2}" exchange-pattern="request-response"/>
     <http:endpoint name="ignored" address="http://localhost:${port3}" exchange-pattern="request-response"/>
-    <endpoint name="inbound" address="http://localhost:${port4}" exchange-pattern="request-response"/>
+    <transports:endpoint name="inbound" address="http://localhost:${port4}" exchange-pattern="request-response"/>
 
     <custom-transformer name="appendString" class="org.mule.tck.functional.StringAppendTestTransformer"/>
 
@@ -27,11 +29,11 @@
          transformers -->
     <flow name="baseService1">
         <http:inbound-endpoint ref="base"/>
-        <outbound-endpoint address="vm://echo1" exchange-pattern="request-response"/>
+        <transports:outbound-endpoint address="vm://echo1" exchange-pattern="request-response"/>
     </flow>
 
     <flow name="baseService2">
-        <inbound-endpoint address="vm://echo1" exchange-pattern="request-response"/>
+        <transports:inbound-endpoint address="vm://echo1" exchange-pattern="request-response"/>
         <test:component doInboundTransform="false" appendString=" Received"/>
     </flow>
 
@@ -43,7 +45,7 @@
     </flow>
 
     <flow name="adaptedService2">
-        <inbound-endpoint address="vm://echo2" exchange-pattern="request-response"/>
+        <transports:inbound-endpoint address="vm://echo2" exchange-pattern="request-response"/>
         <test:component doInboundTransform="false" appendString=" Received"/>
     </flow>
 
@@ -57,13 +59,13 @@
         <component class="org.mule.runtime.transport.http.issues.NoTransformPassThroughComponent">
             <callable-entry-point-resolver/>
         </component>
-        <outbound-endpoint address="vm://echo3" exchange-pattern="request-response"/>
+        <transports:outbound-endpoint address="vm://echo3" exchange-pattern="request-response"/>
     </flow>
 
     <flow name="ignoredService2">
-        <inbound-endpoint address="vm://echo3" exchange-pattern="request-response">
+        <transports:inbound-endpoint address="vm://echo3" exchange-pattern="request-response">
             <transformer ref="appendString2"/>
-        </inbound-endpoint>
+        </transports:inbound-endpoint>
         <test:component doInboundTransform="false" appendString=" Received"/>
     </flow>
     
@@ -76,10 +78,10 @@
     </flow>
 
     <flow name="inboundService2">
-        <inbound-endpoint address="vm://echo4" exchange-pattern="request-response">
+        <transports:inbound-endpoint address="vm://echo4" exchange-pattern="request-response">
             <object-to-string-transformer/>
             <transformer ref="appendString2"/>
-        </inbound-endpoint>
+        </transports:inbound-endpoint>
         <test:component appendString=" Received"/>
     </flow>
 

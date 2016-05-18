@@ -9,7 +9,7 @@
 		  http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <http:connector name="NullSessionConnector">
-        <service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
+        <service-overrides sessionHandler="org.mule.runtime.core.session.NullSessionHandler" />
     </http:connector>
 
     <flow name="inputFlow">

@@ -14,9 +14,10 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
 
 
-    <configuration>
-        <http:config useTransportForUris="true"/>
-    </configuration>
+<!--     <configuration> -->
+<!--         TODO MULE-9720 -->
+<!--         <http:config useTransportForUris="true"/> -->
+<!--     </configuration> -->
 
     <flow name="flowWithoutExceptionStrategySync">
         <http:inbound-endpoint name="httpInSync" port="${port1}" host="localhost" path="flowWithoutExceptionStrategySync" exchange-pattern="request-response"/>

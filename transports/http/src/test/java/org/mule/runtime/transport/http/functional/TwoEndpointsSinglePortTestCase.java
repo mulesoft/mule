@@ -13,6 +13,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.ArrayList;
@@ -44,8 +45,8 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        sendWithResponse("inMyComponent1", "test", "mycomponent1", 5);
-        sendWithResponse("inMyComponent2", "test", "mycomponent2", 5);
+        sendWithResponse("mycomponent1", "test", "mycomponent1", 5);
+        sendWithResponse("mycomponent2", "test", "mycomponent2", 5);
 
         String url = String.format("http://localhost:%d/mycomponent-notfound", port1.getNumber());
         MuleMessage result = client.send(url, "test", null);
@@ -55,11 +56,11 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
         assertEquals(404, status);
 
         // Test that after the exception the endpoints still receive events
-        sendWithResponse("inMyComponent1", "test", "mycomponent1", 5);
-        sendWithResponse("inMyComponent2", "test", "mycomponent2", 5);
+        sendWithResponse("mycomponent1", "test", "mycomponent1", 5);
+        sendWithResponse("mycomponent2", "test", "mycomponent2", 5);
     }
 
-    protected void sendWithResponse(String endPointName, String message, String response, int noOfMessages)
+    protected void sendWithResponse(String flowName, String message, String response, int noOfMessages)
             throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -68,7 +69,7 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
         for (int i = 0; i < noOfMessages; i++)
         {
             results.add(getPayloadAsBytes(client.send(
-                    ((InboundEndpoint) muleContext.getRegistry().lookupObject(endPointName)).getAddress(),
+                    ((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject(flowName)).getMessageSource()).getAddress(),
                     message, null)));
         }
 
