@@ -51,8 +51,8 @@
         <!-- Test using expressions and literal values -->
         <http:rest-service-component serviceUrl="http://localhost:${port1}" httpMethod="POST">
             <http:requiredParameter key="foo" value="boo"/>
-            <http:requiredParameter key="faz" value="#[message.inboundProperties.baz-header]"/>
-            <http:optionalParameter key="far" value="#[message.inboundProperties.bar-optional-header]"/>
+            <http:requiredParameter key="faz" value="#[message.inboundProperties['baz-header']]"/>
+            <http:optionalParameter key="far" value="#[message.inboundProperties['bar-optional-header']]"/>
         </http:rest-service-component>
         <!-- do not log any exceptions, the test makes sure error cases are handled appropriately -->
         <custom-exception-strategy class="org.mule.functional.functional.QuietExceptionStrategy"/>

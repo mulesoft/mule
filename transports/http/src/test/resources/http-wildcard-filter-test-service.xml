@@ -13,7 +13,7 @@
 <!--     </configuration> -->
     
     <flow name="httpIn">
-        <http:inbound-endpoint host="localhost" port="${port1}" exchange-pattern="request-response" name="inHttpIn">
+        <http:inbound-endpoint host="localhost" port="${port1}" exchange-pattern="request-response">
             <not-filter>
                 <http:request-wildcard-filter pattern="*xyz*"/>
             </not-filter>
@@ -22,7 +22,7 @@
     </flow>
 
     <flow name="reference">
-        <inbound-endpoint address="http://localhost:${port2}" exchange-pattern="request-response" name="inReference"/>
+        <inbound-endpoint address="http://localhost:${port2}" exchange-pattern="request-response"/>
         <echo-component/>
     </flow>
 </mule>

@@ -8,11 +8,12 @@ package org.mule.runtime.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;

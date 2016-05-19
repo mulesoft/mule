@@ -20,7 +20,7 @@
 <!--     </configuration> -->
 
     <flow name="flowWithoutExceptionStrategySync">
-        <http:inbound-endpoint name="httpInSync" port="${port1}" host="localhost" path="flowWithoutExceptionStrategySync" exchange-pattern="request-response"/>
+        <http:inbound-endpoint port="${port1}" host="localhost" path="flowWithoutExceptionStrategySync" exchange-pattern="request-response"/>
         <test:component throwException="true"/>
     </flow>
 

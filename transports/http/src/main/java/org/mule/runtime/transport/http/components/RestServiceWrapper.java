@@ -7,6 +7,7 @@
 package org.mule.runtime.transport.http.components;
 
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -155,8 +156,9 @@ public class RestServiceWrapper extends AbstractComponent
         if (errorFilter == null)
         {
             // We'll set a default filter that checks the return code
-            errorFilter = new ExpressionFilter("#[header:INBOUND:http.status!=200]");
-            logger.info("Setting default error filter to ExpressionFilter('#[header:INBOUND:http.status!=200]')");
+            errorFilter = new ExpressionFilter("#[message.inboundProperties['http.status']!=200]");
+            ((ExpressionFilter) errorFilter).setMuleContext(muleContext);
+            logger.info("Setting default error filter to ExpressionFilter('#[message.inboundProperties['http.status']!=200]')");
         }
     }
 
@@ -167,7 +169,6 @@ public class RestServiceWrapper extends AbstractComponent
 
         Object request = event.getMessage().getPayload();
         String tempUrl = serviceUrl;
-        MuleMessage result;
         if (muleContext.getExpressionManager().isExpression(serviceUrl))
         {
             muleContext.getExpressionManager().validateExpression(serviceUrl);
@@ -207,15 +208,16 @@ public class RestServiceWrapper extends AbstractComponent
         OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
 
         MuleEventContext eventContext = new DefaultMuleEventContext(event);
-        result = eventContext.sendEvent(
-                new DefaultMuleMessage(requestBody, event.getMessage(), muleContext), outboundEndpoint.getEndpointURI().toString());
+        MuleEvent result = new DefaultMuleEvent(eventContext.sendEvent(
+                new DefaultMuleMessage(requestBody, event.getMessage(), muleContext), outboundEndpoint.getEndpointURI().toString()), flowConstruct);
+
         if (isErrorPayload(result))
         {
             handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl),
-                event, this), result);
+                    event, this), result.getMessage());
         }
 
-        return result;
+        return result.getMessage();
     }
 
     private String getSeparator(String url)
@@ -353,9 +355,9 @@ public class RestServiceWrapper extends AbstractComponent
         }
     }
 
-    protected boolean isErrorPayload(MuleMessage message)
+    protected boolean isErrorPayload(MuleEvent event)
     {
-        return errorFilter != null && errorFilter.accept(message);
+        return errorFilter != null && errorFilter.accept(event);
     }
 
     protected void handleException(RestServiceException e, MuleMessage result) throws Exception

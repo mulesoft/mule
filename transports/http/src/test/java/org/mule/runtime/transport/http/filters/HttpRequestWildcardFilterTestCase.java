@@ -13,6 +13,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.transport.http.HttpConnector;
 import org.mule.runtime.transport.http.HttpConstants;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -44,7 +45,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
     public void testReference() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inReference")).getAddress(), TEST_HTTP_MESSAGE, null);
+        MuleMessage result = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("reference")).getMessageSource()).getAddress(), TEST_HTTP_MESSAGE, null);
 
         assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
     }
@@ -53,7 +54,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
     public void testHttpPost() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inHttpIn")).getAddress(), TEST_HTTP_MESSAGE, null);
+        MuleMessage result = client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource()).getAddress(), TEST_HTTP_MESSAGE, null);
 
         assertEquals(TEST_HTTP_MESSAGE, getPayloadAsString(result));
     }

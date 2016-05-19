@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.transport.http.HttpConstants;
-import org.mule.runtime.transport.http.components.RestServiceException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;

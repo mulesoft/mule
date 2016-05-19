@@ -5,6 +5,7 @@
       xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
       xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xmlns:xm="http://www.mulesoft.org/schema/mule/xml"
       xsi:schemaLocation="
            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
@@ -12,6 +13,7 @@
            http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
            http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
            http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+           http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <http:connector name="httpConnector" enableCookies="true"/>
@@ -20,8 +22,8 @@
     <http:endpoint name="serverEndpoint" address="http://localhost:${port2}" exchange-pattern="request-response"/>
 
     <flow name="HttpProxyService">
-        <inbound-endpoint ref="clientEndpoint"/>
-        <outbound-endpoint ref="serverEndpoint"/>
+        <transports:inbound-endpoint ref="clientEndpoint"/>
+        <transports:outbound-endpoint ref="serverEndpoint"/>
     </flow>
 
 </mule>

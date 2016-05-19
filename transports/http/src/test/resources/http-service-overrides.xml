@@ -3,13 +3,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
+       xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <http:connector name="httpConnector">
-        <service-overrides sessionHandler="org.mule.runtime.transport.http.functional.TestSessionHandler"/>
+        <transports:service-overrides sessionHandler="org.mule.runtime.transport.http.functional.TestSessionHandler"/>
     </http:connector>
 
 </mule>
