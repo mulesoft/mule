@@ -940,11 +940,6 @@ public final class SchemaBuilder
 
     private boolean shouldGenerateDataTypeChildElements(MetadataType metadataType, ExpressionSupport expressionSupport)
     {
-        if (metadataType == null)
-        {
-            return false;
-        }
-
         boolean isExpressionRequired = ExpressionSupport.REQUIRED == expressionSupport;
         boolean isPojo = metadataType instanceof ObjectType;
         Class<?> clazz = getType(metadataType);

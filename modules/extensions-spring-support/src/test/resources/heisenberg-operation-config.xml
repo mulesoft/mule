@@ -8,7 +8,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
-               http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+               http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd">
 
     <context:property-placeholder location="heisenberg.properties"/>
 
@@ -230,9 +230,9 @@
 
     <spring:beans>
         <util:list id="listOfRicins" value-type="org.mule.test.heisenberg.extension.model.Ricin">
-            <heisenberg:ricin name="1" microgramsPerKilo="20">
+            <heisenberg:ricin name="1" microgramsPerKilo="#[10L+10L]">
                 <heisenberg:destination>
-                    <heisenberg:door victim="Lidia" address="Stevia coffe shop"/>
+                    <heisenberg:door victim="#['Lidia']" address="Stevia coffe shop"/>
                 </heisenberg:destination>
             </heisenberg:ricin>
             <heisenberg:ricin name="2" microgramsPerKilo="22">
