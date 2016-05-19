@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.apache.ftpserver.FtpServerFactory;
+import org.apache.ftpserver.listener.Listener;
 import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 
@@ -22,35 +23,37 @@ import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
  */
 public class EmbeddedFtpServer
 {
+
     private org.apache.ftpserver.FtpServer server;
+    private final int port;
 
     /**
      * Initialize the ftp server on a given port
-     * 
+     *
      * @param port The port to start the server on. Note, you need special
-     *            permissions on *nux to open port 22, so we usually choose a very
-     *            high port number.
+     *             permissions on *nux to open port 22, so we usually choose a very
+     *             high port number.
      * @throws Exception
      */
     public EmbeddedFtpServer(int port) throws Exception
     {
-        FtpServerFactory serverFactory = new FtpServerFactory();
-
-        setupListenerFactory( serverFactory, port);
-        setupUserManagerFactory(serverFactory);
-
-        server = serverFactory.createServer();
-        server.start();
+        this.port = port;
     }
 
-    private void setupListenerFactory(FtpServerFactory serverFactory, int port)
+    private Listener createListener(int port)
+    {
+        ListenerFactory listenerFactory = createListenerFactory(port);
+
+        return listenerFactory.createListener();
+    }
+
+    protected ListenerFactory createListenerFactory(int port)
     {
         ListenerFactory listenerFactory = new ListenerFactory();
-        // set the port of the listener
+
         listenerFactory.setPort(port);
         listenerFactory.setIdleTimeout(60000);
-        // replace the default listener
-        serverFactory.addListener("default", listenerFactory.createListener());
+        return listenerFactory;
     }
 
     private void setupUserManagerFactory(FtpServerFactory serverFactory) throws IOException
@@ -65,13 +68,32 @@ public class EmbeddedFtpServer
         serverFactory.setUserManager(userManagerFactory.createUserManager());
     }
 
+    public void start()
+    {
+        FtpServerFactory serverFactory = new FtpServerFactory();
+        serverFactory.addListener("default", createListener(port));
+        try
+        {
+            setupUserManagerFactory(serverFactory);
+            server = serverFactory.createServer();
+            server.start();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Could not start server", e);
+        }
+    }
+
     /**
      * Stop the ftp server TODO DZ: we may want to put a port check + wait time in
      * here to make sure that the port is released before we continue. Windows tends
      * to hold on to ports longer than it should.
      */
     public void stop()
-    {        
-        server.stop();
+    {
+        if (server != null)
+        {
+            server.stop();
+        }
     }
 }

@@ -241,7 +241,7 @@ public final class IntrospectionUtils
         return ClassUtils.getConstructor(clazz, new Class[] {}) != null;
     }
 
-    public static List<Class<?>> getInterfaceGenerics(Class<?> type, Class<?> implementedInterface)
+    public static List<Class<?>> getInterfaceGenerics(final Class<?> type, final Class<?> implementedInterface)
     {
         ResolvableType interfaceType = null;
         Class<?> searchClass = type;
@@ -275,16 +275,36 @@ public final class IntrospectionUtils
         List<? super Class<?>> generics = toRawClasses(interfaceType.getGenerics());
         if (generics.stream().anyMatch(c -> c == null))
         {
-            generics = getSuperClassGenerics(type, searchClass);
+            return findGenericsInSuperHierarchy(type);
         }
 
         return (List<Class<?>>) generics;
+    }
+
+    public static List<Class<?>> findGenericsInSuperHierarchy(final Class<?> type)
+    {
+        if (Object.class.equals(type))
+        {
+            return ImmutableList.of();
+        }
+
+        Class<?> superClass = type.getSuperclass();
+
+        List<Type> generics = getSuperClassGenerics(type, superClass);
+
+        if (CollectionUtils.isEmpty(generics) && !Object.class.equals(superClass))
+        {
+            return findGenericsInSuperHierarchy(superClass);
+        }
+
+        return (List) generics;
     }
 
     private static List<Class<?>> toRawClasses(ResolvableType... types)
     {
         return stream(types).map(ResolvableType::getRawClass).collect(toList());
     }
+
 
     public static List<Type> getSuperClassGenerics(Class<?> type, Class<?> superClass)
     {
