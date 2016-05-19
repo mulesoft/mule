@@ -160,6 +160,25 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="wild-card-weapons">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-weapon"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="wild-card-weapon-maps">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="wild-card-weapon-map">
+                                        <xs:complexType>
+                                            <xs:attribute type="mule:expressionObject" use="required" name="key"></xs:attribute>
+                                            <xs:attribute type="mule:expressionObject" use="required" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="candidate-doors">
                             <xs:complexType>
                                 <xs:sequence>
@@ -471,12 +490,21 @@
     <xs:complexType name="KillWithMultipleWildCardWeaponsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="wild-card-weapons">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-weapon"></xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionList" use="required" name="wildCardWeapons"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -489,12 +517,48 @@
     <xs:complexType name="KillWithMultiplesWeaponsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="weapon-list">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-weapon"></xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionList" use="required" name="weaponList"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="weaponList"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithRicinsType" substitutionGroup="heisenberg-empire" name="kill-with-ricins"></xs:element>
+    <xs:complexType name="KillWithRicinsType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="ricin-list">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-ricin"></xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="ricinList"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

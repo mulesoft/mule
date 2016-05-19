@@ -687,7 +687,7 @@ public final class SchemaBuilder
             @Override
             public void visitObject(ObjectType objectType)
             {
-                final boolean shouldGenerateChildElement = isInstantiableWithParameters(getType(objectType));
+                final boolean shouldGenerateChildElement = shouldGenerateDataTypeChildElements(objectType, SUPPORTED);
 
                 entryComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, valueType, !shouldGenerateChildElement, SUPPORTED));
 
@@ -850,7 +850,7 @@ public final class SchemaBuilder
             public void visitArrayType(ArrayType arrayType)
             {
                 MetadataType genericType = arrayType.getType();
-                forceOptional = shouldForceOptional(getType(genericType));
+                forceOptional = shouldForceOptional(genericType);
 
                 defaultVisit(arrayType);
                 if (shouldGenerateDataTypeChildElements(genericType, expressionSupport))
@@ -863,7 +863,7 @@ public final class SchemaBuilder
             public void visitDictionary(DictionaryType dictionaryType)
             {
                 MetadataType keyType = dictionaryType.getKeyType();
-                forceOptional = shouldForceOptional(getType(keyType));
+                forceOptional = shouldForceOptional(keyType);
 
                 defaultVisit(dictionaryType);
                 if (shouldGenerateDataTypeChildElements(keyType, expressionSupport))
@@ -877,7 +877,7 @@ public final class SchemaBuilder
             public void visitObject(ObjectType objectType)
             {
                 final Class<?> clazz = getType(objectType);
-                forceOptional = shouldForceOptional(clazz);
+                forceOptional = shouldForceOptional(objectType);
 
                 if (TlsContextFactory.class.isAssignableFrom(clazz))
                 {
@@ -924,26 +924,11 @@ public final class SchemaBuilder
                 extensionType.getAttributeOrAttributeGroup().add(createAttribute(name, description, metadataType, defaultValue, isRequired(forceOptional, required), expressionSupport));
             }
 
-            private boolean shouldGenerateDataTypeChildElements(MetadataType metadataType, ExpressionSupport expressionSupport)
-            {
-                if (metadataType == null)
-                {
-                    return false;
-                }
-
-                boolean isExpressionRequired = ExpressionSupport.REQUIRED == expressionSupport;
-                boolean isPojo = metadataType instanceof ObjectType;
-                Class<?> clazz = getType(metadataType);
-                boolean isPrimitive = clazz.isPrimitive() || ClassUtils.isPrimitiveWrapper(clazz);
-
-                return !isExpressionRequired && (isPrimitive || (isPojo && isInstantiableWithParameters(clazz)) || (!isPojo && isInstantiable(clazz)));
-            }
-
-            private boolean shouldForceOptional(Class<?> type)
+            private boolean shouldForceOptional(MetadataType type)
             {
                 return !required ||
-                       !subTypesMapping.getSubTypes(metadataType).isEmpty() ||
-                       (isInstantiable(type) && ExpressionSupport.REQUIRED != expressionSupport);
+                       !subTypesMapping.getSubTypes(type).isEmpty() ||
+                       (isInstantiable(getType(type)) && ExpressionSupport.REQUIRED != expressionSupport);
             }
 
             private boolean isRequired(boolean forceOptional, boolean required)
@@ -951,6 +936,23 @@ public final class SchemaBuilder
                 return !forceOptional && required;
             }
         };
+    }
+
+    private boolean shouldGenerateDataTypeChildElements(MetadataType metadataType, ExpressionSupport expressionSupport)
+    {
+        if (metadataType == null)
+        {
+            return false;
+        }
+
+        boolean isExpressionRequired = ExpressionSupport.REQUIRED == expressionSupport;
+        boolean isPojo = metadataType instanceof ObjectType;
+        Class<?> clazz = getType(metadataType);
+        boolean isPrimitive = clazz.isPrimitive() || ClassUtils.isPrimitiveWrapper(clazz);
+
+        return !isExpressionRequired &&
+               (isPrimitive || !subTypesMapping.getSubTypes(metadataType).isEmpty() ||
+                (isPojo && isInstantiableWithParameters(clazz)) || (!isPojo && isInstantiable(clazz)));
     }
 
     private void addImportedTypeRef(Class<?> extensionType, String name, String description, MetadataType metadataType, ExplicitGroup all)
