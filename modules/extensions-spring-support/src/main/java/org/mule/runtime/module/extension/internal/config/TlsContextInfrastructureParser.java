@@ -11,11 +11,15 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TLS
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.runtime.module.tls.internal.config.KeyStoreTlsContextDefinitionParser;
+import org.mule.runtime.module.tls.internal.config.TrustStoreTlsContextDefinitionParser;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * A {@link PoolingProfileInfrastructureParser} capable of parsing instances of
@@ -37,5 +41,20 @@ final class TlsContextInfrastructureParser implements InfrastructureParserDelega
     public void parse(Element element, ManagedMap<Class<?>, BeanDefinition> managedMap, ParserContext parserContext)
     {
         managedMap.put(TlsContextFactory.class, new OrphanDefinitionParser(DefaultTlsContextFactory.class, true).parse(element, parserContext));
+        NodeList childs = element.getChildNodes();
+        for (int i = 0; i < childs.getLength(); i++)
+        {
+            Node child = childs.item(i);
+            final String childName = child.getLocalName();
+
+            if ("key-store".equals(childName))
+            {
+                new KeyStoreTlsContextDefinitionParser().parse((Element) child, parserContext);
+            }
+            else if ("trust-store".equals(childName))
+            {
+                new TrustStoreTlsContextDefinitionParser().parse((Element) child, parserContext);
+            }
+        }
     }
 }
