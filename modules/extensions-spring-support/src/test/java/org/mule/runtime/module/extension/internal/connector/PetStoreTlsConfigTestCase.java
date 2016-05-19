@@ -7,13 +7,17 @@
 package org.mule.runtime.module.extension.internal.connector;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.test.petstore.extension.PetStoreConnector;
-import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
+import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.petstore.extension.PetStoreConnector;
 
 import java.util.Collection;
 
@@ -25,6 +29,9 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class PetStoreTlsConfigTestCase extends ExtensionFunctionalTestCase
 {
+
+    private static final String PASSWORD = "changeit";
+
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data()
     {
@@ -61,7 +68,17 @@ public class PetStoreTlsConfigTestCase extends ExtensionFunctionalTestCase
     @Test
     public void tls() throws Exception
     {
-        PetStoreConnector connector = ExtensionsTestUtils.getConfigurationFromRegistry(configName, getTestEvent(""));
-        assertThat(connector.getTlsContext(), is(notNullValue()));
+        PetStoreConnector connector = getConfigurationFromRegistry(configName, getTestEvent(""));
+        TlsContextFactory tls = connector.getTlsContext();
+        assertThat(tls, is(notNullValue()));
+
+        TlsContextTrustStoreConfiguration trustStoreConfig = tls.getTrustStoreConfiguration();
+        assertThat(trustStoreConfig.getPath().endsWith("ssltest-cacerts.jks"), is(true));
+        assertThat(trustStoreConfig.getPassword(), equalTo(PASSWORD));
+
+        TlsContextKeyStoreConfiguration keyStoreConfiguration = tls.getKeyStoreConfiguration();
+        assertThat(keyStoreConfiguration.getPath().endsWith("ssltest-keystore.jks"), is(true));
+        assertThat(keyStoreConfiguration.getKeyPassword(), equalTo(PASSWORD));
+        assertThat(keyStoreConfiguration.getPassword(), equalTo(PASSWORD));
     }
 }
