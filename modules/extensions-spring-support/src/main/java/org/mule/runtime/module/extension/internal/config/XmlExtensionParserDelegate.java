@@ -484,20 +484,15 @@ final class XmlExtensionParserDelegate
                                   ArrayType collectionType)
     {
         ValueResolver resolver = getResolverFromAttribute(element, fieldName, collectionType, defaultValue);
-        if (resolver == null)
+
+        ElementDescriptor collectionElement = element.getChildByName(parentElementName);
+        if (collectionElement != null)
         {
-            ElementDescriptor collectionElement = element.getChildByName(parentElementName);
-            if (collectionElement != null)
-            {
-                resolver = parseCollectionAsInnerElement(collectionElement, childElementName, collectionType);
-            }
-            else
-            {
-                resolver = new StaticValueResolver(defaultValue);
-            }
+            resolver = parseCollectionAsInnerElement(collectionElement, childElementName, collectionType);
         }
 
-        return resolver;
+
+        return resolver != null ? resolver : new StaticValueResolver(defaultValue);
     }
 
     ValueResolver parseMap(ElementDescriptor element,
@@ -508,20 +503,14 @@ final class XmlExtensionParserDelegate
                            DictionaryType mapDataType)
     {
         ValueResolver resolver = getResolverFromAttribute(element, fieldName, mapDataType, defaultValue);
-        if (resolver == null)
+
+        ElementDescriptor mapElement = element.getChildByName(parentElementName);
+        if (mapElement != null)
         {
-            ElementDescriptor mapElement = element.getChildByName(parentElementName);
-            if (mapElement != null)
-            {
-                resolver = parseMapAsInnerElement(mapElement, childElementName, mapDataType);
-            }
-            else
-            {
-                resolver = new StaticValueResolver(defaultValue);
-            }
+            resolver = parseMapAsInnerElement(mapElement, childElementName, mapDataType);
         }
 
-        return resolver;
+        return resolver != null ? resolver : new StaticValueResolver(defaultValue);
     }
 
     ValueResolver getResolverFromAttribute(ElementDescriptor element, String attributeName, MetadataType metadataType, Object defaultValue)
@@ -632,11 +621,6 @@ final class XmlExtensionParserDelegate
         // check if the pojo is referenced as an attribute
         ValueResolver resolver = getResolverFromAttribute(element, fieldName, pojoType, defaultValue);
 
-        if (resolver != null)
-        {
-            return resolver;
-        }
-
         // check if the pojo is defined inline as a child element
         ElementDescriptor childElement = element.getChildByName(childElementName);
 
@@ -664,7 +648,7 @@ final class XmlExtensionParserDelegate
         }
 
         // pojo was not specified, take the coward's route and return a null resolver
-        return new StaticValueResolver(null);
+        return resolver != null ? resolver : new StaticValueResolver(null);
     }
 
     private ValueResolver getPojoValueResolver(ObjectType objectType, ElementDescriptor element)

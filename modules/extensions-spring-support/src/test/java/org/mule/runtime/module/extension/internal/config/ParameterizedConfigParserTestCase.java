@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config;
 
 import static java.util.Calendar.YEAR;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -178,7 +179,7 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         assertCandidateDoors(heisenberg);
         assertDeathsBySeason(heisenberg);
         assertMonthlyIncomes(heisenberg);
-        assertLabeledRicins(heisenberg);
+        assertLabeledRicin(heisenberg);
         assertLiteralExpressions(heisenberg);
     }
 
@@ -287,13 +288,14 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         return calendar;
     }
 
-    private void assertLabeledRicins(HeisenbergExtension heisenberg)
+    private void assertLabeledRicin(HeisenbergExtension heisenberg)
     {
 
         Map<String, Ricin> labeledRicin = heisenberg.getLabeledRicin();
 
         assertNotNull(labeledRicin);
         assertThat(labeledRicin.size(), equalTo(1));
+        assertThat(labeledRicin.get("pojo"), instanceOf(Ricin.class));
 
         Ricin ricin = labeledRicin.get("pojo");
         assertNotNull(ricin);

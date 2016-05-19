@@ -118,6 +118,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String KILL_OPERATION = "kill";
     private static final String KILL_CUSTOM_OPERATION = "killWithCustomMessage";
     private static final String KILL_WITH_WEAPON = "killWithWeapon";
+    private static final String KILL_WITH_RICINS = "killWithRicins";
     private static final String KILL_WITH_MULTIPLES_WEAPONS = "killWithMultiplesWeapons";
     private static final String KILL_WITH_MULTIPLE_WILDCARD_WEAPONS = "killWithMultipleWildCardWeapons";
     private static final String GET_PAYMENT_FROM_EVENT_OPERATION = "getPaymentFromEvent";
@@ -376,12 +377,13 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception
     {
-        assertThat(extensionDeclaration.getOperations(), hasSize(22));
+        assertThat(extensionDeclaration.getOperations(), hasSize(23));
         assertOperation(extensionDeclaration, SAY_MY_NAME_OPERATION, "");
         assertOperation(extensionDeclaration, GET_ENEMY_OPERATION, "");
         assertOperation(extensionDeclaration, KILL_OPERATION, "");
         assertOperation(extensionDeclaration, KILL_CUSTOM_OPERATION, "");
         assertOperation(extensionDeclaration, KILL_WITH_WEAPON, "");
+        assertOperation(extensionDeclaration, KILL_WITH_RICINS, "");
         assertOperation(extensionDeclaration, KILL_WITH_MULTIPLES_WEAPONS, "");
         assertOperation(extensionDeclaration, KILL_WITH_MULTIPLE_WILDCARD_WEAPONS, "");
         assertOperation(extensionDeclaration, GET_PAYMENT_FROM_EVENT_OPERATION, "");
@@ -422,11 +424,15 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(operation.getParameters(), "type", "", toMetadataType(WeaponType.class), true, SUPPORTED, null);
         assertParameter(operation.getParameters(), "attributesOfWeapon", "", toMetadataType(Weapon.WeaponAttributes.class), true, SUPPORTED, null);
 
+        operation = getOperation(extensionDeclaration, KILL_WITH_RICINS);
+        assertThat(operation, is(notNullValue()));
+        assertThat(operation.getParameters(), hasSize(1));
+        assertParameter(operation.getParameters(), "ricinList", "", arrayOf(List.class, objectTypeBuilder(Ricin.class)), false, SUPPORTED, "#[payload]");
 
         operation = getOperation(extensionDeclaration, KILL_WITH_MULTIPLES_WEAPONS);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
-        assertParameter(operation.getParameters(), "weaponList", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), true, SUPPORTED, null);
+        assertParameter(operation.getParameters(), "weaponList", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED, "#[payload]");
 
         operation = getOperation(extensionDeclaration, KILL_WITH_MULTIPLE_WILDCARD_WEAPONS);
         assertThat(operation, is(notNullValue()));

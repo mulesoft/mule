@@ -31,6 +31,7 @@ import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
+import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.WeaponType;
 
@@ -94,12 +95,17 @@ public class HeisenbergOperations
         return knockedDoor.knock();
     }
 
+    public List<Ricin> killWithRicins(@Optional(defaultValue = "#[payload]") List<Ricin> ricinList)
+    {
+        return ricinList;
+    }
+
     public String killWithWeapon(Weapon weapon, WeaponType type, Weapon.WeaponAttributes attributesOfWeapon)
     {
         return String.format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), attributesOfWeapon.getBrand());
     }
 
-    public List<String> killWithMultiplesWeapons(List<Weapon> weaponList)
+    public List<String> killWithMultiplesWeapons(@Optional(defaultValue = "#[payload]") List<Weapon> weaponList)
     {
         return weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
     }

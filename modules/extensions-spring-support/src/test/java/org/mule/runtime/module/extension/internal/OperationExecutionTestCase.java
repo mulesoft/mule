@@ -7,8 +7,10 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
@@ -319,6 +321,71 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 
         List<String> result = weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
         assertThat(event.getMessage().getPayload(), is(result));
+    }
+
+    @Test
+    public void operationWithListPojoAsAttributeOverridesDefault() throws Exception
+    {
+        List<Ricin> ricins = (List<Ricin>) flowRunner("killWithRicinAsAttribute").withPayload(EMPTY)
+                                                                                    .run().getMessage().getPayload();
+
+        assertThat(ricins, hasSize(2));
+        assertThat(ricins.get(0), instanceOf(Ricin.class));
+        assertThat(ricins.get(1), instanceOf(Ricin.class));
+
+        Ricin ricin1 = ricins.get(0);
+        assertThat(ricin1.getMicrogramsPerKilo(), is(20L));
+        assertThat(ricin1.getDestination().getVictim(), is("Lidia"));
+        assertThat(ricin1.getDestination().getAddress(), is("Stevia coffe shop"));
+
+        Ricin ricin2 = ricins.get(1);
+        assertThat(ricin2.getMicrogramsPerKilo(), is(22L));
+        assertThat(ricin2.getDestination().getVictim(), is("Gustavo Fring"));
+        assertThat(ricin2.getDestination().getAddress(), is("pollos hermanos"));
+    }
+
+    @Test
+    public void operationWithListPojoAsDefaultPayload() throws Exception
+    {
+        Ricin ricinWeapon1 = new Ricin();
+        ricinWeapon1.setMicrogramsPerKilo(20L);
+        Ricin ricinWeapon2 = new Ricin();
+        ricinWeapon2.setMicrogramsPerKilo(22L);
+
+        List<Ricin> ricins = (List<Ricin>) flowRunner("killWithRicinDefaultPayload")
+                .withPayload(Arrays.asList(ricinWeapon1, ricinWeapon2))
+                .run().getMessage().getPayload();
+
+        assertThat(ricins, hasSize(2));
+        assertThat(ricins.get(0), instanceOf(Ricin.class));
+        assertThat(ricins.get(1), instanceOf(Ricin.class));
+
+        Ricin ricin1 = ricins.get(0);
+        assertThat(ricin1.getMicrogramsPerKilo(), is(20L));
+
+        Ricin ricin2 = ricins.get(1);
+        assertThat(ricin2.getMicrogramsPerKilo(), is(22L));
+    }
+
+    @Test
+    public void operationWithListPojoAsChildElementsOverridesDefault() throws Exception
+    {
+        List<Ricin> ricins = (List<Ricin>) flowRunner("killWithRicinAsChildElement").withPayload(EMPTY)
+                .run().getMessage().getPayload();
+
+        assertThat(ricins, hasSize(2));
+        assertThat(ricins.get(0), instanceOf(Ricin.class));
+        assertThat(ricins.get(1), instanceOf(Ricin.class));
+
+        Ricin ricin1 = ricins.get(0);
+        assertThat(ricin1.getMicrogramsPerKilo(), is(20L));
+        assertThat(ricin1.getDestination().getVictim(), is("Lidia"));
+        assertThat(ricin1.getDestination().getAddress(), is("Stevia coffe shop"));
+
+        Ricin ricin2 = ricins.get(1);
+        assertThat(ricin2.getMicrogramsPerKilo(), is(22L));
+        assertThat(ricin2.getDestination().getVictim(), is("Gustavo Fring"));
+        assertThat(ricin2.getDestination().getAddress(), is("pollos hermanos"));
     }
 
     @Test
