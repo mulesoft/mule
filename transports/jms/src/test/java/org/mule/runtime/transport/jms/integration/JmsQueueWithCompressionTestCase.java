@@ -14,6 +14,7 @@ import org.junit.Test;
 /**
  * Message is sent to and received from simple queue using compression in between
  */
+@Ignore("MULE-9628")
 public class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCase
 {
     @Override
@@ -32,7 +33,6 @@ public class JmsQueueWithCompressionTestCase extends AbstractJmsFunctionalTestCa
     }
 
     @Test
-    @Ignore("MULE-9628")
     public void testMultipleSend() throws Exception
     {
         dispatchMessage();
