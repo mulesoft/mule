@@ -76,6 +76,7 @@ public class ApplicationModel
     public static final String XSL_NAMESPACE = "xsl";
     public static final String JMS_NAMESPACE = "jms";
     public static final String VM_NAMESPACE = "vm";
+    public static final String BATCH_NAMESPACE = "batch";
 
     public static final ComponentIdentifier CHOICE_EXCEPTION_STRATEGY_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CHOICE_EXCEPTION_STRATEGY).build();
     public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
@@ -122,6 +123,8 @@ public class ApplicationModel
             .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("element").build())
             .add(new ComponentIdentifier.Builder().withNamespace(JMS_NAMESPACE).withName("inbound-endpoint").build())
             .add(new ComponentIdentifier.Builder().withNamespace(VM_NAMESPACE).withName("inbound-endpoint").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(BATCH_NAMESPACE).withName("step").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(BATCH_NAMESPACE).withName("execute").build())
             .build();
 
     private List<ComponentModel> componentModels = new ArrayList<>();
