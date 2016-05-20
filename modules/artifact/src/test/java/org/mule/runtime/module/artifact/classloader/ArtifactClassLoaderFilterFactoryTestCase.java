@@ -33,7 +33,7 @@ public class ArtifactClassLoaderFilterFactoryTestCase extends AbstractMuleTestCa
     @Test
     public void createsFilter() throws Exception
     {
-        final ClassLoaderFilter filter = factory.create("java.lang, java.lang.annotation", "/META-INF, META-INF/xml");
+        final ClassLoaderFilter filter = factory.create("java.lang, java.lang.annotation", "/META-INF, META-INF/xml/");
 
         assertThat(filter.exportsClass(Object.class.getName()), is(true));
         assertThat(filter.exportsClass(Annotation.class.getName()), is(true));
