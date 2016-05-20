@@ -18,6 +18,8 @@ import java.util.Set;
 public class ArtifactClassLoaderFilterFactory implements ClassLoaderFilterFactory
 {
 
+    private static final String PACKAGE_SEPARATOR = "/";
+
     @Override
     public ClassLoaderFilter create(String exportedClassPackages, String exportedResourcePackages)
     {
@@ -43,9 +45,13 @@ public class ArtifactClassLoaderFilterFactory implements ClassLoaderFilterFactor
             for (String export : exports)
             {
                 export = export.trim();
-                if (export.startsWith("/"))
+                if (export.startsWith(PACKAGE_SEPARATOR))
                 {
                     export = export.substring(1);
+                }
+                if (export.endsWith(PACKAGE_SEPARATOR))
+                {
+                    export = export.substring(0, export.length() -1);
                 }
                 exported.add(export);
             }
