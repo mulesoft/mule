@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import static java.lang.Class.forName;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.spring.util.ProcessingStrategyUtils.parseProcessingStrategy;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
+import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
@@ -55,6 +57,9 @@ class ComponentConfigurationBuilder
 
     public void processConfiguration()
     {
+        componentBuildingDefinition.getIgnoredConfigurationParameters().stream().forEach( ignoredParameter -> {
+            simpleParameters.remove(ignoredParameter);
+        });
         for (Map.Entry<String, AttributeDefinition> definitionEntry : componentBuildingDefinition.getSetterParameterDefinitions().entrySet())
         {
             definitionEntry.getValue().accept(setterVisitor(definitionEntry.getKey()));
@@ -85,11 +90,20 @@ class ComponentConfigurationBuilder
                 {
                     try
                     {
-                        beanDefinitionType = Class.forName(cdm.getBeanDefinition().getBeanClassName());
+                        String beanClassName = cdm.getBeanDefinition().getBeanClassName();
+                        if (beanClassName != null)
+                        {
+                            beanDefinitionType = forName(beanClassName);
+                        }
+                        else
+                        {
+                            //Happens in case of spring:property
+                            beanDefinitionType = Object.class;
+                        }
                     }
                     catch (ClassNotFoundException e)
                     {
-                        throw new RuntimeException(e);
+                        beanDefinitionType = Object.class;
                     }
                 }
             }
@@ -159,11 +173,12 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onConfigurationParameter(String parameterName, Object defaultValue)
+        public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter)
         {
             Object value = simpleParameters.get(parameterName);
-            simpleParameters.remove(parameterName);
+            value = typeConverter.isPresent() ? typeConverter.get().convert(value) : value;
             valuePopulator.accept(Optional.ofNullable(value).orElse(defaultValue));
+            simpleParameters.remove(parameterName);
         }
 
         @Override

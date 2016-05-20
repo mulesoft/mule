@@ -14,7 +14,7 @@
         </spring:property>
     </spring:bean>
 
-    <jms:custom-connector name="sharedJmsConnector" class="org.mule.transport.jms.JmsConnector"
+    <jms:custom-connector name="sharedJmsConnector" class="org.mule.runtime.transport.jms.JmsConnector"
                           specification="1.1">
         <spring:property name="connectionFactory" ref="connectionFactory"/>
     </jms:custom-connector>

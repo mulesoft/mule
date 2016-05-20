@@ -19,7 +19,6 @@ import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegis
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import com.google.common.collect.ImmutableSet;
 

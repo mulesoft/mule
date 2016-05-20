@@ -213,9 +213,12 @@ public class DefaultBeanAssembler implements BeanAssembler
      */
     public void extendTarget(String newName, Object newValue, boolean isReference)
     {
-        assertTargetPresent();
-        addPropertyWithReference(target.getPropertyValues(),
-                new SinglePropertyLiteral(isReference), newName, newValue);
+        //TODO MULE-9638 We can get rid of all this code once we finish migrating parsers.
+        if (target != null)
+        {
+            addPropertyWithReference(target.getPropertyValues(),
+                                     new SinglePropertyLiteral(isReference), newName, newValue);
+        }
     }
     
     public void extendTarget(String oldName, String newName, Object newValue)

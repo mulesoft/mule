@@ -278,7 +278,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         {
             String parentNodeNamespace = getNamespace(parentNode);
             String parentNodeName = parentNode.getLocalName();
-            if (parentNode.getNodeName().equals(MULE_ROOT_ELEMENT))
+            if (isMuleRootElement(parentNode))
             {
                 break;
             }
@@ -290,6 +290,11 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         String namespace = getNamespace(element);
         String nodeName = element.getLocalName();
         return beanDefinitionFactory.hasDefinition(new ComponentIdentifier.Builder().withNamespace(namespace).withName(nodeName).build());
+    }
+
+    private boolean isMuleRootElement(Node parentNode)
+    {
+        return parentNode.getNodeName().equals(MULE_ROOT_ELEMENT) || parentNode.getNodeName().equals(MULE_DOMAIN_ROOT_ELEMENT);
     }
 
     private String getNamespace(Node parentNode)

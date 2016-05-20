@@ -81,6 +81,7 @@ public class ApplicationModel
     public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
     public static final ComponentIdentifier MULE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MULE_ROOT_ELEMENT).build();
     public static final ComponentIdentifier SPRING_PROPERTY_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName(PROPERTY_ELEMENT).build();
+    public static final ComponentIdentifier MULE_PROPERTY_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(PROPERTY_ELEMENT).build();
     public static final ComponentIdentifier ANNOTATIONS_ELEMENT_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(ANNOTATION_ELEMENT).build();
     public static final ComponentIdentifier MESSAGE_FILTER_ELEMENT_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MESSAGE_FILTER_ELEMENT).build();
     public static final ComponentIdentifier DEFAULT_ES_ELEMENT_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(DEFAULT_EXCEPTION_STRATEGY).build();
@@ -327,19 +328,21 @@ public class ApplicationModel
                 {
                     builder.addParameter(componentDefinitionModel.getNameAttribute(), componentDefinitionModel.getParameters().get("value"));
                 }
-                else
-                {
-                    builder.addChildComponentModel(componentDefinitionModel);
-                }
+                builder.addChildComponentModel(componentDefinitionModel);
             });
             ConfigLine parent = configLine.getParent();
-            if (parent != null && parent.getIdentifier().equals(MULE_ROOT_ELEMENT))
+            if (parent != null && isConfigurationTopComponent(parent))
             {
                 builder.markAsRootComponent();
             }
             models.add(builder.build());
         }
         return models;
+    }
+
+    private boolean isConfigurationTopComponent(ConfigLine parent)
+    {
+        return (parent.getIdentifier().equals(MULE_ROOT_ELEMENT) || parent.getIdentifier().equals(MULE_DOMAIN_ROOT_ELEMENT));
     }
 
     private ComponentModel innerFindComponentDefinitionModel(Element element, List<ComponentModel> componentModels)
