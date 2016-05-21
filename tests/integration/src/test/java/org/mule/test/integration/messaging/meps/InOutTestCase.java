@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -38,13 +39,14 @@ public class InOutTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("inboundEndpoint", "some data", null);
+        String listenerUrl = format("http://localhost:%s/", httpPort.getNumber());
+        MuleMessage result = client.send(listenerUrl, "some data", null);
         assertNotNull(result);
         assertEquals("foo header not received", getPayloadAsString(result));
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "bar");
-        result = client.send("inboundEndpoint", "some data", props);
+        result = client.send(listenerUrl, "some data", props);
         assertNotNull(result);
         assertEquals("foo header received", getPayloadAsString(result));
     }
