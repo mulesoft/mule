@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.config.spring.dsl.api;
 
+import static com.google.common.collect.ImmutableSet.copyOf;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.runtime.config.spring.dsl.processor.TypeDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
-import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.config.spring.dsl.processor.TypeDefinition;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Defines the mapping between a component configuration and how the object that represents
@@ -29,6 +31,7 @@ public class ComponentBuildingDefinition
     private boolean scope;
     private List<AttributeDefinition> constructorAttributeDefinition = new ArrayList<>();
     private Map<String, AttributeDefinition> setterParameterDefinitions = new HashMap<>();
+    private Set<String> ignoredConfigurationParameters = new HashSet<>();
     //TODO MULE-9638 Use generics. Generics cannot be used right now because this method colides with the ones defined in FactoryBeans.
     private Class<?> objectFactoryType;
     private boolean prototype;
@@ -70,6 +73,11 @@ public class ComponentBuildingDefinition
         return setterParameterDefinitions;
     }
 
+    public Set<String> getIgnoredConfigurationParameters()
+    {
+        return copyOf(ignoredConfigurationParameters);
+    }
+
     /**
      * @return the factory for the domain object. For complex object creations it's possible to define an object builder that will end up creating the domain object.
      */
@@ -98,11 +106,12 @@ public class ComponentBuildingDefinition
 
     /**
      * Builder for {@code ComponentBuildingDefinition}
-     *
+     * <p/>
      * TODO MULE-9693 Improve builder so the copy is not required to reuse the namespace value.
      */
     public static class Builder
     {
+
         private String namespace;
         private String identifier;
         private ComponentBuildingDefinition definition = new ComponentBuildingDefinition();
@@ -122,7 +131,7 @@ public class ComponentBuildingDefinition
         /**
          * Adds a new parameter to be added to the object by using a setter method.
          *
-         * @param fieldName the name of the field in which the value must be injected
+         * @param fieldName           the name of the field in which the value must be injected
          * @param attributeDefinition the setter parameter definition
          * @return the builder
          */
@@ -198,7 +207,22 @@ public class ComponentBuildingDefinition
         }
 
         /**
+         * Mark configuration parameters to be ignored when building the component. This is mostly useful
+         * when {@link org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder#fromUndefinedSimpleAttributes()} is used
+         * an there are certain configuration parameters that we don't want to included them.
+         *
+         * @param parameterName the configuration parameter name.
+         * @return the builder.
+         */
+        public Builder withIgnoredConfigurationParameter(String parameterName)
+        {
+            definition.ignoredConfigurationParameters.add(parameterName);
+            return this;
+        }
+
+        /**
          * Makes a deep copy of the builder so it's current configuration can be reused.
+         *
          * @return a {@code Builder} copy.
          */
         public Builder copy()
@@ -210,12 +234,13 @@ public class ComponentBuildingDefinition
             builder.namespace = this.namespace;
             builder.definition.scope = this.definition.scope;
             builder.definition.typeDefinition = this.definition.typeDefinition;
+            builder.definition.objectFactoryType = this.definition.objectFactoryType;
             return builder;
         }
 
         /**
          * Builds a {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} with the parameters set in the builder.
-         *
+         * <p/>
          * At least the identifier, namespace and type definition must be configured or this method will fail.
          *
          * @return a fully configured {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}

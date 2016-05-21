@@ -11,11 +11,15 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DEFAULT_
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_ELEMENT_SUFFIX;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MESSAGE_FILTER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
+import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.processMetadataAnnotationsHelper;
 import static org.mule.runtime.core.api.AnnotatedObject.PROPERTY_NAME;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
+import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
@@ -25,18 +29,24 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
+import org.mule.runtime.core.util.ClassUtils;
 
 import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.cglib.proxy.Callback;
 import org.springframework.cglib.proxy.Enhancer;
@@ -50,19 +60,35 @@ import org.w3c.dom.Node;
  * {@code ComponentBuildingDefinition}.
  *
  * @since 4.0
- *
+ * <p/>
  * TODO MULE-9638 set visibility to package
  */
 public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
 {
 
-    public static final String SPRING_PROTOTYPE_OBJECT = "prototype";
-
+    private static final String SPRING_PROTOTYPE_OBJECT = "prototype";
+    private static final String TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS = "org.mule.runtime.config.spring.parsers.specific.TransportElementBeanDefinitionPostProcessor";
     private static final ImmutableSet<ComponentIdentifier> MESSAGE_FILTER_WRAPPERS = new ImmutableSet.Builder<ComponentIdentifier>()
             .add(MESSAGE_FILTER_ELEMENT_IDENTIFIER)
             .add(MULE_IDENTIFIER)
             .add(DEFAULT_ES_ELEMENT_IDENTIFIER)
             .build();
+
+    private BeanDefinitionPostProcessor beanDefinitionPostProcessor;
+
+    public CommonBeanDefinitionCreator()
+    {
+        try
+        {
+            //TODO MULE-9728 - Provide a mechanism to hook per transport in the endpoint address parsing
+            this.beanDefinitionPostProcessor = (BeanDefinitionPostProcessor) ClassUtils.getClass(Thread.currentThread().getContextClassLoader(), TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS).newInstance();
+        }
+        catch (Exception e)
+        {
+            this.beanDefinitionPostProcessor = (componentModel, beanDefinition) -> {
+            };
+        }
+    }
 
     @Override
     public boolean handleRequest(CreateBeanDefinitionRequest request)
@@ -173,6 +199,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
     private void processComponentDefinitionModel(final ComponentModel parentComponentModel, final ComponentModel componentModel, ComponentBuildingDefinition componentBuildingDefinition, final BeanDefinitionBuilder beanDefinitionBuilder)
     {
         processObjectConstructionParameters(componentModel, componentBuildingDefinition, new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
+        processSpringOrMuleProperties(componentModel, beanDefinitionBuilder);
         if (componentBuildingDefinition.isPrototype())
         {
             beanDefinitionBuilder.setScope(SPRING_PROTOTYPE_OBJECT);
@@ -183,7 +210,32 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
         {
             componentModel.setType(wrappedBeanDefinition.getBeanClass());
         }
+        beanDefinitionPostProcessor.postProcess(componentModel, wrappedBeanDefinition);
         componentModel.setBeanDefinition(wrappedBeanDefinition);
+    }
+
+    //TODO MULE-9638 Remove once we don't mix spring beans with mule beans.
+    private void processSpringOrMuleProperties(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder)
+    {
+        componentModel.getInnerComponents()
+                .stream()
+                .filter(innerComponent -> {
+                    ComponentIdentifier identifier = innerComponent.getIdentifier();
+                    return identifier.equals(SPRING_PROPERTY_IDENTIFIER) || identifier.equals(MULE_PROPERTY_IDENTIFIER);
+                })
+                .forEach(propertyComponentModel -> {
+                    PropertyValue propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
+                    beanDefinitionBuilder.addPropertyValue(propertyValue.getName(), propertyValue.getValue());
+                });
+    }
+
+    public static List<PropertyValue> getPropertyValueFromPropertiesComponent(ComponentModel propertyComponentModel)
+    {
+        List<PropertyValue> propertyValues = new ArrayList<>();
+        propertyComponentModel.getInnerComponents().stream().forEach( entryComponentModel -> {
+            propertyValues.add(new PropertyValue(entryComponentModel.getParameters().get("key"), entryComponentModel.getParameters().get("value")));
+        });
+        return propertyValues;
     }
 
     private void processObjectConstructionParameters(final ComponentModel componentModel,
@@ -254,9 +306,14 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
         return !MESSAGE_FILTER_WRAPPERS.contains(parentComponentModel.getIdentifier()) && !parentComponentModel.getIdentifier().getName().endsWith(FILTER_ELEMENT_SUFFIX);
     }
 
-    static boolean areMatchingTypes(Class<?> superType, Class<?> childType)
+    public static boolean areMatchingTypes(Class<?> superType, Class<?> childType)
     {
         return superType.isAssignableFrom(childType);
+    }
+
+    public interface BeanDefinitionPostProcessor
+    {
+        void postProcess(ComponentModel componentModel, AbstractBeanDefinition beanDefinition);
     }
 
 }

@@ -133,8 +133,16 @@ public class RetryPolicyDefinitionParser extends OptionalChildDefinitionParser
 
                 // Set the AsynchronousRetryTemplate wrapper bean on the retry policy's parent instead of the retry
                 // policy itself
-                BeanDefinition parent = parserContext.getRegistry().getBeanDefinition(getParentBeanName(element));
-                parent.getPropertyValues().addPropertyValue(getPropertyName(element), new RuntimeBeanReference(asynchWrapperName));
+                //TODO MULE-9638 We can get rid of all this code once we finish migrating parsers.
+                try
+                {
+                    BeanDefinition parent = parserContext.getRegistry().getBeanDefinition(getParentBeanName(element));
+                    parent.getPropertyValues().addPropertyValue(getPropertyName(element), new RuntimeBeanReference(asynchWrapperName));
+                }
+                catch (Exception e)
+                {
+                    //Continue. This happens when the parent element is parsed with the new parsing mechanism.
+                }
             }
         }
     }

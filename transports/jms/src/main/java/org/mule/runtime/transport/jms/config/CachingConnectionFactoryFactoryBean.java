@@ -7,6 +7,7 @@
 
 package org.mule.runtime.transport.jms.config;
 
+import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.transport.jms.CustomCachingConnectionFactory;
 
 import javax.jms.ConnectionFactory;
@@ -19,7 +20,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
  * by default when a CachingConnectionFactory has not been configured explicitly.
  */
 @Deprecated
-public class CachingConnectionFactoryFactoryBean extends AbstractFactoryBean<CustomCachingConnectionFactory>
+public class CachingConnectionFactoryFactoryBean extends AbstractFactoryBean<CustomCachingConnectionFactory> implements ObjectFactory<CustomCachingConnectionFactory>
 {
 
     public static final int DEFAULT_SESSION_CACHE_SIZE = 1;

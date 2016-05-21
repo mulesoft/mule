@@ -16,10 +16,13 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.MessageProcessorWrapperObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
@@ -34,6 +37,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.schedule.SchedulerFactory;
@@ -46,6 +50,7 @@ import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.RedeliveryExceeded;
 import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
+import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.TransactionalMessageProcessor;
 import org.mule.runtime.core.routing.AggregationStrategy;
@@ -61,6 +66,7 @@ import org.mule.runtime.core.routing.WireTap;
 import org.mule.runtime.core.routing.filters.NotWildcardFilter;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
+import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
@@ -120,6 +126,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     private static final String OTHERWISE = "otherwise";
     private static final String ALL = "all";
     private static final String POLL = "poll";
+    private static final String REQUEST_REPLY = "request-reply";
 
     private ComponentBuildingDefinition.Builder baseDefinition;
     private ComponentBuildingDefinition.Builder transactionManagerBaseDefinition;
@@ -383,6 +390,15 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
+                                                 .withIdentifier(REQUEST_REPLY)
+                                                 .withTypeDefinition(fromType(SimpleAsyncRequestReplyRequester.class))
+                                                 .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition("messageSource", fromChildConfiguration(MessageSource.class).build())
+                                                 .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
+                                                 .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build())
+                                                 .build());
+
+        componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(POLL)
                                                  .withTypeDefinition(fromType(PollingMessageSource.class))
                                                  .withObjectFactoryType(PollingMessageSourceFactoryBean.class)
@@ -409,6 +425,39 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition("selectorExpression", fromSimpleParameter("selector-expression").build())
                                                  .withTypeDefinition(fromType(Watermark.class))
                                                  .withObjectFactoryType(WatermarkFactoryBean.class)
+                                                 .build());
+
+        ComponentBuildingDefinition.Builder baseReconnectDefinition = baseDefinition.copy()
+                .withTypeDefinition(fromType(RetryPolicyTemplate.class))
+                .withObjectFactoryType(RetryPolicyTemplateObjectFactory.class)
+                .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").build())
+                .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build());
+
+        componentBuildingDefinitions.add(baseReconnectDefinition.copy()
+                                                 .withIdentifier("reconnect-forever")
+                                                 .withSetterParameterDefinition("count", fromFixedValue(RETRY_COUNT_FOREVER).build())
+                                                 .build());
+        componentBuildingDefinitions.add(baseReconnectDefinition.copy()
+                                                 .withIdentifier("reconnect")
+                                                 .withSetterParameterDefinition("count", fromSimpleParameter("count").build())
+                                                 .build());
+        componentBuildingDefinitions.add(baseDefinition.copy()
+                                                 .withIdentifier("idempotent-redelivery-policy")
+                                                 .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
+                                                 .withSetterParameterDefinition("useSecureHash", fromSimpleParameter("useSecureHash").build())
+                                                 .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
+                                                 .withSetterParameterDefinition("maxRedeliveryCount", fromSimpleParameter("maxRedeliveryCount").build())
+                                                 .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
+                                                 .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
+                                                 .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build())
+                                                 .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(MessageProcessor.class).build())
+                                                 .build());
+
+        componentBuildingDefinitions.add(baseDefinition.copy()
+                                                 .withIdentifier("dead-letter-queue")
+                                                 .withTypeDefinition(fromType(MessageProcessor.class))
+                                                 .withObjectFactoryType(MessageProcessorWrapperObjectFactory.class)
+                                                 .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(MessageProcessor.class).build())
                                                  .build());
         return componentBuildingDefinitions;
     }
