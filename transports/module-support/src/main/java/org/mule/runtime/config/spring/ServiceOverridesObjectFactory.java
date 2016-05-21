@@ -6,6 +6,15 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.mule.runtime.core.api.config.MuleProperties.*;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_DISPATCHER_FACTORY;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_INBOUND_TRANSFORMER;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_MESSAGE_FACTORY;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.core.api.config.MuleProperties;
 
@@ -110,20 +119,20 @@ public class ServiceOverridesObjectFactory implements ObjectFactory<Map<String, 
     public Map<String, String> getObject() throws Exception
     {
         HashMap<String, String> overrides = new HashMap<>();
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, messageReceiver);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, transactedMessageReceiver);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS, xaTransactedMessageReceiver);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_DISPATCHER_FACTORY, dispatcherFactory);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_MESSAGE_FACTORY, messageFactory);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, inboundTransformer);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, outboundTransformer);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, responseTransformer);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_ENDPOINT_BUILDER, endpointBuilder);
-        putIfHasValue(overrides, MuleProperties.SERVICE_FINDER, serviceFinder);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_SESSION_HANDLER, sessionHandler);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS, inboundExchangePatterns);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, outboundExchangePatterns);
-        putIfHasValue(overrides, MuleProperties.CONNECTOR_DEFAULT_EXCHANGE_PATTERN, defaultExchangePattern);
+        putIfHasValue(overrides, CONNECTOR_MESSAGE_RECEIVER_CLASS, messageReceiver);
+        putIfHasValue(overrides, CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, transactedMessageReceiver);
+        putIfHasValue(overrides, CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS, xaTransactedMessageReceiver);
+        putIfHasValue(overrides, CONNECTOR_DISPATCHER_FACTORY, dispatcherFactory);
+        putIfHasValue(overrides, CONNECTOR_MESSAGE_FACTORY, messageFactory);
+        putIfHasValue(overrides, CONNECTOR_INBOUND_TRANSFORMER, inboundTransformer);
+        putIfHasValue(overrides, CONNECTOR_OUTBOUND_TRANSFORMER, outboundTransformer);
+        putIfHasValue(overrides, CONNECTOR_RESPONSE_TRANSFORMER, responseTransformer);
+        putIfHasValue(overrides, CONNECTOR_ENDPOINT_BUILDER, endpointBuilder);
+        putIfHasValue(overrides, SERVICE_FINDER, serviceFinder);
+        putIfHasValue(overrides, CONNECTOR_SESSION_HANDLER, sessionHandler);
+        putIfHasValue(overrides, CONNECTOR_INBOUND_EXCHANGE_PATTERNS, inboundExchangePatterns);
+        putIfHasValue(overrides, CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, outboundExchangePatterns);
+        putIfHasValue(overrides, CONNECTOR_DEFAULT_EXCHANGE_PATTERN, defaultExchangePattern);
         return overrides;
     }
 

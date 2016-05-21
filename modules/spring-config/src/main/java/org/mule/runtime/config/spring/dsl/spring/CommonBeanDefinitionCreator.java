@@ -313,7 +313,6 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
 
     public interface BeanDefinitionPostProcessor
     {
-
         void postProcess(ComponentModel componentModel, AbstractBeanDefinition beanDefinition);
     }
 

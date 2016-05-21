@@ -26,7 +26,7 @@ public class RetryPolicyTemplateObjectFactory implements ObjectFactory<RetryPoli
 {
 
     private boolean blocking;
-    private Integer count = SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;;
+    private Integer count = SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
     private Integer frequency = SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
     private MuleContext muleContext;
 

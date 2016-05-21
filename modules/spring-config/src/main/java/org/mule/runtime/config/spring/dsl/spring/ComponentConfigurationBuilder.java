@@ -25,6 +25,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.ManagedList;
 
 /**
@@ -36,6 +38,7 @@ import org.springframework.beans.factory.support.ManagedList;
  */
 class ComponentConfigurationBuilder
 {
+    private static final Logger logger = LoggerFactory.getLogger(ComponentConfigurationBuilder.class);
 
     private final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper;
     private final ObjectReferencePopulator objectReferencePopulator = new ObjectReferencePopulator();
@@ -103,6 +106,7 @@ class ComponentConfigurationBuilder
                     }
                     catch (ClassNotFoundException e)
                     {
+                        logger.debug("Exception trying to determine ComponentModel type: ", e);
                         beanDefinitionType = Object.class;
                     }
                 }
