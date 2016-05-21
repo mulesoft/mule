@@ -161,13 +161,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
 
     protected String detectHttpMethod(MuleMessage msg)
     {
-        String method = msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
-        // TODO
-        // if (method == null)
-        // {
-        // method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
-        // }
-        return method;
+        return msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
     }
 
     protected HttpMethod createGetMethod(MuleMessage msg, String outputEncoding) throws Exception
@@ -187,14 +181,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
             paramName = URLEncoder.encode(paramName, outputEncoding);
 
             String paramValue;
-            // TODO
-            // Boolean encode = msg.getInvocationProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE);
-            // if (encode == null)
-            // {
-            Boolean encode = msg.getOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true);
-            // }
-
-            if (encode)
+            if (msg.getOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true))
             {
                 paramValue = URLEncoder.encode(src.toString(), outputEncoding);
             }
@@ -253,8 +240,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     {
         // if a content type was specified on the endpoint, use it
         String outgoingContentType = msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
-        // TODO
-        // String outgoingContentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
         if (outgoingContentType != null)
         {
             method.setRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, outgoingContentType);
@@ -263,13 +248,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
 
     protected String getBodyParameterName(MuleMessage message)
     {
-        String bodyParameter = message.getOutboundProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
-        // TODO
-        // if (bodyParameter == null)
-        // {
-        // bodyParameter = message.getInvocationProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
-        // }
-        return bodyParameter;
+        return message.getOutboundProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
     }
 
     protected HttpMethod createPutMethod(MuleEvent event, String outputEncoding) throws Exception

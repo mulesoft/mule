@@ -2,8 +2,7 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-      xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
-      xmlns:https="http://www.mulesoft.org/schema/mule/transport/https"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
@@ -11,8 +10,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
-       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
-       http://www.mulesoft.org/schema/mule/transport/https http://www.mulesoft.org/schema/mule/transport/https/current/mule-transport-https.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
@@ -152,7 +150,7 @@
         <choice-exception-strategy>
             <rollback-exception-strategy when="#[exception.causedBy(java.io.IOException)]" maxRedeliveryAttempts="2">
                 <on-redelivery-attempts-exceeded>
-                    <custom-processor class="org.mule.runtime.transport.jms.integration.exceptions.RollbackExceptionStrategyTestCase$CallMessageProcessor"/>
+                    <custom-processor class="org.mule.test.integration.exceptions.RollbackExceptionStrategyTestCase$CallMessageProcessor"/>
                 </on-redelivery-attempts-exceeded>
             </rollback-exception-strategy>
             <catch-exception-strategy/>

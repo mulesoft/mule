@@ -3,7 +3,8 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
+      xmlns:httpt="http://www.mulesoft.org/schema/mule/transport/http"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
@@ -11,20 +12,19 @@
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
     <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
-    <http:body-to-parameter-map-transformer name="httpRequestToMapTransformer"/>
+    <httpt:body-to-parameter-map-transformer name="httpRequestToMapTransformer"/>
     
     <mulexml:jaxb-context name="myJaxb" packageNames="org.mule.test.issues"/>
 
     <flow name="aero2BtsServiceInbound">
         <http:listener path="*" config-ref="listenerConfig" />
-        <message-properties-transformer scope="session">
-            <add-message-property key="param1" value="value1"/>
-        </message-properties-transformer>
+        <set-property propertyName="param1" value="value1" />
         <vm:outbound-endpoint path="secondFlow" transformer-refs="httpRequestToMapTransformer"
                               exchange-pattern="request-response"/>
     </flow>

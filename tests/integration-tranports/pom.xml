@@ -58,6 +58,13 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.mule.transports</groupId>
+			<artifactId>mule-core-transports-tests</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.mule.tests</groupId>
 			<artifactId>mule-tests-functional</artifactId>
 			<version>${project.version}</version>

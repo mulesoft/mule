@@ -216,11 +216,6 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             {
                 contentType = DataTypeUtils.getContentType(dataType);
             }
-            // TODO
-            // else
-            // {
-            // contentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
-            // }
         }
 
         response.setStatusLine(HttpVersion.parse(version), status);
@@ -275,11 +270,6 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             else
             {
                 Object value = msg.getOutboundProperty(headerName);
-                // TODO
-                // if (value == null)
-                // {
-                // value = msg.getInvocationProperty(headerName);
-                // }
                 if (value != null)
                 {
                     response.setHeader(new Header(headerName, value.toString()));

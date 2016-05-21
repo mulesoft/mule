@@ -28,7 +28,6 @@ public class ServletTransformer extends AbstractMessageTransformer
     {
         MuleMessage message = (MuleMessage) src;
         
-        // TODO: these were invocation properties!
         message.setProperty(HttpConnector.HTTP_SERVLET_REQUEST_PROPERTY, new MuleHttpServletRequest(event), PropertyScope.INBOUND);
         message.setProperty(HttpConnector.HTTP_SERVLET_RESPONSE_PROPERTY, new MuleHttpServletResponse(event), PropertyScope.INBOUND);
         

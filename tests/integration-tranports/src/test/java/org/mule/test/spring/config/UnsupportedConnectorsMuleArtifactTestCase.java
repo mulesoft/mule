@@ -16,12 +16,13 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import junit.framework.Assert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
+import junit.framework.Assert;
 
 /**
  *
@@ -38,12 +39,17 @@ public class UnsupportedConnectorsMuleArtifactTestCase
                                   "        pollingFrequency=\"30000\" reuseAddress=\"true\" xmlns:http=\"http://www.mulesoft.org/schema/mule/transport/http\"/>");
         //HTTPS
         checkUnsupportedConnector("<https:connector name=\"httpConnector\" xmlns:https=\"http://www.mulesoft.org/schema/mule/transport/https\">\n" +
-                                  "        <https:tls-key-store path=\"~/ce/tests/integration/src/test/resources/muletest.keystore\" keyPassword=\"mulepassword\" storePassword=\"mulepassword\"/>\n" +
+                                  "        <https:tls-key-store path=\"~/ce/tests/integration/src/test/resources/muletest.keystore\" keyPassword=\"mulepassword\" storePassword=\"mulepassword\"/>\n"
+                                  +
                                   "</https:connector>");
         //JMS
-        checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost\" validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/jms\"/>");
+        // TODO MULE-9711
+        // checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost\"
+        // validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/jms\"/>");
         //VM
-        checkUnsupportedConnector("<vm:connector name=\"memory\" xmlns:vm=\"http://www.mulesoft.org/schema/mule/vm\"/>");
+        // TODO MULE-9711
+        // checkUnsupportedConnector("<vm:connector name=\"memory\"
+        // xmlns:vm=\"http://www.mulesoft.org/schema/mule/vm\"/>");
 
     }
 
@@ -73,17 +79,19 @@ public class UnsupportedConnectorsMuleArtifactTestCase
             {
                 if (s != null){
                     int connectorNameStart = s.lastIndexOf("/") + 1;
-                    s = s + "/current/mule-" + s.substring(connectorNameStart) + ".xsd";
+                    s = s + "/current/mule-transport-" + s.substring(connectorNameStart) + ".xsd";
                     return s;
                 }
                 else return null;
             }
 
+            @Override
             public Element[] getPropertyPlaceholders()
             {
                 return new Element[0];
             }
 
+            @Override
             public Map<String, String> getEnvironmentProperties()
             {
                 return null;

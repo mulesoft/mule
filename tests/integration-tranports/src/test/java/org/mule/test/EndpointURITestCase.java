@@ -31,11 +31,11 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase
     {
         EndpointUri[] uris =
         {
-            new EndpointUri("vm://#[header:INBOUND:prop1]/#[header:INBOUND:prop2]", "vm://apple/orange"),
+            new EndpointUri("vm://#[message.inboundProperties.prop1]/#[message.inboundProperties.prop2]", "vm://apple/orange"),
             new EndpointUri("vm://bucket:somefiles?query=%7B%22filename%22%3A%22foo%22%7D"),
             new EndpointUri("http://localhost:1313"),
             new EndpointUri("http://localhost:1313?${foo}", "http://localhost:1313?$[foo]"),
-            new EndpointUri("vm://#[header:INBOUND:prop1]", "vm://apple"),
+            new EndpointUri("vm://#[message.inboundProperties.prop1]", "vm://apple"),
         };
 
         for (EndpointUri uri : uris)
