@@ -6,13 +6,12 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-          http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
-          http://www.mulesoft.org/schema/mule/transport/https http://www.mulesoft.org/schema/mule/transport/https/current/mule-https.xsd
+          http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
+          http://www.mulesoft.org/schema/mule/transport/https http://www.mulesoft.org/schema/mule/transport/https/current/mule-transport-https.xsd
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="Streaming">
-        <http:inbound-endpoint address="http://localhost:${port1}/streaming" exchange-pattern="request-response"
-                               name="inStreaming"/>
+        <http:inbound-endpoint address="http://localhost:${port1}/streaming" exchange-pattern="request-response"/>
         <component>
             <singleton-object class="org.mule.runtime.transport.http.components.StreamingResponseComponent"/>
         </component>

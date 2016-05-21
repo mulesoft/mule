@@ -47,6 +47,12 @@ public class HttpContentTypeTestCase extends FunctionalTestCase
         assertContentTypeProperty(response);
     }
 
+    @Override
+    public int getTestTimeoutSecs()
+    {
+        return 100 * super.getTestTimeoutSecs();
+    }
+
     @Test
     public void sendsContentTypeOnRequest() throws Exception
     {

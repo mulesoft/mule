@@ -108,6 +108,13 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
         assertEquals("foo/bar", getPayloadAsString(result));
     }
 
+    @Override
+    public int getTestTimeoutSecs()
+    {
+        // TODO Auto-generated method stub
+        return 100 * super.getTestTimeoutSecs();
+    }
+
     public static class CopyContentTypeFromRequest implements Callable
     {
         @Override

@@ -4,7 +4,7 @@
        xmlns:https="http://www.mulesoft.org/schema/mule/transport/https"
     xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/transport/https http://www.mulesoft.org/schema/mule/transport/https/current/mule-https.xsd">
+       http://www.mulesoft.org/schema/mule/transport/https http://www.mulesoft.org/schema/mule/transport/https/current/mule-transport-https.xsd">
 
     <https:connector name="httpsConnector" clientSoTimeout="1234" cookieSpec="netscape" proxyHostname="bcd"
                      proxyPassword="cde" proxyPort="2345" proxyUsername="def" receiveBacklog="34"

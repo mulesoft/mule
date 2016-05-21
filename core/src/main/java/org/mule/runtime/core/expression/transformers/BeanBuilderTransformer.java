@@ -9,7 +9,6 @@ package org.mule.runtime.core.expression.transformers;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.expression.RequiredValueException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -101,10 +100,6 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
             try
             {
                 value = argument.evaluate(event);
-            }
-            catch (RequiredValueException e)
-            {
-                logger.warn(e.getMessage());
             }
             catch (ExpressionRuntimeException e)
             {

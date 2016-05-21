@@ -16,6 +16,7 @@ import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.transport.http.HttpConstants;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -100,11 +101,11 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
             Object httpMethod = message.getInboundProperty("http.method");
             if (HttpConstants.METHOD_GET.equals(httpMethod))
             {
-                assertEquals("/services/Echo?foo=bar", muleContext.getTransformationService().getPayloadForLogging(message));
+                assertEquals("/services/Echo?foo=bar", muleContext.getTransformationService().transform(message, DataTypeFactory.create(String.class)).getPayload());
             }
             else if (HttpConstants.METHOD_POST.equals(httpMethod))
             {
-                assertEquals("foo=bar", muleContext.getTransformationService().getPayloadForLogging(message));
+                assertEquals("foo=bar", muleContext.getTransformationService().transform(message, DataTypeFactory.create(String.class)).getPayload());
             }
             else
             {

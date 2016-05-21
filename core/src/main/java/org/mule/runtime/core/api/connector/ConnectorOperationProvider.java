@@ -39,4 +39,17 @@ public interface ConnectorOperationProvider
      */
     MessageProcessor getMessageProcessor(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern) throws MuleException;
 
+    /**
+     * Defines the priority in which different implementations of this interface will be evaluated to use by calling
+     * {@link #supportsUrl(String)}.
+     * <p>
+     * This is useful when there are many possible providers for a same protocol, in order to have certainty as to which
+     * one of the possible providers will be used.
+     * <p>
+     * instances with higher priority will be evaluated before the ones with lower priority.
+     * 
+     * @return the priority for this {@link ConnectorOperationProvider}.
+     */
+    int priority();
+
 }

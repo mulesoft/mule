@@ -9,7 +9,7 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/transport/https http://www.mulesoft.org/schema/mule/transport/https/current/mule-https.xsd
+       http://www.mulesoft.org/schema/mule/transport/https http://www.mulesoft.org/schema/mule/transport/https/current/mule-transport-https.xsd
        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <https:connector name="httpConnector">

@@ -2,14 +2,15 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
-            http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
-            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+            http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
-<!--     <configuration> -->
-<!--         TODO MULE-9720 -->
-<!--         <http:config useTransportForUris="true"/> -->
-<!--     </configuration> -->
+    <configuration>
+        <transports:config useTransportForUris="true"/>
+    </configuration>
 
     <flow name="main">
         <http:inbound-endpoint address="http://localhost:${httpPort}/testInput" exchange-pattern="request-response" method="POST"/>
@@ -23,9 +24,9 @@
         <http:inbound-endpoint address="http://localhost:${httpPort}/backend" exchange-pattern="request-response" method="POST"/>
 
         <set-variable variableName="attachment" value="#[message.inboundAttachments.get('testAttachment')]"/>
-        <set-variable variableName="attachmentName" value="#[attachment.getDataSource().getPart().getName()]"/>
-        <set-variable variableName="attachmentFileName" value="#[attachment.getDataSource().getPart().getContentDispositionFilename()]"/>
+        <set-variable variableName="attachmentName" value="#[flowVars.attachment.getDataSource().getPart().getName()]"/>
+        <set-variable variableName="attachmentFileName" value="#[flowVars.attachment.getDataSource().getPart().getContentDispositionFilename()]"/>
 
-        <set-payload value="#[attachmentName]:#[attachmentFileName]"/>
+        <set-payload value="#[flowVars.attachmentName]:#[flowVars.attachmentFileName]"/>
     </flow>
 </mule>

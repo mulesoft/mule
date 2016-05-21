@@ -50,6 +50,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
     private ExpressionLanguage expressionLanguage;
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -143,6 +144,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     {
         return parser.parse(new TemplateParser.TemplateCallback()
         {
+            @Override
             public Object match(String token)
             {
                 Object result = evaluate(token, event, failIfNull);

@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.transport.http.HttpConstants;
 import org.mule.runtime.transport.http.HttpResponse;
-import org.mule.runtime.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -115,8 +114,9 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         when(msg.getDataType()).thenReturn(objectDataType);
         when(msg.getMuleContext()).thenReturn(muleContext);
         when(muleContext.getTransformationService()).thenReturn(transformationService);
-        doReturn((OutputHandler) (event, out) -> {
-        }).when(transformationService).transform(any(MuleMessage.class), any(DataType.class));
+        doReturn(new DefaultMuleMessage((OutputHandler) (event, out) ->
+        {
+        })).when(transformationService).transform(any(MuleMessage.class), any(DataType.class));
         return msg;
     }
 

@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.api.transport.ReceiveException;
 import org.mule.runtime.core.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
+import org.mule.runtime.core.config.ConnectorConfiguration;
 import org.mule.runtime.core.endpoint.SimpleEndpointCache;
 
 import java.util.Collections;
@@ -110,5 +111,11 @@ public class ConnectorEndpointProvider extends AbstractConnectorMessageProcessor
                 }
             };
         }
+    }
+
+    @Override
+    public int priority()
+    {
+        return ConnectorConfiguration.useTransportForUris(muleContext) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
     }
 }

@@ -4,16 +4,17 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
-<!--     <configuration> -->
-<!--         TODO MULE-9720 -->
-<!--         <http:config useTransportForUris="true"/> -->
-<!--     </configuration> -->
+    <configuration>
+        <transports:config useTransportForUris="true"/>
+    </configuration>
 
     <flow name="testProperties" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources" exchange-pattern="request-response"/>

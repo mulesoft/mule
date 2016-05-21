@@ -50,4 +50,11 @@ public class FileAttachmentNameTestCase extends FunctionalTestCase
 
         assertThat(getPayloadAsString(response), equalTo("testAttachment:testAttachment.txt"));
     }
+
+    @Override
+    public int getTestTimeoutSecs()
+    {
+        // TODO Auto-generated method stub
+        return 100 * super.getTestTimeoutSecs();
+    }
 }

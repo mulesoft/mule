@@ -252,7 +252,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     private void checkForContentType(MuleMessage msg, EntityEnclosingMethod method)
     {
         // if a content type was specified on the endpoint, use it
-        String outgoingContentType = msg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        String outgoingContentType = msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
         // TODO
         // String outgoingContentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
         if (outgoingContentType != null)
@@ -449,14 +449,13 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
                 // Define Mule headers a custom headers
                 headerName = new StringBuilder(30).append("X-").append(headerName).toString();
                 httpMethod.addRequestHeader(headerName, headerValue);
-
             }
 
             else if (!HttpConstants.RESPONSE_HEADER_NAMES.containsKey(headerName)
+                     && !HttpConstants.HEADER_CONTENT_TYPE.contains(headerName)
                      && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName)
                      && !HttpConnector.HTTP_COOKIES_PROPERTY.equals(headerName))
             {
-
                 httpMethod.addRequestHeader(headerName, headerValue);
             }
         }

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.connector;
 
+import static java.util.Collections.sort;
+
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -17,7 +19,9 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Default {@link org.mule.runtime.core.api.connector.ConnectorOperationLocator} that will search
@@ -33,7 +37,10 @@ public class MuleConnectorOperationLocator implements ConnectorOperationLocator,
     @Override
     public void initialise() throws InitialisationException
     {
-        this.connectorOperationProviders = muleContext.getRegistry().lookupObjects(ConnectorOperationProvider.class);
+        final List<ConnectorOperationProvider> providers = new ArrayList<>(muleContext.getRegistry().lookupObjects(ConnectorOperationProvider.class));
+        sort(providers, ((ConnectorOperationProvider p1, ConnectorOperationProvider p2) -> p2.priority() - p1.priority()));
+
+        this.connectorOperationProviders = providers;
     }
 
     @Override

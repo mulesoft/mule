@@ -28,7 +28,6 @@ import org.mule.runtime.transport.http.CookieWrapper;
 import org.mule.runtime.transport.http.HttpConnector;
 import org.mule.runtime.transport.http.HttpConstants;
 import org.mule.runtime.transport.http.HttpResponse;
-import org.mule.runtime.transport.http.components.HttpResponseBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -267,6 +266,8 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
         when(mockMuleMessage.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE)).thenReturn("text/html");
+
+        when(mockEvent.getMessage()).thenReturn(mockMuleMessage);
 
         HttpResponse response = new HttpResponse();
         mockParse();

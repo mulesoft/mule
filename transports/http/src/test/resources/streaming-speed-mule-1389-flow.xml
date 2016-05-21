@@ -32,7 +32,7 @@
 
         <component>
             <singleton-object
-                class="org.mule.tck.functional.FunctionalStreamingTestComponent" />
+                class="org.mule.functional.functional.FunctionalStreamingTestComponent" />
         </component>
     </flow>
 

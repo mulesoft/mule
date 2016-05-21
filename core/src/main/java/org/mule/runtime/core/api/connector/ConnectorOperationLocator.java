@@ -12,8 +12,7 @@ import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
 /**
- * Locator for a MessageProcessor which is an operation from a Mule connector
- * that fulfils the operation required.
+ * Locator for a MessageProcessor which is an operation from a Mule connector that fulfills the operation required.
  */
 public interface ConnectorOperationLocator
 {

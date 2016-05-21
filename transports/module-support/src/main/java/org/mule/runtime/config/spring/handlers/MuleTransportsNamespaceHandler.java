@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.component.DefaultInterfaceBinding;
 import org.mule.runtime.core.component.DefaultJavaWithBindingComponent;
 import org.mule.runtime.core.component.PooledJavaWithBindingsComponent;
+import org.mule.runtime.core.config.ConnectorConfiguration;
 import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.routing.EndpointDlqUntilSuccessful;
@@ -79,6 +80,9 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
         SecurityFilterDefinitionParser securityFilterDefinitionParser = new SecurityFilterDefinitionParser(HttpBasicAuthenticationFilter.class);
         securityFilterDefinitionParser.addAlias("securityManager-ref", "securityManager");
         registerBeanDefinitionParser("http-security-filter", securityFilterDefinitionParser);
+
+        // HTTP
+        registerBeanDefinitionParser("config", new ChildDefinitionParser("extension", ConnectorConfiguration.class));
 
         // CXF
         MessageProcessorDefinitionParser jsParser = new MessageProcessorDefinitionParser(WebServiceMessageProcessorWithInboundEndpointBuilder.class);

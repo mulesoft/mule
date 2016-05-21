@@ -47,6 +47,7 @@ public abstract class AbstractConnectorMessageProcessorProvider implements Conne
                 .build(
                         new CacheLoader<RequestCacheKey, MessageProcessor>()
                         {
+                            @Override
                             public MessageProcessor load(RequestCacheKey cacheKey) throws MuleException
                             {
                                 return buildMessageProcessor(cacheKey);
@@ -86,5 +87,11 @@ public abstract class AbstractConnectorMessageProcessorProvider implements Conne
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+    }
+
+    @Override
+    public int priority()
+    {
+        return 0;
     }
 }

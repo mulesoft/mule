@@ -4,7 +4,7 @@
       xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd">
+        http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd">
 
     <flow name="noPath">
         <http:inbound-endpoint port="${port1}" host="localhost"/>

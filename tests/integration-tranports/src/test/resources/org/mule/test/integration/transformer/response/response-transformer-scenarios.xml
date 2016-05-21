@@ -5,18 +5,19 @@
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
-       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
-<!--     <configuration> -->
-<!--         TODO MULE-9720 -->
-<!--         <http:config useTransportForUris="true"/> -->
-<!--     </configuration> -->
+    <configuration>
+        <transports:config useTransportForUris="true"/>
+    </configuration>
 
     <jms:activemq-connector name="jmsConnector"/>
 

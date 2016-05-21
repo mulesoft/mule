@@ -36,8 +36,8 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
     @Test
     public void testSendToEach() throws Exception
     {
-        sendWithResponse("inMyComponent1", "test", "mycomponent1", 10);
-        sendWithResponse("inMyComponent2", "test", "mycomponent2", 10);
+        sendWithResponse("mycomponent1", "test", "mycomponent1", 10);
+        sendWithResponse("mycomponent2", "test", "mycomponent2", 10);
     }
 
     @Test

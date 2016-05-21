@@ -17,9 +17,11 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import java.util.Collections;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("Session properties are not supported anymore")
 public class SessionPropertiesTestCase extends FunctionalTestCase
 {
     @Rule

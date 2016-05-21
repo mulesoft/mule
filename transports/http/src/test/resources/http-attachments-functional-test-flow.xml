@@ -9,11 +9,11 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <http:connector name="httpConnector">
-        <service-overrides messageFactory="org.mule.runtime.transport.http.HttpMultipartMuleMessageFactory"/>
+        <transports:service-overrides messageFactory="org.mule.runtime.transport.http.HttpMultipartMuleMessageFactory"/>
     </http:connector>
 
     <http:endpoint name="endpoint1" host="localhost" port="${port1}"

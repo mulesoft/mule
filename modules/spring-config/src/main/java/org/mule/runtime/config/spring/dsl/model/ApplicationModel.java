@@ -10,6 +10,7 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceI
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.runtime.config.spring.dsl.processor.ApplicationConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
@@ -74,8 +75,10 @@ public class ApplicationModel
     public static final String MULE_XML_NAMESPACE = "mulexml";
     public static final String PGP_NAMESPACE = "pgp";
     public static final String XSL_NAMESPACE = "xsl";
+    public static final String TRANSPORT_NAMESPACE = "transports";
     public static final String JMS_NAMESPACE = "jms";
     public static final String VM_NAMESPACE = "vm";
+    public static final String HTTP_NAMESPACE = "http";
     public static final String BATCH_NAMESPACE = "batch";
 
     public static final ComponentIdentifier CHOICE_EXCEPTION_STRATEGY_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CHOICE_EXCEPTION_STRATEGY).build();
@@ -122,8 +125,16 @@ public class ApplicationModel
             .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("param").build())
             .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("attribute").build())
             .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("element").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(TRANSPORT_NAMESPACE).withName("inbound-endpoint").build())
             .add(new ComponentIdentifier.Builder().withNamespace(JMS_NAMESPACE).withName("inbound-endpoint").build())
             .add(new ComponentIdentifier.Builder().withNamespace(VM_NAMESPACE).withName("inbound-endpoint").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("inbound-endpoint").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("set-cookie").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("header").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("http-response-to-object-transformer").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("http-response-to-string-transformer").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("message-to-http-response-transformer").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("object-to-http-request-transformer").build())
             .add(new ComponentIdentifier.Builder().withNamespace(BATCH_NAMESPACE).withName("step").build())
             .add(new ComponentIdentifier.Builder().withNamespace(BATCH_NAMESPACE).withName("execute").build())
             .build();

@@ -4,7 +4,7 @@
       xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
-          http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
+          http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
           http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 

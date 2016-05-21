@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.transport.http.functional;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.expression.RequiredValueException;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;
@@ -67,7 +68,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
         }
         catch (Exception e)
         {
-            assertTrue(e.getCause() instanceof RequiredValueException);
+            assertThat(e.getCause(), instanceOf(ExpressionRuntimeException.class));
         }
     }
 }

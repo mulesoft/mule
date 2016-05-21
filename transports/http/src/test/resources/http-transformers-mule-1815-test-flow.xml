@@ -11,7 +11,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <http:endpoint name="base" host="localhost" port="${port1}" exchange-pattern="request-response"/>
@@ -19,9 +19,9 @@
     <http:endpoint name="ignored" address="http://localhost:${port3}" exchange-pattern="request-response"/>
     <transports:endpoint name="inbound" address="http://localhost:${port4}" exchange-pattern="request-response"/>
 
-    <custom-transformer name="appendString" class="org.mule.tck.functional.StringAppendTestTransformer"/>
+    <custom-transformer name="appendString" class="org.mule.functional.functional.StringAppendTestTransformer"/>
 
-    <custom-transformer name="appendString2" class="org.mule.tck.functional.StringAppendTestTransformer">
+    <custom-transformer name="appendString2" class="org.mule.functional.functional.StringAppendTestTransformer">
         <spring:property name="message" value=" transformed 2"/>
     </custom-transformer>
 
@@ -39,9 +39,9 @@
 
     <!-- next, the same flows but with adapted components that call getMessage() rather than getTransformedMessage() -->
     <flow name="adaptedService1">
-        <inbound-endpoint ref="adapted"/>
+        <transports:inbound-endpoint ref="adapted"/>
         <component class="org.mule.runtime.transport.http.issues.NoTransformPassThroughComponent"/>
-        <outbound-endpoint address="vm://echo2" exchange-pattern="request-response"/>
+        <transports:outbound-endpoint address="vm://echo2" exchange-pattern="request-response"/>
     </flow>
 
     <flow name="adaptedService2">
@@ -70,11 +70,11 @@
     </flow>
     
     <flow name="inboundService1">
-        <inbound-endpoint ref="inbound">
+        <transports:inbound-endpoint ref="inbound">
             <object-to-string-transformer/>
             <transformer ref="appendString"/>
-        </inbound-endpoint>
-        <outbound-endpoint address="vm://echo4" exchange-pattern="request-response"/>
+        </transports:inbound-endpoint>
+        <transports:outbound-endpoint address="vm://echo4" exchange-pattern="request-response"/>
     </flow>
 
     <flow name="inboundService2">

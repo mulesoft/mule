@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.endpoint.EndpointBuilder;
 import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.api.expression.RequiredValueException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.component.AbstractComponent;
@@ -282,14 +281,7 @@ public class RestServiceWrapper extends AbstractComponent
             if (muleContext.getExpressionManager().isExpression(exp))
             {
                 muleContext.getExpressionManager().validateExpression(exp);
-                try
-                {
-                    value = muleContext.getExpressionManager().evaluate(exp, event);
-                }
-                catch (RequiredValueException e)
-                {
-                    //ignore
-                }
+                value = muleContext.getExpressionManager().evaluate(exp, event);
             }
             else
             {

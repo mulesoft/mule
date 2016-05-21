@@ -18,6 +18,7 @@ import static org.mule.runtime.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.runtime.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.runtime.transport.http.HttpConstants.METHOD_PUT;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
@@ -26,7 +27,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.transport.http.transformers.HttpRequestBodyToParamMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -53,10 +53,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
     public void setup() throws Exception
     {
         when(muleContext.getTransformationService()).thenReturn(transformationService);
-        when(transformationService.getPayloadForLogging(any(MuleMessage.class), any(String.class))).thenAnswer
-                (inv -> ((MuleMessage) inv.getArguments()[0]).getPayload());
-        when(transformationService.getPayloadForLogging(any(MuleMessage.class))).thenAnswer
-                (inv -> (((String) ((MuleMessage) inv.getArguments()[0]).getPayload()).getBytes()));
+        when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenAnswer(inv -> (MuleMessage) inv.getArguments()[0]);
     }
 
     @Test
@@ -77,7 +74,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
     public void validPut() throws TransformerException
     {
         MuleMessage msg = createMessage(METHOD_PUT, FORM_URLENCODED_CONTENT_TYPE);
-        verifyTransformation(new DefaultMuleEvent(msg, (FlowConstruct) null));
+        verifyTransformation(transform(new DefaultMuleEvent(msg, (FlowConstruct) null)));
     }
 
     @Test(expected = TransformerException.class)

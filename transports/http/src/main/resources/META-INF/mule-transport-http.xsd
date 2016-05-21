@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/transport/http"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:httpc="http://www.mulesoft.org/schema/mule/http"
             xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
             xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
@@ -14,15 +15,12 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/tcp"
                 schemaLocation="http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/http"
+                schemaLocation="http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/transports"
                 schemaLocation="http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
                 schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.7/mule-schemadoc.xsd"/>
-
-    <!--
-    We include all the elements defined in the schema of the new HTTP connector into this namespace.
-    -->
-<!--     <xsd:include schemaLocation="http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd" /> -->
 
     <xsd:annotation>
         <xsd:documentation>The HTTP transport provides support for exposing services over HTTP and making HTTP client requests from Mule services to external services as part of service event flows. Mule supports inbound, outbound, and polling HTTP endpooints. These endpoints support all common features of the HTTP spec, such as ETag processing, cookies, and keepalive. Both HTTP 1.0 and 1.1 are supported.</xsd:documentation>
@@ -462,7 +460,8 @@
      <xsd:complexType name="headerType">
         <xsd:complexContent>
             <xsd:extension base="mule:annotatedType">
-               <xsd:attribute name="value" type="xsd:string" />
+                <xsd:attribute name="headerName" type="xsd:string" use="required"/>
+                <xsd:attribute name="value" type="xsd:string" />
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -470,7 +469,7 @@
     <xsd:complexType name="cookieType">
         <xsd:complexContent>
             <xsd:extension base="mule:annotatedType">
-                <xsd:attribute name="name" type="xsd:string" use="required">
+                <xsd:attribute name="cookieName" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Indicates the name of the cookie.It supports expressions
@@ -905,4 +904,12 @@
         </xsd:union>
     </xsd:simpleType>
 
+    <!-- From the connector -->
+    <xsd:element name="response-builder" type="httpc:globalResponseBuilderType" substitutionGroup="mule:abstract-empty-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                HTTP response
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 </xsd:schema>

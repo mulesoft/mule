@@ -6,7 +6,7 @@
       xsi:schemaLocation="
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd">
+      http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd">
 
     <description>Test session properties propagates between flows</description>
 
@@ -64,7 +64,7 @@
 
     <flow name="Flow1s1">
 
-        <http:inbound-endpoint connector-ref="httpConnector" name="Flow1s1i"
+        <http:inbound-endpoint connector-ref="httpConnector"
                                host="localhost" port="${port1}" path="Flow1s1">
         </http:inbound-endpoint>
 
@@ -74,7 +74,7 @@
 
         <component><spring-object bean="property-f1p1"/></component>
 
-        <http:outbound-endpoint name="Flow2s1o" connector-ref="httpConnector"
+        <http:outbound-endpoint connector-ref="httpConnector"
                               path="Flow2s1" exchange-pattern="request-response"
                               host="localhost" port="${port2}">
         </http:outbound-endpoint>
@@ -91,7 +91,7 @@
 
     <flow name="Flow2s1">
 
-        <http:inbound-endpoint connector-ref="httpConnector" name="Flow2s1i"
+        <http:inbound-endpoint connector-ref="httpConnector"
                                host="localhost" port="${port2}" path="Flow2s1">
         </http:inbound-endpoint>
 
@@ -103,7 +103,7 @@
 
         <component><spring-object bean="property-f1p1-f2p1"/></component>
 
-        <http:outbound-endpoint name="Flow3s1o" connector-ref="httpConnector"
+        <http:outbound-endpoint connector-ref="httpConnector"
                               path="Flow3s1" exchange-pattern="request-response"
                               host="localhost" port="${port3}">
         </http:outbound-endpoint>
@@ -114,7 +114,7 @@
 
     <flow name="Flow3s1">
 
-        <http:inbound-endpoint connector-ref="httpConnector" name="Flow3s1i"
+        <http:inbound-endpoint connector-ref="httpConnector"
                                host="localhost" port="${port3}" path="Flow3s1">
         </http:inbound-endpoint>
 
@@ -134,7 +134,7 @@
 
     <flow name="Flow1s2">
 
-        <http:inbound-endpoint connector-ref="httpConnector" name="Flow1s2i"
+        <http:inbound-endpoint connector-ref="httpConnector"
                                host="localhost" port="${port4}" path="Flow1s2">
         </http:inbound-endpoint>
 
@@ -144,7 +144,7 @@
 
         <component><spring-object bean="property-f1p1"/></component>
 
-        <http:outbound-endpoint name="Flow2s2o" connector-ref="httpConnector"
+        <http:outbound-endpoint connector-ref="httpConnector"
                               path="Flow2s2" exchange-pattern="request-response"
                               host="localhost" port="${port5}">
         </http:outbound-endpoint>
@@ -155,7 +155,7 @@
             <set-property propertyName="flow1-p2" value="flow1-p2-value"/>
 <!--         </message-properties-transformer> -->
 
-        <http:outbound-endpoint name="Flow3s2o" connector-ref="httpConnector"
+        <http:outbound-endpoint connector-ref="httpConnector"
                               path="Flow3s2" exchange-pattern="request-response"
                               host="localhost" port="${port6}">
         </http:outbound-endpoint>
@@ -166,7 +166,7 @@
 
     <flow name="Flow2s2">
 
-        <http:inbound-endpoint connector-ref="httpConnector" name="Flow2s2i"
+        <http:inbound-endpoint connector-ref="httpConnector"
                                host="localhost" port="${port5}" path="Flow2s2">
         </http:inbound-endpoint>
 
@@ -182,7 +182,7 @@
 
     <flow name="Flow3s2">
 
-        <http:inbound-endpoint connector-ref="httpConnector" name="Flow3s2i"
+        <http:inbound-endpoint connector-ref="httpConnector"
                                host="localhost" port="${port6}" path="Flow3s2">
         </http:inbound-endpoint>
 

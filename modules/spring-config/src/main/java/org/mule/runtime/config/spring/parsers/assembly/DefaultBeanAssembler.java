@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.spring.parsers.assembly;
 
-import org.mule.runtime.core.api.AnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
@@ -17,6 +15,8 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.SinglePrope
 import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
+import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.MapCombiner;
 
@@ -63,6 +63,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         this.target = target;
     }
 
+    @Override
     public BeanDefinitionBuilder getBean()
     {
         return bean;
@@ -73,6 +74,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         this.bean = bean;
     }
 
+    @Override
     public BeanDefinition getTarget()
     {
         return target;
@@ -99,6 +101,7 @@ public class DefaultBeanAssembler implements BeanAssembler
      * (see {@link org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration})
      * @param attribute The attribute to add
      */
+    @Override
     public void extendBean(Attr attribute)
     {
         AbstractBeanDefinition beanDefinition = bean.getBeanDefinition();
@@ -182,6 +185,7 @@ public class DefaultBeanAssembler implements BeanAssembler
      * @param newValue The property value to add
      * @param isReference If true, a bean reference is added (and newValue must be a String)
      */
+    @Override
     public void extendBean(String newName, Object newValue, boolean isReference)
     {
         addPropertyWithReference(bean.getBeanDefinition().getPropertyValues(),
@@ -194,6 +198,7 @@ public class DefaultBeanAssembler implements BeanAssembler
      * <p>This is unusual.  Normally you want {@link #extendBean(org.w3c.dom.Attr)}.
      * @param attribute The attribute to add
      */
+    @Override
     public void extendTarget(Attr attribute)
     {
         String oldName = SpringXMLUtils.attributeName(attribute);
@@ -211,6 +216,7 @@ public class DefaultBeanAssembler implements BeanAssembler
      * @param newValue The property value to add
      * @param isReference If true, a bean reference is added (and newValue must be a String)
      */
+    @Override
     public void extendTarget(String newName, Object newValue, boolean isReference)
     {
         //TODO MULE-9638 We can get rid of all this code once we finish migrating parsers.
@@ -221,6 +227,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         }
     }
     
+    @Override
     public void extendTarget(String oldName, String newName, Object newValue)
     {
         assertTargetPresent();
@@ -235,6 +242,7 @@ public class DefaultBeanAssembler implements BeanAssembler
      * 
      * @param oldName The identifying the bean (typically element name).
      */
+    @Override
     public void insertBeanInTarget(String oldName)
     {
         if (target == null)
@@ -319,6 +327,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         }
     }
     
+    @Override
     public void insertSingletonBeanInTarget(String propertyName, String singletonName)
     {
         if (target == null)
@@ -411,6 +420,7 @@ public class DefaultBeanAssembler implements BeanAssembler
      * what is ignored, a map, a list, etc) have already been made.   All it does (apart from a
      * direct copy) is merge collections with those on the target when necessary.
      */
+    @Override
     public void copyBeanToTarget()
     {
         if (target == null)
@@ -430,6 +440,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         }
     }
 
+    @Override
     public void setBeanFlag(String flag)
     {
         MuleHierarchicalBeanDefinitionParserDelegate.setFlag(bean.getRawBeanDefinition(), flag);

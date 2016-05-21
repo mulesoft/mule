@@ -7,8 +7,7 @@
 package org.mule.runtime.transport.http.config;
 
 
-import org.mule.runtime.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.runtime.config.spring.factories.OutboundEndpointFactoryBean;
+import org.mule.runtime.config.spring.handlers.AbstractMuleTransportsNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitionParser;
@@ -23,10 +22,6 @@ import org.mule.runtime.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
-import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.endpoint.URIBuilder;
 import org.mule.runtime.transport.http.CacheControlHeader;
 import org.mule.runtime.transport.http.CookieWrapper;
@@ -54,7 +49,7 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
  * This namespace handler now extends HttpNamespaceHandler from mule-module-http so that both projects can
  * register bean definition parsers for the same namespace (http).
  */
-public class HttpNamespaceHandler extends org.mule.runtime.module.http.internal.config.HttpNamespaceHandler
+public class HttpNamespaceHandler extends AbstractMuleTransportsNamespaceHandler
 {
     public static final String HTTP_TRANSPORT_DEPRECATION_MESSAGE = "HTTP transport is deprecated and will be removed in Mule 4.0. Use HTTP module instead.";
 
@@ -90,13 +85,12 @@ public class HttpNamespaceHandler extends org.mule.runtime.module.http.internal.
         registerDeprecatedBeanDefinitionParser("error-response-builder", new HttpResponseBuilderDefinitionParser("errorResponseBuilder"));
 
         registerDeprecatedMuleBeanDefinitionParser("header", new HttpHeaderDefinitionParser()).addCollection("headers");
-        registerDeprecatedMuleBeanDefinitionParser("set-cookie", new HttpCookiesDefinitionParser("cookie", CookieWrapper.class)).registerPreProcessor(new CheckExclusiveAttributes(new String[][] {new String[] {"maxAge"}, new String[] {"expiryDate"}}));
+        registerDeprecatedMuleBeanDefinitionParser("set-cookie", new HttpCookiesDefinitionParser("cookie", CookieWrapper.class)).registerPreProcessor(
+                new CheckExclusiveAttributes(new String[][] {new String[] {"maxAge"}, new String[] {"expiryDate"}}));
         registerDeprecatedMuleBeanDefinitionParser("body", new TextDefinitionParser("body"));
         registerDeprecatedMuleBeanDefinitionParser("location", new HttpResponseDefinitionParser("header"));
         registerDeprecatedMuleBeanDefinitionParser("cache-control", new ChildDefinitionParser("cacheControl", CacheControlHeader.class));
         registerDeprecatedMuleBeanDefinitionParser("expires", new HttpResponseDefinitionParser("header"));
-
-        super.init();
     }
 
     protected void registerDeprecatedBeanDefinitionParser(String elementName, BeanDefinitionParser parser)
@@ -113,45 +107,4 @@ public class HttpNamespaceHandler extends org.mule.runtime.module.http.internal.
     {
         return registerDeprecatedConnectorDefinitionParser(connectorClass, HTTP_TRANSPORT_DEPRECATION_MESSAGE);
     }
-
-    @Override
-    protected MuleDefinitionParserConfiguration registerStandardTransportEndpoints(String protocol, String[] requiredAttributes)
-    {
-        return new TransportRegisteredMdps(protocol, AddressedEndpointDefinitionParser.PROTOCOL, requiredAttributes);
-    }
-
-    @Override
-    protected MuleDefinitionParserConfiguration registerMetaTransportEndpoints(String protocol)
-    {
-        return new TransportRegisteredMdps(protocol, AddressedEndpointDefinitionParser.META, new String[] {});
-    }
-
-    protected Class getInboundEndpointFactoryBeanClass()
-    {
-        return InboundEndpointFactoryBean.class;
-    }
-
-    protected Class getOutboundEndpointFactoryBeanClass()
-    {
-        return OutboundEndpointFactoryBean.class;
-    }
-
-    protected Class getGlobalEndpointBuilderBeanClass()
-    {
-        return EndpointURIEndpointBuilder.class;
-    }
-
-    protected class TransportRegisteredMdps extends RegisteredMdps
-    {
-        public TransportRegisteredMdps(String protocol, boolean isMeta, String[] requiredAttributes)
-        {
-            registerBeanDefinitionParser("endpoint",
-                    add(new TransportGlobalEndpointDefinitionParser(protocol, isMeta, getGlobalEndpointBuilderBeanClass(), requiredAttributes, new String[] {})));
-            registerBeanDefinitionParser("inbound-endpoint",
-                    add(new TransportEndpointDefinitionParser(protocol, isMeta, getInboundEndpointFactoryBeanClass(), requiredAttributes, new String[] {})));
-            registerBeanDefinitionParser("outbound-endpoint",
-                    add(new TransportEndpointDefinitionParser(protocol, isMeta, getOutboundEndpointFactoryBeanClass(), requiredAttributes, new String[] {})));
-        }
-    }
-
 }

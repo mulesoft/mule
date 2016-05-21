@@ -13,7 +13,7 @@
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/transport/http"
-                schemaLocation="http://www.mulesoft.org/schema/mule/transport/http/current/mule-http.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/transports"
                 schemaLocation="http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"

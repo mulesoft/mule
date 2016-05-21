@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.transport.Connector;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.connector.EndpointConnectException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.transport.http.i18n.HttpMessages;
 
@@ -50,7 +51,7 @@ public class OldHttpsMessageReceiver extends OldHttpMessageReceiver
         String keyStore = httpsConnector.getKeyStore();
         if (StringUtils.isBlank(keyStore))
         {
-            throw new ConnectException(CoreMessages.objectIsNull("tls-key-store"), this);
+            throw new EndpointConnectException(CoreMessages.objectIsNull("tls-key-store"), this);
         }
     }
 

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.endpoint.InboundEndpoint;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.transport.http.HttpConstants;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -47,7 +48,7 @@ public class Http10FunctionalTestCase extends FunctionalTestCase
     public void testHttp10EnforceNonChunking() throws Exception
     {
         HttpClient client = setupHttpClient();
-        GetMethod request = new GetMethod(((InboundEndpoint) muleContext.getRegistry().lookupObject("inStreaming")).getAddress());
+        GetMethod request = new GetMethod(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("Streaming")).getMessageSource()).getAddress());
         client.executeMethod(request);
         assertEquals("hello", request.getResponseBodyAsString());
 
