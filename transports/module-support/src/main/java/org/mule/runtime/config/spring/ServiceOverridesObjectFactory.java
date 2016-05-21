@@ -6,17 +6,21 @@
  */
 package org.mule.runtime.config.spring;
 
-import static org.mule.runtime.core.api.config.MuleProperties.*;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_DEFAULT_EXCHANGE_PATTERN;
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_DISPATCHER_FACTORY;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_ENDPOINT_BUILDER;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS;
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_INBOUND_TRANSFORMER;
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_MESSAGE_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS;
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER;
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER;
+import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_SESSION_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS;
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS;
+import static org.mule.runtime.core.api.config.MuleProperties.SERVICE_FINDER;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
-import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.util.HashMap;
 import java.util.Map;
