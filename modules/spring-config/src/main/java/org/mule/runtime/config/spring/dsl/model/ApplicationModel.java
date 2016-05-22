@@ -126,6 +126,7 @@ public class ApplicationModel
             .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("attribute").build())
             .add(new ComponentIdentifier.Builder().withNamespace(XSL_NAMESPACE).withName("element").build())
             .add(new ComponentIdentifier.Builder().withNamespace(TRANSPORT_NAMESPACE).withName("inbound-endpoint").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(TRANSPORT_NAMESPACE).withName("outbound-endpoint").build())
             .add(new ComponentIdentifier.Builder().withNamespace(JMS_NAMESPACE).withName("inbound-endpoint").build())
             .add(new ComponentIdentifier.Builder().withNamespace(VM_NAMESPACE).withName("inbound-endpoint").build())
             .add(new ComponentIdentifier.Builder().withNamespace(HTTP_NAMESPACE).withName("inbound-endpoint").build())
