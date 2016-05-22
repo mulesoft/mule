@@ -60,58 +60,9 @@ public class WSConsumerConfig implements MuleContextAware
         }
 
         // MULE-9694 Reintroduce endpoint lookup capabilites for http and ws modules
-        // if (useHttpModule())
-        // {
         return createHttpRequester();
-        // }
-        // else
-        // {
-        // return createOutboundEndpoint();
-        // }
     }
 
-    // MULE-9694 Reintroduce endpoint lookup capabilites for http and ws modules
-    // private boolean useHttpModule()
-    // {
-    // if (connectorConfig != null)
-    // {
-    // return true;
-    // }
-    // if (!isHttp())
-    // {
-    // return false;
-    // }
-    // if (connector != null)
-    // {
-    // return false;
-    // }
-    // if (HttpConfiguration.useTransportForUris(muleContext))
-    // {
-    // return false;
-    // }
-    // return true;
-    // }
-
-    // MULE-9694 Reintroduce endpoint lookup capabilites for http and ws modules
-    // private OutboundEndpoint createOutboundEndpoint() throws MuleException
-    // {
-    // EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(serviceAddress);
-    //
-    // if (connector != null)
-    // {
-    // String protocol = new MuleEndpointURI(serviceAddress, muleContext).getScheme();
-    // if (!connector.supportsProtocol(protocol))
-    // {
-    // throw new IllegalStateException(String.format("Connector %s does not support protocol: %s", connector.getName(),
-    // protocol));
-    // }
-    //
-    // builder.setConnector(connector);
-    // }
-    //
-    // return muleContext.getEndpointFactory().getOutboundEndpoint(builder);
-    // }
-    //
     private MessageProcessor createHttpRequester() throws MuleException
     {
         return new MessageProcessor()
