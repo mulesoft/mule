@@ -75,6 +75,10 @@
             </includes>
         </fileSet>
 
+        <fileSet>
+            <directory>${project.build.directory}/app-plugins</directory>
+            <outputDirectory>lib/app-plugins</outputDirectory>
+        </fileSet>
     </fileSets>
 
     <!--
@@ -153,7 +157,6 @@
                 <include>org.mule.modules:mule-module-sockets</include>
                 <include>org.mule.modules:mule-module-tls</include>
                 <include>org.mule.modules:mule-module-tomcat</include>
-                <include>org.mule.modules:mule-module-validation</include>
                 <include>org.mule.modules:mule-module-ws</include>
                 <include>org.mule.modules:mule-module-xml</include>
 
@@ -219,10 +222,12 @@
                 <exclude>org.mule.modules:mule-module-sockets</exclude>
                 <exclude>org.mule.modules:mule-module-tls</exclude>
                 <exclude>org.mule.modules:mule-module-tomcat</exclude>
-                <exclude>org.mule.modules:mule-module-validation</exclude>
                 <exclude>org.mule.modules:mule-module-ws</exclude>
                 <exclude>org.mule.modules:mule-module-xml</exclude>
                 <exclude>org.mule.tools:mule-tools-anttasks</exclude>
+
+                <!-- lib/app-plugins (these artifacts are zip type) -->
+                <exclude>*:zip:*</exclude>
 
                 <!-- mule-tests-functional dependencies -->
                 <exclude>org.apache.ftpserver:ftpserver-core</exclude>

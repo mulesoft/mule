@@ -111,7 +111,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
             final String pluginName = StringUtils.removeEnd(pluginZip, ".zip");
             // must unpack as there's no straightforward way for a ClassLoader to use a jar within another jar/zip
             final File tmpDir = new File(MuleContainerBootstrapUtils.getMuleTmpDir(),
-                                         appDescriptor.getName() + "/plugins/" + pluginName);
+                                         appDescriptor.getName() + File.separator + MuleFoldersUtil.PLUGINS_FOLDER + File.separator + pluginName);
             FileUtils.unzip(new File(pluginsDir, pluginZip), tmpDir);
             final ApplicationPluginDescriptor pd = pluginDescriptorFactory.create(tmpDir);
 

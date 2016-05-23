@@ -32,6 +32,8 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.CONTAINER_APP_PLUGINS;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
@@ -160,6 +162,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     protected File muleHome;
     protected File appsDir;
     protected File domainsDir;
+    protected File containerAppPluginsDir;
+    protected File tmpAppsDir;
     protected MuleDeploymentService deploymentService;
     protected DeploymentListener applicationDeploymentListener;
     protected DeploymentListener domainDeploymentListener;
@@ -179,6 +183,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         muleHome = new File(new File(tmpDir, "mule home"), getClass().getSimpleName() + System.currentTimeMillis());
         appsDir = new File(muleHome, "apps");
         appsDir.mkdirs();
+        containerAppPluginsDir = new File(muleHome, "lib/" + CONTAINER_APP_PLUGINS);
+        containerAppPluginsDir.mkdirs();
+        tmpAppsDir = new File(muleHome, "tmp");
+        tmpAppsDir.mkdirs();
         domainsDir = new File(muleHome, "domains");
         domainsDir.mkdirs();
         System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, muleHome.getCanonicalPath());
@@ -1287,6 +1295,78 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(applicationDeploymentListener, echoPluginAppFileBuilder.getId());
     }
+
+    @Test
+    public void deploysAppZipWithContainerPluginBroken() throws Exception
+    {
+        ApplicationPluginFileBuilder echoPluginBroken = new ApplicationPluginFileBuilder("echoPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar").corrupted();
+
+        copyFile(echoPluginBroken.getArtifactFile(), new File(containerAppPluginsDir, echoPluginBroken.getId() + ".zip"));
+
+        final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("my-app.zip", emptyAppFileBuilder).containingPlugin(echoPluginWithLib1);
+        addPackedAppFromBuilder(applicationFileBuilder);
+
+        deploymentService.start();
+
+        assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
+    }
+
+    @Test
+    public void deploysAppZipWithPluginAlreadyInContainerPlugins() throws Exception
+    {
+        copyFile(echoPlugin.getArtifactFile(), new File(containerAppPluginsDir, echoPlugin.getId() + ".zip"));
+        // Just an non-zip file to validate that it is only looking for zip files
+        copyFile(echoPlugin.getArtifactFile(), new File(containerAppPluginsDir, ".DS_Store"));
+
+        final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("my-app.zip", emptyAppFileBuilder).containingPlugin(echoPlugin);
+        addPackedAppFromBuilder(applicationFileBuilder);
+
+        deploymentService.start();
+
+        assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
+    }
+
+    @Test
+    public void deploysAppZipWithPluginShouldIncludedBundledPluginsFromContainer() throws Exception
+    {
+        copyFile(echoPlugin.getArtifactFile(), new File(containerAppPluginsDir, echoPlugin.getId() + ".zip"));
+
+        final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml").containingPlugin(echoPluginWithLib1);
+        addPackedAppFromBuilder(applicationFileBuilder);
+
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+        assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
+        assertAppExplodedPluginsDir(applicationFileBuilder.getDeployedPath(), new String[] {echoPlugin.getDeployedPath(), echoPluginWithLib1.getDeployedPath()});
+    }
+
+    @Test
+    public void redeploysAppZipIncludingBundledPluginsDeployedAfterStartup() throws Exception
+    {
+        copyFile(echoPlugin.getArtifactFile(), new File(containerAppPluginsDir, echoPlugin.getId() + ".zip"));
+
+        addPackedAppFromBuilder(emptyAppFileBuilder);
+
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+        assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+        assertAppExplodedPluginsDir(emptyAppFileBuilder.getDeployedPath(), new String[] {echoPlugin.getDeployedPath()});
+
+        reset(applicationDeploymentListener);
+
+        addPackedAppFromBuilder(emptyAppFileBuilder);
+
+        assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+        assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+        assertAppExplodedPluginsDir(emptyAppFileBuilder.getDeployedPath(), new String[] {echoPlugin.getDeployedPath()});
+    }
+
 
     @Test
     public void deploysAppWithPluginSharedLibrary() throws Exception
@@ -2964,6 +3044,15 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private void assertAppsDir(String[] expectedZips, String[] expectedApps, boolean performValidation)
     {
         assertArtifactDir(appsDir, expectedZips, expectedApps, performValidation);
+    }
+
+    private void assertAppExplodedPluginsDir(String appDeployedPath, String[] expectedPlugins)
+    {
+        File tmpAppFolder = new File(tmpAppsDir, appDeployedPath);
+        assertTrue("tmp folder for application doesn't exist or is not a directory", tmpAppFolder.exists() && tmpAppFolder.isDirectory());
+        final String[] actualArtifacts = new File(tmpAppFolder, PLUGINS_FOLDER).list(DirectoryFileFilter.DIRECTORY);
+        assertTrue("Invalid Mule plugins exploded for artifact",
+                   CollectionUtils.isEqualCollection(Arrays.asList(expectedPlugins), Arrays.asList(actualArtifacts)));
     }
 
     private void assertDomainDir(String[] expectedZips, String[] expectedDomains, boolean performValidation)

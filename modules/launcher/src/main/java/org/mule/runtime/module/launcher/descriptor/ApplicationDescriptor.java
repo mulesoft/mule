@@ -1,4 +1,5 @@
 /*
+/*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -6,10 +7,11 @@
  */
 package org.mule.runtime.module.launcher.descriptor;
 
-import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
+import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
+import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 
 import java.io.File;
 import java.net.URL;
@@ -149,6 +151,11 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor
     public void setPlugins(Set<ApplicationPluginDescriptor> plugins)
     {
         this.plugins = plugins;
+    }
+
+    public boolean containsApplicationPlugin(final String pluginName)
+    {
+        return CollectionUtils.find(this.plugins, object -> ((ApplicationPluginDescriptor) object).getName().equals(pluginName)) != null;
     }
 
 }
