@@ -106,4 +106,14 @@
                 cookBook="global-cookbook"
         />
     </flow>
+
+
+    <flow name="sourceWithParameterMapping" initialState="stopped">
+        <subtypes:subtypes-source>
+            <subtypes:door-param>
+                <subtypes:house-door isLocked="false"/>
+            </subtypes:door-param>
+        </subtypes:subtypes-source>
+        <set-payload value="100"/>
+    </flow>
 </mule>

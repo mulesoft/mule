@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Extension(name = "SubtypesConnector", description = "Test connector for pojo subtype mapping")
 @Operations(TestOperationsWithSubTypeMapping.class)
+@Sources(SubtypesSource.class)
 @Providers(SubTypesConnectionProvider.class)
 @SubTypeMapping(baseType = ParentShape.class, subTypes = {Square.class, Triangle.class})
 @SubTypeMapping(baseType = Door.class, subTypes = {HouseDoor.class, CarDoor.class})
