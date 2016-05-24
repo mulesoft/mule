@@ -83,14 +83,16 @@ final class SourceWrapper extends Source implements Lifecycle, FlowConstructAwar
         {
             ((FlowConstructAware) delegate).setFlowConstruct(flowConstruct);
         }
+
+        setConfiguration(sourceContext.getConfigurationInstance());
+        setConnection(sourceContext);
+
         initialiseIfNeeded(delegate, true, muleContext);
     }
 
     @Override
     public void start() throws MuleException
     {
-        setConfiguration(sourceContext.getConfigurationInstance());
-        setConnection(sourceContext);
 
         try
         {
