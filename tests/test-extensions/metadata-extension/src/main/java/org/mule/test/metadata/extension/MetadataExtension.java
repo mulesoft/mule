@@ -8,11 +8,13 @@ package org.mule.test.metadata.extension;
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.shapes.Circle;
@@ -34,5 +36,21 @@ import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWit
         outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
 public class MetadataExtension
 {
+    @Parameter
+    @Optional(defaultValue = "noExpression")
+    private String data;
 
+    public String getData()
+    {
+        return data;
+    }
+
+    @Parameter
+    @Optional(defaultValue = "#['defaultString']")
+    private String dataWithDefault;
+
+    public String getDataWithDefault()
+    {
+        return dataWithDefault;
+    }
 }

@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConnectionProviderFactory;
@@ -35,17 +36,25 @@ public final class ImplicitConnectionProviderValueResolver implements ValueResol
 
     public ImplicitConnectionProviderValueResolver(String name, RuntimeConfigurationModel configurationModel)
     {
-        delegate = event -> {
-            synchronized (this)
-            {
-                if (connectionProvider == null)
+        if (getAllConnectionProviders(configurationModel).isEmpty())
+        {
+            // No connection provider to resolve
+            delegate = nextEvent -> null;
+        }
+        else
+        {
+            delegate = event -> {
+                synchronized (this)
                 {
-                    connectionProvider = new DefaultImplicitConnectionProviderFactory().createImplicitConnectionProvider(name, configurationModel, event);
-                    delegate = nextEvent -> connectionProvider;
+                    if (connectionProvider == null)
+                    {
+                        connectionProvider = new DefaultImplicitConnectionProviderFactory().createImplicitConnectionProvider(name, configurationModel, event);
+                        delegate = nextEvent -> connectionProvider;
+                    }
+                    return connectionProvider;
                 }
-                return connectionProvider;
-            }
-        };
+            };
+        }
     }
 
     @Override

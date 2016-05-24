@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.metadata.ComponentId;
@@ -119,7 +120,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
     public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId, MetadataKey key)
     {
         return exceptionHandledMetadataFetch(componentId, processor -> processor.getMetadata(key),
-                                             String.format(EXCEPTION_RESOLVING_COMPONENT_METADATA, componentId));
+                                             format(EXCEPTION_RESOLVING_COMPONENT_METADATA, componentId));
     }
 
     /**
@@ -129,7 +130,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
     public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId)
     {
         return exceptionHandledMetadataFetch(componentId, MetadataAware::getMetadata,
-                                             String.format(EXCEPTION_RESOLVING_COMPONENT_METADATA, componentId));
+                                             format(EXCEPTION_RESOLVING_COMPONENT_METADATA, componentId));
     }
 
     /**
@@ -170,7 +171,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
         }
         catch (Exception e)
         {
-            return MetadataResult.failure(null, failureMessage, e);
+            return MetadataResult.failure(null, format("%s: %s", failureMessage, e.getMessage()), e);
         }
     }
 
@@ -180,7 +181,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
         Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(componentId.getFlowName());
         if (flow == null)
         {
-            throw new InvalidComponentIdException(createStaticMessage(String.format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())));
+            throw new InvalidComponentIdException(createStaticMessage(format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())));
         }
         try
         {
@@ -192,7 +193,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
                 }
                 catch (IndexOutOfBoundsException | NumberFormatException e)
                 {
-                    throw new InvalidComponentIdException(createStaticMessage(String.format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())), e);
+                    throw new InvalidComponentIdException(createStaticMessage(format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())), e);
                 }
             }
             else

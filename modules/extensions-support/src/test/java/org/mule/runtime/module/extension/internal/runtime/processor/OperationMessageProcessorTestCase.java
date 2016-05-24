@@ -214,6 +214,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
         when(extensionManager.getConfiguration(anyString(), anyObject())).thenReturn(configurationInstance);
         when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);
+        when(configurationProvider.get(anyObject())).thenReturn(configurationInstance);
         when(extensionManager.getConfigurationProvider(extensionModel)).thenReturn(Optional.of(configurationProvider));
         when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(Optional.of(configurationProvider));
 

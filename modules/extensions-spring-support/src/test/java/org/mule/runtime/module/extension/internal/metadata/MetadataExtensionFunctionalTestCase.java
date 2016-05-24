@@ -32,8 +32,6 @@ import org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -43,6 +41,12 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
 {
 
     protected static final String FIRST_PROCESSOR_INDEX = "0";
+
+    protected static final String METADATA_TEST = "metadata-tests.xml";
+
+    protected static final String METADATA_TEST_STATIC_NO_REF_CONFIGURATION = "metadata-tests-static-no-ref-configuration.xml";
+    protected static final String METADATA_TEST_DYNAMIC_NO_REF_CONFIGURATION = "metadata-tests-dynamic-no-ref-configuration.xml";
+    protected static final String METADATA_TEST_DYNAMIC_IMPLICIT_CONFIGURATION = "metadata-tests-dynamic-implicit-configuration.xml";
 
     protected static final String CONTENT_METADATA_WITH_KEY_ID = "contentMetadataWithKeyId";
     protected static final String OUTPUT_METADATA_WITH_KEY_ID = "outputMetadataWithKeyId";
@@ -65,7 +69,8 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS = "shouldInheritOperationParentResolvers";
     protected static final String SIMPLE_MULTILEVEL_KEY_RESOLVER = "simpleMultiLevelKeyResolver";
     protected static final String TYPE_WITH_DECLARED_SUBTYPES_METADATA = "typeWithDeclaredSubtypesMetadata";
-
+    protected static final String RESOLVER_WITH_DYNAMIC_CONFIG = "resolverWithDynamicConfig";
+    protected static final String RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG = "resolverWithImplicitDynamicConfig";
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
     protected MetadataType personType;
@@ -76,20 +81,10 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected MetadataManager metadataManager;
     protected ClassTypeLoader typeLoader;
 
-    protected static final List<MetadataKey> METADATA_KEYS = new MetadataConnection().getEntities().stream()
-            .map(e -> MetadataKeyBuilder.newKey(e).build())
-            .collect(Collectors.toList());
-
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
     {
         return new Class<?>[] {MetadataExtension.class};
-    }
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "metadata-tests.xml";
     }
 
     @Before
@@ -116,7 +111,6 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     {
         MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId, key);
         assertThat(componentMetadata.isSuccess(), is(true));
-
         return componentMetadata.get();
     }
 
@@ -132,7 +126,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     {
         assertThat(result.isSuccess(), is(false));
         MetadataFailure metadataFailure = result.getFailure().get();
-        assertThat(metadataFailure.getFailureCode(), is(failureCode));
+        assertThat(metadataFailure.getMessage(), metadataFailure.getFailureCode(), is(failureCode));
 
         if (!StringUtils.isBlank(msgContains))
         {
