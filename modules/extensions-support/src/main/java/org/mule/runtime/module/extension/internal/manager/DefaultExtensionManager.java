@@ -145,7 +145,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         final DefaultDescribingContext context = new DefaultDescribingContext(classLoader);
 
         RuntimeExtensionModel extensionModel = withContextClassLoader(classLoader, () ->
-                extensionFactory.createFrom(describer.describe(context)));
+                extensionFactory.createFrom(describer.describe(context), context));
 
         registerExtension(extensionModel);
     }

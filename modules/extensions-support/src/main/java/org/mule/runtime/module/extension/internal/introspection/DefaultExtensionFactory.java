@@ -46,16 +46,15 @@ import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.Interceptor;
 import org.mule.runtime.extension.api.runtime.OperationExecutorFactory;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.introspection.validation.SubtypesModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.MetadataComponentModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.NameClashModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.OperationReturnTypeModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ParameterModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.SubtypesModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.TargetParameterModelValidator;
 import org.mule.runtime.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
 
@@ -111,9 +110,10 @@ public final class DefaultExtensionFactory implements ExtensionFactory
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public RuntimeExtensionModel createFrom(ExtensionDeclarer declarer)
     {
-        return createFrom(declarer, new DefaultDescribingContext(declarer, getClass().getClassLoader()));
+        throw new UnsupportedOperationException("A describingContext has to be provided with the correct classloader, use createFrom method that receives a describingContext instead");
     }
 
     /**
