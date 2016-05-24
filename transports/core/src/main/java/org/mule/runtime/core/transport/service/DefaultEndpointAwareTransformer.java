@@ -23,9 +23,9 @@ import org.mule.runtime.core.transformer.TransformerChain;
 
 import java.util.List;
 
-public final class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
+public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
 {
-    private final Transformer transformer;
+    protected final Transformer transformer;
     private ImmutableEndpoint endpoint;
     private String defaultEncoding;
 

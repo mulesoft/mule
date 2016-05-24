@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.client.AbstractPriorizableConnectorMessageProcessorProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,9 +39,21 @@ public class MuleConnectorOperationLocator implements ConnectorOperationLocator,
     public void initialise() throws InitialisationException
     {
         final List<ConnectorOperationProvider> providers = new ArrayList<>(muleContext.getRegistry().lookupObjects(ConnectorOperationProvider.class));
-        sort(providers, ((ConnectorOperationProvider p1, ConnectorOperationProvider p2) -> p2.priority() - p1.priority()));
+        sort(providers, ((ConnectorOperationProvider p1, ConnectorOperationProvider p2) -> priority(p2) - priority(p1)));
 
         this.connectorOperationProviders = providers;
+    }
+
+    private int priority(ConnectorOperationProvider provider)
+    {
+        if (provider instanceof AbstractPriorizableConnectorMessageProcessorProvider)
+        {
+            return ((AbstractPriorizableConnectorMessageProcessorProvider) provider).priority();
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     @Override

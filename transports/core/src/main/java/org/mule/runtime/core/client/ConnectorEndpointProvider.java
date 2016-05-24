@@ -13,7 +13,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.AbstractConnectorMessageProcessorProvider;
 import org.mule.runtime.core.api.client.LocalMuleClient;
 import org.mule.runtime.core.api.client.RequestCacheKey;
 import org.mule.runtime.core.api.endpoint.EndpointCache;
@@ -33,7 +32,7 @@ import java.util.Set;
 /**
  * Provides transports support to {@link LocalMuleClient}.
  */
-public class ConnectorEndpointProvider extends AbstractConnectorMessageProcessorProvider
+public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessageProcessorProvider
 {
 
     private EndpointCache endpointCache;

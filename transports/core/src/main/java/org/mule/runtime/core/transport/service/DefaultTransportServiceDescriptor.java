@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.registry.AbstractServiceDescriptor;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transformer.EndpointAwareTransformer;
+import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.Connector;
 import org.mule.runtime.core.api.transport.MessageDispatcherFactory;
@@ -452,8 +453,20 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
     protected Transformer createTransformer(String className, ImmutableEndpoint endpoint) throws Exception
     {
-        EndpointAwareTransformer newTransformer = new DefaultEndpointAwareTransformer(
-                (Transformer) ClassUtils.instanciateClass(className, ClassUtils.NO_ARGS, classLoader), SystemUtils.getDefaultEncoding(muleContext));
+        final Transformer innerTransformer = (Transformer) ClassUtils.instanciateClass(className, ClassUtils.NO_ARGS, classLoader);
+
+        EndpointAwareTransformer newTransformer;
+        if (innerTransformer instanceof MessageTransformer)
+        {
+            newTransformer = new DefaultEndpointAwareMessageTransformer(
+                    (MessageTransformer) innerTransformer, SystemUtils.getDefaultEncoding(muleContext));
+        }
+        else
+        {
+            newTransformer = new DefaultEndpointAwareTransformer(
+                    innerTransformer, SystemUtils.getDefaultEncoding(muleContext));
+        }
+
         newTransformer.setMuleContext(muleContext);
         newTransformer.setName(newTransformer.getName() + "#" + newTransformer.hashCode());
         newTransformer.setEndpoint(endpoint);

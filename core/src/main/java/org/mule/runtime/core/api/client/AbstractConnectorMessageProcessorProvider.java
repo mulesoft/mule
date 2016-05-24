@@ -88,10 +88,4 @@ public abstract class AbstractConnectorMessageProcessorProvider implements Conne
     {
         this.muleContext = context;
     }
-
-    @Override
-    public int priority()
-    {
-        return 0;
-    }
 }
