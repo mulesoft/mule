@@ -7,12 +7,15 @@
 package org.mule.test.heisenberg.extension;
 
 import static org.mule.runtime.api.metadata.DataType.STRING_DATA_TYPE;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -31,7 +34,7 @@ import javax.inject.Inject;
 
 
 @Alias("ListenPayments")
-public class HeisenbergSource extends Source<Void, Serializable>
+public class HeisenbergSource extends Source<Void, Serializable> implements Initialisable
 {
     public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
     public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
@@ -53,6 +56,13 @@ public class HeisenbergSource extends Source<Void, Serializable>
 
     @Inject
     private MuleContext muleContext;
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        checkArgument(heisenberg != null, "config not injected");
+        checkArgument(muleContext != null, "dependencies not injected");
+    }
 
     @Override
     public void start()
