@@ -25,13 +25,6 @@ public class MetadataImplicitDynamicConfigurationTestCase extends MetadataExtens
         return METADATA_TEST_DYNAMIC_IMPLICIT_CONFIGURATION;
     }
 
-    @Override
-    protected TestRule createTestTimeoutRule()
-    {
-        int millisecondsTimeout = getTestTimeoutSecs() * 10000;
-        return new WarningTimeout(millisecondsTimeout);
-    }
-
     @Test
     public void resolveMetadataWithImplicitDynamicConfig() throws Exception
     {
