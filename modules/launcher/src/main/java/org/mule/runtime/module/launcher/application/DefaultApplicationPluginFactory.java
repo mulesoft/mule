@@ -16,10 +16,6 @@ import java.net.URL;
 public class DefaultApplicationPluginFactory implements ApplicationPluginFactory
 {
 
-    public DefaultApplicationPluginFactory()
-    {
-    }
-
     @Override
     public ApplicationPlugin create(ApplicationPluginDescriptor descriptor, ArtifactClassLoader parent)
     {

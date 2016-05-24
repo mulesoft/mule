@@ -13,20 +13,26 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainRepository;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,8 +46,10 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
 
     private final ArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory = mock(ArtifactClassLoaderFactory.class);
     private final DomainRepository domainRepository = mock(DomainRepository.class);
+    private final ApplicationPluginRepository applicationPluginRepository = mock(ApplicationPluginRepository.class);
     private final ApplicationDescriptorFactory applicationDescriptorFactory = mock(ApplicationDescriptorFactory.class);
-    private final DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, applicationDescriptorFactory, domainRepository);
+    private final ApplicationPluginFactory applicationPluginFactory = mock(ApplicationPluginFactory.class);
+    private final DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, applicationDescriptorFactory, applicationPluginFactory, domainRepository, applicationPluginRepository);
 
     @Rule
     public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
@@ -55,6 +63,19 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
         final File[] resourceFiles = new File[0];
         descriptor.setConfigResourcesFile(resourceFiles);
         when(applicationDescriptorFactory.create(any())).thenReturn(descriptor);
+
+        final ApplicationPluginDescriptor coreApplicationPluginDescriptor = mock(ApplicationPluginDescriptor.class);
+        List<ApplicationPluginDescriptor> containerApplicationPluginDescriptors = new LinkedList<>();
+        containerApplicationPluginDescriptors.add(coreApplicationPluginDescriptor);
+        when(applicationPluginRepository.getContainerApplicationPluginDescriptors()).thenReturn(containerApplicationPluginDescriptors);
+
+        final ApplicationPlugin appPlugin = mock(ApplicationPlugin.class);
+        final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
+        when(appPlugin.getArtifactClassLoader()).thenReturn(artifactClassLoader);
+        final ClassLoaderFilter classLoaderFilter = mock(ClassLoaderFilter.class);
+        when(coreApplicationPluginDescriptor.getClassLoaderFilter()).thenReturn(classLoaderFilter);
+        when(appPlugin.getDescriptor()).thenReturn(coreApplicationPluginDescriptor);
+        when(applicationPluginFactory.create(same(coreApplicationPluginDescriptor), any())).thenReturn(appPlugin);
 
         final Domain domain = createDomain(DOMAIN_NAME);
 
@@ -71,6 +92,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
         assertThat(application.getDescriptor(), is(descriptor));
         assertThat(application.getArtifactName(), is(APP_NAME));
         assertThat(application.getResourceFiles(), is(resourceFiles));
+        // Descriptor doesn't contain the core application plugin installed for this app
+        assertThat(application.getDescriptor().getPlugins().contains(appPlugin), is(false));
     }
 
     private Domain createDomain(String name)

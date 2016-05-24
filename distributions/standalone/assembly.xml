@@ -77,7 +77,7 @@
 
         <fileSet>
             <directory>${project.build.directory}/app-plugins</directory>
-            <outputDirectory>lib/app-plugins</outputDirectory>
+            <outputDirectory>app-plugins</outputDirectory>
         </fileSet>
     </fileSets>
 

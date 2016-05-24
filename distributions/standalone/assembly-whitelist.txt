@@ -160,10 +160,10 @@
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 
 #
-# /lib/app-plugins
+# /app-plugins
 #
-/mule-standalone-${productVersion}/lib/app-plugins
-/mule-standalone-${productVersion}/lib/app-plugins/mule-module-validation-${productVersion}.zip
+/mule-standalone-${productVersion}/app-plugins
+/mule-standalone-${productVersion}/app-plugins/mule-module-validation-${productVersion}.zip
 
 #
 # /lib/opt

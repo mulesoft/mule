@@ -10,6 +10,11 @@ package org.mule.runtime.module.launcher.application;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 
+/**
+ * Creates an application plugin artifact.
+ *
+ * @since 4.0
+ */
 public interface ApplicationPluginFactory
 {
     ApplicationPlugin create(ApplicationPluginDescriptor descriptor, ArtifactClassLoader parent);

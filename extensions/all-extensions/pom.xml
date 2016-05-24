@@ -30,10 +30,13 @@
             <artifactId>mule-module-validation</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <!--TODO(gfernandes): dependencies included in modules as zip must be excluded as this artifact
+                is going to be included as zip in distro
+            -->
             <!--TODO(gfernandes): https://issues.apache.org/jira/browse/MASSEMBLY-799
                 wildcard exclusions were supported in maven-core https://issues.apache.org/jira/browse/MNG-3832
-                but still assembly it having not handling this correctly
-                so the transitive dependencies of this artifact will end up in lib/opt (and we don't want to explicity
+                but still assembly is not handling this correctly. Remove commons-validator and add * for groupId and artifacId
+                so transitive dependencies will not end up in lib/opt (and we don't want to explicitly
                 exclude them from the assembly descriptor)
             -->
             <exclusions>

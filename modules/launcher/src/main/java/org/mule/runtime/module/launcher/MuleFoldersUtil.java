@@ -105,6 +105,6 @@ public class MuleFoldersUtil
 
     public static File getContainerAppPluginsFolder()
     {
-        return new File(getMuleLibFolder(), CONTAINER_APP_PLUGINS);
+        return new File(getMuleHomeFolder(), CONTAINER_APP_PLUGINS);
     }
 }

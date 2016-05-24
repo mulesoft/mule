@@ -153,9 +153,13 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor
         this.plugins = plugins;
     }
 
-    public boolean containsApplicationPlugin(final String pluginName)
+    /**
+     * @param appPluginDescriptor
+     * @return true if this application has the given appPluginDescriptor already defined in its plugins list.
+     */
+    public boolean containsApplicationPluginDescriptor(final ApplicationPluginDescriptor appPluginDescriptor)
     {
-        return CollectionUtils.find(this.plugins, object -> ((ApplicationPluginDescriptor) object).getName().equals(pluginName)) != null;
+        return CollectionUtils.find(this.plugins, object -> ((ApplicationPluginDescriptor) object).getName().equals(appPluginDescriptor.getName())) != null;
     }
 
 }
