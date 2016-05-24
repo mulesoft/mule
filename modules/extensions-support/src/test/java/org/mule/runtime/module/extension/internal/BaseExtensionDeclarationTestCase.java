@@ -20,6 +20,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
@@ -55,7 +56,12 @@ abstract class BaseExtensionDeclarationTestCase extends AbstractMuleTestCase
 
         factory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
         extensionDeclarer = createDeclarationDescriptor();
-        extensionModel = factory.createFrom(extensionDeclarer, new DefaultDescribingContext(extensionDeclarer, getClass().getClassLoader()));
+        extensionModel = factory.createFrom(extensionDeclarer, createDescribingContext());
+    }
+
+    protected DescribingContext createDescribingContext()
+    {
+        return new DefaultDescribingContext(extensionDeclarer, getClass().getClassLoader());
     }
 
     protected void assertParameter(ParameterModel parameterModel,
