@@ -11,8 +11,10 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.subtypes.extension.CarDoor;
@@ -169,5 +171,18 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
         assertThat(((Triangle) payload.get(5)).getHeight(), is(6));
         assertThat(((Triangle) payload.get(5)).getArea(), is(3));
 
+    }
+
+    @Test
+    public void mappedParamSource() throws Exception
+    {
+        try
+        {
+            ((Flow) getFlowConstruct("sourceWithParameterMapping")).start();
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
     }
 }
