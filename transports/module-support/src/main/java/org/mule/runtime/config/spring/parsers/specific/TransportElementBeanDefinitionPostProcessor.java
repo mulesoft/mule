@@ -218,5 +218,14 @@ public class TransportElementBeanDefinitionPostProcessor implements CommonBeanDe
             }
             addUriBuilderPropertyValue(modelBeanDefinition, address.toString());
         }
+        else if (componentModel.getIdentifier().getNamespace().equals("vm"))
+        {
+            if (componentModel.getParameters().containsKey("path"))
+            {
+                StringBuilder address = new StringBuilder("vm://");
+                address.append(componentModel.getParameters().get("path"));
+                addUriBuilderPropertyValue(modelBeanDefinition, address.toString());
+            }
+        }
     }
 }

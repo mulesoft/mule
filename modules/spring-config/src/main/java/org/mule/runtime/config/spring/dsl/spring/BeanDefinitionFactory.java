@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.QUEUE_STORE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
@@ -49,6 +50,15 @@ public class BeanDefinitionFactory
             .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MULE_ROOT_ELEMENT).build())
             .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(DESCRIPTION_ELEMENT).build())
             .build();
+
+    /**
+     * These are the set of current language construct that have specific bean definitions parsers since we don't want to
+     * include them in the parsing API.
+     */
+    private final ImmutableSet<ComponentIdentifier> customBuildersComponentIdentifiers = ImmutableSet.<ComponentIdentifier>builder()
+            .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(QUEUE_STORE).build())
+            .build();
+
 
     private ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
     private BeanDefinitionCreator componentModelProcessor;
@@ -112,11 +122,15 @@ public class BeanDefinitionFactory
 
     private void resolveComponentBeanDefinition(ComponentModel parentComponentModel, ComponentModel componentModel)
     {
-        ComponentBuildingDefinition componentBuildingDefinition = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier()).orElseThrow(() -> {
-            return new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency " +
-                                                                       "missing to the project that handle that extension.",
-                                                                       componentModel.getIdentifier())));
-        });
+        ComponentBuildingDefinition componentBuildingDefinition = null;
+        if (!customBuildersComponentIdentifiers.contains(componentModel.getIdentifier()))
+        {
+            componentBuildingDefinition = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier()).orElseThrow(() -> {
+                return new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency " +
+                                                                           "missing to the project that handle that extension.",
+                                                                           componentModel.getIdentifier())));
+            });
+        }
         this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel, componentBuildingDefinition));
     }
 
@@ -134,15 +148,15 @@ public class BeanDefinitionFactory
 
     private BeanDefinitionCreator buildComponentModelProcessorChainOfResponsability()
     {
-        ReferenceProcessorBeanDefinitionCreator referenceProcessorBeanDefinitionCreator = new ReferenceProcessorBeanDefinitionCreator();
         ExceptionStrategyRefBeanDefinitionCreator exceptionStrategyRefBeanDefinitionCreator = new ExceptionStrategyRefBeanDefinitionCreator();
         FilterReferenceBeanDefinitionCreator filterReferenceBeanDefinitionCreator = new FilterReferenceBeanDefinitionCreator();
+        ReferenceBeanDefinitionCreator referenceBeanDefinitionCreator = new ReferenceBeanDefinitionCreator();
         CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator();
-        referenceProcessorBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
         exceptionStrategyRefBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
         exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);
-        filterReferenceBeanDefinitionCreator.setNext(commonComponentModelProcessor);
-        return referenceProcessorBeanDefinitionCreator;
+        filterReferenceBeanDefinitionCreator.setNext(referenceBeanDefinitionCreator);
+        referenceBeanDefinitionCreator.setNext(commonComponentModelProcessor);
+        return exceptionStrategyRefBeanDefinitionCreator;
     }
 
     /**
@@ -154,7 +168,9 @@ public class BeanDefinitionFactory
      */
     public boolean hasDefinition(ComponentIdentifier componentIdentifier)
     {
-        return ignoredMuleCoreComponentIdentifiers.contains(componentIdentifier) || componentBuildingDefinitionRegistry.getBuildingDefinition(componentIdentifier).isPresent();
+        return ignoredMuleCoreComponentIdentifiers.contains(componentIdentifier)
+               || customBuildersComponentIdentifiers.contains(componentIdentifier)
+               || componentBuildingDefinitionRegistry.getBuildingDefinition(componentIdentifier).isPresent();
     }
 
 }
