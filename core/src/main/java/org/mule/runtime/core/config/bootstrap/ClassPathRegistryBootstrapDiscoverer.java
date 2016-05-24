@@ -6,20 +6,12 @@
  */
 package org.mule.runtime.core.config.bootstrap;
 
-import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.OrderedProperties;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.PropertiesUtils.discoverProperties;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -38,40 +30,19 @@ public class ClassPathRegistryBootstrapDiscoverer implements RegistryBootstrapDi
 
     private static final String BOOTSTRAP_PROPERTIES = "META-INF/services/org/mule/runtime/core/config/registry-bootstrap.properties";
 
-    private final transient Log logger = LogFactory.getLog(getClass());
-
     /**
      * {@inheritDoc}
      */
     @Override
     public List<Properties> discover() throws BootstrapException
     {
-        List<Properties> bootstrapsProperties = new LinkedList<Properties>();
-
-        Enumeration<URL> allPropertiesResources = ClassUtils.getResources(BOOTSTRAP_PROPERTIES, getClass());
-        while (allPropertiesResources.hasMoreElements())
+        try
         {
-            URL propertiesResource = allPropertiesResources.nextElement();
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Reading bootstrap properties from: " + propertiesResource.toString());
-            }
-            Properties properties = new OrderedProperties();
-
-            try
-            {
-                try (InputStream resourceStream = propertiesResource.openStream())
-                {
-                    properties.load(resourceStream);
-                }
-            }
-            catch (IOException e)
-            {
-                throw new BootstrapException(MessageFactory.createStaticMessage("Could not load properties from: %s", propertiesResource.toString()), e);
-            }
-
-            bootstrapsProperties.add(properties);
+            return discoverProperties(BOOTSTRAP_PROPERTIES);
         }
-        return bootstrapsProperties;
+        catch (IOException e)
+        {
+            throw new BootstrapException(createStaticMessage("Could not load properties file"), e);
+        }
     }
 }

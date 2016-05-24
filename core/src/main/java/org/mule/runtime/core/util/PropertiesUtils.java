@@ -19,10 +19,14 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>PropertiesHelper</code> is a utility class for manipulating and filtering
@@ -31,6 +35,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 // @ThreadSafe
 public final class PropertiesUtils
 {
+    private static final Logger logger = LoggerFactory.getLogger(PropertiesUtils.class);
+
     // @GuardedBy(itself)
     private static final List<String> maskedProperties = new CopyOnWriteArrayList<String>();
 
@@ -332,5 +338,37 @@ public final class PropertiesUtils
             properties.setProperty(key, value);
         }
         return i2;
+    }
+
+    /**
+     * Discovers properties files available on the execution context
+     *
+     * @param resource resource to find. Not empty
+     * @return a non null list of Properties
+     * @throws IOException when a property file cannot be processed
+     */
+    public static List<Properties> discoverProperties(String resource) throws IOException
+    {
+        List<Properties> result = new LinkedList<Properties>();
+
+        Enumeration<URL> allPropertiesResources = ClassUtils.getResources(resource, PropertiesUtils.class);
+        while (allPropertiesResources.hasMoreElements())
+        {
+            URL propertiesResource = allPropertiesResources.nextElement();
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Reading properties from: " + propertiesResource.toString());
+            }
+            Properties properties = new OrderedProperties();
+
+            try (InputStream resourceStream = propertiesResource.openStream())
+            {
+                properties.load(resourceStream);
+            }
+
+            result.add(properties);
+        }
+
+        return result;
     }
 }

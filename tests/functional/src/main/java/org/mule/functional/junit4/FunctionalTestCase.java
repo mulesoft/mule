@@ -7,9 +7,10 @@
 package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
-import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.container.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.Component;
@@ -26,6 +27,7 @@ import org.mule.runtime.core.construct.AbstractPipeline;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
@@ -43,6 +45,13 @@ import org.junit.After;
  */
 public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
 {
+
+    /**
+     * The executionClassLoader used to run this test. It will be created per class
+     * or per method depending on  {@link #disposeContextPerClass}.
+     */
+    private static ArtifactClassLoader executionClassLoader;
+
     public FunctionalTestCase()
     {
         super();
@@ -163,6 +172,24 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     protected FlowConstruct getFlowConstruct(String flowName) throws Exception
     {
         return muleContext.getRegistry().lookupFlowConstruct(flowName);
+    }
+
+    @Override
+    protected ClassLoader getExecutionClassLoader()
+    {
+        if (!isDisposeContextPerClass() || executionClassLoader == null)
+        {
+            executionClassLoader = new ContainerClassLoaderFactory().createContainerClassLoader(getClass().getClassLoader());
+        }
+
+        return executionClassLoader.getClassLoader();
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        executionClassLoader = null;
+        super.doTearDown();
     }
 
     protected String loadResourceAsString(String resourceName) throws IOException

@@ -95,6 +95,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected BootstrapServiceDiscoverer bootstrapDiscoverer;
 
+    protected ClassLoader executionClassLoader;
+
     /**
      * {@inheritDoc}
      */
@@ -118,7 +120,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
         muleContext.setLocalMuleClient(new DefaultLocalMuleClient(muleContext));
         muleContext.setExceptionListener(createExceptionListener(muleContext));
-        muleContext.setExecutionClassLoader(Thread.currentThread().getContextClassLoader());
+        muleContext.setExecutionClassLoader(getExecutionClassLoader());
         muleContext.setBootstrapServiceDiscoverer(injectMuleContextIfRequired(getBootstrapPropertiesServiceDiscoverer(), muleContext));
 
         JavaObjectSerializer defaultObjectSerializer = new JavaObjectSerializer();
@@ -176,6 +178,24 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         else
         {
             return createMuleConfiguration();
+        }
+    }
+
+    @Override
+    public void setExecutionClassLoader(ClassLoader executionClassLoader)
+    {
+        this.executionClassLoader = executionClassLoader;
+    }
+
+    protected ClassLoader getExecutionClassLoader()
+    {
+        if (executionClassLoader != null)
+        {
+            return executionClassLoader;
+        }
+        else
+        {
+            return Thread.currentThread().getContextClassLoader();
         }
     }
 

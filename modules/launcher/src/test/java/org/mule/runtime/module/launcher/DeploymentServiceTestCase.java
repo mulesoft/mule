@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.launcher;
 
-import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
@@ -33,11 +32,11 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.launcher.MuleDeploymentService.SYSTEM_PACKAGES;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+import org.mule.runtime.container.ContainerClassLoaderFactory;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -54,9 +53,6 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.application.ApplicationStatus;
 import org.mule.runtime.module.launcher.application.MuleApplicationClassLoaderFactory;
@@ -159,8 +155,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private final DomainFileBuilder dummyUndeployableDomainFileBuilder = new DomainFileBuilder("dummy-undeployable-domain").definedBy("empty-domain-config.xml").deployedWith("redeployment.enabled", "false");
     private final DomainFileBuilder sharedHttpDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml");
     private final DomainFileBuilder sharedHttpBundleDomainFileBuilder = new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml").containing(httpAAppFileBuilder).containing(httpBAppFileBuilder);
-    private final ClassLoaderLookupPolicy containerLookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), SYSTEM_PACKAGES);
-    private final ArtifactClassLoader containerClassLoader = new MuleArtifactClassLoader("mule", new URL[0], getClass().getClassLoader(), containerLookupPolicy);
+    private final ArtifactClassLoader containerClassLoader = new ContainerClassLoaderFactory().createContainerClassLoader(getClass().getClassLoader());
 
     protected File muleHome;
     protected File appsDir;

@@ -5,11 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.launcher;
+package org.mule.runtime.container.internal;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.module.artifact.classloader.EnumerationMatcher;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoaderTestCase;
@@ -37,14 +38,14 @@ public class FilteringContainerClassLoaderTestCase extends FilteringArtifactClas
     {
         TestClassLoader classLoader = new TestClassLoader();
         URL expectedResource = new URL("file:///app.txt");
-        classLoader.addResource(RESOURCE_NAME, expectedResource);
+        classLoader.addResource(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME, expectedResource);
 
-        when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
+        when(filter.exportsResource(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME)).thenReturn(true);
         when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
         filteringArtifactClassLoader = doCreateClassLoader();
 
-        URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
+        URL resource = filteringArtifactClassLoader.getResource(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME);
         assertThat(resource, equalTo(expectedResource));
     }
 
@@ -54,14 +55,14 @@ public class FilteringContainerClassLoaderTestCase extends FilteringArtifactClas
     {
         TestClassLoader classLoader = new TestClassLoader();
         URL resource = new URL("file:/app.txt");
-        classLoader.addResource(RESOURCE_NAME, resource);
+        classLoader.addResource(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME, resource);
 
-        when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
+        when(filter.exportsResource(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME)).thenReturn(true);
         when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
         filteringArtifactClassLoader = doCreateClassLoader();
 
-        Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
+        Enumeration<URL> resources = filteringArtifactClassLoader.getResources(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME);
         assertThat(resources, EnumerationMatcher.equalTo(Collections.singletonList(resource)));
     }
 }

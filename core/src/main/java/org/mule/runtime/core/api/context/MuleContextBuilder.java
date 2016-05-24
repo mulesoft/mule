@@ -35,4 +35,9 @@ public interface MuleContextBuilder
     void setLifecycleManager(LifecycleManager lifecycleManager);
     
     void setMuleConfiguration(MuleConfiguration muleConfiguration);
+
+    /**
+     * @param executionClassLoader classloader to use on the created context. Non null.
+     */
+    void setExecutionClassLoader(ClassLoader executionClassLoader);
 }

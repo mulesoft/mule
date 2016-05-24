@@ -18,6 +18,7 @@
         <module>artifact</module>
         <module>builders</module>
         <module>cxf</module>
+        <module>container</module>
         <module>db</module>
         <module>extensions-support</module>
         <module>file-extension-common</module>
