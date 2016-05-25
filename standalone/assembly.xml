@@ -127,6 +127,7 @@
                 <!-- Modules -->
                 <include>org.mule.modules:mule-module-artifact</include>
                 <include>org.mule.modules:mule-module-launcher</include>
+                <include>org.mule.modules:mule-module-container</include>
                 <include>org.mule.modules:mule-module-builders</include>
                 <include>org.mule.modules:mule-module-client</include>
                 <include>org.mule.modules:mule-module-cxf</include>
@@ -203,6 +204,7 @@
                 <exclude>org.mule.modules:mule-module-jaas</exclude>
                 <exclude>org.mule.modules:mule-module-jbossts</exclude>
                 <exclude>org.mule.modules:mule-module-json</exclude>
+                <exclude>org.mule.modules:mule-module-container</exclude>
                 <exclude>org.mule.modules:mule-module-launcher</exclude>
                 <exclude>org.mule.modules:mule-module-management</exclude>
                 <exclude>org.mule.modules:mule-module-oauth</exclude>
