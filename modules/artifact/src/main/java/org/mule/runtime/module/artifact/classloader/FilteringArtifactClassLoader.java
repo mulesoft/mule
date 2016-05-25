@@ -53,7 +53,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
         }
         else
         {
-            throw new ClassNotFoundException();
+            throw new ClassNotFoundException(name);
         }
     }
 

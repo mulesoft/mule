@@ -183,6 +183,7 @@ public class DefaultMuleApplication implements Application
                 }
 
                 ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor);
+                applicationContextBuilder.setExecutionClassLoader(deploymentClassLoader.getClassLoader());
                 setMuleContext(muleContextFactory.createMuleContext(builders, applicationContextBuilder));
             }
         }
