@@ -612,11 +612,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-http</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
         </dependency>

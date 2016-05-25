@@ -292,10 +292,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
 
-
-        boolean isCompatibleWithAsync = sourceCompatibleWithAsync.evaluate(messageSource)
-        ;
-
+        boolean isCompatibleWithAsync = sourceCompatibleWithAsync.evaluate(messageSource);
         if (userConfiguredAsyncProcessingStrategy
             && (!(messageSource == null || isCompatibleWithAsync) || redeliveryHandlerConfigured))
         {

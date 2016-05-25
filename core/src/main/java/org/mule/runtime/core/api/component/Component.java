@@ -27,5 +27,4 @@ public interface Component extends MessageProcessor, FlowConstructAware
      * sync/async invocation counts and total and average execution time.
      */
     ComponentStatistics getStatistics();
-
 }

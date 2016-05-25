@@ -30,6 +30,7 @@ import org.mule.runtime.module.cxf.CxfConfiguration;
 import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
+import org.mule.runtime.module.http.api.HttpConstants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -160,6 +161,9 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit
     {
         try
         {
+            MuleMessage req = reqEvent.getMessage();
+            req.setOutboundProperty(HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
+
             if (reqEvent.isAllowNonBlocking())
             {
                 final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();

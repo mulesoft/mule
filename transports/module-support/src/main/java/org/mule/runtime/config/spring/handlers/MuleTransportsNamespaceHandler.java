@@ -19,6 +19,7 @@ import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefi
 import org.mule.runtime.config.spring.parsers.specific.ExceptionStrategyDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ResponseDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
@@ -28,6 +29,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.component.DefaultInterfaceBinding;
 import org.mule.runtime.core.component.DefaultJavaWithBindingComponent;
 import org.mule.runtime.core.component.PooledJavaWithBindingsComponent;
+import org.mule.runtime.core.config.ConnectorConfiguration;
 import org.mule.runtime.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.routing.EndpointDlqUntilSuccessful;
@@ -39,6 +41,7 @@ import org.mule.runtime.module.cxf.component.WebServiceWrapperComponent;
 import org.mule.runtime.module.cxf.config.JaxWsClientWithDecoupledEndpointFactoryBean;
 import org.mule.runtime.module.cxf.config.ProxyClientWithDecoupledEndpointFactoryBean;
 import org.mule.runtime.module.cxf.config.SimpleClientWithDecoupledEndpointFactoryBean;
+import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
 
 public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -72,6 +75,14 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaWithBindingComponent.class));
         registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaWithBindingsComponent.class));
         registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("interfaceBinding", DefaultInterfaceBinding.class));
+
+        // Security
+        SecurityFilterDefinitionParser securityFilterDefinitionParser = new SecurityFilterDefinitionParser(HttpBasicAuthenticationFilter.class);
+        securityFilterDefinitionParser.addAlias("securityManager-ref", "securityManager");
+        registerBeanDefinitionParser("http-security-filter", securityFilterDefinitionParser);
+
+        // HTTP
+        registerBeanDefinitionParser("config", new ChildDefinitionParser("extension", ConnectorConfiguration.class));
 
         // CXF
         MessageProcessorDefinitionParser jsParser = new MessageProcessorDefinitionParser(WebServiceMessageProcessorWithInboundEndpointBuilder.class);

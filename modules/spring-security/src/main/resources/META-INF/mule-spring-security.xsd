@@ -52,37 +52,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="http-security-filter" type="httpSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                Authenticate users via information in standard HTTP headers. Deprecated. Use http:basic-security-filter instead.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="httpSecurityFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractSecurityFilterType">
-                <xsd:attribute name="securityManager-ref" type="xsd:string" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A reference to the security manager. If not specified uses the default one.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="realm" type="xsd:string" use="required"/>
-                <xsd:attribute name="securityProviders" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The delegate-security-provider to use for authenticating. Use this element
-                            in case you have multiple security managers defined in your configuration.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    
     <xsd:element name="authorization-filter" type="authorizationFilterType" substitutionGroup="mule:abstract-security-filter">
         <xsd:annotation>
             <xsd:documentation>

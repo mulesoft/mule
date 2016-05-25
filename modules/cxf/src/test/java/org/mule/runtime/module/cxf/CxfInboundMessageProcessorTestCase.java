@@ -102,6 +102,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         builder.setMuleContext(muleContext);
         
         CxfInboundMessageProcessor processor = builder.build();
+        processor.initialise();
         processor.start();
         return processor;
     }

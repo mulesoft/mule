@@ -7,6 +7,8 @@
 package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.hash;
+import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -80,6 +82,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
         this.value = new AttributeEvaluator(value);
     }
 
+    @Override
     public boolean accept(MuleMessage message)
     {
         // TODO MULE-9341 Remove Filters that are not needed
@@ -97,7 +100,14 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
             }
             else
             {
-                return accept(muleContext.getTransformationService().transform(event.getMessage(), DataTypeFactory.STRING).getPayload());
+                final MuleMessage transformedMessage = muleContext.getTransformationService().transform(event.getMessage(), DataTypeFactory.STRING);
+                // If the payload is a stream and we've consumed it, then we should set the payload on the
+                // message. This is the only time this method will alter the payload on the message
+                if (isConsumable(event.getMessage().getDataType().getType()))
+                {
+                    event.setMessage(transformedMessage);
+                }
+                return accept(transformedMessage.getPayload());
             }
         }
         catch (Exception e)
@@ -106,6 +116,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
         }
     }
 
+    @Override
     public boolean accept(Object object)
     {
         if (object == null)

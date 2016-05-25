@@ -13,7 +13,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.AbstractConnectorMessageProcessorProvider;
 import org.mule.runtime.core.api.client.LocalMuleClient;
 import org.mule.runtime.core.api.client.RequestCacheKey;
 import org.mule.runtime.core.api.endpoint.EndpointCache;
@@ -23,6 +22,7 @@ import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.api.transport.ReceiveException;
 import org.mule.runtime.core.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
+import org.mule.runtime.core.config.ConnectorConfiguration;
 import org.mule.runtime.core.endpoint.SimpleEndpointCache;
 
 import java.util.Collections;
@@ -32,7 +32,7 @@ import java.util.Set;
 /**
  * Provides transports support to {@link LocalMuleClient}.
  */
-public class ConnectorEndpointProvider extends AbstractConnectorMessageProcessorProvider
+public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessageProcessorProvider
 {
 
     private EndpointCache endpointCache;
@@ -110,5 +110,11 @@ public class ConnectorEndpointProvider extends AbstractConnectorMessageProcessor
                 }
             };
         }
+    }
+
+    @Override
+    public int priority()
+    {
+        return ConnectorConfiguration.useTransportForUris(muleContext) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
     }
 }

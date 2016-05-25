@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.core.expression.transformers;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.expression.RequiredValueException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.util.Iterator;
 
@@ -49,14 +48,6 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
             try
             {
                 results[i] = argument.evaluate(event);
-            }
-            catch (RequiredValueException e)
-            {
-                if(!argument.isOptional())
-                {
-                    throw e;
-                }
-                logger.warn(e.getMessage());
             }
             catch (ExpressionRuntimeException e)
             {

@@ -15,7 +15,7 @@
         <module>core-transports-tests</module>
 
         <module>file</module>
-<!--         <module>http</module> -->
+        <module>http</module>
         <module>jms</module>
         <module>ssl</module>
         <module>tcp</module>
