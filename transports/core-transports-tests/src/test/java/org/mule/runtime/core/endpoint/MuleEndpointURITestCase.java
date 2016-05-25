@@ -8,12 +8,14 @@ package org.mule.runtime.core.endpoint;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.endpoint.MuleEndpointURI;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.net.URI;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -164,6 +166,23 @@ public class MuleEndpointURITestCase extends AbstractMuleContextTestCase
         MuleEndpointURI uri = new MuleEndpointURI("test://theUser%40theEmailHost:password@theHost", muleContext);
         assertEquals("test://theUser%40theEmailHost:****@theHost", uri.toString());
     }
+
+    @Test
+    public void ensuresDeadlockFreeEquals() throws Exception
+    {
+        Properties props1 = System.getProperties();
+        Properties props2 = new Properties(props1);
+
+        final MuleEndpointURI uri1 = new MuleEndpointURI("", "", "", "", "", props1, new URI("http://localhost"), null);
+        final MuleEndpointURI uri2 = new MuleEndpointURI("", "", "", "", "", props2, new URI("http://localhost"), null);
+
+        ExecutorService pool = Executors.newFixedThreadPool(10);
+        pool.submit(new UriComparator(uri1, uri2));
+        pool.submit(new UriComparator(uri2, uri1));
+
+        pool.shutdown();
+        pool.awaitTermination(30, TimeUnit.SECONDS);
+    }
     
     private MuleEndpointURI buildEndpointUri(String uriString) throws MuleException
     {
@@ -177,5 +196,27 @@ public class MuleEndpointURITestCase extends AbstractMuleContextTestCase
         assertEquals("test", uri.getScheme());
         assertEquals("theHost", uri.getHost());
         assertNull(uri.getEndpointName());
+    }
+
+    private static class UriComparator implements Runnable
+    {
+
+        private final MuleEndpointURI uri1;
+        private final MuleEndpointURI uri2;
+
+        public UriComparator(MuleEndpointURI uri1, MuleEndpointURI uri2)
+        {
+            this.uri1 = uri1;
+            this.uri2 = uri2;
+        }
+
+        @Override
+        public void run()
+        {
+            for (int i = 0; i < 1000; i++)
+            {
+                uri1.equals(uri2);
+            }
+        }
     }
 }
