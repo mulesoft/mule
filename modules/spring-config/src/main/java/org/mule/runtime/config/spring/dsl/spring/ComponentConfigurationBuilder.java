@@ -180,7 +180,10 @@ class ComponentConfigurationBuilder
         public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter)
         {
             Object value = simpleParameters.get(parameterName);
-            value = typeConverter.isPresent() ? typeConverter.get().convert(value) : value;
+            if (value != null)
+            {
+                value = typeConverter.isPresent() ? typeConverter.get().convert(value) : value;
+            }
             valuePopulator.accept(Optional.ofNullable(value).orElse(defaultValue));
             simpleParameters.remove(parameterName);
         }
