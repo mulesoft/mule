@@ -53,12 +53,11 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
     public static final String INBOUND_ENDPOINT_ELEMENT = "inbound-endpoint";
     private static final String ENDPOINT_RESPONSE_ELEMENT = "response";
 
-    private ComponentBuildingDefinition.Builder baseDefinition;
+    private ComponentBuildingDefinition.Builder baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(TRANSPORTS_NAMESPACE_NAME);
 
     @Override
     public void init(MuleContext muleContext)
     {
-        baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(TRANSPORTS_NAMESPACE_NAME);
     }
 
     @Override
@@ -93,6 +92,15 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
                                                  .withSetterParameterDefinition("defaultExchangePattern", fromSimpleParameter("defaultExchangePattern").build())
                                                  .build());
         return componentBuildingDefinitions;
+    }
+
+    protected ComponentBuildingDefinition.Builder getBaseConnector()
+    {
+        return baseDefinition.copy()
+                .withIdentifier("connector")
+                .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+                .withSetterParameterDefinition("serviceOverrides", fromChildConfiguration(Map.class).build())
+                .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
     }
 
     protected ComponentBuildingDefinition.Builder getOutboundEndpointBuildingDefinitionBuilder()
@@ -175,6 +183,7 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
         return baseDefinition.copy()
                 .withIdentifier("transaction")
                 .withTypeDefinition(fromType(MuleTransactionConfig.class))
+                .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
                 .withSetterParameterDefinition("action", fromSimpleParameter("action", getTransactionActionTypeConverter()).build());
     }
 

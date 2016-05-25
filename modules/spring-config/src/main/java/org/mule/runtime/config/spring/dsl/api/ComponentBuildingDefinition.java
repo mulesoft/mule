@@ -228,6 +228,7 @@ public class ComponentBuildingDefinition
         public Builder copy()
         {
             Builder builder = new Builder();
+            builder.definition.typeDefinition = this.definition.typeDefinition;
             builder.definition.setterParameterDefinitions = new HashMap<>(this.definition.setterParameterDefinitions);
             builder.definition.constructorAttributeDefinition = new ArrayList<>(this.definition.constructorAttributeDefinition);
             builder.identifier = this.identifier;

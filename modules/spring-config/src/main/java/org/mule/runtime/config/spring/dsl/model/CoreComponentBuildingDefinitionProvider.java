@@ -67,6 +67,7 @@ import org.mule.runtime.core.routing.filters.NotWildcardFilter;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
+import org.mule.runtime.core.source.StartableCompositeMessageSource;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
@@ -458,6 +459,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withTypeDefinition(fromType(MessageProcessor.class))
                                                  .withObjectFactoryType(MessageProcessorWrapperObjectFactory.class)
                                                  .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(MessageProcessor.class).build())
+                                                 .build());
+
+        componentBuildingDefinitions.add(baseDefinition.copy()
+                                                 .withIdentifier("composite-source")
+                                                 .withTypeDefinition(fromType(StartableCompositeMessageSource.class))
+                                                 .withSetterParameterDefinition("messageSources", fromChildListConfiguration(MessageSource.class).build())
+                                                 .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
                                                  .build());
         return componentBuildingDefinitions;
     }

@@ -8,7 +8,6 @@ package org.mule.runtime.transport.jms.config;
 
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromConfigurationAttribute;
@@ -20,8 +19,6 @@ import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.transport.jms.JmsClientAcknowledgeTransactionFactory;
 import org.mule.runtime.transport.jms.JmsConnector;
 import org.mule.runtime.transport.jms.JmsTransactionFactory;
@@ -37,7 +34,6 @@ import org.mule.runtime.transport.jms.websphere.WebsphereJmsConnector;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.jms.Session;
 
@@ -91,10 +87,8 @@ public class JmsTransportComponentBuildingDefinitionProvider extends TransportCo
     public List<ComponentBuildingDefinition> getComponentBuildingDefinitions()
     {
         List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-        ComponentBuildingDefinition.Builder baseJmsConnector = baseDefinition.copy()
-                .withIdentifier("connector")
+        ComponentBuildingDefinition.Builder baseJmsConnector = getBaseConnector()
                 .withTypeDefinition(fromType(JmsConnector.class))
-                .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
                 .withSetterParameterDefinition("acknowledgementMode", fromSimpleParameter("acknowledgementMode", getAckModeConverter()).build())
                 .withSetterParameterDefinition("clientId", fromSimpleParameter("clientId").build())
                 .withSetterParameterDefinition("durable", fromSimpleParameter("durable").build())
@@ -121,8 +115,6 @@ public class JmsTransportComponentBuildingDefinitionProvider extends TransportCo
                 .withSetterParameterDefinition("connectionFactory", fromSimpleReferenceParameter("connectionFactory-ref").build())
                 .withSetterParameterDefinition("numberOfConsumers", fromSimpleParameter("numberOfConsumers").build())
                 .withSetterParameterDefinition("numberOfConcurrentTransactedReceivers", fromSimpleParameter("numberOfConcurrentTransactedReceivers").build())
-                .withSetterParameterDefinition("serviceOverrides", fromChildConfiguration(Map.class).build())
-                .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
                 .withSetterParameterDefinition("jndiNameResolver", fromChildConfiguration(JndiNameResolver.class).build());
 
         componentBuildingDefinitions.add(baseJmsConnector.copy().build());
