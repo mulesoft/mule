@@ -22,6 +22,7 @@ import org.mule.util.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Hashtable;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -550,15 +551,61 @@ public class MuleEndpointURI implements EndpointURI
         }
         MuleEndpointURI muleEndpointURI = (MuleEndpointURI) o;
         return ClassUtils.equal(address, muleEndpointURI.address) &&
-                ClassUtils.equal(connectorName, muleEndpointURI.connectorName) &&
-                ClassUtils.equal(endpointName, muleEndpointURI.endpointName) &&
-                ClassUtils.equal(filterAddress, muleEndpointURI.filterAddress) &&
-                ClassUtils.equal(params, muleEndpointURI.params) &&
-                ClassUtils.equal(resourceInfo, muleEndpointURI.resourceInfo) &&
-                ClassUtils.equal(schemeMetaInfo, muleEndpointURI.schemeMetaInfo) &&
-                ClassUtils.equal(transformers, muleEndpointURI.transformers) &&
-                ClassUtils.equal(responseTransformers, muleEndpointURI.responseTransformers) &&
-                ClassUtils.equal(uri, muleEndpointURI.uri);
+               ClassUtils.equal(connectorName, muleEndpointURI.connectorName) &&
+               ClassUtils.equal(endpointName, muleEndpointURI.endpointName) &&
+               ClassUtils.equal(filterAddress, muleEndpointURI.filterAddress) &&
+               areParamsEquals(muleEndpointURI.params) &&
+               ClassUtils.equal(resourceInfo, muleEndpointURI.resourceInfo) &&
+               ClassUtils.equal(schemeMetaInfo, muleEndpointURI.schemeMetaInfo) &&
+               ClassUtils.equal(transformers, muleEndpointURI.transformers) &&
+               ClassUtils.equal(responseTransformers, muleEndpointURI.responseTransformers) &&
+               ClassUtils.equal(uri, muleEndpointURI.uri);
+    }
+
+    /**
+     * Checks whether or not params are equals to another instance's params.
+     * <p/>
+     * The reason of this method is because {code}params{code} is a {@link Properties} which
+     * extends from {@link java.util.Hashtable}. This last class has  a synchronized {@link java.util.Hashtable#equals(Object)}
+     * which calls the synchronized {@link Hashtable#size()} on the compared object.
+     * This implies that doing {@code A.equals(B)} and {@code B.equals(A)} can cause a deadlock
+     * depending on the invocation order.
+     * <p/>
+     * As the detected problem occurs when {@link MuleEndpointURI} instances are compared, the workaround consist
+     * in compare both instances's params using always the same order. The order is determine by the identity
+     * hashcode of each {@code params} instance.
+     *
+     * @See http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6582568
+     * @return
+     * @param theirParams
+     */
+    private boolean areParamsEquals(Properties theirParams)
+    {
+        boolean result;
+        if (params == null)
+        {
+            result = theirParams == null;
+        }
+        else if (theirParams == null)
+        {
+            result = params == null;
+        }
+        else
+        {
+            final int ourIdentity = System.identityHashCode(params);
+            final int theirIdentity = System.identityHashCode(theirParams);
+
+            if (ourIdentity <= theirIdentity)
+            {
+                result = params.equals(theirParams);
+            }
+            else
+            {
+                result = theirParams.equals(params);
+            }
+        }
+
+        return result;
     }
 
     @Override
