@@ -13,6 +13,11 @@ import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 
 import java.net.URL;
 
+/**
+ * Default implementation for creating an {@link ApplicationPlugin} with the corresponding classloader.
+ *
+ * @since 4.0
+ */
 public class DefaultApplicationPluginFactory implements ApplicationPluginFactory
 {
 

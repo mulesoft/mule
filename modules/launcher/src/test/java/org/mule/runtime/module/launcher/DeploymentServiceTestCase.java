@@ -1303,7 +1303,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         ApplicationPluginFileBuilder echoPluginBroken = new ApplicationPluginFileBuilder("echoPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar").corrupted();
 
-        copyFile(echoPluginBroken.getArtifactFile(), new File(containerAppPluginsDir, echoPluginBroken.getId() + ".zip"));
+        installContainerPlugin(echoPluginBroken);
 
         final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("my-app.zip", emptyAppFileBuilder).containingPlugin(echoPluginWithLib1);
         addPackedAppFromBuilder(applicationFileBuilder);

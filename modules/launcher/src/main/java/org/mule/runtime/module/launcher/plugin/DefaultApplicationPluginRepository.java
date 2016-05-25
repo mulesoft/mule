@@ -56,28 +56,45 @@ public class DefaultApplicationPluginRepository implements ApplicationPluginRepo
         File[] containerPlugins = getContainerAppPluginsFolder().listFiles();
         if (containerPlugins != null)
         {
-            // First iteration over zip plugins to expand and delete
-            for (File pluginZipFile : getContainerAppPluginsFolder().listFiles((FileFilter) new SuffixFileFilter(".zip", IOCase.INSENSITIVE)))
-            {
-                String pluginName = FilenameUtils.removeExtension(pluginZipFile.getName());
-
-                // must unpack as there's no straightforward way for a ClassLoader to use a zip within another jar/zip
-                final File pluginFolderExpanded = new File(getContainerAppPluginsFolder(),
-                                             separator + pluginName);
-                FileUtils.unzip(pluginZipFile, pluginFolderExpanded);
-
-                // now we don't need to have the zip file anymore so deleting it
-                FileUtils.forceDelete(pluginZipFile);
-            }
-
-            // Load core application plugins
-            for (File pluginExpandedFolder : getContainerAppPluginsFolder().listFiles((FileFilter) DirectoryFileFilter.DIRECTORY))
-            {
-                final ApplicationPluginDescriptor appPluginDescriptor = pluginDescriptorFactory.create(pluginExpandedFolder);
-                pluginDescriptors.add(appPluginDescriptor);
-            }
+            unzipPluginsIfNeeded();
+            createApplicationPluginDescriptors(pluginDescriptors);
         }
 
         containerApplicationPluginDescriptors = Collections.unmodifiableList(pluginDescriptors);
+    }
+
+    /**
+     * Iterates the list of zip files in container application plugin folder and unzip them.
+     * @throws IOException
+     */
+    private void unzipPluginsIfNeeded() throws IOException
+    {
+        for (File pluginZipFile : getContainerAppPluginsFolder().listFiles((FileFilter) new SuffixFileFilter(".zip", IOCase.INSENSITIVE)))
+        {
+            String pluginName = FilenameUtils.removeExtension(pluginZipFile.getName());
+
+            // must unpack as there's no straightforward way for a ClassLoader to use a zip within another jar/zip
+            final File pluginFolderExpanded = new File(getContainerAppPluginsFolder(),
+                                                       separator + pluginName);
+            FileUtils.unzip(pluginZipFile, pluginFolderExpanded);
+
+            // now we don't need to have the zip file anymore so deleting it
+            FileUtils.forceDelete(pluginZipFile);
+        }
+    }
+
+    /**
+     * For each plugin expanded in container application plugins folder it creates an {@link ApplicationPluginDescriptor} for it and
+     * adds the descriptor the given list.
+     * @param pluginDescriptors list to populate with descriptors.
+     */
+    private void createApplicationPluginDescriptors(List<ApplicationPluginDescriptor> pluginDescriptors)
+    {
+        // Load core application plugins
+        for (File pluginExpandedFolder : getContainerAppPluginsFolder().listFiles((FileFilter) DirectoryFileFilter.DIRECTORY))
+        {
+            final ApplicationPluginDescriptor appPluginDescriptor = pluginDescriptorFactory.create(pluginExpandedFolder);
+            pluginDescriptors.add(appPluginDescriptor);
+        }
     }
 }
