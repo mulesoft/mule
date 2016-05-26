@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.transport.jms.integration;
 
-import org.mule.tck.ParameterizedConfiguration;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 
@@ -46,7 +44,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
      * @param xa whether to create an XA connection factory
      * @return a new JMS connection
      */
-    public abstract Connection getConnection(boolean topic, boolean xa) throws Exception;
+    Connection getConnection(boolean topic, boolean xa) throws Exception;
 
     /**
      * Returns the {@link #getInboundDestinationName()} in the form of an endpoint URI i.e.
@@ -54,7 +52,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
      *
      * @return the Inbound JMS endpoint
      */
-    public String getInboundEndpoint();
+    String getInboundEndpoint();
 
      /**
      * Returns the {@link #getOutboundDestinationName()} in the form of an endpoint URI i.e.
@@ -62,7 +60,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
       *
      * @return the Outbound JMS endpoint
      */
-    public String getOutboundEndpoint();
+    String getOutboundEndpoint();
 
      /**
      * Returns the {@link #getMiddleDestinationName()} in the form of an endpoint URI i.e.
@@ -70,7 +68,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
       *
      * @return the middle JMS endpoint
      */
-    public String getMiddleEndpoint();
+    String getMiddleEndpoint();
 
      /**
      * Returns the {@link #getBroadcastDestinationName()} in the form of an endpoint URI i.e.
@@ -78,7 +76,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
       *
      * @return the Broadcast JMS topic endpoint
      */
-    public String getTopicBroadcastEndpoint();
+    String getTopicBroadcastEndpoint();
 
     /**
      * Returns the {@link #getDeadLetterDestinationName()} in the form of an endpoint URI i.e.
@@ -86,7 +84,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
       *
      * @return the dead letter JMS endpoint
      */
-    public String getDeadLetterEndpoint();
+    String getDeadLetterEndpoint();
 
     /**
      * The test inbound queue name.  For consistency this should always be 'in'. Note that you need to make
@@ -94,7 +92,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
      *
      * @return The test inbound destination name
      */
-    public String getInboundDestinationName();
+    String getInboundDestinationName();
 
     /**
      * The test outbound queue name.  For consistency this should always be 'out'. Note that you need to make
@@ -102,7 +100,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
      *
      * @return The test outbound destination name
      */
-    public String getOutboundDestinationName();
+    String getOutboundDestinationName();
 
     /**
      * The test middle queue name.  For consistency this should always be 'middle'. This value is used to create
@@ -111,7 +109,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
      *
      * @return The test middle destination name
      */
-    public String getMiddleDestinationName();
+    String getMiddleDestinationName();
 
     /**
      * The test broadcast topic name.  For consistency this should always be 'broadcast'. Note that you need to make
@@ -119,7 +117,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
      *
      * @return The test broadcast topic name
      */
-    public String getBroadcastDestinationName();
+    String getBroadcastDestinationName();
 
     /**
      * The test dead letter queue name.  For consistency this should always be 'dlq'. Note that you need to make
@@ -127,7 +125,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
      *
      * @return The test dead letterdestination name
      */
-    public String getDeadLetterDestinationName();
+    String getDeadLetterDestinationName();
     
     /**
      * Timeout in milliseconds used when checking that a message is NOT present. This is usually 1000-2000ms.
@@ -135,7 +133,7 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
      * 
      * @return timeout in milliseconds used when checking that a message is NOT present
      */
-    public long getSmallTimeout();
+    long getSmallTimeout();
 
     /**
      * The timeout in milliseconds used when waiting for a message to arrive. This is usually 3000-5000ms.
@@ -143,18 +141,18 @@ public interface JmsVendorConfiguration extends ParameterizedConfiguration
      * 
      * @return The timeout used when waiting for a message to arrive
      */
-    public long getTimeout();
+    long getTimeout();
 
     /**
      * The protocol used for creating endpoints.  This is usually 'jms' but for specific messaging transports
      * such as WebsphereMQ the protocol will be the protocol of the transport i.e. 'wmq'.
      * @return returns the transport protocol
      */
-    public String getProtocol();
+    String getProtocol();
 
     /**
      * @return a ConnectionFactory implementation used for unit testing of the provider, 
      * usually consisting of some mocked-up methods.
      */
-    public ConnectionFactory getTestConnectionFactory();
+    ConnectionFactory getTestConnectionFactory();
 }

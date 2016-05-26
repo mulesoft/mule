@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.tck;
+package org.mule.runtime.transport.jms.integration;
 
 import org.mule.runtime.core.api.NamedObject;
 
@@ -21,7 +21,6 @@ import org.junit.runners.Parameterized.Parameters;
  * @see Parameterized
  * @see Parameters
  */
-//TODO(pablo.kraan): remove this and related classes once JMS transport is gone (MULE-9209)
 public interface ParameterizedConfiguration extends NamedObject
 {
     /**
@@ -30,16 +29,16 @@ public interface ParameterizedConfiguration extends NamedObject
      * @param callingClass is sometimes needed for correct classpath ordering
      * @throws Exception
      */
-    public void initialise(Class callingClass) throws Exception;
+    void initialise(Class callingClass) throws Exception;
 
     /**
      * A configuration which is not enabled will be skipped over when running tests.
      */
-    public boolean isEnabled();
+    boolean isEnabled();
 
     /**
      * Any properties returned by this method will be made available for substitution in the XML 
      * configuration file(s) for this test case.
      */
-    public Map getProperties();
+    Map getProperties();
 }
