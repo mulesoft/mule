@@ -14,8 +14,11 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.launcher.application.Application;
+import org.mule.runtime.module.launcher.application.ApplicationPluginClassLoaderFactory;
+import org.mule.runtime.module.launcher.application.ApplicationPluginFactory;
 import org.mule.runtime.module.launcher.application.CompositeApplicationClassLoaderFactory;
 import org.mule.runtime.module.launcher.application.DefaultApplicationFactory;
+import org.mule.runtime.module.launcher.application.DefaultApplicationPluginFactory;
 import org.mule.runtime.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
@@ -27,6 +30,8 @@ import org.mule.runtime.module.launcher.domain.DomainFactory;
 import org.mule.runtime.module.launcher.domain.DomainManager;
 import org.mule.runtime.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginRepository;
+import org.mule.runtime.module.launcher.plugin.DefaultApplicationPluginRepository;
 import org.mule.runtime.module.launcher.util.DebuggableReentrantLock;
 import org.mule.runtime.module.launcher.util.ObservableList;
 
@@ -71,6 +76,7 @@ public class MuleDeploymentService implements DeploymentService
     private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
     private DefaultArchiveDeployer<Application> applicationDeployer;
     private final DomainManager domainManager = new DefaultDomainManager();
+    private final ApplicationPluginRepository applicationPluginRepository;
 
     public MuleDeploymentService(ServerPluginClassLoaderManager serverPluginClassLoaderManager)
     {
@@ -86,8 +92,13 @@ public class MuleDeploymentService implements DeploymentService
         DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderFactory, domainManager, containerClassLoader);
         domainFactory.setDeploymentListener(domainDeploymentListener);
 
-        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory()));
-        DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, applicationDescriptorFactory, domainManager);
+        final ApplicationPluginFactory applicationPluginFactory = new DefaultApplicationPluginFactory(new ApplicationPluginClassLoaderFactory());
+        final ApplicationPluginDescriptorFactory applicationPluginDescriptorFactory = new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory());
+        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(applicationPluginDescriptorFactory);
+
+        applicationPluginRepository = new DefaultApplicationPluginRepository(applicationPluginDescriptorFactory);
+
+        DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, applicationDescriptorFactory, applicationPluginFactory, domainManager, applicationPluginRepository);
         applicationFactory.setDeploymentListener(applicationDeploymentListener);
 
         ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>();

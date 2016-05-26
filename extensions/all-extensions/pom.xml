@@ -14,21 +14,52 @@
         This is needed in our various distributions we publish.
     </description>
 
+    <!-- Dependencies included in modules with type zip must be excluded as their
+        are going to be included as zip in distro
+    -->
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file</artifactId>
             <version>${project.version}</version>
+            <type>zip</type>
         </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-ftp</artifactId>
             <version>${project.version}</version>
+            <type>zip</type>
+            <exclusions>
+                <!--TODO(gfernandes): remove this, see validation's comment-->
+                <exclusion>
+                    <groupId>commons-net</groupId>
+                    <artifactId>commons-net</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.jcraft</groupId>
+                    <artifactId>jsch</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-validation</artifactId>
             <version>${project.version}</version>
+            <type>zip</type>
+            <!--TODO(gfernandes): https://issues.apache.org/jira/browse/MASSEMBLY-799
+                wildcard exclusions were supported in maven-core https://issues.apache.org/jira/browse/MNG-3832
+                but still assembly is not handling this correctly. Remove commons-validator and add * for groupId and artifacId
+                so transitive dependencies will not end up in lib/opt (and we don't want to explicitly
+                exclude them from the assembly descriptor)
+            -->
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-validator</groupId>
+                    <artifactId>commons-validator</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

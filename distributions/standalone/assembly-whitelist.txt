@@ -133,9 +133,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-db-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-spring-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-file-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-file-extension-common-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-ftp-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-http-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
@@ -154,12 +152,18 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-sockets-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tls-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-validation-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-010.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 
+#
+# /app-plugins
+#
+/mule-standalone-${productVersion}/app-plugins
+/mule-standalone-${productVersion}/app-plugins/mule-module-validation-${productVersion}.zip
+/mule-standalone-${productVersion}/app-plugins/mule-module-ftp-${productVersion}.zip
+/mule-standalone-${productVersion}/app-plugins/mule-module-file-${productVersion}.zip
 
 #
 # /lib/opt
@@ -185,13 +189,11 @@
 /mule-standalone-${productVersion}/lib/opt/commons-codec-1.9.jar
 /mule-standalone-${productVersion}/lib/opt/commons-collections-3.2.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-dbutils-1.2.jar
-/mule-standalone-${productVersion}/lib/opt/commons-digester-1.8.jar
 /mule-standalone-${productVersion}/lib/opt/commons-io-2.4.jar
 /mule-standalone-${productVersion}/lib/opt/commons-lang-2.4.jar
 /mule-standalone-${productVersion}/lib/opt/commons-lang3-3.4.jar
 /mule-standalone-${productVersion}/lib/opt/commons-net-3.3.jar
 /mule-standalone-${productVersion}/lib/opt/commons-pool-1.6.jar
-/mule-standalone-${productVersion}/lib/opt/commons-validator-1.4.0.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-api-2.7.15.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-management-2.7.15.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-rt-bindings-soap-2.7.15.jar
@@ -264,7 +266,6 @@
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-4.6.jar
 /mule-standalone-${productVersion}/lib/opt/json-20140107.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-stdlib-1.7.24.jar
-/mule-standalone-${productVersion}/lib/opt/jsch-0.1.53.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.6.jar

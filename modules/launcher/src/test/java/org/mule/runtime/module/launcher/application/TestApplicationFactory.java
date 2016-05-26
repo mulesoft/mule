@@ -10,9 +10,13 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
 import org.mule.runtime.module.launcher.domain.DomainManager;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginRepository;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Creates a {@link DefaultApplicationFactory} that returns {@link TestApplicationWrapper}
@@ -26,7 +30,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
 
     public TestApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, DomainManager domainManager)
     {
-        super(applicationClassLoaderFactory, new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())), domainManager);
+        super(applicationClassLoaderFactory, new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())), new DefaultApplicationPluginFactory(new ApplicationPluginClassLoaderFactory()), domainManager, new TestEmptyApplicationPluginRepository());
     }
 
     @Override
@@ -49,5 +53,15 @@ public class TestApplicationFactory extends DefaultApplicationFactory
     public void setFailOnStopApplication(boolean failOnStopApplication)
     {
         this.failOnStopApplication = failOnStopApplication;
+    }
+
+
+    private static class TestEmptyApplicationPluginRepository implements ApplicationPluginRepository
+    {
+        @Override
+        public List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors() throws IOException
+        {
+            return Collections.emptyList();
+        }
     }
 }

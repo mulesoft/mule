@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static java.io.File.separator;
 import static java.lang.String.format;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
@@ -78,7 +81,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
             }
 
             // get a ref to an optional app props file (right next to the descriptor)
-            final File appPropsFile = new File(artifactFolder, ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE);
+            final File appPropsFile = new File(artifactFolder, DEFAULT_APP_PROPERTIES_RESOURCE);
             setApplicationProperties(desc, appPropsFile);
 
             final Set<ApplicationPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
@@ -96,7 +99,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
 
     private Set<ApplicationPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor) throws IOException
     {
-        final File pluginsDir = new File(appDir, MuleFoldersUtil.PLUGINS_FOLDER);
+        final File pluginsDir = new File(appDir, PLUGINS_FOLDER);
         String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
         if (pluginZips == null || pluginZips.length == 0)
         {
@@ -111,7 +114,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
             final String pluginName = StringUtils.removeEnd(pluginZip, ".zip");
             // must unpack as there's no straightforward way for a ClassLoader to use a jar within another jar/zip
             final File tmpDir = new File(MuleContainerBootstrapUtils.getMuleTmpDir(),
-                                         appDescriptor.getName() + "/plugins/" + pluginName);
+                                         appDescriptor.getName() + separator + PLUGINS_FOLDER + separator + pluginName);
             FileUtils.unzip(new File(pluginsDir, pluginZip), tmpDir);
             final ApplicationPluginDescriptor pd = pluginDescriptorFactory.create(tmpDir);
 
