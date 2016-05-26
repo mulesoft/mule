@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core;
+package org.mule.runtime.container.api;
 
 import java.util.List;
 

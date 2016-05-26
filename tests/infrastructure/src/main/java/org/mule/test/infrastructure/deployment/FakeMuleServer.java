@@ -13,11 +13,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import org.mule.runtime.core.MuleCoreExtension;
+import org.mule.runtime.container.ContainerClassLoaderFactory;
+import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.FilenameUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.DeploymentListener;
 import org.mule.runtime.module.launcher.DeploymentService;
 import org.mule.runtime.module.launcher.MuleDeploymentService;
@@ -29,9 +34,6 @@ import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensio
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
-import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.FilenameUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,15 +70,23 @@ public class FakeMuleServer
     }
 
     private DefaultMuleCoreExtensionManagerServer coreExtensionManager;
+    private final ArtifactClassLoader containerClassLoader;
 
     public FakeMuleServer(String muleHomePath)
     {
-        this(muleHomePath, new LinkedList<MuleCoreExtension>());
+        this(muleHomePath, new LinkedList<>());
     }
 
     public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions)
     {
+        final ContainerClassLoaderFactory containerClassLoaderFactory = new ContainerClassLoaderFactory();
+        containerClassLoader = containerClassLoaderFactory.createContainerClassLoader(getClass().getClassLoader());
+
         this.coreExtensions = intialCoreExtensions;
+        for (MuleCoreExtension extension : coreExtensions)
+        {
+            extension.setContainerClassLoader(containerClassLoader);
+        }
 
         muleHome = new File(muleHomePath);
         muleHome.deleteOnExit();
@@ -98,7 +108,8 @@ public class FakeMuleServer
             throw new RuntimeException(e);
         }
 
-        deploymentService = new MuleDeploymentService(new MuleServerPluginClassLoaderManager());
+
+        deploymentService = new MuleDeploymentService(containerClassLoader, new MuleServerPluginClassLoaderManager());
         deploymentListener = mock(DeploymentListener.class);
         deploymentService.addDeploymentListener(deploymentListener);
 
@@ -366,6 +377,7 @@ public class FakeMuleServer
 
     public void addCoreExtension(MuleCoreExtension coreExtension)
     {
+        coreExtension.setContainerClassLoader(containerClassLoader);
         coreExtensions.add(coreExtension);
     }
 

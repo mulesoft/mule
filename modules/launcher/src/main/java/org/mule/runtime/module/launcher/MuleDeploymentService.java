@@ -8,7 +8,6 @@ package org.mule.runtime.module.launcher;
 
 import static org.mule.runtime.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
-import org.mule.runtime.container.ContainerClassLoaderFactory;
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
@@ -78,12 +77,8 @@ public class MuleDeploymentService implements DeploymentService
     private final DomainManager domainManager = new DefaultDomainManager();
     private final ApplicationPluginRepository applicationPluginRepository;
 
-    public MuleDeploymentService(ServerPluginClassLoaderManager serverPluginClassLoaderManager)
+    public MuleDeploymentService(ArtifactClassLoader containerClassLoader, ServerPluginClassLoaderManager serverPluginClassLoaderManager)
     {
-        final ContainerClassLoaderFactory containerClassLoaderFactory = new ContainerClassLoaderFactory();
-
-        final ArtifactClassLoader containerClassLoader = containerClassLoaderFactory.createContainerClassLoader(getClass().getClassLoader());
-
         ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory = new DomainClassLoaderFactory(containerClassLoader.getClassLoader());
 
         ArtifactClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory());

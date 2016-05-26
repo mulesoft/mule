@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
-import org.mule.runtime.core.MuleCoreExtension;
+import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
 
 import java.util.List;
 
 /**
- * Defines a way to search for available {@link org.mule.runtime.core.MuleCoreExtension}
+ * Defines a way to search for available {@link MuleCoreExtension}
  */
 public interface MuleCoreExtensionDiscoverer
 {

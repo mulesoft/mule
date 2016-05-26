@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
-import org.mule.runtime.core.CoreExtensionsAware;
-import org.mule.runtime.core.MuleCoreExtension;
+import org.mule.runtime.container.api.CoreExtensionsAware;
+import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -34,11 +34,6 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     private DeploymentService deploymentService;
     private List<MuleCoreExtension> orderedCoreExtensions;
     private ServerPluginClassLoaderManager serverPluginClassLoaderManager;
-
-    public DefaultMuleCoreExtensionManagerServer()
-    {
-        this(new ClasspathMuleCoreExtensionDiscoverer(), new ReflectionMuleCoreExtensionDependencyResolver());
-    }
 
     public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer, MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver)
     {

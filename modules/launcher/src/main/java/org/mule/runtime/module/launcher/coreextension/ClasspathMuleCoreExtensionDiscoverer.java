@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
-import org.mule.runtime.core.MuleCoreExtension;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.net.URL;
 import java.util.Enumeration;
@@ -27,17 +29,28 @@ import org.apache.commons.logging.LogFactory;
 public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDiscoverer
 {
 
-    public static final String SERVICE_PATH = "META-INF/services/org/mule/runtime/core/config/";
-    public static final String CORE_EXTENSION_PROPERTIES = "core-extensions.properties";
+    public static final String CORE_EXTENSION_RESOURCE_NAME = "META-INF/services/org/mule/runtime/core/config/core-extensions.properties";
 
     private static Log logger = LogFactory.getLog(ClasspathMuleCoreExtensionDiscoverer.class);
+    private final ArtifactClassLoader containerClassLoader;
+
+    /**
+     * Creates a new extension discoverer
+     *
+     * @param containerClassLoader classloader where the discovering process will be executed. Non null.
+     */
+    public ClasspathMuleCoreExtensionDiscoverer(ArtifactClassLoader containerClassLoader)
+    {
+        checkArgument(containerClassLoader != null, "Container classLoader cannot be null");
+        this.containerClassLoader = containerClassLoader;
+    }
 
     @Override
     public List<MuleCoreExtension> discover() throws DefaultMuleException
     {
-        List<MuleCoreExtension> result = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> result = new LinkedList<>();
 
-        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + CORE_EXTENSION_PROPERTIES, getClass());
+        Enumeration<?> e = ClassUtils.getResources(CORE_EXTENSION_RESOURCE_NAME, getClass());
         List<Properties> extensions = new LinkedList<Properties>();
 
         // load ALL of the extension files first
@@ -69,6 +82,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
                 try
                 {
                     MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instanciateClass(extClass);
+                    extension.setContainerClassLoader(containerClassLoader);
                     result.add(extension);
                 }
                 catch (Exception ex)

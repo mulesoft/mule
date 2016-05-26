@@ -6,7 +6,7 @@
  */
 package org.mule.test.infrastructure.process;
 
-import org.mule.runtime.core.MuleCoreExtension;
+import org.mule.runtime.container.api.MuleCoreExtension;
 
 public class MuleCoreExtensionProcessConfigurer implements ProcessBuilderConfigurer
 {

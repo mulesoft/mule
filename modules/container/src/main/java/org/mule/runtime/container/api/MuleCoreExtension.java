@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core;
+package org.mule.runtime.container.api;
 
 import org.mule.runtime.core.api.NamedObject;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 /**
  * Allows Mule modules and transports to extend core functionality in an
@@ -15,5 +16,9 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
  */
 public interface MuleCoreExtension extends Lifecycle, NamedObject
 {
-    // no custom methods
+
+    /**
+     * @param containerClassLoader container classloader which provides access to Mule API only. Non null
+     */
+    void setContainerClassLoader(ArtifactClassLoader containerClassLoader);
 }
