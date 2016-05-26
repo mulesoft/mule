@@ -7,9 +7,9 @@
  */
 package org.mule.runtime.module.launcher.descriptor;
 
+import static org.apache.commons.collections.CollectionUtils.find;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
-import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 
@@ -159,7 +159,7 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor
      */
     public boolean containsApplicationPluginDescriptor(final ApplicationPluginDescriptor appPluginDescriptor)
     {
-        return CollectionUtils.find(this.plugins, object -> ((ApplicationPluginDescriptor) object).getName().equals(appPluginDescriptor.getName())) != null;
+        return find(this.plugins, object -> ((ApplicationPluginDescriptor) object).getName().equals(appPluginDescriptor.getName())) != null;
     }
 
 }

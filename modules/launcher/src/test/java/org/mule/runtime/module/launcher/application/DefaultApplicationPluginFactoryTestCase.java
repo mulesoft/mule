@@ -18,6 +18,7 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.net.MalformedURLException;
@@ -26,7 +27,7 @@ import java.net.URL;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultApplicationPluginFactoryTestCase
+public class DefaultApplicationPluginFactoryTestCase extends AbstractMuleTestCase
 {
     @Test
     public void createApplicationPlugin() throws MalformedURLException, ClassNotFoundException
@@ -38,7 +39,7 @@ public class DefaultApplicationPluginFactoryTestCase
         when(descriptor.getRuntimeClassesDir()).thenReturn(getClass().getClassLoader().getResource("org/foo/"));
 
         ArtifactClassLoader parentClassLoader = new MuleArtifactClassLoader("mule", new URL[0], getClass().getClassLoader(), new MuleClassLoaderLookupPolicy(emptyMap(), emptySet()));
-        ApplicationPlugin appPlugin = new DefaultApplicationPluginFactory().create(descriptor, parentClassLoader);
+        ApplicationPlugin appPlugin = new DefaultApplicationPluginFactory(new ApplicationPluginClassLoaderFactory()).create(descriptor, parentClassLoader);
 
         // Look for a class in bar-1.0.jar to check classloader has been correctly set
         assertThat(Class.forName("org.bar.BarUtils", true, appPlugin.getArtifactClassLoader().getClassLoader()), is(notNullValue()));

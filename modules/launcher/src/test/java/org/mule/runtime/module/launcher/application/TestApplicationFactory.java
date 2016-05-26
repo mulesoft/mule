@@ -30,7 +30,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
 
     public TestApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, DomainManager domainManager)
     {
-        super(applicationClassLoaderFactory, new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())), new DefaultApplicationPluginFactory(), domainManager, new TestEmptyApplicationPluginRepository());
+        super(applicationClassLoaderFactory, new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())), new DefaultApplicationPluginFactory(new ApplicationPluginClassLoaderFactory()), domainManager, new TestEmptyApplicationPluginRepository());
     }
 
     @Override

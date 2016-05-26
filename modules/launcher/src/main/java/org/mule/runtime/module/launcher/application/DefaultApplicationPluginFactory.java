@@ -8,10 +8,7 @@
 package org.mule.runtime.module.launcher.application;
 
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
-
-import java.net.URL;
 
 /**
  * Default implementation for creating an {@link ApplicationPlugin} with the corresponding classloader.
@@ -20,21 +17,22 @@ import java.net.URL;
  */
 public class DefaultApplicationPluginFactory implements ApplicationPluginFactory
 {
+    private ApplicationPluginClassLoaderFactory applicationPluginClassLoaderFactory;
+
+    /**
+     * Creates an instance
+     * @param applicationPluginClassLoaderFactory used to create the {@link ArtifactClassLoader}, cannot be null.
+     */
+    public DefaultApplicationPluginFactory(ApplicationPluginClassLoaderFactory applicationPluginClassLoaderFactory)
+    {
+        this.applicationPluginClassLoaderFactory = applicationPluginClassLoaderFactory;
+    }
 
     @Override
     public ApplicationPlugin create(ApplicationPluginDescriptor descriptor, ArtifactClassLoader parent)
     {
-        final MuleArtifactClassLoader pluginClassLoader = createPluginClassLoader(parent, descriptor);
+        final ArtifactClassLoader pluginClassLoader = applicationPluginClassLoaderFactory.create(parent, descriptor);
 
         return new DefaultApplicationPlugin(descriptor, pluginClassLoader);
-    }
-
-    private MuleArtifactClassLoader createPluginClassLoader(ArtifactClassLoader parent, ApplicationPluginDescriptor descriptor)
-    {
-        URL[] urls = new URL[descriptor.getRuntimeLibs().length + 1];
-        urls[0] = descriptor.getRuntimeClassesDir();
-        System.arraycopy(descriptor.getRuntimeLibs(), 0, urls, 1, descriptor.getRuntimeLibs().length);
-
-        return new MuleArtifactClassLoader(descriptor.getName(), urls, parent.getClassLoader(), parent.getClassLoaderLookupPolicy());
     }
 }

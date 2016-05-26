@@ -92,8 +92,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
         assertThat(application.getDescriptor(), is(descriptor));
         assertThat(application.getArtifactName(), is(APP_NAME));
         assertThat(application.getResourceFiles(), is(resourceFiles));
-        // Descriptor doesn't contain the core application plugin installed for this app
-        assertThat(application.getDescriptor().getPlugins().contains(appPlugin), is(false));
     }
 
     private Domain createDomain(String name)

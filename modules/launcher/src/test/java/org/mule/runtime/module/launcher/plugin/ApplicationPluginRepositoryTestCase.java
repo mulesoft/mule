@@ -7,14 +7,15 @@
 
 package org.mule.runtime.module.launcher.plugin;
 
+import static java.io.File.separator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.config.MuleProperties;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.CONTAINER_APP_PLUGINS;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.module.launcher.MuleFoldersUtil;
 import org.mule.tck.ZipUtils;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -40,23 +41,26 @@ public class ApplicationPluginRepositoryTestCase extends AbstractMuleTestCase
     public TemporaryFolder muleHomeFolder = new TemporaryFolder();
 
     private final ApplicationPluginDescriptorFactory applicationPluginDescriptorFactory = mock(ApplicationPluginDescriptorFactory.class);
-    private ApplicationPluginRepository applicationPluginRepository = new DefaultApplicationPluginRepository(applicationPluginDescriptorFactory);
+    private final ApplicationPluginRepository applicationPluginRepository = new DefaultApplicationPluginRepository(applicationPluginDescriptorFactory);
+
+    private File pluginsLibFolder;
 
     @Before
     public void setUp() throws IOException
     {
-        System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getCanonicalPath());
+        System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getCanonicalPath());
         when(applicationPluginDescriptorFactory.create(anyObject())).thenAnswer(invocation -> {
             ApplicationPluginDescriptor descriptor = new ApplicationPluginDescriptor();
             descriptor.setName(((File) invocation.getArguments()[0]).getName());
             return descriptor;
         });
+
+        pluginsLibFolder = createContainerAppPluginsFolder();
     }
 
     @Test
     public void emptyListOfPlugins() throws Exception
     {
-        createContainerAppPluginsFolder();
         final List<ApplicationPluginDescriptor> descriptorList = applicationPluginRepository.getContainerApplicationPluginDescriptors();
         assertThat(descriptorList.size(), is(0));
     }
@@ -64,7 +68,6 @@ public class ApplicationPluginRepositoryTestCase extends AbstractMuleTestCase
     @Test
     public void unzipPluginZipFileCreateDescriptor() throws Exception
     {
-        File pluginsLibFolder = createContainerAppPluginsFolder();
         File zipPlugin = createPluginZipFile(pluginsLibFolder, PLUGIN_NAME);
 
         final List<ApplicationPluginDescriptor> descriptorList = applicationPluginRepository.getContainerApplicationPluginDescriptors();
@@ -80,7 +83,6 @@ public class ApplicationPluginRepositoryTestCase extends AbstractMuleTestCase
     @Test
     public void loadPluginAlreadyUnzippedCreateDescriptor() throws Exception
     {
-        File pluginsLibFolder = createContainerAppPluginsFolder();
         File pluginFolder = createPluginFolder(pluginsLibFolder, PLUGIN_NAME);
 
         final List<ApplicationPluginDescriptor> descriptorList = applicationPluginRepository.getContainerApplicationPluginDescriptors();
@@ -94,7 +96,7 @@ public class ApplicationPluginRepositoryTestCase extends AbstractMuleTestCase
 
     private File createContainerAppPluginsFolder() throws IOException
     {
-        final File pluginsFolder = new File(muleHomeFolder.getRoot(), MuleFoldersUtil.CONTAINER_APP_PLUGINS);
+        final File pluginsFolder = new File(muleHomeFolder.getRoot(), CONTAINER_APP_PLUGINS);
         assertThat(pluginsFolder.mkdir(), is(true));
         return pluginsFolder;
     }
@@ -111,7 +113,7 @@ public class ApplicationPluginRepositoryTestCase extends AbstractMuleTestCase
 
 
         File zipFile = new File(pluginsLibFolder, pluginName + ".zip");
-        ZipUtils.compress(zipFile, new ZipResource[] {new ZipResource(dummyJar.getAbsolutePath(), PLUGIN_LIB_FOLDER + "/" + libraryJarName), new ZipResource(pluginPropertiesFile.getAbsolutePath(), pluginPropertiesFile.getName())});
+        ZipUtils.compress(zipFile, new ZipResource[] {new ZipResource(dummyJar.getAbsolutePath(), PLUGIN_LIB_FOLDER + separator + libraryJarName), new ZipResource(pluginPropertiesFile.getAbsolutePath(), pluginPropertiesFile.getName())});
 
         FileUtils.forceDelete(pluginFolder);
 

@@ -8,23 +8,25 @@
 package org.mule.runtime.module.launcher.plugin;
 
 import static java.io.File.separator;
+import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.unmodifiableList;
+import static org.apache.commons.io.FileUtils.forceDelete;
+import static org.apache.commons.io.FilenameUtils.removeExtension;
+import static org.apache.commons.io.IOCase.INSENSITIVE;
+import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getContainerAppPluginsFolder;
-import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.FilenameUtils;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 /**
- * Default implemmentation of an {@link ApplicationPluginRepository} that holds in memory the list
+ * Default implementation of an {@link ApplicationPluginRepository} that holds in memory the list
  * of artifact plugin descriptors bundled with the container.
  *
  * @since 4.0
@@ -34,15 +36,18 @@ public class DefaultApplicationPluginRepository implements ApplicationPluginRepo
     private List<ApplicationPluginDescriptor> containerApplicationPluginDescriptors;
     private final ApplicationPluginDescriptorFactory pluginDescriptorFactory;
 
+    /**
+     * @param pluginDescriptorFactory a {@link ApplicationPluginDescriptorFactory} for creating from the container applications plugins folder the list of {@link ApplicationPluginDescriptor}'s
+     */
     public DefaultApplicationPluginRepository(ApplicationPluginDescriptorFactory pluginDescriptorFactory)
     {
         this.pluginDescriptorFactory = pluginDescriptorFactory;
     }
 
     @Override
-    public List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors() throws IOException
+    public synchronized List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors() throws IOException
     {
-        if(containerApplicationPluginDescriptors == null)
+        if (containerApplicationPluginDescriptors == null)
         {
             collectContainerApplicationPluginDescriptors();
         }
@@ -51,50 +56,52 @@ public class DefaultApplicationPluginRepository implements ApplicationPluginRepo
 
     private void collectContainerApplicationPluginDescriptors() throws IOException
     {
-        List<ApplicationPluginDescriptor> pluginDescriptors = new LinkedList<>();
-
         File[] containerPlugins = getContainerAppPluginsFolder().listFiles();
         if (containerPlugins != null)
         {
             unzipPluginsIfNeeded();
-            createApplicationPluginDescriptors(pluginDescriptors);
+            containerApplicationPluginDescriptors = unmodifiableList(createApplicationPluginDescriptors());
         }
-
-        containerApplicationPluginDescriptors = Collections.unmodifiableList(pluginDescriptors);
+        else
+        {
+            containerApplicationPluginDescriptors = EMPTY_LIST;
+        }
     }
 
     /**
-     * Iterates the list of zip files in container application plugin folder and unzip them.
+     * Iterates the list of zip files in container application plugin folder, unzip them and once the plugin is expanded
+     * it deletes the zip from the container app plugins folder.
      * @throws IOException
      */
     private void unzipPluginsIfNeeded() throws IOException
     {
-        for (File pluginZipFile : getContainerAppPluginsFolder().listFiles((FileFilter) new SuffixFileFilter(".zip", IOCase.INSENSITIVE)))
+        for (File pluginZipFile : getContainerAppPluginsFolder().listFiles((FileFilter) new SuffixFileFilter(".zip", INSENSITIVE)))
         {
-            String pluginName = FilenameUtils.removeExtension(pluginZipFile.getName());
+            String pluginName = removeExtension(pluginZipFile.getName());
 
-            // must unpack as there's no straightforward way for a ClassLoader to use a zip within another jar/zip
             final File pluginFolderExpanded = new File(getContainerAppPluginsFolder(),
                                                        separator + pluginName);
-            FileUtils.unzip(pluginZipFile, pluginFolderExpanded);
+            unzip(pluginZipFile, pluginFolderExpanded);
 
-            // now we don't need to have the zip file anymore so deleting it
-            FileUtils.forceDelete(pluginZipFile);
+            forceDelete(pluginZipFile);
         }
     }
 
     /**
      * For each plugin expanded in container application plugins folder it creates an {@link ApplicationPluginDescriptor} for it and
      * adds the descriptor the given list.
-     * @param pluginDescriptors list to populate with descriptors.
+     * @return a non null {@link List} of {@link ApplicationPluginDescriptor}
      */
-    private void createApplicationPluginDescriptors(List<ApplicationPluginDescriptor> pluginDescriptors)
+    private List<ApplicationPluginDescriptor> createApplicationPluginDescriptors()
     {
-        // Load core application plugins
+        List<ApplicationPluginDescriptor> pluginDescriptors = new LinkedList<>();
+
         for (File pluginExpandedFolder : getContainerAppPluginsFolder().listFiles((FileFilter) DirectoryFileFilter.DIRECTORY))
         {
             final ApplicationPluginDescriptor appPluginDescriptor = pluginDescriptorFactory.create(pluginExpandedFolder);
             pluginDescriptors.add(appPluginDescriptor);
         }
+
+        return pluginDescriptors;
     }
 }

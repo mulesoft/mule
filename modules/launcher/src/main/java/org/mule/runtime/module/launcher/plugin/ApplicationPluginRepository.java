@@ -17,7 +17,7 @@ import java.util.List;
 public interface ApplicationPluginRepository
 {
     /**
-     * @return a List of {@link ApplicationPluginDescriptor} corresponding to application plugins already bundled with the container.
+     * @return a non null List of {@link ApplicationPluginDescriptor} corresponding to application plugins already bundled with the container.
      * @throws IOException if an error happens while building the descriptors from application plugins file.
      */
     List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors() throws IOException;

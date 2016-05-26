@@ -7,7 +7,10 @@
 package org.mule.runtime.module.launcher;
 
 import static java.io.File.separator;
+import static java.util.Arrays.asList;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
@@ -51,7 +54,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -89,7 +91,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +98,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -3067,9 +3067,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         File tmpAppFolder = new File(tmpAppsDir, appDeployedPath);
         assertTrue("tmp folder for application doesn't exist or is not a directory", tmpAppFolder.exists());
         assertTrue("tmp folder is not a directory", tmpAppFolder.isDirectory());
-        final String[] actualArtifacts = new File(tmpAppFolder, PLUGINS_FOLDER).list(DirectoryFileFilter.DIRECTORY);
+        final String[] actualArtifacts = new File(tmpAppFolder, PLUGINS_FOLDER).list(DIRECTORY);
         assertTrue("Invalid Mule plugins exploded for artifact",
-        CollectionUtils.isEqualCollection(Arrays.asList(expectedPlugins), Arrays.asList(actualArtifacts)));
+        isEqualCollection(asList(expectedPlugins), asList(actualArtifacts)));
     }
 
     /**
@@ -3078,9 +3078,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
      */
     private void assertContainerAppPluginExplodedDir(String[] expectedPlugins)
     {
-        final String[] actualArtifactPlugins = containerAppPluginsDir.list(DirectoryFileFilter.DIRECTORY);
+        final String[] actualArtifactPlugins = containerAppPluginsDir.list(DIRECTORY);
         assertTrue("Invalid Mule core application plugins exploded",
-                   CollectionUtils.isEqualCollection(Arrays.asList(expectedPlugins), Arrays.asList(actualArtifactPlugins)));
+                   isEqualCollection(asList(expectedPlugins), asList(actualArtifactPlugins)));
     }
 
     private void assertDomainDir(String[] expectedZips, String[] expectedDomains, boolean performValidation)
@@ -3095,11 +3095,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         {
             assertArrayEquals("Invalid Mule artifact archives set", expectedZips, actualZips);
         }
-        final String[] actualArtifacts = artifactDir.list(DirectoryFileFilter.DIRECTORY);
+        final String[] actualArtifacts = artifactDir.list(DIRECTORY);
         if (performValidation)
         {
             assertTrue("Invalid Mule exploded artifact set",
-                       CollectionUtils.isEqualCollection(Arrays.asList(expectedArtifacts), Arrays.asList(actualArtifacts)));
+                       isEqualCollection(asList(expectedArtifacts), asList(actualArtifacts)));
         }
     }
 
