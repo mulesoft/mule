@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDiscoverer
 {
 
-    public static final String CORE_EXTENSION_RESOURCE_NAME = "META-INF/services/org/mule/runtime/core/config/" + "core-extensions.properties";
+    public static final String CORE_EXTENSION_RESOURCE_NAME = "META-INF/services/org/mule/runtime/core/config/core-extensions.properties";
 
     private static Log logger = LogFactory.getLog(ClasspathMuleCoreExtensionDiscoverer.class);
     private final ArtifactClassLoader containerClassLoader;
