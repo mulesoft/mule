@@ -17,9 +17,15 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Object that sends an HTTP request, and returns the response.
+ *
+ * @since 4.0
  */
 public interface HttpClient extends Startable, Stoppable
 {
+    /**
+     * Returns the default parameters for the {@link HttpRequest} URI.
+     */
+    UriParameters getDefaultUriParameters();
 
     /**
      * Sends a HttpRequest blocking the current thread until a response is available for the request times out.

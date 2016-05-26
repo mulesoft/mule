@@ -6,9 +6,14 @@
  */
 package org.mule.extension.http.api.request;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
+import org.mule.extension.http.internal.request.client.DefaultUriParameters;
 import org.mule.extension.http.internal.request.client.HttpClientConfiguration;
 import org.mule.extension.http.internal.request.client.HttpClientFactory;
 import org.mule.extension.http.internal.request.grizzly.GrizzlyHttpClient;
@@ -18,6 +23,9 @@ import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -26,6 +34,12 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
+
+import java.util.function.Function;
+
+import javax.inject.Inject;
 
 /**
  * Connection provider for a HTTP request, handles the creation of {@link HttpClient} instances.
@@ -38,6 +52,38 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final String OBJECT_HTTP_CLIENT_FACTORY = "_httpClientFactory";
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
+
+    /**
+     * Host where the requests will be sent.
+     */
+    @Parameter
+    private Function<MuleEvent, String> host;
+
+    /**
+     * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the protocol
+     * attribute is HTTPS then the default value is 443.
+     */
+    @Parameter
+    @Optional
+    private Function<MuleEvent, Integer> port;
+
+    /**
+     * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the
+     * HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the
+     * user can customize the tls/ssl configuration by defining the tls:context child element of this listener-config.
+     * If not tls:context is defined then the default JVM certificates are going to be used to establish communication.
+     */
+    @Parameter
+    @Optional(defaultValue = "HTTP")
+    @Expression(NOT_SUPPORTED)
+    private HttpConstants.Protocols protocol;
+
+    /**
+     * Reference to a TLS config element. This will enable HTTPS for this config.
+     */
+    @Parameter
+    @Optional
+    private TlsContextFactory tlsContextFactory;
 
     /**
      * Reusable configuration element for outbound connections through a proxy.
@@ -79,21 +125,26 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
     @Expression(NOT_SUPPORTED)
     private TcpClientSocketProperties clientSocketProperties;
 
+    @Inject
+    @DefaultTlsContextFactoryBuilder
+    private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
+
     @Override
     public HttpClient connect(HttpRequesterConfig httpRequesterConfig) throws ConnectionException
     {
         String threadNamePrefix = String.format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(httpRequesterConfig.getMuleContext()), httpRequesterConfig.getName());
 
         HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
-            .setTlsContextFactory(httpRequesterConfig.getTlsContextFactory())
-            .setProxyConfig(proxyConfig)
-            .setClientSocketProperties(clientSocketProperties)
-            .setMaxConnections(maxConnections)
-            .setUsePersistentConnections(usePersistentConnections)
-            .setConnectionIdleTimeout(connectionIdleTimeout)
-            .setThreadNamePrefix(threadNamePrefix)
-            .setOwnerName(httpRequesterConfig.getName())
-            .build();
+                .setUriParameters(new DefaultUriParameters(protocol, host, port))
+                .setTlsContextFactory(tlsContextFactory)
+                .setProxyConfig(proxyConfig)
+                .setClientSocketProperties(clientSocketProperties)
+                .setMaxConnections(maxConnections)
+                .setUsePersistentConnections(usePersistentConnections)
+                .setConnectionIdleTimeout(connectionIdleTimeout)
+                .setThreadNamePrefix(threadNamePrefix)
+                .setOwnerName(httpRequesterConfig.getName())
+                .build();
 
         HttpClientFactory httpClientFactory = httpRequesterConfig.getMuleContext().getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
         HttpClient httpClient;
@@ -129,6 +180,26 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
     @Override
     public void initialise() throws InitialisationException
     {
+        if (port == null)
+        {
+            port = muleEvent -> protocol.getDefaultPort();
+        }
+
+        if (protocol.equals(HTTP) && tlsContextFactory != null)
+        {
+            throw new InitialisationException(createStaticMessage("TlsContext cannot be configured with protocol HTTP, " +
+                                                                  "when using tls:context you must set attribute protocol=\"HTTPS\""), this);
+        }
+
+        if (protocol.equals(HTTPS) && tlsContextFactory == null)
+        {
+            tlsContextFactory = defaultTlsContextFactoryBuilder.buildDefault();
+        }
+        if (tlsContextFactory != null)
+        {
+            initialiseIfNeeded(tlsContextFactory);
+        }
+
         verifyConnectionsParameters();
     }
 

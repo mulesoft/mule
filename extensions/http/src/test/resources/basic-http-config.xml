@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
-      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
     
-    <httpn:request-config name="reqConfig" host="localhost" protocol="HTTP" port="${clientPort}">
-        <httpn:requester-connection/>
+    <httpn:request-config name="reqConfig">
+        <httpn:requester-connection host="localhost" protocol="HTTP" port="${clientPort}"/>
     </httpn:request-config>
     
     <httpn:listener-config name="lisConfig">

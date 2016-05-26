@@ -6,17 +6,11 @@
  */
 package org.mule.extension.http.api.request;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -30,8 +24,6 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.module.http.api.HttpConstants;
-import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
 
 import java.net.CookieManager;
 import java.util.function.Function;
@@ -50,38 +42,6 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
 {
     @ConfigName
     private String configName;
-
-    /**
-     * Host where the requests will be sent.
-     */
-    @Parameter
-    private Function<MuleEvent, String> host;
-
-    /**
-     * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the protocol
-     * attribute is HTTPS then the default value is 443.
-     */
-    @Parameter
-    @Optional
-    private Function<MuleEvent, Integer> port;
-
-    /**
-     * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the
-     * HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the
-     * user can customize the tls/ssl configuration by defining the tls:context child element of this listener-config.
-     * If not tls:context is defined then the default JVM certificates are going to be used to establish communication.
-     */
-    @Parameter
-    @Optional(defaultValue = "HTTP")
-    @Expression(NOT_SUPPORTED)
-    private HttpConstants.Protocols protocol;
-
-    /**
-     * Reference to a TLS config element. This will enable HTTPS for this config.
-     */
-    @Parameter
-    @Optional
-    private TlsContextFactory tlsContextFactory;
 
     //TODO: document
     @Parameter
@@ -154,10 +114,6 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
     private RamlApiConfiguration ramlApiConfiguration;
 
     @Inject
-    @DefaultTlsContextFactoryBuilder
-    private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
-
-    @Inject
     private MuleContext muleContext;
     private CookieManager cookieManager;
     private boolean stopped = false;
@@ -170,40 +126,10 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
     @Override
     public void initialise() throws InitialisationException
     {
-        if (port == null)
-        {
-            port = muleEvent -> protocol.getDefaultPort();
-        }
-
-        if (protocol.equals(HTTP) && tlsContextFactory != null)
-        {
-            throw new InitialisationException(createStaticMessage("TlsContext cannot be configured with protocol HTTP, " +
-                                                                  "when using tls:context you must set attribute protocol=\"HTTPS\""), this);
-        }
-
-        if (protocol.equals(HTTPS) && tlsContextFactory == null)
-        {
-            tlsContextFactory = defaultTlsContextFactoryBuilder.buildDefault();
-        }
-        if (tlsContextFactory != null)
-        {
-            initialiseIfNeeded(tlsContextFactory);
-        }
-
         if (enableCookies)
         {
             cookieManager = new CookieManager();
         }
-    }
-
-    public Function<MuleEvent, String> getHost()
-    {
-        return host;
-    }
-
-    public Function<MuleEvent, Integer> getPort()
-    {
-        return port;
     }
 
     public Function<MuleEvent, String> getBasePath()
@@ -234,16 +160,6 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
     public Function<MuleEvent, Integer> getResponseTimeout()
     {
         return responseTimeout;
-    }
-
-    public HttpConstants.Protocols getScheme()
-    {
-        return protocol;
-    }
-
-    public TlsContextFactory getTlsContextFactory()
-    {
-        return tlsContextFactory;
     }
 
     public HttpAuthentication getAuthentication()

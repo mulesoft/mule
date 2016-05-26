@@ -13,6 +13,7 @@ import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.HttpClient;
+import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.request.HttpRequester;
@@ -79,13 +80,14 @@ public class HttpRequesterOperations
     {
         HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder
                                                                              : new HttpRequesterRequestBuilder();
+        UriParameters uriParameters = client.getDefaultUriParameters();
 
-        String resolvedHost = resolveIfNecessary(host, config.getHost(), muleEvent);
-        Integer resolvedPort = resolveIfNecessary(port, config.getPort(), muleEvent);
+        String resolvedHost = resolveIfNecessary(host, uriParameters.getHost(), muleEvent);
+        Integer resolvedPort = resolveIfNecessary(port, uriParameters.getPort(), muleEvent);
         String resolvedBasePath = config.getBasePath().apply(muleEvent);
         String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, path));
 
-        String resolvedUri = resolveUri(config.getScheme(), resolvedHost, resolvedPort, resolvedPath);
+        String resolvedUri = resolveUri(uriParameters.getScheme(), resolvedHost, resolvedPort, resolvedPath);
         Boolean resolvedFollowRedirects = resolveIfNecessary(followRedirects, config.getFollowRedirects(), muleEvent);
         HttpStreamingType resolvedStreamingMode = resolveIfNecessary(requestStreamingMode, config.getRequestStreamingMode(), muleEvent);
         HttpSendBodyMode resolvedSendBody = resolveIfNecessary(sendBodyMode, config.getSendBodyMode(), muleEvent);

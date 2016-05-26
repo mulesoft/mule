@@ -19,12 +19,12 @@ import org.mule.extension.http.api.request.validator.FailureStatusCodeValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.module.socket.api.SocketsExtension;
+import org.mule.module.socket.api.TcpClientSocketProperties;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
-import org.mule.runtime.module.socket.api.TcpClientSocketProperties;
 
 /**
  * HTTP connector used to handle and perform HTTP requests.

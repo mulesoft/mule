@@ -11,7 +11,7 @@
 
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-http-ext</artifactId>
-    <packaging>jar</packaging>
+    <packaging>mule-extension</packaging>
 
     <name>Mule HTTP Extension</name>
     <description>A Mule extension that provides HTTP server and client functionality</description>
@@ -41,12 +41,6 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.mule.modules</groupId>-->
-            <!--<artifactId>mule-module-spring-config</artifactId>-->
-            <!--<version>${project.version}</version>-->
-            <!--<scope>provided</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_3.0_spec</artifactId>

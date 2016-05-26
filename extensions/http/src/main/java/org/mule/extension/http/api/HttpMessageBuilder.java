@@ -41,8 +41,8 @@ public class HttpMessageBuilder
     /**
      * HTTP parts the message should include.
      */
-    //@Parameter
-    //@Optional
+    @Parameter
+    @Optional
     protected List<HttpPart> parts = new LinkedList<>();
 
     public Map<String, String> getHeaders()
