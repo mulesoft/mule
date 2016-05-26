@@ -75,6 +75,10 @@
             </includes>
         </fileSet>
 
+        <fileSet>
+            <directory>${project.build.directory}/app-plugins</directory>
+            <outputDirectory>app-plugins</outputDirectory>
+        </fileSet>
     </fileSets>
 
     <!--
@@ -134,9 +138,7 @@
                 <include>org.mule.modules:mule-module-db</include>
                 <include>org.mule.modules:mule-module-extensions-support</include>
                 <include>org.mule.modules:mule-module-extensions-spring-support</include>
-                <include>org.mule.modules:mule-module-file</include>
                 <include>org.mule.modules:mule-module-file-extension-common</include>
-                <include>org.mule.modules:mule-module-ftp</include>
                 <include>org.mule.modules:mule-module-http</include>
                 <include>org.mule.modules:mule-module-jaas</include>
                 <include>org.mule.modules:mule-module-jbossts</include>
@@ -153,7 +155,6 @@
                 <include>org.mule.modules:mule-module-sockets</include>
                 <include>org.mule.modules:mule-module-tls</include>
                 <include>org.mule.modules:mule-module-tomcat</include>
-                <include>org.mule.modules:mule-module-validation</include>
                 <include>org.mule.modules:mule-module-ws</include>
                 <include>org.mule.modules:mule-module-xml</include>
 
@@ -219,10 +220,12 @@
                 <exclude>org.mule.modules:mule-module-sockets</exclude>
                 <exclude>org.mule.modules:mule-module-tls</exclude>
                 <exclude>org.mule.modules:mule-module-tomcat</exclude>
-                <exclude>org.mule.modules:mule-module-validation</exclude>
                 <exclude>org.mule.modules:mule-module-ws</exclude>
                 <exclude>org.mule.modules:mule-module-xml</exclude>
                 <exclude>org.mule.tools:mule-tools-anttasks</exclude>
+
+                <!-- lib/app-plugins (these artifacts are zip type) -->
+                <exclude>*:zip:*</exclude>
 
                 <!-- mule-tests-functional dependencies -->
                 <exclude>org.apache.ftpserver:ftpserver-core</exclude>
