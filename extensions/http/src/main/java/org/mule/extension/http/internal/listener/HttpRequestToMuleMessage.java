@@ -32,6 +32,11 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+/**
+ * Component that transforms an HTTP request to a proper {@link MuleMessage}.
+ *
+ * @since 4.0
+ */
 public class HttpRequestToMuleMessage
 {
 

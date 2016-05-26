@@ -8,6 +8,8 @@ package org.mule.extension.http.api;
 
 /**
  * Defines if the request should contain a body or not.
+ *
+ * @since 4.0
  */
 public enum HttpSendBodyMode
 {
@@ -22,5 +24,5 @@ public enum HttpSendBodyMode
     /**
      * Will not send a body, regardless of the HTTP method selected.
      */
-    NEVER;
+    NEVER
 }

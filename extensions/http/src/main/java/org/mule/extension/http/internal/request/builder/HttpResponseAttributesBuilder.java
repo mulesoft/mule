@@ -36,7 +36,7 @@ public class HttpResponseAttributesBuilder
 
     public HttpResponseAttributes build()
     {
-        Map<String, String> headers = new HashMap<>();
+        Map<String, Object> headers = new HashMap<>();
         for (String headerName : response.getHeaderNames())
         {
             headers.put(headerName, response.getHeaderValue(headerName));

@@ -13,13 +13,21 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentic
 
 /**
  * Configures NTLM authentication for the requests.
+ *
+ * @since 4.0
  */
 public class NtlmAuthentication extends UsernamePasswordAuthentication
 {
+    /**
+     * The domain to authenticate.
+     */
     @Parameter
     @Optional
     private String domain;
 
+    /**
+     * The workstation to authenticate.
+     */
     @Parameter
     @Optional
     private String workstation;

@@ -6,11 +6,16 @@
  */
 package org.mule.extension.http.internal.request.client;
 
+import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.module.socket.api.TcpClientSocketProperties;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
-
+/**
+ * Configuration component that specifies how an {@link HttpClient} should be created.
+ *
+ * @since 4.0
+ */
 public class HttpClientConfiguration
 {
     private final TlsContextFactory tlsContextFactory;

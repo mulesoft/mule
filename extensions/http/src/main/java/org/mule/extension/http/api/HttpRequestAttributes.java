@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import static java.util.Collections.unmodifiableMap;
+import static com.google.common.collect.ImmutableMap.copyOf;
 
 import java.security.cert.Certificate;
 import java.util.Map;
@@ -15,20 +15,58 @@ import javax.activation.DataHandler;
 
 /**
  * Representation of an HTTP request message attributes.
+ *
+ * @since 4.0
  */
 public class HttpRequestAttributes extends HttpAttributes
 {
+    /**
+     * Full path where the request was received. Former 'http.listener.path'.
+     */
     private final String listenerPath;
+    /**
+     * Path where the request was received, without considering the base path. Former 'http.relative.path'.
+     */
     private final String relativePath;
+    /**
+     * HTTP version of the request. Former 'http.version'.
+     */
     private final String version;
+    /**
+     * HTTP scheme of the request. Former 'http.scheme'.
+     */
     private final String scheme;
+    /**
+     * HTTP method of the request. Former 'http.method'.
+     */
     private final String method;
+    /**
+     * Full path requested. Former 'http.request.path'.
+     */
     private final String requestPath;
+    /**
+     * Full URI of the request. Former 'http.request.uri'.
+     */
     private final String requestUri;
+    /**
+     * Query string of the request. Former 'http.query.string'.
+     */
     private final String queryString;
+    /**
+     * Query parameters map built from the parsed string. Former 'http.query.params'.
+     */
     private final Map<String, String> queryParams;
+    /**
+     * URI parameters extracted from the request path. Former 'http.uri.params'.
+     */
     private final Map<String, String> uriParams;
+    /**
+     * Remote host address from the sender. Former 'http.remote.address'.
+     */
     private final String remoteHostAddress;
+    /**
+     * Client certificate (if 2 way TLS is enabled). Former 'http.client.cert'.
+     */
     private final Certificate clientCertificate;
 
     public HttpRequestAttributes(Map<String, Object> headers, Map<String, DataHandler> parts, String listenerPath,
@@ -36,7 +74,7 @@ public class HttpRequestAttributes extends HttpAttributes
                                  String requestUri, String queryString, Map<String, String> queryParams,
                                  Map<String, String> uriParams, String remoteHostAddress, Certificate clientCertificate)
     {
-        super(unmodifiableMap(headers), unmodifiableMap(parts));
+        super(headers, parts);
         this.listenerPath = listenerPath;
         this.relativePath = relativePath;
         this.version = version;
@@ -45,8 +83,8 @@ public class HttpRequestAttributes extends HttpAttributes
         this.requestPath = requestPath;
         this.requestUri = requestUri;
         this.queryString = queryString;
-        this.queryParams = unmodifiableMap(queryParams);
-        this.uriParams = unmodifiableMap(uriParams);
+        this.queryParams = copyOf(queryParams);
+        this.uriParams = copyOf(uriParams);
         this.remoteHostAddress = remoteHostAddress;
         this.clientCertificate = clientCertificate;
     }

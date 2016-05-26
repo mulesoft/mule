@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api.listener;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -24,7 +25,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -65,6 +65,11 @@ import org.apache.commons.collections.map.MultiValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents a listener for HTTP requests.
+ *
+ * @since 4.0
+ */
 @Alias("listener")
 public class HttpListener extends Source<Object, HttpRequestAttributes> implements Initialisable
 {
@@ -78,7 +83,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
     private Server server;
 
     @Parameter
-    @Expression(NOT_SUPPORTED)
     private String path;
 
     /**
@@ -86,7 +90,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
      */
     @Parameter
     @Optional
-    @Expression(NOT_SUPPORTED)
     private String allowedMethods;
 
     /**
@@ -97,7 +100,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
      */
     @Parameter
     @Optional(defaultValue = "AUTO")
-    @Expression(NOT_SUPPORTED)
     private HttpStreamingType responseStreamingMode;
 
     /**
@@ -106,18 +108,15 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
      * no parsing will be done, and the payload will always contain the raw contents of the HTTP request.
      */
     @Parameter
-    @Optional(defaultValue = "true")
     @Expression(NOT_SUPPORTED)
     private Boolean parseRequest;
 
     @Parameter
     @Optional
-    @Expression(NOT_SUPPORTED)
     private HttpResponseBuilder responseBuilder;
 
     @Parameter
     @Optional
-    @Expression(NOT_SUPPORTED)
     private HttpResponseBuilder errorResponseBuilder;
 
     private MethodRequestMatcher methodRequestMatcher = AcceptsAllMethodsRequestMatcher.instance();
@@ -142,14 +141,14 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
             responseBuilder = HttpResponseBuilder.emptyInstance();
         }
 
-        LifecycleUtils.initialiseIfNeeded(responseBuilder);
+        initialiseIfNeeded(responseBuilder);
 
         if (errorResponseBuilder == null)
         {
             errorResponseBuilder = HttpResponseBuilder.emptyInstance();
         }
 
-        LifecycleUtils.initialiseIfNeeded(errorResponseBuilder);
+        initialiseIfNeeded(errorResponseBuilder);
 
     }
 
@@ -280,6 +279,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
     private MuleMessage<Object, HttpRequestAttributes> createMuleMessage(HttpRequestContext requestContext) throws HttpRequestParsingException
     {
         return HttpRequestToMuleMessage.transform(requestContext, muleContext, parseRequest, listenerPath);
+        //TODO: MULE-9748 Analyse RequestContext use in HTTP extension
         // Update RequestContext ThreadLocal for backwards compatibility
         //OptimizedRequestContext.unsafeSetEvent(muleEvent);
         //return muleEvent;
@@ -347,7 +347,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
             @Override
             public void responseSendSuccessfully()
             {
-                //TODO: Figure out how to handle this. Maybe doing nothing is right since this will be executed later if everything goes right.
+                //TODO: MULE-9749 Figure out how to handle this. Maybe doing nothing is right since this will be executed later if everything goes right.
                 //responseCompletationCallback.responseSentSuccessfully();
             }
         };

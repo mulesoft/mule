@@ -41,6 +41,11 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Collection;
 
+/**
+ * Grizzly based {@link HttpServerFactory}.
+ *
+ * @since 4.0
+ */
 public class HttpListenerConnectionManager implements HttpServerFactory, Initialisable, Disposable, MuleContextAware
 {
 
@@ -80,7 +85,7 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
             throw new InitialisationException(e, this);
         }
 
-        //TODO: Analyse whether this can be avoided
+        //TODO: MULE-9320 Define threading model for message sources in Mule 4 - Analyse whether this can be avoided
         workerThreadingProfile = new MutableThreadingProfile(DEFAULT_THREADING_PROFILE);
         workerThreadingProfile.setMaxThreadsActive(DEFAULT_MAX_THREADS);
 

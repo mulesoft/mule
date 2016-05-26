@@ -11,6 +11,8 @@ import org.mule.runtime.module.http.internal.listener.Server;
 
 /**
  * Factory object for {@link Server}
+ *
+ * @since 4.0
  */
 public interface HttpServerFactory
 {

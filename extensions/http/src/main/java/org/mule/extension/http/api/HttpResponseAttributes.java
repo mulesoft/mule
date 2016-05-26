@@ -6,24 +6,30 @@
  */
 package org.mule.extension.http.api;
 
-import static java.util.Collections.unmodifiableMap;
-
 import java.util.Map;
 
 import javax.activation.DataHandler;
 
 /**
  * Representation of an HTTP response message attributes.
+ *
+ * @since 4.0
  */
 public class HttpResponseAttributes extends HttpAttributes
 {
+    /**
+     * HTTP status code of the response. Former 'http.status'.
+     */
     private final int statusCode;
+    /**
+     * HTTP reason phrase of the response. Former 'http.reason'.
+     */
     private final String reasonPhrase;
 
     public HttpResponseAttributes(int statusCode, String reasonPhrase, Map<String, DataHandler> parts,
-                                  Map<String, String> headers)
+                                  Map<String, Object> headers)
     {
-        super(unmodifiableMap(headers), unmodifiableMap(parts));
+        super(headers, parts);
         this.statusCode = statusCode;
         this.reasonPhrase = reasonPhrase;
     }

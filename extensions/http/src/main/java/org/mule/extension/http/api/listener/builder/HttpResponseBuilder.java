@@ -48,16 +48,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Component that transforms a {@link MuleEvent} to a proper HTTP response.
+ * Component that specifies how to create a proper HTTP response.
+ *
+ * @since 4.0
  */
 public class HttpResponseBuilder extends HttpMessageBuilder
 {
     public static final String MULTIPART = "multipart";
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    /**
+     * HTTP status code the response should have.
+     */
     @Parameter
     @Optional
     private Integer statusCode;
+    /**
+     * HTTP reason phrase the response should have.
+     */
     @Parameter
     @Optional
     private String reasonPhrase;
@@ -70,7 +78,6 @@ public class HttpResponseBuilder extends HttpMessageBuilder
     public HttpResponse build(org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder httpResponseBuilder, MuleEvent event, boolean supportsTransferEncoding) throws MessagingException
     {
         final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
-
 
         if (httpResponseHeaderBuilder.getHeader(MuleProperties.CONTENT_TYPE_PROPERTY) != null)
         {

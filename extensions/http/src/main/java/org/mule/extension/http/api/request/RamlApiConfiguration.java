@@ -11,6 +11,11 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 
+/**
+ * Configuration for the API that is being consumed based on a RAML file.
+ *
+ * @since 4.0
+ */
 public class RamlApiConfiguration
 {
 

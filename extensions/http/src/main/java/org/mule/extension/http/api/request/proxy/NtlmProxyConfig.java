@@ -11,10 +11,15 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 
 /**
  * A Proxy configuration for NTLM authentication proxies.
+ *
+ * @since 4.0
  */
 @Alias("ntlm-proxy")
 public class NtlmProxyConfig extends DefaultProxyConfig
 {
+    /**
+     * The domain to authenticate against the proxy.
+     */
     @Parameter
     private String ntlmDomain;
 

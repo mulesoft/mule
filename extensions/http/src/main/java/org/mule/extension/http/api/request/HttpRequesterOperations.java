@@ -17,6 +17,7 @@ import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.request.HttpRequester;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -29,11 +30,16 @@ import org.mule.runtime.module.http.internal.HttpParser;
 
 import java.util.function.Function;
 
+import javax.inject.Inject;
+
 
 public class HttpRequesterOperations
 {
 
     private static final int WAIT_FOR_EVER = MAX_VALUE;
+
+    @Inject
+    private MuleContext muleContext;
 
     /**
      * Consumes an HTTP service.
@@ -53,7 +59,7 @@ public class HttpRequesterOperations
      * @param muleEvent the current {@link MuleEvent}
      * @return a {@link MuleMessage} with {@link HttpResponseAttributes}
      */
-    @MetadataScope(keysResolver = MetadataResolver.class, outputResolver = MetadataResolver.class)
+    @MetadataScope(keysResolver = HttpMetadataResolver.class, outputResolver = HttpMetadataResolver.class)
     public MuleMessage<Object, HttpResponseAttributes> request(String path,
                                                           @Optional(defaultValue = "GET") String method,
                                                           @Optional String host,
@@ -125,7 +131,7 @@ public class HttpRequesterOperations
             responseTimeout = config.getResponseTimeout().apply(muleEvent);
         }
 
-        if (muleEvent.getMuleContext().getConfiguration().isDisableTimeouts())
+        if (muleContext.getConfiguration().isDisableTimeouts())
         {
             return WAIT_FOR_EVER;
         }

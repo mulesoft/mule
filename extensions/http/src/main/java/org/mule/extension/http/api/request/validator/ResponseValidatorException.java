@@ -11,6 +11,11 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
+/**
+ * Signals that an error occurred while validating a {@link MuleMessage}
+ *
+ * @since 4.0
+ */
 public class ResponseValidatorException extends MessagingException
 {
 

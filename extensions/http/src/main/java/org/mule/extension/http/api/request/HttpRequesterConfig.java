@@ -6,6 +6,9 @@
  */
 package org.mule.extension.http.api.request;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -19,9 +22,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -37,6 +38,11 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+/**
+ * Configuration element for a HTTP requests.
+ *
+ * @since 4.0
+ */
 @Configuration(name = "request-config")
 @Providers(HttpRequesterProvider.class)
 @Operations({HttpRequesterOperations.class})
@@ -150,6 +156,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
     @Inject
     @DefaultTlsContextFactoryBuilder
     private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
+
     @Inject
     private MuleContext muleContext;
     private CookieManager cookieManager;
@@ -170,8 +177,8 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
 
         if (protocol.equals(HTTP) && tlsContextFactory != null)
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("TlsContext cannot be configured with protocol HTTP, " +
-                                                                               "when using tls:context you must set attribute protocol=\"HTTPS\""), this);
+            throw new InitialisationException(createStaticMessage("TlsContext cannot be configured with protocol HTTP, " +
+                                                                  "when using tls:context you must set attribute protocol=\"HTTPS\""), this);
         }
 
         if (protocol.equals(HTTPS) && tlsContextFactory == null)
@@ -180,7 +187,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
         }
         if (tlsContextFactory != null)
         {
-            LifecycleUtils.initialiseIfNeeded(tlsContextFactory);
+            initialiseIfNeeded(tlsContextFactory);
         }
 
         if (enableCookies)
@@ -267,10 +274,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
     @Override
     public void stop() throws MuleException
     {
-        if (this.authentication instanceof Stoppable)
-        {
-            ((Stoppable) this.authentication).stop();
-        }
+        stopIfNeeded(this.authentication);
         stopped = true;
     }
 

@@ -46,6 +46,11 @@ import javax.activation.DataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Component that transforms an HTTP response to a proper {@link MuleMessage}.
+ *
+ * @since 4.0
+ */
 public class HttpResponseToMuleMessage
 {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponseToMuleMessage.class);
@@ -94,19 +99,6 @@ public class HttpResponseToMuleMessage
             }
         }
 
-        //String requestMessageId = muleEvent.getMessage().getUniqueId();
-        //String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
-        //DefaultMuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
-        //                                                    null, inboundAttachments, muleContext, muleEvent.getMessage().getDataType());
-
-
-
-        // Setting uniqueId and rootId in order to correlate messages from request to response generated.
-        //message.setUniqueId(requestMessageId);
-        //message.setMessageRootId(requestMessageRootId);
-
-        //muleEvent.setMessage(message);
-
         if (config.isEnableCookies())
         {
             processCookies(response, uri);
@@ -114,6 +106,13 @@ public class HttpResponseToMuleMessage
 
         HttpResponseAttributes responseAttributes = createAttributes(response, parts);
         MuleMessage responseMessage = new DefaultMuleMessage(payload, dataType, responseAttributes);
+
+        String requestMessageId = muleEvent.getMessage().getUniqueId();
+        String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
+
+        // Setting uniqueId and rootId in order to correlate messages from request to response generated.
+        ((DefaultMuleMessage) responseMessage).setUniqueId(requestMessageId);
+        ((DefaultMuleMessage) responseMessage).setMessageRootId(requestMessageRootId);
 
         if (encoding != null)
         {
@@ -151,7 +150,7 @@ public class HttpResponseToMuleMessage
                 else
                 {
                     logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), responseContentType, e.getMessage()));
-                    logger.warn(String.format("Using defualt encoding: %s", encoding));
+                    logger.warn(String.format("Using default encoding: %s", encoding));
                 }
             }
         }

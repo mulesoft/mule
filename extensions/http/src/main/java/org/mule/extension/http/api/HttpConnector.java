@@ -26,6 +26,14 @@ import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.module.socket.api.TcpClientSocketProperties;
 
+/**
+ * HTTP connector used to handle and perform HTTP requests.
+ * <p>
+ * This class only serves as an extension definition. It's configurations are divided on server
+ * ({@link HttpListenerConfig}) and client ({@link HttpRequesterConfig}) capabilities.
+ *
+ * @since 4.0
+ */
 @Extension(name = "Http Connector", description = "Connector to handle and perform HTTP requests")
 @Configurations({HttpListenerConfig.class, HttpRequesterConfig.class})
 @SubTypeMapping(baseType = HttpAuthentication.class, subTypes = {BasicAuthentication.class, DigestAuthentication.class, NtlmAuthentication.class})

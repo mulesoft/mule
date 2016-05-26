@@ -11,6 +11,8 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentic
 
 /**
  * Configures digest authentication for the requests.
+ *
+ * @since 4.0
  */
 public class DigestAuthentication extends UsernamePasswordAuthentication
 {

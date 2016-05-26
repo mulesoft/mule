@@ -7,7 +7,13 @@
 package org.mule.extension.http.internal.listener.server;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.module.http.internal.listener.Server;
 
+/**
+ * Configuration component that specifies how a {@link Server} should be created.
+ *
+ * @since 4.0
+ */
 public class HttpServerConfiguration
 {
     private final String host;

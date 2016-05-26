@@ -8,8 +8,17 @@ package org.mule.extension.http.api.request.validator;
 
 import org.mule.runtime.extension.api.annotation.Parameter;
 
+/**
+ * Base status code validator that can be extended to create custom validations.
+ *
+ * @since 4.0
+ */
 public abstract class RangeStatusCodeValidator implements ResponseValidator
 {
+
+    /**
+     * Status codes that will be considered.
+     */
     @Parameter
     private String values;
 

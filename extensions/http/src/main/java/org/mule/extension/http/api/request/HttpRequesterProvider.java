@@ -9,8 +9,8 @@ package org.mule.extension.http.api.request;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
-import org.mule.extension.http.internal.request.client.HttpClientFactory;
 import org.mule.extension.http.internal.request.client.HttpClientConfiguration;
+import org.mule.extension.http.internal.request.client.HttpClientFactory;
 import org.mule.extension.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.module.socket.api.TcpClientSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -27,6 +27,11 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
+/**
+ * Connection provider for a HTTP request, handles the creation of {@link HttpClient} instances.
+ *
+ * @since 4.0
+ */
 @Alias("requester")
 public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterConfig, HttpClient>, Initialisable
 {
@@ -107,7 +112,6 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
     @Override
     public void disconnect(HttpClient httpClient)
     {
-        //here we'll get rid of stuff that has too
     }
 
     @Override

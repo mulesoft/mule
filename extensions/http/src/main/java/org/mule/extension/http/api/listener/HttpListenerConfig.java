@@ -6,10 +6,10 @@
  */
 package org.mule.extension.http.api.listener;
 
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -20,6 +20,11 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 
+/**
+ * Configuration element for a {@link HttpListener}.
+ *
+ * @since 4.0
+ */
 @Configuration(name = "listener-config")
 @Providers(HttpListenerProvider.class)
 @Sources(HttpListener.class)
@@ -55,7 +60,7 @@ public class HttpListenerConfig implements Initialisable
 
     public ListenerPath getFullListenerPath(String listenerPath)
     {
-        Preconditions.checkArgument(listenerPath.startsWith("/"), "listenerPath must start with /");
+        checkArgument(listenerPath.startsWith("/"), "listenerPath must start with /");
         return new ListenerPath(basePath, listenerPath);
     }
 

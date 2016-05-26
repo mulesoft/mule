@@ -11,20 +11,34 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
- * Representation of an HTTP attachment.
+ * Representation of an HTTP part.
+ *
+ * @since 4.0
  */
 @Alias("part")
 public class HttpPart
 {
+    /**
+     * Name to identify this part.
+     */
     @Parameter
     private String id;
 
+    /**
+     * Actual value the part holds.
+     */
     @Parameter
     private Object data;
 
+    /**
+     * Content type from the data.
+     */
     @Parameter
     private String contentType;
 
+    /**
+     * File name of this part, if required.
+     */
     @Parameter
     @Optional
     private String filename;

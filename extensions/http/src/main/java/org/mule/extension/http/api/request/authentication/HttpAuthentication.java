@@ -12,6 +12,8 @@ import org.mule.runtime.core.api.MuleException;
 
 /**
  * An object that authenticates an HTTP request.
+ *
+ * @since 4.0
  */
 public interface HttpAuthentication
 {

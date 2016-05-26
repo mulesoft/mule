@@ -12,17 +12,33 @@ import org.mule.runtime.extension.api.annotation.param.display.Password;
 
 /**
  * Basic HTTP Proxy configuration based on host and port, and optionally a username and password for proxy authentication.
+ *
+ * @since 4.0
  */
 @Alias("proxy")
 public class DefaultProxyConfig implements ProxyConfig
 {
-
+    /**
+     * Host where the proxy requests will be sent.
+     */
     @Parameter
     private String host;
+
+    /**
+     * Port where the proxy requests will be sent.
+     */
     @Parameter
     private int port = Integer.MAX_VALUE;
+
+    /**
+     * The username to authenticate against the proxy.
+     */
     @Parameter
     private String username;
+
+    /**
+     * The password to authenticate against the proxy.
+     */
     @Parameter
     @Password
     private String password;

@@ -14,13 +14,24 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Component that specifies how to create a proper HTTP request.
+ *
+ * @since 4.0
+ */
 @Alias("requester-request-builder")
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder
 {
+    /**
+     * Query parameters the request should include.
+     */
     @Parameter
     @Optional
     private Map<String, String> queryParams = new HashMap<>();
 
+    /**
+     * URI parameters that should be used to create the request.
+     */
     @Parameter
     @Optional
     private Map<String, String> uriParams = new HashMap<>();

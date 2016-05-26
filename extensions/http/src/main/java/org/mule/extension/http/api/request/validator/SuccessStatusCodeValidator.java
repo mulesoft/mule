@@ -10,6 +10,12 @@ package org.mule.extension.http.api.request.validator;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 
+/**
+ * Response validator that allows specifying which status codes will be considered as successful.
+ * Other status codes in the response will cause the component to throw an exception.
+ *
+ * @since 4.0
+ */
 public class SuccessStatusCodeValidator extends RangeStatusCodeValidator
 {
 

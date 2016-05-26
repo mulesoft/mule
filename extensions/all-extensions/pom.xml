@@ -50,6 +50,11 @@
 
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http-ext</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-validation</artifactId>
             <version>${project.version}</version>
             <type>zip</type>

@@ -26,13 +26,21 @@ import javax.activation.FileDataSource;
 
 /**
  * Base component to create HTTP messages.
+ *
+ * @since 4.0
  */
 public class HttpMessageBuilder
 {
+    /**
+     * HTTP headers the message should include.
+     */
     @Parameter
     @Optional
     protected Map<String, String> headers = new HashMap<>();
 
+    /**
+     * HTTP parts the message should include.
+     */
     //@Parameter
     //@Optional
     protected List<HttpPart> parts = new LinkedList<>();

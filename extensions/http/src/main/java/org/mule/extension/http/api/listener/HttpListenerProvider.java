@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api.listener;
 
+import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -20,7 +22,6 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -33,6 +34,11 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+/**
+ * Connection provider for a {@link HttpListener}, handles the creation of {@link Server} instances.
+ *
+ * @since 4.0
+ */
 @Alias("listener")
 public class HttpListenerProvider implements ConnectionProvider<HttpListenerConfig, Server>, Initialisable
 {
@@ -88,6 +94,7 @@ public class HttpListenerProvider implements ConnectionProvider<HttpListenerConf
 
     @Inject
     private HttpListenerConnectionManager connectionManager;
+
     @Inject
     private MuleContext muleContext;
 
@@ -115,7 +122,7 @@ public class HttpListenerProvider implements ConnectionProvider<HttpListenerConf
 
         if (tlsContext != null)
         {
-            LifecycleUtils.initialiseIfNeeded(tlsContext);
+            initialiseIfNeeded(tlsContext);
         }
 
         verifyConnectionsParameters();
@@ -155,7 +162,14 @@ public class HttpListenerProvider implements ConnectionProvider<HttpListenerConf
     @Override
     public ConnectionValidationResult validate(Server server)
     {
-        return ConnectionValidationResult.success();
+        if (server.isStopped() || server.isStopping())
+        {
+            return ConnectionValidationResult.failure("The server is not running.", UNKNOWN, new ConnectionException("Server not running."));
+        }
+        else
+        {
+            return ConnectionValidationResult.success();
+        }
     }
 
     @Override

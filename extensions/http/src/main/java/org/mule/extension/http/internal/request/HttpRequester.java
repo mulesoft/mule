@@ -37,6 +37,11 @@ import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Component capable of performing an HTTP request given a {@link MuleEvent}.
+ *
+ * @since 4.0
+ */
 public class HttpRequester
 {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequester.class);

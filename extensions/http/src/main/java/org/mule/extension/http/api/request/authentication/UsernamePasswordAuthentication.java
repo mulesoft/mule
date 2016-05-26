@@ -16,12 +16,20 @@ import org.mule.runtime.module.http.internal.request.HttpAuthenticationType;
 
 /**
  * Base class for user/pass based implementations.
+ *
+ * @since 4.0
  */
 public abstract class UsernamePasswordAuthentication implements HttpAuthentication
 {
+    /**
+     * The username to authenticate.
+     */
     @Parameter
     private String username;
 
+    /**
+     * The password to authenticate.
+     */
     @Parameter
     @Password
     private String password;

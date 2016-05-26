@@ -26,26 +26,27 @@ import org.mule.runtime.module.http.internal.ParameterMap;
 
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class MetadataResolver implements Initialisable, MetadataKeysResolver, MetadataOutputResolver<String>
+/**
+ * Handles all metadata related operations for HTTP requests.
+ *
+ * @since 4.0
+ */
+public class HttpMetadataResolver implements Initialisable, MetadataKeysResolver, MetadataOutputResolver<String>
 {
     private static final ClassTypeLoader  TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
     private static final String ANY = "ANY";
-    private Map<String, MetadataType> types = new HashMap<>();
+
     private Class[] classes = new Class[]{InputStream.class, NullPayload.class, ParameterMap.class};
+    private Map<String, MetadataType> types;
+    private List<MetadataKey> keys;
 
     @Override
     public List<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
     {
-        List<MetadataKey> keyList = new LinkedList<>();
-        types.keySet().stream().forEach(
-                aKey -> keyList.add(newKey(aKey).build())
-        );
-        return keyList;
+        return keys;
     }
 
     @Override
@@ -57,12 +58,18 @@ public class MetadataResolver implements Initialisable, MetadataKeysResolver, Me
     @Override
     public void initialise() throws InitialisationException
     {
-        Arrays.stream(classes).map(aClass -> types.put(aClass.getSimpleName(), TYPE_LOADER.load(aClass)));
-        UnionTypeBuilder builder = new BaseTypeBuilder<>(JAVA).unionType()
-                .of(types.get("InputStream"))
-                .of(types.get("NullPayload"))
-                .of(types.get("ParameterMap"));
+        UnionTypeBuilder builder = new BaseTypeBuilder<>(JAVA).unionType();
+        //Create all MetadataTypes and store them by String key
+        Arrays.stream(classes).forEach(aClass -> {
+            MetadataType type = TYPE_LOADER.load(aClass);
+            types.put(aClass.getSimpleName(), type);
+            builder.of(type);
+        });
         types.put(ANY, builder.build());
+        //Create MetadataKeys
+        types.keySet().stream().forEach(
+                aKey -> keys.add(newKey(aKey).build())
+        );
     }
 
 }

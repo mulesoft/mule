@@ -17,6 +17,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Default implementation of an {@link HttpRequest}.
+ *
+ * @since 4.0
+ */
 public class DefaultHttpRequest implements HttpRequest
 {
 

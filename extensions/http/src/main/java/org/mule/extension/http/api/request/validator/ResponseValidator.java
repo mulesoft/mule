@@ -8,9 +8,20 @@ package org.mule.extension.http.api.request.validator;
 
 import org.mule.runtime.api.message.MuleMessage;
 
+/**
+ * Configures error handling of the response.
+ *
+ * @since 4.0
+ */
 public interface ResponseValidator
 {
 
+    /**
+     * Validates whether a message should be accepted or not, failing in that case.
+     *
+     * @param muleMessage the message to validate
+     * @throws ResponseValidatorException if the message is not considered valid.
+     */
     void validate(MuleMessage muleMessage) throws ResponseValidatorException;
 
 }
