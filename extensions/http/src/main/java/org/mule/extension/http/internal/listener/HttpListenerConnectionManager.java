@@ -12,8 +12,7 @@ import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADIN
 import org.mule.extension.http.internal.listener.grizzly.GrizzlyServerManager;
 import org.mule.extension.http.internal.listener.server.HttpServerConfiguration;
 import org.mule.extension.http.internal.listener.server.HttpServerFactory;
-import org.mule.module.socket.api.TcpServerSocketProperties;
-import org.mule.module.socket.internal.DefaultTcpServerSocketProperties;
+import org.mule.module.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
@@ -74,7 +73,7 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
         }
 
         Collection<TcpServerSocketProperties> tcpServerSocketPropertiesBeans = muleContext.getRegistry().lookupObjects(TcpServerSocketProperties.class);
-        TcpServerSocketProperties tcpServerSocketProperties = new DefaultTcpServerSocketProperties();
+        TcpServerSocketProperties tcpServerSocketProperties = new TcpServerSocketProperties();
 
         if (tcpServerSocketPropertiesBeans.size() == 1)
         {

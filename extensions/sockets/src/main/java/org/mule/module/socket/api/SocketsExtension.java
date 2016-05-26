@@ -6,45 +6,36 @@
  */
 package org.mule.module.socket.api;
 
-import org.mule.module.socket.internal.DefaultTcpClientSocketProperties;
-import org.mule.module.socket.internal.DefaultTcpServerSocketProperties;
+import org.mule.module.socket.api.config.ListenerConfig;
+import org.mule.module.socket.api.config.RequesterConfig;
+import org.mule.module.socket.api.protocol.CustomProtocol;
+import org.mule.module.socket.api.protocol.DirectProtocol;
+import org.mule.module.socket.api.protocol.EOFProtocol;
+import org.mule.module.socket.api.protocol.LengthProtocol;
+import org.mule.module.socket.api.protocol.SafeProtocol;
+import org.mule.module.socket.api.protocol.StreamingProtocol;
+import org.mule.module.socket.api.protocol.TcpProtocol;
+import org.mule.module.socket.api.protocol.XmlMessageEOFProtocol;
+import org.mule.module.socket.api.protocol.XmlMessageProtocol;
+import org.mule.module.socket.api.socket.tcp.TcpClientSocketProperties;
+import org.mule.module.socket.api.socket.tcp.TcpServerSocketProperties;
+import org.mule.module.socket.api.socket.udp.UdpSocketProperties;
+import org.mule.runtime.extension.api.annotation.Configurations;
+import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
- * A simple extension which allows configuring sockets
+ * An extension for sending and receiving connections through both TCP and UDP protocols.
  *
  * @since 4.0
  */
 @Extension(name = "sockets")
-@SubTypeMapping(baseType = TcpServerSocketProperties.class, subTypes = DefaultTcpServerSocketProperties.class)
-@SubTypeMapping(baseType = TcpClientSocketProperties.class, subTypes = DefaultTcpClientSocketProperties.class)
+@Configurations({ListenerConfig.class, RequesterConfig.class})
+@SubTypeMapping(baseType = TcpProtocol.class, subTypes = {SafeProtocol.class, DirectProtocol.class, LengthProtocol.class,
+        StreamingProtocol.class, XmlMessageProtocol.class, XmlMessageEOFProtocol.class, CustomProtocol.class, EOFProtocol.class})
+@Export(classes = {TcpClientSocketProperties.class, TcpServerSocketProperties.class, UdpSocketProperties.class})
 public class SocketsExtension
 {
 
-    /**
-     * Provides TCP configuration for client sockets.
-     */
-    @Parameter
-    @Optional
-    private TcpClientSocketProperties tcpClientSocketProperties;
-
-    /**
-     * Provides TCP configuration for server sockets.
-     */
-    @Parameter
-    @Optional
-    private TcpServerSocketProperties tcpServerSocketProperties;
-
-    public TcpClientSocketProperties getTcpClientSocketProperties()
-    {
-        return tcpClientSocketProperties;
-    }
-
-    public TcpServerSocketProperties getTcpServerSocketProperties()
-    {
-        return tcpServerSocketProperties;
-    }
 }

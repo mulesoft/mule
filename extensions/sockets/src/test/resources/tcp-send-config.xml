@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+
+    <spring:beans>
+        <spring:import resource="protocols.xml"/>
+    </spring:beans>
+
+    <sockets:request-config name="tcp-requester">
+        <sockets:tcp-requester-connection host="localhost"
+                                          port="${port}"
+                                          protocol="${protocol}"
+                                          failOnUnresolvedHost="true"
+                                          sendTcpNoDelay="true"/>
+    </sockets:request-config>
+
+    <sockets:listener-config name="tcp-listener">
+        <sockets:tcp-listener-connection host="localhost"
+                                         port="${port}"
+                                         protocol="${protocol}"
+                                         sendTcpNoDelay="true"/>
+    </sockets:listener-config>
+
+    <flow name="tcp-send">
+        <sockets:send config-ref="tcp-requester" hasResponse="false"/>
+    </flow>
+
+    <flow name="tcp-listen">
+        <sockets:socket-listener config-ref="tcp-listener"/>
+        <flow-ref name="onIncomingConnection"/>
+        <set-payload value="Consumed"/>
+    </flow>
+
+    <sub-flow name="onIncomingConnection">
+        <expression-component>org.mule.extension.socket.SocketExtensionTestCase.onIncomingConnection(message)
+        </expression-component>
+    </sub-flow>
+
+</mule>

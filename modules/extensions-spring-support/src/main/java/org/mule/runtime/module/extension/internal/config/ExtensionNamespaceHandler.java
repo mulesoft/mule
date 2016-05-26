@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config;
 
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
@@ -22,23 +23,23 @@ import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
+import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
-import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -105,6 +106,8 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
             ExtensionModel extensionModel = locateExtensionByNamespace(namespace);
             withContextClassLoader(getClassLoader(extensionModel), () -> {
 
+                registerSubtypesTopLevelParsers(extensionModel);
+                registerExportedTypesTopLevelParsers(extensionModel);
                 registerTopLevelParameters(extensionModel);
                 registerConfigurations(extensionModel);
                 registerOperations(extensionModel, extensionModel.getOperationModels());
@@ -118,6 +121,25 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         {
             parserContext.getReaderContext().fatal(e.getMessage(), element, e);
         }
+    }
+
+    private void registerSubtypesTopLevelParsers(ExtensionModel extensionModel)
+    {
+        extensionModel.getModelProperty(SubTypesModelProperty.class).map(SubTypesModelProperty::getSubTypesMapping)
+                .ifPresent(typesMapping -> typesMapping.forEach((basetype, subtypes) -> {
+                    registerTopLevelParameter(extensionModel, basetype);
+                    subtypes.forEach(subtype -> registerTopLevelParameter(extensionModel, subtype));
+                }));
+    }
+
+    private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel)
+    {
+        //TODO MDM-7 replace isInstantiableWithParameters
+        extensionModel.getModelProperty(ExportModelProperty.class).map(ExportModelProperty::getExportedClasses)
+                .ifPresent(exportedTypes -> exportedTypes.stream()
+                        .filter(IntrospectionUtils::isInstantiableWithParameters)
+                        .map(c -> getMetadataType(c, ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(c.getClassLoader())))
+                        .forEach(exportedType -> registerTopLevelParameter(extensionModel, exportedType)));
     }
 
     private void registerOperations(ExtensionModel extensionModel, List<OperationModel> operations)
@@ -148,15 +170,12 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 
     private void registerTopLevelParameters(ExtensionModel extensionModel)
     {
-        Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
-        SubTypesMappingContainer typeMapping = new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : Collections.emptyMap());
-
-        new ExtensionWalker() {
+        new ExtensionWalker()
+        {
 
             @Override
             public void onParameter(ParameterizedModel owner, ParameterModel model)
             {
-                typeMapping.getSubTypes(model.getType()).forEach(subtype -> registerTopLevelParameter(extensionModel, subtype));
                 registerTopLevelParameter(extensionModel, model.getType());
             }
         }.walk(extensionModel);

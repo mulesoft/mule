@@ -19,9 +19,9 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiableWithParameters;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.NameUtils.sanitizeName;
@@ -107,6 +107,7 @@ import org.mule.runtime.module.extension.internal.exception.IllegalParameterMode
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.NameUtils;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
@@ -197,7 +198,7 @@ public final class SchemaBuilder
     private SchemaBuilder withExportedTypes(List<Class> exportedTypes)
     {
         exportedTypes.stream()
-                .filter(this::isInstantiableWithParameters)
+                .filter(IntrospectionUtils::isInstantiableWithParameters)
                 .map(c -> getMetadataType(c, ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(c.getClassLoader())))
                 .forEach(t -> registerPojoType(t, t.getDescription().orElse(EMPTY)));
         return this;
@@ -1082,11 +1083,6 @@ public final class SchemaBuilder
         element.setMinOccurs(isRequired ? ONE : ZERO);
         element.setMaxOccurs("1");
         return element;
-    }
-
-    private boolean isInstantiableWithParameters(Class<?> type)
-    {
-        return isInstantiable(type) && !getExposedFields(type).isEmpty();
     }
 
     private void generateNestedProcessorElement(ExplicitGroup all, ParameterModel parameterModel, String maxOccurs)

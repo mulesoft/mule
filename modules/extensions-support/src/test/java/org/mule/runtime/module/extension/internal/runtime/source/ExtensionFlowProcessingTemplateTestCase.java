@@ -16,8 +16,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
@@ -36,7 +36,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 {
 
     @Mock
-    private MuleEvent event;
+    private DefaultMuleEvent event;
 
     @Mock
     private MessageProcessor messageProcessor;

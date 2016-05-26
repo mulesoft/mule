@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+
+    <sockets:request-config name="udp-requester-with-timeout">
+        <sockets:udp-requester-connection host="localhost" port="${port}" clientTimeout="100"/>
+    </sockets:request-config>
+
+    <sockets:listener-config name="udp-listener">
+        <sockets:udp-listener-connection host="localhost" port="${port}"/>
+    </sockets:listener-config>
+
+    <flow name="udp-send-with-timeout">
+        <sockets:send config-ref="udp-requester-with-timeout" hasResponse="true"/>
+    </flow>
+
+    <flow name="udp-listen">
+        <sockets:socket-listener config-ref="udp-listener"/>
+        <set-payload value="Consumed"/>
+        <test:component waitTime="200"/>
+    </flow>
+</mule>

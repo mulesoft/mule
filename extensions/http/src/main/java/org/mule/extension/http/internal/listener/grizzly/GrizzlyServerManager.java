@@ -11,7 +11,7 @@ import static java.lang.System.getProperty;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
-import org.mule.module.socket.api.TcpServerSocketProperties;
+import org.mule.module.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.WorkManagerSource;
@@ -119,34 +119,30 @@ public class GrizzlyServerManager implements HttpServerManager
         {
             transportBuilder.setLinger(serverSocketProperties.getLinger());
         }
-        if (serverSocketProperties.getReuseAddress() != null)
-        {
-            transportBuilder.setReuseAddress(serverSocketProperties.getReuseAddress());
-        }
-        if (serverSocketProperties.getSendTcpNoDelay() != null)
-        {
-            transportBuilder.setTcpNoDelay(serverSocketProperties.getSendTcpNoDelay());
-        }
-        if (serverSocketProperties.getReceiveBacklog() != null)
-        {
-            transportBuilder.setServerConnectionBackLog(serverSocketProperties.getReceiveBacklog());
-        }
+
         if (serverSocketProperties.getReceiveBufferSize() != null)
         {
             transportBuilder.setReadBufferSize(serverSocketProperties.getReceiveBufferSize());
         }
+
         if (serverSocketProperties.getSendBufferSize() != null)
         {
             transportBuilder.setWriteBufferSize(serverSocketProperties.getSendBufferSize());
         }
+
+        if (serverSocketProperties.getClientTimeout() != null)
+        {
+            transportBuilder.setClientSocketSoTimeout(serverSocketProperties.getClientTimeout());
+        }
+
         if (serverSocketProperties.getServerTimeout() != null)
         {
             transportBuilder.setServerSocketSoTimeout(serverSocketProperties.getServerTimeout());
         }
-        if (serverSocketProperties.getTimeout() != null)
-        {
-            transportBuilder.setClientSocketSoTimeout(serverSocketProperties.getTimeout());
-        }
+
+        transportBuilder.setReuseAddress(serverSocketProperties.getReuseAddress());
+        transportBuilder.setTcpNoDelay(serverSocketProperties.getSendTcpNoDelay());
+        transportBuilder.setServerConnectionBackLog(serverSocketProperties.getReceiveBacklog());
     }
 
     /**
