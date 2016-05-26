@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/tcp"
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/transport/tcp"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
-            targetNamespace="http://www.mulesoft.org/schema/mule/tcp"
+            targetNamespace="http://www.mulesoft.org/schema/mule/transport/tcp"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 

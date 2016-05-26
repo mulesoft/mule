@@ -45,11 +45,11 @@ public class UnsupportedConnectorsMuleArtifactTestCase
         //JMS
         // TODO MULE-9711
         // checkUnsupportedConnector("<jms:activemq-connector name=\"Active_MQ\" brokerURL=\"vm://localhost\"
-        // validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/jms\"/>");
+        // validateConnections=\"true\" xmlns:jms=\"http://www.mulesoft.org/schema/mule/transport/jms\"/>");
         //VM
         // TODO MULE-9711
         // checkUnsupportedConnector("<vm:connector name=\"memory\"
-        // xmlns:vm=\"http://www.mulesoft.org/schema/mule/vm\"/>");
+        // xmlns:vm=\"http://www.mulesoft.org/schema/mule/transport/vm\"/>");
 
     }
 

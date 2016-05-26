@@ -21,7 +21,7 @@ public class JmsXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
     @Override
     public String getNamespaceUriPrefix()
     {
-        return "http://www.mulesoft.org/schema/mule/jms";
+        return "http://www.mulesoft.org/schema/mule/transport/jms";
     }
 
     @Override

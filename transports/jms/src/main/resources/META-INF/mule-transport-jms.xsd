@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/jms"
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/transport/jms"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             xmlns:spring="http://www.springframework.org/schema/beans"
-            targetNamespace="http://www.mulesoft.org/schema/mule/jms"
+            targetNamespace="http://www.mulesoft.org/schema/mule/transport/jms"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
