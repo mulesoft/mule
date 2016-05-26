@@ -33,10 +33,10 @@ public class FunctionalComponentObjectFactory implements ObjectFactory<MessagePr
     @Override
     public MessageProcessor getObject() throws Exception
     {
-        return new DefaultJavaComponent(getFunctinoalComponentObjectFactory());
+        return new DefaultJavaComponent(getFunctionalComponentObjectFactory());
     }
 
-    private org.mule.runtime.core.api.object.ObjectFactory getFunctinoalComponentObjectFactory()
+    private org.mule.runtime.core.api.object.ObjectFactory getFunctionalComponentObjectFactory()
     {
         return new org.mule.runtime.core.api.object.ObjectFactory()
         {

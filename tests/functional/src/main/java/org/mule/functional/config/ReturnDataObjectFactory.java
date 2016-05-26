@@ -6,8 +6,8 @@
  */
 package org.mule.functional.config;
 
+import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 
@@ -41,7 +41,7 @@ public class ReturnDataObjectFactory implements ObjectFactory<Object>
         {
             try
             {
-                returnData = IOUtils.getResourceAsString(file, getClass());
+                returnData = getResourceAsString(file, getClass());
             }
             catch (IOException e)
             {
