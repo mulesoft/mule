@@ -8,6 +8,7 @@ package org.mule.runtime.module.launcher.application;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
@@ -51,6 +52,12 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application>
 
     public DefaultApplicationFactory(ArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory, ApplicationDescriptorFactory applicationDescriptorFactory, ApplicationPluginFactory applicationPluginFactory, DomainRepository domainRepository, ApplicationPluginRepository applicationPluginRepository)
     {
+        checkArgument(applicationClassLoaderFactory != null, "Application classLoader factory cannot be null");
+        checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
+        checkArgument(applicationPluginFactory != null, "Application plugin factory cannot be null");
+        checkArgument(domainRepository != null, "Domain repository cannot be null");
+        checkArgument(applicationPluginRepository != null, "Application plugin repository cannot be null");
+
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;
         this.applicationDescriptorFactory = applicationDescriptorFactory;
         this.applicationPluginFactory = applicationPluginFactory;

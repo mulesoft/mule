@@ -14,6 +14,7 @@ import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.mule.runtime.core.util.FileUtils.unzip;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getContainerAppPluginsFolder;
 
 import java.io.File;
@@ -41,6 +42,7 @@ public class DefaultApplicationPluginRepository implements ApplicationPluginRepo
      */
     public DefaultApplicationPluginRepository(ApplicationPluginDescriptorFactory pluginDescriptorFactory)
     {
+        checkArgument(pluginDescriptorFactory != null, "Application plugin descriptor factory cannot be null");
         this.pluginDescriptorFactory = pluginDescriptorFactory;
     }
 

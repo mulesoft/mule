@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.launcher.application;
 
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 
@@ -25,6 +26,7 @@ public class DefaultApplicationPluginFactory implements ApplicationPluginFactory
      */
     public DefaultApplicationPluginFactory(ApplicationPluginClassLoaderFactory applicationPluginClassLoaderFactory)
     {
+        checkArgument(applicationPluginClassLoaderFactory != null, "Application plugin classloader factory cannot be null");
         this.applicationPluginClassLoaderFactory = applicationPluginClassLoaderFactory;
     }
 
