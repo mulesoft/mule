@@ -34,7 +34,8 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
  */
 public class DefaultApplicationPluginRepository implements ApplicationPluginRepository
 {
-    private List<ApplicationPluginDescriptor> containerApplicationPluginDescriptors;
+    private volatile List<ApplicationPluginDescriptor> containerApplicationPluginDescriptors;
+
     private final ApplicationPluginDescriptorFactory pluginDescriptorFactory;
 
     /**
@@ -47,32 +48,43 @@ public class DefaultApplicationPluginRepository implements ApplicationPluginRepo
     }
 
     @Override
-    public synchronized List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors() throws IOException
+    public List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors() throws IOException
     {
         if (containerApplicationPluginDescriptors == null)
         {
-            collectContainerApplicationPluginDescriptors();
+            synchronized (this)
+            {
+                if (containerApplicationPluginDescriptors == null)
+                {
+                    containerApplicationPluginDescriptors = unmodifiableList(collectContainerApplicationPluginDescriptors());
+                }
+            }
         }
         return containerApplicationPluginDescriptors;
     }
 
-    private void collectContainerApplicationPluginDescriptors() throws IOException
+    /**
+     * @return collects and initializes a {@link List} of {@link ApplicationPluginDescriptor} by loading the container application plugins
+     * @throws IOException
+     */
+    private List<ApplicationPluginDescriptor> collectContainerApplicationPluginDescriptors() throws IOException
     {
         File[] containerPlugins = getContainerAppPluginsFolder().listFiles();
         if (containerPlugins != null)
         {
             unzipPluginsIfNeeded();
-            containerApplicationPluginDescriptors = unmodifiableList(createApplicationPluginDescriptors());
+            return createApplicationPluginDescriptors();
         }
         else
         {
-            containerApplicationPluginDescriptors = EMPTY_LIST;
+            return EMPTY_LIST;
         }
     }
 
     /**
      * Iterates the list of zip files in container application plugin folder, unzip them and once the plugin is expanded
      * it deletes the zip from the container app plugins folder.
+     *
      * @throws IOException
      */
     private void unzipPluginsIfNeeded() throws IOException
@@ -92,6 +104,7 @@ public class DefaultApplicationPluginRepository implements ApplicationPluginRepo
     /**
      * For each plugin expanded in container application plugins folder it creates an {@link ApplicationPluginDescriptor} for it and
      * adds the descriptor the given list.
+     *
      * @return a non null {@link List} of {@link ApplicationPluginDescriptor}
      */
     private List<ApplicationPluginDescriptor> createApplicationPluginDescriptors()

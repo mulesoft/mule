@@ -22,6 +22,7 @@ public class DefaultApplicationPluginFactory implements ApplicationPluginFactory
 
     /**
      * Creates an instance
+     *
      * @param applicationPluginClassLoaderFactory used to create the {@link ArtifactClassLoader}, cannot be null.
      */
     public DefaultApplicationPluginFactory(ApplicationPluginClassLoaderFactory applicationPluginClassLoaderFactory)

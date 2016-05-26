@@ -22,6 +22,7 @@ public interface ApplicationPluginFactory
     /**
      * Creates an {@link ApplicationPlugin} along with its classloader. The classloader for the application plugin
      * would be a child classloader of the given parent and it will use the same {@link ClassLoaderLookupPolicy} as the parent.
+     *
      * @param descriptor that defines the application plugin
      * @param parent {@link ArtifactClassLoader} to be used as parent classloader
      * @return an {@link ApplicationPlugin}

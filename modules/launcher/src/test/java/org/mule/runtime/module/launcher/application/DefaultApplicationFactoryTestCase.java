@@ -15,6 +15,8 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -92,6 +94,13 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
         assertThat(application.getDescriptor(), is(descriptor));
         assertThat(application.getArtifactName(), is(APP_NAME));
         assertThat(application.getResourceFiles(), is(resourceFiles));
+
+        verify(applicationClassLoaderFactory).create(any(), argThat(equalTo(descriptor)));
+        verify(domainRepository, times(2)).getDomain(DOMAIN_NAME);
+        verify(applicationPluginRepository).getContainerApplicationPluginDescriptors();
+        verify(coreApplicationPluginDescriptor).getClassLoaderFilter();
+        verify(appPlugin).getArtifactClassLoader();
+        verify(appPlugin).getDescriptor();
     }
 
     private Domain createDomain(String name)
