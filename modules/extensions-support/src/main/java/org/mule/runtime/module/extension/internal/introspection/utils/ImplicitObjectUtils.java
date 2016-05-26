@@ -10,7 +10,7 @@ import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
@@ -19,7 +19,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import java.util.List;
 
 /**
- * Utilities for creating object with implicit values based on a {@link ParametrizedModel}
+ * Utilities for creating object with implicit values based on a {@link ParameterizedModel}
  *
  * @since 4.0
  */
@@ -37,14 +37,14 @@ public final class ImplicitObjectUtils
      * If a {@link ParameterModel} returns {@code null} for {@link ParameterModel#getDefaultValue()}
      * then it's ignored
      *
-     * @param parametrizedModel a model holding the {@link ParameterModel}s to consider
+     * @param parameterizedModel a model holding the {@link ParameterModel}s to consider
      * @param expressionManager a {@link ExpressionManager} for the default values which are expessions
      * @return a {@link ResolverSet}
      */
-    public static ResolverSet buildImplicitResolverSet(ParametrizedModel parametrizedModel, ExpressionManager expressionManager)
+    public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, ExpressionManager expressionManager)
     {
         ResolverSet resolverSet = new ResolverSet();
-        for (ParameterModel parameterModel : parametrizedModel.getParameterModels())
+        for (ParameterModel parameterModel : parameterizedModel.getParameterModels())
         {
             Object defaultValue = parameterModel.getDefaultValue();
             if (defaultValue != null)
@@ -69,14 +69,14 @@ public final class ImplicitObjectUtils
     /**
      * Returns the first item in the {@code models} {@link List} that can be used implicitly.
      * <p>
-     * A {@link ParametrizedModel} is consider to be implicit when all its {@link ParameterModel}s
+     * A {@link ParameterizedModel} is consider to be implicit when all its {@link ParameterModel}s
      * are either optional or have a default value
      *
      * @param models a {@link List} of {@code T}
-     * @param <T>    the generic type of the items in the {@code models}. It's a type which is assignable from {@link ParametrizedModel}
+     * @param <T>    the generic type of the items in the {@code models}. It's a type which is assignable from {@link ParameterizedModel}
      * @return one of the items in {@code models} or {@code null} if none of the models are implicit
      */
-    public static <T extends ParametrizedModel> T getFirstImplicit(List<T> models)
+    public static <T extends ParameterizedModel> T getFirstImplicit(List<T> models)
     {
         for (T model : models)
         {
@@ -89,9 +89,9 @@ public final class ImplicitObjectUtils
         return null;
     }
 
-    private static boolean canBeUsedImplicitly(ParametrizedModel parametrizedModel)
+    private static boolean canBeUsedImplicitly(ParameterizedModel parameterizedModel)
     {
-        for (ParameterModel parameterModel : parametrizedModel.getParameterModels())
+        for (ParameterModel parameterModel : parameterizedModel.getParameterModels())
         {
             if (parameterModel.isRequired() && parameterModel.getDefaultValue() == null)
             {

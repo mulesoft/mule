@@ -75,7 +75,7 @@ import org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
@@ -776,7 +776,7 @@ public final class SchemaBuilder
         return name + GROUP_SUFFIX;
     }
 
-    ExtensionType registerExecutableType(String name, ParametrizedModel parametrizedModel, QName base)
+    ExtensionType registerExecutableType(String name, ParameterizedModel parameterizedModel, QName base)
     {
         TopLevelComplexType complexType = new TopLevelComplexType();
         complexType.setName(name);
@@ -793,7 +793,7 @@ public final class SchemaBuilder
         final ExplicitGroup all = new ExplicitGroup();
         complexContentExtension.setSequence(all);
 
-        for (final ParameterModel parameterModel : parametrizedModel.getParameterModels())
+        for (final ParameterModel parameterModel : parameterizedModel.getParameterModels())
         {
             MetadataType parameterType = parameterModel.getType();
 

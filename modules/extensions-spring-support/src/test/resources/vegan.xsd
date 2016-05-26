@@ -154,6 +154,47 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EatWatermelonType" substitutionGroup="mule:abstract-message-processor" name="eat-watermelon"></xs:element>
+    <xs:complexType name="org.mule.tck.testmodels.fruit.WaterMelon">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" name="bitten"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
+                <xs:attribute type="mule:expressionDouble" use="optional" name="radius"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="seeds"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="state"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-water-melon"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.tck.testmodels.fruit.WaterMelon" substitutionGroup="vegan:abstract-water-melon" name="water-melon"></xs:element>
+    <xs:complexType name="EatWatermelonType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="fruit">
+                        <xs:complexType>
+                            <xs:sequence minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="0" maxOccurs="1" ref="vegan:abstract-water-melon"></xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="fruit"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="kiwi-connection">
         <xs:complexType>
             <xs:complexContent>

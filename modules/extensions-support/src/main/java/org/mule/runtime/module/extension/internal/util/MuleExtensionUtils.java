@@ -34,7 +34,7 @@ import org.mule.runtime.extension.api.introspection.operation.HasOperationModels
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
@@ -92,10 +92,10 @@ public class MuleExtensionUtils
      * Collects the {@link ParameterModel parameters} from {@code model} which
      * supports or requires expressions
      *
-     * @param model a {@link ParametrizedModel}
+     * @param model a {@link ParameterizedModel}
      * @return a {@link List} of {@link ParameterModel}. Can be empty but will never be {@code null}
      */
-    public static List<ParameterModel> getDynamicParameters(ParametrizedModel model)
+    public static List<ParameterModel> getDynamicParameters(ParameterizedModel model)
     {
         return model.getParameterModels().stream()
                 .filter(parameter -> acceptsExpressions(parameter.getExpressionSupport()))

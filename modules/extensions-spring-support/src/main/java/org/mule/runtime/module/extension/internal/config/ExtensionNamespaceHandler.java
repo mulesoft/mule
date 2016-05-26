@@ -17,12 +17,14 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.config.spring.MuleArtifactContext;
+import org.mule.runtime.extension.api.BaseExtensionWalker;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
@@ -32,7 +34,6 @@ import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingC
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -147,8 +148,18 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
 
     private void registerTopLevelParameters(ExtensionModel extensionModel)
     {
-        extensionModel.getConfigurationModels().forEach(configurationModel -> registerTopLevelParameter(extensionModel, configurationModel.getParameterModels()));
-        extensionModel.getOperationModels().forEach(operationModel -> registerTopLevelParameter(extensionModel, operationModel.getParameterModels()));
+        Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
+        SubTypesMappingContainer typeMapping = new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : Collections.emptyMap());
+
+        new BaseExtensionWalker() {
+
+            @Override
+            public void onParameter(ParameterizedModel owner, ParameterModel model)
+            {
+                typeMapping.getSubTypes(model.getType()).forEach(subtype -> registerTopLevelParameter(extensionModel, subtype));
+                registerTopLevelParameter(extensionModel, model.getType());
+            }
+        }.walk(extensionModel);
     }
 
     private void registerTopLevelParameter(final ExtensionModel extensionModel, final MetadataType parameterType)
@@ -181,19 +192,6 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         });
 
     }
-
-    private void registerTopLevelParameter(ExtensionModel extensionModel, Collection<ParameterModel> parameterModels)
-    {
-        Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
-        SubTypesMappingContainer typeMapping = new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : Collections.emptyMap());
-
-        parameterModels.forEach(parameterModel -> {
-            typeMapping.getSubTypes(parameterModel.getType()).forEach(subtype -> registerTopLevelParameter(extensionModel, subtype));
-
-            registerTopLevelParameter(extensionModel, parameterModel.getType());
-        });
-    }
-
 
     private ExtensionModel locateExtensionByNamespace(String namespace)
     {
