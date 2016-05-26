@@ -6,60 +6,23 @@
  */
 package org.mule.module.http.internal.listener;
 
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
-import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 
 /**
- * Request handle for request calls to paths with no listener configured.
+ * Request handler for request calls when service is unavailable
  */
-public class ServiceTemporarilyUnavailableListenerRequestHandler implements RequestHandler
+public class ServiceTemporarilyUnavailableListenerRequestHandler extends ErrorRequestHandler
 {
-
-    public static final int SERVICE_TEMPORARILY_UNAVAILABLE_STATUS_CODE = 503;
-
-    private Logger logger = LoggerFactory.getLogger(ServiceTemporarilyUnavailableListenerRequestHandler.class);
-
     private static ServiceTemporarilyUnavailableListenerRequestHandler instance = new ServiceTemporarilyUnavailableListenerRequestHandler();
 
     private ServiceTemporarilyUnavailableListenerRequestHandler()
     {
-
+        super(SERVICE_UNAVAILABLE.getStatusCode(), SERVICE_UNAVAILABLE.getReasonPhrase(), "Service not available for endpoint: %s");
     }
 
     public static ServiceTemporarilyUnavailableListenerRequestHandler getInstance()
     {
         return instance;
-    }
-
-    @Override
-    public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback)
-    {
-        responseCallback.responseReady(new HttpResponseBuilder()
-                                               .setStatusCode(SERVICE_TEMPORARILY_UNAVAILABLE_STATUS_CODE)
-                                               .setReasonPhrase("Service Temporarily Unavailable")
-                                               .build(), new ResponseStatusCallback()
-        {
-            @Override
-            public void responseSendFailure(Throwable exception)
-            {
-                logger.warn("Error while sending 503 response " + exception.getMessage());
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("exception thrown",exception);
-                }
-            }
-
-            @Override
-            public void responseSendSuccessfully()
-            {
-            }
-        });
     }
 
 }
