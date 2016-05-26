@@ -81,6 +81,7 @@ public class ApplicationModel
     public static final String VM_NAMESPACE = "vm";
     public static final String HTTP_NAMESPACE = "http";
     public static final String BATCH_NAMESPACE = "batch";
+    public static final String TRANSPORTS_NAMESPACE = "transports";
 
     public static final ComponentIdentifier CHOICE_EXCEPTION_STRATEGY_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CHOICE_EXCEPTION_STRATEGY).build();
     public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
@@ -103,11 +104,11 @@ public class ApplicationModel
             .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("custom-encryption-strategy").build())
             .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("secret-key-encryption-strategy").build())
             .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("import").build())
-            .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("inbound-endpoint").build())
-            .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("outbound-endpoint").build())
             .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("string-to-byte-array-transformer").build())
             .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("append-string-transformer").build())
             .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("security-manager").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(TRANSPORTS_NAMESPACE).withName("inbound-endpoint").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(TRANSPORTS_NAMESPACE).withName("outbound-endpoint").build())
             .add(new ComponentIdentifier.Builder().withNamespace(TEST_NAMESPACE).withName("queue").build())
             .add(new ComponentIdentifier.Builder().withNamespace(TEST_NAMESPACE).withName("invocation-counter").build())
             .add(new ComponentIdentifier.Builder().withNamespace(DB_NAMESPACE).withName("data-type").build())
