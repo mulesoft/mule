@@ -45,7 +45,7 @@ import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParametrizedModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -553,7 +553,7 @@ public final class IntrospectionUtils
 
     private static void collectParameterClasses(ImmutableSet.Builder<Class<?>> parameterClasses,
                                                 Predicate<ParameterModel> filter,
-                                                Collection<? extends ParametrizedModel>... parametrizedModelsArray)
+                                                Collection<? extends ParameterizedModel>... parametrizedModelsArray)
     {
         stream(parametrizedModelsArray).forEach(models -> models.stream().forEach(
                 model -> model.getParameterModels().stream()

@@ -16,8 +16,8 @@ import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.test.vegan.extension.VeganExtension;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.vegan.extension.VeganExtension;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +25,7 @@ import org.junit.Test;
 @SmallTest
 public class ComplexAnnotationBasedDescriberTestCase extends AbstractAnnotationsBasedDescriberTestCase
 {
+
     private ExtensionDeclaration extensionDeclaration;
 
     @Before
@@ -51,8 +52,11 @@ public class ComplexAnnotationBasedDescriberTestCase extends AbstractAnnotations
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No config with name " + configName));
 
-        assertThat(config.getOperations(), hasSize(1));
-        OperationDeclaration operation = config.getOperations().get(0);
+        OperationDeclaration operation = config.getOperations().stream()
+                .filter(model -> model.getName().equals(operationName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No operation with name " + operationName));
+
         assertThat(operation.getName(), is(operationName));
     }
 }
