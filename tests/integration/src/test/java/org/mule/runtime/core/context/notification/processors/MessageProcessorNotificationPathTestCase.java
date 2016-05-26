@@ -6,21 +6,22 @@
  */
 package org.mule.runtime.core.context.notification.processors;
 
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 /**
  *
@@ -67,7 +68,9 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     {
         testFlowPaths("foreach", "/0", "/0/0", "/1");
         testFlowPaths("enricher", "/0", "/0/0", "/1", "/1/0", "/1/0/0", "/1/0/1");
-        testFlowPaths("until-successful", "/0", "/0/0", "/0/0/0", "/0/0/1");
+        testFlowPaths("until-successful", "/0", "/0/0", "/1");
+        testFlowPaths("until-successful-with-processor-chain", "/0", "/0/0", "/0/0/0", "/0/0/1", "/1");
+        testFlowPaths("until-successful-with-enricher", "/0", "/0/0", "/0/0/0", "/1");
         testFlowPaths("async", "/0", "/0/0", "/0/1");
     }
 
@@ -129,7 +132,7 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
         ((Pipeline) flow).addMessageProcessorPathElements(flowElement);
         FlowMap messageProcessorPaths = buildPathResolver(flowElement);
 
-        assertThat(messageProcessorPaths.getAllPaths(), hasSize(nodes.length));
+        assertThat(messageProcessorPaths.getAllPaths().toString(), messageProcessorPaths.getAllPaths(), hasSize(nodes.length));
         assertThat(messageProcessorPaths.getAllPaths(), hasItems(expectedPaths));
     }
 

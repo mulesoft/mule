@@ -9,6 +9,7 @@ package org.mule.runtime.core.processor;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -21,7 +22,7 @@ import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
  * the {@link TransactionConfig} is null then no transaction is used and the next
  * {@link MessageProcessor} is invoked directly.
  */
-public class EndpointTransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
+public class EndpointTransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor implements NonBlockingSupported
 {
     protected TransactionConfig transactionConfig;
 
@@ -30,6 +31,7 @@ public class EndpointTransactionalInterceptingMessageProcessor extends AbstractI
         this.transactionConfig = transactionConfig;
     }
 
+    @Override
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
         if (next == null)
@@ -41,6 +43,7 @@ public class EndpointTransactionalInterceptingMessageProcessor extends AbstractI
             ExecutionTemplate<MuleEvent> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, transactionConfig);
             ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
             {
+                @Override
                 public MuleEvent process() throws Exception
                 {
                     return processNext(event);

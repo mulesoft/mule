@@ -15,10 +15,10 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.interceptor.Interceptor;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 
@@ -83,7 +83,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
             responseEvent = processNext(processRequest(responseEvent));
             if (!(responseEvent instanceof NonBlockingVoidMuleEvent))
             {
-                responseEvent = processResponse(responseEvent);
+                responseEvent = processResponse(responseEvent, event);
             }
         }
         catch (Exception exception)
@@ -94,6 +94,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
         return responseEvent;
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;

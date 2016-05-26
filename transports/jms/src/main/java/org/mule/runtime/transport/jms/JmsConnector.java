@@ -35,6 +35,7 @@ import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transport.AbstractConnector;
 import org.mule.runtime.core.util.BeanUtils;
+import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.transport.jms.filters.JmsSelectorFilter;
 import org.mule.runtime.transport.jms.i18n.JmsMessages;
 import org.mule.runtime.transport.jms.jndi.JndiNameResolver;
@@ -44,6 +45,8 @@ import org.mule.runtime.transport.jms.redelivery.RedeliveryHandlerFactory;
 
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.jms.Connection;
@@ -187,6 +190,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
      */
     private volatile boolean disconnecting;
 
+    private Timer responseTimeoutTimer;
+
     ////////////////////////////////////////////////////////////////////////
     // Methods
     ////////////////////////////////////////////////////////////////////////
@@ -212,6 +217,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     @Override
     protected void doInitialise() throws InitialisationException
     {
+        responseTimeoutTimer = new Timer(ThreadNameHelper.getPrefix(muleContext) + name + ".ResponseTimeoutTimer");
         if (jmsSupport == null)
         {
             jmsSupport = createJmsSupport();
@@ -382,6 +388,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             jndiNameResolver.dispose();
         }
+        responseTimeoutTimer.cancel();
     }
 
     protected Object lookupFromJndi(String jndiName) throws NamingException
@@ -1465,5 +1472,16 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     protected Object getOperationResourceFactory()
     {
         return getConnection();
+    }
+
+    /**
+     * Schedules a timeout task used for performing timeout of async responses.
+     *
+     * @param timerTask task to be executed on timeout
+     * @param timeout the number of milliseconds after which the timeout task should be executed
+     */
+    public void scheduleTimeoutTask(TimerTask timerTask, int timeout)
+    {
+        responseTimeoutTimer.schedule(timerTask, timeout);
     }
 }

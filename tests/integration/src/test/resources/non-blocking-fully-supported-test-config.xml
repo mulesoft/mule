@@ -14,12 +14,7 @@
         </expression-language>
     </configuration>
 
-    <flow name="defaultFlow">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-        <test:non-blocking-processor/>
-    </flow>
-
-    <flow name="nonBlockingFlow">
+    <flow name="flow">
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[assertPayload()]"/>

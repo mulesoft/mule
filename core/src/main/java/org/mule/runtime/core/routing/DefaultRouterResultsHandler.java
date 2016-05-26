@@ -8,8 +8,8 @@ package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -62,6 +62,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
      * @param muleContext
      * @return
      */
+    @Override
     @SuppressWarnings(value = {"unchecked"})
     public MuleEvent aggregateResults(final List<MuleEvent> results,
                                       final MuleEvent previous,
@@ -99,6 +100,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             List<MuleEvent> nonNullResults = (List<MuleEvent>) CollectionUtils.select(results,
                 new Predicate()
                 {
+                    @Override
                     public boolean evaluate(Object object)
                     {
                         return
@@ -144,7 +146,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
         for (String name : previous.getFlowVariableNames())
         {
-            resultEvent.setFlowVariable(name, previous.getFlowVariable(name));
+            resultEvent.setFlowVariable(name, previous.getFlowVariable(name), previous.getFlowVariableDataType(name));
         }
         return OptimizedRequestContext.unsafeSetEvent(resultEvent);
     }

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.functional;
+package org.mule.tck.processor;
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
@@ -25,6 +25,7 @@ public class TestNonBlockingProcessor implements NonBlockingMessageProcessor
 
     private static Executor executor = Executors.newCachedThreadPool();
 
+    @Override
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
         if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)

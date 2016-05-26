@@ -35,6 +35,7 @@ public class SimpleMessageProcessorChain extends DefaultMessageProcessorChain
         super(name, processors);
     }
 
+    @Override
     protected MuleEvent doProcess(MuleEvent event) throws MuleException
     {
         for (int i = 0; i < processors.size(); i++)
@@ -45,7 +46,7 @@ public class SimpleMessageProcessorChain extends DefaultMessageProcessorChain
             {
                 return null;
             }
-            else if (VoidMuleEvent.getInstance().equals(event))
+            else if (event instanceof VoidMuleEvent)
             {
                 return event;
             }

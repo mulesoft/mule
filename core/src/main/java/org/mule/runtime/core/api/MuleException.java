@@ -26,6 +26,9 @@ import java.util.Set;
  */
 public abstract class MuleException extends Exception
 {
+
+    private static final long serialVersionUID = -4544199933449632546L;
+
     private static final String EXCEPTION_MESSAGE_DELIMITER = StringUtils.repeat('*', 80) + SystemUtils.LINE_SEPARATOR;
     private static final String EXCEPTION_MESSAGE_SECTION_DELIMITER = StringUtils.repeat('-', 80) + SystemUtils.LINE_SEPARATOR;
 

@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -29,17 +30,17 @@ import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.SequentialStageNameSource;
 import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.api.processor.StageNameSourceProvider;
-import org.mule.runtime.core.execution.ExceptionHandlingReplyToHandlerDecorator;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
+import org.mule.runtime.core.execution.ExceptionHandlingReplyToHandlerDecorator;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
+import org.mule.runtime.core.work.SerialWorkManager;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
@@ -74,6 +75,10 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         if (processingStrategy instanceof NonBlockingProcessingStrategy)
         {
             workManager = ((NonBlockingProcessingStrategy) processingStrategy).createWorkManager(this);
+        }
+        else
+        {
+            new SerialWorkManager();
         }
     }
 
@@ -237,6 +242,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         muleContext.getStatistics().add(statistics);
     }
 
+    @Override
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException
     {
         getProcessingStrategy().configureProcessors(getMessageProcessors(),

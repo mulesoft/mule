@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.endpoint;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -184,6 +186,14 @@ public class MuleEndpointURITestCase extends AbstractMuleContextTestCase
         pool.awaitTermination(30, TimeUnit.SECONDS);
     }
     
+    @Test
+    public void userPasswordEncoding() throws MuleException
+    {
+        MuleEndpointURI uri = buildEndpointUri("test://user%3Aname%40somehost.com:pass%3Aword@host:8081");
+        assertThat(uri.getUser(), is("user:name@somehost.com"));
+        assertThat(uri.getPassword(), is("pass:word"));
+    }
+
     private MuleEndpointURI buildEndpointUri(String uriString) throws MuleException
     {
         MuleEndpointURI uri = new MuleEndpointURI(uriString, muleContext);

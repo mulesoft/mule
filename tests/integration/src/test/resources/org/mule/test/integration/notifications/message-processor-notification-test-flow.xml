@@ -181,11 +181,28 @@
 
     <flow name="until-successful">
         <until-successful objectStore-ref="objectStore">
+            <test:queue name="out-us"/>
+        </until-successful>
+        <logger message="check1"/>
+    </flow>
+
+    <flow name="until-successful-with-processor-chain">
+        <until-successful objectStore-ref="objectStore">
             <processor-chain>
-                <logger/>
+                <logger message="check1"/>
                 <test:queue name="out-us"/>
             </processor-chain>
         </until-successful>
+        <logger message="check2"/>
+    </flow>
+
+    <flow name="until-successful-with-enricher">
+        <until-successful objectStore-ref="objectStore">
+            <enricher source="#[payload]" target="#[payload]">
+                <append-string-transformer message="Hello"/>
+            </enricher>
+        </until-successful>
+        <append-string-transformer message="Hello"/>
     </flow>
 
     <flow name="async">

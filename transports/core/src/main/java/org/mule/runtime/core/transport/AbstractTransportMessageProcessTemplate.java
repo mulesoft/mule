@@ -33,6 +33,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
 
     private final MessageReceiverType messageReceiver;
     private Object rawMessage;
+    private MuleEvent muleEvent;
 
     public AbstractTransportMessageProcessTemplate(MessageReceiverType messageReceiver)
     {
@@ -42,8 +43,12 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     @Override
     public MuleEvent getMuleEvent() throws MuleException
     {
-        MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
-        return createEventFromMuleMessage(messageFromSource);
+        if (muleEvent == null)
+        {
+            MuleMessage messageFromSource = createMessageFromSource(getOriginalMessage());
+            muleEvent = createEventFromMuleMessage(messageFromSource);
+        }
+        return muleEvent;
     }
 
     @Override

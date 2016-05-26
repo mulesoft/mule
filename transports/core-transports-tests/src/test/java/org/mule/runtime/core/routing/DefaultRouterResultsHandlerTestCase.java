@@ -15,6 +15,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventEndpointUtils;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -100,20 +101,21 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     @Test
     public void aggregateMultipleEvents() throws Exception
     {
+        SimpleDataType simpleDateType1 = new SimpleDataType(String.class, "text/plain");
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
         DefaultMuleEvent event1 = new DefaultMuleEvent(message1, flow);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event1, endpoint);
 
-        event1.setFlowVariable("key1", "value1");
+        event1.setFlowVariable("key1", "value1", simpleDateType1.cloneDataType());
         MuleSession session = event1.getSession();
         DefaultMuleEvent event2 = new DefaultMuleEvent(message2, flow, session);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event2, endpoint);
-        event2.setFlowVariable("key2", "value2");
+        event2.setFlowVariable("key2", "value2", simpleDateType1.cloneDataType());
         DefaultMuleEvent event3 = new DefaultMuleEvent(message3, flow, session);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event3, endpoint);
-        event3.setFlowVariable("key3", "value3");
+        event3.setFlowVariable("key3", "value3", simpleDateType1.cloneDataType());
         event1.getSession().setProperty("key", "value");
         event2.getSession().setProperty("key1", "value1");
         event2.getSession().setProperty("key2", "value2");
@@ -134,6 +136,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
         // Because a new MuleMessageCollection is created, propagate properties from
         // original event
         assertEquals("value1", result.getFlowVariable("key1"));
+        assertTrue(simpleDateType1.equals(result.getFlowVariableDataType("key1")));
         assertNull(result.getFlowVariable("key2"));
         assertNull(result.getFlowVariable("key3"));
 

@@ -6,11 +6,18 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.api.execution.ExceptionCallback;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.transport.AbstractMessageDispatcher;
+import org.mule.tck.processor.TestNonBlockingProcessor;
 
 public class TestMessageDispatcher extends AbstractMessageDispatcher
 {
@@ -18,6 +25,8 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     {
         super(endpoint);
     }
+
+    private MessageProcessor nonBlockingProcessor = new TestNonBlockingProcessor();
 
     @Override
     protected void doInitialise()
@@ -51,6 +60,45 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
+    protected void doSendNonBlocking(MuleEvent event, final CompletionHandler<MuleMessage, Exception, Void> completionHandler)
+    {
+        if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail"))
+        {
+            completionHandler.onFailure(new RoutingException(event, (OutboundEndpoint) endpoint));
+        }
+        else
+        {
+            try
+            {
+                final MuleMessage response = event.getMessage();
+                event = new DefaultMuleEvent(event, new ReplyToHandler()
+                {
+                    @Override
+                    public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo)
+                    {
+                        completionHandler.onCompletion(response, (ExceptionCallback<Void, Exception>) (exception ->
+                        {
+                            // TODO MULE-9629
+                            return null;
+                        }));
+                    }
+
+                    @Override
+                    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
+                    {
+                        completionHandler.onFailure(exception);
+                    }
+                });
+                nonBlockingProcessor.process(event);
+            }
+            catch (Exception e)
+            {
+                completionHandler.onFailure(e);
+            }
+        }
+    }
+
+    @Override
     protected void doConnect() throws Exception
     {
         // no op
@@ -72,5 +120,11 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     protected void doStop() 
     {
         // no op
+    }
+
+    @Override
+    protected boolean isSupportsNonBlocking()
+    {
+        return true;
     }
 }

@@ -222,7 +222,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
             MuleEvent result = processNext(copyEventForEnrichment(new DefaultMuleEvent(event, createReplyToHandler(event))));
             if (!(result instanceof NonBlockingVoidMuleEvent))
             {
-                result = processResponse(result);
+                result = processResponse(result, event);
             }
             return result;
         }
@@ -233,25 +233,25 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
         }
 
         @Override
-        protected MuleEvent processResponse(MuleEvent event) throws MuleException
+        protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
         {
             // Reset access control on current event instance for continued flow processing
             ((ThreadSafeAccess) eventToEnrich).resetAccessControl();
 
             final ExpressionManager expressionManager = eventToEnrich.getMuleContext().getExpressionManager();
 
-            if (event != null && !VoidMuleEvent.getInstance().equals(eventToEnrich))
+            if (response != null && !VoidMuleEvent.getInstance().equals(eventToEnrich))
             {
                 for (EnrichExpressionPair pair : enrichExpressionPairs)
                 {
-                    enrich(eventToEnrich, event, pair.getSource(), pair.getTarget(), expressionManager);
+                    enrich(eventToEnrich, response, pair.getSource(), pair.getTarget(), expressionManager);
                 }
             }
 
             if (muleContext != null
                 && muleContext.getConfiguration().isEnricherPropagatesSessionVariableChanges())
             {
-                eventToEnrich = new DefaultMuleEvent(eventToEnrich.getMessage(), eventToEnrich, event.getSession());
+                eventToEnrich = new DefaultMuleEvent(eventToEnrich.getMessage(), eventToEnrich, response.getSession());
             }
 
             return OptimizedRequestContext.unsafeSetEvent(eventToEnrich);

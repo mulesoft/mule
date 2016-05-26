@@ -8,6 +8,7 @@
 package org.mule.runtime.module.ws.consumer;
 
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MessagingException;
@@ -25,16 +26,16 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.module.cxf.CxfConstants;
-import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.runtime.module.cxf.builder.ProxyClientMessageProcessorBuilder;
-import org.mule.runtime.module.ws.security.SecurityStrategy;
-import org.mule.runtime.module.ws.security.WSSecurity;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.util.Base64;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.runtime.module.cxf.builder.ProxyClientMessageProcessorBuilder;
+import org.mule.runtime.module.ws.security.SecurityStrategy;
+import org.mule.runtime.module.ws.security.WSSecurity;
 
 import java.io.IOException;
 import java.net.URL;
@@ -207,10 +208,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
 
             @Override
-            protected MuleEvent processResponse(MuleEvent event) throws MuleException
+            protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
             {
-                copyAttachmentsResponse(event);
-                return super.processResponse(event);
+                copyAttachmentsResponse(response);
+                return super.processResponse(response, request);
             }
         };
     }
@@ -230,13 +231,13 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
 
             @Override
-            protected MuleEvent processResponse(MuleEvent event) throws MuleException
+            protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
             {
                 if (propertyValue != null)
                 {
-                    event.setFlowVariable(propertyName, propertyValue);
+                    response.setFlowVariable(propertyName, propertyValue);
                 }
-                return super.processResponse(event);
+                return super.processResponse(response, request);
             }
         };
     }
@@ -265,15 +266,15 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
 
             @Override
-            protected MuleEvent processResponse(MuleEvent event) throws MuleException
+            protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException
             {
                 // Ensure that the http.status code inbound property (if present) is a String.
-                Object statusCode = event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY, null);
+                Object statusCode = response.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY, null);
                 if (statusCode != null && !(statusCode instanceof String))
                 {
-                    event.getMessage().setProperty(HTTP_STATUS_PROPERTY, statusCode.toString(), PropertyScope.INBOUND);
+                    response.getMessage().setProperty(HTTP_STATUS_PROPERTY, statusCode.toString(), PropertyScope.INBOUND);
                 }
-                return super.processResponse(event);
+                return super.processResponse(response, request);
             }
         };
     }
