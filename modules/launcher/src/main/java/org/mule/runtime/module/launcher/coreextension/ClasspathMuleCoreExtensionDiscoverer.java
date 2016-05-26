@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
-import org.mule.runtime.core.MuleCoreExtension;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.net.URL;
 import java.util.Enumeration;
@@ -31,6 +33,18 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
     public static final String CORE_EXTENSION_PROPERTIES = "core-extensions.properties";
 
     private static Log logger = LogFactory.getLog(ClasspathMuleCoreExtensionDiscoverer.class);
+    private final ArtifactClassLoader containerClassLoader;
+
+    /**
+     * Creates a new extension discoverer
+     *
+     * @param containerClassLoader classloader where the discovering process will be executed. Non null.
+     */
+    public ClasspathMuleCoreExtensionDiscoverer(ArtifactClassLoader containerClassLoader)
+    {
+        checkArgument(containerClassLoader != null, "Container classLoader cannot be null");
+        this.containerClassLoader = containerClassLoader;
+    }
 
     @Override
     public List<MuleCoreExtension> discover() throws DefaultMuleException
@@ -69,6 +83,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
                 try
                 {
                     MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instanciateClass(extClass);
+                    extension.setContainerClassLoader(containerClassLoader);
                     result.add(extension);
                 }
                 catch (Exception ex)

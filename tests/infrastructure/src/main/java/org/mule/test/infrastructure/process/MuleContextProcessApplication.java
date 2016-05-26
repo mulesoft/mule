@@ -8,7 +8,7 @@ package org.mule.test.infrastructure.process;
 
 import static org.mule.test.infrastructure.process.MuleContextProcessBuilder.MULE_CORE_EXTENSIONS_PROPERTY;
 
-import org.mule.runtime.core.MuleCoreExtension;
+import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.MuleServer;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;

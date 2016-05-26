@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core;
+package org.mule.runtime.container.api;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

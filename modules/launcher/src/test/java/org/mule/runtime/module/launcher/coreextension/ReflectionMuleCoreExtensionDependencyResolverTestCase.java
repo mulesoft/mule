@@ -15,12 +15,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.CoreExtensionsAware;
-import org.mule.runtime.core.MuleCoreExtension;
-import org.mule.runtime.core.MuleCoreExtensionDependency;
+import org.mule.runtime.container.api.CoreExtensionsAware;
+import org.mule.runtime.container.api.MuleCoreExtension;
+import org.mule.runtime.container.api.MuleCoreExtensionDependency;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -253,6 +254,12 @@ public class ReflectionMuleCoreExtensionDependencyResolverTestCase extends Abstr
         @Override
         public void stop() throws MuleException
         {
+        }
+
+        @Override
+        public void setContainerClassLoader(ArtifactClassLoader containerClassLoader)
+        {
+
         }
     }
 

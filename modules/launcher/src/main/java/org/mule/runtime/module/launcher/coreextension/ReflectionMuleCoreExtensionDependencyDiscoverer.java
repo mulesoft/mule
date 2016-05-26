@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
-import org.mule.runtime.core.MuleCoreExtension;
-import org.mule.runtime.core.MuleCoreExtensionDependency;
+import org.mule.runtime.container.api.MuleCoreExtension;
+import org.mule.runtime.container.api.MuleCoreExtensionDependency;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
