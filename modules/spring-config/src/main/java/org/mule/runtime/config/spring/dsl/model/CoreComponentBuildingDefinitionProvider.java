@@ -23,6 +23,7 @@ import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvide
 import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MessageProcessorWrapperObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.TransformerObjectFactory;
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
@@ -42,6 +43,7 @@ import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.schedule.SchedulerFactory;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
@@ -78,6 +80,7 @@ import org.mule.runtime.core.transaction.lookup.JRunTransactionManagerLookupFact
 import org.mule.runtime.core.transaction.lookup.Resin3TransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.WeblogicTransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.WebsphereTransactionManagerLookupFactory;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.simple.SetPayloadMessageProcessor;
 
 import java.util.LinkedList;
@@ -129,13 +132,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     private static final String POLL = "poll";
     private static final String REQUEST_REPLY = "request-reply";
 
-    private ComponentBuildingDefinition.Builder baseDefinition;
+    private static ComponentBuildingDefinition.Builder baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(CORE_NAMESPACE_NAME);
     private ComponentBuildingDefinition.Builder transactionManagerBaseDefinition;
 
     @Override
     public void init(MuleContext muleContext)
     {
-        baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace(CORE_NAMESPACE_NAME);
         transactionManagerBaseDefinition = baseDefinition.copy();
     }
 
@@ -468,6 +470,23 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
                                                  .build());
         return componentBuildingDefinitions;
+    }
+
+    public static ComponentBuildingDefinition.Builder getTransformerBaseBuilder()
+    {
+        return baseDefinition.copy()
+                .withTypeDefinition(fromType(Transformer.class))
+                .withObjectFactoryType(TransformerObjectFactory.class)
+                .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+                .withSetterParameterDefinition("ignoreBadInput", fromSimpleParameter("ignoreBadInput").build())
+                .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
+                .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
+                .withSetterParameterDefinition("returnClass", fromSimpleParameter("returnClass").build()).copy();
+    }
+
+    public static ComponentBuildingDefinition.Builder getTransformerBaseBuilderForClass(Class<? extends AbstractTransformer> transformerClass)
+    {
+        return getTransformerBaseBuilder().withSetterParameterDefinition("transformerClass", fromFixedValue(transformerClass).build()).withTypeDefinition(fromType(transformerClass));
     }
 
     private ComponentBuildingDefinition.Builder createTransactionManagerDefinitionBuilder(String transactionManagerName, Class<?> transactionManagerClass)
