@@ -29,8 +29,7 @@ import org.apache.commons.logging.LogFactory;
 public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDiscoverer
 {
 
-    public static final String SERVICE_PATH = "META-INF/services/org/mule/runtime/core/config/";
-    public static final String CORE_EXTENSION_PROPERTIES = "core-extensions.properties";
+    public static final String CORE_EXTENSION_RESOURCE_NAME = "META-INF/services/org/mule/runtime/core/config/" + "core-extensions.properties";
 
     private static Log logger = LogFactory.getLog(ClasspathMuleCoreExtensionDiscoverer.class);
     private final ArtifactClassLoader containerClassLoader;
@@ -49,9 +48,9 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
     @Override
     public List<MuleCoreExtension> discover() throws DefaultMuleException
     {
-        List<MuleCoreExtension> result = new LinkedList<MuleCoreExtension>();
+        List<MuleCoreExtension> result = new LinkedList<>();
 
-        Enumeration<?> e = ClassUtils.getResources(SERVICE_PATH + CORE_EXTENSION_PROPERTIES, getClass());
+        Enumeration<?> e = ClassUtils.getResources(CORE_EXTENSION_RESOURCE_NAME, getClass());
         List<Properties> extensions = new LinkedList<Properties>();
 
         // load ALL of the extension files first
