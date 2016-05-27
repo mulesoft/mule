@@ -25,8 +25,12 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class MetadataTypeUtils
+public final class MetadataTypeUtils
 {
+
+    private MetadataTypeUtils()
+    {
+    }
 
     public static boolean isNullType(MetadataType type)
     {
@@ -62,17 +66,17 @@ public class MetadataTypeUtils
     /**
      * Provides a unique way to generate an {@link UnionType} from the SubTypes Mapping declaration
      * for a given {@link MetadataType baseType}.
-     *
+     * <p>
      * If no subType mapping exists for the given {@link MetadataType baseType}, then the {@code baseType}
      * is returned, without wrapping it in a new {@link UnionType}.
-     *
+     * <p>
      * When there is a single subtype mapped, then instead of returning an {@link UnionType} of a single
      * {@link MetadataType}, the subtype is returned.
-     *
+     * <p>
      * In all cases, if the {@link MetadataType baseType} is a concrete implementation, it is also added
      * as a part of the {@link UnionType}.
      *
-     * @param baseType the base {@link MetadataType} for which subtypes could be mapped
+     * @param baseType          the base {@link MetadataType} for which subtypes could be mapped
      * @param subtypesContainer the {@link SubTypesMappingContainer} used to look for mapped subtypes for
      *                          the given {@code baseType}
      * @return The {@code baseType} if no subtypes were present, its subtype if only one mapping is defined,
