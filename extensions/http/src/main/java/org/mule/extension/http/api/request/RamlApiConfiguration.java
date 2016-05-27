@@ -8,6 +8,7 @@ package org.mule.extension.http.api.request;
 
 
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 
@@ -16,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
  *
  * @since 4.0
  */
+@Alias("api-configuration")
 public class RamlApiConfiguration
 {
 
