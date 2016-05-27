@@ -2,10 +2,10 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/transport/sockets"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
+               http://www.mulesoft.org/schema/mule/transport/sockets http://www.mulesoft.org/schema/mule/transport/sockets/current/mule-transport-sockets.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <sockets:client-socket-properties name="globalTcpProperties" connectionTimeout="1000" keepAlive="true"

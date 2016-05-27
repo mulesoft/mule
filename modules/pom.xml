@@ -42,7 +42,6 @@
         <module>extensions-spring-support</module>
         
         <module>spring-security</module>
-        <module>sockets</module>
         <module>tls</module>
         <module>tomcat</module>
         <module>ws</module>

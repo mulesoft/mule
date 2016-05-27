@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.runtime.module.socket.api.TcpServerSocketProperties;
+import org.mule.runtime.transport.socket.api.TcpServerSocketProperties;
 
 import org.junit.Rule;
 import org.junit.Test;
