@@ -12,7 +12,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
-import org.mule.metadata.java.utils.JavaTypeUtils;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 
@@ -38,17 +38,46 @@ public class MetadataTypeUtils
         return isNullType(type);
     }
 
+    /**
+     * @param metadataType the {@link MetadataType} to inspect to retrieve its type Alias
+     * @return the {@code Alias} name of the {@link MetadataType}
+     */
     public static String getAliasName(MetadataType metadataType)
     {
-        return IntrospectionUtils.getAliasName(JavaTypeUtils.getType(metadataType));
+        return IntrospectionUtils.getAliasName(getType(metadataType));
     }
 
+    /**
+     * @param metadataType the {@link MetadataType} to inspect to retrieve its type Alias
+     * @param defaultName  default name to use if {@code metadataType} alias is not defined
+     * @return the {@code Alias} name of the {@link MetadataType} or the {@code defaultName}
+     * if alias was not specified
+     */
     public static String getAliasName(MetadataType metadataType, String defaultName)
     {
-        Class<?> type = JavaTypeUtils.getType(metadataType);
+        Class<?> type = getType(metadataType);
         return IntrospectionUtils.getAliasName(defaultName, type.getAnnotation(Alias.class));
     }
 
+    /**
+     * Provides a unique way to generate an {@link UnionType} from the SubTypes Mapping declaration
+     * for a given {@link MetadataType baseType}.
+     *
+     * If no subType mapping exists for the given {@link MetadataType baseType}, then the {@code baseType}
+     * is returned, without wrapping it in a new {@link UnionType}.
+     *
+     * When there is a single subtype mapped, then instead of returning an {@link UnionType} of a single
+     * {@link MetadataType}, the subtype is returned.
+     *
+     * In all cases, if the {@link MetadataType baseType} is a concrete implementation, it is also added
+     * as a part of the {@link UnionType}.
+     *
+     * @param baseType the base {@link MetadataType} for which subtypes could be mapped
+     * @param subtypesContainer the {@link SubTypesMappingContainer} used to look for mapped subtypes for
+     *                          the given {@code baseType}
+     * @return The {@code baseType} if no subtypes were present, its subtype if only one mapping is defined,
+     * or the {@link UnionType union} of all the mapped subtypes for the given {@code baseType}
+     */
     public static MetadataType subTypesAsUnionType(MetadataType baseType, SubTypesMappingContainer subtypesContainer)
     {
         List<MetadataType> subTypes = subtypesContainer.getSubTypes(baseType);

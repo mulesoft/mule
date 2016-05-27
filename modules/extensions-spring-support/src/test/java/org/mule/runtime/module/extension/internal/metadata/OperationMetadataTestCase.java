@@ -295,13 +295,11 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
         MetadataType shapeType = metadataDescriptor.getOutputMetadata().getPayloadMetadata().getType();
-        ;
         assertThat(shapeType, is(instanceOf(DefaultUnionType.class)));
         assertThat(((DefaultUnionType) shapeType).getTypes(), hasSize(2));
         assertThat(((DefaultUnionType) shapeType).getTypes(), hasItems(toMetadataType(Circle.class), toMetadataType(Rectangle.class)));
 
         MetadataType attributesType = metadataDescriptor.getOutputMetadata().getAttributesMetadata().getType();
-        ;
         assertThat(attributesType, is(instanceOf(DefaultUnionType.class)));
         assertThat(((DefaultUnionType) attributesType).getTypes(), hasSize(2));
         assertThat(((DefaultUnionType) attributesType).getTypes(), hasItems(toMetadataType(ShapeOutputAttributes.class), toMetadataType(AnimalsOutputAttributes.class)));
