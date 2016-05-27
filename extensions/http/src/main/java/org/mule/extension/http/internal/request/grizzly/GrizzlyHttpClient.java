@@ -35,7 +35,6 @@ import org.mule.runtime.module.http.internal.request.grizzly.CompositeTransportC
 import org.mule.runtime.module.http.internal.request.grizzly.CustomTimeoutThrottleRequestFilter;
 import org.mule.runtime.module.http.internal.request.grizzly.IOStrategyTransportCustomizer;
 import org.mule.runtime.module.http.internal.request.grizzly.LoggerTransportCustomizer;
-import org.mule.runtime.module.http.internal.request.grizzly.SocketConfigTransportCustomizer;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;

@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.http.functional.requester;
 
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.module.socket.api.SocketsExtension;
-import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -36,7 +35,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 
-public class AbstractHttpRequestTestCase extends ExtensionFunctionalTestCase
+public class AbstractHttpRequestTestCase extends FunctionalTestCase
 {
 
     @Rule
@@ -53,12 +52,6 @@ public class AbstractHttpRequestTestCase extends ExtensionFunctionalTestCase
     protected Multimap<String, String> headers = Multimaps.newMultimap(new CaseInsensitiveMapWrapper<>(HashMap.class), Sets::newHashSet);
 
     protected String body;
-
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {SocketsExtension.class};
-    }
 
     @Before
     public void startServer() throws Exception

@@ -9,6 +9,7 @@ package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
+import org.mule.extension.http.internal.listener.grizzly.GrizzlyServerManager;
 import org.mule.extension.http.internal.listener.server.HttpServerConfiguration;
 import org.mule.extension.http.internal.listener.server.HttpServerFactory;
 import org.mule.module.socket.api.TcpServerSocketProperties;
@@ -33,7 +34,6 @@ import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.runtime.module.http.internal.listener.HttpServerManager;
 import org.mule.runtime.module.http.internal.listener.Server;
 import org.mule.runtime.module.http.internal.listener.ServerAddress;
-import org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyServerManager;
 
 import com.google.common.collect.Iterables;
 
