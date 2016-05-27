@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+    
+    <httpn:request-config name="reqConfig">
+        <httpn:requester-connection host="localhost" protocol="HTTP" port="${clientPort}"/>
+    </httpn:request-config>
+    
+    <httpn:listener-config name="lisConfig">
+        <httpn:listener-connection host="localhost" port="${serverPort}" protocol="HTTP"/>
+    </httpn:listener-config> 
+    
+    <flow name="client">
+        <httpn:request path="/" config-ref="reqConfig" key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder>
+                    <httpn:query-params>
+                        <httpn:query-param key="query" value="param"/>
+                    </httpn:query-params>
+                    <httpn:headers>
+                        <httpn:header key="X-Custom" value="custom-value"/>
+                    </httpn:headers>
+                </httpn:requester-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
+    </flow>
+
+    <flow name="server">
+        <httpn:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true" config-ref="lisConfig"/>
+        <custom-processor class="org.mule.extension.http.BasicHttpTestCase$RequestCheckerMessageProcessor"/>
+        <set-payload value="HEY"/>
+    </flow>
+
+</mule>

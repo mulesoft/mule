@@ -139,7 +139,7 @@ public class GrizzlyHttpClient implements HttpClient
             }
             TlsContextTrustStoreConfiguration trustStoreConfiguration = tlsContextFactory.getTrustStoreConfiguration();
 
-            if(trustStoreConfiguration != null && trustStoreConfiguration.isInsecure())
+            if (trustStoreConfiguration != null && trustStoreConfiguration.isInsecure())
             {
                 logger.warn(String.format("TLS configuration for requester %s has been set to use an insecure trust store. This means no certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.", ownerName));
                 //This disables hostname verification
@@ -187,7 +187,7 @@ public class GrizzlyHttpClient implements HttpClient
         }
         else
         {
-            proxyServer = new ProxyServer(proxyConfig.getHost(),proxyConfig.getPort());
+            proxyServer = new ProxyServer(proxyConfig.getHost(), proxyConfig.getPort());
         }
         return proxyServer;
     }
@@ -234,7 +234,7 @@ public class GrizzlyHttpClient implements HttpClient
     public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication) throws IOException, TimeoutException
     {
 
-        Request grizzlyRequest= createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
+        Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
         ListenableFuture<Response> future = asyncHttpClient.executeRequest(grizzlyRequest);
         try
         {
@@ -368,9 +368,9 @@ public class GrizzlyHttpClient implements HttpClient
         if (authentication != null)
         {
             Realm.RealmBuilder realmBuilder = new Realm.RealmBuilder()
-                        .setPrincipal(authentication.getUsername())
-                        .setPassword(authentication.getPassword())
-                        .setUsePreemptiveAuth(authentication.isPreemptive());
+                    .setPrincipal(authentication.getUsername())
+                    .setPassword(authentication.getPassword())
+                    .setUsePreemptiveAuth(authentication.isPreemptive());
 
             if (authentication.getType() == HttpAuthenticationType.BASIC)
             {
@@ -458,7 +458,7 @@ public class GrizzlyHttpClient implements HttpClient
                 logger.debug("Persistent connections are disabled in the HTTP requester configuration, but the request already " +
                              "contains a Connection header with value {}. This header will be ignored, and a Connection: close header " +
                              "will be sent instead.",
-                        connectionHeaderValue);
+                             connectionHeaderValue);
             }
             builder.setHeader(CONNECTION, CLOSE);
         }
