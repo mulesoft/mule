@@ -40,6 +40,7 @@ import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Grizzly based {@link HttpServerFactory}.
@@ -59,10 +60,16 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     private HttpServerManager httpServerManager;
 
     private MuleContext muleContext;
+    private AtomicBoolean initialized = new AtomicBoolean(false);
 
     @Override
     public void initialise() throws InitialisationException
     {
+        if (initialized.getAndSet(true))
+        {
+            return;
+        }
+
         Collection<TcpServerSocketProperties> tcpServerSocketPropertiesBeans = muleContext.getRegistry().lookupObjects(TcpServerSocketProperties.class);
         TcpServerSocketProperties tcpServerSocketProperties = new DefaultTcpServerSocketProperties();
 

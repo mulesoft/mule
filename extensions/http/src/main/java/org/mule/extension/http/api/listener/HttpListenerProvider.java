@@ -6,7 +6,6 @@
  */
 package org.mule.extension.http.api.listener;
 
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
@@ -101,6 +100,8 @@ public class HttpListenerProvider implements ConnectionProvider<HttpListenerConf
     @Override
     public void initialise() throws InitialisationException
     {
+        initialiseIfNeeded(connectionManager);
+
         if (port == null)
         {
             port = protocol.getDefaultPort();
@@ -162,14 +163,7 @@ public class HttpListenerProvider implements ConnectionProvider<HttpListenerConf
     @Override
     public ConnectionValidationResult validate(Server server)
     {
-        if (server.isStopped() || server.isStopping())
-        {
-            return ConnectionValidationResult.failure("The server is not running.", UNKNOWN, new ConnectionException("Server not running."));
-        }
-        else
-        {
-            return ConnectionValidationResult.success();
-        }
+        return ConnectionValidationResult.success();
     }
 
     @Override

@@ -200,7 +200,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         verify((Stoppable) source).stop();
         verify(workManager, never()).dispose();
         verify((Disposable) source).dispose();
-        verify((Initialisable) source, times(3)).initialise();
+        verify((Initialisable) source, times(2)).initialise();
         verify((Startable) source, times(2)).start();
         handleMessage();
     }

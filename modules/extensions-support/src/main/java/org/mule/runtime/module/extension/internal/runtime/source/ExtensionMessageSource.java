@@ -241,6 +241,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     private void disposeSource()
     {
         disposeIfNeeded(source, LOGGER);
+        source = null;
     }
 
     private void createSource() throws Exception
@@ -277,7 +278,10 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
         {
             try
             {
-                createSource();
+                if (source == null)
+                {
+                    createSource();
+                }
                 source.start();
             }
             catch (Exception e)
