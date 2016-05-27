@@ -45,6 +45,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.runtime.module.extension.internal.runtime.processor.IllegalOperationException;
@@ -91,9 +92,10 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
                                   String configurationProviderName,
                                   ThreadingProfile threadingProfile,
                                   RetryPolicyTemplate retryPolicyTemplate,
-                                  ExtensionManagerAdapter managerAdapter)
+                                  ExtensionManagerAdapter managerAdapter,
+                                  MetadataMediator metadataMediator)
     {
-        super(extensionModel, sourceModel, configurationProviderName, managerAdapter);
+        super(extensionModel, configurationProviderName, managerAdapter, metadataMediator);
         this.sourceModel = sourceModel;
         this.sourceFactory = sourceFactory;
         this.threadingProfile = threadingProfile;

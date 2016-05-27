@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.OperationContext;
 import org.mule.runtime.extension.api.runtime.OperationExecutor;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionMediator;
@@ -75,7 +76,7 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
                                      ResolverSet resolverSet,
                                      ExtensionManagerAdapter extensionManager)
     {
-        super(extensionModel, operationModel, configurationProviderName, extensionManager);
+        super(extensionModel, configurationProviderName, extensionManager, new MetadataMediator(extensionModel, operationModel));
         this.extensionModel = extensionModel;
         this.operationModel = operationModel;
         this.resolverSet = resolverSet;

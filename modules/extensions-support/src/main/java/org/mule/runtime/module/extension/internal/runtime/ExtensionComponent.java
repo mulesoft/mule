@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
@@ -34,6 +35,7 @@ import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.processor.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -65,12 +67,12 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     @Inject
     private MuleMetadataManager metadataManager;
 
-    protected ExtensionComponent(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel, String configurationProviderName, ExtensionManagerAdapter extensionManager)
+    protected ExtensionComponent(RuntimeExtensionModel extensionModel, String configurationProviderName, ExtensionManagerAdapter extensionManager, MetadataMediator metadataMediator)
     {
         this.extensionModel = extensionModel;
         this.configurationProviderName = configurationProviderName;
         this.extensionManager = extensionManager;
-        this.metadataMediator = new MetadataMediator(extensionModel, componentModel);
+        this.metadataMediator = metadataMediator;
     }
 
     /**
@@ -120,7 +122,8 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     @Override
     public MetadataResult<List<MetadataKey>> getMetadataKeys() throws MetadataResolvingException
     {
-        return metadataMediator.getMetadataKeys(getMetadataContext());
+        final MetadataContext metadataContext = getMetadataContext();
+        return ClassUtils.withContextClassLoader(MuleExtensionUtils.getClassLoader(this.extensionModel), () -> metadataMediator.getMetadataKeys(metadataContext));
     }
 
     /**
@@ -129,7 +132,7 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     @Override
     public MetadataResult<ComponentMetadataDescriptor> getMetadata() throws MetadataResolvingException
     {
-        return metadataMediator.getMetadata();
+        return ClassUtils.withContextClassLoader(MuleExtensionUtils.getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata());
     }
 
     /**
@@ -138,7 +141,8 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     @Override
     public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataKey key) throws MetadataResolvingException
     {
-        return metadataMediator.getMetadata(getMetadataContext(), key);
+        final MetadataContext metadataContext = getMetadataContext();
+        return ClassUtils.withContextClassLoader(MuleExtensionUtils.getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata(metadataContext, key));
     }
 
     @Override
