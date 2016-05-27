@@ -279,32 +279,38 @@ public class SftpConnector extends AbstractConnector
         pool.invalidateObject(client);
     }
 
-    protected synchronized ObjectPool getClientPool(ImmutableEndpoint endpoint)
+    protected ObjectPool getClientPool(ImmutableEndpoint endpoint)
     {
         GenericObjectPool pool = pools.get(endpoint.getEndpointURI());
-
         if (pool == null)
         {
-            if (logger.isDebugEnabled())
+            synchronized (pools)
             {
-                logger.debug("Pool is null - creating one for endpoint " + endpoint.getEndpointURI()
-                             + " with max size " + getMaxConnectionPoolSize());
-            }
-            SftpConnectionFactory factory = new SftpConnectionFactory(endpoint);
-            factory.setPreferredAuthenticationMethods(preferredAuthenticationMethods);
-            pool = new GenericObjectPool(factory, getMaxConnectionPoolSize());
-            pool.setTestOnBorrow(isValidateConnections());
-            pools.put(endpoint.getEndpointURI(), pool);
-        }
-        else
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Using existing pool for endpoint " + endpoint.getEndpointURI() + ". Active: "
-                             + pool.getNumActive() + ", Idle:" + pool.getNumIdle());
-            }
-        }
+                pool = pools.get(endpoint.getEndpointURI());
 
+                if (pool == null)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Pool is null - creating one for endpoint " + endpoint.getEndpointURI()
+                                     + " with max size " + getMaxConnectionPoolSize());
+                    }
+                    SftpConnectionFactory factory = new SftpConnectionFactory(endpoint);
+                    factory.setPreferredAuthenticationMethods(preferredAuthenticationMethods);
+                    pool = new GenericObjectPool(factory, getMaxConnectionPoolSize());
+                    pool.setTestOnBorrow(isValidateConnections());
+                    pools.put(endpoint.getEndpointURI(), pool);
+                }
+                else
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Using existing pool for endpoint " + endpoint.getEndpointURI() + ". Active: "
+                                     + pool.getNumActive() + ", Idle:" + pool.getNumIdle());
+                    }
+                }
+            }
+        }
         return pool;
     }
 
