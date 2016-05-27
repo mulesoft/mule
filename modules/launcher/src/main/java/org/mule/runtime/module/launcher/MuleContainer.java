@@ -67,7 +67,6 @@ public class MuleContainer
 
     protected final DeploymentService deploymentService;
     private final MuleCoreExtensionManagerServer coreExtensionManager;
-    private final ServerPluginClassLoaderManager serverPluginClassLoaderManager = new MuleServerPluginClassLoaderManager();
 
     static
     {
@@ -95,7 +94,7 @@ public class MuleContainer
         final ContainerClassLoaderFactory containerClassLoaderFactory = new ContainerClassLoaderFactory();
         final ArtifactClassLoader containerClassLoader = containerClassLoaderFactory.createContainerClassLoader(getClass().getClassLoader());
 
-        this.deploymentService = new MuleDeploymentService(containerClassLoader, serverPluginClassLoaderManager);
+        this.deploymentService = new MuleDeploymentService(containerClassLoader);
         this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(new ClasspathMuleCoreExtensionDiscoverer(containerClassLoader), new ReflectionMuleCoreExtensionDependencyResolver());
 
         init(args);
@@ -170,7 +169,6 @@ public class MuleContainer
             createExecutionMuleFolder();
 
             coreExtensionManager.setDeploymentService(deploymentService);
-            coreExtensionManager.setServerPluginClassLoaderManager(serverPluginClassLoaderManager);
             coreExtensionManager.initialise();
             coreExtensionManager.start();
 

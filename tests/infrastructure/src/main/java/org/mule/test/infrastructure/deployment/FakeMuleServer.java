@@ -26,7 +26,6 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.DeploymentListener;
 import org.mule.runtime.module.launcher.DeploymentService;
 import org.mule.runtime.module.launcher.MuleDeploymentService;
-import org.mule.runtime.module.launcher.MuleServerPluginClassLoaderManager;
 import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionDiscoverer;
@@ -108,8 +107,7 @@ public class FakeMuleServer
             throw new RuntimeException(e);
         }
 
-
-        deploymentService = new MuleDeploymentService(containerClassLoader, new MuleServerPluginClassLoaderManager());
+        deploymentService = new MuleDeploymentService(containerClassLoader);
         deploymentListener = mock(DeploymentListener.class);
         deploymentService.addDeploymentListener(deploymentListener);
 
