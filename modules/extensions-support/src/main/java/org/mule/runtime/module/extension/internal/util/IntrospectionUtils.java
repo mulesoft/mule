@@ -26,7 +26,6 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
-import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.ClassUtils;
@@ -363,11 +362,6 @@ public final class IntrospectionUtils
         return !forceOptional && parameterModel.isRequired();
     }
 
-    public static boolean isNullType(MetadataType type)
-    {
-        return type instanceof NullType;
-    }
-
     public static boolean isVoid(Method method)
     {
         return isVoid(method.getReturnType());
@@ -452,16 +446,9 @@ public final class IntrospectionUtils
         return expressionAnnotation != null ? expressionAnnotation.value() : SUPPORTED;
     }
 
-    public static String getAliasName(MetadataType metadataType)
+    public static String getAliasName(Class<?> type)
     {
-        Class<?> type = JavaTypeUtils.getType(metadataType);
-        return getAliasName(metadataType, type.getSimpleName());
-    }
-
-    public static String getAliasName(MetadataType metadataType, String defaultName)
-    {
-        Class<?> type = JavaTypeUtils.getType(metadataType);
-        return getAliasName(defaultName, type.getAnnotation(Alias.class));
+        return getAliasName(type.getSimpleName(), type.getAnnotation(Alias.class));
     }
 
     public static String getAliasName(String defaultName, Alias aliasAnnotation)

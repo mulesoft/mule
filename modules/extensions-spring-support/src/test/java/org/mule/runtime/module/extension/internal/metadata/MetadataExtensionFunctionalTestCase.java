@@ -71,6 +71,8 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String TYPE_WITH_DECLARED_SUBTYPES_METADATA = "typeWithDeclaredSubtypesMetadata";
     protected static final String RESOLVER_WITH_DYNAMIC_CONFIG = "resolverWithDynamicConfig";
     protected static final String RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG = "resolverWithImplicitDynamicConfig";
+    protected static final String OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA = "outputAttributesWithDynamicMetadata";
+    protected static final String OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA = "outputAttributesWithDeclaredSubtypesMetadata";
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
     protected MetadataType personType;
@@ -110,7 +112,8 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected ComponentMetadataDescriptor getComponentDynamicMetadata(MetadataKey key)
     {
         MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId, key);
-        assertThat(componentMetadata.isSuccess(), is(true));
+        assertThat(componentMetadata.getFailure().isPresent() ? componentMetadata.getFailure().get().getReason() : "No Failure",
+                   componentMetadata.isSuccess(), is(true));
         return componentMetadata.get();
     }
 
@@ -146,6 +149,12 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     }
 
     protected void assertExpectedOutput(OutputMetadataDescriptor outputDescriptor, MetadataType payloadType, Type attributesType) throws IOException
+    {
+        assertExpectedType(outputDescriptor.getPayloadMetadata(), "Message.Payload", payloadType);
+        assertExpectedType(outputDescriptor.getAttributesMetadata(), "Message.Attributes", attributesType);
+    }
+
+    protected void assertExpectedOutput(OutputMetadataDescriptor outputDescriptor, MetadataType payloadType, MetadataType attributesType) throws IOException
     {
         assertExpectedType(outputDescriptor.getPayloadMetadata(), "Message.Payload", payloadType);
         assertExpectedType(outputDescriptor.getAttributesMetadata(), "Message.Attributes", attributesType);

@@ -14,6 +14,8 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.test.metadata.extension.MetadataConnection;
 
 import java.util.List;
@@ -39,7 +41,7 @@ public class TestMetadataResolverUtils
                 .collect(Collectors.toList());
     }
 
-    public static MetadataType getMetadata(String key)
+    public static MetadataType getMetadata(String key) throws MetadataResolvingException
     {
         final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(new MetadataFormat(key, key, APPLICATION_JAVA_MIME_TYPE)).objectType();
 
@@ -57,6 +59,8 @@ public class TestMetadataResolverUtils
                 objectBuilder.addField().key(NAME).value().stringType();
                 objectBuilder.addField().key(AGE).value().numberType();
                 break;
+            default:
+                throw new MetadataResolvingException("Uknown key " + key, FailureCode.INVALID_METADATA_KEY);
         }
 
         return objectBuilder.build();

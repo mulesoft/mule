@@ -119,6 +119,14 @@
         <metadata:should-inherit-operation-parent-resolvers config-ref="config" type="Person"/>
     </flow>
 
+    <flow name="outputAttributesWithDeclaredSubtypesMetadata">
+        <metadata:output-attributes-with-declared-subtypes-metadata config-ref="config"/>
+    </flow>
+
+    <flow name="outputAttributesWithDynamicMetadata">
+        <metadata:output-attributes-with-dynamic-metadata config-ref="config" type="Person"/>
+    </flow>
+
     <flow name="simpleMultiLevelKeyResolver">
         <metadata:simple-multi-level-key-resolver config-ref="config" continent="AMERICA" country="USA" city="SFO"/>
     </flow>
