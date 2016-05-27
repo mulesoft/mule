@@ -24,15 +24,16 @@ import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.FileInputStream;
 import org.mule.extension.file.api.ListenerFileAttributes;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -127,20 +128,21 @@ import org.slf4j.LoggerFactory;
  * <ul>
  * <li>Overflows: In highly concurrent scenarios a given file might be associated to hundreds of
  * events per second. Some OS might not be able to handle that gracefully and decide to drop
- * some of those events or event fail.
+ * some of those events or even fail.
  * </li>
  * <li>Polling: Some operation systems (like older versions of OSX) don't actually support file system
- * notifications. In those cases, the JRE decides to compensate by using a low frequency poll, in which
+ * notifications. In those cases, the JRE decides to compensate by using a high frequency poll, in which
  * case the listener becomes pretty much the same as using a poll element</li>
  * </ul>
  *
  * @since 4.0
  */
-@Alias("directory-listener")
+@Alias(DirectoryListener.DIRECTORY_LISTENER)
 public class DirectoryListener extends Source<InputStream, ListenerFileAttributes> implements FlowConstructAware
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryListener.class);
+    static final String DIRECTORY_LISTENER = "directory-listener";
 
     @UseConfig
     private FileConnector config;
@@ -176,7 +178,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     /**
      * Whether or not to also listen for notification which happen on
      * sub directories which are also contained on the main one.
-     *
+     * <p>
      * This option is set to {@code false} by default. Consider that when
      * enabled, some operating systems might fire many notifications when
      * an event happens on a subdirectory. One per each watched directory
@@ -207,13 +209,22 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     private Predicate<FileAttributes> matcher;
     private Set<FileEventType> enabledEventTypes = new HashSet<>();
     private ExecutorService executorService;
+    private PrimaryNodeLifecycleNotificationListener clusterListener;
 
     private final Map<WatchKey, Path> keyPaths = new HashMap<>();
     private final AtomicBoolean stopRequested = new AtomicBoolean(false);
+    private boolean started = false;
 
     @Override
     public void start() throws Exception
     {
+        if (!muleContext.isPrimaryPollingInstance())
+        {
+            LOGGER.debug("{} source on flow {} not started because this is a secondary cluster node", DIRECTORY_LISTENER, flowConstruct.getName());
+            initialiseClusterListener();
+            return;
+        }
+
         calculateEnabledEventTypes();
         directoryPath = resolveDirectory();
 
@@ -222,6 +233,26 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
         matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate();
         executorService = newSingleThreadExecutor(r -> new Thread(r, format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName())));
         executorService.execute(this::listen);
+        started = true;
+    }
+
+    private synchronized void initialiseClusterListener()
+    {
+        if (clusterListener == null)
+        {
+            clusterListener = new PrimaryNodeLifecycleNotificationListener(() -> {
+                try
+                {
+                    DirectoryListener.this.start();
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(e);
+                }
+            }, muleContext);
+
+            clusterListener.register();
+        }
     }
 
     private void listen()
@@ -324,6 +355,8 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     public void stop()
     {
         stopRequested.set(true);
+        started = false;
+
         closeWatcherService();
         shutdownExecutor();
     }
@@ -483,5 +516,13 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
+    }
+
+    /**
+     * @return whether {@code this} source is actually started
+     */
+    public boolean isStarted()
+    {
+        return started;
     }
 }
