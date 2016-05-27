@@ -200,7 +200,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         applicationDeploymentListener = mock(DeploymentListener.class);
         domainDeploymentListener = mock(DeploymentListener.class);
-        deploymentService = new MuleDeploymentService(containerClassLoader, new MuleServerPluginClassLoaderManager());
+        deploymentService = new MuleDeploymentService(containerClassLoader);
         deploymentService.addDeploymentListener(applicationDeploymentListener);
         deploymentService.addDomainDeploymentListener(domainDeploymentListener);
     }

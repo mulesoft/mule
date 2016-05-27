@@ -14,8 +14,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.launcher.DeploymentListener;
 import org.mule.runtime.module.launcher.DeploymentService;
 import org.mule.runtime.module.launcher.DeploymentServiceAware;
-import org.mule.runtime.module.launcher.ServerPluginClassLoaderManager;
-import org.mule.runtime.module.launcher.ServerPluginClassLoaderManagerAware;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +31,6 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     private List<MuleCoreExtension> coreExtensions = new LinkedList<>();
     private DeploymentService deploymentService;
     private List<MuleCoreExtension> orderedCoreExtensions;
-    private ServerPluginClassLoaderManager serverPluginClassLoaderManager;
 
     public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer, MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver)
     {
@@ -124,11 +121,6 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
                 deploymentService.addDeploymentListener((DeploymentListener) extension);
             }
 
-            if (extension instanceof ServerPluginClassLoaderManagerAware)
-            {
-                ((ServerPluginClassLoaderManagerAware) extension).setServerPluginClassLoaderManager(serverPluginClassLoaderManager);
-            }
-
             if (extension instanceof CoreExtensionsAware)
             {
                 ((CoreExtensionsAware) extension).setCoreExtensions(orderedCoreExtensions);
@@ -142,10 +134,5 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     public void setDeploymentService(DeploymentService deploymentService)
     {
         this.deploymentService = deploymentService;
-    }
-
-    public void setServerPluginClassLoaderManager(ServerPluginClassLoaderManager serverPluginClassLoaderManager)
-    {
-        this.serverPluginClassLoaderManager = serverPluginClassLoaderManager;
     }
 }
