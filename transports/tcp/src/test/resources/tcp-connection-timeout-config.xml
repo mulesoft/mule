@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:tcp="http://www.mulesoft.org/schema/mule/transport/tcp"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
       xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd
-            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+            http://www.mulesoft.org/schema/mule/transport/tcp http://www.mulesoft.org/schema/mule/transport/tcp/current/mule-transport-tcp.xsd
+            http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd">
 
     <tcp:connector name="tcpConnector" connectionTimeout="1"/>
 

@@ -4,7 +4,7 @@
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:httpc="http://www.mulesoft.org/schema/mule/http"
             xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
-            xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+            xmlns:tcp="http://www.mulesoft.org/schema/mule/transport/tcp"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             targetNamespace="http://www.mulesoft.org/schema/mule/transport/http"
             elementFormDefault="qualified"
@@ -13,8 +13,8 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
-    <xsd:import namespace="http://www.mulesoft.org/schema/mule/tcp"
-                schemaLocation="http://www.mulesoft.org/schema/mule/tcp/current/mule-tcp.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/transport/tcp"
+                schemaLocation="http://www.mulesoft.org/schema/mule/transport/tcp/current/mule-transport-tcp.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/http"
                 schemaLocation="http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/transports"

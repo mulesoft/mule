@@ -21,7 +21,7 @@ public class VmXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
     @Override
     public String getNamespaceUriPrefix()
     {
-        return "http://www.mulesoft.org/schema/mule/vm";
+        return "http://www.mulesoft.org/schema/mule/transport/vm";
     }
 
     @Override
