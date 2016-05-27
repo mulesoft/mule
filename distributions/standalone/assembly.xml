@@ -152,11 +152,11 @@
                 <include>org.mule.modules:mule-module-spring-config</include>
                 <include>org.mule.modules:mule-module-spring-extras</include>
                 <include>org.mule.modules:mule-module-spring-security</include>
-                <include>org.mule.modules:mule-module-sockets</include>
                 <include>org.mule.modules:mule-module-tls</include>
                 <include>org.mule.modules:mule-module-tomcat</include>
                 <include>org.mule.modules:mule-module-ws</include>
                 <include>org.mule.modules:mule-module-xml</include>
+                <include>org.mule.transports:mule-transport-sockets</include>
 
                 <!-- Tools -->
                 <include>org.mule.tools:mule-tools-anttasks</include>
@@ -215,12 +215,12 @@
                 <exclude>org.mule.modules:mule-module-spring-config</exclude>
                 <exclude>org.mule.modules:mule-module-spring-extras</exclude>
                 <exclude>org.mule.modules:mule-module-spring-security</exclude>
-                <exclude>org.mule.modules:mule-module-sockets</exclude>
                 <exclude>org.mule.modules:mule-module-tls</exclude>
                 <exclude>org.mule.modules:mule-module-tomcat</exclude>
                 <exclude>org.mule.modules:mule-module-ws</exclude>
                 <exclude>org.mule.modules:mule-module-xml</exclude>
                 <exclude>org.mule.tools:mule-tools-anttasks</exclude>
+                <exclude>org.mule.transports:mule-transport-sockets</exclude>
 
                 <!-- lib/app-plugins (these artifacts are zip type) -->
                 <exclude>*:zip:*</exclude>

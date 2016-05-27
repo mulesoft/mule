@@ -34,7 +34,7 @@ import org.mule.runtime.module.http.internal.request.HttpAuthenticationType;
 import org.mule.runtime.module.http.internal.request.HttpClient;
 import org.mule.runtime.module.http.internal.request.HttpClientConfiguration;
 import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
-import org.mule.runtime.module.socket.api.TcpClientSocketProperties;
+import org.mule.runtime.transport.socket.api.TcpClientSocketProperties;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;

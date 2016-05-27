@@ -3,7 +3,7 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-            xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+            xmlns:sockets="http://www.mulesoft.org/schema/mule/transport/sockets"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             targetNamespace="http://www.mulesoft.org/schema/mule/http"
             elementFormDefault="qualified"
@@ -14,8 +14,8 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/tls"
                 schemaLocation="http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd" />
-    <xsd:import namespace="http://www.mulesoft.org/schema/mule/sockets"
-                schemaLocation="http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/transport/sockets"
+                schemaLocation="http://www.mulesoft.org/schema/mule/transport/sockets/current/mule-transport-sockets.xsd" />
 
     <xsd:annotation>
         <xsd:documentation>

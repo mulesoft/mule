@@ -24,8 +24,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-sockets</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-sockets</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

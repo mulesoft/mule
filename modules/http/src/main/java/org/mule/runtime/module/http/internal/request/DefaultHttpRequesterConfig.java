@@ -29,8 +29,8 @@ import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.runtime.module.http.internal.request.grizzly.GrizzlyHttpClient;
-import org.mule.runtime.module.socket.api.TcpClientSocketProperties;
-import org.mule.runtime.module.socket.internal.DefaultTcpClientSocketProperties;
+import org.mule.runtime.transport.socket.api.TcpClientSocketProperties;
+import org.mule.runtime.transport.socket.internal.DefaultTcpClientSocketProperties;
 import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
