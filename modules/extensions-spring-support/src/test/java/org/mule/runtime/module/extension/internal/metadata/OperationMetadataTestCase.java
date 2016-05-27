@@ -15,13 +15,13 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
-import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.AGE;
-import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
@@ -45,6 +45,8 @@ import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.metadata.extension.LocationKey;
 import org.mule.test.metadata.extension.model.animals.Bear;
+import org.mule.test.metadata.extension.model.attribute.AnimalsOutputAttributes;
+import org.mule.test.metadata.extension.model.attribute.ShapeOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Circle;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Square;
@@ -283,6 +285,38 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, String.class);
 
         assertThat(metadataDescriptor.getParametersMetadata(), empty());
+    }
+
+    @Test
+    public void attributesUnionTypeMetadata() throws Exception
+    {
+        componentId = new ProcessorId(OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA, FIRST_PROCESSOR_INDEX);
+
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
+
+        MetadataType shapeType = metadataDescriptor.getOutputMetadata().getPayloadMetadata().getType();
+        ;
+        assertThat(shapeType, is(instanceOf(DefaultUnionType.class)));
+        assertThat(((DefaultUnionType) shapeType).getTypes(), hasSize(2));
+        assertThat(((DefaultUnionType) shapeType).getTypes(), hasItems(toMetadataType(Circle.class), toMetadataType(Rectangle.class)));
+
+        MetadataType attributesType = metadataDescriptor.getOutputMetadata().getAttributesMetadata().getType();
+        ;
+        assertThat(attributesType, is(instanceOf(DefaultUnionType.class)));
+        assertThat(((DefaultUnionType) attributesType).getTypes(), hasSize(2));
+        assertThat(((DefaultUnionType) attributesType).getTypes(), hasItems(toMetadataType(ShapeOutputAttributes.class), toMetadataType(AnimalsOutputAttributes.class)));
+    }
+
+    @Test
+    public void attributesDynamicPersonTypeMetadata() throws Exception
+    {
+        componentId = new ProcessorId(OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA, FIRST_PROCESSOR_INDEX);
+
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
+        assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, personType);
+
+        assertThat(metadataDescriptor.getParametersMetadata().size(), is(1));
+        assertExpectedType(metadataDescriptor.getParametersMetadata().get(0), "type", String.class);
     }
 
     @Test

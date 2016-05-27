@@ -12,6 +12,7 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.test.metadata.extension.model.animals.Animal;
+import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
@@ -19,6 +20,7 @@ import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWit
 import org.mule.test.metadata.extension.resolver.TestContentResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver;
+import org.mule.test.metadata.extension.resolver.TestOutputAttributesResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputNullTypeResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
@@ -29,6 +31,7 @@ import org.mule.test.metadata.extension.resolver.TestResolverWithCache;
         outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
 public class MetadataOperations extends MetadataOperationsParent
 {
+
     @MetadataScope(keysResolver = TestContentResolverWithKeyResolver.class, contentResolver = TestContentResolverWithKeyResolver.class, outputResolver = TestOutputNullTypeResolver.class)
     public Object contentMetadataWithKeyId(@Connection MetadataConnection connection, @MetadataKeyId String type, @Content Object content)
     {
@@ -128,8 +131,21 @@ public class MetadataOperations extends MetadataOperationsParent
         return null;
     }
 
+    @MetadataScope(keysResolver = TestOutputAttributesResolverWithKeyResolver.class, outputResolver = TestOutputAttributesResolverWithKeyResolver.class)
+    public MuleMessage<Object, AbstractOutputAttributes> outputAttributesWithDynamicMetadata(@MetadataKeyId String type)
+    {
+        return null;
+    }
+
+    @MetadataScope()
     public boolean typeWithDeclaredSubtypesMetadata(Shape plainShape, Rectangle rectangleSubtype, Animal animal)
     {
         return false;
+    }
+
+    @MetadataScope()
+    public MuleMessage<Shape, AbstractOutputAttributes> outputAttributesWithDeclaredSubtypesMetadata()
+    {
+        return null;
     }
 }
