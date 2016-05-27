@@ -27,6 +27,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
+                            <skip>${skipDistributions}</skip>
                             <outputDirectory>${project.build.directory}/app-plugins</outputDirectory>
                             <includeTypes>zip</includeTypes>
                             <includeGroupIds>

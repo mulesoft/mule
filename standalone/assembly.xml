@@ -198,9 +198,7 @@
                 <exclude>org.mule.modules:mule-module-db</exclude>
                 <exclude>org.mule.modules:mule-module-extensions-support</exclude>
                 <exclude>org.mule.modules:mule-module-extensions-spring-support</exclude>
-                <exclude>org.mule.modules:mule-module-file</exclude>
                 <exclude>org.mule.modules:mule-module-file-extension-common</exclude>
-                <exclude>org.mule.modules:mule-module-ftp</exclude>
                 <exclude>org.mule.modules:mule-module-http</exclude>
                 <exclude>org.mule.modules:mule-module-jaas</exclude>
                 <exclude>org.mule.modules:mule-module-jbossts</exclude>
