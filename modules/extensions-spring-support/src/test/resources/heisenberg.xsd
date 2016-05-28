@@ -603,7 +603,7 @@
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="weapon"></xs:attribute>
-                <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.WeaponTypeEnumType" use="required" name="type"></xs:attribute>
+                <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType" use="required" name="type"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="attributesOfWeapon"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -777,7 +777,7 @@
             </xs:simpleType>
         </xs:union>
     </xs:simpleType>
-    <xs:simpleType name="org.mule.test.heisenberg.extension.model.WeaponTypeEnumType">
+    <xs:simpleType name="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType">
         <xs:union>
             <xs:simpleType>
                 <xs:restriction base="xs:string">

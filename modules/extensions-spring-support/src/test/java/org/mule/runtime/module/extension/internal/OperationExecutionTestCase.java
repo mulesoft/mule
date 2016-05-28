@@ -35,7 +35,7 @@ import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
-import org.mule.test.heisenberg.extension.model.WeaponType;
+import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

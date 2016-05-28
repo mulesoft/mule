@@ -39,7 +39,7 @@ import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
-import org.mule.test.heisenberg.extension.model.WeaponType;
+import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
