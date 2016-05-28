@@ -22,7 +22,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_CLASSLOADER;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
@@ -39,7 +38,6 @@ import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.manifest.ExtensionManifestBuilder;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -327,9 +325,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
                 .setId(DESCRIBER_ID)
                 .addProperty(TYPE_PROPERTY_NAME, HeisenbergExtension.class.getName());
 
-        final ClassLoader extensionClassLoader = mock(ClassLoader.class);
-        final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        extensionsManager.registerExtension(builder.build(), extensionClassLoader);
+        extensionsManager.registerExtension(builder.build(), getClass().getClassLoader());
 
         Set<RuntimeExtensionModel> registered = extensionsManager.getExtensions(HEISENBERG);
         assertThat(registered, hasSize(1));
@@ -337,8 +333,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         final ExtensionModel registeredExtension = registered.iterator().next();
         assertThat(registeredExtension.getName(), is(HEISENBERG));
         assertThat(registeredExtension.getVersion(), is(version));
-        assertThat(((ClassLoaderModelProperty) registeredExtension.getConfigurationModel(EXTENSION_CLASSLOADER).get()).getClassLoader(), is(sameInstance(classLoader)));
-        assertThat(Thread.currentThread().getContextClassLoader(), is(sameInstance(originalClassLoader)));
     }
 
     @Test
