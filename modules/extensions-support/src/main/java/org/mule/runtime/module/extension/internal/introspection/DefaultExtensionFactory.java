@@ -110,16 +110,6 @@ public final class DefaultExtensionFactory implements ExtensionFactory
      * {@inheritDoc}
      */
     @Override
-    @Deprecated
-    public RuntimeExtensionModel createFrom(ExtensionDeclarer declarer)
-    {
-        throw new UnsupportedOperationException("A describingContext has to be provided with the correct classloader, use createFrom method that receives a describingContext instead");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public RuntimeExtensionModel createFrom(ExtensionDeclarer declarer, DescribingContext describingContext)
     {
         enrichModel(describingContext);
