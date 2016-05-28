@@ -17,6 +17,7 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
@@ -204,18 +205,18 @@ final class ExportedArtifactsCollector
                 @Override
                 public void visitString(StringType stringType)
                 {
-                    accept.set(stringType.getAnnotation(TypeIdAnnotation.class).stream().filter(
+                    accept.set(stringType.getAnnotation(TypeIdAnnotation.class).stream().anyMatch(
                             p -> {
                                 try
                                 {
-                                    return Class.forName(p.getValue()).isEnum();
+                                    return ClassUtils.getClass(Thread.currentThread().getContextClassLoader(), p.getValue(), false).isEnum();
                                 }
                                 catch (ClassNotFoundException e)
                                 {
-                                    throw new IllegalArgumentException("Could not load class " + p.getValue());
+                                    throw new IllegalArgumentException(String.format("Could not load class '%s' while exporting artifacts for extension '%s'", p.getValue(), extensionModel.getName()));
                                 }
                             }
-                    ).count() > 0);
+                    ));
                 }
             };
 
