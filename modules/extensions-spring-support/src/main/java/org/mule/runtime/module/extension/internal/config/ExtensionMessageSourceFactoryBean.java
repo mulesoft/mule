@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceConfigurer;
@@ -87,7 +88,8 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
                                                                           configurationProviderName,
                                                                           getThreadingProfile(),
                                                                           retryPolicyTemplate,
-                                                                          (ExtensionManagerAdapter) muleContext.getExtensionManager());
+                                                                          (ExtensionManagerAdapter) muleContext.getExtensionManager(),
+                                                                          new MetadataMediator(extensionModel, sourceModel));
         muleContext.getInjector().inject(messageSource);
 
         return messageSource;
