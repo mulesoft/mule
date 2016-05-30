@@ -16,17 +16,18 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.SpringSchemaBundleResourceFactory.BUNDLE_MASK;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.SpringSchemaBundleResourceFactory.GENERATED_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CURRENT_VERSION;
-import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
-import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
+import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.config.ExtensionNamespaceHandler;
+import org.mule.runtime.module.extension.internal.resources.AbstractGeneratedResourceFactoryTestCase;
 import org.mule.runtime.module.extension.internal.resources.AnnotationProcessorResourceGenerator;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Optional;
@@ -41,7 +42,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class XmlGeneratedResourcesTestCase extends AbstractMuleTestCase
+public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFactoryTestCase
 {
 
     private static final String EXTENSION_NAME = "extension";
@@ -86,6 +87,12 @@ public class XmlGeneratedResourcesTestCase extends AbstractMuleTestCase
 
         when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
         when(extensionModel.getVersion()).thenReturn(EXTENSION_VERSION);
+    }
+
+    @Override
+    protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes()
+    {
+        return new Class[] {SpringHandlerBundleResourceFactory.class, SchemaResourceFactory.class, SpringSchemaBundleResourceFactory.class};
     }
 
     @Test

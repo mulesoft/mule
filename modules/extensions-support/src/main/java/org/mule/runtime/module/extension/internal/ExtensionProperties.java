@@ -64,6 +64,11 @@ public class ExtensionProperties
     public static final String EXTENSION_MANIFEST_FILE_NAME = "extension-manifest.xml";
 
     /**
+     * The name of a file which contains a json representation of the extension's model
+     */
+    public static final String EXTENSION_MODEL_JSON_FILE_NAME = "extension-model.json";
+
+    /**
      * The name of a property which points to the {@link ClassLoader} that an extension should use
      */
     public static final String EXTENSION_CLASSLOADER = "extension_classloader";
