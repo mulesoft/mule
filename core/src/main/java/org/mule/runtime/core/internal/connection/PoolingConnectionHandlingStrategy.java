@@ -7,15 +7,15 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingListener;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 
 import java.util.NoSuchElementException;
 
@@ -113,7 +113,15 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
     private Connection borrowConnection() throws Exception
     {
         Connection connection = pool.borrowObject();
-        poolingListener.onBorrow(config, connection);
+        try
+        {
+            poolingListener.onBorrow(config, connection);
+        }
+        catch (Exception e)
+        {
+            pool.invalidateObject(connection);
+            throw e;
+        }
 
         return connection;
     }
