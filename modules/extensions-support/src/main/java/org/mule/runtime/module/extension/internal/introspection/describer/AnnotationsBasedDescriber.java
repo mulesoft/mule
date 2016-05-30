@@ -361,7 +361,7 @@ public final class AnnotationsBasedDescriber implements Describer
         getAnnotatedFields(sourceType, MetadataKeyId.class)
                 .stream()
                 .findFirst()
-                .ifPresent(f -> source.withModelProperty(new MetadataKeyIdModelProperty(f.getType())));
+                .ifPresent(f -> source.withModelProperty(new MetadataKeyIdModelProperty(typeLoader.load(f.getType()))));
     }
 
     private void declareAnnotatedParameters(Class<?> annotatedType, ParameterizedDeclarer parameterDeclarer)
@@ -532,7 +532,7 @@ public final class AnnotationsBasedDescriber implements Describer
         stream(method.getParameters())
                 .filter(p -> p.isAnnotationPresent(MetadataKeyId.class))
                 .findFirst()
-                .ifPresent(p -> operation.withModelProperty(new MetadataKeyIdModelProperty(p.getType())));
+                .ifPresent(p -> operation.withModelProperty(new MetadataKeyIdModelProperty(typeLoader.load(p.getType()))));
     }
 
     private MetadataResolverFactory getMetadataResolverFactory(MetadataScope scopeAnnotation)

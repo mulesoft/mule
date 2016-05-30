@@ -25,6 +25,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -41,7 +43,6 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -154,8 +155,9 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
         when(sourceModel.getName()).thenReturn(SOURCE_NAME);
         when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
+        mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 
-        LifecycleUtils.initialiseIfNeeded(retryPolicyTemplate, muleContext);
+        initialiseIfNeeded(retryPolicyTemplate, muleContext);
 
         muleContext.getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
 

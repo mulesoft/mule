@@ -82,7 +82,7 @@ public final class MetadataTypeUtils
      * @return The {@code baseType} if no subtypes were present, its subtype if only one mapping is defined,
      * or the {@link UnionType union} of all the mapped subtypes for the given {@code baseType}
      */
-    public static MetadataType subTypesAsUnionType(MetadataType baseType, SubTypesMappingContainer subtypesContainer)
+    public static MetadataType subTypesAsUnionType(MetadataType baseType, SubTypesMappingContainer subtypesContainer, ClassLoader classLoader)
     {
         List<MetadataType> subTypes = subtypesContainer.getSubTypes(baseType);
         if (subTypes.isEmpty())
@@ -90,7 +90,7 @@ public final class MetadataTypeUtils
             return baseType;
         }
 
-        boolean baseIsInstantiable = isInstantiable(getType(baseType));
+        boolean baseIsInstantiable = isInstantiable(getType(baseType, classLoader));
         if (subTypes.size() == 1 && !baseIsInstantiable)
         {
             // avoid single type union

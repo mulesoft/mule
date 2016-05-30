@@ -26,9 +26,11 @@ import org.mule.metadata.java.utils.ParsingContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.Collection;
@@ -170,5 +172,11 @@ public abstract class ExtensionsTestUtils
 
             throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines.toString());
         }
+    }
+
+    public static void mockClassLoaderModelProperty(ExtensionModel extensionModel, ClassLoader classLoader)
+    {
+        when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(Optional.of(
+                new ClassLoaderModelProperty(classLoader)));
     }
 }
