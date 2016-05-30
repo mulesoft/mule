@@ -9,15 +9,15 @@ package org.mule.runtime.module.extension.internal.resources.manifest;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
-import org.mule.metadata.api.annotation.TypeIdAnnotation;
+import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
@@ -205,18 +205,8 @@ final class ExportedArtifactsCollector
                 @Override
                 public void visitString(StringType stringType)
                 {
-                    accept.set(stringType.getAnnotation(TypeIdAnnotation.class).stream().anyMatch(
-                            p -> {
-                                try
-                                {
-                                    return ClassUtils.getClass(Thread.currentThread().getContextClassLoader(), p.getValue(), false).isEnum();
-                                }
-                                catch (ClassNotFoundException e)
-                                {
-                                    throw new IllegalArgumentException(String.format("Could not load class '%s' while exporting artifacts for extension '%s'", p.getValue(), extensionModel.getName()));
-                                }
-                            }
-                    ));
+                    Optional<EnumAnnotation> enumAnnotation = getSingleAnnotation(stringType, EnumAnnotation.class);
+                    accept.set(enumAnnotation.isPresent());
                 }
             };
 
