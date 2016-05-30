@@ -17,6 +17,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
@@ -44,7 +45,6 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.metadata.extension.LocationKey;
@@ -547,19 +547,11 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     {
         componentId = new ProcessorId(flowName, FIRST_PROCESSOR_INDEX);
         TestThreadContextClassLoaderResolver.reset();
-        final ClassLoader mockClassLoader = mock(ClassLoader.class);
         final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            ClassUtils.withContextClassLoader(mockClassLoader, () -> {
-                doAction.execute(OperationMetadataTestCase.this);
-                assertThat(TestThreadContextClassLoaderResolver.getCurrentState(), is(sameInstance(originalClassLoader)));
-            });
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-        }
+        withContextClassLoader(mock(ClassLoader.class), () -> {
+            doAction.execute(OperationMetadataTestCase.this);
+            assertThat(TestThreadContextClassLoaderResolver.getCurrentState(), is(sameInstance(originalClassLoader)));
+        });
     }
 
 }
