@@ -1512,9 +1512,6 @@
                             <!-- exclude inner classes -->
                             <exclude>**/*$*</exclude>
                         </excludes>
-                        <excludedAnnotations>
-                            <excludedAnnotation>org.mule.tck.size.LargeTest</excludedAnnotation>
-                        </excludedAnnotations>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1908,17 +1905,6 @@
             <id>unit</id>
             <build>
                 <defaultGoal>test</defaultGoal>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <includedAnnotations>
-                                <includedAnnotation>org.mule.tck.size.SmallTest</includedAnnotation>
-                            </includedAnnotations>
-                        </configuration>
-                    </plugin>
-                </plugins>
             </build>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
@@ -1932,17 +1918,6 @@
             <id>functional</id>
             <build>
                 <defaultGoal>test</defaultGoal>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <excludedAnnotations>
-                                <excludedAnnotation>org.mule.tck.size.SmallTest</excludedAnnotation>
-                            </excludedAnnotations>
-                        </configuration>
-                    </plugin>
-                </plugins>
             </build>
             <properties>
                 <skipFunctionalTests>false</skipFunctionalTests>
