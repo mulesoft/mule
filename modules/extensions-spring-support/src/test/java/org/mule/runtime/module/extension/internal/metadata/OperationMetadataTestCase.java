@@ -44,6 +44,7 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.metadata.extension.LocationKey;
@@ -397,21 +398,21 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     }
 
     @Test
-    public void threadContextClassLoaderResolverTypeKeys() throws Exception
+    public void typeKeysResolverWithContextClassLoader() throws Exception
     {
-        doTestThreadContextClassLoaderResolver(THREAD_CONTEXT_CLASSLOADER_RESOLVER_KEYS, source -> source.metadataManager.getMetadataKeys(componentId));
+        doResolverTestWithContextClassLoader(RESOLVER_KEYS_WITH_CONTEXT_CLASSLOADER, source -> source.metadataManager.getMetadataKeys(componentId));
     }
 
     @Test
-    public void threadContextClassLoaderResolverContent() throws Exception
+    public void resolverContentWithContextClassLoader() throws Exception
     {
-        doTestThreadContextClassLoaderResolver(THREAD_CONTEXT_CLASSLOADER_RESOLVER_CONTENT, source -> source.getComponentDynamicMetadata());
+        doResolverTestWithContextClassLoader(RESOLVER_CONTENT_WITH_CONTEXT_CLASSLOADER, source -> source.getComponentDynamicMetadata());
     }
 
     @Test
-    public void threadContextClassLoaderResolverOutput() throws Exception
+    public void resolverOutputWithContextClassLoader() throws Exception
     {
-        doTestThreadContextClassLoaderResolver(THREAD_CONTEXT_CLASSLOADER_RESOLVER_OUTPUT, source -> source.getComponentDynamicMetadata());
+        doResolverTestWithContextClassLoader(RESOLVER_OUTPUT_WITH_CONTEXT_CLASSLOADER, source -> source.getComponentDynamicMetadata());
     }
 
     @Test
@@ -542,7 +543,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
      * @param doAction
      * @throws Exception
      */
-    private void doTestThreadContextClassLoaderResolver(String flowName, Callback<OperationMetadataTestCase> doAction) throws Exception
+    private void doResolverTestWithContextClassLoader(String flowName, Callback<OperationMetadataTestCase> doAction) throws Exception
     {
         componentId = new ProcessorId(flowName, FIRST_PROCESSOR_INDEX);
         TestThreadContextClassLoaderResolver.reset();
@@ -550,9 +551,10 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            Thread.currentThread().setContextClassLoader(mockClassLoader);
-            doAction.execute(this);
-            assertThat(TestThreadContextClassLoaderResolver.getCurrentState(), is(sameInstance(originalClassLoader)));
+            ClassUtils.withContextClassLoader(mockClassLoader, () -> {
+                doAction.execute(OperationMetadataTestCase.this);
+                assertThat(TestThreadContextClassLoaderResolver.getCurrentState(), is(sameInstance(originalClassLoader)));
+            });
         }
         finally
         {
