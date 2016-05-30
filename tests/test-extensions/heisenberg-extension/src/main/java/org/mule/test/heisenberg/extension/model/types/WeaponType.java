@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.heisenberg.extension.model;
+package org.mule.test.heisenberg.extension.model.types;
 
 public enum WeaponType
 {

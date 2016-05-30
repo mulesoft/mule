@@ -33,7 +33,7 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
-import org.mule.test.heisenberg.extension.model.WeaponType;
+import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

@@ -9,11 +9,14 @@ package org.mule.runtime.module.extension.internal.resources.manifest;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
+import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
@@ -197,6 +200,13 @@ final class ExportedArtifactsCollector
                 public void visitObject(ObjectType objectType)
                 {
                     accept.set(true);
+                }
+
+                @Override
+                public void visitString(StringType stringType)
+                {
+                    Optional<EnumAnnotation> enumAnnotation = getSingleAnnotation(stringType, EnumAnnotation.class);
+                    accept.set(enumAnnotation.isPresent());
                 }
             };
 

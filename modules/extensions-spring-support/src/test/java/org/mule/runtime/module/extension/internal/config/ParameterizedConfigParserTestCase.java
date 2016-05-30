@@ -22,7 +22,7 @@ import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
-import static org.mule.test.heisenberg.extension.model.WeaponType.FIRE_WEAPON;
+import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
