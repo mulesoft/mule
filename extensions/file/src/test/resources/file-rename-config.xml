@@ -12,7 +12,7 @@
     </spring:beans>
 
     <flow name="rename">
-        <file:rename path="#[path]" to="#[to]"/>
+        <file:rename path="#[path]" to="#[to]" overwrite="#[overwrite]"/>
     </flow>
 
     <flow name="readAndRename">

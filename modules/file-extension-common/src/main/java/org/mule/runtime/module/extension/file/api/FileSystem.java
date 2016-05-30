@@ -191,10 +191,11 @@ public interface FileSystem
     /**
      * Renames the file pointed by {@code filePath} to the provided {@code newName}
      *
-     * @param filePath the path to the file to be renamed
-     * @param newName  the file's new name
+     * @param filePath  the path to the file to be renamed
+     * @param newName   the file's new name
+     * @param overwrite whether or not overwrite the file if the target destination already exists.
      */
-    void rename(String filePath, String newName);
+    void rename(String filePath, String newName, boolean overwrite);
 
     /**
      * Creates a new directory of the given {@code directoryName} as a child

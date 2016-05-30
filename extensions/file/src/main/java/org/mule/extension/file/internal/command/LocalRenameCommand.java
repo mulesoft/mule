@@ -7,13 +7,14 @@
 package org.mule.extension.file.internal.command;
 
 import static java.lang.String.format;
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
 import org.mule.runtime.module.extension.file.api.command.RenameCommand;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 /**
  * A {@link LocalFileCommand} which implements the {@link RenameCommand} contract
@@ -35,19 +36,19 @@ public final class LocalRenameCommand extends LocalFileCommand implements Rename
      * {@inheritDoc}
      */
     @Override
-    public void rename(String filePath, String newName)
+    public void rename(String filePath, String newName, boolean overwrite)
     {
         Path source = resolveExistingPath(filePath);
         Path target = source.getParent().resolve(newName);
 
-        if (Files.exists(target))
+        if (Files.exists(target) && !overwrite)
         {
             throw new IllegalArgumentException(format("'%s' cannot be renamed because '%s' already exists", source, target));
         }
 
         try
         {
-            Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
+            Files.move(source, target, ATOMIC_MOVE, REPLACE_EXISTING);
         }
         catch (Exception e)
         {
