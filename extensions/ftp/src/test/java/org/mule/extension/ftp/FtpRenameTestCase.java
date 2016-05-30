@@ -47,7 +47,7 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     public void renameReadFile() throws Exception
     {
         testHarness.createHelloWorldFile();
-        doRename("readAndRename", HELLO_PATH);
+        doRename("readAndRename", HELLO_PATH, false);
         assertRenamedFile();
     }
 
@@ -72,7 +72,7 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     }
 
     @Test
-    public void targetAlreadyExists() throws Exception
+    public void targetAlreadyExistsWithoutOverwrite() throws Exception
     {
         final String sourceFile = "renameme.txt";
         testHarness.write(sourceFile, "rename me");
@@ -80,6 +80,16 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
 
         testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doRename(sourceFile);
+    }
+
+    @Test
+    public void targetAlreadyExistsWithOverwrite() throws Exception
+    {
+        testHarness.createHelloWorldFile();
+        testHarness.write(RENAME_TO, "I was here first");
+
+        doRename(HELLO_PATH, true);
+        assertRenamedFile();
     }
 
     private void assertRenamedFile() throws Exception
@@ -93,14 +103,20 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
 
     private void doRename(String source) throws Exception
     {
-        doRename("rename", source);
+        doRename("rename", source, false);
     }
 
-    private void doRename(String flow, String source) throws Exception
+    private void doRename(String source, boolean overwrite) throws Exception
+    {
+        doRename("rename", source, overwrite);
+    }
+
+    private void doRename(String flow, String source, boolean overwrite) throws Exception
     {
         flowRunner(flow)
                 .withFlowVariable("path", source)
                 .withFlowVariable("to", RENAME_TO)
+                .withFlowVariable("overwrite", overwrite)
                 .run();
     }
 }

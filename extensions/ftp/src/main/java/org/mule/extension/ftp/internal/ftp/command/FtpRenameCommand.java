@@ -32,8 +32,8 @@ public final class FtpRenameCommand extends ClassicFtpCommand implements RenameC
      * {@inheritDoc}
      */
     @Override
-    public void rename(String filePath, String newName)
+    public void rename(String filePath, String newName, boolean overwrite)
     {
-        super.rename(filePath, newName);
+        super.rename(filePath, newName, overwrite);
     }
 }

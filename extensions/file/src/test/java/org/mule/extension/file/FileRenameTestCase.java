@@ -39,7 +39,7 @@ public class FileRenameTestCase extends FileConnectorTestCase
     {
         File origin = createHelloWorldFile();
 
-        doRename("readAndRename", origin.getAbsolutePath());
+        doRename("readAndRename", origin.getAbsolutePath(), false);
         assertRenamedFile(origin);
     }
 
@@ -65,13 +65,23 @@ public class FileRenameTestCase extends FileConnectorTestCase
     }
 
     @Test
-    public void targetAlreadyExists() throws Exception
+    public void targetAlreadyExistsWithoutOverwrite() throws Exception
     {
         File origin = temporaryFolder.newFile("source");
         temporaryFolder.newFile(RENAME_TO);
 
         expectedException.expectCause(instanceOf(IllegalArgumentException.class));
         doRename(origin.getAbsolutePath());
+    }
+
+    @Test
+    public void targetAlreadyExistsWithOverwrite() throws Exception
+    {
+        File origin = createHelloWorldFile();
+        temporaryFolder.newFile(RENAME_TO);
+
+        doRename(origin.getAbsolutePath(), true);
+        assertRenamedFile(origin);
     }
 
     private void assertRenamedFile(File origin) throws Exception
@@ -85,14 +95,20 @@ public class FileRenameTestCase extends FileConnectorTestCase
 
     private void doRename(String source) throws Exception
     {
-        doRename("rename", source);
+        doRename("rename", source, false);
     }
 
-    private void doRename(String flow, String source) throws Exception
+    private void doRename(String source, boolean overwrite) throws Exception
+    {
+        doRename("rename", source, overwrite);
+    }
+
+    private void doRename(String flow, String source, boolean overwrite) throws Exception
     {
         flowRunner(flow)
                 .withFlowVariable("path", source)
                 .withFlowVariable("to", RENAME_TO)
+                .withFlowVariable("overwrite", overwrite)
                 .run();
     }
 }

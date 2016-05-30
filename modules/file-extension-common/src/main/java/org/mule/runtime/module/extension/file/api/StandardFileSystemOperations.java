@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.StringUtils;
@@ -277,13 +277,14 @@ public class StandardFileSystemOperations
      * @param fileSystem a reference to the host {@link FileSystem}
      * @param path       the path to the file to be renamed
      * @param to         the file's new name
+     * @param overwrite  whether or not overwrite the file if the target destination already exists.
      * @param event      The current {@link MuleEvent}
      */
     //TODO: MULE-9715
-    public void rename(@Connection FileSystem fileSystem, @Optional String path, String to, MuleEvent event)
+    public void rename(@Connection FileSystem fileSystem, @Optional String path, String to, @Optional(defaultValue = "false") boolean overwrite, MuleEvent event)
     {
         path = resolvePath(path, event, "path");
-        fileSystem.rename(path, to);
+        fileSystem.rename(path, to, overwrite);
     }
 
     /**

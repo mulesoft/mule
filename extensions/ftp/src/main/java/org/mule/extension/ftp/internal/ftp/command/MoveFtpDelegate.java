@@ -42,7 +42,7 @@ public class MoveFtpDelegate implements FtpCopyDelegate
                 }
             }
 
-            command.rename(source.getPath(), targetPath.toString());
+            command.rename(source.getPath(), targetPath.toString(), overwrite);
         }
         catch (Exception e)
         {

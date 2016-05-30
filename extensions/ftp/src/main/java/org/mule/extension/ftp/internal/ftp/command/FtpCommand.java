@@ -132,18 +132,19 @@ public abstract class FtpCommand<Config extends FtpConnector, Connection extends
      * Template method that renames the file at {@code filePath} to {@code newName}.
      * <p>
      * This method performs path resolution and validation and eventually delegates
-     * into {@link #doRename(String, String)}, in which the actual renaming implementation
+     * into {@link #doRename(String, String, boolean)}, in which the actual renaming implementation
      * is.
      *
-     * @param filePath the path of the file to be renamed
-     * @param newName  the new name
+     * @param filePath  the path of the file to be renamed
+     * @param newName   the new name
+     * @param overwrite whether to overwrite the target file if it already exists
      */
-    protected void rename(String filePath, String newName)
+    protected void rename(String filePath, String newName, boolean overwrite)
     {
         Path source = resolveExistingPath(filePath);
         Path target = source.getParent().resolve(newName);
 
-        if (exists(target))
+        if (exists(target) && !overwrite)
         {
             throw new IllegalArgumentException(format("'%s' cannot be renamed because '%s' already exists", source, target));
         }
@@ -160,7 +161,7 @@ public abstract class FtpCommand<Config extends FtpConnector, Connection extends
     }
 
     /**
-     * Template method which works in tandem with {@link #rename(String, String)}.
+     * Template method which works in tandem with {@link #rename(String, String, boolean)}.
      * <p>
      * Implementations are to perform the actual renaming logic here
      *

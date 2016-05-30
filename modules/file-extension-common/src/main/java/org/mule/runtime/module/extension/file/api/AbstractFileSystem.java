@@ -141,9 +141,9 @@ public abstract class AbstractFileSystem implements FileSystem
      * {@inheritDoc}
      */
     @Override
-    public final void rename(String filePath, String newName)
+    public final void rename(String filePath, String newName, boolean overwrite)
     {
-        getRenameCommand().rename(filePath, newName);
+        getRenameCommand().rename(filePath, newName, overwrite);
     }
 
     /**
