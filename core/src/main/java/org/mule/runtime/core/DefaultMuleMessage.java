@@ -1150,6 +1150,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         setDataType(dataType);
     }
 
+    public void setAttributes(Serializable attributes)
+    {
+        this.attributes = attributes;
+    }
+
     /**
      * {@inheritDoc}
      */

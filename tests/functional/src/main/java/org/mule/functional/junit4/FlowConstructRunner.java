@@ -181,7 +181,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
      *
      * @return this {@link FlowRunner}
      */
-    public R withExchangePAttern(MessageExchangePattern exchangePattern)
+    public R withExchangePattern(MessageExchangePattern exchangePattern)
     {
         eventBuilder.withExchangePattern(exchangePattern);
 
