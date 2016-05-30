@@ -27,7 +27,7 @@ public class NonBlockingFullySupportedEndpointFunctionalTestCase extends Functio
     @Test
     public void testTransportOutboundEndpoint() throws Exception
     {
-        final MuleEvent result = flowRunner("testOutboundEndpoint").withPayload(TEST_MESSAGE).withExchangePAttern(getMessageExchnagePattern()).nonBlocking().run();
+        final MuleEvent result = flowRunner("testOutboundEndpoint").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
         verify("testOutboundEndpoint");
         assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
     }
@@ -35,7 +35,7 @@ public class NonBlockingFullySupportedEndpointFunctionalTestCase extends Functio
     @Test
     public void testTransportOutboundEndpointError() throws Exception
     {
-        MuleEvent result = flowRunner("testOutboundEndpointError").withPayload(TEST_MESSAGE).withExchangePAttern(getMessageExchnagePattern()).nonBlocking().run();
+        MuleEvent result = flowRunner("testOutboundEndpointError").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
         verify("testOutboundEndpointError");
         assertThat(result.getMessageAsString(), is(equalTo(TEST_MESSAGE)));
     }

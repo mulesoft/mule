@@ -7,13 +7,13 @@
 package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
-
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -22,7 +22,7 @@ import org.mockito.Mockito;
 
 /**
  * Provides a fluent API for running events through batch FlowConstructs.
- * 
+ *
  * @param <R> the runner class for a {@link FlowConstruct} implementation.
  */
 public abstract class FlowConstructRunner<R extends FlowConstructRunner>
@@ -34,65 +34,77 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
 
     /**
      * Prepares the given data to be sent as the payload of the {@link MuleEvent} to the configured flow.
-     * 
+     *
      * @param payload the payload to use in the message
      * @return this {@link FlowRunner}
      */
     public R withPayload(Object payload)
     {
         eventBuilder.withPayload(payload);
-    
+
+        return (R) this;
+    }
+
+    /**
+     * Prepares the given data to be sent as the attributes of the {@link MuleEvent} to the configured flow.
+     *
+     * @param attributes the message attributes
+     * @return this {@link FlowRunner}
+     */
+    public R withAttributes(Serializable attributes)
+    {
+        eventBuilder.withAttributes(attributes);
         return (R) this;
     }
 
     /**
      * Prepares a property with the given key and value to be sent as an inbound property of the {@link MuleMessage} to
      * the configured flow.
-     * 
-     * @param key the key of the inbound property to add
+     *
+     * @param key   the key of the inbound property to add
      * @param value the value of the inbound property to add
      * @return this {@link FlowRunner}
      */
     public R withInboundProperty(String key, Object value)
     {
         eventBuilder.withInboundProperty(key, value);
-    
+
         return (R) this;
     }
 
     /**
      * Prepares the given properties map to be sent as inbound properties of the {@link MuleMessage} to the configured
      * flow.
-     * 
+     *
      * @param properties the inbound properties to add
      * @return this {@link FlowRunner}
      */
     public R withInboundProperties(Map<String, Object> properties)
     {
         eventBuilder.withInboundProperties(properties);
-    
+
         return (R) this;
     }
 
     /**
      * Prepares a property with the given key and value to be sent as an outbound property of the {@link MuleMessage} to
      * the configured flow.
-     * 
-     * @param key the key of the outbound property to add
+     *
+     * @param key   the key of the outbound property to add
      * @param value the value of the outbound property to add
      * @return this {@link FlowRunner}
      */
     public R withOutboundProperty(String key, Object value)
     {
         eventBuilder.withOutboundProperty(key, value);
-    
+
         return (R) this;
     }
 
     /**
      * Prepares an attachment with the given key and value to be sent in the {@link MuleMessage} to the configured flow.
-     * 
-     * @param key the key of the attachment to add
+     *
+     * @param key   the key of the attachment to add
      * @param value the {@link DataHandler} for the attachment to add
      * @return this {@link FlowRunner}
      */
@@ -105,11 +117,11 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
 
     /**
      * Prepares an attachment with the given key and value to be sent in the {@link MuleMessage} to the configured flow.
-     * 
-     * @param key the key of the attachment to add
-     * @param object the content of the attachment to add
+     *
+     * @param key         the key of the attachment to add
+     * @param object      the content of the attachment to add
      * @param contentType the content type of the attachment to add. Note that the charset attribute can be specifed too
-     *            i.e. text/plain;charset=UTF-8
+     *                    i.e. text/plain;charset=UTF-8
      * @return this {@link FlowRunner}
      */
     public R withOutboundAttachment(String key, Object object, String contentType)
@@ -121,8 +133,8 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
 
     /**
      * Prepares an attachment with the given key and value to be sent in the {@link MuleMessage} to the configured flow.
-     * 
-     * @param key the key of the attachment to add
+     *
+     * @param key   the key of the attachment to add
      * @param value the {@link DataHandler} for the attachment to add
      * @return this {@link FlowRunner}
      */
@@ -136,42 +148,42 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
     /**
      * Prepares a property with the given key and value to be sent as a session property of the {@link MuleMessage} to
      * the configured flow.
-     * 
-     * @param key the key of the session property to add
+     *
+     * @param key   the key of the session property to add
      * @param value the value of the session property to add
      * @return this {@link FlowRunner}
      */
     public R withSessionProperty(String key, Object value)
     {
         eventBuilder.withSessionProperty(key, value);
-    
+
         return (R) this;
     }
 
     /**
      * Prepares a flow variable with the given key and value to be set in the {@link MuleMessage} to the configured
      * flow.
-     * 
-     * @param key the key of the flow variable to put
+     *
+     * @param key   the key of the flow variable to put
      * @param value the value of the flow variable to put
      * @return this {@link FlowRunner}
      */
     public R withFlowVariable(String key, Object value)
     {
         eventBuilder.withFlowVariable(key, value);
-    
+
         return (R) this;
     }
 
     /**
      * Configures this runner to run this flow as one-way.
-     * 
+     *
      * @return this {@link FlowRunner}
      */
     public R asynchronously()
     {
         eventBuilder.asynchronously();
-    
+
         return (R) this;
     }
 
@@ -181,7 +193,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
      *
      * @return this {@link FlowRunner}
      */
-    public R withExchangePAttern(MessageExchangePattern exchangePattern)
+    public R withExchangePattern(MessageExchangePattern exchangePattern)
     {
         eventBuilder.withExchangePattern(exchangePattern);
 
@@ -189,22 +201,21 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
     }
 
 
-
     /**
      * Will spy the built {@link MuleMessage} and {@link MuleEvent}. See {@link Mockito#spy(Object) spy}.
-     * 
+     *
      * @return this {@link FlowRunner}
      */
     public R spyObjects()
     {
         eventBuilder.spyObjects();
-    
+
         return (R) this;
     }
 
     /**
      * Initializes this runner with a mule context.
-     * 
+     *
      * @param muleContext the context of the mule application
      */
     public FlowConstructRunner(MuleContext muleContext)
@@ -223,7 +234,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
 
     /**
      * Builds a new event based on this runner's config. If one has already been built, it will fail.
-     * 
+     *
      * @return an event that would be used to go through the flow.
      */
     public MuleEvent buildEvent()

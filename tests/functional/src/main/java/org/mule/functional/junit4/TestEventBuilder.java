@@ -9,7 +9,6 @@ package org.mule.functional.junit4;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -17,10 +16,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.session.DefaultMuleSession;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class TestEventBuilder
 {
 
     private Object payload;
-
+    private Serializable attributes;
     private Map<String, Object> inboundProperties = new HashMap<>();
     private Map<String, Object> outboundProperties = new HashMap<>();
     private Map<String, DataHandler> inboundAttachments = new HashMap<>();
@@ -53,19 +53,11 @@ public class TestEventBuilder
 
     private ReplyToHandler replyToHandler;
 
-    private Transformer spyTransformer = new Transformer()
-    {
-
-        @Override
-        public Object transform(Object input)
-        {
-            return input;
-        }
-    };
+    private Transformer spyTransformer = input -> input;
 
     /**
      * Prepares the given data to be sent as the payload of the product.
-     * 
+     *
      * @param payload the payload to use in the message
      * @return this {@link TestEventBuilder}
      */
@@ -77,9 +69,22 @@ public class TestEventBuilder
     }
 
     /**
+     * Sets the {@link org.mule.runtime.api.message.MuleMessage#getAttributes()} value
+     * of the produced message
+     *
+     * @param attributes the attributes object for the produced {@link org.mule.runtime.api.message.MuleMessage}
+     * @return this {@link TestEventBuilder}
+     */
+    public TestEventBuilder withAttributes(Serializable attributes)
+    {
+        this.attributes = attributes;
+        return this;
+    }
+
+    /**
      * Prepares a property with the given key and value to be sent as an inbound property of the product.
-     * 
-     * @param key the key of the inbound property to add
+     *
+     * @param key   the key of the inbound property to add
      * @param value the value of the inbound property to add
      * @return this {@link TestEventBuilder}
      */
@@ -92,7 +97,7 @@ public class TestEventBuilder
 
     /**
      * Prepares the given properties map to be sent as inbound properties of the product.
-     * 
+     *
      * @param properties the inbound properties to add
      * @return this {@link TestEventBuilder}
      */
@@ -105,8 +110,8 @@ public class TestEventBuilder
 
     /**
      * Prepares a property with the given key and value to be sent as an outbound property of the product.
-     * 
-     * @param key the key of the outbound property to add
+     *
+     * @param key   the key of the outbound property to add
      * @param value the value of the outbound property to add
      * @return this {@link TestEventBuilder}
      */
@@ -119,8 +124,8 @@ public class TestEventBuilder
 
     /**
      * Prepares an attachment with the given key and value to be sent in the product.
-     * 
-     * @param key the key of the attachment to add
+     *
+     * @param key   the key of the attachment to add
      * @param value the {@link DataHandler} for the attachment to add
      * @return this {@link TestEventBuilder}
      */
@@ -133,11 +138,11 @@ public class TestEventBuilder
 
     /**
      * Prepares an attachment with the given key and value to be sent in the product.
-     * 
-     * @param key the key of the attachment to add
-     * @param object the content of the attachment to add
+     *
+     * @param key         the key of the attachment to add
+     * @param object      the content of the attachment to add
      * @param contentType the content type of the attachment to add. Note that the charset attribute can be specifed too
-     *            i.e. text/plain;charset=UTF-8
+     *                    i.e. text/plain;charset=UTF-8
      * @return this {@link TestEventBuilder}
      */
     public TestEventBuilder withOutboundAttachment(String key, Object object, String contentType)
@@ -149,8 +154,8 @@ public class TestEventBuilder
 
     /**
      * Prepares an attachment with the given key and value to be sent in the product.
-     * 
-     * @param key the key of the attachment to add
+     *
+     * @param key   the key of the attachment to add
      * @param value the {@link DataHandler} for the attachment to add
      * @return this {@link TestEventBuilder}
      */
@@ -163,8 +168,8 @@ public class TestEventBuilder
 
     /**
      * Prepares a property with the given key and value to be sent as a session property of the product.
-     * 
-     * @param key the key of the session property to add
+     *
+     * @param key   the key of the session property to add
      * @param value the value of the session property to add
      * @return this {@link TestEventBuilder}
      */
@@ -177,8 +182,8 @@ public class TestEventBuilder
 
     /**
      * Prepares a flow variable with the given key and value to be set in the product.
-     * 
-     * @param key the key of the flow variable to put
+     *
+     * @param key   the key of the flow variable to put
      * @param value the value of the flow variable to put
      * @return this {@link TestEventBuilder}
      */
@@ -198,7 +203,7 @@ public class TestEventBuilder
 
     /**
      * Configures the product event to run as one-way.
-     * 
+     *
      * @return this {@link TestEventBuilder}
      */
     public TestEventBuilder asynchronously()
@@ -210,7 +215,7 @@ public class TestEventBuilder
 
     /**
      * Configures the product event to have the provided {@link ReplyToHandler}.
-     * 
+     *
      * @return this {@link TestEventBuilder}
      */
     public TestEventBuilder withReplyToHandler(ReplyToHandler replyToHandler)
@@ -234,29 +239,21 @@ public class TestEventBuilder
 
     /**
      * Will spy the built {@link MuleMessage} and {@link MuleEvent}. See {@link Mockito#spy(Object) spy}.
-     * 
+     *
      * @return this {@link TestEventBuilder}
      */
     public TestEventBuilder spyObjects()
     {
-        spyTransformer = new Transformer()
-        {
-
-            @Override
-            public Object transform(Object input)
-            {
-                return spy(input);
-            }
-        };
+        spyTransformer = input -> spy(input);
 
         return this;
     }
 
     /**
      * Produces an event with the specified configuration.
-     * 
+     *
      * @param muleContext the context of the mule application
-     * @param flow the recipient for the event to be built.
+     * @param flow        the recipient for the event to be built.
      * @return an event with the specified configuration.
      */
     public MuleEvent build(MuleContext muleContext, FlowConstruct flow)
@@ -266,6 +263,11 @@ public class TestEventBuilder
                 (DefaultMuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern, flow, new DefaultMuleSession(),
                 muleContext.getConfiguration().getDefaultResponseTimeout(), null, null, "UTF-8", transacted,
                 null, replyToHandler);
+
+        if (attributes != null)
+        {
+            ((DefaultMuleMessage) event.getMessage()).setAttributes(attributes);
+        }
 
         for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet())
         {
@@ -286,11 +288,13 @@ public class TestEventBuilder
 
     private interface Attachment
     {
+
         void addOutboundTo(MuleMessage msg, String key);
     }
 
     private class DataHandlerAttachment implements Attachment
     {
+
         private DataHandler dataHandler;
 
         public DataHandlerAttachment(DataHandler dataHandler)
@@ -314,6 +318,7 @@ public class TestEventBuilder
 
     private class ObjectAttachment implements Attachment
     {
+
         private Object object;
         private String contentType;
 

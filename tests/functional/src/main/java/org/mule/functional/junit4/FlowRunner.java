@@ -9,16 +9,13 @@ package org.mule.functional.junit4;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
-
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
@@ -40,25 +37,11 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner>
 
     private String flowName;
 
-    private ExecutionTemplate<MuleEvent> txExecutionTemplate = new ExecutionTemplate<MuleEvent>()
-    {
-        @Override
-        public MuleEvent execute(ExecutionCallback<MuleEvent> callback) throws Exception
-        {
-            return callback.process();
-        }
-    };
+    private ExecutionTemplate<MuleEvent> txExecutionTemplate = callback -> callback.process();
 
     private ReplyToHandler replyToHandler;
 
-    private Transformer responseEventTransformer = new Transformer()
-    {
-        @Override
-        public Object transform(Object input)
-        {
-            return input;
-        }
-    };
+    private Transformer responseEventTransformer = input -> input;
 
     /**
      * Initializes this flow runner.
@@ -100,21 +83,16 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner>
         replyToHandler = new SensingNullReplyToHandler();
         eventBuilder.withReplyToHandler(replyToHandler);
 
-        responseEventTransformer = new Transformer()
-        {
-            @Override
-            public Object transform(Object input)
+        responseEventTransformer = input -> {
+            MuleEvent responseEvent = (MuleEvent) input;
+            SensingNullReplyToHandler nullSensingReplyToHandler = (SensingNullReplyToHandler) replyToHandler;
+            try
             {
-                MuleEvent responseEvent = (MuleEvent) input;
-                SensingNullReplyToHandler nullSensingReplyToHandler = (SensingNullReplyToHandler) replyToHandler;
-                try
-                {
-                    return getNonBlockingResponse(nullSensingReplyToHandler, responseEvent);
-                }
-                catch (Exception e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
+                return getNonBlockingResponse(nullSensingReplyToHandler, responseEvent);
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
             }
         };
 
@@ -151,7 +129,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner>
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
-    public MuleEvent run() throws MuleException, Exception
+    public MuleEvent run() throws Exception
     {
         return runAndVerify(flowName);
     }
@@ -165,7 +143,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner>
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
-    public MuleEvent runNoVerify() throws MuleException, Exception
+    public MuleEvent runNoVerify() throws Exception
     {
         return runAndVerify(new String[] {});
     }
@@ -181,17 +159,10 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner>
      * @return the resulting <code>MuleEvent</code>
      * @throws Exception
      */
-    public MuleEvent runAndVerify(String... flowNamesToVerify) throws MuleException, Exception
+    public MuleEvent runAndVerify(String... flowNamesToVerify) throws Exception
     {
         Flow flow = (Flow) getFlowConstruct();
-        MuleEvent responseEvent = txExecutionTemplate.execute(new ExecutionCallback<MuleEvent>()
-        {
-            @Override
-            public MuleEvent process() throws Exception
-            {
-                return flow.process(getOrBuildEvent());
-            }
-        });
+        MuleEvent responseEvent = txExecutionTemplate.execute(() -> flow.process(getOrBuildEvent()));
         for (String flowNameToVerify : flowNamesToVerify)
         {
             FlowAssert.verify(flowNameToVerify);
