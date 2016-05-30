@@ -4,16 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.config;
+package org.mule.runtime.module.extension.internal.config.dsl.source;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
@@ -22,6 +24,7 @@ import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
+import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
@@ -31,53 +34,36 @@ import com.google.common.base.Joiner;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
-import org.springframework.beans.factory.FactoryBean;
-
 /**
- * A {@link FactoryBean} which yields instances of {@link ExtensionMessageSource}
+ * An {@link AbstractExtensionObjectFactory} that produces instances of {@link ExtensionMessageSource}
  *
  * @since 4.0
  */
-final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryBean<ExtensionMessageSource>
+public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory<ExtensionMessageSource>
 {
 
-    private final ElementDescriptor element;
+    private final RuntimeExtensionModel extensionModel;
     private final RuntimeSourceModel sourceModel;
-    private final String configurationProviderName;
     private final MuleContext muleContext;
+
+    private String configurationProviderName;
     private RetryPolicyTemplate retryPolicyTemplate;
+    private ConnectionManagerAdapter connectionManager;
 
-    @Inject
-    private ConnectionManagerAdapter connectionManagerAdapter;
-
-    ExtensionMessageSourceFactoryBean(ElementDescriptor element,
-                                      RuntimeExtensionModel extensionModel,
-                                      RuntimeSourceModel sourceModel,
-                                      String configurationProviderName,
-                                      MuleContext muleContext) throws ConfigurationException
+    public ExtensionSourceObjectFactory(RuntimeExtensionModel extensionModel, RuntimeSourceModel sourceModel, MuleContext muleContext)
     {
-        this.element = element;
         this.extensionModel = extensionModel;
         this.sourceModel = sourceModel;
-        this.configurationProviderName = configurationProviderName;
         this.muleContext = muleContext;
     }
 
     @Override
-    public ExtensionMessageSource getObject() throws Exception
+    public ExtensionMessageSource getObject() throws ConfigurationException
     {
-        ResolverSet resolverSet = parserDelegate.getResolverSet(element, sourceModel.getParameterModels());
+        ResolverSet resolverSet = getParametersAsResolverSet();
         if (resolverSet.isDynamic())
         {
-            throw dynamicParameterException(resolverSet, sourceModel, element);
-        }
-
-        retryPolicyTemplate = parserDelegate.getInfrastructureParameter(RetryPolicyTemplate.class);
-        if (retryPolicyTemplate == null)
-        {
-            retryPolicyTemplate = connectionManagerAdapter.getDefaultRetryPolicyTemplate();
+            throw dynamicParameterException(resolverSet, sourceModel);
         }
 
         ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel,
@@ -85,9 +71,16 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
                                                                           getSourceFactory(resolverSet),
                                                                           configurationProviderName,
                                                                           getThreadingProfile(),
-                                                                          retryPolicyTemplate,
+                                                                          getRetryPolicyTemplate(),
                                                                           (ExtensionManagerAdapter) muleContext.getExtensionManager());
-        muleContext.getInjector().inject(messageSource);
+        try
+        {
+            muleContext.getInjector().inject(messageSource);
+        }
+        catch (MuleException e)
+        {
+            throw new ConfigurationException(createStaticMessage("Could not inject dependencies into source"), e);
+        }
 
         return messageSource;
     }
@@ -100,17 +93,6 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
         return tp;
     }
 
-    @Override
-    public Class<?> getObjectType()
-    {
-        return ExtensionMessageSource.class;
-    }
-
-    @Override
-    public boolean isSingleton()
-    {
-        return true;
-    }
 
     private SourceFactory getSourceFactory(ResolverSet resolverSet)
     {
@@ -122,22 +104,48 @@ final class ExtensionMessageSourceFactoryBean extends ExtensionComponentFactoryB
             }
             catch (Exception e)
             {
-                throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s' in flow '%s'",
-                                                                          sourceModel.getName(), element.getSourceElement().getParentNode().getLocalName())));
+                throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'", sourceModel.getName())));
             }
         };
     }
 
-    private ConfigurationException dynamicParameterException(ResolverSet resolverSet, SourceModel model, ElementDescriptor element)
+    private RetryPolicyTemplate getRetryPolicyTemplate() throws ConfigurationException
+    {
+        return retryPolicyTemplate != null ? retryPolicyTemplate : getConnectionManagerAdapter().getDefaultRetryPolicyTemplate();
+    }
+
+    private ConfigurationException dynamicParameterException(ResolverSet resolverSet, SourceModel model)
     {
         List<String> dynamicParams = resolverSet.getResolvers().entrySet().stream()
                 .filter(entry -> entry.getValue().isDynamic())
-                .map(entry -> entry.getKey().getName())
+                .map(entry -> entry.getKey())
                 .collect(toList());
 
-        return new ConfigurationException(createStaticMessage(format("The '%s' message source on flow '%s' is using expressions, which are not allowed on message sources. " +
+        return new ConfigurationException(createStaticMessage(format("The '%s' message source is using expressions, which are not allowed on message sources. " +
                                                                      "Offending parameters are: [%s]",
-                                                                     model.getName(), element.getSourceElement().getParentNode().getLocalName(), Joiner.on(',').join(dynamicParams))));
+                                                                     model.getName(), Joiner.on(',').join(dynamicParams))));
+    }
+
+    private ConnectionManagerAdapter getConnectionManagerAdapter() throws ConfigurationException
+    {
+        if (connectionManager == null)
+        {
+            try
+            {
+                connectionManager = muleContext.getRegistry().lookupObject(ConnectionManagerAdapter.class);
+            }
+            catch (RegistrationException e)
+            {
+                throw new ConfigurationException(createStaticMessage("Could not obtain connection manager adapter"), e);
+            }
+        }
+
+        return connectionManager;
+    }
+
+    public void setConfigurationProviderName(String configurationProviderName)
+    {
+        this.configurationProviderName = configurationProviderName;
     }
 
     public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate)

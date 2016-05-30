@@ -2,13 +2,10 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
       xmlns:context="http://www.springframework.org/schema/context"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:util="http://www.springframework.org/schema/util"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
-               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
-               http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd">
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
 
     <context:property-placeholder location="heisenberg.properties"/>
 
@@ -25,7 +22,6 @@
                        money="1000000"
                        recipe="recipes"
                        finalHealth="CANCER"
-                       monthlyIncomes="monthlyIncomes"
                        candidateDoors="candidateDoors">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
@@ -187,10 +183,6 @@
         <heisenberg:kill-with-multiple-wild-card-weapons wildCardWeapons="#[weapons]"/>
     </flow>
 
-    <flow name="killWithRicinAsAttribute">
-        <heisenberg:kill-with-ricins ricinList="listOfRicins"/>
-    </flow>
-
     <flow name="killWithRicinDefaultPayload">
         <heisenberg:kill-with-ricins/>
     </flow>
@@ -227,19 +219,4 @@
     <flow name="literalEcho">
         <heisenberg:literal-echo literalExpression="#[money]"/>
     </flow>
-
-    <spring:beans>
-        <util:list id="listOfRicins" value-type="org.mule.test.heisenberg.extension.model.Ricin">
-            <heisenberg:ricin name="1" microgramsPerKilo="#[10L+10L]">
-                <heisenberg:destination>
-                    <heisenberg:door victim="#['Lidia']" address="Stevia coffe shop"/>
-                </heisenberg:destination>
-            </heisenberg:ricin>
-            <heisenberg:ricin name="2" microgramsPerKilo="22">
-                <heisenberg:destination>
-                    <heisenberg:door address="pollos hermanos" victim="Gustavo Fring"/>
-                </heisenberg:destination>
-            </heisenberg:ricin>
-        </util:list>
-    </spring:beans>
 </mule>

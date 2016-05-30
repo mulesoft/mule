@@ -83,7 +83,7 @@ public class ResolverSetResultTestCase extends AbstractMuleTestCase
     @Test
     public void invalidParameter()
     {
-        assertThat(result.get(getParameter("invalid", String.class)), is(nullValue()));
+        assertThat(result.get("invalid"), is(nullValue()));
     }
 
     @Test
@@ -94,9 +94,9 @@ public class ResolverSetResultTestCase extends AbstractMuleTestCase
 
     private void assertResult(ResolverSetResult result)
     {
-        assertThat(result.get(nameParameterModel), is(NAME));
-        assertThat(result.get(ageParameterModel), is(AGE));
-        assertThat(result.get(healthParameterModel), is(HEALTH));
+        assertThat(result.get(nameParameterModel.getName()), is(NAME));
+        assertThat(result.get(ageParameterModel.getName()), is(AGE));
+        assertThat(result.get(healthParameterModel.getName()), is(HEALTH));
     }
 
     private ResolverSetResult buildResult()
@@ -107,15 +107,15 @@ public class ResolverSetResultTestCase extends AbstractMuleTestCase
     private ResolverSetResult agelessResult()
     {
         return getBuilder()
-                .add(ageParameterModel, null)
+                .add(ageParameterModel.getName(), null)
                 .build();
     }
 
     private ResolverSetResult.Builder getBuilder()
     {
         return ResolverSetResult.newBuilder()
-                .add(nameParameterModel, NAME)
-                .add(ageParameterModel, AGE)
-                .add(healthParameterModel, HEALTH);
+                .add(nameParameterModel.getName(), NAME)
+                .add(ageParameterModel.getName(), AGE)
+                .add(healthParameterModel.getName(), HEALTH);
     }
 }

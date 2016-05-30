@@ -17,9 +17,9 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
-
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
@@ -28,13 +28,11 @@ import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -58,7 +56,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
 {
 
     private static final String CONFIG_NAME = "config";
-    private static final DataType DATA_TYPE = DataType.STRING;
+    private static final DataType DATA_TYPE = STRING;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleEvent muleEvent;
@@ -135,8 +133,8 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     @Test
     public void withArgumentsAndReturnValue() throws Exception
     {
-        Map<ParameterModel, Object> parametersMap = new HashMap<>();
-        parametersMap.put(ExtensionsTestUtils.getParameter("index", int.class), 0);
+        Map<String, Object> parametersMap = new HashMap<>();
+        parametersMap.put("index", 0);
         when(parameters.asMap()).thenReturn(parametersMap);
         init();
 

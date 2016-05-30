@@ -14,7 +14,6 @@
                        money="100000"
                        recipe="recipes"
                        initialHealth="CANCER"
-                       monthlyIncomes="monthlyIncomes"
                        finalHealth="CANCER">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>

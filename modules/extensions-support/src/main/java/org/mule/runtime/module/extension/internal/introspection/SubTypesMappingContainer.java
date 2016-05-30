@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.introspection;
 
+import static com.google.common.collect.ImmutableList.copyOf;
+import static com.google.common.collect.ImmutableList.of;
 import org.mule.metadata.api.model.MetadataType;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +38,6 @@ public class SubTypesMappingContainer
     public List<MetadataType> getSubTypes(MetadataType type)
     {
         List<MetadataType> subTypes = subTypesMapping.get(type);
-        return subTypes != null ? ImmutableList.copyOf(subTypes) : Collections.emptyList();
+        return subTypes != null ? copyOf(subTypes) : of();
     }
 }

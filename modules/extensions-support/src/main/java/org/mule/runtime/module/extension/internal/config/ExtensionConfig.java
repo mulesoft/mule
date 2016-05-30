@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.config;
 
 import org.mule.runtime.core.time.Time;
 
+import java.util.Optional;
+
 /**
  * A config object which gathers all the configuration properties about how
  * the platform should handle extensions
@@ -25,5 +27,5 @@ public interface ExtensionConfig
      *
      * @return a {@link Time}
      */
-    Time getDynamicConfigExpirationFrequency();
+    Optional<Time> getDynamicConfigExpirationFrequency();
 }

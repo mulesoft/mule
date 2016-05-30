@@ -47,15 +47,15 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        ParameterGroup group = new ParameterGroup(ExtendedPersonalInfo.class, getField(HeisenbergExtension.class, "personalInfo", ExtendedPersonalInfo.class));
-        group.addParameter("myName", getField(ExtendedPersonalInfo.class, "name", String.class));
-        group.addParameter("age", getField(ExtendedPersonalInfo.class, "age", Integer.class));
+        ParameterGroup group = new ParameterGroup(ExtendedPersonalInfo.class, getField(HeisenbergExtension.class, "personalInfo"));
+        group.addParameter(getField(ExtendedPersonalInfo.class, "name"));
+        group.addParameter(getField(ExtendedPersonalInfo.class, "age"));
 
-        ParameterGroup child = new ParameterGroup(LifetimeInfo.class, getField(ExtendedPersonalInfo.class, "lifetimeInfo", LifetimeInfo.class));
-        child.addParameter("dateOfBirth", getField(LifetimeInfo.class, "dateOfBirth", Date.class));
+        ParameterGroup child = new ParameterGroup(LifetimeInfo.class, getField(ExtendedPersonalInfo.class, "lifetimeInfo"));
+        child.addParameter(getField(LifetimeInfo.class, "dateOfBirth"));
         group.addModelProperty(new ParameterGroupModelProperty(asList(child)));
 
-        when(result.get("myName")).thenReturn(NAME);
+        when(result.get("name")).thenReturn(NAME);
         when(result.get("age")).thenReturn(AGE);
         when(result.get("dateOfBirth")).thenReturn(DATE);
 

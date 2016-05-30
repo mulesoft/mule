@@ -42,24 +42,24 @@ public class ResolverSetResult
     {
 
         private int hashCode = 1;
-        private Map<ParameterModel, Object> values = new LinkedHashMap<>();
+        private Map<String, Object> values = new LinkedHashMap<>();
 
         private Builder()
         {
         }
 
         /**
-         * Adds a new result {@code value} for the given {@code parameter}
+         * Adds a new result {@code value} for the given {@code key}
          *
-         * @param parameterModel a not {@code null} {@link ParameterModel parameterModel}
-         * @param value     the associated value. It can be {@code null}
+         * @param key   a not {@code null} key for the value
+         * @param value the associated value. It can be {@code null}
          * @return this builder
          * @throws IllegalArgumentException is {@code parameter} is {@code null}
          */
-        public Builder add(ParameterModel parameterModel, Object value)
+        public Builder add(String key, Object value)
         {
-            checkArgument(parameterModel != null, "parameter cannot be null");
-            values.put(parameterModel, value);
+            checkArgument(key != null, "parameter cannot be null");
+            values.put(key, value);
             hashCode = 31 * hashCode + (value == null ? 0 : value.hashCode());
             return this;
         }
@@ -86,31 +86,13 @@ public class ResolverSetResult
         return new Builder();
     }
 
-    private final Map<ParameterModel, Object> evaluationResult;
-    private final Map<String, Object> parameterToResult;
+    private final Map<String, Object> evaluationResult;
     private final int hashCode;
 
-    private ResolverSetResult(Map<ParameterModel, Object> evaluationResult, int hashCode)
+    private ResolverSetResult(Map<String, Object> evaluationResult, int hashCode)
     {
-        this.evaluationResult = evaluationResult;
-        parameterToResult = new HashMap<>(evaluationResult.size());
-        for (Map.Entry<ParameterModel, Object> entry : evaluationResult.entrySet())
-        {
-            parameterToResult.put(entry.getKey().getName(), entry.getValue());
-        }
-
+        this.evaluationResult = new HashMap<>(evaluationResult);
         this.hashCode = hashCode;
-    }
-
-    /**
-     * Returns the value associated with the given {@code parameter}
-     *
-     * @param parameterModel a {@link ParameterModel} which was registered with the builder
-     * @return the value associated to that {@code parameter} or {@code null} if no such association exists
-     */
-    public Object get(ParameterModel parameterModel)
-    {
-        return evaluationResult.get(parameterModel);
     }
 
     /**
@@ -121,12 +103,12 @@ public class ResolverSetResult
      */
     public Object get(String parameterName)
     {
-        return parameterToResult.get(parameterName);
+        return evaluationResult.get(parameterName);
     }
 
-    public Map<ParameterModel, Object> asMap()
+    public Map<String, Object> asMap()
     {
-        return Collections.unmodifiableMap(evaluationResult);
+        return evaluationResult;
     }
 
     /**
@@ -148,16 +130,10 @@ public class ResolverSetResult
         if (obj instanceof ResolverSetResult)
         {
             ResolverSetResult other = (ResolverSetResult) obj;
-            for (Map.Entry<ParameterModel, Object> entry : evaluationResult.entrySet())
-            {
-                Object otherValue = other.get(entry.getKey());
-                if (!Objects.equal(entry.getValue(), otherValue))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return !evaluationResult.entrySet().stream()
+                    .filter(entry -> !Objects.equal(entry.getValue(), other.get(entry.getKey())))
+                    .findFirst()
+                    .isPresent();
         }
 
         return false;

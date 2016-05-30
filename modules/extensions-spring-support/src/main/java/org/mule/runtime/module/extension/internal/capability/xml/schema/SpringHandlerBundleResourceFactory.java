@@ -15,7 +15,9 @@ import org.mule.runtime.module.extension.internal.config.ExtensionNamespaceHandl
  * Generates a Spring bundle file which links the extension's namespace to the {@link ExtensionNamespaceHandler}
  *
  * @since 4.0
+ * @deprecated Will be removed as soon as MULE-9865 is fixed. Do not use.
  */
+@Deprecated
 public class SpringHandlerBundleResourceFactory extends AbstractXmlResourceFactory
 {
 

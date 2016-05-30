@@ -15,7 +15,6 @@
                        recipe="recipes"
                        initialHealth="CANCER"
                        finalHealth="DEAD"
-                       monthlyIncomes="monthlyIncomes"
                        candidateDoors="candidateDoors">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
@@ -47,7 +46,6 @@
                        recipe="recipes"
                        initialHealth="CANCER"
                        finalHealth="DEAD"
-                       monthlyIncomes="monthlyIncomes"
                        candidateDoors="candidateDoors">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
@@ -72,6 +70,4 @@
             <heisenberg:monthly-income value="500"/>
         </heisenberg:monthly-incomes>
     </heisenberg:config>
-
-
 </mule>

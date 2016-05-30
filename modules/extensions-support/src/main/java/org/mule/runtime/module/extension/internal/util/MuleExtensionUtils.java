@@ -31,13 +31,11 @@ import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.Interceptor;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
@@ -113,42 +111,6 @@ public class MuleExtensionUtils
     }
 
     /**
-     * Returns a {@link List} with all the {@link OperationModel} available to the {@code configurationModel}
-     * which requires a connection. This will include operations defined at both the
-     * {@link ExtensionModel#getOperationModels()} and {@link ConfigurationModel#getOperationModels()}
-     * level.
-     *
-     * @param configurationModel a {@link RuntimeConfigurationModel}
-     * @return a {@link List} of {@link OperationModel}. It might be empty but will never be {@code null}
-     */
-    public static List<OperationModel> getConnectedOperations(RuntimeConfigurationModel configurationModel)
-    {
-        List<OperationModel> operations = new LinkedList<>();
-        operations.addAll(collectConnectedOperations(configurationModel.getExtensionModel()));
-        operations.addAll(collectConnectedOperations(configurationModel));
-
-        return operations;
-    }
-
-    /**
-     * Returns a {@link List} with all the {@link SourceModel} available to the {@code configurationModel}
-     * which requires a connection. This will include sources defined at both the
-     * {@link ExtensionModel#getSourceModels()} and {@link ConfigurationModel#getSourceModels()}
-     * level.
-     *
-     * @param configurationModel a {@link RuntimeConfigurationModel}
-     * @return a {@link List} of {@link SourceModel}. It might be empty but will never be {@code null}
-     */
-    public static List<SourceModel> getConnectedSources(RuntimeConfigurationModel configurationModel)
-    {
-        List<SourceModel> sources = new LinkedList<>();
-        sources.addAll(collectConnectedSources(configurationModel.getExtensionModel()));
-        sources.addAll(collectConnectedSources(configurationModel));
-
-        return sources;
-    }
-
-    /**
      * Returns a {@link List} with all the {@link ComponentModel} available to the {@code configurationModel}
      * which requires a connection. This includes both {@link SourceModel} and {@link OperationModel}.
      *
@@ -157,25 +119,31 @@ public class MuleExtensionUtils
      */
     public static List<ComponentModel> getConnectedComponents(RuntimeConfigurationModel configurationModel)
     {
-        List<ComponentModel> components = new LinkedList<>();
-        components.addAll(getConnectedOperations(configurationModel));
-        components.addAll(getConnectedSources(configurationModel));
+        List<ComponentModel> connectedModels = new LinkedList<>();
+        new IdempotentExtensionWalker()
+        {
+            @Override
+            public void onOperation(OperationModel model)
+            {
+                collect(model);
+            }
 
-        return components;
-    }
+            @Override
+            public void onSource(SourceModel model)
+            {
+                collect(model);
+            }
 
-    private static List<OperationModel> collectConnectedOperations(HasOperationModels hasOperationModels)
-    {
-        return hasOperationModels.getOperationModels().stream()
-                .filter(MuleExtensionUtils::isConnected)
-                .collect(toList());
-    }
+            private void collect(EnrichableModel model)
+            {
+                if (MuleExtensionUtils.isConnected(model))
+                {
+                    connectedModels.add((ComponentModel) model);
+                }
+            }
+        }.walk(configurationModel.getExtensionModel());
 
-    private static List<SourceModel> collectConnectedSources(HasSourceModels hasSourceModels)
-    {
-        return hasSourceModels.getSourceModels().stream()
-                .filter(MuleExtensionUtils::isConnected)
-                .collect(toList());
+        return connectedModels;
     }
 
     /**

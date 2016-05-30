@@ -38,7 +38,7 @@ final class MuleDomainContext extends MuleArtifactContext
 
     protected MuleBeanDefinitionDocumentReader createBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory)
     {
-        return new MuleDomainBeanDefinitionDocumentReader(beanDefinitionFactory);
+        return new MuleDomainBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser);
     }
 
     @Override

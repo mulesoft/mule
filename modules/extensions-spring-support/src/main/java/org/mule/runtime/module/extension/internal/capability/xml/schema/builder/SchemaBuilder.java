@@ -851,10 +851,11 @@ public final class SchemaBuilder
             public void visitArrayType(ArrayType arrayType)
             {
                 MetadataType genericType = arrayType.getType();
-                forceOptional = shouldForceOptional(genericType);
+                final boolean supportsChildElement = shouldGenerateDataTypeChildElements(genericType, expressionSupport);
+                forceOptional = supportsChildElement || shouldForceOptional(genericType);
 
                 defaultVisit(arrayType);
-                if (shouldGenerateDataTypeChildElements(genericType, expressionSupport))
+                if (supportsChildElement)
                 {
                     generateCollectionElement(all, name, description, arrayType, isRequired(true, required));
                 }

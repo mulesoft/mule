@@ -91,7 +91,13 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>
         Iterator<ValueResolver<V>> valueIt = valueResolvers.iterator();
         while (keyIt.hasNext() && valueIt.hasNext())
         {
-            map.put(keyIt.next().resolve(event), valueIt.next().resolve(event));
+                      try {
+                map.put(keyIt.next().resolve(event), valueIt.next().resolve(event));
+
+                      }
+                          catch (Exception e) {
+                              throw new RuntimeException(e);
+                          }
         }
         return map;
     }
@@ -102,7 +108,11 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>
     @Override
     public boolean isDynamic()
     {
+        try{
         return MuleExtensionUtils.hasAnyDynamic(keyResolvers) || MuleExtensionUtils.hasAnyDynamic(valueResolvers);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Map<K, V> instantiateMap()

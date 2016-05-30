@@ -45,8 +45,8 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase
     public static ResolverSet createResolverSet() throws Exception
     {
         ResolverSet resolverSet = new ResolverSet();
-        resolverSet.add(nameParameterModel, getResolver(NAME_VALUE));
-        resolverSet.add(descriptionParameterModel, getResolver(DESCRIPTION_VALUE));
+        resolverSet.add(nameParameterModel.getName(), getResolver(NAME_VALUE));
+        resolverSet.add(descriptionParameterModel.getName(), getResolver(DESCRIPTION_VALUE));
 
         return resolverSet;
     }

@@ -294,13 +294,15 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
     private Time getConfigurationExpirationFrequency()
     {
         ExtensionConfig extensionConfig = muleContext.getConfiguration().getExtension(ExtensionConfig.class);
+        final Time defaultFreq = new Time(5L, TimeUnit.MINUTES);
+
         if (extensionConfig != null)
         {
-            return extensionConfig.getDynamicConfigExpirationFrequency();
+            return extensionConfig.getDynamicConfigExpirationFrequency().orElse(defaultFreq);
         }
         else
         {
-            return new Time(5L, TimeUnit.MINUTES);
+            return defaultFreq;
         }
     }
 

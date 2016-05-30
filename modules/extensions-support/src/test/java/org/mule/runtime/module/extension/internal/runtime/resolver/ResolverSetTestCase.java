@@ -72,17 +72,17 @@ public class ResolverSetTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void addNullresolver() throws Exception
     {
-        set.add(getParameter("blah", String.class), null);
+        set.add("blah", null);
     }
 
     @Test(expected = IllegalStateException.class)
     public void addRepeatedParameter() throws Exception
     {
-        ParameterModel parameterModel = getParameter("name", String.class);
+        final String parameterName = "name";
         ValueResolver<String> resolver = getResolver(NAME);
 
-        set.add(parameterModel, resolver);
-        set.add(parameterModel, resolver);
+        set.add(parameterName, resolver);
+        set.add(parameterName, resolver);
     }
 
     @Test
@@ -97,7 +97,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase
         ValueResolver resolver = getResolver(null);
         when(resolver.isDynamic()).thenReturn(true);
 
-        set.add(getParameter("whatever", String.class), resolver);
+        set.add("whatever", resolver);
         assertThat(set.isDynamic(), is(true));
     }
 
@@ -106,7 +106,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase
         assertThat(result, is(notNullValue()));
         for (Map.Entry<ParameterModel, ValueResolver> entry : mapping.entrySet())
         {
-            Object value = result.get(entry.getKey());
+            Object value = result.get(entry.getKey().getName());
             assertThat(value, is(entry.getValue().resolve(event)));
         }
     }
@@ -114,10 +114,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase
     private ResolverSet buildSet(Map<ParameterModel, ValueResolver> mapping)
     {
         ResolverSet set = new ResolverSet();
-        for (Map.Entry<ParameterModel, ValueResolver> entry : mapping.entrySet())
-        {
-            set.add(entry.getKey(), entry.getValue());
-        }
+        mapping.forEach((key, value) -> set.add(key.getName(), value));
 
         return set;
     }

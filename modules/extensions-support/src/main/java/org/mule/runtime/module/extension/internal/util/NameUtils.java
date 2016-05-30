@@ -132,28 +132,6 @@ public class NameUtils
     }
 
     /**
-     * Transforms a hyphenized value into a camel case one.
-     * <p>
-     * For example:
-     * {@code message-processor} would be transformed to {@code messageProcessor}
-     *
-     * @param hyphenizedValue a String in hypenized form
-     * @return the {@code hyphenizedValue} in camel case format
-     */
-    public static String camel(String hyphenizedValue)
-    {
-        String result = "";
-        String[] parts = hyphenizedValue.split("-");
-
-        for (int i = 0; i < parts.length; i++)
-        {
-            result += StringUtils.capitalize(parts[i].toLowerCase());
-        }
-
-        return result;
-    }
-
-    /**
      * Transforms a camel case value into a hyphenizedone.
      * <p>
      * For example:

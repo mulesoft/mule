@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+import org.mule.runtime.config.spring.dsl.api.TypeConverter;
+import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.config.BeanDefinition;
+
 /**
  * Abstract construct of a chain of responsibility to create a {@link org.springframework.beans.factory.config.BeanDefinition}
  * from a {@code org.mule.runtime.config.spring.dsl.model.ComponentModel}.
@@ -53,4 +61,15 @@ abstract class BeanDefinitionCreator
      */
     abstract boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest);
 
+    protected BeanDefinition getConvertibleBeanDefinition(Class<?> type, Object value, Optional<TypeConverter> converter)
+    {
+        if (converter.isPresent())
+        {
+            return genericBeanDefinition(ConstantFactoryBean.class).addConstructorArgValue(converter.get().convert(value)).getBeanDefinition();
+        }
+        else
+        {
+            return genericBeanDefinition(type).addConstructorArgValue(value).getBeanDefinition();
+        }
+    }
 }

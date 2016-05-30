@@ -11,13 +11,12 @@ import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleTy
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.MapEntry;
-import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.config.spring.dsl.api.TypeDefinition.MapEntryType;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -25,7 +24,7 @@ import org.springframework.beans.factory.support.ManagedList;
 
 /**
  * {@code BeanDefinitionCreator} that handles component that define a map entry.
- *
+ * <p>
  * <pre>
  *  <parsers-test:simple-type-entry key="key1" value="1"/>
  * </pre>
@@ -57,29 +56,28 @@ public class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator
         ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
         componentModel.setType(type);
         final Object key = componentModel.getParameters().get(ENTRY_TYPE_KEY_PARAMETER_NAME);
-        Object keyBeanDefinition = getParameterBeanDefinition(objectTypeVisitor.getMapEntryType().get().getKeyType(), componentBuildingDefinition.getKeyTypeConverter(), key);
+        Object keyBeanDefinition = getConvertibleBeanDefinition(objectTypeVisitor.getMapEntryType().get().getKeyType(), key, componentBuildingDefinition.getKeyTypeConverter());
         Object value;
         Class valueType = objectTypeVisitor.getMapEntryType().get().getValueType();
         if (isSimpleType(valueType))
         {
-            value = getParameterBeanDefinition(objectTypeVisitor.getMapEntryType().get().getValueType(),
-                                               componentBuildingDefinition.getTypeConverter(),
-                                               componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME));
+            value = getConvertibleBeanDefinition(objectTypeVisitor.getMapEntryType().get().getValueType(),
+                                                 componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME),
+                                                 componentBuildingDefinition.getTypeConverter());
         }
         else if (List.class.isAssignableFrom(objectTypeVisitor.getMapEntryType().get().getValueType()))
         {
             if (componentModel.getInnerComponents().isEmpty())
             {
                 String valueParameter = componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME);
-                value = getParameterBeanDefinition(valueType, componentBuildingDefinition.getTypeConverter(), valueParameter);
+                value = getConvertibleBeanDefinition(valueType, valueParameter, componentBuildingDefinition.getTypeConverter());
             }
             else
             {
-                ManagedList<Object> managedList = new ManagedList<>();
-                for (ComponentModel childComponent : componentModel.getInnerComponents())
-                {
-                    managedList.add(childComponent.getBeanDefinition() != null ? childComponent.getBeanDefinition() : childComponent.getBeanReference());
-                }
+                ManagedList<Object> managedList = componentModel.getInnerComponents().stream()
+                        .map(childComponent -> childComponent.getBeanDefinition() != null ? childComponent.getBeanDefinition() : childComponent.getBeanReference())
+                        .collect(Collectors.toCollection(ManagedList::new));
+
                 value = genericBeanDefinition(ObjectTypeVisitor.DEFAULT_COLLECTION_TYPE)
                         .addConstructorArgValue(managedList)
                         .getBeanDefinition();
@@ -97,11 +95,6 @@ public class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator
                 .getBeanDefinition();
         componentModel.setBeanDefinition(beanDefinition);
         return true;
-    }
 
-    private AbstractBeanDefinition getParameterBeanDefinition(Class<?> beanType, Optional<TypeConverter> typeConverterOptional, Object configValue)
-    {
-        Object converterKey = typeConverterOptional.map(converter -> converter.convert(configValue)).orElse(configValue);
-        return genericBeanDefinition(beanType).addConstructorArgValue(converterKey).getBeanDefinition();
     }
 }

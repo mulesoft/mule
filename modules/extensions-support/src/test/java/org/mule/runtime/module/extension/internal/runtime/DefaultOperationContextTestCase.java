@@ -15,13 +15,11 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -71,8 +69,8 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     public void before()
     {
         configuration = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, configurationInstance, emptyList(), Optional.empty());
-        Map<ParameterModel, Object> parametersMap = new HashMap<>();
-        parametersMap.put(ExtensionsTestUtils.getParameter(PARAM_NAME, String.class), VALUE);
+        Map<String, Object> parametersMap = new HashMap<>();
+        parametersMap.put(PARAM_NAME, VALUE);
         when(resolverSetResult.asMap()).thenReturn(parametersMap);
 
         operationContext = new DefaultOperationContext(configuration, resolverSetResult, operationModel, event);

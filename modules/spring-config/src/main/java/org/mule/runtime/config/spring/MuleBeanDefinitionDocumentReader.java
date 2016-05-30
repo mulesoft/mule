@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.config.spring;
 
-import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.*;
-import org.mule.runtime.config.spring.dsl.processor.ApplicationConfig;
+import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.getConfigFileIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
+import org.mule.runtime.config.spring.dsl.processor.ApplicationConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
-import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.runtime.core.api.MuleRuntimeException;
 
 import java.util.ArrayList;
@@ -34,13 +33,14 @@ public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocum
 {
 
     private final BeanDefinitionFactory beanDefinitionFactory;
-    private final XmlApplicationParser xmlApplicationParser = new XmlApplicationParser();
+    private final XmlApplicationParser xmlApplicationParser;
     //This same instance is called several time to parse different XML files so a stack is needed to save previous state.
     private final Stack<ApplicationModel> applicationModelStack = new Stack<>();
 
-    public MuleBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory)
+    public MuleBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory, XmlApplicationParser xmlApplicationParser)
     {
         this.beanDefinitionFactory = beanDefinitionFactory;
+        this.xmlApplicationParser = xmlApplicationParser;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocum
 
     protected MuleHierarchicalBeanDefinitionParserDelegate createBeanDefinitionParserDelegate(XmlReaderContext readerContext)
     {
-        return new MuleHierarchicalBeanDefinitionParserDelegate(readerContext, this, () -> { return applicationModelStack.peek();}, beanDefinitionFactory, getElementsValidator());
+        return new MuleHierarchicalBeanDefinitionParserDelegate(readerContext, this, applicationModelStack::peek, beanDefinitionFactory, getElementsValidator());
     }
 
     protected ElementValidator[] getElementsValidator()
