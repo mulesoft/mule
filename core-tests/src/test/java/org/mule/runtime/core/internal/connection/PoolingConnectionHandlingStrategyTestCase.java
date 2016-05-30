@@ -15,6 +15,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyVararg;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -25,7 +26,6 @@ import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.tck.MuleTestUtils.spyInjector;
-import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionExceptionCode;
@@ -33,6 +33,7 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingListener;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -86,6 +87,27 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
 
         verifyThat(Lifecycle::initialise);
         verifyThat(Lifecycle::start);
+    }
+
+    @Test
+    public void poolingListenerFailsOnBorrow() throws Exception
+    {
+        initStrategy();
+        final RuntimeException exception = new RuntimeException();
+
+        doThrow(exception).when(poolingListener).onBorrow(any(), any(Lifecycle.class));
+
+        try
+        {
+            strategy.getConnectionHandler();
+            fail("was expecting poolingListener to fail");
+        }
+        catch (Exception e)
+        {
+            assertThat(e.getCause(), is(sameInstance(exception)));
+            verify(connectionProvider).disconnect(any(Lifecycle.class));
+        }
+
     }
 
     @Test
