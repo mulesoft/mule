@@ -1512,9 +1512,6 @@
                             <!-- exclude inner classes -->
                             <exclude>**/*$*</exclude>
                         </excludes>
-                        <excludedAnnotations>
-                            <excludedAnnotation>org.mule.tck.size.LargeTest</excludedAnnotation>
-                        </excludedAnnotations>
                     </configuration>
                 </plugin>
                 <plugin>
