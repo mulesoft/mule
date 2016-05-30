@@ -57,6 +57,7 @@ import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
@@ -192,13 +193,17 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         final ClassLoader extensionClassLoader = mock(ClassLoader.class);
         final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
 
+        final ValueHolder<ClassLoader> classLoaderHolder = new ValueHolder<>();
+
         when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(Optional.of(new ClassLoaderModelProperty(extensionClassLoader)));
         when(metadataMediator.getMetadata()).thenAnswer(invocation -> {
-            assertThat(Thread.currentThread().getContextClassLoader(), is(sameInstance(extensionClassLoader)));
+            classLoaderHolder.set(Thread.currentThread().getContextClassLoader());
             return result;
         });
 
         messageSource.getMetadata();
+
+        assertThat(classLoaderHolder.get(), is(sameInstance(extensionClassLoader)));
         assertThat(Thread.currentThread().getContextClassLoader(), is(sameInstance(originalClassLoader)));
         verify(extensionModel).getModelProperty(ClassLoaderModelProperty.class);
         verify(metadataMediator).getMetadata();
@@ -211,13 +216,17 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         final ClassLoader extensionClassLoader = mock(ClassLoader.class);
         final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
 
+        final ValueHolder<ClassLoader> classLoaderHolder = new ValueHolder<>();
+
         when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(Optional.of(new ClassLoaderModelProperty(extensionClassLoader)));
         when(metadataMediator.getMetadataKeys(any(MetadataContext.class))).thenAnswer(invocation -> {
-            assertThat(Thread.currentThread().getContextClassLoader(), is(sameInstance(extensionClassLoader)));
+            classLoaderHolder.set(Thread.currentThread().getContextClassLoader());
             return result;
         });
 
         messageSource.getMetadataKeys();
+
+        assertThat(classLoaderHolder.get(), is(sameInstance(extensionClassLoader)));
         assertThat(Thread.currentThread().getContextClassLoader(), is(sameInstance(originalClassLoader)));
         verify(extensionModel).getModelProperty(ClassLoaderModelProperty.class);
         verify(metadataMediator).getMetadataKeys(any(MetadataContext.class));
@@ -230,14 +239,18 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         final ClassLoader extensionClassLoader = mock(ClassLoader.class);
         final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
 
+        final ValueHolder<ClassLoader> classLoaderHolder = new ValueHolder<>();
+
         MetadataKey key = mock(MetadataKey.class);
         when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(Optional.of(new ClassLoaderModelProperty(extensionClassLoader)));
         when(metadataMediator.getMetadata(any(MetadataContext.class), eq(key))).thenAnswer(invocation -> {
-            assertThat(Thread.currentThread().getContextClassLoader(), is(sameInstance(extensionClassLoader)));
+            classLoaderHolder.set(Thread.currentThread().getContextClassLoader());
             return result;
         });
 
         messageSource.getMetadata(key);
+
+        assertThat(classLoaderHolder.get(), is(sameInstance(extensionClassLoader)));
         assertThat(Thread.currentThread().getContextClassLoader(), is(sameInstance(originalClassLoader)));
         verify(extensionModel).getModelProperty(ClassLoaderModelProperty.class);
         verify(metadataMediator).getMetadata(any(MetadataContext.class), eq(key));
