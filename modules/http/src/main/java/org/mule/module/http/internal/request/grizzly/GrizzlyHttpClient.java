@@ -9,7 +9,6 @@ package org.mule.module.http.internal.request.grizzly;
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
-
 import org.mule.api.CompletionHandler;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
@@ -37,17 +36,6 @@ import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
-import javax.net.ssl.SSLContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -61,6 +49,17 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GrizzlyHttpClient implements HttpClient
 {
@@ -450,7 +449,7 @@ public class GrizzlyHttpClient implements HttpClient
 
         if (!usePersistentConnections)
         {
-            String connectionHeaderValue = request.getHeaderValue(CONNECTION);
+            String connectionHeaderValue = request.getHeaderValueIgnoreCase(CONNECTION);
             if (connectionHeaderValue != null && !CLOSE.equals(connectionHeaderValue) && logger.isDebugEnabled())
             {
                 logger.debug("Persistent connections are disabled in the HTTP requester configuration, but the request already " +
