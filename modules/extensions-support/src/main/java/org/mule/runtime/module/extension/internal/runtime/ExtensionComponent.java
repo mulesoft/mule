@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.metadata.MetadataAware;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -120,7 +122,8 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     @Override
     public MetadataResult<List<MetadataKey>> getMetadataKeys() throws MetadataResolvingException
     {
-        return metadataMediator.getMetadataKeys(getMetadataContext());
+        final MetadataContext metadataContext = getMetadataContext();
+        return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadataKeys(metadataContext));
     }
 
     /**
@@ -129,7 +132,7 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     @Override
     public MetadataResult<ComponentMetadataDescriptor> getMetadata() throws MetadataResolvingException
     {
-        return metadataMediator.getMetadata();
+        return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata());
     }
 
     /**
@@ -138,7 +141,8 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     @Override
     public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataKey key) throws MetadataResolvingException
     {
-        return metadataMediator.getMetadata(getMetadataContext(), key);
+        final MetadataContext metadataContext = getMetadataContext();
+        return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadata(metadataContext, key));
     }
 
     @Override

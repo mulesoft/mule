@@ -25,6 +25,7 @@ import org.mule.test.metadata.extension.resolver.TestOutputNullTypeResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestResolverWithCache;
+import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
 
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
         contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
@@ -127,6 +128,22 @@ public class MetadataOperations extends MetadataOperationsParent
 
     @MetadataScope(outputResolver = TestOutputNullTypeResolver.class)
     public MuleMessage<Object, String> messageAttributesPersonTypeMetadata()
+    {
+        return null;
+    }
+
+    @MetadataScope(keysResolver = TestThreadContextClassLoaderResolver.class)
+    public void resolverTypeKeysWithContextClassLoader(@MetadataKeyId String type)
+    {
+    }
+
+    @MetadataScope(contentResolver = TestThreadContextClassLoaderResolver.class)
+    public void resolverContentWithContextClassLoader(@Content Object content)
+    {
+    }
+
+    @MetadataScope(outputResolver = TestThreadContextClassLoaderResolver.class)
+    public Object resolverOutputWithContextClassLoader()
     {
         return null;
     }

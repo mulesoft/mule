@@ -15,6 +15,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -107,8 +108,9 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase
 
     private ExtensionModel modelFor(Class<?> connectorClass)
     {
+        DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
         return extensionFactory.createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
-                                                   .describe(new DefaultDescribingContext(connectorClass.getClassLoader())));
+                                                   .describe(context), context);
     }
 
     private void validate(Class<?> connectorClass)

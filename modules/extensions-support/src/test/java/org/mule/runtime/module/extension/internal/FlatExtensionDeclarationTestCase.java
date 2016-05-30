@@ -166,7 +166,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     @Test(expected = IllegalArgumentException.class)
     public void badExtensionVersion()
     {
-        factory.createFrom(new ExtensionDeclarer().named("bad").onVersion("i'm new"));
+        factory.createFrom(new ExtensionDeclarer().named("bad").onVersion("i'm new"), createDescribingContext());
     }
 
     @Test
@@ -183,7 +183,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
         declarer.withConfig(beta).describedAs(beta).createdWith(mockInstantiator);
         declarer.withConfig(alpha).describedAs(alpha).createdWith(mockInstantiator);
 
-        ExtensionModel extensionModel = factory.createFrom(declarer);
+        ExtensionModel extensionModel = factory.createFrom(declarer, createDescribingContext());
         List<ConfigurationModel> configurationModels = extensionModel.getConfigurationModels();
         assertThat(configurationModels, hasSize(3));
         assertThat(configurationModels.get(1).getName(), equalTo(alpha));
@@ -203,14 +203,14 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     public void nameClashes()
     {
         extensionDeclarer.withConfig(CONFIG_NAME).createdWith(mock(ConfigurationFactory.class)).describedAs("");
-        factory.createFrom(extensionDeclarer);
+        factory.createFrom(extensionDeclarer, createDescribingContext());
     }
 
     @Test(expected = IllegalParameterModelDefinitionException.class)
     public void operationWithParameterNamedName()
     {
         extensionDeclarer.withOperation("invalidOperation").describedAs("").withRequiredParameter("name").ofType(String.class);
-        factory.createFrom(extensionDeclarer);
+        factory.createFrom(extensionDeclarer, createDescribingContext());
     }
 
     @Test(expected = IllegalParameterModelDefinitionException.class)
@@ -221,7 +221,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
                 .withExpressionSupport(NOT_SUPPORTED)
                 .defaultingTo("#['hello']");
 
-        factory.createFrom(extensionDeclarer);
+        factory.createFrom(extensionDeclarer, createDescribingContext());
     }
 
     @Test(expected = IllegalOperationModelDefinitionException.class)
@@ -230,7 +230,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
         extensionDeclarer.withOperation("invalidOperation").describedAs("")
                 .withOptionalParameter(TARGET_ATTRIBUTE).ofType(String.class);
 
-        factory.createFrom(extensionDeclarer);
+        factory.createFrom(extensionDeclarer, createDescribingContext());
     }
 
     @Test(expected = IllegalParameterModelDefinitionException.class)
@@ -241,14 +241,14 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
                 .withExpressionSupport(REQUIRED)
                 .defaultingTo("static");
 
-        factory.createFrom(extensionDeclarer);
+        factory.createFrom(extensionDeclarer, createDescribingContext());
     }
 
     @Test(expected = IllegalOperationModelDefinitionException.class)
     public void operationWithNoReturnType()
     {
         extensionDeclarer.withOperation("noReturn").describedAs("");
-        factory.createFrom(extensionDeclarer);
+        factory.createFrom(extensionDeclarer, createDescribingContext());
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
@@ -260,13 +260,13 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
                 .withConfig("default")
                 .createdWith(mock(ConfigurationFactory.class));
 
-        factory.createFrom(extensionDeclarer);
+        factory.createFrom(extensionDeclarer, createDescribingContext());
     }
 
     @Test
     public void configlessDescriptor()
     {
-        factory.createFrom(new ExtensionDeclarer().named("noConfigs").onVersion("1.0").fromVendor("MuleSoft"));
+        factory.createFrom(new ExtensionDeclarer().named("noConfigs").onVersion("1.0").fromVendor("MuleSoft"), createDescribingContext());
     }
 
     @Test
@@ -279,7 +279,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
                 .thenReturn(Arrays.asList(modelEnricher1, modelEnricher2));
 
         factory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
-        factory.createFrom(extensionDeclarer);
+        factory.createFrom(extensionDeclarer, createDescribingContext());
 
         assertDescribingContext(modelEnricher1);
         assertDescribingContext(modelEnricher2);

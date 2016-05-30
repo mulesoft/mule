@@ -181,7 +181,7 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
         for (Describer describer : describers)
         {
             final DescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
-            extensionManager.registerExtension(extensionFactory.createFrom(describer.describe(context)));
+            extensionManager.registerExtension(extensionFactory.createFrom(describer.describe(context), context));
         }
     }
 

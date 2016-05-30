@@ -92,7 +92,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
         String expectedSchema = IOUtils.getResourceAsString(expectedXSD, getClass());
 
         ExtensionDeclarer declarer = new AnnotationsBasedDescriber(extensionUnderTest, new StaticVersionResolver(getProductVersion())).describe(new DefaultDescribingContext(extensionUnderTest.getClassLoader()));
-        ExtensionModel extensionModel = extensionFactory.createFrom(declarer);
+        ExtensionModel extensionModel = extensionFactory.createFrom(declarer, new DefaultDescribingContext(declarer, getClass().getClassLoader()));
 
         XmlModelProperty capability = extensionModel.getModelProperty(XmlModelProperty.class).get();
 

@@ -15,6 +15,7 @@ import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.property.StudioModelProperty;
@@ -51,9 +52,10 @@ public class StudioModelPropertyTestCase extends AbstractMuleTestCase
     @Test
     public void verifyPropertyIsPopulated() throws Exception
     {
+        DescribingContext context = new DefaultDescribingContext(HeisenbergExtension.class.getClassLoader());
         ExtensionDeclarer declarer = new AnnotationsBasedDescriber(HeisenbergExtension.class, new StaticVersionResolver(getProductVersion()))
-                .describe(new DefaultDescribingContext(HeisenbergExtension.class.getClassLoader()));
-        ExtensionModel extensionModel = extensionFactory.createFrom(declarer);
+                .describe(context);
+        ExtensionModel extensionModel = extensionFactory.createFrom(declarer, context);
         StudioModelProperty studioModelProperty = extensionModel.getModelProperty(StudioModelProperty.class).get();
         assertThat(studioModelProperty.getEditorFileName(), is(""));
         assertThat(studioModelProperty.isDerived(), is(true));
