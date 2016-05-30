@@ -68,7 +68,7 @@ public class HttpListenerLifecycleTestCase extends FunctionalTestCase
         assertThat(returnResponse.getEntity(), notNullValue());
         assertThat(returnResponse.getStatusLine().getStatusCode(), is(SERVICE_UNAVAILABLE.getStatusCode()));
         assertThat(returnResponse.getStatusLine().getReasonPhrase(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
-        assertThat(getHttpEntityContent(returnResponse), startsWith("Service not available for endpoint: "));
+        assertThat(getHttpEntityContent(returnResponse), startsWith("Service not available for request uri: "));
     }
 
     private String getHttpEntityContent(HttpResponse returnResponse) throws IOException {

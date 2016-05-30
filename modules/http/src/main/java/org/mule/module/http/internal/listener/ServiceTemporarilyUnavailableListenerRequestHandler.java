@@ -17,7 +17,7 @@ public class ServiceTemporarilyUnavailableListenerRequestHandler extends ErrorRe
 
     private ServiceTemporarilyUnavailableListenerRequestHandler()
     {
-        super(SERVICE_UNAVAILABLE.getStatusCode(), SERVICE_UNAVAILABLE.getReasonPhrase(), "Service not available for endpoint: %s");
+        super(SERVICE_UNAVAILABLE.getStatusCode(), SERVICE_UNAVAILABLE.getReasonPhrase(), "Service not available for request uri: %s");
     }
 
     public static ServiceTemporarilyUnavailableListenerRequestHandler getInstance()
