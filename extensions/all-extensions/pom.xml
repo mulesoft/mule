@@ -20,19 +20,20 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-ftp</artifactId>
+            <artifactId>mule-module-file</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
         </dependency>
 
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-file</artifactId>
+            <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-sockets</artifactId>
+            <artifactId>mule-module-ftp</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
             <exclusions>
@@ -53,6 +54,7 @@
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-validation</artifactId>
