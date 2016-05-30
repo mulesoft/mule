@@ -7,9 +7,13 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.lang.String.format;
+import static java.util.function.Function.identity;
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
@@ -22,7 +26,6 @@ import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Provides an instance of the annotated {@link MetadataKeyId} parameter's complex type.
@@ -33,7 +36,7 @@ import java.util.function.Function;
 final class MetadataKeyIdObjectResolver
 {
 
-    private final Class type;
+    private final MetadataType type;
     private final Map<Field, String> fieldValueMap = new HashMap<>();
 
     /**
@@ -45,16 +48,20 @@ final class MetadataKeyIdObjectResolver
     MetadataKeyIdObjectResolver(ComponentModel component, MetadataKey key) throws MetadataResolvingException
     {
         type = component.getModelProperty(MetadataKeyIdModelProperty.class)
-                .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId parameter assosiated", component.getName())))
+                .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId parameter associated", component.getName())))
                 .getType();
-        checkInstantiable(type);
-        fillFieldValueMap(key);
+
+
+        Class<?> typeClass = getType(type);
+        checkInstantiable(typeClass);
+        fillFieldValueMap(key, typeClass);
+
     }
 
-    private void fillFieldValueMap(MetadataKey key) throws MetadataResolvingException
+    private void fillFieldValueMap(MetadataKey key, Class<?> type) throws MetadataResolvingException
     {
         Map<Integer, Field> metadataKeyPartMap = getAnnotatedFields(type, MetadataKeyPart.class)
-                .stream().collect(new ImmutableMapCollector<>(f -> f.getAnnotation(MetadataKeyPart.class).order(), Function.identity()));
+                .stream().collect(new ImmutableMapCollector<>(f -> f.getAnnotation(MetadataKeyPart.class).order(), identity()));
 
         int order = 1;
         while (!key.getChilds().isEmpty())
@@ -73,16 +80,18 @@ final class MetadataKeyIdObjectResolver
      */
     public Object resolve() throws MetadataResolvingException
     {
+        Object metadataKeyId;
         try
         {
-            Object metadataKeyId = type.newInstance();
-            fieldValueMap.keySet().forEach(field -> new FieldSetter<Object, String>(field).set(metadataKeyId, fieldValueMap.get(field)));
-            return metadataKeyId;
+            metadataKeyId = getType(type).newInstance();
         }
-        catch (InstantiationException | IllegalAccessException e)
+        catch (Exception e)
         {
-            throw buildException(format("Could not instantiate MetadataKeyId of type '%s'", type.toString()), e);
+            throw new MetadataResolvingException("Could not instantiate metadata key object", UNKNOWN, e);
         }
+
+        fieldValueMap.entrySet().forEach(entry -> new FieldSetter<Object, String>(entry.getKey()).set(metadataKeyId, entry.getValue()));
+        return metadataKeyId;
     }
 
     private MetadataResolvingException buildException(String message)
