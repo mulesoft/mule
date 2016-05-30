@@ -7,7 +7,7 @@
 package org.mule.runtime.module.launcher.application;
 
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
 import org.mule.runtime.module.launcher.domain.DomainManager;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
@@ -30,7 +30,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
 
     public TestApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, DomainManager domainManager)
     {
-        super(applicationClassLoaderFactory, new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())), new DefaultApplicationPluginFactory(new ApplicationPluginClassLoaderFactory()), domainManager, new TestEmptyApplicationPluginRepository());
+        super(applicationClassLoaderFactory, new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory()), new TestEmptyApplicationPluginRepository()), new DefaultApplicationPluginFactory(new ApplicationPluginClassLoaderFactory()), domainManager, new TestEmptyApplicationPluginRepository());
     }
 
     @Override
@@ -59,7 +59,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
     private static class TestEmptyApplicationPluginRepository implements ApplicationPluginRepository
     {
         @Override
-        public List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors() throws IOException
+        public List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors()
         {
             return Collections.emptyList();
         }

@@ -11,7 +11,7 @@ import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ZIP_FILE_S
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.application.ApplicationPluginClassLoaderFactory;
 import org.mule.runtime.module.launcher.application.ApplicationPluginFactory;
@@ -86,10 +86,10 @@ public class MuleDeploymentService implements DeploymentService
         domainFactory.setDeploymentListener(domainDeploymentListener);
 
         final ApplicationPluginFactory applicationPluginFactory = new DefaultApplicationPluginFactory(new ApplicationPluginClassLoaderFactory());
-        final ApplicationPluginDescriptorFactory applicationPluginDescriptorFactory = new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory());
-        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(applicationPluginDescriptorFactory);
-
+        final ApplicationPluginDescriptorFactory applicationPluginDescriptorFactory = new ApplicationPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory());
         applicationPluginRepository = new DefaultApplicationPluginRepository(applicationPluginDescriptorFactory);
+
+        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(applicationPluginDescriptorFactory, applicationPluginRepository);
 
         DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderFactory, applicationDescriptorFactory, applicationPluginFactory, domainManager, applicationPluginRepository);
         applicationFactory.setDeploymentListener(applicationDeploymentListener);

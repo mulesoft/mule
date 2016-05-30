@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.plugin;
 
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.launcher.descriptor.DeployableArtifactDescriptor;
 
 import java.net.URL;
@@ -16,6 +17,7 @@ public class ApplicationPluginDescriptor extends DeployableArtifactDescriptor
 
     private URL runtimeClassesDir;
     private URL[] runtimeLibs = new URL[0];
+    private ArtifactClassLoaderFilter classLoaderFilter = ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 
     public URL getRuntimeClassesDir()
     {
@@ -35,5 +37,15 @@ public class ApplicationPluginDescriptor extends DeployableArtifactDescriptor
     public void setRuntimeLibs(URL[] runtimeLibs)
     {
         this.runtimeLibs = runtimeLibs;
+    }
+
+    public ArtifactClassLoaderFilter getClassLoaderFilter()
+    {
+        return classLoaderFilter;
+    }
+
+    public void setClassLoaderFilter(ArtifactClassLoaderFilter classLoaderFilter)
+    {
+        this.classLoaderFilter = classLoaderFilter;
     }
 }

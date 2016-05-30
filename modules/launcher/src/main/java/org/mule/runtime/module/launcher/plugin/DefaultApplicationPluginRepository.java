@@ -17,6 +17,8 @@ import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getContainerAppPluginsFolder;
 
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -48,7 +50,7 @@ public class DefaultApplicationPluginRepository implements ApplicationPluginRepo
     }
 
     @Override
-    public List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors() throws IOException
+    public List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors()
     {
         if (containerApplicationPluginDescriptors == null)
         {
@@ -56,7 +58,14 @@ public class DefaultApplicationPluginRepository implements ApplicationPluginRepo
             {
                 if (containerApplicationPluginDescriptors == null)
                 {
-                    containerApplicationPluginDescriptors = unmodifiableList(collectContainerApplicationPluginDescriptors());
+                    try
+                    {
+                        containerApplicationPluginDescriptors = unmodifiableList(collectContainerApplicationPluginDescriptors());
+                    }
+                    catch (IOException e)
+                    {
+                        throw new ArtifactDescriptorCreateException("Cannot load application plugin descriptors from container", e);
+                    }
                 }
             }
         }

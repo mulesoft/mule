@@ -8,21 +8,23 @@ package org.mule.runtime.module.launcher;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.PropertiesUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.launcher.application.DuplicateExportedPackageException;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.descriptor.EmptyApplicationDescriptor;
 import org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.PropertiesUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +35,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -48,11 +52,13 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     public static final String SYSTEM_PROPERTY_OVERRIDE = "-O";
 
     private final ApplicationPluginDescriptorFactory pluginDescriptorFactory;
+    private final ApplicationPluginRepository applicationPluginRepository;
 
-    public ApplicationDescriptorFactory(ApplicationPluginDescriptorFactory applicationPluginDescriptorFactory)
+    public ApplicationDescriptorFactory(ApplicationPluginDescriptorFactory applicationPluginDescriptorFactory, ApplicationPluginRepository applicationPluginRepository)
     {
         checkArgument(applicationPluginDescriptorFactory != null, "ApplicationPluginDescriptorFactory cannot be null");
-
+        checkArgument(applicationPluginRepository  != null, "ApplicationPluginRepository cannot be null");
+        this.applicationPluginRepository = applicationPluginRepository;
         this.pluginDescriptorFactory = applicationPluginDescriptorFactory;
     }
 
@@ -85,6 +91,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
             setApplicationProperties(desc, appPropsFile);
 
             final Set<ApplicationPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
+            verifyPluginExportedPackages(getAllApplicationPlugins(plugins));
             desc.setPlugins(plugins);
 
             desc.setSharedPluginLibs(findSharedPluginLibs(appName));
@@ -95,6 +102,30 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
         }
 
         return desc;
+    }
+
+    private List<ApplicationPluginDescriptor> getAllApplicationPlugins(Set<ApplicationPluginDescriptor> plugins)
+    {
+        final List<ApplicationPluginDescriptor> result = new LinkedList<>(applicationPluginRepository.getContainerApplicationPluginDescriptors());
+        result.addAll(plugins);
+        return result;
+    }
+
+    private void verifyPluginExportedPackages(List<ApplicationPluginDescriptor> plugins)
+    {
+        final HashMap<String, String> exportedPackages = new HashMap<>();
+
+        for (ApplicationPluginDescriptor plugin : plugins)
+        {
+            for (String exportedPackage : plugin.getClassLoaderFilter().getExportedClassPackages())
+            {
+                if (exportedPackages.containsKey(exportedPackage))
+                {
+                    throw new DuplicateExportedPackageException(String.format("Package '%s' is exported on plugins '%s' and '%s'", exportedPackage, exportedPackages.get(exportedPackage), plugin.getName()));
+                }
+                exportedPackages.put(exportedPackage, plugin.getName());
+            }
+        }
     }
 
     private Set<ApplicationPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor) throws IOException

@@ -7,9 +7,6 @@
 
 package org.mule.runtime.module.artifact.descriptor;
 
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
-
 import java.io.File;
 
 public class ArtifactDescriptor
@@ -17,7 +14,6 @@ public class ArtifactDescriptor
 
     private String name;
     private File rootFolder;
-    private ClassLoaderFilter classLoaderFilter = ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 
     public String getName()
     {
@@ -42,15 +38,5 @@ public class ArtifactDescriptor
         }
 
         this.rootFolder = rootFolder;
-    }
-
-    public ClassLoaderFilter getClassLoaderFilter()
-    {
-        return classLoaderFilter;
-    }
-
-    public void setClassLoaderFilter(ClassLoaderFilter classLoaderFilter)
-    {
-        this.classLoaderFilter = classLoaderFilter;
     }
 }

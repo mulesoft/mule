@@ -7,56 +7,18 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
-import org.mule.runtime.core.util.StringUtils;
-
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- * Creates {@link ArtifactClassLoaderFilter} instances
+ * Creates {@link ClassLoaderFilter} instances
  */
-public class ArtifactClassLoaderFilterFactory implements ClassLoaderFilterFactory
+public interface ArtifactClassLoaderFilterFactory
 {
 
-    private static final String PACKAGE_SEPARATOR = "/";
-
-    @Override
-    public ClassLoaderFilter create(String exportedClassPackages, String exportedResourcePackages)
-    {
-        Set<String> exportedClasses = getPackages(exportedClassPackages);
-        Set<String> exportedResources = getPackages(exportedResourcePackages);
-
-        if (exportedClasses.isEmpty() && exportedResources.isEmpty())
-        {
-            return ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
-        }
-        else
-        {
-            return new ArtifactClassLoaderFilter(exportedClasses, exportedResources);
-        }
-    }
-
-    private Set<String> getPackages(String exportedPackages)
-    {
-        Set<String> exported = new HashSet<>();
-        if (StringUtils.isNotBlank(exportedPackages))
-        {
-            final String[] exports = exportedPackages.split(",");
-            for (String export : exports)
-            {
-                export = export.trim();
-                if (export.startsWith(PACKAGE_SEPARATOR))
-                {
-                    export = export.substring(1);
-                }
-                if (export.endsWith(PACKAGE_SEPARATOR))
-                {
-                    export = export.substring(0, export.length() -1);
-                }
-                exported.add(export);
-            }
-        }
-
-        return exported;
-    }
+    /**
+     * Creates a filter based on the provided configuration
+     *
+     * @param exportedClassPackages comma separated list of class packages to export. Can be null
+     * @param exportedResourcePackages comma separated list of resource packages to export. Can be null
+     * @return a class loader filter that matches the provided configuration
+     */
+    ArtifactClassLoaderFilter create(String exportedClassPackages, String exportedResourcePackages);
 }

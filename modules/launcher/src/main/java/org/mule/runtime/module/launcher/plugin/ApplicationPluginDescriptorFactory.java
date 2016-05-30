@@ -7,11 +7,11 @@
 
 package org.mule.runtime.module.launcher.plugin;
 
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
@@ -31,13 +31,13 @@ public class ApplicationPluginDescriptorFactory implements ArtifactDescriptorFac
     public static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
     public static final String PLUGIN_PROPERTIES = "plugin.properties";
 
-    private final ClassLoaderFilterFactory classLoaderFilterFactory;
+    private final ArtifactClassLoaderFilterFactory classLoaderFilterFactory;
 
     /**
      * Creates a new instance
      *  @param classLoaderFilterFactory creates classloader filters for the created descriptors. Not null.
      */
-    public ApplicationPluginDescriptorFactory(ClassLoaderFilterFactory classLoaderFilterFactory)
+    public ApplicationPluginDescriptorFactory(ArtifactClassLoaderFilterFactory classLoaderFilterFactory)
     {
         checkArgument(classLoaderFilterFactory != null, "ClassLoaderFilterFactory cannot be null");
 
@@ -68,7 +68,7 @@ public class ApplicationPluginDescriptorFactory implements ArtifactDescriptorFac
             String exportedClasses = props.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY);
             String exportedResources = props.getProperty(EXPORTED_RESOURCE_PACKAGES_PROPERTY);
 
-            final ClassLoaderFilter classLoaderFilter = classLoaderFilterFactory.create(exportedClasses, exportedResources);
+            final ArtifactClassLoaderFilter classLoaderFilter = classLoaderFilterFactory.create(exportedClasses, exportedResources);
             descriptor.setClassLoaderFilter(classLoaderFilter);
         }
 

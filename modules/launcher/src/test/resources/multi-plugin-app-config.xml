@@ -6,6 +6,6 @@
 
     <flow name="main">
         <component class="org.foo.Plugin1Echo"/>
-        <component class="org.foo.Plugin2Echo"/>
+        <component class="org.foo.echo.Plugin2Echo"/>
     </flow>
 </mule>

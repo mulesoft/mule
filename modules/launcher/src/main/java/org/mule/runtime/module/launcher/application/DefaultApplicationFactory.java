@@ -147,7 +147,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application>
         return new CompositeArtifactClassLoader("appPlugins", parent.getClassLoader(), classLoaders, parent.getClassLoaderLookupPolicy());
     }
 
-    private List<ApplicationPlugin> createContainerApplicationPlugins(ArtifactClassLoader parentClassLoader, ApplicationDescriptor appDescriptor) throws IOException
+    private List<ApplicationPlugin> createContainerApplicationPlugins(ArtifactClassLoader parentClassLoader, ApplicationDescriptor appDescriptor)
     {
         final List<ApplicationPlugin> plugins = new LinkedList<>();
 
