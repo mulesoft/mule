@@ -18,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
@@ -26,6 +27,9 @@ import org.mule.runtime.module.extension.file.api.StandardFileSystemOperations;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * File connector used to manipulate file systems mounted on the host
@@ -43,6 +47,10 @@ import java.nio.file.Paths;
 @Sources(DirectoryListener.class)
 public class FileConnector implements Initialisable, FileConnectorConfig
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileConnector.class);
+
+    @ConfigName
+    private String configName;
 
     /**
      * The directory to be considered as the root of every
@@ -70,6 +78,8 @@ public class FileConnector implements Initialisable, FileConnectorConfig
             {
                 throw new InitialisationException(createStaticMessage("Could not obtain user's home directory. Please provide a explicit value for the baseDir parameter"), this);
             }
+
+            LOGGER.warn("File connector '{}' does not specify the baseDir property. Defaulting to '{}'", configName, baseDir);
         }
         Path baseDirPath = Paths.get(baseDir);
         if (Files.notExists(baseDirPath))
