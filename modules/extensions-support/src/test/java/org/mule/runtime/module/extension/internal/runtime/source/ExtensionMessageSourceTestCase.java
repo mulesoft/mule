@@ -25,17 +25,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_MANAGER;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
-import org.mule.runtime.api.metadata.MetadataCache;
-import org.mule.runtime.api.metadata.MetadataContext;
-import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -53,16 +47,13 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.execution.MessageProcessingManager;
-import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.util.ExceptionUtils;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -71,7 +62,6 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
@@ -151,13 +141,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleEvent event;
 
-    @Mock
-    private MetadataMediator metadataMediator;
-
     private ExtensionMessageSource messageSource;
     private final RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
-    @Mock
-    private MuleMetadataManager metadataManager;
 
     @Before
     public void before() throws Exception
@@ -173,9 +158,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         LifecycleUtils.initialiseIfNeeded(retryPolicyTemplate, muleContext);
 
         muleContext.getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
-        MetadataCache value = mock(MetadataCache.class);
-        when(metadataManager.getMetadataCache(anyString())).thenReturn(value);
-        muleContext.getRegistry().registerObject(OBJECT_METADATA_MANAGER, metadataManager);
 
         when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
         when(configurationModel.getSourceModel(SOURCE_NAME)).thenReturn(Optional.of(sourceModel));
@@ -184,76 +166,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         when(configurationProvider.getModel()).thenReturn(configurationModel);
 
         messageSource = getNewExtensionMessageSourceInstance();
-    }
-
-    @Test
-    public void getMetadataUsesClassLoaderModelProperty() throws MetadataResolvingException
-    {
-        final MetadataResult result = mock(MetadataResult.class);
-        final ClassLoader extensionClassLoader = mock(ClassLoader.class);
-        final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-
-        final ValueHolder<ClassLoader> classLoaderHolder = new ValueHolder<>();
-
-        when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(Optional.of(new ClassLoaderModelProperty(extensionClassLoader)));
-        when(metadataMediator.getMetadata()).thenAnswer(invocation -> {
-            classLoaderHolder.set(Thread.currentThread().getContextClassLoader());
-            return result;
-        });
-
-        messageSource.getMetadata();
-
-        assertThat(classLoaderHolder.get(), is(sameInstance(extensionClassLoader)));
-        assertThat(Thread.currentThread().getContextClassLoader(), is(sameInstance(originalClassLoader)));
-        verify(extensionModel).getModelProperty(ClassLoaderModelProperty.class);
-        verify(metadataMediator).getMetadata();
-    }
-
-    @Test
-    public void getMetadataKeysUsesClassLoaderModelProperty() throws MetadataResolvingException, InitialisationException
-    {
-        final MetadataResult result = mock(MetadataResult.class);
-        final ClassLoader extensionClassLoader = mock(ClassLoader.class);
-        final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-
-        final ValueHolder<ClassLoader> classLoaderHolder = new ValueHolder<>();
-
-        when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(Optional.of(new ClassLoaderModelProperty(extensionClassLoader)));
-        when(metadataMediator.getMetadataKeys(any(MetadataContext.class))).thenAnswer(invocation -> {
-            classLoaderHolder.set(Thread.currentThread().getContextClassLoader());
-            return result;
-        });
-
-        messageSource.getMetadataKeys();
-
-        assertThat(classLoaderHolder.get(), is(sameInstance(extensionClassLoader)));
-        assertThat(Thread.currentThread().getContextClassLoader(), is(sameInstance(originalClassLoader)));
-        verify(extensionModel).getModelProperty(ClassLoaderModelProperty.class);
-        verify(metadataMediator).getMetadataKeys(any(MetadataContext.class));
-    }
-
-    @Test
-    public void getMetadataForKeyUsesClassLoaderModelProperty() throws MetadataResolvingException, InitialisationException
-    {
-        final MetadataResult result = mock(MetadataResult.class);
-        final ClassLoader extensionClassLoader = mock(ClassLoader.class);
-        final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-
-        final ValueHolder<ClassLoader> classLoaderHolder = new ValueHolder<>();
-
-        MetadataKey key = mock(MetadataKey.class);
-        when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(Optional.of(new ClassLoaderModelProperty(extensionClassLoader)));
-        when(metadataMediator.getMetadata(any(MetadataContext.class), eq(key))).thenAnswer(invocation -> {
-            classLoaderHolder.set(Thread.currentThread().getContextClassLoader());
-            return result;
-        });
-
-        messageSource.getMetadata(key);
-
-        assertThat(classLoaderHolder.get(), is(sameInstance(extensionClassLoader)));
-        assertThat(Thread.currentThread().getContextClassLoader(), is(sameInstance(originalClassLoader)));
-        verify(extensionModel).getModelProperty(ClassLoaderModelProperty.class);
-        verify(metadataMediator).getMetadata(any(MetadataContext.class), eq(key));
     }
 
     @Test
@@ -486,7 +398,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
 
     private ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException
     {
-        ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, sourceModel, sourceFactory, CONFIG_NAME, threadingProfile, retryPolicyTemplate, extensionManager, metadataMediator);
+        ExtensionMessageSource messageSource = new ExtensionMessageSource(extensionModel, sourceModel, sourceFactory, CONFIG_NAME, threadingProfile, retryPolicyTemplate, extensionManager);
         messageSource.setListener(messageProcessor);
         messageSource.setFlowConstruct(flowConstruct);
         muleContext.getInjector().inject(messageSource);

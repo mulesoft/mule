@@ -89,6 +89,18 @@
         <metadata:content-only-cache-resolver config-ref="config" type="Person"/>
     </flow>
 
+    <flow name="threadContextClassLoaderResolverTypeKeys">
+        <metadata:thread-context-class-loader-resolver-type-keys config-ref="config" type="Person"/>
+    </flow>
+
+    <flow name="threadContextClassLoaderResolverContent">
+        <metadata:thread-context-class-loader-resolver-content config-ref="config"/>
+    </flow>
+
+    <flow name="threadContextClassLoaderResolverOutput">
+        <metadata:thread-context-class-loader-resolver-output config-ref="config"/>
+    </flow>
+
     <flow name="outputAndMetadataKeyCacheResolver">
         <metadata:output-and-metadata-key-cache-resolver config-ref="config" type="Person"/>
     </flow>

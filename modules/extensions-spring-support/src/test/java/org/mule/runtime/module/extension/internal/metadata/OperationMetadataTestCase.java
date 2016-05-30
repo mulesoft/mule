@@ -11,9 +11,11 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
@@ -30,6 +32,7 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.runtime.api.metadata.MetadataCache;
@@ -50,6 +53,7 @@ import org.mule.test.metadata.extension.model.attribute.ShapeOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Circle;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Square;
+import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
 
 import java.io.IOException;
 import java.util.List;
@@ -393,6 +397,24 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     }
 
     @Test
+    public void threadContextClassLoaderResolverTypeKeys() throws Exception
+    {
+        doTestThreadContextClassLoaderResolver(THREAD_CONTEXT_CLASSLOADER_RESOLVER_KEYS, source -> source.metadataManager.getMetadataKeys(componentId));
+    }
+
+    @Test
+    public void threadContextClassLoaderResolverContent() throws Exception
+    {
+        doTestThreadContextClassLoaderResolver(THREAD_CONTEXT_CLASSLOADER_RESOLVER_CONTENT, source -> source.getComponentDynamicMetadata());
+    }
+
+    @Test
+    public void threadContextClassLoaderResolverOutput() throws Exception
+    {
+        doTestThreadContextClassLoaderResolver(THREAD_CONTEXT_CLASSLOADER_RESOLVER_OUTPUT, source -> source.getComponentDynamicMetadata());
+    }
+
+    @Test
     public void shouldInheritOperationResolvers() throws Exception
     {
         componentId = new ProcessorId(SHOULD_INHERIT_OPERATION_RESOLVERS, FIRST_PROCESSOR_INDEX);
@@ -511,4 +533,31 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         assertThat(animalMetadata.getName(), is("animal"));
         assertThat(animalMetadata.getType(), is(toMetadataType(Bear.class)));
     }
+
+    /**
+     * Test template that sets an "invalid" classloader in TCCL different from the one that was used to register the extension
+     * and asserts that, it sets back the original classloader to TCCL.
+     * Done in this way due to it is not possible to change extension model classloader property once it is registered.
+     * @param flowName
+     * @param doAction
+     * @throws Exception
+     */
+    private void doTestThreadContextClassLoaderResolver(String flowName, Callback<OperationMetadataTestCase> doAction) throws Exception
+    {
+        componentId = new ProcessorId(flowName, FIRST_PROCESSOR_INDEX);
+        TestThreadContextClassLoaderResolver.reset();
+        final ClassLoader mockClassLoader = mock(ClassLoader.class);
+        final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            Thread.currentThread().setContextClassLoader(mockClassLoader);
+            doAction.execute(this);
+            assertThat(TestThreadContextClassLoaderResolver.getCurrentState(), is(sameInstance(originalClassLoader)));
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
+        }
+    }
+
 }

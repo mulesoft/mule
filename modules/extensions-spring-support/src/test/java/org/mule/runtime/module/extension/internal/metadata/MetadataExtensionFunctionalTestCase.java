@@ -73,6 +73,9 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG = "resolverWithImplicitDynamicConfig";
     protected static final String OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA = "outputAttributesWithDynamicMetadata";
     protected static final String OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA = "outputAttributesWithDeclaredSubtypesMetadata";
+    protected static final String THREAD_CONTEXT_CLASSLOADER_RESOLVER_KEYS = "threadContextClassLoaderResolverTypeKeys";
+    protected static final String THREAD_CONTEXT_CLASSLOADER_RESOLVER_CONTENT = "threadContextClassLoaderResolverContent";
+    protected static final String THREAD_CONTEXT_CLASSLOADER_RESOLVER_OUTPUT = "threadContextClassLoaderResolverOutput";
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
     protected MetadataType personType;

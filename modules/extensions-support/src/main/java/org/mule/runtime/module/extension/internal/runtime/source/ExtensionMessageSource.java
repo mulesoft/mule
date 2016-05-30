@@ -14,6 +14,7 @@ import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -39,13 +40,11 @@ import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
 import org.mule.runtime.module.extension.internal.runtime.processor.IllegalOperationException;
@@ -92,10 +91,9 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
                                   String configurationProviderName,
                                   ThreadingProfile threadingProfile,
                                   RetryPolicyTemplate retryPolicyTemplate,
-                                  ExtensionManagerAdapter managerAdapter,
-                                  MetadataMediator metadataMediator)
+                                  ExtensionManagerAdapter managerAdapter)
     {
-        super(extensionModel, configurationProviderName, managerAdapter, metadataMediator);
+        super(extensionModel, sourceModel, configurationProviderName, managerAdapter);
         this.sourceModel = sourceModel;
         this.sourceFactory = sourceFactory;
         this.threadingProfile = threadingProfile;

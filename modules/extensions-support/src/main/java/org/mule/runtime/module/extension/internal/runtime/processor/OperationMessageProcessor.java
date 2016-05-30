@@ -18,23 +18,22 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.OperationContext;
 import org.mule.runtime.extension.api.runtime.OperationExecutor;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.core.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +75,7 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
                                      ResolverSet resolverSet,
                                      ExtensionManagerAdapter extensionManager)
     {
-        super(extensionModel, configurationProviderName, extensionManager, new MetadataMediator(extensionModel, operationModel));
+        super(extensionModel, operationModel, configurationProviderName, extensionManager);
         this.extensionModel = extensionModel;
         this.operationModel = operationModel;
         this.resolverSet = resolverSet;

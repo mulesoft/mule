@@ -67,12 +67,12 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     @Inject
     private MuleMetadataManager metadataManager;
 
-    protected ExtensionComponent(RuntimeExtensionModel extensionModel, String configurationProviderName, ExtensionManagerAdapter extensionManager, MetadataMediator metadataMediator)
+    protected ExtensionComponent(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel, String configurationProviderName, ExtensionManagerAdapter extensionManager)
     {
         this.extensionModel = extensionModel;
         this.configurationProviderName = configurationProviderName;
         this.extensionManager = extensionManager;
-        this.metadataMediator = metadataMediator;
+        this.metadataMediator = new MetadataMediator(extensionModel, componentModel);
     }
 
     /**
