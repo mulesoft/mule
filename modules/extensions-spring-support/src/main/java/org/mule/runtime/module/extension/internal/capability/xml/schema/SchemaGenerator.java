@@ -10,9 +10,17 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_PREFIX;
+import org.mule.runtime.extension.api.BaseExtensionWalker;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.connection.HasConnectionProviderModels;
+import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
@@ -49,10 +57,31 @@ public class SchemaGenerator
         validate(extensionModel, xmlModelProperty);
         SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(extensionModel, xmlModelProperty);
 
-        extensionModel.getConfigurationModels().forEach(conf -> schemaBuilder.registerConfigElement((RuntimeConfigurationModel) conf));
-        extensionModel.getOperationModels().forEach(schemaBuilder::registerOperation);
-        extensionModel.getConnectionProviders().forEach(schemaBuilder::registerConnectionProviderElement);
-        extensionModel.getSourceModels().forEach(schemaBuilder::registerMessageSource);
+        new BaseExtensionWalker() {
+            @Override
+            public void onConfiguration(ConfigurationModel model)
+            {
+                schemaBuilder.registerConfigElement((RuntimeConfigurationModel) model);
+            }
+
+            @Override
+            public void onOperation(HasOperationModels owner, OperationModel model)
+            {
+                schemaBuilder.registerOperation(model);
+            }
+
+            @Override
+            public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model)
+            {
+                schemaBuilder.registerConnectionProviderElement(model);
+            }
+
+            @Override
+            public void onSource(HasSourceModels owner, SourceModel model)
+            {
+                schemaBuilder.registerMessageSource(model);
+            }
+        }.walk(extensionModel);
 
         schemaBuilder.registerEnums();
 

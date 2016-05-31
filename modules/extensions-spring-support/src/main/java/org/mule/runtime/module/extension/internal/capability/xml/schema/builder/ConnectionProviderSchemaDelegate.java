@@ -13,18 +13,17 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_POOLING_PROFILE_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.connection.PoolingSupport;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 /**
@@ -33,7 +32,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
  *
  * @since 4.0.0
  */
-final class ConnectionProviderSchemaDelegate
+final class ConnectionProviderSchemaDelegate extends AbstractSchemaDelegate
 {
 
     private final ObjectFactory objectFactory = new ObjectFactory();
@@ -45,8 +44,13 @@ final class ConnectionProviderSchemaDelegate
         this.builder = builder;
     }
 
-    public void registerConnectionProviderElement(Schema schema, ConnectionProviderModel providerModel)
+    public void registerConnectionProviderElement(ConnectionProviderModel providerModel)
     {
+        if (trackElement(providerModel.getName()))
+        {
+            return;
+        }
+
         Element providerElement = new TopLevelElement();
         providerElement.setName(providerModel.getName());
         providerElement.setSubstitutionGroup(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
@@ -61,7 +65,7 @@ final class ConnectionProviderSchemaDelegate
         complexContent.setExtension(providerType);
         complexType.setComplexContent(complexContent);
 
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(providerElement);
+        builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(providerElement);
 
         final ExplicitGroup choice = new ExplicitGroup();
         choice.setMinOccurs(ZERO);

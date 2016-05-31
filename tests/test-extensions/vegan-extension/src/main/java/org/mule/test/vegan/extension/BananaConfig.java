@@ -9,11 +9,13 @@ package org.mule.test.vegan.extension;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 
 @Configuration(name = BANANA)
 @Operations(EatBananaOperation.class)
 @Providers(VeganBananaConnectionProvider.class)
+@Sources(PaulMcCartneySource.class)
 public class BananaConfig
 {
 
