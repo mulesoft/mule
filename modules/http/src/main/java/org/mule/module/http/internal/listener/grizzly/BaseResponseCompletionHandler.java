@@ -7,9 +7,8 @@
 package org.mule.module.http.internal.listener.grizzly;
 
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
-
-import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 
 import java.util.Collection;
@@ -39,7 +38,7 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
         }
         HttpResponsePacket httpResponsePacket = responsePacketBuilder.build();
         httpResponsePacket.setProtocol(sourceRequest.getProtocol());
-        if (httpResponse.getHeaderValue(HttpHeaders.Names.TRANSFER_ENCODING) != null)
+        if (httpResponse.getHeaderValueIgnoreCase(TRANSFER_ENCODING) != null)
         {
             httpResponsePacket.setChunked(true);
         }
