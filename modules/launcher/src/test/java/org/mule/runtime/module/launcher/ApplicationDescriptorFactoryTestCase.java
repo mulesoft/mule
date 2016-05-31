@@ -155,8 +155,8 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase
         }
         catch (DuplicateExportedPackageException e)
         {
-            assertThat(e.getMessage(), containsString("Package org.foo is exported on plugins: plugin1, plugin2"));
-            assertThat(e.getMessage(), containsString("Package org.bar is exported on plugins: plugin1, plugin2"));
+            assertThat(e.getMessage(), containsString("Package org.foo is exported on artifacts: plugin1, plugin2"));
+            assertThat(e.getMessage(), containsString("Package org.bar is exported on artifacts: plugin1, plugin2"));
         }
     }
 

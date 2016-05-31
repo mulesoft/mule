@@ -149,37 +149,8 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
 
         if (error)
         {
-            throw new DuplicateExportedPackageException(buildPackageDuplicationErrorMessage(exportedPackages));
+            throw new DuplicateExportedPackageException(exportedPackages);
         }
-    }
-
-    private String buildPackageDuplicationErrorMessage(Map<String, List<String>> exportedPackages)
-    {
-        StringBuilder errorMessageBuilder = new StringBuilder("There are multiple application plugins exporting the same package:");
-
-        for (String packageName : exportedPackages.keySet())
-        {
-            final List<String> exportedOn = exportedPackages.get((packageName));
-            if (exportedOn.size() > 1)
-            {
-                errorMessageBuilder.append("\nPackage ").append(packageName).append(" is exported on plugins: ");
-                boolean firstPlugin = true;
-                for (String plugin : exportedOn)
-                {
-                    if (firstPlugin)
-                    {
-                        firstPlugin = false;
-                    }
-                    else
-                    {
-                        errorMessageBuilder.append(", ");
-                    }
-                    errorMessageBuilder.append(plugin);
-                }
-            }
-        }
-
-        return errorMessageBuilder.toString();
     }
 
     private Set<ApplicationPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor) throws IOException
