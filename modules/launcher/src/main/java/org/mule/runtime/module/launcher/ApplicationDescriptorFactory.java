@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -108,24 +109,77 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     {
         final List<ApplicationPluginDescriptor> result = new LinkedList<>(applicationPluginRepository.getContainerApplicationPluginDescriptors());
         result.addAll(plugins);
+
+        // Sorts plugins by name to ensure consistent deployment
+        result.sort(new Comparator<ApplicationPluginDescriptor>()
+        {
+            @Override
+            public int compare(ApplicationPluginDescriptor descriptor1, ApplicationPluginDescriptor descriptor2)
+            {
+                return descriptor1.getName().compareTo(descriptor2.getName());
+            }
+        });
+
         return result;
     }
 
     private void verifyPluginExportedPackages(List<ApplicationPluginDescriptor> plugins)
     {
-        final HashMap<String, String> exportedPackages = new HashMap<>();
+        final Map<String, List<String>> exportedPackages = new HashMap<>();
 
+        boolean error = false;
         for (ApplicationPluginDescriptor plugin : plugins)
         {
-            for (String exportedPackage : plugin.getClassLoaderFilter().getExportedClassPackages())
+            for (String packageName : plugin.getClassLoaderFilter().getExportedClassPackages())
             {
-                if (exportedPackages.containsKey(exportedPackage))
+                List<String> exportedOn = exportedPackages.get(packageName);
+
+                if (exportedOn == null)
                 {
-                    throw new DuplicateExportedPackageException(String.format("Package '%s' is exported on plugins '%s' and '%s'", exportedPackage, exportedPackages.get(exportedPackage), plugin.getName()));
+                    exportedOn = new LinkedList<>();
+                    exportedPackages.put(packageName, exportedOn);
                 }
-                exportedPackages.put(exportedPackage, plugin.getName());
+                else
+                {
+                    error = true;
+                }
+                exportedOn.add(plugin.getName());
             }
         }
+
+        if (error)
+        {
+            throw new DuplicateExportedPackageException(buildPackageDuplicationErrorMessage(exportedPackages));
+        }
+    }
+
+    private String buildPackageDuplicationErrorMessage(Map<String, List<String>> exportedPackages)
+    {
+        StringBuilder errorMessageBuilder = new StringBuilder("There are multiple application plugins exporting the same package:");
+
+        for (String packageName : exportedPackages.keySet())
+        {
+            final List<String> exportedOn = exportedPackages.get((packageName));
+            if (exportedOn.size() > 1)
+            {
+                errorMessageBuilder.append("\nPackage ").append(packageName).append(" is exported on plugins: ");
+                boolean firstPlugin = true;
+                for (String plugin : exportedOn)
+                {
+                    if (firstPlugin)
+                    {
+                        firstPlugin = false;
+                    }
+                    else
+                    {
+                        errorMessageBuilder.append(", ");
+                    }
+                    errorMessageBuilder.append(plugin);
+                }
+            }
+        }
+
+        return errorMessageBuilder.toString();
     }
 
     private Set<ApplicationPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor) throws IOException

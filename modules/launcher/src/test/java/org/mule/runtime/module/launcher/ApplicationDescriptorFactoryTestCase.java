@@ -8,10 +8,12 @@ package org.mule.runtime.module.launcher;
 
 import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.copyFile;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
@@ -74,8 +77,10 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase
 
         final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(pluginDescriptorFactory, applicationPluginRepository);
         final ApplicationPluginDescriptor expectedPluginDescriptor1 = mock(ApplicationPluginDescriptor.class);
+        when(expectedPluginDescriptor1.getName()).thenReturn("plugin1");
         when(expectedPluginDescriptor1.getClassLoaderFilter()).thenReturn(ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER);
         final ApplicationPluginDescriptor expectedPluginDescriptor2 = mock(ApplicationPluginDescriptor.class);
+        when(expectedPluginDescriptor2.getName()).thenReturn("plugin2");
         when(expectedPluginDescriptor2.getClassLoaderFilter()).thenReturn(ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER);
         when(pluginDescriptorFactory.create(any())).thenReturn(expectedPluginDescriptor1).thenReturn(expectedPluginDescriptor2);
 
@@ -101,38 +106,58 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase
         assertThat(sharedPluginLibs[0].toExternalForm(), endsWith(JAR_FILE_NAME));
     }
 
-    @Test(expected = DuplicateExportedPackageException.class)
+    @Test
     public void validatesExportedPackageDuplication() throws Exception
     {
         File pluginDir = getAppPluginsFolder(APP_NAME);
         pluginDir.mkdirs();
-        final File pluginFile = new ApplicationPluginFileBuilder("plugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").getArtifactFile();
+
+        final File pluginFile = createApplicationPluginFile();
         copyFile(pluginFile, new File(pluginDir, "plugin1.zip"));
         copyFile(pluginFile, new File(pluginDir, "plugin2.zip"));
 
-        final ApplicationPluginDescriptorFactory pluginDescriptorFactory = new ApplicationPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory());
-        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(pluginDescriptorFactory, applicationPluginRepository);
-
-        applicationDescriptorFactory.create(getAppFolder(APP_NAME));
+        doPackageValidationTest(applicationPluginRepository);
     }
 
-    @Test(expected = DuplicateExportedPackageException.class)
+    @Test
     public void validatesExportedPackageDuplicationAgainstContainerPlugin() throws Exception
     {
         File pluginDir = getAppPluginsFolder(APP_NAME);
         pluginDir.mkdirs();
-        final File pluginFile = new ApplicationPluginFileBuilder("plugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").getArtifactFile();
-        copyFile(pluginFile, new File(pluginDir, "plugin1.zip"));
+        copyFile(createApplicationPluginFile(), new File(pluginDir, "plugin1.zip"));
 
-        final ApplicationPluginDescriptorFactory pluginDescriptorFactory = new ApplicationPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory());
         final ApplicationPluginRepository applicationPluginRepository = mock(ApplicationPluginRepository.class);
         final ApplicationPluginDescriptor plugin2Descriptor = new ApplicationPluginDescriptor();
         plugin2Descriptor.setName("plugin2");
-        plugin2Descriptor.setClassLoaderFilter(new ArtifactClassLoaderFilter(Collections.singleton("org.foo"), Collections.emptySet()));
+        final Set<String> exportedPackages = new HashSet<>();
+        exportedPackages.add("org.foo");
+        exportedPackages.add("org.bar");
+        plugin2Descriptor.setClassLoaderFilter(new ArtifactClassLoaderFilter(exportedPackages, Collections.emptySet()));
         when(applicationPluginRepository.getContainerApplicationPluginDescriptors()).thenReturn(Collections.singletonList(plugin2Descriptor));
+
+        doPackageValidationTest(applicationPluginRepository);
+    }
+
+    private File createApplicationPluginFile() throws Exception
+    {
+        return new ApplicationPluginFileBuilder("plugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo, org.bar").getArtifactFile();
+    }
+
+    private void doPackageValidationTest(ApplicationPluginRepository applicationPluginRepository)
+    {
+        final ApplicationPluginDescriptorFactory pluginDescriptorFactory = new ApplicationPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory());
         final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(pluginDescriptorFactory, applicationPluginRepository);
 
-        applicationDescriptorFactory.create(getAppFolder(APP_NAME));
+        try
+        {
+            applicationDescriptorFactory.create(getAppFolder(APP_NAME));
+            fail("Descriptor creation was supposed to fail as the same packages are exported by two plugins");
+        }
+        catch (DuplicateExportedPackageException e)
+        {
+            assertThat(e.getMessage(), containsString("Package org.foo is exported on plugins: plugin1, plugin2"));
+            assertThat(e.getMessage(), containsString("Package org.bar is exported on plugins: plugin1, plugin2"));
+        }
     }
 
     private void copyResourceAs(String resourceName, File folder, String fileName) throws IOException

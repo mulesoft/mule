@@ -8,7 +8,7 @@
 package org.mule.runtime.module.artifact.classloader;
 
 /**
- * Creates {@link ClassLoaderFilter} instances
+ * Creates {@link ArtifactClassLoaderFilter} instances
  */
 public interface ArtifactClassLoaderFilterFactory
 {
