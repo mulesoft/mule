@@ -27,7 +27,6 @@ import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.util.ServiceLoader;
-import java.util.function.Function;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
