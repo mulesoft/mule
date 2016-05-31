@@ -45,12 +45,6 @@ public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
         super(variant, configResources);
     }
 
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        return (AbstractEncryptionStrategyTestCase.isCryptographyExtensionInstalled() == false);
-    }
-
     @Test
     public void testAuthenticationAuthorised() throws Exception
     {
