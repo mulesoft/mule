@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -50,6 +51,7 @@ import java.util.Locale;
 @Operations({CommonValidationOperations.class, CustomValidatorOperation.class, ValidationStrategies.class, NumberValidationOperation.class})
 @Extensible(alias = "validator-message-processor")
 @StudioProvidedEditor
+@Export(resources = {"/META-INF/services/org/mule/runtime/core/i18n"})
 public class ValidationExtension extends AbstractAnnotatedObject implements Config, NamedObject, Initialisable, MuleContextAware
 {
 

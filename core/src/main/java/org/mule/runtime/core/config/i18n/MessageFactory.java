@@ -47,7 +47,7 @@ public abstract class MessageFactory
      */
     protected static String getBundlePath(String bundleName)
     {
-        return "META-INF.services.org.mule.runtime.core.i18n." + bundleName + "-messages";
+        return "META-INF/services/org/mule/runtime/core/i18n/" + bundleName + "-messages";
     }
     
     /**
