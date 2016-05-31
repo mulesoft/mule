@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 
 @Configuration(name = APPLE)
 @Operations(EatAppleOperation.class)
-@Sources(HarvestApplesSource.class)
+@Sources({HarvestApplesSource.class, PaulMcCartneySource.class})
 @Providers(VeganAppleConnectionProvider.class)
 public class AppleConfig
 {

@@ -60,10 +60,6 @@ final class ConfigurationSchemaDelegate
         addDynamicConfigPolicyElement(choice, configurationModel);
         builder.registerParameters(config, choice, configurationModel.getParameterModels());
         config.setAnnotation(builder.createDocAnnotation(configurationModel.getDescription()));
-
-        configurationModel.getOperationModels().forEach(builder::registerOperation);
-        configurationModel.getConnectionProviders().forEach(builder::registerConnectionProviderElement);
-        configurationModel.getSourceModels().forEach(builder::registerMessageSource);
     }
 
     private ExtensionType registerExtension(String name)

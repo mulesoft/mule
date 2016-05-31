@@ -15,7 +15,6 @@ import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 import javax.xml.namespace.QName;
@@ -26,20 +25,22 @@ import javax.xml.namespace.QName;
  *
  * @since 4.0.0
  */
-class SourceSchemaDelegate
+class SourceSchemaDelegate extends AbstractSchemaDelegate
 {
 
     private final SchemaBuilder builder;
-    private Schema schema;
 
     public SourceSchemaDelegate(SchemaBuilder builder)
     {
         this.builder = builder;
     }
 
-    public void registerMessageSource(Schema schema, SourceModel sourceModel)
+    public void registerMessageSource(SourceModel sourceModel)
     {
-        this.schema = schema;
+        if (trackElement(sourceModel.getName()))
+        {
+            return;
+        }
 
         String typeName = capitalize(sourceModel.getName()) + TYPE_SUFFIX;
         registerSourceElement(sourceModel, typeName);
@@ -50,10 +51,10 @@ class SourceSchemaDelegate
     {
         Element element = new TopLevelElement();
         element.setName(hyphenize(sourceModel.getName()));
-        element.setType(new QName(schema.getTargetNamespace(), typeName));
+        element.setType(new QName(builder.getSchema().getTargetNamespace(), typeName));
         element.setAnnotation(builder.createDocAnnotation(sourceModel.getDescription()));
         element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_SOURCE);
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
+        builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
 
     private void registerSourceType(String name, SourceModel sourceModel)

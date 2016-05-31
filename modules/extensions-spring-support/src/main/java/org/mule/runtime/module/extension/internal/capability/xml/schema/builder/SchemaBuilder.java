@@ -268,7 +268,7 @@ public final class SchemaBuilder
 
     public SchemaBuilder registerConnectionProviderElement(ConnectionProviderModel providerModel)
     {
-        connectionProviderSchemaDelegate.registerConnectionProviderElement(schema, providerModel);
+        connectionProviderSchemaDelegate.registerConnectionProviderElement(providerModel);
         return this;
     }
 
@@ -285,14 +285,14 @@ public final class SchemaBuilder
 
     public SchemaBuilder registerOperation(OperationModel operationModel)
     {
-        operationSchemaDelegate.registerOperation(schema, operationModel);
+        operationSchemaDelegate.registerOperation(operationModel);
         return this;
     }
 
     public SchemaBuilder registerMessageSource(SourceModel sourceModel)
     {
 
-        sourceSchemaDelegate.registerMessageSource(schema, sourceModel);
+        sourceSchemaDelegate.registerMessageSource(sourceModel);
         return this;
     }
 
@@ -1136,6 +1136,11 @@ public final class SchemaBuilder
         }
 
         return attr;
+    }
+
+    Schema getSchema()
+    {
+        return schema;
     }
 
     Annotation createDocAnnotation(String content)
