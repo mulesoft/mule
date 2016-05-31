@@ -43,7 +43,7 @@ public class TestMetadataResolverUtils
 
     public static MetadataType getMetadata(String key) throws MetadataResolvingException
     {
-        final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(new MetadataFormat(key, key, APPLICATION_JAVA_MIME_TYPE)).objectType();
+        final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA).objectType();
 
         switch (key)
         {
@@ -60,7 +60,7 @@ public class TestMetadataResolverUtils
                 objectBuilder.addField().key(AGE).value().numberType();
                 break;
             default:
-                throw new MetadataResolvingException("Uknown key " + key, FailureCode.INVALID_METADATA_KEY);
+                throw new MetadataResolvingException("Unknown key " + key, FailureCode.INVALID_METADATA_KEY);
         }
 
         return objectBuilder.build();

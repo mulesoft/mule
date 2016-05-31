@@ -9,6 +9,10 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -32,6 +36,9 @@ import org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -76,6 +83,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String RESOLVER_KEYS_WITH_CONTEXT_CLASSLOADER = "resolverTypeKeysWithContextClassLoader";
     protected static final String RESOLVER_CONTENT_WITH_CONTEXT_CLASSLOADER = "resolverContentWithContextClassLoader";
     protected static final String RESOLVER_OUTPUT_WITH_CONTEXT_CLASSLOADER = "resolverOutputWithContextClassLoader";
+    protected static final String KEY_NAME = "key";
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
     protected MetadataType personType;
@@ -109,14 +117,15 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
 
     protected ComponentMetadataDescriptor getComponentDynamicMetadata()
     {
-        return getComponentDynamicMetadata(personKey);
+        return getComponentDynamicMetadata(personKey.getId());
     }
 
-    protected ComponentMetadataDescriptor getComponentDynamicMetadata(MetadataKey key)
+    protected ComponentMetadataDescriptor getComponentDynamicMetadata(String key)
     {
-        MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId, key);
+        MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId, Collections.singletonMap(KEY_NAME, key));
         assertThat(componentMetadata.getFailure().isPresent() ? componentMetadata.getFailure().get().getReason() : "No Failure",
                    componentMetadata.isSuccess(), is(true));
+
         return componentMetadata.get();
     }
 
@@ -179,5 +188,19 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
             assertThat(param.getName(), is(name));
         }
         assertThat(param.getType(), is(type));
+    }
+
+    protected Map<String, String> getMultilevelKey()
+    {
+        final HashMap<String, String> map = new HashMap<>();
+        map.put("continent", AMERICA);
+        map.put("country", USA);
+        map.put("city", SAN_FRANCISCO);
+        return map;
+    }
+
+    MetadataResult<ComponentMetadataDescriptor> getMetadata(String key)
+    {
+        return metadataManager.getMetadata(componentId, Collections.singletonMap(KEY_NAME, key));
     }
 }
