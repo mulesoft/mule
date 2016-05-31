@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.launcher;
 
-
-
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -22,6 +24,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -41,6 +44,15 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase
         setSystemProperty("-Omule.mmc", "evenCooler");
     }
 
+    private ApplicationPluginRepository applicationPluginRepository;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        applicationPluginRepository = mock(ApplicationPluginRepository.class);
+        when(applicationPluginRepository.getContainerApplicationPluginDescriptors()).thenReturn(emptyList());
+    }
+
     @Test
     public void testOverrides() throws Exception
     {
@@ -51,7 +63,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase
         input.close();
         output.close();
         ApplicationDescriptor descriptor = new ApplicationDescriptor();
-        ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory()));
+        ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory()), applicationPluginRepository);
         applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
         Map<String, String>appProps = descriptor.getAppProperties();
         assertEquals("state", appProps.get("texas"));

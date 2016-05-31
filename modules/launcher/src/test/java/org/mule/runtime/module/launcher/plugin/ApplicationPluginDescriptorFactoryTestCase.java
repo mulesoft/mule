@@ -20,7 +20,7 @@ import static org.mule.runtime.module.launcher.plugin.ApplicationPluginDescripto
 import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.FileUtils;
@@ -44,7 +44,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
     @Rule
     public TemporaryFolder pluginsFolder = new TemporaryFolder();
 
-    private final ClassLoaderFilterFactory classLoaderFilterFactory = mock(ClassLoaderFilterFactory.class);
+    private final ArtifactClassLoaderFilterFactory classLoaderFilterFactory = mock(ArtifactClassLoaderFilterFactory.class);
     private ApplicationPluginDescriptorFactory descriptorFactory = new ApplicationPluginDescriptorFactory(classLoaderFilterFactory);
 
     @Before
@@ -71,7 +71,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
         final String exportedClassPackages = "org.foo, org.bar";
         new PluginPropertiesBuilder(pluginFolder).exportingClassesFrom(exportedClassPackages).build();
 
-        final ClassLoaderFilter classLoaderFilter = mock(ClassLoaderFilter.class);
+        final ArtifactClassLoaderFilter classLoaderFilter = mock(ArtifactClassLoaderFilter.class);
         when(classLoaderFilterFactory.create(exportedClassPackages, null)).thenReturn(classLoaderFilter);
 
         final ApplicationPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
@@ -87,7 +87,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
         final String exportedResourcePackages = "META-INF, META-INF/xml";
         new PluginPropertiesBuilder(pluginFolder).exportingResourcesFrom(exportedResourcePackages).build();
 
-        final ClassLoaderFilter classLoaderFilter = mock(ClassLoaderFilter.class);
+        final ArtifactClassLoaderFilter classLoaderFilter = mock(ArtifactClassLoaderFilter.class);
         when(classLoaderFilterFactory.create(null, exportedResourcePackages)).thenReturn(classLoaderFilter);
 
         final ApplicationPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);

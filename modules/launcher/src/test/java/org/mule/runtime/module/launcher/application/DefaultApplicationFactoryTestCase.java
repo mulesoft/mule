@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
@@ -74,7 +74,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
         final ApplicationPlugin appPlugin = mock(ApplicationPlugin.class);
         final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
         when(appPlugin.getArtifactClassLoader()).thenReturn(artifactClassLoader);
-        final ClassLoaderFilter classLoaderFilter = mock(ClassLoaderFilter.class);
+        final ArtifactClassLoaderFilter classLoaderFilter = mock(ArtifactClassLoaderFilter.class);
         when(coreApplicationPluginDescriptor.getClassLoaderFilter()).thenReturn(classLoaderFilter);
         when(appPlugin.getDescriptor()).thenReturn(coreApplicationPluginDescriptor);
         when(applicationPluginFactory.create(same(coreApplicationPluginDescriptor), any())).thenReturn(appPlugin);

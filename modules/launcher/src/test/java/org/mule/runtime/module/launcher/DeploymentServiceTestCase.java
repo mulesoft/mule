@@ -126,7 +126,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private final ApplicationPluginFileBuilder echoPlugin = new ApplicationPluginFileBuilder("echoPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar");
     private final ApplicationPluginFileBuilder echoPluginWithLib1 = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/bar-1.0.jar").containingClass("org/foo/Plugin1Echo.clazz");
     private final ApplicationPluginFileBuilder echoPluginWithoutLib1 = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz");
-    private final ApplicationPluginFileBuilder echoPluginWithLib2 = new ApplicationPluginFileBuilder("echoPlugin2").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/Plugin2Echo.clazz");
+    private final ApplicationPluginFileBuilder echoPluginWithLib2 = new ApplicationPluginFileBuilder("echoPlugin2").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo").usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/echo/Plugin2Echo.clazz");
     private final ApplicationPluginFileBuilder pluginWithResource = new ApplicationPluginFileBuilder("resourcePlugin").configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/").containingResource("pluginResourceSource.properties", "pluginResource.properties");
 
     // Application file builders
@@ -137,7 +137,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private final ApplicationFileBuilder brokenAppFileBuilder = new ApplicationFileBuilder("broken-app").corrupted();
     private final ApplicationFileBuilder incompleteAppFileBuilder = new ApplicationFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
     private final ApplicationFileBuilder echoPluginAppFileBuilder = new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml").containingPlugin(echoPlugin);
-    private final ApplicationFileBuilder differentLibPluginAppFileBuilder = new ApplicationFileBuilder("appWithLibDifferentThanPlugin").definedBy("app-plugin-different-lib-config.xml").containingPlugin(echoPluginWithLib1).usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/Plugin2Echo.clazz");
+    private final ApplicationFileBuilder differentLibPluginAppFileBuilder = new ApplicationFileBuilder("appWithLibDifferentThanPlugin").definedBy("app-plugin-different-lib-config.xml").containingPlugin(echoPluginWithLib1).usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/echo/Plugin2Echo.clazz");
     private final ApplicationFileBuilder multiLibPluginAppFileBuilder = new ApplicationFileBuilder("multiPluginLibVersion").definedBy("multi-plugin-app-config.xml").containingPlugin(echoPluginWithLib1).containingPlugin(echoPluginWithLib2);
     private final ApplicationFileBuilder resourcePluginAppFileBuilder = new ApplicationFileBuilder("dummyWithPluginResource").definedBy("plugin-resource-app-config.xml").containingPlugin(pluginWithResource);
     private final ApplicationFileBuilder sharedLibPluginAppFileBuilder = new ApplicationFileBuilder("shared-plugin-lib-app").definedBy("app-with-echo1-plugin-config.xml").containingPlugin(echoPluginWithoutLib1).sharingLibrary("lib/bar-1.0.jar");
@@ -1333,7 +1333,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         installContainerPlugin(echoPlugin);
 
-        final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml").containingPlugin(echoPluginWithLib1);
+        final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml");
         addPackedAppFromBuilder(applicationFileBuilder);
 
         deploymentService.start();
@@ -1341,7 +1341,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
         assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
         assertContainerAppPluginExplodedDir(new String[] {echoPlugin.getDeployedPath()});
-        assertAppExplodedPluginsDir(applicationFileBuilder.getDeployedPath(), new String[] {echoPluginWithLib1.getDeployedPath()});
     }
 
     @Test
@@ -1349,7 +1348,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         installContainerPluginExpanded(echoPlugin);
 
-        final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml").containingPlugin(echoPluginWithLib1);
+        final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml");
         addPackedAppFromBuilder(applicationFileBuilder);
 
         deploymentService.start();
@@ -1357,7 +1356,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
         assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
         assertContainerAppPluginExplodedDir(new String[] {echoPlugin.getDeployedPath()});
-        assertAppExplodedPluginsDir(applicationFileBuilder.getDeployedPath(), new String[] {echoPluginWithLib1.getDeployedPath()});
     }
 
     @Test

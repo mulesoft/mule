@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.util.Collections.unmodifiableSet;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.core.util.StringUtils;
@@ -49,8 +50,8 @@ public class ArtifactClassLoaderFilter implements ClassLoaderFilter
         checkArgument(exportedClassPackages != null, "Exported class packages cannot be null");
         checkArgument(exportedResourcePackages != null, "Exported resource packages cannot be null");
 
-        this.exportedClassPackages = exportedClassPackages;
-        this.exportedResourcePackages = exportedResourcePackages;
+        this.exportedClassPackages = unmodifiableSet(exportedClassPackages);
+        this.exportedResourcePackages = unmodifiableSet(exportedResourcePackages);
     }
 
     @Override
@@ -69,6 +70,14 @@ public class ArtifactClassLoaderFilter implements ClassLoaderFilter
         final String resourcePackage = getResourceFolder(name);
 
         return exportedResourcePackages.contains(resourcePackage);
+    }
+
+    /**
+     * @return exported class packages configured on this filter. Non null.
+     */
+    public Set<String> getExportedClassPackages()
+    {
+        return exportedClassPackages;
     }
 
     private String getResourceFolder(String resourceName)
