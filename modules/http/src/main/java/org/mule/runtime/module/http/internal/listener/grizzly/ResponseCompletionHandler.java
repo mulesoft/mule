@@ -7,18 +7,15 @@
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.http.api.HttpConstants;
-import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
-import org.mule.runtime.core.util.Preconditions;
 
 import java.io.IOException;
 
@@ -28,8 +25,8 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
-import org.glassfish.grizzly.memory.Buffers;
 import org.glassfish.grizzly.http.HttpServerFilter;
+import org.glassfish.grizzly.memory.Buffers;
 
 /**
  * {@link org.glassfish.grizzly.CompletionHandler}, responsible for asynchronous response writing
@@ -71,7 +68,7 @@ public class ResponseCompletionHandler
         }
         HttpContent.Builder contentBuilder = HttpContent.builder(httpResponsePacket);
         //For some reason, grizzly tries to send Transfer-Encoding: chunk even if the content-length is set.
-        if (httpResponse.getHeaderValue(CONTENT_LENGTH.toLowerCase()) != null)
+        if (httpResponse.getHeaderValueIgnoreCase(CONTENT_LENGTH) != null)
         {
             contentBuilder.last(true);
         }

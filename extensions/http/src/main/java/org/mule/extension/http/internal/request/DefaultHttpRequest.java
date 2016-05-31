@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import org.mule.module.http.internal.domain.BaseHttpMessage;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpProtocol;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
@@ -22,7 +23,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class DefaultHttpRequest implements HttpRequest
+public class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest
 {
 
     private final String uri;

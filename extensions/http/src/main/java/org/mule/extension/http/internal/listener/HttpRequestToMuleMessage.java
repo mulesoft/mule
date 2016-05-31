@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -56,7 +57,7 @@ public class HttpRequestToMuleMessage
                 }
                 else
                 {
-                    final String contentTypeValue = request.getHeaderValue(HttpHeaders.Names.CONTENT_TYPE);
+                    final String contentTypeValue = request.getHeaderValueIgnoreCase(CONTENT_TYPE);
                     if (contentTypeValue != null)
                     {
                         final MediaType mediaType = MediaType.parse(contentTypeValue);

@@ -405,7 +405,7 @@ public class GrizzlyHttpClient implements HttpClient
 
         if (!usePersistentConnections)
         {
-            String connectionHeaderValue = request.getHeaderValue(CONNECTION);
+            String connectionHeaderValue = request.getHeaderValueIgnoreCase(CONNECTION);
             if (connectionHeaderValue != null && !CLOSE.equals(connectionHeaderValue) && logger.isDebugEnabled())
             {
                 logger.debug("Persistent connections are disabled in the HTTP requester configuration, but the request already " +

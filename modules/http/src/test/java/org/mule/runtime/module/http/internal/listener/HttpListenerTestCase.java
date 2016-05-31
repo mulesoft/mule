@@ -111,7 +111,7 @@ public class HttpListenerTestCase extends AbstractMuleTestCase
         }).when(responseCallback).responseReady(any(HttpResponse.class), any(ResponseStatusCallback.class));
 
         HttpRequest request = buildGetRootRequest(HTTP_1_1);
-        when(request.getHeaderValue("host")).thenReturn("localhost");
+        when(request.getHeaderValueIgnoreCase(HOST)).thenReturn("localhost");
         HttpRequestContext requestContext = buildRequestContext(request);
 
         requestHandlerRef.get().handleRequest(requestContext, responseCallback);

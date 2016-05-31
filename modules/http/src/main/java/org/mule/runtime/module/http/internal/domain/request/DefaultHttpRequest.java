@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.domain.request;
 
+import org.mule.module.http.internal.domain.BaseHttpMessage;
 import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpProtocol;
@@ -14,7 +15,7 @@ import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class DefaultHttpRequest implements HttpRequest
+public class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest
 {
 
     private final String uri;

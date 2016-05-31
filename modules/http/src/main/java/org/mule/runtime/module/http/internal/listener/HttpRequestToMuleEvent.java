@@ -9,6 +9,8 @@ package org.mule.runtime.module.http.internal.listener;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ALL_INTERFACES_IP;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
@@ -86,7 +88,7 @@ public class HttpRequestToMuleEvent
                 }
                 else
                 {
-                    final String contentTypeValue = request.getHeaderValue(HttpHeaders.Names.CONTENT_TYPE);
+                    final String contentTypeValue = request.getHeaderValueIgnoreCase(CONTENT_TYPE);
                     if (contentTypeValue != null)
                     {
                         final MediaType mediaType = MediaType.parse(contentTypeValue);
@@ -159,7 +161,7 @@ public class HttpRequestToMuleEvent
      */
     private static String resolveTargetHost(HttpRequest request)
     {
-        String hostHeaderValue = request.getHeaderValue("host");
+        String hostHeaderValue = request.getHeaderValueIgnoreCase(HOST);
         if (HTTP_1_0.equals(request.getProtocol()) || HTTP_0_9.equals(request.getProtocol()))
         {
             return hostHeaderValue == null ? ALL_INTERFACES_IP : hostHeaderValue;
