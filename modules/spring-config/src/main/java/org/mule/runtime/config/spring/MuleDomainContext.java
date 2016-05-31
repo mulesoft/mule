@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring;
 
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-
+import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.processors.ContextExclusiveInjectorProcessor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.config.ConfigResource;
@@ -39,6 +39,11 @@ final class MuleDomainContext extends MuleArtifactContext
     protected Class<MuleDomainBeanDefinitionDocumentReader> getBeanDefinitionDocumentReaderClass()
     {
         return MuleDomainBeanDefinitionDocumentReader.class;
+    }
+
+    protected MuleBeanDefinitionDocumentReader createBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory)
+    {
+        return new MuleDomainBeanDefinitionDocumentReader(beanDefinitionFactory);
     }
 
     @Override

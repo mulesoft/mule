@@ -27,6 +27,7 @@ import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.util.ServiceLoader;
+import java.util.function.Function;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
@@ -209,7 +210,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
     protected BeanDefinitionReader createBeanDefinitionReader(DefaultListableBeanFactory beanFactory)
     {
-        beanDefinitionReader = new MuleXmlBeanDefinitionReader(beanFactory, beanDefinitionFactory);
+        beanDefinitionReader = new MuleXmlBeanDefinitionReader(beanFactory, createBeanDefinitionDocumentReader(beanDefinitionFactory));
         // annotate parsed elements with metadata
         beanDefinitionReader.setDocumentLoader(createLoader());
         // hook in our custom hierarchical reader
@@ -219,6 +220,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         registerAnnotationConfigProcessors(beanDefinitionReader.getRegistry(), null);
 
         return beanDefinitionReader;
+    }
+
+    protected MuleBeanDefinitionDocumentReader createBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory)
+    {
+        return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory);
     }
 
     protected MuleDocumentLoader createLoader()

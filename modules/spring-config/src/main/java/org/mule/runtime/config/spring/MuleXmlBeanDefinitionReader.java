@@ -34,10 +34,10 @@ public class MuleXmlBeanDefinitionReader extends XmlBeanDefinitionReader impleme
      * @param registry the BeanFactory to load bean definitions into,
      *                 in the form of a BeanDefinitionRegistry
      */
-    public MuleXmlBeanDefinitionReader(BeanDefinitionRegistry registry, BeanDefinitionFactory beanDefinitionFactory)
+    public MuleXmlBeanDefinitionReader(BeanDefinitionRegistry registry, MuleBeanDefinitionDocumentReader beanDefinitionDocumentReader)
     {
         super(registry);
-        beanDefinitionDocumentReader = new MuleBeanDefinitionDocumentReader(beanDefinitionFactory);
+        this.beanDefinitionDocumentReader = beanDefinitionDocumentReader;;
     }
 
     @Override
