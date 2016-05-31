@@ -6,10 +6,12 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.api.MuleRuntimeException;
-import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
+import org.mule.module.http.internal.domain.BaseHttpMessage;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.HttpEntity;
 import org.mule.module.http.internal.domain.HttpProtocol;
@@ -28,7 +30,7 @@ import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.Protocol;
 import org.glassfish.grizzly.utils.BufferInputStream;
 
-public class GrizzlyHttpRequestAdapter implements HttpRequest
+public class GrizzlyHttpRequestAdapter extends BaseHttpMessage implements HttpRequest
 {
 
     private final HttpRequestPacket requestPacket;
@@ -49,7 +51,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
         this.requestPacket = (HttpRequestPacket) httpContent.getHttpHeader();
         isTransferEncodingChunked = httpContent.getHttpHeader().isChunked();
         int contentLengthAsInt = 0;
-        String contentLengthAsString = requestPacket.getHeader(HttpHeaders.Names.CONTENT_LENGTH);
+        String contentLengthAsString = requestPacket.getHeader(CONTENT_LENGTH);
         if (contentLengthAsString != null)
         {
             contentLengthAsInt = Integer.parseInt(contentLengthAsString);
@@ -112,7 +114,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
         {
             initializeHeaders();
         }
-        return this.headers.get(headerName.toLowerCase());
+        return this.headers.get(headerName);
     }
 
     @Override
@@ -122,7 +124,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
         {
             initializeHeaders();
         }
-        return this.headers.getAll(headerName.toLowerCase());
+        return this.headers.getAll(headerName);
     }
 
     private void initializeHeaders()
@@ -146,7 +148,7 @@ public class GrizzlyHttpRequestAdapter implements HttpRequest
         {
             if (this.body == null)
             {
-                final String contentTypeValue = getHeaderValue(HttpHeaders.Names.CONTENT_TYPE);
+                final String contentTypeValue = getHeaderValueIgnoreCase(CONTENT_TYPE);
                 if (contentTypeValue != null && contentTypeValue.contains("multipart"))
                 {
                     final Collection<HttpPart> parts = HttpParser.parseMultipartContent(requestContent, contentTypeValue);

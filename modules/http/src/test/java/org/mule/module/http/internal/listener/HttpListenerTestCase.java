@@ -23,7 +23,6 @@ import static org.mule.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_1;
 import static org.mule.module.http.internal.listener.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
-
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleConfiguration;
@@ -111,7 +110,7 @@ public class HttpListenerTestCase extends AbstractMuleTestCase
         }).when(responseCallback).responseReady(any(HttpResponse.class), any(ResponseStatusCallback.class));
 
         HttpRequest request = buildGetRootRequest(HTTP_1_1);
-        when(request.getHeaderValue("host")).thenReturn("localhost");
+        when(request.getHeaderValueIgnoreCase(HOST)).thenReturn("localhost");
         HttpRequestContext requestContext = buildRequestContext(request);
 
         requestHandlerRef.get().handleRequest(requestContext, responseCallback);

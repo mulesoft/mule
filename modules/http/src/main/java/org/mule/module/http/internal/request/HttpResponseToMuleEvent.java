@@ -73,7 +73,7 @@ public class HttpResponseToMuleEvent
 
     public void convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException
     {
-        String responseContentType = response.getHeaderValue(CONTENT_TYPE.toLowerCase());
+        String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
         DataType<?> dataType = muleEvent.getMessage().getDataType();
         if (StringUtils.isEmpty(responseContentType) && !MimeTypes.ANY.equals(dataType.getMimeType()))
         {
@@ -220,8 +220,8 @@ public class HttpResponseToMuleEvent
 
     private void processCookies(HttpResponse response, String uri)
     {
-        Collection<String> setCookieHeader = response.getHeaderValues(SET_COOKIE.toLowerCase());
-        Collection<String> setCookie2Header = response.getHeaderValues(SET_COOKIE2.toLowerCase());
+        Collection<String> setCookieHeader = response.getHeaderValuesIgnoreCase(SET_COOKIE);
+        Collection<String> setCookie2Header = response.getHeaderValuesIgnoreCase(SET_COOKIE2);
 
         Map<String, List<String>> cookieHeaders = new HashMap<>();
 
