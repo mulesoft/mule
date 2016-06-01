@@ -32,6 +32,8 @@ public class StartupSummaryDeploymentListener implements StartupListener
     private static final int STATUS_LABEL_LENGTH = 18;
     private static final int DOMAIN_OWNER_LABEL_LENGTH = 30;
 
+    private static final String UNKNOWN_ARTIFACT_NAME = "UNKNOWN";
+
     private final DeploymentService deploymentService;
 
     protected DeploymentStatusTracker tracker;
@@ -68,7 +70,12 @@ public class StartupSummaryDeploymentListener implements StartupListener
         for (String applicationName : applicationStates.keySet())
         {
             Application application = deploymentService.findApplication(applicationName);
-            applicationsPerDomain.put(application.getDomain().getArtifactName(), applicationName);
+            String domainName = UNKNOWN_ARTIFACT_NAME;
+            if (application != null)
+            {
+                domainName = application.getDomain().getArtifactName();
+            }
+            applicationsPerDomain.put(domainName, applicationName);
         }
 
         String message;

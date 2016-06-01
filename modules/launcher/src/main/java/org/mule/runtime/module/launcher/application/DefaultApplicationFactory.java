@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.launcher.application;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -21,6 +23,7 @@ import org.mule.runtime.module.launcher.DeploymentException;
 import org.mule.runtime.module.launcher.DeploymentListener;
 import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainRepository;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 import org.mule.runtime.module.launcher.plugin.ApplicationPluginRepository;
@@ -94,7 +97,13 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application>
 
     protected Application createAppFrom(ApplicationDescriptor descriptor) throws IOException
     {
-        ArtifactClassLoader parent = domainRepository.getDomain(descriptor.getDomain()).getArtifactClassLoader();
+        Domain domain = domainRepository.getDomain(descriptor.getDomain());
+        if (domain == null)
+        {
+            throw new DeploymentException(CoreMessages.createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'", descriptor.getDomain(), descriptor.getName())));
+        }
+
+        ArtifactClassLoader parent = domain.getArtifactClassLoader();
 
         parent = getSharedLibClassLoader(descriptor, parent);
 
