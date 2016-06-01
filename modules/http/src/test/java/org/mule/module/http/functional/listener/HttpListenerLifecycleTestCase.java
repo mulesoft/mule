@@ -6,12 +6,28 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 
 import org.mule.construct.Flow;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerConfig;
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.module.http.internal.domain.request.HttpRequestContext;
+import org.mule.module.http.internal.listener.HttpListenerRegistry;
+import org.mule.module.http.internal.listener.HttpListenerRegistryTestCase;
+import org.mule.module.http.internal.listener.RequestHandlerManager;
+import org.mule.module.http.internal.listener.ServiceTemporarilyUnavailableListenerRequestHandler;
+import org.mule.module.http.internal.listener.async.RequestHandler;
+import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
+import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
@@ -48,7 +64,15 @@ public class HttpListenerLifecycleTestCase extends FunctionalTestCase
         HttpListener httpListener = (HttpListener) ((Flow) getFlowConstruct("testPathFlow")).getMessageSource();
         httpListener.stop();
         final Response response = Request.Get(getLifecycleConfigUrl("/path/subpath")).execute();
-        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(503));
+        final HttpResponse returnResponse = response.returnResponse();
+        assertThat(returnResponse.getEntity(), notNullValue());
+        assertThat(returnResponse.getStatusLine().getStatusCode(), is(SERVICE_UNAVAILABLE.getStatusCode()));
+        assertThat(returnResponse.getStatusLine().getReasonPhrase(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
+        assertThat(getHttpEntityContent(returnResponse), startsWith("Service not available for request uri: "));
+    }
+
+    private String getHttpEntityContent(HttpResponse returnResponse) throws IOException {
+        return IOUtils.toString(returnResponse.getEntity().getContent());
     }
 
     @Test
