@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.lang.String.format;
+import static java.util.Optional.of;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
@@ -15,21 +16,30 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceI
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.core.api.MuleRuntimeException;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.ManagedList;
 import org.w3c.dom.Element;
 
 /**
@@ -62,6 +72,10 @@ public class BeanDefinitionFactory
 
     private ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
     private BeanDefinitionCreator componentModelProcessor;
+    private enum ChildType
+    {
+        SINGLE, COLLECTION
+    }
 
     /**
      * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the artifact.
@@ -93,7 +107,7 @@ public class BeanDefinitionFactory
         {
             for (ComponentModel innerComponent : innerComponents)
             {
-                if (hasDefinition(innerComponent.getIdentifier()))
+                if (hasDefinition(innerComponent.getIdentifier(), of(innerComponent.getParent().getIdentifier())))
                 {
                     resolveComponentRecursively(componentModel, innerComponent, registry, componentModelPostProcessor, oldParsingMechanism);
                 }
@@ -122,16 +136,48 @@ public class BeanDefinitionFactory
 
     private void resolveComponentBeanDefinition(ComponentModel parentComponentModel, ComponentModel componentModel)
     {
-        ComponentBuildingDefinition componentBuildingDefinition = null;
-        if (!customBuildersComponentIdentifiers.contains(componentModel.getIdentifier()))
+        if (isWrapperComponent(componentModel.getIdentifier(), of(parentComponentModel.getIdentifier())))
         {
-            componentBuildingDefinition = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier()).orElseThrow(() -> {
-                return new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency " +
-                                                                           "missing to the project that handle that extension.",
-                                                                           componentModel.getIdentifier())));
-            });
+            processComponentWrapper(componentModel);
         }
-        this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel, componentBuildingDefinition));
+        else
+        {
+            ComponentBuildingDefinition componentBuildingDefinition = null;
+            if (!customBuildersComponentIdentifiers.contains(componentModel.getIdentifier()))
+            {
+                componentBuildingDefinition = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier()).orElseThrow(() -> {
+                    return new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency " +
+                                                                               "missing to the project that handle that extension.",
+                                                                               componentModel.getIdentifier())));
+                });
+            }
+            this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel, componentBuildingDefinition));
+        }
+    }
+
+    private void processComponentWrapper(ComponentModel componentModel)
+    {
+        componentModel.setType(componentModel.getInnerComponents().get(0).getType());
+        ComponentBuildingDefinition parentBuildingDefinition = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getParent().getIdentifier()).get();
+        Map<String, ChildType> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(parentBuildingDefinition);
+        ChildType wrapperType = wrapperIdentifierAndTypeMap.get(componentModel.getIdentifier().getName());
+        if (wrapperType.equals(ChildType.COLLECTION))
+        {
+            ManagedList<Object> managedList = new ManagedList<>();
+            for (ComponentModel innerComponentModel : componentModel.getInnerComponents())
+            {
+                Object value = innerComponentModel.getBeanDefinition() != null ? innerComponentModel.getBeanDefinition() : innerComponentModel.getBeanReference();
+                managedList.add(value);
+            }
+            componentModel.setBeanDefinition(genericBeanDefinition(ArrayList.class)
+                                                     .addConstructorArgValue(managedList)
+                                                     .getBeanDefinition());
+        }
+        else
+        {
+            componentModel.setBeanDefinition(componentModel.getInnerComponents().get(0).getBeanDefinition());
+            componentModel.setBeanReference(componentModel.getInnerComponents().get(0).getBeanReference());
+        }
     }
 
     public static void checkElementNameUnique(BeanDefinitionRegistry registry, Element element)
@@ -164,13 +210,68 @@ public class BeanDefinitionFactory
      * If {@code #hasDefinition} returns false, then the old mechanism must be used.
      *
      * @param componentIdentifier a {@code ComponentModel} identifier.
+     * @param parentComponentModelOptional the {@code ComponentModel} parent identifier.
      * @return true if there's a {@code ComponentBuildingDefinition} for the specified configuration identifier, false if there's not.
      */
-    public boolean hasDefinition(ComponentIdentifier componentIdentifier)
+    public boolean hasDefinition(ComponentIdentifier componentIdentifier, Optional<ComponentIdentifier> parentComponentModelOptional)
     {
         return ignoredMuleCoreComponentIdentifiers.contains(componentIdentifier)
                || customBuildersComponentIdentifiers.contains(componentIdentifier)
-               || componentBuildingDefinitionRegistry.getBuildingDefinition(componentIdentifier).isPresent();
+               || componentBuildingDefinitionRegistry.getBuildingDefinition(componentIdentifier).isPresent()
+                || isWrapperComponent(componentIdentifier, parentComponentModelOptional);
     }
 
+    //TODO MULE-9638 this code will be removed and a cache will be implemented
+    public boolean isWrapperComponent(ComponentIdentifier componentModel, Optional<ComponentIdentifier> parentComponentModelOptional)
+    {
+        if (!parentComponentModelOptional.isPresent())
+        {
+            return false;
+        }
+        Optional<ComponentBuildingDefinition> buildingDefinitionOptional = componentBuildingDefinitionRegistry.getBuildingDefinition(parentComponentModelOptional.get());
+        if (!buildingDefinitionOptional.isPresent())
+        {
+            return false;
+        }
+        final Map<String, ChildType> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(buildingDefinitionOptional.get());
+        return wrapperIdentifierAndTypeMap.containsKey(componentModel.getName());
+    }
+
+    private Map<String, ChildType> getWrapperIdentifierAndTypeMap(ComponentBuildingDefinition buildingDefinition)
+    {
+        final Map<String, ChildType> wrapperIdentifierAndTypeMap = new HashMap<>();
+        AbstractAttributeDefinitionVisitor wrapperIdentifiersCollector = new AbstractAttributeDefinitionVisitor()
+        {
+            @Override
+            public void onComplexChildList(Class<?> type, Optional<String> identifierOptional)
+            {
+                identifierOptional.ifPresent( identifier -> {
+                    wrapperIdentifierAndTypeMap.put(identifier, ChildType.COLLECTION);
+                });
+            }
+
+            @Override
+            public void onComplexChild(Class<?> type, Optional<String> identifierOptional)
+            {
+                identifierOptional.ifPresent(identifier -> {
+                    wrapperIdentifierAndTypeMap.put(identifier, ChildType.SINGLE);
+                });
+            }
+
+            @Override
+            public void onMultipleValues(AttributeDefinition[] definitions)
+            {
+                for (AttributeDefinition attributeDefinition : definitions)
+                {
+                    attributeDefinition.accept(this);
+                }
+            }
+        };
+        Consumer<AttributeDefinition> collectWrappersConsumer = attributeDefinition -> {
+            attributeDefinition.accept(wrapperIdentifiersCollector);
+        };
+        buildingDefinition.getSetterParameterDefinitions().values().stream().forEach(collectWrappersConsumer);
+        buildingDefinition.getConstructorAttributeDefinition().stream().forEach(collectWrappersConsumer);
+        return wrapperIdentifierAndTypeMap;
+    }
 }

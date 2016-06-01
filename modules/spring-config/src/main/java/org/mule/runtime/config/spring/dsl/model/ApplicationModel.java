@@ -85,6 +85,7 @@ public class ApplicationModel
     public static final ComponentIdentifier CHOICE_EXCEPTION_STRATEGY_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CHOICE_EXCEPTION_STRATEGY).build();
     public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
     public static final ComponentIdentifier MULE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MULE_ROOT_ELEMENT).build();
+    public static final ComponentIdentifier MULE_DOMAIN_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(MULE_DOMAIN_ROOT_ELEMENT).build();
     public static final ComponentIdentifier SPRING_PROPERTY_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName(PROPERTY_ELEMENT).build();
     public static final ComponentIdentifier MULE_PROPERTY_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(PROPERTY_ELEMENT).build();
     public static final ComponentIdentifier ANNOTATIONS_ELEMENT_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(ANNOTATION_ELEMENT).build();
@@ -352,7 +353,12 @@ public class ApplicationModel
             {
                 builder.markAsRootComponent();
             }
-            models.add(builder.build());
+            ComponentModel componentModel = builder.build();
+            for (ComponentModel innerComponentModel : componentModel.getInnerComponents())
+            {
+                innerComponentModel.setParent(componentModel);
+            }
+            models.add(componentModel);
         }
         return models;
     }

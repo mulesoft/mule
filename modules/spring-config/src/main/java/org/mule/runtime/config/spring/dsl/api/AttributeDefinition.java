@@ -8,8 +8,7 @@ package org.mule.runtime.config.spring.dsl.api;
 
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
-
-import java.util.Optional;
+import org.mule.runtime.core.util.Preconditions;
 
 /**
  * Defines how to build an attribute from an object.
@@ -35,6 +34,8 @@ public class AttributeDefinition
     private boolean collection;
     private boolean valueFromTextContent;
     private TypeConverter typeConverter;
+    private AttributeDefinition[] definitions;
+    private String wrapperIdentifier;
 
     private AttributeDefinition()
     {
@@ -71,15 +72,19 @@ public class AttributeDefinition
         }
         else if (childObjectType != null && collection)
         {
-            visitor.onComplexChildList(childObjectType);
+            visitor.onComplexChildList(childObjectType, ofNullable(wrapperIdentifier));
         }
         else if (childObjectType != null)
         {
-            visitor.onComplexChild(childObjectType);
+            visitor.onComplexChild(childObjectType, ofNullable(wrapperIdentifier));
         }
         else if (valueFromTextContent)
         {
             visitor.onValueFromTextContent();
+        }
+        else if (definitions != null)
+        {
+            visitor.onMultipleValues(definitions);
         }
         else
         {
@@ -123,6 +128,36 @@ public class AttributeDefinition
         {
             attributeDefinition.hasDefaultValue = true;
             attributeDefinition.defaultValue = defaultValue;
+            return this;
+        }
+
+        /**
+         * Defines the parent identifier used to wrap a child element. Useful when there are children with the same type and
+         * we need to make a distinction to know how to do injection over multiple attributes with the same type.
+         * The identifier provided does not require a component definition since it will be just for qualifying a child.
+         *
+         * i.e.:
+         * <pre>
+         *     <parent-component>
+         *         <first-wrapper>
+         *             <child-component>
+         *         </first-wrapper>
+         *         <second-wrapper>
+         *             <child-component>
+         *         </second-wrapper>
+         *     </parent-component>
+         * </pre>
+         *
+         * The first-wrapper and second-wrapper elements are just used to univocally identify the object attribute in which the
+         * child-component object must be injected.
+         *
+         * @param identifier component identifier in the configuration for the parent element wrapping the child component
+         * @return
+         */
+        public Builder withWrapperIdentifier(String identifier)
+        {
+            Preconditions.checkState(attributeDefinition.childObjectType != null, "Identifier can only be used with children component definitions");
+            attributeDefinition.wrapperIdentifier = identifier;
             return this;
         }
 
@@ -237,6 +272,21 @@ public class AttributeDefinition
         {
             Builder builder = new Builder();
             builder.attributeDefinition.valueFromTextContent = true;
+            return builder;
+        }
+
+        /**
+         * Used when several attributes or child components needs to be mapped to a
+         * single attribute. The attribute must be of type Map where the key are
+         * the attribute name or the child element name and the value is the actual object.
+         *
+         * @param definitions the set of attribute definitions
+         * @return the builder
+         */
+        public static Builder fromMultipleDefinitions(AttributeDefinition... definitions)
+        {
+            Builder builder = new Builder();
+            builder.attributeDefinition.definitions = definitions;
             return builder;
         }
 

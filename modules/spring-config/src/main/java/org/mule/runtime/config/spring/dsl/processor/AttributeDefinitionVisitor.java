@@ -7,6 +7,7 @@
 
 package org.mule.runtime.config.spring.dsl.processor;
 
+import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 
 import java.util.Optional;
@@ -68,18 +69,22 @@ public interface AttributeDefinitionVisitor
      * Called when the attribute is configured from a list of object with a certain type.
      *
      * @param type type of the list to be set in the attribute.
+     * @param identifier
      */
-    void onComplexChildList(Class<?> type);
+    void onComplexChildList(Class<?> type, Optional<String> identifier);
 
     /**
-     * Called when the attribute is configured from an object with a ceratin type.
+     * Called when the attribute is configured from an object with a certain type.
      *
      * @param type type of the attribute value.
+     * @param identifier the identifier of the component
      */
-    void onComplexChild(Class<?> type);
+    void onComplexChild(Class<?> type, Optional<String> identifier);
 
     /**
      * Called when the attribute is configured from the {@code ComponentModel} inner configuration.
      */
     void onValueFromTextContent();
+
+    void onMultipleValues(AttributeDefinition[] definitions);
 }
