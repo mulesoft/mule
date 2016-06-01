@@ -8,6 +8,7 @@
 package org.mule.runtime.module.launcher.application;
 
 import static java.util.stream.Collectors.toCollection;
+
 import org.mule.runtime.module.artifact.Artifact;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -150,5 +151,11 @@ public class CompositeArtifactClassLoader extends CompositeClassLoader implement
                 return;
             }
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + classLoaders.toString();
     }
 }

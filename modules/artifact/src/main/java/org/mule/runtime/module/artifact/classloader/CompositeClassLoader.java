@@ -7,15 +7,18 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
+import org.mule.runtime.module.artifact.classloader.exception.CompositeClassNotFoundException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -75,6 +78,12 @@ public class CompositeClassLoader extends ClassLoader implements ClassLoaderLook
         final ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
         Class<?> result;
 
+        /*
+         * Gather information about the exceptions in each of the contained classloaders to provide
+         * troubleshooting information in case of throwing a ClassNotFoundException.
+         */
+        final List<ClassNotFoundException> exceptions = new ArrayList<>(classLoaders.size() + 1);
+
         if (lookupStrategy == PARENT_ONLY)
         {
             result = getParent().loadClass(name);
@@ -87,12 +96,13 @@ public class CompositeClassLoader extends ClassLoader implements ClassLoaderLook
             }
             catch (ClassNotFoundException e)
             {
-                result = doLoadClass(name);
+                exceptions.add(e);
+                result = doLoadClass(name, exceptions);
             }
         }
         else
         {
-            result = doLoadClass(name);
+            result = doLoadClass(name, exceptions);
             if (result == null)
             {
                 result = getParent().loadClass(name);
@@ -109,10 +119,10 @@ public class CompositeClassLoader extends ClassLoader implements ClassLoaderLook
             return result;
         }
 
-        throw new ClassNotFoundException(String.format("Cannot load class '%s'", name));
+        throw new CompositeClassNotFoundException(name, lookupStrategy, exceptions);
     }
 
-    private Class<?> doLoadClass(String name)
+    private Class<?> doLoadClass(String name, List<ClassNotFoundException> exceptions)
     {
         for (ClassLoader classLoader : classLoaders)
         {
@@ -129,6 +139,7 @@ public class CompositeClassLoader extends ClassLoader implements ClassLoaderLook
             catch (ClassNotFoundException e)
             {
                 // Ignoring
+                exceptions.add(e);
             }
         }
         return null;

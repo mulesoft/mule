@@ -7,6 +7,7 @@
 package org.mule.runtime.module.launcher;
 
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
+
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
@@ -26,14 +27,6 @@ public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader impleme
     public MuleSharedDomainClassLoader(String domain, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy, List<URL> urls)
     {
         super(domain, urls.toArray(new URL[0]), parent, lookupPolicy);
-    }
-
-    @Override
-    public String toString()
-    {
-        return String.format("%s[%s]@%s", getClass().getName(),
-                             getArtifactName(),
-                             Integer.toHexString(System.identityHashCode(this)));
     }
 
     @Override
