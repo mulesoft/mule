@@ -43,6 +43,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -107,6 +108,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    @Ignore("MULE-9649")
     public void validatesExportedPackageDuplication() throws Exception
     {
         File pluginDir = getAppPluginsFolder(APP_NAME);
@@ -120,6 +122,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    @Ignore("MULE-9649")
     public void validatesExportedPackageDuplicationAgainstContainerPlugin() throws Exception
     {
         File pluginDir = getAppPluginsFolder(APP_NAME);

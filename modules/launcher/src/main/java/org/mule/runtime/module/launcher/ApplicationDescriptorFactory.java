@@ -17,7 +17,6 @@ import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
-import org.mule.runtime.module.launcher.application.DuplicateExportedPackageException;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.descriptor.EmptyApplicationDescriptor;
 import org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser;
@@ -147,10 +146,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
             }
         }
 
-        if (error)
-        {
-            throw new DuplicateExportedPackageException(exportedPackages);
-        }
+        //TODO(pablo.kraan): MULE-9649 - de add validation when a decision is made about how to, in a plugin,
     }
 
     private Set<ApplicationPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor) throws IOException
