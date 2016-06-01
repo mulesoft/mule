@@ -24,6 +24,7 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
+import org.mule.runtime.module.launcher.DeploymentException;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainRepository;
@@ -38,6 +39,7 @@ import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
@@ -55,6 +57,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
 
     @Rule
     public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void createsApplication() throws Exception
@@ -115,5 +119,18 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
         when(domain.getArtifactClassLoader()).thenReturn(domainArtifactClassLoader);
 
         return domain;
+    }
+
+    @Test
+    public void applicationDesployFailDueToDomainNotDeployed() throws Exception
+    {
+        expectedException.expect(DeploymentException.class);
+
+        final ApplicationDescriptor descriptor = new ApplicationDescriptor();
+        descriptor.setName(APP_NAME);
+        descriptor.setDomain(DOMAIN_NAME);
+        when(applicationDescriptorFactory.create(any())).thenReturn(descriptor);
+
+        applicationFactory.createArtifact(APP_NAME);
     }
 }
