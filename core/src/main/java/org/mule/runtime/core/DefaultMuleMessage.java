@@ -10,6 +10,9 @@ import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.core.PropertyScope.INBOUND;
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -17,12 +20,11 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
+import org.mule.runtime.core.message.ds.InputStreamDataSource;
 import org.mule.runtime.core.message.ds.StringDataSource;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.TypedValue;
@@ -959,6 +961,10 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         else if (object instanceof byte[] && contentType != null)
         {
             dh = new DataHandler(new ByteArrayDataSource((byte[]) object, contentType, name));
+        }
+        else if (object instanceof InputStream && contentType != null)
+        {
+            dh = new DataHandler(new InputStreamDataSource((InputStream) object, contentType, name));
         }
         else
         {
