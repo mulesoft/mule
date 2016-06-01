@@ -26,6 +26,7 @@ import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.ds.ByteArrayDataSource;
+import org.mule.message.ds.InputStreamDataSource;
 import org.mule.message.ds.StringDataSource;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
@@ -1205,6 +1206,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         else if (object instanceof byte[] && contentType != null)
         {
             dh = new DataHandler(new ByteArrayDataSource((byte[]) object, contentType, name));
+        }
+        else if (object instanceof InputStream && contentType != null)
+        {
+            dh = new DataHandler(new InputStreamDataSource((InputStream) object, contentType, name));
         }
         else
         {
