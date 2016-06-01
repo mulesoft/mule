@@ -10,7 +10,7 @@
     <vm:connector name="quedvm"/>
 
     <tcp:connector name="tcpConnector">
-        <tcp:custom-protocol class="org.mule.runtime.transport.tcp.integration.CustomSerializationProtocol"/>
+        <tcp:custom-protocol class="org.mule.compatibility.transport.tcp.integration.CustomSerializationProtocol"/>
     </tcp:connector>
 
     <custom-transformer name="NoAction" class="org.mule.functional.transformer.NoActionTransformer"/>

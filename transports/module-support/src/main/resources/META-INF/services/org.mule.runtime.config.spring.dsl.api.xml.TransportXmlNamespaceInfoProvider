@@ -1,1 +1,1 @@
-org.mule.runtime.config.spring.dsl.processor.xml.TransportXmlNamespaceInfoProvider
+org.mule.compatibility.config.spring.dsl.processor.xml.TransportXmlNamespaceInfoProvider

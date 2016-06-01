@@ -10,7 +10,7 @@
        http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd
        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
-    <spring:bean name="connectionFactory" class="org.mule.runtime.transport.jms.test.TestConnectionFactory"/>
+    <spring:bean name="connectionFactory" class="org.mule.compatibility.transport.jms.test.TestConnectionFactory"/>
 
     <!-- Default config -->
     <jms:connector name="jmsConnector" connectionFactory-ref="connectionFactory"/>

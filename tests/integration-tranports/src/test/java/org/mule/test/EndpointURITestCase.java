@@ -8,15 +8,15 @@ package org.mule.test;
 
 import static org.junit.Assert.assertEquals;
 
+import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
+import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.endpoint.DynamicOutboundEndpoint;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.endpoint.EndpointBuilder;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.endpoint.DynamicOutboundEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.util.HashMap;

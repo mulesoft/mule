@@ -9,15 +9,15 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mule.runtime.core.registry.MuleRegistryTransportHelper.lookupConnector;
+import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupConnector;
 
+import org.mule.compatibility.core.transport.AbstractConnector;
+import org.mule.compatibility.core.transport.service.DefaultEndpointAwareTransformer;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.TransformerUtils;
-import org.mule.runtime.core.transport.AbstractConnector;
-import org.mule.runtime.core.transport.service.DefaultEndpointAwareTransformer;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
 
 import org.junit.Test;

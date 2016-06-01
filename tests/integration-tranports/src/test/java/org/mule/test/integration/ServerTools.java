@@ -6,8 +6,8 @@
  */
 package org.mule.test.integration;
 
+import org.mule.compatibility.transport.file.filters.FilenameWildcardFilter;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.transport.file.filters.FilenameWildcardFilter;
 
 import java.io.File;
 

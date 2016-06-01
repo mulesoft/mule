@@ -6,17 +6,17 @@
  */
 package org.mule.tck.junit4;
 
+import org.mule.compatibility.core.api.config.MuleEndpointProperties;
+import org.mule.compatibility.core.api.endpoint.EndpointFactory;
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.api.transport.Connector;
+import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.MuleEndpointProperties;
-import org.mule.runtime.core.api.endpoint.EndpointFactory;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transport.Connector;
-import org.mule.runtime.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.MuleEndpointTestUtils;
 import org.mule.tck.testmodels.mule.TestConnector;

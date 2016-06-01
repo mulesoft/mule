@@ -11,10 +11,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.compatibility.core.api.transport.MessageReceiver;
+import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.transport.MessageReceiver;
 import org.mule.runtime.core.construct.AbstractFlowConstruct;
-import org.mule.runtime.core.transport.AbstractConnector;
 
 import org.junit.Test;
 

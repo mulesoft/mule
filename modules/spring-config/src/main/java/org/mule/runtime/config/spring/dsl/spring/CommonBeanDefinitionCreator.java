@@ -18,6 +18,7 @@ import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.g
 import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.processMetadataAnnotationsHelper;
 import static org.mule.runtime.core.api.AnnotatedObject.PROPERTY_NAME;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
@@ -64,7 +65,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
 {
 
     private static final String SPRING_PROTOTYPE_OBJECT = "prototype";
-    private static final String TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS = "org.mule.runtime.config.spring.parsers.specific.TransportElementBeanDefinitionPostProcessor";
+    private static final String TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS = "org.mule.compatibility.config.spring.parsers.specific.TransportElementBeanDefinitionPostProcessor";
     private static final ImmutableSet<ComponentIdentifier> MESSAGE_FILTER_WRAPPERS = new ImmutableSet.Builder<ComponentIdentifier>()
             .add(MESSAGE_FILTER_ELEMENT_IDENTIFIER)
             .add(MULE_IDENTIFIER)

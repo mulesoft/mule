@@ -26,26 +26,26 @@
                    serverSoTimeout="4000"/>
                    
     <tcp:connector name="connectorWithProtocolClass">
-        <tcp:custom-protocol class="org.mule.runtime.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
+        <tcp:custom-protocol class="org.mule.compatibility.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
     </tcp:connector>
                    
     <tcp:polling-connector name="pollingConnector"
                    clientSoTimeout="3000"
                    pollingFrequency="4000"/>
     
-    <spring:bean name="tcpProtocol" class="org.mule.runtime.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
+    <spring:bean name="tcpProtocol" class="org.mule.compatibility.transport.tcp.TcpNamespaceHandlerTestCase$MockTcpProtocol"/>
 
     <tcp:connector name="connectorWithProtocolRef">
         <tcp:custom-protocol ref="tcpProtocol"/>
     </tcp:connector>    
 
-    <spring:bean id="classLoader" class="org.mule.runtime.transport.tcp.TcpNamespaceHandlerTestCase$FakeClassLoader"/>
+    <spring:bean id="classLoader" class="org.mule.compatibility.transport.tcp.TcpNamespaceHandlerTestCase$FakeClassLoader"/>
 
     <tcp:connector name="custom-class-loading-protocol-connector">
         <tcp:custom-class-loading-protocol payloadOnly="true" classLoader-ref="classLoader" rethrowExceptionOnRead="true"/>
     </tcp:connector>
     
-    <spring:bean id="messageDispatcherFactory" class="org.mule.runtime.transport.tcp.LocalSocketTcpMessageDispatcherFactory"/>
+    <spring:bean id="messageDispatcherFactory" class="org.mule.compatibility.transport.tcp.LocalSocketTcpMessageDispatcherFactory"/>
     
     <tcp:connector name="messageDispatcherFactoryConnector" dispatcherFactory-ref="messageDispatcherFactory" >
     </tcp:connector>

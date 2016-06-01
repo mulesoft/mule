@@ -15,7 +15,7 @@
                     streaming="false"
                     fileAge="20000"
                     pollingFrequency="500">
-        <transports:service-overrides messageReceiver="org.mule.runtime.transport.file.FileAgeAndPollingFrequencyInteractionTestCase$TestFileMessageReceiver"/>
+        <transports:service-overrides messageReceiver="org.mule.compatibility.transport.file.FileAgeAndPollingFrequencyInteractionTestCase$TestFileMessageReceiver"/>
     </file:connector>
 
     <flow name="test">

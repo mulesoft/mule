@@ -6,9 +6,9 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.transport.AbstractMessageRequester;
 
 /**
  * TODO

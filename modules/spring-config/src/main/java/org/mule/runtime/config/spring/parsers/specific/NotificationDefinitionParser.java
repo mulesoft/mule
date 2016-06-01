@@ -49,8 +49,8 @@ import org.w3c.dom.Element;
 public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
 {
 
-    private static final String ENDPOINT_MESSAGE_NOTIFICATION_CLASS = "org.mule.runtime.core.context.notification.EndpointMessageNotification";
-    private static final String ENDPOINT_MESSAGE_NOTIFICATION_LISTENER_CLASS = "org.mule.runtime.core.api.context.notification.EndpointMessageNotificationListener";
+    private static final String ENDPOINT_MESSAGE_NOTIFICATION_CLASS = "org.mule.compatibility.core.context.notification.EndpointMessageNotification";
+    private static final String ENDPOINT_MESSAGE_NOTIFICATION_LISTENER_CLASS = "org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener";
     public static final Map EVENT_MAP;
     public static final Map INTERFACE_MAP;
     public static final String INTERFACE = "interface";

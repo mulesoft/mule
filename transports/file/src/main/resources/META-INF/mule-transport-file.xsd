@@ -231,7 +231,7 @@
             <xsd:attribute name="comparator" type="mule:substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
-                    Sorts incoming files using the specified comparator, such as comparator="org.mule.runtime.transport.file.comparator.OlderFirstComparator". The class must implement the java.util.Comparator interface.
+                    Sorts incoming files using the specified comparator, such as comparator="org.mule.compatibility.transport.file.comparator.OlderFirstComparator". The class must implement the java.util.Comparator interface.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -283,7 +283,7 @@
                  substitutionGroup="abstract-filenameParser">
         <xsd:annotation>
             <xsd:documentation>
-                The custom-filename-parser element allows the user to specify a custom filename parser. The implementation must implement org.mule.runtime.transport.file.FilenameParser.
+                The custom-filename-parser element allows the user to specify a custom filename parser. The implementation must implement org.mule.compatibility.transport.file.FilenameParser.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -294,7 +294,7 @@
                 <xsd:attribute name="class" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The implementation class name that implements org.mule.runtime.transport.file.FilenameParser.
+                            The implementation class name that implements org.mule.compatibility.transport.file.FilenameParser.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

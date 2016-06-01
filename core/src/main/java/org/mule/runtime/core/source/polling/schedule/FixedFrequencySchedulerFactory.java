@@ -8,6 +8,7 @@ package org.mule.runtime.core.source.polling.schedule;
 
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.SchedulerFactory;
 
@@ -40,7 +41,7 @@ public class FixedFrequencySchedulerFactory<T extends Runnable> extends Schedule
 
 
     @Override
-    protected Scheduler doCreate(String name, final T job)
+    public Scheduler doCreate(String name, final T job)
     {
         FixedFrequencyScheduler<T> fixedFrequencyScheduler = new FixedFrequencyScheduler<T>(name,
                                                                                       frequency, startDelay, job, timeUnit);

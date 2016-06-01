@@ -15,7 +15,7 @@
         <vm:inbound-endpoint path="async" exchange-pattern="one-way">
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
-        <component class="org.mule.runtime.transport.vm.functional.transactions.RollbackTestCase$AggregatingComponent"/>
+        <component class="org.mule.compatibility.transport.vm.functional.transactions.RollbackTestCase$AggregatingComponent"/>
         <default-exception-strategy>
             <rollback-transaction exception-pattern="*"/>
         </default-exception-strategy>

@@ -130,7 +130,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
         }
     }
 
-    protected MuleContext getMuleContext()
+    public MuleContext getMuleContext()
     {
         return muleContext;
     }
@@ -636,7 +636,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
      * @param obj the object to inspect
      * @return the name for this object
      */
-    protected String getName(Object obj)
+    public String getName(Object obj)
     {
         String name = null;
         if (obj instanceof NameableObject)

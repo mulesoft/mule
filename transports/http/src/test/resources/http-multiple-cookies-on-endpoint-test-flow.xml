@@ -33,7 +33,7 @@
 
     <flow name="HttpServer">
         <http:inbound-endpoint address="http://localhost:${port1}/test" exchange-pattern="request-response"/>
-        <component class="org.mule.runtime.transport.http.functional.HttpMultipleCookiesInEndpointTestComponent"/>
+        <component class="org.mule.compatibility.transport.http.functional.HttpMultipleCookiesInEndpointTestComponent"/>
     </flow>
 
 </mule>

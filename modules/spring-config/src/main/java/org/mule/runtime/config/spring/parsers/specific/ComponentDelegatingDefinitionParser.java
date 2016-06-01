@@ -82,6 +82,7 @@ public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegat
 
         private static final String OBJECT_FACTORY_ELEMENT_CONVENTION_SUFFIX = "object";
 
+        @Override
         public void preProcess(PropertyConfiguration config, Element element)
         {
             NamedNodeMap attributes = element.getAttributes();
@@ -110,7 +111,7 @@ public class ComponentDelegatingDefinitionParser extends AbstractParallelDelegat
         }
     }
 
-    class CheckExclusiveClassAttributeObjectFactoryException extends IllegalStateException
+    public class CheckExclusiveClassAttributeObjectFactoryException extends IllegalStateException
     {
         private static final long serialVersionUID = 4625276914151932111L;
 

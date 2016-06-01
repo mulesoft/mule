@@ -9,7 +9,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <spring:bean name="factory"
-                 class="org.mule.runtime.transport.tcp.TcpDispatcherPoolFactoryTestCase$StubDispatcherPoolFactory"/>
+                 class="org.mule.compatibility.transport.tcp.TcpDispatcherPoolFactoryTestCase$StubDispatcherPoolFactory"/>
 
     <tcp:connector name="tcpConnectorWithDefaultFactory"/>
 

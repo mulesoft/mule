@@ -22,9 +22,9 @@
     <jms:activemq-connector name="jmsConnector"/>
 
     <vm:connector name="default">
-        <transports:service-overrides inboundTransformer="org.mule.runtime.core.transformer.simple.InboundAppendTransformer"
-                           outboundTransformer="org.mule.runtime.core.transformer.simple.OutboundAppendTransformer"
-                           responseTransformer="org.mule.runtime.core.transformer.simple.ResponseAppendTransformer"/>
+        <transports:service-overrides inboundTransformer="org.mule.compatibility.core.transformer.simple.InboundAppendTransformer"
+                           outboundTransformer="org.mule.compatibility.core.transformer.simple.OutboundAppendTransformer"
+                           responseTransformer="org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer"/>
     </vm:connector>
 
     <custom-transformer name="customResponse" class="org.mule.runtime.core.transformer.simple.StringAppendTransformer">

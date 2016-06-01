@@ -13,7 +13,7 @@
     <flow name="Streaming">
         <http:inbound-endpoint address="http://localhost:${port1}/streaming" exchange-pattern="request-response"/>
         <component>
-            <singleton-object class="org.mule.runtime.transport.http.components.StreamingResponseComponent"/>
+            <singleton-object class="org.mule.compatibility.transport.http.components.StreamingResponseComponent"/>
         </component>
     </flow>
     

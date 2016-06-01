@@ -164,7 +164,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <!-- Defaults to org.mule.runtime.transport.jms.JmsConstants.JMS_SPECIFICATION_102B  -->
+        <!-- Defaults to org.mule.compatibility.transport.jms.JmsConstants.JMS_SPECIFICATION_102B  -->
         <xsd:attribute name="specification" default="1.0.2b">
             <xsd:annotation>
                 <xsd:documentation>

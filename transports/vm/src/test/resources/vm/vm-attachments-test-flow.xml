@@ -18,7 +18,7 @@
         <transports:inbound-endpoint ref="vm-in" />
 
         <component
-            class="org.mule.runtime.transport.vm.functional.AttachmentsComponent" />
+            class="org.mule.compatibility.transport.vm.functional.AttachmentsComponent" />
     </flow>
 
 </mule>

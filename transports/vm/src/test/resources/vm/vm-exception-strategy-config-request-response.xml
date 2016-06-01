@@ -15,7 +15,7 @@
     <flow name="dlqExceptionInboundEndpoint">
         <vm:inbound-endpoint path="in1" exchange-pattern="request-response">
             <custom-transformer
-                    class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
+                    class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <test:component/>
@@ -34,7 +34,7 @@
         <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
             <transports:response>
                 <custom-transformer
-                        class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
+                        class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
             </transports:response>
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
@@ -73,7 +73,7 @@
         <test:component/>
         <vm:outbound-endpoint path="out" exchange-pattern="request-response">
             <custom-transformer
-                    class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
+                    class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
             <vm:transaction action="ALWAYS_JOIN"/>
         </vm:outbound-endpoint>
         <default-exception-strategy>
@@ -92,7 +92,7 @@
         <vm:outbound-endpoint path="out" exchange-pattern="request-response">
             <transports:response>
                 <custom-transformer
-                        class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
+                        class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$FailingTransformer"/>
             </transports:response>
             <vm:transaction action="ALWAYS_JOIN"/>
         </vm:outbound-endpoint>
@@ -109,7 +109,7 @@
             <vm:transaction action="NONE"/>
         </vm:inbound-endpoint>
         <component
-                class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$DeadLetterQueueComponent"/>
+                class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$DeadLetterQueueComponent"/>
     </flow>
 
     <flow name="outboundFlow">
@@ -117,6 +117,6 @@
             <vm:transaction action="NONE"/>
         </vm:inbound-endpoint>
         <component
-                class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$OutboundComponent"/>
+                class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyRequestResponseTestCase$OutboundComponent"/>
     </flow>
 </mule>

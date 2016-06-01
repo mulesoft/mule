@@ -58,9 +58,9 @@
 
     <flow name="consumefileWithStreamingAndAsyncProcessingStrategy" processingStrategy="asynchronous">
         <file:inbound-endpoint path="${workingDirectory}/temp/input-streaming-and-async-processing-strategy" connector-ref="fileConnectorStreamingLongPolling"/>
-        <custom-processor class="org.mule.runtime.transport.file.FileExceptionStrategyFunctionalTestCase$BeforeCloseStream"/>
+        <custom-processor class="org.mule.compatibility.transport.file.FileExceptionStrategyFunctionalTestCase$BeforeCloseStream"/>
         <object-to-byte-array-transformer/>
-        <custom-processor class="org.mule.runtime.transport.file.FileExceptionStrategyFunctionalTestCase$AfterCloseStream"/>
+        <custom-processor class="org.mule.compatibility.transport.file.FileExceptionStrategyFunctionalTestCase$AfterCloseStream"/>
     </flow>
 
 </mule>

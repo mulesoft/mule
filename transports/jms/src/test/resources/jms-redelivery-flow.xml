@@ -20,9 +20,9 @@
             <jms:transaction action="ALWAYS_JOIN" />
         </jms:outbound-endpoint>
         <default-exception-strategy>
-            <commit-transaction exception-pattern="org.mule.runtime.transport.jms.redelivery.MessageRedeliveredException"/>
+            <commit-transaction exception-pattern="org.mule.compatibility.transport.jms.redelivery.MessageRedeliveredException"/>
             <choice>
-                <when expression="#[payload.exception instanceof org.mule.runtime.transport.jms.redelivery.MessageRedeliveredException]">
+                <when expression="#[payload.exception instanceof org.mule.compatibility.transport.jms.redelivery.MessageRedeliveredException]">
                     <jms:outbound-endpoint queue="dead.letter" connector-ref="jmsConnectorLimitedRedelivery">
                         <jms:transaction action="ALWAYS_JOIN" />
                     </jms:outbound-endpoint>

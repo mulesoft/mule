@@ -32,7 +32,7 @@
         <component>
             <!-- This component knows how to look for EOF -->
             <singleton-object
-                class="org.mule.runtime.transport.tcp.integration.EOFStreamingTestComponent" />
+                class="org.mule.compatibility.transport.tcp.integration.EOFStreamingTestComponent" />
         </component>
     </flow>
 

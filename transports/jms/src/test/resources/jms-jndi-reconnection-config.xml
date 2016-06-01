@@ -8,7 +8,7 @@
 
     <jms:connector name="jmsConnector"
                    connectionFactoryJndiName="jms/connectionFactory"
-                   jndiInitialFactory="org.mule.runtime.transport.jms.test.JmsTestContextFactory">
+                   jndiInitialFactory="org.mule.compatibility.transport.jms.test.JmsTestContextFactory">
         <reconnect-forever blocking="false"/>
     </jms:connector>
 </mule>

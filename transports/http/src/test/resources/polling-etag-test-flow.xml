@@ -28,7 +28,7 @@
         <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="request-response"
                           connector-ref="HttpConnector"/>
         <component>
-            <singleton-object class="org.mule.runtime.transport.http.functional.ETagComponent"/>
+            <singleton-object class="org.mule.compatibility.transport.http.functional.ETagComponent"/>
         </component>
     </flow>
 

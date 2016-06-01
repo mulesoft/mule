@@ -10,7 +10,7 @@
 
     <flow name="recursiveService">
         <file:inbound-endpoint path="${workingDirectory}">
-            <custom-filter class="org.mule.runtime.transport.file.FileRecursiveFileFilterTestCase$TxtFileFilter"/>
+            <custom-filter class="org.mule.compatibility.transport.file.FileRecursiveFileFilterTestCase$TxtFileFilter"/>
         </file:inbound-endpoint>
 
         <vm:outbound-endpoint path="testOut"/>

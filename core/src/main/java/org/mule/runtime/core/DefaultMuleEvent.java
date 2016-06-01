@@ -558,7 +558,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * @param key The name of the property to ignore
      * @return true if the property should be ignored, false otherwise
      */
-    protected boolean ignoreProperty(String key)
+    public boolean ignoreProperty(String key)
     {
         if (key == null || key.startsWith(MuleProperties.ENDPOINT_PROPERTY_PREFIX))
         {
@@ -1134,5 +1134,30 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     public ProcessorsTrace getProcessorsTrace()
     {
         return processorsTrace;
+    }
+
+    /**
+     * @deprecated This should be used only by the compatibility module.
+     * @param credentials
+     * @param encoding
+     * @param exchangePattern
+     * @param name
+     * @param uri
+     * @param timeout
+     * @param transacted
+     */
+    @Deprecated
+    public void setEndpointFileds(Credentials credentials, String encoding, MessageExchangePattern exchangePattern, String name, URI uri, int timeout, boolean transacted)
+    {
+        this.credentials = credentials;
+        this.encoding = encoding;
+        this.exchangePattern = exchangePattern;
+        this.messageSourceName = name;
+        this.messageSourceURI = uri;
+        this.timeout = timeout;
+        this.transacted = transacted;
+
+        this.synchronous = resolveEventSynchronicity();
+        this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
     }
 }

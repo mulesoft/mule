@@ -9,8 +9,8 @@ package org.mule.test.integration.transaction;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.mule.compatibility.module.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.module.client.MuleClient;
 
 import org.junit.Test;
 

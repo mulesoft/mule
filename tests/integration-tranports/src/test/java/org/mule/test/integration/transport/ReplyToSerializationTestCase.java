@@ -8,16 +8,16 @@ package org.mule.test.integration.transport;
 
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
+import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
 
+import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.api.transport.Connector;
+import org.mule.compatibility.core.connector.EndpointReplyToHandler;
+import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.endpoint.EndpointBuilder;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.transport.Connector;
-import org.mule.runtime.core.connector.EndpointReplyToHandler;
-import org.mule.runtime.core.transport.AbstractConnector;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayInputStream;

@@ -27,7 +27,7 @@
 
     <flow name="echo">
         <vm:inbound-endpoint ref="outbound1"/>
-        <component class="org.mule.runtime.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
+        <component class="org.mule.compatibility.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
     </flow>
 
     <flow name="testService2">
@@ -39,7 +39,7 @@
 
     <flow name="echo2">
         <vm:inbound-endpoint ref="outbound2"/>
-        <component class="org.mule.runtime.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
+        <component class="org.mule.compatibility.transport.vm.functional.TransformerContentTypeTestCase$EchoComponent"/>
     </flow>
 
 </mule>

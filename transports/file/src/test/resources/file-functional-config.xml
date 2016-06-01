@@ -25,10 +25,10 @@
 
     <file:endpoint path="${workingDirectory}/in" name="get" connector-ref="fileConnector"/>
 
-    <custom-transformer class="org.mule.runtime.transport.file.transformers.FileToByteArray" name="FileToByteArray"/>
+    <custom-transformer class="org.mule.compatibility.transport.file.transformers.FileToByteArray" name="FileToByteArray"/>
 
     <flow name="FolderTO" processingStrategy="synchronous">
-        <file:inbound-endpoint ref="get" comparator="org.mule.runtime.transport.file.comparator.OlderFirstComparator"
+        <file:inbound-endpoint ref="get" comparator="org.mule.compatibility.transport.file.comparator.OlderFirstComparator"
             reverseOrder="true">
             <file:file-to-byte-array-transformer />
         </file:inbound-endpoint>

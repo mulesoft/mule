@@ -10,10 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener;
+import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.context.notification.EndpointMessageNotificationListener;
-import org.mule.runtime.core.context.notification.EndpointMessageNotification;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 

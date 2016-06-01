@@ -1,1 +1,1 @@
-org.mule.runtime.transport.vm.config.VmTransportComponentBuildingDefinitionProvider
+org.mule.compatibility.transport.vm.config.VmTransportComponentBuildingDefinitionProvider

@@ -40,7 +40,7 @@
     <!-- next, the same flows but with adapted components that call getMessage() rather than getTransformedMessage() -->
     <flow name="adaptedService1">
         <transports:inbound-endpoint ref="adapted"/>
-        <component class="org.mule.runtime.transport.http.issues.NoTransformPassThroughComponent"/>
+        <component class="org.mule.compatibility.transport.http.issues.NoTransformPassThroughComponent"/>
         <transports:outbound-endpoint address="vm://echo2" exchange-pattern="request-response"/>
     </flow>
 
@@ -56,7 +56,7 @@
         <http:inbound-endpoint ref="ignored">
             <transformer ref="appendString"/>
         </http:inbound-endpoint>
-        <component class="org.mule.runtime.transport.http.issues.NoTransformPassThroughComponent">
+        <component class="org.mule.compatibility.transport.http.issues.NoTransformPassThroughComponent">
             <callable-entry-point-resolver/>
         </component>
         <transports:outbound-endpoint address="vm://echo3" exchange-pattern="request-response"/>

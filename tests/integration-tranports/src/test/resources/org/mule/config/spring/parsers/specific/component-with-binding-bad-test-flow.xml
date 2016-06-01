@@ -7,7 +7,7 @@
 
     <flow name="service">
         <transports:component class="org.mule.functional.functional.FunctionalTestComponent">
-            <singleton-object class="org.mule.runtime.core.component.simple.StaticComponent"/>
+            <singleton-object class="org.mule.compatibility.core.component.simple.StaticComponent"/>
             <transports:binding interface="java.lang.String" method="setPrefix">
                 <transports:outbound-endpoint address="test://test"/>
             </transports:binding>

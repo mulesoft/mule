@@ -46,7 +46,7 @@
         </http:inbound-endpoint>
         <echo-component/>
         <custom-exception-strategy
-                class="org.mule.runtime.transport.http.reliability.InboundMessageLossTestCase$Handler"/>
+                class="org.mule.compatibility.transport.http.reliability.InboundMessageLossTestCase$Handler"/>
     </flow>
 
     <flow name="FailToHandledTransformerException">
@@ -56,6 +56,6 @@
         </http:inbound-endpoint>
         <echo-component/>
         <custom-exception-strategy
-                class="org.mule.runtime.transport.http.reliability.InboundMessageLossTestCase$BadHandler"/>
+                class="org.mule.compatibility.transport.http.reliability.InboundMessageLossTestCase$BadHandler"/>
     </flow>
 </mule>
