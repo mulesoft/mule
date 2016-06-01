@@ -37,12 +37,6 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         return "test-pgp-encrypt-config-flow.xml";
     }
 
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        return (AbstractEncryptionStrategyTestCase.isCryptographyExtensionInstalled() == false);
-    }
-
     @Test
     public void testAuthenticationAuthorised() throws Exception
     {

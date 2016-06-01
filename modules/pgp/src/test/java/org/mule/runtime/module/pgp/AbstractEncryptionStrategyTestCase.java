@@ -18,27 +18,6 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleCon
     protected KeyBasedEncryptionStrategy kbStrategy;
     protected PGPKeyRing keyManager;
 
-    protected static boolean isCryptographyExtensionInstalled()
-    {
-        // see MULE-3671
-        try
-        {
-            int maxKeyLength = Cipher.getMaxAllowedKeyLength("DES/CBC/PKCS5Padding");
-            // if JCE is not installed, maxKeyLength will be 64
-            return maxKeyLength == Integer.MAX_VALUE;
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new AssertionError(e);
-        }
-    }
-
-    @Override
-    protected boolean isDisabledInThisEnvironment()
-    {
-        return (isCryptographyExtensionInstalled() == false);
-    }
-
     @Override
     protected void doSetUp() throws Exception
     {
