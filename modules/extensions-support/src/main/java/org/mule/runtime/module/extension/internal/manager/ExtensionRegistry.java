@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.manager;
 
 import static java.lang.String.format;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
@@ -89,9 +88,10 @@ public final class ExtensionRegistry
     void registerExtension(String name, String vendor, RuntimeExtensionModel extensionModel)
     {
         extensions.put(new ExtensionEntityKey(name, vendor), extensionModel);
-        getParameterClasses(extensionModel, parameter -> Enum.class.isAssignableFrom(getType(parameter.getType())))
-                .forEach(clazz -> {
-                    final Class<Enum> enumClass = (Class<Enum>) clazz;
+        getParameterClasses(extensionModel).stream()
+                .filter(type -> Enum.class.isAssignableFrom(type))
+                .forEach(type -> {
+                    final Class<Enum> enumClass = (Class<Enum>) type;
                     if (enumClasses.add(enumClass))
                     {
                         try

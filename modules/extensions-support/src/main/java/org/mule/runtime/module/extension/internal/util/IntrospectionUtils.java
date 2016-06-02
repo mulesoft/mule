@@ -31,6 +31,7 @@ import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.extension.api.BaseExtensionWalker;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -68,7 +69,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang.StringUtils;
@@ -513,38 +513,20 @@ public final class IntrospectionUtils
      * operations, etc.
      *
      * @param extensionModel a {@link ExtensionModel}
-     * @param filter         a {@link Predicate} used to filter out the classes which are not of interest
      * @return a non {@code null} {@link Set}
      */
-    public static Set<Class<?>> getParameterClasses(ExtensionModel extensionModel, Predicate<ParameterModel> filter)
+    public static Set<Class<?>> getParameterClasses(ExtensionModel extensionModel)
     {
         ImmutableSet.Builder<Class<?>> parameterClasses = ImmutableSet.builder();
-
-        collectParameterClasses(parameterClasses,
-                                filter,
-                                extensionModel.getConnectionProviders(),
-                                extensionModel.getConfigurationModels(),
-                                extensionModel.getOperationModels(),
-                                extensionModel.getSourceModels());
-
-        extensionModel.getConfigurationModels().forEach(configuration ->
-                                                                collectParameterClasses(parameterClasses,
-                                                                                        filter,
-                                                                                        configuration.getConnectionProviders(),
-                                                                                        configuration.getOperationModels(),
-                                                                                        configuration.getSourceModels())
-        );
+        new BaseExtensionWalker()
+        {
+            @Override
+            public void onParameter(ParameterizedModel owner, ParameterModel model)
+            {
+                parameterClasses.add(getType(model.getType()));
+            }
+        }.walk(extensionModel);
 
         return parameterClasses.build();
-    }
-
-    private static void collectParameterClasses(ImmutableSet.Builder<Class<?>> parameterClasses,
-                                                Predicate<ParameterModel> filter,
-                                                Collection<? extends ParameterizedModel>... parametrizedModelsArray)
-    {
-        stream(parametrizedModelsArray).forEach(models -> models.stream().forEach(
-                model -> model.getParameterModels().stream()
-                        .filter(filter)
-                        .forEach(parameter -> parameterClasses.add(getType(parameter.getType())))));
     }
 }

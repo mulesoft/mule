@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
-import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
@@ -19,19 +17,26 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.extension.api.BaseExtensionWalker;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.connection.HasConnectionProviderModels;
 import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import com.google.common.collect.ImmutableSet;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -140,112 +145,92 @@ final class ExportedArtifactsCollector
 
     private void collectDefault()
     {
-        collectImplementingClasses();
-        collectParameterClasses();
-        collectReturnTypes();
-        collectConnectionTypes();
-    }
-
-    private void collectReturnTypes()
-    {
-        collectReturnTypes(extensionModel.getOperationModels(), extensionModel.getSourceModels());
-        extensionModel.getConfigurationModels().forEach(configuration ->
-                                                                collectReturnTypes(configuration.getOperationModels(),
-                                                                                   configuration.getSourceModels())
-        );
-    }
-
-    private void collectConnectionTypes()
-    {
-        collectConnectionTypes(extensionModel);
-        extensionModel.getConfigurationModels().forEach(this::collectConnectionTypes);
-    }
-
-    private void collectConnectionTypes(HasConnectionProviderModels model)
-    {
-        model.getConnectionProviders().stream()
-                .map(provider -> ((RuntimeConnectionProviderModel) provider).getConnectionType())
-                .forEach(exportedClasses::add);
-    }
-
-    private void collectReturnTypes(Collection<? extends ComponentModel>... componentModelsArray)
-    {
-        stream(componentModelsArray).forEach(componentList -> componentList.forEach(component -> {
-            exportedClasses.add(getType(component.getReturnType()));
-            exportedClasses.add(getType(component.getAttributesType()));
-        }));
-    }
-
-    private void collectParameterClasses()
-    {
-        exportedClasses.addAll(getParameterClasses(extensionModel, parameter -> {
-            ValueHolder<Boolean> accept = new ValueHolder<>(false);
-
-            MetadataTypeVisitor visitor = new MetadataTypeVisitor()
+        new BaseExtensionWalker()
+        {
+            @Override
+            public void onConfiguration(ConfigurationModel model)
             {
-                @Override
-                public void visitDictionary(DictionaryType dictionaryType)
-                {
-                    dictionaryType.getKeyType().accept(this);
-                    dictionaryType.getValueType().accept(this);
-                }
+                collectImplementingClass(model);
+            }
 
-                @Override
-                public void visitArrayType(ArrayType arrayType)
-                {
-                    arrayType.getType().accept(this);
-                }
+            @Override
+            public void onParameter(ParameterizedModel owner, ParameterModel model)
+            {
+                getParameterClass(model).ifPresent(exportedClasses::add);
+            }
 
-                @Override
-                public void visitObject(ObjectType objectType)
-                {
-                    accept.set(true);
-                }
+            @Override
+            public void onOperation(HasOperationModels owner, OperationModel model)
+            {
+                collectImplementingClass(model);
+                collectReturnTypes(model);
+            }
 
-                @Override
-                public void visitString(StringType stringType)
-                {
-                    Optional<EnumAnnotation> enumAnnotation = getSingleAnnotation(stringType, EnumAnnotation.class);
-                    accept.set(enumAnnotation.isPresent());
-                }
-            };
+            @Override
+            public void onSource(HasSourceModels owner, SourceModel model)
+            {
+                collectImplementingClass(model);
+                collectReturnTypes(model);
+            }
 
-            parameter.getType().accept(visitor);
-            return accept.get();
-        }));
+            @Override
+            public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model)
+            {
+                collectImplementingClass(model);
+                exportedClasses.add(((RuntimeConnectionProviderModel) model).getConnectionType());
+            }
+        }.walk(extensionModel);
     }
 
-    private void collectImplementingClasses()
+    private void collectReturnTypes(ComponentModel model)
     {
-        collectImplementingClasses(collectEnrichableModels());
+        exportedClasses.add(getType(model.getReturnType()));
+        exportedClasses.add(getType(model.getAttributesType()));
     }
 
-
-    private void collectImplementingClasses(Collection<EnrichableModel> models)
+    private Optional<Class<?>> getParameterClass(ParameterModel parameter)
     {
-        models.stream()
-                .map(model -> model.getModelProperty(ImplementingTypeModelProperty.class))
-                .map(property -> property.isPresent() ? property.get().getType() : null)
-                .filter(property -> property != null)
-                .forEach(exportedClasses::add);
-    }
+        ValueHolder<Class<?>> clazz = new ValueHolder<>(null);
 
-    private Collection<EnrichableModel> collectEnrichableModels()
-    {
-        Set<EnrichableModel> enrichableModels = new HashSet<>();
+        parameter.getType().accept(new MetadataTypeVisitor()
+        {
+            @Override
+            public void visitDictionary(DictionaryType dictionaryType)
+            {
+                dictionaryType.getKeyType().accept(this);
+                dictionaryType.getValueType().accept(this);
+            }
 
-        enrichableModels.add(extensionModel);
-        enrichableModels.addAll(extensionModel.getConfigurationModels());
-        enrichableModels.addAll(extensionModel.getOperationModels());
-        enrichableModels.addAll(extensionModel.getSourceModels());
-        enrichableModels.addAll(extensionModel.getConnectionProviders());
-        extensionModel.getConfigurationModels().forEach(configuration -> {
-            enrichableModels.addAll(configuration.getOperationModels());
-            enrichableModels.addAll(configuration.getOperationModels());
-            enrichableModels.addAll(configuration.getSourceModels());
-            enrichableModels.addAll(configuration.getConnectionProviders());
+            @Override
+            public void visitArrayType(ArrayType arrayType)
+            {
+                arrayType.getType().accept(this);
+            }
+
+            @Override
+            public void visitObject(ObjectType objectType)
+            {
+                clazz.set(getType(objectType));
+            }
+
+            @Override
+            public void visitString(StringType stringType)
+            {
+                Optional<EnumAnnotation> enumAnnotation = getSingleAnnotation(stringType, EnumAnnotation.class);
+                if (enumAnnotation.isPresent())
+                {
+                    clazz.set(getType(stringType));
+                }
+            }
         });
 
-        return enrichableModels;
+        return Optional.ofNullable(clazz.get());
+    }
+
+    private void collectImplementingClass(EnrichableModel model)
+    {
+        model.getModelProperty(ImplementingTypeModelProperty.class)
+                .map(ImplementingTypeModelProperty::getType)
+                .ifPresent(exportedClasses::add);
     }
 }
