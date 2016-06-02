@@ -15,6 +15,10 @@
         <file:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]"/>
     </flow>
 
+    <flow name="writeStaticContent">
+        <file:write path="#[path]" mode="#[mode]" content="Hello World!" createParentDirectories="#[createParent]"/>
+    </flow>
+
     <flow name="readAndWrite">
         <file:read path="#[path]" />
         <set-payload value="Hello World!" />

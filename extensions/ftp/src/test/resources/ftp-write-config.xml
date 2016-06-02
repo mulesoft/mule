@@ -15,6 +15,10 @@
         <ftp:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]"/>
     </flow>
 
+    <flow name="writeStaticContent">
+        <ftp:write path="#[path]" mode="#[mode]" content="Hello World!" createParentDirectories="#[createParent]"/>
+    </flow>
+
     <flow name="readAndWrite">
         <ftp:read path="#[path]" />
         <set-payload value="Hello World!" />
