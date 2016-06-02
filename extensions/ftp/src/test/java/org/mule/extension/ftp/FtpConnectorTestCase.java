@@ -32,8 +32,9 @@ public abstract class FtpConnectorTestCase extends ExtensionFunctionalTestCase
     @Rule
     public final FtpTestHarness testHarness;
 
-    @Parameters(name ="{0}")
-    public static Collection<Object[]> data() {
+    @Parameters(name = "{0}")
+    public static Collection<Object[]> data()
+    {
         return Arrays.asList(new Object[][] {
                 {"ftp", new ClassicFtpTestHarness()},
                 {"sftp", new SftpTestHarness()}
@@ -64,7 +65,12 @@ public abstract class FtpConnectorTestCase extends ExtensionFunctionalTestCase
 
     protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
     {
-        flowRunner("write")
+        doWrite("write", path, content, mode, createParent);
+    }
+
+    protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
+    {
+        flowRunner(flow)
                 .withFlowVariable("path", path)
                 .withFlowVariable("createParent", createParent)
                 .withFlowVariable("mode", mode)

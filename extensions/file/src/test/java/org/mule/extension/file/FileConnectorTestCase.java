@@ -9,15 +9,15 @@ package org.mule.extension.file;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,8 +100,12 @@ public abstract class FileConnectorTestCase extends ExtensionFunctionalTestCase
 
     protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
     {
+        doWrite("write", path, content, mode, createParent);
+    }
 
-        flowRunner("write")
+    protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
+    {
+        flowRunner(flow)
                 .withFlowVariable("path", path)
                 .withFlowVariable("createParent", createParent)
                 .withFlowVariable("mode", mode)

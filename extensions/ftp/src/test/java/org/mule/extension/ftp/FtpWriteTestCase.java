@@ -131,6 +131,17 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
         assertThat(event.getMessageAsString(), equalTo(HELLO_WORLD));
     }
 
+    @Test
+    public void writeStaticContent() throws Exception
+    {
+        testHarness.makeDir(TEMP_DIRECTORY);
+        String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "test.txt").toString();
+        doWrite("writeStaticContent", path, "", CREATE_NEW, false);
+
+        String content = getPayloadAsString(readPath(path));
+        assertThat(content, is(HELLO_WORLD));
+    }
+
     private void doWriteNotExistingFileWithCreatedParent(FileWriteMode mode) throws Exception
     {
         testHarness.makeDir(TEMP_DIRECTORY);

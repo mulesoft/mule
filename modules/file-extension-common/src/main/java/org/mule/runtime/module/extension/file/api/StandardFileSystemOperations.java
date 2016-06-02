@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.extension.file.api.matcher.NullFilePayloadPredicate;
@@ -21,6 +25,7 @@ import java.util.Iterator;
 import java.util.function.Predicate;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.inject.Inject;
 
 /**
  * Basic set of operations for extensions which perform operations
@@ -31,6 +36,8 @@ import javax.activation.MimetypesFileTypeMap;
 //TODO: MULE-9215
 public class StandardFileSystemOperations
 {
+    @Inject
+    private MuleContext muleContext;
 
     /**
      * Lists all the files in the {@code directoryPath} which match the given {@code matcher}.
@@ -137,7 +144,7 @@ public class StandardFileSystemOperations
      */
     public void write(@Connection FileSystem fileSystem,
                       @Optional String path,
-                      @Optional(defaultValue = "#[payload]") Object content,
+                      @Optional(defaultValue = "#[payload]") @Expression(LITERAL) Object content,
                       @Optional(defaultValue = "OVERWRITE") FileWriteMode mode,
                       @Optional(defaultValue = "false") boolean lock,
                       @Optional(defaultValue = "true") boolean createParentDirectories,
@@ -146,6 +153,17 @@ public class StandardFileSystemOperations
         if (content == null || content instanceof NullPayload)
         {
             throw new IllegalArgumentException("Cannot write a null content");
+        }
+
+        if (content instanceof String)
+        {
+            String value = (String) content;
+            AttributeEvaluator evaluator = new AttributeEvaluator(value);
+            evaluator.initialize(muleContext.getExpressionManager());
+            if (evaluator.isExpression() || evaluator.isParseExpression())
+            {
+                content = evaluator.resolveValue(event);
+            }
         }
 
         path = resolvePath(path, event, "path");

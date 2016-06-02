@@ -14,8 +14,8 @@ import static org.mule.runtime.module.extension.file.api.FileWriteMode.APPEND;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.CREATE_NEW;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.OVERWRITE;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
 import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.module.extension.file.api.FileWriteMode;
 
 import java.io.File;
 
@@ -47,7 +47,6 @@ public class FileWriteTestCase extends FileConnectorTestCase
     @Test
     public void createNewOnNotExistingFile() throws Exception
     {
-
         doWriteOnNotExistingFile(CREATE_NEW);
     }
 
@@ -122,6 +121,16 @@ public class FileWriteTestCase extends FileConnectorTestCase
                 .run();
 
         assertThat(event.getMessageAsString(), equalTo(HELLO_WORLD));
+    }
+
+    @Test
+    public void writeStaticContent() throws Exception
+    {
+        String path = String.format("%s/%s", temporaryFolder.newFolder().getPath(), TEST_FILENAME);
+        doWrite("writeStaticContent", path, "", CREATE_NEW, false);
+
+        String content = readPathAsString(path);
+        assertThat(content, is(HELLO_WORLD));
     }
 
     private void doWriteNotExistingFileWithCreatedParent(FileWriteMode mode) throws Exception
