@@ -8,6 +8,7 @@
 package org.mule.runtime.module.db.integration.model;
 
 import org.mule.common.metadata.datatype.DataType;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -194,7 +195,7 @@ public class OracleTestDatabase extends AbstractTestDatabase
     {
         try
         {
-            return Class.forName("oracle.sql.ROWID");
+            return ClassUtils.getClass("oracle.sql.ROWID");
         }
         catch (ClassNotFoundException e)
         {

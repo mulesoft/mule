@@ -17,6 +17,7 @@ import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
@@ -324,7 +325,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
                 if (preferredConnectorName != null)
                 {
                     logger.debug("Found preferred connector class " + preferredConnectorName);
-                    return Class.forName(preferredConnectorName);
+                    return ClassUtils.getClass(preferredConnectorName);
                 }
             }
             catch (Exception e)

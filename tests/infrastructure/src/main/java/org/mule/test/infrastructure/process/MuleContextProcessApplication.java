@@ -11,8 +11,9 @@ import static org.mule.test.infrastructure.process.MuleContextProcessBuilder.MUL
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.MuleServer;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.test.infrastructure.deployment.FakeMuleServer;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FileUtils;
+import org.mule.test.infrastructure.deployment.FakeMuleServer;
 
 import java.io.File;
 import java.io.IOException;
@@ -101,7 +102,7 @@ public class MuleContextProcessApplication
             {
                 try
                 {
-                    muleCoreExtensions.add((MuleCoreExtension) Class.forName(coreExtensionClassName).newInstance());
+                    muleCoreExtensions.add((MuleCoreExtension) ClassUtils.getClass(coreExtensionClassName).newInstance());
                 }
                 catch (Exception e)
                 {

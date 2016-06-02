@@ -10,11 +10,13 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOM
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
+
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -84,6 +86,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         this.elementValidators = ArrayUtils.isEmpty(elementValidators) ? ImmutableList.<ElementValidator>of() : ImmutableList.copyOf(elementValidators);
     }
 
+    @Override
     public BeanDefinition parseCustomElement(Element element, BeanDefinition parent)
     {
         if (logger.isDebugEnabled())
@@ -219,20 +222,20 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             {
                 try
                 {
-                    Class<?> type = Class.forName(finalChild.getBeanClassName());
+                    Class<?> type = ClassUtils.getClass(finalChild.getBeanClassName());
                     if (FactoryBean.class.isAssignableFrom(type))
                     {
                         try
                         {
                             //When the FactoryBean implementation implements the FactoryBean directly.
-                            type = (Class<?>) ((ParameterizedType) Class.forName(finalChild.getBeanClassName()).getGenericInterfaces()[0]).getActualTypeArguments()[0];
+                            type = (Class<?>) ((ParameterizedType) ClassUtils.getClass(finalChild.getBeanClassName()).getGenericInterfaces()[0]).getActualTypeArguments()[0];
                         }
                         catch (Exception e2)
                         {
                             try
                             {
                                 //When the FactoryBean implementation extends a Class that implements FactoryBean.
-                                type = (Class<?>) ((ParameterizedType) Class.forName(finalChild.getBeanClassName()).getGenericSuperclass()).getActualTypeArguments()[0];
+                                type = (Class<?>) ((ParameterizedType) ClassUtils.getClass(finalChild.getBeanClassName()).getGenericSuperclass()).getActualTypeArguments()[0];
                             }
                             catch(Exception e3)
                             {

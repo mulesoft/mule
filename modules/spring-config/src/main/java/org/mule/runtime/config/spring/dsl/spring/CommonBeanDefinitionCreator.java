@@ -274,7 +274,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
             }
             try
             {
-                beanClass = Class.forName(originalBeanDefinition.getBeanClassName());
+                beanClass = ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
             }
             catch (ClassNotFoundException e)
             {

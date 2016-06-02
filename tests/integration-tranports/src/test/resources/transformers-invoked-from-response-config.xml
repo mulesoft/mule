@@ -26,7 +26,7 @@
                     </scripting:script>
                 </scripting:transformer>
                 <custom-transformer
-                        class="org.mule.TransformersInvokedFromResponseTestCase$InvocationCounterTransformer1"/>
+                        class="org.mule.test.integration.transformer.TransformersInvokedFromResponseTestCase$InvocationCounterTransformer1"/>
             </transports:response>
         </transports:inbound-endpoint>
         <echo-component/>
