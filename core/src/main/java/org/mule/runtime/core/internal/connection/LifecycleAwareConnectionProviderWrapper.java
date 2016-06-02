@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.retry.RetryPolicy;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 
 import java.util.Optional;
 
@@ -65,7 +66,8 @@ public class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends
         Connection connection = super.connect(config);
         try
         {
-            muleContext.getRegistry().applyProcessorsAndLifecycle(connection);
+            muleContext.getInjector().inject(connection);
+            muleContext.getRegistry().applyLifecycle(connection, NotInLifecyclePhase.PHASE_NAME, Startable.PHASE_NAME);
         }
         catch (MuleException e)
         {
