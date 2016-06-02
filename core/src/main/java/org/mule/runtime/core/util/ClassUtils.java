@@ -10,7 +10,6 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
-import com.google.common.base.Supplier;
 import com.google.common.primitives.Primitives;
 
 import java.io.BufferedReader;
@@ -41,6 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Extend the Apache Commons ClassUtils to provide additional functionality.
