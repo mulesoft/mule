@@ -107,6 +107,40 @@
                 <version>${mule.extensions.maven.plugin.version}</version>
                 <extensions>true</extensions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>analyze-dependencies</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <failOnWarning>true</failOnWarning>
+                            <verbose>true</verbose>
+                            <ignoredUsedUndeclaredDependencies>
+                                <!-- Mule dependencies are ignored -->
+                                <ignoredUsedUndeclaredDependency>org.mule*</ignoredUsedUndeclaredDependency>
+                                <!-- Testing dependencies are ignored -->
+                                <ignoredUsedUndeclaredDependency>org.hamcrest</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>org.mockito</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>junit:junit</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>commons-logging:commons-logging</ignoredUsedUndeclaredDependency>
+
+                                <!-- Logging related artifacts are exposed by the BOOTSTRAP ClassLoader -->
+                                <ignoredUsedUndeclaredDependency>org.slf4j:slf4j-api</ignoredUsedUndeclaredDependency>
+                                <ignoredUsedUndeclaredDependency>javax.inject:javax.inject</ignoredUsedUndeclaredDependency>
+                            </ignoredUsedUndeclaredDependencies>
+                            <ignoredUnusedDeclaredDependencies>
+                                <!-- Don't need to worry about this -->
+                                <ignoredUnusedDeclaredDependency>:::</ignoredUnusedDeclaredDependency>
+                            </ignoredUnusedDeclaredDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

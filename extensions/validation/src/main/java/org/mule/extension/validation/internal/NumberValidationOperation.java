@@ -6,17 +6,16 @@
  */
 package org.mule.extension.validation.internal;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.validator.NumberType;
 import org.mule.extension.validation.internal.validator.NumberValidator;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
 import java.util.Locale;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Defines operations to validate numbers
