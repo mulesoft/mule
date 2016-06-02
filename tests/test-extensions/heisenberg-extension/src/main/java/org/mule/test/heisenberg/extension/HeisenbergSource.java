@@ -6,6 +6,7 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.mule.runtime.api.metadata.DataType.STRING_DATA_TYPE;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.execution.BlockingCompletionHandler;
@@ -26,7 +27,6 @@ import org.mule.runtime.extension.api.runtime.source.SourceContext;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +36,7 @@ import javax.inject.Inject;
 @Alias("ListenPayments")
 public class HeisenbergSource extends Source<Void, Serializable> implements Initialisable
 {
+
     public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
     public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
 
@@ -62,11 +63,13 @@ public class HeisenbergSource extends Source<Void, Serializable> implements Init
     {
         checkArgument(heisenberg != null, "config not injected");
         checkArgument(muleContext != null, "dependencies not injected");
+        connection.verifyLifecycle(1, 1, 0, 0);
     }
 
     @Override
     public void start()
     {
+        connection.verifyLifecycle(1, 1, 0, 0);
         HeisenbergExtension.sourceTimesStarted++;
 
         if (corePoolSize < 0)
@@ -74,7 +77,7 @@ public class HeisenbergSource extends Source<Void, Serializable> implements Init
             throw new RuntimeException(CORE_POOL_SIZE_ERROR_MESSAGE);
         }
 
-        executor = Executors.newScheduledThreadPool(1);
+        executor = newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(() -> sourceContext.getMessageHandler().handle(makeMessage(sourceContext), completionHandler()), 0, 100, TimeUnit.MILLISECONDS);
     }
 

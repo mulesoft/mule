@@ -93,7 +93,6 @@ final class SourceWrapper extends Source implements Lifecycle, FlowConstructAwar
     @Override
     public void start() throws MuleException
     {
-
         try
         {
             delegate.start();
