@@ -13,6 +13,8 @@ import groovy.transform.Field
 @Field String help = '\nDeploys to a remote Maven repository Mule CE and EE artifacts including distributions, poms, jars, test jars, javadoc jars and source jars.\n'
 @Field String ceRepoId
 @Field String ceRepoUrl
+@Field boolean logErrors
+@Field boolean verbose
 @Field Boolean deployDistro
 @Field String version
 @Field String m2repo
@@ -46,6 +48,8 @@ def parseArguments(def arguments)
     deploySignatures = options.g ? true : false
     ceRepoId = options.ce.split('::')[0]
     ceRepoUrl = options.ce.split('::')[1]
+    logErrors = options.le ? true : false
+    verbose = options.vb ? true : false
 }
 
 private OptionAccessor parseOptions(arguments)
@@ -58,6 +62,8 @@ private OptionAccessor parseOptions(arguments)
     cliBuilder.d(longOpt: "deploy-distributions", "Deploy Distribution Artifacts")
     cliBuilder.ce(longOpt: "ce-repository", required: true, args: 1, "CE Remote repository (id::repository)")
     cliBuilder.g(longOpt: "deploy-gpg-signatures", required: false, args: 0, "Configures the script to upload GPG signatures")
+    cliBuilder.le(longOpt: "log-errors", required: false, args: 0, "It will be logged in case an error occurs when a maven command is executed")
+    cliBuilder.vb(longOpt: "verbose", required: false, args: 0, "It will log the maven command output")
     return cliBuilder.parse(arguments)
 }
 
@@ -139,7 +145,7 @@ protected void deployToRemote(String repoUrl, String repoId, String groupId, Str
 
 private boolean getDependency(Artifact artifact, String destFilename)
 {
-    return mvn([GET_PLUGIN, "-Dartifact=${artifact}", "-Ddest=${destFilename}", "-Dtransitive=false"], false)
+    return mvn([GET_PLUGIN, "-Dartifact=${artifact}", "-Ddest=${destFilename}", "-Dtransitive=false"], logErrors)
 }
 
 private boolean deployFile(Artifact artifact, String pomFile, String artifactFile, String repoUrl, String repoId)
@@ -149,7 +155,7 @@ private boolean deployFile(Artifact artifact, String pomFile, String artifactFil
     {
         args.add("-Dclassifier=${artifact.classifier}")
     }
-    result = mvn(args)
+    result = mvn(args, logErrors)
     log((result ? "Deployed: " : "Failed to deploy: ") + artifact)
     return result
 }
@@ -176,7 +182,8 @@ def mvn(List mvnArgs, boolean logErrors=false)
     List<String> lines = proc.in.readLines()
     proc.waitForOrKill(FIVE_MINUTES)
     boolean error = lines.find { it.startsWith('[ERROR]') }
-    if (error && logErrors) { lines.each { log it } }
+    if (error && logErrors && ! verbose) { lines.each { log it } }
+    if (verbose) { lines.each { log it } }
     return !error
 }
 
