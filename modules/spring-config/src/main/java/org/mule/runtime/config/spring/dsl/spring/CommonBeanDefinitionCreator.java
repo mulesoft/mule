@@ -19,7 +19,6 @@ import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionP
 import static org.mule.runtime.core.api.AnnotatedObject.PROPERTY_NAME;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
@@ -43,10 +42,8 @@ import javax.xml.namespace.QName;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.cglib.proxy.Callback;
 import org.springframework.cglib.proxy.Enhancer;
@@ -182,11 +179,16 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
         Enhancer.registerStaticCallbacks(factoryBeanClass, new Callback[] {
                 new MethodInterceptor()
                 {
+                    @Override
                     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable
                     {
                         if (method.getName().equals("isSingleton"))
                         {
                             return !componentBuildingDefinition.isPrototype();
+                        }
+                        if (method.getName().equals("getObjectType"))
+                        {
+                            return null;
                         }
                         return proxy.invokeSuper(obj, args);
                     }
