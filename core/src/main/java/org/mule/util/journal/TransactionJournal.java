@@ -54,7 +54,7 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
         File logFileDirectory = new File(logFilesDirectory);
         if (!logFileDirectory.exists())
         {
-            Preconditions.checkState(logFileDirectory.mkdirs(), "Could not created directory for queue transaction logger " + logFileDirectory);
+            Preconditions.checkState(logFileDirectory.mkdirs(), "Could not create directory for queue transaction logger " + logFileDirectory);
         }
         File logFile1 = new File(logFileDirectory, "tx1.log");
         File logFile2 = new File(logFileDirectory, "tx2.log");
