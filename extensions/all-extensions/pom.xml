@@ -91,11 +91,9 @@
             <artifactId>mule-module-validation</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
-            <!--TODO(gfernandes): https://issues.apache.org/jira/browse/MASSEMBLY-799
-                wildcard exclusions were supported in maven-core https://issues.apache.org/jira/browse/MNG-3832
-                but still assembly is not handling this correctly. Remove commons-validator and add * for groupId and artifacId
-                so transitive dependencies will not end up in lib/opt (and we don't want to explicitly
-                exclude them from the assembly descriptor)
+            <!--TODO(gfernandes): https://www.mulesoft.org/jira/browse/MULE-9810
+                Remove explicit exclusions whenever this issue is fixed (this applies to all the zip type
+                dependencies
             -->
             <exclusions>
                 <exclusion>
