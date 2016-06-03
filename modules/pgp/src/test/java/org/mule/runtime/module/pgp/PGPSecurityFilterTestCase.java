@@ -23,8 +23,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-9818")
 public class PGPSecurityFilterTestCase extends FunctionalTestCase
 {
     protected static final String TARGET = "/encrypted.txt";
