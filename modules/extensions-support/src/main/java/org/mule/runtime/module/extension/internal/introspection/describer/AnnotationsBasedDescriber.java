@@ -106,11 +106,14 @@ import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFa
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -146,6 +149,10 @@ public final class AnnotationsBasedDescriber implements Describer
     private final Class<?> extensionType;
     private final VersionResolver versionResolver;
     private final ClassTypeLoader typeLoader;
+
+    private final Multimap<Class<?>, OperationDeclarer> operationDeclarers = LinkedListMultimap.create();
+    private final Map<Class<?>, SourceDeclarer> sourceDeclarers = new HashMap<>();
+    private final Map<Class<?>, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
     /**
      * An ordered {@link List} used to locate a {@link FieldDescriber} that can handle
@@ -209,7 +216,7 @@ public final class AnnotationsBasedDescriber implements Describer
             if (typeMappings.stream().map(SubTypeMapping::baseType).distinct().collect(toList()).size() != typeMappings.size())
             {
                 throw new IllegalModelDefinitionException(String.format("There should be only one SubtypeMapping for any given base type in extension [%s]." +
-                                                                        " Duplicated base types are not allowed", declaration.getExtensionDeclaration().getName()));
+                                                                        " Duplicated base types are not allowed", declaration.getDeclaration().getName()));
             }
 
             Map<MetadataType, List<MetadataType>> subTypesMap = typeMappings.stream().collect(
@@ -231,7 +238,7 @@ public final class AnnotationsBasedDescriber implements Describer
             if (importTypes.stream().map(Import::type).distinct().collect(toList()).size() != importTypes.size())
             {
                 throw new IllegalModelDefinitionException(String.format("There should be only one Import declaration for any given type in extension [%s]." +
-                                                                        " Multiple imports of the same type are not allowed", declaration.getExtensionDeclaration().getName()));
+                                                                        " Multiple imports of the same type are not allowed", declaration.getDeclaration().getName()));
             }
 
             Map<MetadataType, MetadataType> importedTypes = importTypes.stream().collect(
@@ -326,10 +333,17 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
+    //TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
     private void declareMessageSource(HasSourceDeclarer declarer, Class<? extends Source> sourceType)
     {
-        //TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
-        SourceDeclarer source = declarer.withMessageSource(getSourceName(sourceType));
+        SourceDeclarer source = sourceDeclarers.get(sourceType);
+        if (source != null)
+        {
+            declarer.withMessageSource(source);
+            return;
+        }
+
+        source = declarer.withMessageSource(getSourceName(sourceType));
 
         List<Class<?>> sourceGenerics = (List) getSuperClassGenerics(sourceType, Source.class);
 
@@ -348,12 +362,23 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withModelProperty(new ImplementingTypeModelProperty(sourceType))
                 .withMetadataResolverFactory(getMetadataResolverFactoryFromClass(extensionType, sourceType));
 
+        sourceDeclarers.put(sourceType, source);
         declareMetadataKeyId(sourceType, source);
         declareSingleParameters(getParameterFields(sourceType), source, MuleExtensionAnnotationParser::parseMetadataAnnotations);
 
-        getAnnotatedFields(sourceType, Connection.class).stream().forEach(f -> parseConnectionAnnotation(f.getDeclaringClass(), source));
-        getAnnotatedFields(sourceType, UseConfig.class).stream().forEach(f -> parseUseConfigAnnotation(f.getDeclaringClass(), source));
+        declareSourceConnection(sourceType, source);
+        declareSourceConfig(sourceType, source);
         declareParameterGroups(sourceType, source);
+    }
+
+    private void declareSourceConfig(Class<? extends Source> sourceType, SourceDeclarer source)
+    {
+        getAnnotatedFields(sourceType, UseConfig.class).stream().forEach(f -> parseUseConfigAnnotation(f.getDeclaringClass(), source));
+    }
+
+    private void declareSourceConnection(Class<? extends Source> sourceType, SourceDeclarer source)
+    {
+        getAnnotatedFields(sourceType, Connection.class).stream().forEach(f -> parseConnectionAnnotation(f.getDeclaringClass(), source));
     }
 
     private void declareMetadataKeyId(Class<?> sourceType, SourceDeclarer source)
@@ -509,6 +534,12 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private <T> void declareOperation(HasOperationDeclarer declarer, Class<T> actingClass)
     {
+        if (operationDeclarers.containsKey(actingClass))
+        {
+            operationDeclarers.get(actingClass).forEach(declarer::withOperation);
+            return;
+        }
+
         checkOperationIsNotAnExtension(actingClass);
 
         for (Method method : getOperationMethods(actingClass))
@@ -524,6 +555,8 @@ public final class AnnotationsBasedDescriber implements Describer
             declareOperationMetadataKeyId(method, operation);
             declareOperationParameters(method, operation);
             calculateExtendedTypes(actingClass, method, operation);
+
+            operationDeclarers.put(actingClass, operation);
         }
     }
 
@@ -580,6 +613,13 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private <T> void declareConnectionProvider(HasConnectionProviderDeclarer declarer, Class<T> providerClass)
     {
+        ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(providerClass);
+        if (providerDeclarer != null)
+        {
+            declarer.withConnectionProvider(providerDeclarer);
+            return;
+        }
+
         String name = DEFAULT_CONNECTION_PROVIDER_NAME;
         String description = EMPTY;
 
@@ -600,14 +640,15 @@ public final class AnnotationsBasedDescriber implements Describer
                                                                                providerClass.getName(), providerGenerics.size()));
         }
 
-        ConnectionProviderDeclarer providerDescriptor = declarer.withConnectionProvider(name)
+        providerDeclarer = declarer.withConnectionProvider(name)
                 .describedAs(description)
                 .createdWith(new DefaultConnectionProviderFactory<>(providerClass))
                 .forConfigsOfType(providerGenerics.get(0))
                 .whichGivesConnectionsOfType(providerGenerics.get(1))
                 .withModelProperty(new ImplementingTypeModelProperty(providerClass));
 
-        declareAnnotatedParameters(providerClass, providerDescriptor);
+        connectionProviderDeclarers.put(providerClass, providerDeclarer);
+        declareAnnotatedParameters(providerClass, providerDeclarer);
     }
 
     private void calculateExtendedTypes(Class<?> actingClass, Method method, OperationDeclarer operation)
@@ -708,6 +749,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private interface ModelPropertyContributor
     {
+
         void contribute(AnnotatedElement annotatedElement, HasModelProperties descriptor);
     }
 }

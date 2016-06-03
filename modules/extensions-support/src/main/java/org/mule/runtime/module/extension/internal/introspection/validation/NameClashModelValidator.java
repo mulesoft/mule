@@ -7,23 +7,27 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.lang.String.format;
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.extension.api.BaseExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.Described;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.connection.HasConnectionProviderModels;
+import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
+import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -56,14 +60,8 @@ public final class NameClashModelValidator implements ModelValidator
     private class ValidationDelegate
     {
 
-        public static final String CONFIGURATIONS = "configurations";
-        public static final String OPERATIONS = "operations";
-        public static final String CONNECTION_PROVIDERS = "connection providers";
-        public static final String COMPLEX_TYPE_PARAMETERS = "complex type parameters";
         private final ExtensionModel extensionModel;
-        private final Set<String> configurationNames = new HashSet<>();
-        private final Set<String> operationNames = new HashSet<>();
-        private final Set<String> connectionProviderNames = new HashSet<>();
+        private final Set<Reference<Described>> namedObjects = new HashSet<>();
         private final Multimap<String, TopLevelParameter> topLevelParameters = LinkedListMultimap.create();
 
         public ValidationDelegate(ExtensionModel extensionModel)
@@ -73,148 +71,155 @@ public final class NameClashModelValidator implements ModelValidator
 
         private void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
         {
-            extensionModel.getConfigurationModels().stream().forEach(configurationModel -> validate(configurationModel.getParameterModels(),
-                                                                                                    configurationNames,
-                                                                                                    configurationModel.getName(),
-                                                                                                    "configuration"));
-
-            validateOperations(extensionModel.getOperationModels());
-            extensionModel.getConfigurationModels().forEach(config -> validateOperations(config.getOperationModels()));
-
-            validateConnectionProviders(extensionModel.getConnectionProviders());
-            extensionModel.getConfigurationModels().forEach(config -> validateConnectionProviders(config.getConnectionProviders()));
-
-            validateClashes(configurationNames, operationNames, CONFIGURATIONS, OPERATIONS);
-            validateClashes(configurationNames, connectionProviderNames, CONFIGURATIONS, CONNECTION_PROVIDERS);
-            validateClashes(operationNames, connectionProviderNames, OPERATIONS, CONNECTION_PROVIDERS);
-
-            Set<String> parameterNames = topLevelParameters.keySet();
-            validateClashes(configurationNames, parameterNames, CONFIGURATIONS, COMPLEX_TYPE_PARAMETERS);
-            validateClashes(operationNames, parameterNames, OPERATIONS, COMPLEX_TYPE_PARAMETERS);
-            validateClashes(connectionProviderNames, parameterNames, CONNECTION_PROVIDERS, COMPLEX_TYPE_PARAMETERS);
-        }
-
-        private void validateConnectionProviders(List<ConnectionProviderModel> providers)
-        {
-            providers.stream().forEach(providerModel -> validate(providerModel.getParameterModels(),
-                                                                 connectionProviderNames,
-                                                                 providerModel.getName(),
-                                                                 "connection provider"));
-        }
-
-        private void validateOperations(List<OperationModel> operations)
-        {
-            operations.stream().forEach(operationModel -> validate(operationModel.getParameterModels(),
-                                                                   operationNames,
-                                                                   operationModel.getName(),
-                                                                   "operation"));
-
-            // Check clash between each operation and its parameters type
-            operations.stream().forEach(operationModel -> {
-                operationModel.getParameterModels().stream().forEach(parameterModel -> {
-                    validateClash(operationModel.getName(),
-                                  getType(parameterModel.getType()).getName(),
-                                  "operation",
-                                  "argument");
-                });
-            });
-
-            // Check clashes between each operation argument and the connection providers
-            for (ConfigurationModel configuration : extensionModel.getConfigurationModels())
+            new BaseExtensionWalker()
             {
-                MuleExtensionUtils.getAllConnectionProviders((RuntimeConfigurationModel) configuration).stream()
-                        .forEach(connectionProviderModel -> {
-                            extensionModel.getOperationModels().stream().forEach(operationModel -> {
-                                operationModel.getParameterModels().stream().forEach(parameterModel -> {
-                                    validateClash(connectionProviderModel.getName(),
-                                                  getType(parameterModel.getType()).getName(),
-                                                  "connection provider",
-                                                  String.format("operation's (%s) parameter", operationModel.getName()));
-                                });
-                            });
-                        });
-            }
 
-            // Check clashes between each operation argument and the configs
-            extensionModel.getConfigurationModels().stream().forEach(configurationModel -> {
-                operations.stream().forEach(operationModel -> {
-                    operationModel.getParameterModels().stream().forEach(parameterModel -> {
-                        validateClash(configurationModel.getName(),
-                                      getType(parameterModel.getType()).getName(),
-                                      "configuration",
-                                      String.format("operation's (%s) parameter", operationModel.getName()));
-                    });
-                });
-            });
+                @Override
+                public void onConfiguration(ConfigurationModel model)
+                {
+                    defaultValidation(model);
+                }
+
+                @Override
+                public void onOperation(HasOperationModels owner, OperationModel model)
+                {
+                    validateOperation(model);
+                    registerNamedObject(model);
+                }
+
+                @Override
+                public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model)
+                {
+                    defaultValidation(model);
+                }
+
+                @Override
+                public void onSource(HasSourceModels owner, SourceModel model)
+                {
+                    defaultValidation(model);
+                }
+
+                @Override
+                public void onParameter(ParameterizedModel owner, ParameterModel model)
+                {
+                    validateTopLevelParameter(model, owner);
+                }
+
+                private void defaultValidation(ParameterizedModel model)
+                {
+                    validateParameterNames(model);
+                    registerNamedObject(model);
+                }
+
+                private void registerNamedObject(Described described)
+                {
+                    namedObjects.add(new Reference<>(described));
+                }
+            }.walk(extensionModel);
+
+            validateNameClashes(namedObjects, topLevelParameters.values(), topLevelParameters.values().stream().map(TypedTopLevelParameter::new).collect(toSet()));
         }
 
-        private void validate(List<ParameterModel> parameters, Set<String> accumulator, String ownerName, String ownerType)
+        private void validateOperation(OperationModel operation)
         {
-            Set<String> repeatedParameters = getRepeatedParameters(parameters);
+            validateParameterNames(operation);
+            // Check clash between each operation and its parameters type
+            operation.getParameterModels().stream().forEach(parameterModel ->
+                                                                    validateClash(operation.getName(),
+                                                                                  getType(parameterModel.getType()).getName(),
+                                                                                  "operation",
+                                                                                  "argument")
+            );
+        }
+
+        private void validateParameterNames(ParameterizedModel model)
+        {
+            Set<String> repeatedParameters = collectRepeatedNames(model.getParameterModels());
             if (!repeatedParameters.isEmpty())
             {
                 throw new IllegalModelDefinitionException(format("Extension '%s' defines the %s '%s' which has parameters " +
                                                                  "with repeated names. Offending parameters are: [%s]",
-                                                                 extensionModel.getName(), ownerType, ownerName, Joiner.on(",").join(repeatedParameters)));
-            }
-
-            validateTopLevelParameters(parameters, ownerName, ownerType);
-
-            if (!accumulator.add(ownerName))
-            {
-                throw new IllegalModelDefinitionException(format("Extension '%s' defines more than one %s of name '%s'. Please make sure %s names are unique",
-                                                                 extensionModel.getName(), ownerType, ownerName, ownerType));
+                                                                 extensionModel.getName(), model.getClass().getSimpleName(), model.getName(), Joiner.on(",").join(repeatedParameters)));
             }
         }
 
-
-        private void validateTopLevelParameters(List<ParameterModel> parameters, String ownerName, String ownerType)
+        private void validateTopLevelParameter(ParameterModel parameter, ParameterizedModel owner)
         {
-            parameters.stream()
-                    .filter(parameter -> parameter.getType() instanceof ObjectType)
-                    .forEach(parameter -> {
-                        final Class<?> parameterType = getType(parameter.getType());
-                        Collection<TopLevelParameter> foundParameters = topLevelParameters.get(parameter.getName());
-                        if (CollectionUtils.isEmpty(foundParameters))
-                        {
-                            topLevelParameters.put(parameter.getName(), new TopLevelParameter(parameter, ownerName, ownerType));
-                        }
-                        else
-                        {
-                            Optional<TopLevelParameter> repeated = foundParameters.stream()
-                                    .filter(topLevelParameter -> !topLevelParameter.type.equals(parameterType))
-                                    .findFirst();
+            if (!(parameter.getType() instanceof ObjectType))
+            {
+                return;
+            }
 
-                            if (repeated.isPresent())
-                            {
-                                TopLevelParameter tp = repeated.get();
-                                throw new IllegalModelDefinitionException(format("Extension '%s' defines a %s of name '%s' which contains a parameter of complex type '%s'. However, " +
-                                                                                 "%s of name '%s' defines a parameter of the same name but type '%s'. Complex parameter of different types cannot have the same name.",
-                                                                                 extensionModel.getName(), ownerType, ownerName, parameterType, tp.ownerType, tp.owner, tp.type.getName()));
-                            }
-                        }
-                    });
+            final Class<?> parameterType = getType(parameter.getType());
+            final String ownerName = owner.getName();
+            final String ownerType = owner.getClass().getSimpleName();
+
+            Collection<TopLevelParameter> foundParameters = topLevelParameters.get(parameter.getName());
+            if (CollectionUtils.isEmpty(foundParameters))
+            {
+                topLevelParameters.put(parameter.getName(), new TopLevelParameter(parameter, ownerName, ownerType));
+            }
+            else
+            {
+                Optional<TopLevelParameter> repeated = foundParameters.stream()
+                        .filter(topLevelParameter -> !topLevelParameter.type.equals(parameterType))
+                        .findFirst();
+
+                if (repeated.isPresent())
+                {
+                    TopLevelParameter tp = repeated.get();
+                    throw new IllegalModelDefinitionException(format("Extension '%s' defines a %s of name '%s' which contains a parameter of complex type '%s'. However, " +
+                                                                     "%s of name '%s' defines a parameter of the same name but type '%s'. Complex parameter of different types cannot have the same name.",
+                                                                     extensionModel.getName(), ownerType, ownerName, parameterType, tp.ownerType, tp.owner, tp.type.getName()));
+                }
+            }
         }
 
-        private Set<String> getRepeatedParameters(List<ParameterModel> parameters)
+        private Set<String> collectRepeatedNames(List<? extends Described> namedObject)
         {
             Set<String> names = new HashSet<>();
-            Set<String> repeatedNames = parameters.stream()
+            Set<String> repeatedNames = namedObject.stream()
                     .filter(parameter -> !names.add(parameter.getName()))
-                    .map(ParameterModel::getName)
+                    .map(Described::getName)
                     .collect(toSet());
 
             return repeatedNames;
         }
 
-        private void validateClashes(Set<String> set1, Set<String> set2, String type1, String type2)
+        private void validateNameClashes(Collection<? extends Described>... collections)
         {
-            Set<String> intersection = Sets.intersection(set1, set2);
-            if (!intersection.isEmpty())
-            {
-                throw new IllegalModelDefinitionException(format("Extension '%s' has %s and %s with the same name. Offending names are: [%s]",
-                                                                 extensionModel.getName(), type1, type2, Joiner.on(", ").join(intersection)));
-            }
+            Multimap<String, Described> names = LinkedListMultimap.create();
+            stream(collections).flatMap(Collection::stream).forEach(described -> names.put(described.getName(), described));
+
+            names.asMap().entrySet().forEach(entry -> {
+                List<Described> values = (List<Described>) entry.getValue();
+                if (values.size() > 1)
+                {
+                    Set<String> offendingTypes = values.stream().map(Described::getDescription).collect(toSet());
+                    StringBuilder errorMessage = new StringBuilder(format("Extension '%s' contains %d ", extensionModel.getName(), values.size()));
+
+                    final int top = offendingTypes.size() - 1;
+                    int i = 0;
+                    for (String offender : offendingTypes)
+                    {
+                        errorMessage.append(offender);
+
+                        if (i + 1 == top)
+                        {
+                            errorMessage.append(" and ");
+                        }
+                        else if (i != top)
+                        {
+                            errorMessage.append(", ");
+                        }
+
+                        i++;
+                    }
+
+                    errorMessage.append(format(" which name is '%s'. Names should be unique", entry.getKey()));
+                    throw new IllegalModelDefinitionException(errorMessage.toString());
+                }
+            });
         }
 
         private void validateClash(String existingNamingModel, String newNamingModel, String typeOfExistingNamingModel, String typeOfNewNamingModel)
@@ -228,18 +233,126 @@ public final class NameClashModelValidator implements ModelValidator
     }
 
 
-    private class TopLevelParameter
+    private class TopLevelParameter implements Described
     {
 
-        private String owner;
-        private String ownerType;
-        private Class<?> type;
+        protected final ParameterModel parameterModel;
+        protected final String owner;
+        protected final String ownerType;
+        protected final Class<?> type;
 
         private TopLevelParameter(ParameterModel parameterModel, String owner, String ownerType)
         {
+            this.parameterModel = parameterModel;
             this.owner = owner;
             this.ownerType = ownerType;
             type = getType(parameterModel.getType());
+        }
+
+        @Override
+        public String getName()
+        {
+            return parameterModel.getName();
+        }
+
+        @Override
+        public String getDescription()
+        {
+            return "top level parameter";
+        }
+    }
+
+    private class TypedTopLevelParameter extends TopLevelParameter
+    {
+
+        public TypedTopLevelParameter(TopLevelParameter parameter)
+        {
+            super(parameter.parameterModel, parameter.owner, parameter.ownerType);
+        }
+
+        @Override
+        public String getName()
+        {
+            return type.getName();
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (obj instanceof TypedTopLevelParameter)
+            {
+                return type.equals(((TypedTopLevelParameter) obj).type);
+            }
+
+            return false;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return type.hashCode();
+        }
+    }
+
+    private class Reference<T extends Described> implements Described
+    {
+
+        private final T value;
+
+        public Reference(T value)
+        {
+            this.value = value;
+        }
+
+        public T get()
+        {
+            return value;
+        }
+
+        @Override
+        public String getName()
+        {
+            return value.getName();
+        }
+
+        @Override
+        public String getDescription()
+        {
+            if (value instanceof ConfigurationModel)
+            {
+                return "configuration";
+            }
+            else if (value instanceof OperationModel)
+            {
+                return "operation";
+            }
+            else if (value instanceof SourceModel)
+            {
+                return "message source";
+            }
+            else if (value instanceof ConnectionProviderModel)
+            {
+                return "connection provider";
+            }
+
+            return "";
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (obj instanceof Reference)
+            {
+                return value == ((Reference) obj).value;
+            }
+
+            return false;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return value.hashCode();
         }
     }
 }

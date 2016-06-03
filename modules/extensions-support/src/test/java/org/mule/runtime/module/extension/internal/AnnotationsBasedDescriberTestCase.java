@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
@@ -37,6 +38,8 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.KILL_WITH_GROUP;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
+import static org.mule.test.vegan.extension.VeganExtension.APPLE;
+import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -57,6 +60,7 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
@@ -88,12 +92,16 @@ import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.metadata.extension.MetadataExtension;
+import org.mule.test.vegan.extension.PaulMcCartneySource;
+import org.mule.test.vegan.extension.VeganExtension;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -301,6 +309,36 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(operation.getReturnType(), is(instanceOf(AnyType.class)));
         assertThat(operation.getAttributesType(), is(instanceOf(NullType.class)));
     }
+
+    @Test
+    public void flyweight()
+    {
+        setDescriber(describerFor(VeganExtension.class));
+        ExtensionDeclarer declarer = describeExtension();
+
+        final ExtensionDeclaration declaration = declarer.getDeclaration();
+        final ConfigurationDeclaration appleConfiguration = findDeclarationByName(declaration.getConfigurations(), APPLE);
+        final ConfigurationDeclaration bananaConfiguration = findDeclarationByName(declaration.getConfigurations(), BANANA);
+
+        final String sourceName = PaulMcCartneySource.class.getSimpleName();
+        SourceDeclaration appleSource = findDeclarationByName(appleConfiguration.getMessageSources(), sourceName);
+        SourceDeclaration bananaSource = findDeclarationByName(bananaConfiguration.getMessageSources(), sourceName);
+        assertThat(appleSource, is(sameInstance(bananaSource)));
+
+        final String operationName = "spreadTheWord";
+        OperationDeclaration appleOperation = findDeclarationByName(appleConfiguration.getOperations(), operationName);
+        OperationDeclaration bananaOperation = findDeclarationByName(bananaConfiguration.getOperations(), operationName);
+
+        assertThat(appleOperation, is(sameInstance(bananaOperation)));
+    }
+
+    private <T extends BaseDeclaration> T findDeclarationByName(Collection<T> declarations, String name)
+    {
+        return declarations.stream().filter(decl -> decl.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException());
+    }
+
 
     private void assertTestModuleConfiguration(ExtensionDeclaration extensionDeclaration) throws Exception
     {

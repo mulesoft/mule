@@ -18,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
@@ -46,13 +47,16 @@ public class ExportModelEnricherTestCase extends AbstractMuleTestCase
     @Mock(answer = RETURNS_DEEP_STUBS)
     private ExtensionDeclarer extensionDeclarer;
 
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private ExtensionDeclaration extensionDeclaration;
+
     private ExportModelEnricher enricher = new ExportModelEnricher();
 
     @Before
     public void before()
     {
         when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
-
+        when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
     }
 
     @Test
@@ -82,8 +86,7 @@ public class ExportModelEnricherTestCase extends AbstractMuleTestCase
 
     private void setImplementingType(Class<?> type)
     {
-        when(extensionDeclarer.getDeclaration().getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(
-                Optional.of(new ImplementingTypeModelProperty(type)));
+        when(extensionDeclaration.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.of(new ImplementingTypeModelProperty(type)));
     }
 
     @Export(classes = {ExportModelEnricherTestCase.class}, resources = {EXPORTED_RESOURCE})

@@ -19,6 +19,8 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
@@ -44,6 +46,12 @@ public class ConfigNameModelEnricherTestCase extends AbstractMuleTestCase
     @Mock(answer = RETURNS_DEEP_STUBS)
     private DescribingContext describingContext;
 
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private ExtensionDeclarer extensionDeclarer;
+
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private ExtensionDeclaration extensionDeclaration;
+
     @Mock
     private ConfigurationDeclaration configurationDeclaration;
 
@@ -53,7 +61,9 @@ public class ConfigNameModelEnricherTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        when(describingContext.getExtensionDeclarer().getExtensionDeclaration().getConfigurations()).thenReturn(asList(configurationDeclaration));
+        when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
+        when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
+        when(extensionDeclaration.getConfigurations()).thenReturn(asList(configurationDeclaration));
         mockImplementingProperty(TestNameAwareConfig.class);
         nameField = getAllFields(TestNameAwareConfig.class, withAnnotation(ConfigName.class)).iterator().next();
     }

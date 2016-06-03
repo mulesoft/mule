@@ -32,7 +32,7 @@ public final class ConnectionHandlingEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getExtensionDeclaration();
+        final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getDeclaration();
         doEnrich(declaration.getConnectionProviders());
         declaration.getConfigurations().forEach(c -> doEnrich(c.getConnectionProviders()));
     }

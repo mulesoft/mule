@@ -40,7 +40,7 @@ public final class DataTypeModelEnricher extends AbstractAnnotatedModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getExtensionDeclaration();
+        final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getDeclaration();
         doEnrich(declaration, declaration.getOperations());
         declaration.getConfigurations().forEach(config -> doEnrich(declaration, config.getOperations()));
     }

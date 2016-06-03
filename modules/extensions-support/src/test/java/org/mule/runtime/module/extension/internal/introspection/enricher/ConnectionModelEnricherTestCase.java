@@ -17,6 +17,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
@@ -43,6 +45,12 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase
     private DescribingContext describingContext;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
+    private ExtensionDeclarer extensionDeclarer;
+
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private ExtensionDeclaration extensionDeclaration;
+
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private OperationDeclaration connectedOperation;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
@@ -53,7 +61,9 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        when(describingContext.getExtensionDeclarer().getExtensionDeclaration().getOperations()).thenReturn(asList(connectedOperation, notConnectedOperation));
+        when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
+        when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
+        when(extensionDeclaration.getOperations()).thenReturn(asList(connectedOperation, notConnectedOperation));
         when(connectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(Object.class)));
         when(notConnectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.empty());
     }

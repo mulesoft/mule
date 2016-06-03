@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_CLASSLOADER;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -40,6 +41,9 @@ public class ClassLoaderModelEnricherTestCase extends AbstractMuleTestCase
     @Mock(answer = RETURNS_DEEP_STUBS)
     private ExtensionDeclarer extensionDeclarer;
 
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private ExtensionDeclaration extensionDeclaration;
+
     @Mock
     private ClassLoader classLoader;
 
@@ -49,6 +53,7 @@ public class ClassLoaderModelEnricherTestCase extends AbstractMuleTestCase
     public void before()
     {
         when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
+        when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
     }
 
     @Test

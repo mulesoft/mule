@@ -28,7 +28,7 @@ public class ConnectionModelEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getExtensionDeclaration();
+        final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getDeclaration();
         doEnrich(declaration.getOperations());
         declaration.getConfigurations().forEach(config -> doEnrich(config.getOperations()));
     }

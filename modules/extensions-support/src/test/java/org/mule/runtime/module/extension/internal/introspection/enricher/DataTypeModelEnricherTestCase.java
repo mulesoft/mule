@@ -28,6 +28,8 @@ import static org.reflections.ReflectionUtils.withReturnType;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
@@ -55,6 +57,12 @@ public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase
     private DescribingContext describingContext;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
+    private ExtensionDeclarer extensionDeclarer;
+
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private ExtensionDeclaration extensionDeclaration;
+
+    @Mock(answer = RETURNS_DEEP_STUBS)
     private OperationDeclaration annotatedOperation;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
@@ -68,7 +76,9 @@ public class DataTypeModelEnricherTestCase extends AbstractMuleTestCase
     @DataTypeParameters
     public void before()
     {
-        when(describingContext.getExtensionDeclarer().getExtensionDeclaration().getOperations()).thenReturn(asList(annotatedOperation, notAnnotatedOperation));
+        when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
+        when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
+        when(extensionDeclaration.getOperations()).thenReturn(asList(annotatedOperation, notAnnotatedOperation));
         when(annotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
         when(notAnnotatedOperation.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.empty());
         when(annotatedOperation.getModelProperty(ImplementingMethodModelProperty.class)).thenReturn(Optional.of(new ImplementingMethodModelProperty(method)));
