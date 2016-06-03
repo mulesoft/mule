@@ -6,24 +6,24 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import static java.lang.Class.forName;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.spring.util.ProcessingStrategyUtils.parseProcessingStrategy;
-import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
+
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
+import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
+import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +96,7 @@ class ComponentConfigurationBuilder
                         String beanClassName = cdm.getBeanDefinition().getBeanClassName();
                         if (beanClassName != null)
                         {
-                            beanDefinitionType = forName(beanClassName);
+                            beanDefinitionType = ClassUtils.getClass(beanClassName);
                         }
                         else
                         {

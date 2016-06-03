@@ -9,9 +9,11 @@ package org.mule.runtime.core.config.bootstrap;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
     public void registeringOptionalTransaction() throws Exception
     {
         createTestRegistryBootstrap(ArtifactType.APP);
-        muleContext.getTransactionFactoryManager().getTransactionFactoryFor(Class.forName(TEST_TRANSACTION_FACTORY_CLASS));
+        muleContext.getTransactionFactoryManager().getTransactionFactoryFor(ClassUtils.getClass(TEST_TRANSACTION_FACTORY_CLASS));
     }
 
     @Test

@@ -9,12 +9,12 @@ package org.mule.runtime.config.spring.parsers.generic;
 import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.runtime.config.spring.parsers.AbstractHierarchicalDefinitionParser;
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.runtime.core.util.ClassUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.w3c.dom.Element;
 
@@ -36,7 +36,7 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
     {
         try
         {
-            return Class.forName(getParentBeanDefinition(element).getBeanClassName());
+            return ClassUtils.getClass(getParentBeanDefinition(element).getBeanClassName());
         }
         catch (Exception e)
         {
