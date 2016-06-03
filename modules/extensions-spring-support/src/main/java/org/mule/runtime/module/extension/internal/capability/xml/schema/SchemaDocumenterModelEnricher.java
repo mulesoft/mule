@@ -55,7 +55,7 @@ public final class SchemaDocumenterModelEnricher implements ModelEnricher
             return;
         }
 
-        new SchemaDocumenter(processingEnv).document(describingContext.getExtensionDeclarer().getExtensionDeclaration(), extensionElement, roundEnvironment);
+        new SchemaDocumenter(processingEnv).document(describingContext.getExtensionDeclarer().getDeclaration(), extensionElement, roundEnvironment);
 
     }
 }

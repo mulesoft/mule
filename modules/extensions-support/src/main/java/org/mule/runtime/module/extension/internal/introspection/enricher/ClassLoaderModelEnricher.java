@@ -34,7 +34,7 @@ public class ClassLoaderModelEnricher implements ModelEnricher
         ClassLoader classLoader = describingContext.getParameter(EXTENSION_CLASSLOADER, ClassLoader.class);
         if (classLoader == null)
         {
-            throw noClassLoaderException(describingContext.getExtensionDeclarer().getExtensionDeclaration().getName());
+            throw noClassLoaderException(describingContext.getExtensionDeclarer().getDeclaration().getName());
         }
 
         describingContext.getExtensionDeclarer().withModelProperty(new ClassLoaderModelProperty(classLoader));

@@ -29,9 +29,9 @@ public final class XmlModelEnricher extends AbstractAnnotatedModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        Xml xml = extractAnnotation(describingContext.getExtensionDeclarer().getExtensionDeclaration(), Xml.class);
+        Xml xml = extractAnnotation(describingContext.getExtensionDeclarer().getDeclaration(), Xml.class);
         ExtensionDeclarer descriptor = describingContext.getExtensionDeclarer();
-        ExtensionDeclaration extensionDeclaration = descriptor.getExtensionDeclaration();
+        ExtensionDeclaration extensionDeclaration = descriptor.getDeclaration();
         descriptor.withModelProperty(createXmlModelProperty(xml, extensionDeclaration.getName(), extensionDeclaration.getVersion()));
     }
 

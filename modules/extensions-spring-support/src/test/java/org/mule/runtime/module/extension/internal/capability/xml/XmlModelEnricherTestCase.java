@@ -112,7 +112,7 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase
     {
         extensionDeclarer.withModelProperty(new ImplementingTypeModelProperty(type));
         modelEnricher.enrich(new DefaultDescribingContext(extensionDeclarer, type.getClassLoader()));
-        return extensionDeclarer.getExtensionDeclaration().getModelProperty(XmlModelProperty.class).get();
+        return extensionDeclarer.getDeclaration().getModelProperty(XmlModelProperty.class).get();
     }
 
     @Xml(namespace = NAMESPACE, namespaceLocation = NAMESPACE_LOCATION)

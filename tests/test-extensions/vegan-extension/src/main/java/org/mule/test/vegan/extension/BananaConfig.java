@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 
 @Configuration(name = BANANA)
-@Operations(EatBananaOperation.class)
+@Operations({EatBananaOperation.class, SpreadVeganismOperation.class})
 @Providers(VeganBananaConnectionProvider.class)
 @Sources(PaulMcCartneySource.class)
 public class BananaConfig
