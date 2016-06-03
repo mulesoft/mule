@@ -6,14 +6,6 @@
  */
 package org.mule.runtime.core.model.resolvers;
 
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.model.EntryPointResolver;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.ClassUtils;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * An {@link org.mule.runtime.core.api.model.EntryPointResolverSet} that mimics the behaviour of the Mule 1.x
  * DynamicEntryPointResolver.
@@ -22,12 +14,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
 {
-    private static final String ANNOTATED_ENTRYPOINT_RESOLVER_CLASS = "org.mule.runtime.core.impl.model.resolvers.AnnotatedEntryPointResolver";
-    private static final Log logger = LogFactory.getLog(LegacyEntryPointResolverSet.class);
-
     public LegacyEntryPointResolverSet()
     {
-        addAnnotatedEntryPointResolver();
         addEntryPointResolver(new MethodHeaderPropertyEntryPointResolver());
         addEntryPointResolver(new CallableEntryPointResolver());
 
@@ -37,27 +25,4 @@ public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
         addEntryPointResolver(reflectionResolver);
     }
 
-    protected void addAnnotatedEntryPointResolver()
-    {
-        //Annotations support is not part of Mule core, but we want default handling for annotations we have
-        //work-arounds like this to avoid importing annotation classes
-        //See MULE-4962 for details
-        try
-        {
-            Class<? extends EntryPointResolver> annotatedEntrypointResolver =
-                    ClassUtils.loadClass(ANNOTATED_ENTRYPOINT_RESOLVER_CLASS, getClass(), EntryPointResolver.class);
-            addEntryPointResolver(ClassUtils.instanciateClass(annotatedEntrypointResolver, ClassUtils.NO_ARGS));
-        }
-        catch (ClassNotFoundException e)
-        {
-            if(logger.isDebugEnabled())
-            {
-                logger.warn("Mule annotations module is not on your classpath, annotations cannot be used on components");
-            }
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(CoreMessages.cannotLoadFromClasspath(ANNOTATED_ENTRYPOINT_RESOLVER_CLASS));
-        }
-    }
 }
