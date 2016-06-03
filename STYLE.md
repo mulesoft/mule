@@ -160,7 +160,7 @@ Ensure that all source files contain the following header.
 | Convention           | Example      | Notes  |
 |:--------------------------|:-------------|:-------------|
 | Names representing packages should be in all lower case.	 | `org.mule.application`      | Package naming convention used by Sun for the Java core packages. The initial package name representing the domain name must be in lower case. |
-| Package names should be singular rather than plural.	 | `org.mule.runtime.core.transformer`, `org.mule.runtime.core.transport`      |  |
+| Package names should be singular rather than plural.	 | `org.mule.runtime.core.transformer`, `org.mule.runtime.core.processor`      |  |
 | The 'org.mule.runtime.api' package tree should be used for all interfaces that make up the API/SPI.	 | `org.mule.runtime.core.api.lifecycle.Callable`      |  |
 
 

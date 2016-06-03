@@ -1831,19 +1831,15 @@
                                 <groups>
                                     <group>
                                         <title>Mule Core</title>
-                                        <packages>org.mule*</packages>
+                                        <packages>org.mule.runtime.core.*</packages>
                                     </group>
                                     <group>
                                         <title>Modules (not part of the Mule core)</title>
                                         <packages>org.mule.runtime.module.*:org.mule.runtime.core.components.*</packages>
                                     </group>
                                     <group>
-                                        <title>Transports</title>
-                                        <packages>org.mule.runtime.core.transport.*</packages>
-                                    </group>
-                                    <group>
                                         <title>Testing Framework</title>
-                                        <packages>org.mule.tck*</packages>
+                                        <packages>org.mule.tck.*:org.mule.functional.*</packages>
                                     </group>
                                     <group>
                                         <title>Tools</title>
