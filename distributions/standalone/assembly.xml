@@ -79,6 +79,15 @@
             <directory>${project.build.directory}/app-plugins</directory>
             <outputDirectory>app-plugins</outputDirectory>
         </fileSet>
+
+        <!-- 3rd-party libraries (resolved with maven-dependencies-plugin -->
+        <!-- TODO: definition of transitive dependencies could be added here as it was
+            before once issue https://issues.apache.org/jira/browse/MASSEMBLY-799 is fixed.
+            See https://www.mulesoft.org/jira/browse/MULE-9810 for more information -->
+        <fileSet>
+            <directory>${project.build.directory}/lib/opt</directory>
+            <outputDirectory>lib/opt</outputDirectory>
+        </fileSet>
     </fileSets>
 
     <!--
@@ -166,105 +175,6 @@
                 <include>org.mule.common:mule-common</include>
                 <include>org.mule.mvel:mule-mvel2</include>
             </includes>
-        </dependencySet>
-
-        <!-- 3rd-party libraries -->
-        <dependencySet>
-            <outputDirectory>lib/opt</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-
-            <!-- Since we don't define any "includes" here, this will suck in the whole
-    universe of transitive dependencies.  Therefore, we need to explicitly
-    _exclude_ all libs which should _not_ go into this directory (usually
-    because they are already in a different directory). -->
-            <excludes>
-                <!--Mule API-->
-                <exclude>org.mule:mule-api</exclude>
-                <!--Metadata API-->
-                <exclude>org.mule:mule-metadata-model-api</exclude>
-                <exclude>org.mule:mule-metadata-model-java</exclude>
-                <exclude>org.mule:mule-metadata-model-persistence</exclude>
-                <!--extensions API-->
-                <exclude>org.mule.extensions:mule-extensions-api</exclude>
-                <exclude>org.mule.extensions:mule-extensions-api-persistence</exclude>
-                <!-- lib/mule -->
-                <exclude>org.mule.common:mule-common</exclude>
-                <exclude>org.mule.mvel:mule-mvel2</exclude>
-                <exclude>org.mule:mule-core</exclude>
-                <exclude>org.mule.extensions:mule-extensions-all</exclude>
-                <exclude>org.mule.modules:mule-modules-all</exclude>
-                <exclude>org.mule.modules:mule-module-artifact</exclude>
-                <exclude>org.mule.modules:mule-module-builders</exclude>
-                <exclude>org.mule.modules:mule-module-client</exclude>
-                <exclude>org.mule.modules:mule-module-cxf</exclude>
-                <exclude>org.mule.modules:mule-module-db</exclude>
-                <exclude>org.mule.modules:mule-module-extensions-support</exclude>
-                <exclude>org.mule.modules:mule-module-extensions-spring-support</exclude>
-                <exclude>org.mule.modules:mule-module-file-extension-common</exclude>
-                <exclude>org.mule.modules:mule-module-http</exclude>
-                <exclude>org.mule.modules:mule-module-http-ext</exclude>
-                <exclude>org.mule.modules:mule-module-jaas</exclude>
-                <exclude>org.mule.modules:mule-module-jbossts</exclude>
-                <exclude>org.mule.modules:mule-module-json</exclude>
-                <exclude>org.mule.modules:mule-module-container</exclude>
-                <exclude>org.mule.modules:mule-module-launcher</exclude>
-                <exclude>org.mule.modules:mule-module-management</exclude>
-                <exclude>org.mule.modules:mule-module-oauth</exclude>
-                <exclude>org.mule.modules:mule-module-pgp</exclude>
-                <exclude>org.mule.modules:mule-module-reboot</exclude>
-                <exclude>org.mule.modules:mule-module-scripting</exclude>
-                <exclude>org.mule.modules:mule-module-scripting-jruby</exclude>
-                <exclude>org.mule.modules:mule-module-schedulers</exclude>
-                <exclude>org.mule.modules:mule-module-spring-config</exclude>
-                <exclude>org.mule.modules:mule-module-spring-extras</exclude>
-                <exclude>org.mule.modules:mule-module-spring-security</exclude>
-                <exclude>org.mule.modules:mule-module-sockets</exclude>
-                <exclude>org.mule.modules:mule-module-tls</exclude>
-                <exclude>org.mule.modules:mule-module-tomcat</exclude>
-                <exclude>org.mule.modules:mule-module-ws</exclude>
-                <exclude>org.mule.modules:mule-module-xml</exclude>
-                <exclude>org.mule.tools:mule-tools-anttasks</exclude>
-                <exclude>org.mule.transports:mule-transport-sockets</exclude>
-
-                <!-- lib/app-plugins (these artifacts are zip type) -->
-                <exclude>*:zip:*</exclude>
-
-                <!-- mule-tests-functional dependencies -->
-                <exclude>org.apache.ftpserver:ftpserver-core</exclude>
-                <exclude>org.apache.ftpserver:ftplet-api</exclude>
-                <exclude>org.apache.sshd:sshd-core</exclude>
-                <exclude>org.apache.mina:mina-core</exclude>
-
-                <!-- lib/user -->
-                <exclude>junit:junit</exclude>
-                <exclude>xmlunit:xmlunit</exclude>
-                <exclude>org.mule.tests:mule-tests-functional</exclude>
-                <exclude>org.mule.tests:mule-tests-unit</exclude>
-
-                <!-- lib/boot -->
-                <exclude>commons-cli:commons-cli</exclude>
-                <exclude>tanukisoft:wrapper</exclude>
-                <exclude>org.slf4j:slf4j-api</exclude>
-                <exclude>org.apache.logging.log4j:log4j-api</exclude>
-                <exclude>org.apache.logging.log4j:log4j-core</exclude>
-                <exclude>org.apache.logging.log4j:log4j-slf4j-impl</exclude>
-                <exclude>org.apache.logging.log4j:log4j-1.2-api</exclude>
-                <exclude>org.apache.logging.log4j:log4j-jcl</exclude>
-                <exclude>org.apache.logging.log4j:log4j-jul</exclude>
-                <exclude>org.slf4j:jcl-over-slf4j</exclude>
-                <exclude>commons-logging:commons-logging</exclude>
-                <exclude>com.lmax:disruptor</exclude>
-
-                <!-- lib/endorsed -->
-                <exclude>xml-apis:xml-apis</exclude>
-                <exclude>xerces:xercesImpl</exclude>
-                <exclude>xerces:xml-serializer</exclude>
-                <exclude>xalan:xalan</exclude>
-
-                <!-- Distributed separately in profiler pack -->
-                <exclude>com.yourkit:yjp-controller-api-redist</exclude>
-
-            </excludes>
         </dependencySet>
 
         <!-- Mule testing framework -->
