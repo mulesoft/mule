@@ -1445,7 +1445,39 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>${dependency.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>analyze-dependencies-for-extension</id>
+                            <goals>
+                                <goal>analyze-only</goal>
+                            </goals>
+                            <phase>none</phase>
+                            <configuration>
+                                <failOnWarning>true</failOnWarning>
+                                <verbose>true</verbose>
+                                <ignoredUsedUndeclaredDependencies>
+                                    <!-- Mule dependencies are ignored -->
+                                    <ignoredUsedUndeclaredDependency>org.mule*</ignoredUsedUndeclaredDependency>
+                                    <!-- Testing dependencies are ignored -->
+                                    <ignoredUsedUndeclaredDependency>org.hamcrest</ignoredUsedUndeclaredDependency>
+                                    <ignoredUsedUndeclaredDependency>org.mockito</ignoredUsedUndeclaredDependency>
+                                    <ignoredUsedUndeclaredDependency>junit:junit</ignoredUsedUndeclaredDependency>
+                                    <ignoredUsedUndeclaredDependency>commons-logging:commons-logging</ignoredUsedUndeclaredDependency>
+                                    <ignoredUsedUndeclaredDependency>org.apache.ftpserver:ftpserver-core</ignoredUsedUndeclaredDependency>
+
+                                    <!-- Logging related artifacts are exposed by the BOOTSTRAP ClassLoader -->
+                                    <ignoredUsedUndeclaredDependency>org.slf4j:slf4j-api</ignoredUsedUndeclaredDependency>
+                                    <ignoredUsedUndeclaredDependency>javax.inject:javax.inject</ignoredUsedUndeclaredDependency>
+                                </ignoredUsedUndeclaredDependencies>
+                                <ignoredUnusedDeclaredDependencies>
+                                    <!-- Don't need to worry about this -->
+                                    <ignoredUnusedDeclaredDependency>:::</ignoredUnusedDeclaredDependency>
+                                </ignoredUnusedDeclaredDependencies>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
