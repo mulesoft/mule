@@ -124,13 +124,12 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void applicationDesployFailDueToDomainNotDeployed() throws Exception
     {
-        expectedException.expect(DeploymentException.class);
-
         final ApplicationDescriptor descriptor = new ApplicationDescriptor();
         descriptor.setName(APP_NAME);
         descriptor.setDomain(DOMAIN_NAME);
         when(applicationDescriptorFactory.create(any())).thenReturn(descriptor);
 
+        expectedException.expect(DeploymentException.class);
         applicationFactory.createArtifact(APP_NAME);
     }
 }
