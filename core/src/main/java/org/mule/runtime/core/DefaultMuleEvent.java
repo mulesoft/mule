@@ -1147,7 +1147,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * @param transacted
      */
     @Deprecated
-    public void setEndpointFileds(Credentials credentials, String encoding, MessageExchangePattern exchangePattern, String name, URI uri, int timeout, boolean transacted)
+    public void setEndpointFields(Credentials credentials, String encoding, MessageExchangePattern exchangePattern, String name, URI uri, int timeout, boolean transacted)
     {
         this.credentials = credentials;
         this.encoding = encoding;
