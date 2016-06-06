@@ -94,11 +94,11 @@
     </flow>
 
     <flow name="resolverContentWithContextClassLoader">
-        <metadata:resolver-content-with-context-class-loader config-ref="config"/>
+        <metadata:resolver-content-with-context-class-loader config-ref="config" type="Person"/>
     </flow>
 
     <flow name="resolverOutputWithContextClassLoader">
-        <metadata:resolver-output-with-context-class-loader config-ref="config"/>
+        <metadata:resolver-output-with-context-class-loader config-ref="config" type="Person"/>
     </flow>
 
     <flow name="outputAndMetadataKeyCacheResolver">
@@ -157,5 +157,4 @@
     <flow name="resolverWithDynamicConfig">
         <metadata:simple-multi-level-key-resolver config-ref="dynamic-config" continent="AMERICA" country="USA" city="SFO"/>
     </flow>
-
 </mule>

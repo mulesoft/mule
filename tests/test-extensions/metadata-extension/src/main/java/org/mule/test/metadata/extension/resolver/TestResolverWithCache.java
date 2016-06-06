@@ -25,8 +25,8 @@ import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class TestResolverWithCache implements MetadataContentResolver<String>, MetadataOutputResolver<String>, MetadataKeysResolver
 {
@@ -70,33 +70,10 @@ public class TestResolverWithCache implements MetadataContentResolver<String>, M
     }
 
     @Override
-    public List<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
+    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
     {
         context.getCache().put(AGE, AGE_VALUE);
         context.getCache().put(NAME, NAME_VALUE);
         return getKeys(context);
-    }
-
-    private final class SerializableAccount implements Serializable
-    {
-
-        private String accountName;
-        private String accountId;
-
-        public SerializableAccount(String accountId, String accountName)
-        {
-            this.accountId = accountId;
-            this.accountName = accountName;
-        }
-
-        public String getAccountId()
-        {
-            return accountId;
-        }
-
-        public String getAccountName()
-        {
-            return accountName;
-        }
     }
 }

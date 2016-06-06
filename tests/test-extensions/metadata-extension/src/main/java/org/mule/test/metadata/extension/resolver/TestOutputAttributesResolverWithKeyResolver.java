@@ -14,13 +14,13 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 
-import java.util.List;
+import java.util.Set;
 
 public class TestOutputAttributesResolverWithKeyResolver implements MetadataKeysResolver, MetadataOutputResolver<String>
 {
 
     @Override
-    public List<MetadataKey> getMetadataKeys(MetadataContext context) throws ConnectionException
+    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws ConnectionException
     {
         return TestMetadataResolverUtils.getKeys(context);
     }

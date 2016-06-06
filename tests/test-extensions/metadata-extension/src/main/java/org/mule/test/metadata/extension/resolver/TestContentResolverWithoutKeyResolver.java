@@ -18,6 +18,6 @@ public class TestContentResolverWithoutKeyResolver implements MetadataContentRes
     @Override
     public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
     {
-        return TestMetadataResolverUtils.getMetadata(TestMetadataResolverUtils.getKeys(context).get(0).getId());
+        return TestMetadataResolverUtils.getMetadata(key);
     }
 }

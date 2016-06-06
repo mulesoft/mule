@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -71,11 +72,16 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String TYPE_WITH_DECLARED_SUBTYPES_METADATA = "typeWithDeclaredSubtypesMetadata";
     protected static final String RESOLVER_WITH_DYNAMIC_CONFIG = "resolverWithDynamicConfig";
     protected static final String RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG = "resolverWithImplicitDynamicConfig";
+    protected static final String RESOLVER_WITH_IMPLICIT_STATIC_CONFIG = "resolverWithImplicitStaticConfig";
     protected static final String OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA = "outputAttributesWithDynamicMetadata";
     protected static final String OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA = "outputAttributesWithDeclaredSubtypesMetadata";
     protected static final String RESOLVER_KEYS_WITH_CONTEXT_CLASSLOADER = "resolverTypeKeysWithContextClassLoader";
     protected static final String RESOLVER_CONTENT_WITH_CONTEXT_CLASSLOADER = "resolverContentWithContextClassLoader";
     protected static final String RESOLVER_OUTPUT_WITH_CONTEXT_CLASSLOADER = "resolverOutputWithContextClassLoader";
+    protected static final String METADATA_RESOLVING_WITH_INVALID_MULTILEVEL_KEY = "metadataResolvingWithInvalidMultilevelKey";
+    protected static final String CONTINENT = "continent";
+    protected static final String COUNTRY = "country";
+    protected static final String CITY = "city";
 
     protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
     protected MetadataType personType;
@@ -117,6 +123,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
         MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId, key);
         assertThat(componentMetadata.getFailure().isPresent() ? componentMetadata.getFailure().get().getReason() : "No Failure",
                    componentMetadata.isSuccess(), is(true));
+
         return componentMetadata.get();
     }
 

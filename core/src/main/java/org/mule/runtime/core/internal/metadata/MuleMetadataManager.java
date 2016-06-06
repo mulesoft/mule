@@ -32,8 +32,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -108,7 +108,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
      * {@inheritDoc}
      */
     @Override
-    public MetadataResult<List<MetadataKey>> getMetadataKeys(ComponentId componentId)
+    public MetadataResult<Set<MetadataKey>> getMetadataKeys(ComponentId componentId)
     {
         return exceptionHandledMetadataFetch(componentId, MetadataAware::getMetadataKeys, EXCEPTION_RESOLVING_METADATA_KEYS);
     }
@@ -214,7 +214,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
 
     private interface MetadataDelegate<T>
     {
-        MetadataResult<T> get(MetadataAware processor) throws MetadataResolvingException;
 
+        MetadataResult<T> get(MetadataAware processor) throws MetadataResolvingException;
     }
 }

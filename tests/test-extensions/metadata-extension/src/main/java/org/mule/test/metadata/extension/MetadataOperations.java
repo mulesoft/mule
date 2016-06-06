@@ -16,7 +16,7 @@ import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithoutKeyResolver;
+import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithoutKeyResolverAndKeyIdParam;
 import org.mule.test.metadata.extension.resolver.TestContentResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver;
@@ -62,19 +62,19 @@ public class MetadataOperations extends MetadataOperationsParent
     {
     }
 
-    @MetadataScope(contentResolver = TestContentResolverWithoutKeyResolver.class, outputResolver = TestOutputNullTypeResolver.class)
+    @MetadataScope(contentResolver = TestContentAndOutputResolverWithoutKeyResolverAndKeyIdParam.class, outputResolver = TestOutputNullTypeResolver.class)
     public Object contentMetadataWithoutKeyId(@Connection MetadataConnection connection, @Content Object content)
     {
         return null;
     }
 
-    @MetadataScope(outputResolver = TestOutputResolverWithoutKeyResolver.class)
+    @MetadataScope(outputResolver = TestContentAndOutputResolverWithoutKeyResolverAndKeyIdParam.class)
     public Object outputMetadataWithoutKeyId(@Connection MetadataConnection connection, @Content Object content)
     {
         return null;
     }
 
-    @MetadataScope(contentResolver = TestContentAndOutputResolverWithoutKeyResolver.class, outputResolver = TestContentAndOutputResolverWithoutKeyResolver.class)
+    @MetadataScope(contentResolver = TestContentAndOutputResolverWithoutKeyResolverAndKeyIdParam.class, outputResolver = TestContentAndOutputResolverWithoutKeyResolverAndKeyIdParam.class)
     public Object contentAndOutputMetadataWithoutKeyId(@Connection MetadataConnection connection, @Content Object content)
     {
         return null;
@@ -138,12 +138,12 @@ public class MetadataOperations extends MetadataOperationsParent
     }
 
     @MetadataScope(contentResolver = TestThreadContextClassLoaderResolver.class)
-    public void resolverContentWithContextClassLoader(@Content Object content)
+    public void resolverContentWithContextClassLoader(@Content Object content, @MetadataKeyId String type)
     {
     }
 
     @MetadataScope(outputResolver = TestThreadContextClassLoaderResolver.class)
-    public Object resolverOutputWithContextClassLoader()
+    public Object resolverOutputWithContextClassLoader(@MetadataKeyId String type)
     {
         return null;
     }

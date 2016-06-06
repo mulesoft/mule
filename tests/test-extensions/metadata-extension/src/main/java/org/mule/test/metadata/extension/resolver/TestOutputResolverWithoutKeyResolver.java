@@ -18,6 +18,6 @@ public class TestOutputResolverWithoutKeyResolver implements MetadataOutputResol
     @Override
     public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
     {
-        return TestMetadataResolverUtils.getMetadata(TestMetadataResolverUtils.getKeys(context).get(0).getId());
+        return TestMetadataResolverUtils.getMetadata(key);
     }
 }

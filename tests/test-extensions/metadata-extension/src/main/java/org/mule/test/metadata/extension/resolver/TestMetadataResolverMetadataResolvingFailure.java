@@ -6,6 +6,7 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -13,14 +14,13 @@ import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
-import org.mule.metadata.api.model.MetadataType;
 
-import java.util.List;
+import java.util.Set;
 
 public class TestMetadataResolverMetadataResolvingFailure implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String>
 {
 
-    public List<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException
+    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException
     {
         throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
     }

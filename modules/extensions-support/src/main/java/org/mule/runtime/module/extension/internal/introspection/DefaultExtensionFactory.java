@@ -53,6 +53,7 @@ import org.mule.runtime.module.extension.internal.exception.IllegalParameterMode
 import org.mule.runtime.module.extension.internal.introspection.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.MetadataComponentModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.MetadataKeyIdParamModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.NameClashModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.OperationReturnTypeModelValidator;
@@ -111,6 +112,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                 .add(new OperationReturnTypeModelValidator())
                 .add(new TargetParameterModelValidator())
                 .add(new MetadataComponentModelValidator())
+                .add(new MetadataKeyIdParamModelValidator())
                 .build();
     }
 

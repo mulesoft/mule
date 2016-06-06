@@ -37,8 +37,8 @@ import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigur
 import org.mule.runtime.module.extension.internal.runtime.processor.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -120,7 +120,7 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
      * {@inheritDoc}
      */
     @Override
-    public MetadataResult<List<MetadataKey>> getMetadataKeys() throws MetadataResolvingException
+    public MetadataResult<Set<MetadataKey>> getMetadataKeys() throws MetadataResolvingException
     {
         final MetadataContext metadataContext = getMetadataContext();
         return withContextClassLoader(getClassLoader(this.extensionModel), () -> metadataMediator.getMetadataKeys(metadataContext));
