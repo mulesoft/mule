@@ -9,6 +9,7 @@ import groovy.transform.Field
 
 @Field String GET_PLUGIN = "org.apache.maven.plugins:maven-dependency-plugin:2.8:get"
 @Field long FIVE_MINUTES = 300000
+@Field String TEMP_FOLDER_NAME = "tmp"
 @Field int INVALID_ARGUMENTS = 1
 @Field String help = '\nDeploys to a remote Maven repository Mule CE and EE artifacts including distributions, poms, jars, test jars, javadoc jars and source jars.\n'
 @Field String ceRepoId
@@ -30,6 +31,7 @@ import groovy.transform.Field
                                'mule-catalog-archetype'  : 'mule-catalog-archetype']
 
 parseArguments(args)
+createFolder(TEMP_FOLDER_NAME)
 deployJars()
 if (deployDistro) { deployCeDistributions() }
 
@@ -83,7 +85,7 @@ def deployJars()
         def pom = new Artifact(groupId: 'org.mule.' + it, artifactId: 'mule-' + it, version: version, packaging: 'pom')
         assert getDependency(pom, 'target/pom')
         deployToRemote(ceRepoUrl, ceRepoId, pom.groupId, pom.artifactId, version, 'pom')
-        def project = new XmlSlurper().parse('target/pom')
+        def project = new XmlSlurper().parse(TEMP_FOLDER_NAME + '/target/pom')
         project.modules.children().each { module ->
             if (module.text().startsWith('all-'))
             {
@@ -178,7 +180,7 @@ def mvn(List mvnArgs, boolean logErrors=false)
     mvnArgs = mvnArgs*.replaceAll(' ', "\\\\ ") // escaping spaces: -Dkey=value\ with\ spaces
     String repoConfig = m2repo ? "-Dmaven.repo.local=${m2repo}" : ""
     String settingsConfig = settings ? "--settings ${settings}" : ""
-    Process proc = "mvn -B ${settingsConfig} ${repoConfig} ${mvnArgs.join(' ')}".execute()
+    Process proc = "mvn -B ${settingsConfig} ${repoConfig} ${mvnArgs.join(' ')}".execute(null, new File("./${TEMP_FOLDER_NAME}"))
     List<String> lines = proc.in.readLines()
     proc.waitForOrKill(FIVE_MINUTES)
     boolean error = lines.find { it.startsWith('[ERROR]') }
@@ -190,6 +192,12 @@ def mvn(List mvnArgs, boolean logErrors=false)
 def log(String message)
 {
     println message
+}
+
+def createFolder(String folderName)
+{
+    Process makeFolder  = "mkdir ${folderName}".execute()
+    makeFolder.waitForOrKill(FIVE_MINUTES)
 }
 
 @AutoClone
@@ -213,3 +221,4 @@ class Artifact
         return clone;
     }
 }
+
