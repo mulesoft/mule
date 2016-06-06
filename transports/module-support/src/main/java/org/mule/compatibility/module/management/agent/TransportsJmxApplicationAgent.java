@@ -14,7 +14,7 @@ import javax.management.MBeanRegistrationException;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 
-public class TranspotsJmxApplicationAgent extends AbstractTransportsJmxAgent implements AbstractJmxAgentExtension
+public class TransportsJmxApplicationAgent extends AbstractTransportsJmxAgent implements AbstractJmxAgentExtension
 {
 
     @Override
