@@ -218,7 +218,7 @@ public class BeanDefinitionFactory
         return ignoredMuleCoreComponentIdentifiers.contains(componentIdentifier)
                || customBuildersComponentIdentifiers.contains(componentIdentifier)
                || componentBuildingDefinitionRegistry.getBuildingDefinition(componentIdentifier).isPresent()
-                || isWrapperComponent(componentIdentifier, parentComponentModelOptional);
+               || isWrapperComponent(componentIdentifier, parentComponentModelOptional);
     }
 
     //TODO MULE-9638 this code will be removed and a cache will be implemented
@@ -243,17 +243,17 @@ public class BeanDefinitionFactory
         AbstractAttributeDefinitionVisitor wrapperIdentifiersCollector = new AbstractAttributeDefinitionVisitor()
         {
             @Override
-            public void onComplexChildList(Class<?> type, Optional<String> identifierOptional)
+            public void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier)
             {
-                identifierOptional.ifPresent( identifier -> {
+                wrapperIdentifier.ifPresent( identifier -> {
                     wrapperIdentifierAndTypeMap.put(identifier, ChildType.COLLECTION);
                 });
             }
 
             @Override
-            public void onComplexChild(Class<?> type, Optional<String> identifierOptional)
+            public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
             {
-                identifierOptional.ifPresent(identifier -> {
+                wrapperIdentifier.ifPresent(identifier -> {
                     wrapperIdentifierAndTypeMap.put(identifier, ChildType.SINGLE);
                 });
             }

@@ -215,18 +215,18 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onComplexChildList(Class<?> type, Optional<String> identifier)
+        public void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier)
         {
             ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
-            valueExtractor.onComplexChildList(type, identifier);
+            valueExtractor.onComplexChildList(type, wrapperIdentifier);
             valueConsumer.accept(valueExtractor.getValue());
         }
 
         @Override
-        public void onComplexChild(Class<?> type, Optional<String> identifier)
+        public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
         {
             ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
-            valueExtractor.onComplexChild(type, identifier);
+            valueExtractor.onComplexChild(type, wrapperIdentifier);
             Object value = valueExtractor.getValue();
             if (value != null)
             {
@@ -336,9 +336,9 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onComplexChildList(Class<?> type, Optional<String> identifierOptional)
+        public void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier)
         {
-            Predicate<ComponentValue> matchesTypeAndIdentifierPredicate = getTypeAndIdentifierPredicate(type, identifierOptional);
+            Predicate<ComponentValue> matchesTypeAndIdentifierPredicate = getTypeAndIdentifierPredicate(type, wrapperIdentifier);
             List<ComponentValue> matchingComponentValues = complexParameters.stream()
                     .filter(matchesTypeAndIdentifierPredicate)
                     .collect(toList());
@@ -346,7 +346,7 @@ class ComponentConfigurationBuilder
             matchingComponentValues.stream().forEach(beanDefinitionTypePair -> {
                 complexParameters.remove(beanDefinitionTypePair);
             });
-            if (identifierOptional.isPresent() && !matchingComponentValues.isEmpty())
+            if (wrapperIdentifier.isPresent() && !matchingComponentValues.isEmpty())
             {
                 this.value = matchingComponentValues.get(0).getBean();
             }
@@ -360,9 +360,9 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onComplexChild(Class<?> type, Optional<String> identifierOptional)
+        public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
         {
-            Predicate<ComponentValue> matchesTypeAndIdentifierPredicate = getTypeAndIdentifierPredicate(type, identifierOptional);
+            Predicate<ComponentValue> matchesTypeAndIdentifierPredicate = getTypeAndIdentifierPredicate(type, wrapperIdentifier);
             Optional<ComponentValue> value = complexParameters.stream().filter(matchesTypeAndIdentifierPredicate).findFirst();
             value.ifPresent(beanDefinitionTypePair -> {
                 complexParameters.remove(beanDefinitionTypePair);
@@ -450,18 +450,18 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onComplexChildList(Class<?> type, Optional<String> identifierOptional)
+        public void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier)
         {
             this.key = type;
-            identifierOptional.ifPresent( (identifier) -> {
+            wrapperIdentifier.ifPresent( (identifier) -> {
                 this.key = identifier;
             });
         }
 
         @Override
-        public void onComplexChild(Class<?> type, Optional<String> identifier)
+        public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
         {
-            onComplexChildList(type, identifier);
+            onComplexChildList(type, wrapperIdentifier);
         }
 
         @Override
