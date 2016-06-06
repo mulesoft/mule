@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
@@ -24,6 +28,7 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -279,25 +284,39 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         Node parentNode = element;
         while ((parentNode = parentNode.getParentNode()) != null)
         {
-            String parentNodeNamespace = getNamespace(parentNode);
-            String parentNodeName = parentNode.getLocalName();
-            if (isMuleRootElement(parentNode))
+            ComponentIdentifier parentComponentIdentifier = getComponentIdentifier(parentNode);
+            if (isMuleRootElement(parentComponentIdentifier))
             {
                 break;
             }
-            if (!beanDefinitionFactory.hasDefinition(new ComponentIdentifier.Builder().withNamespace(parentNodeNamespace).withName(parentNodeName).build()))
+            if (!beanDefinitionFactory.hasDefinition(parentComponentIdentifier, getParentComponentIdentifier(parentNode)))
             {
                 return false;
             }
         }
-        String namespace = getNamespace(element);
-        String nodeName = element.getLocalName();
-        return beanDefinitionFactory.hasDefinition(new ComponentIdentifier.Builder().withNamespace(namespace).withName(nodeName).build());
+        ComponentIdentifier elementComponentIdentifier = getComponentIdentifier(element);
+        return beanDefinitionFactory.hasDefinition(elementComponentIdentifier, getParentComponentIdentifier(element));
     }
 
-    private boolean isMuleRootElement(Node parentNode)
+    private Optional<ComponentIdentifier> getParentComponentIdentifier(Node element)
     {
-        return parentNode.getNodeName().equals(MULE_ROOT_ELEMENT) || parentNode.getNodeName().equals(MULE_DOMAIN_ROOT_ELEMENT);
+        if (element.getParentNode() == null || element.getParentNode().getLocalName() == null)
+        {
+            return empty();
+        }
+        return of(getComponentIdentifier(element.getParentNode()));
+    }
+
+    private ComponentIdentifier getComponentIdentifier(Node element)
+    {
+        String parentNodeNamespace = getNamespace(element);
+        String parentNodeName = element.getLocalName();
+        return new ComponentIdentifier.Builder().withNamespace(parentNodeNamespace).withName(parentNodeName).build();
+    }
+
+    private boolean isMuleRootElement(ComponentIdentifier componentIdentifier)
+    {
+        return MULE_IDENTIFIER.equals(componentIdentifier) || MULE_DOMAIN_IDENTIFIER.equals(componentIdentifier);
     }
 
     private String getNamespace(Node parentNode)

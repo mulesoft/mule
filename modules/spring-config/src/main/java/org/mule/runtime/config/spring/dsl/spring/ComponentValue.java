@@ -7,26 +7,31 @@
 
 package org.mule.runtime.config.spring.dsl.spring;
 
+import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
+
 /**
- * Holder for a bean value and the object {@code Class} that will be created from it.
+ * Holder for the component identifier, it's bean value and the object {@code Class} that will be created from it.
  *
  * The bean value currently it's of an Object type since it can be a {@link org.springframework.beans.factory.config.BeanDefinition}
  * or a {@link org.springframework.beans.factory.config.RuntimeBeanReference}
  *
  * @since 4.0
  */
-class BeanValueTypePair
+class ComponentValue
 {
 
     private final Class<?> type;
     private final Object bean;
+    private final ComponentIdentifier identifier;
 
     /**
+     * @param identifier the identifier of the component for which the bean definition is provided
      * @param type the type of the object to be created
      * @param bean the bean definition
      */
-    public BeanValueTypePair(Class<?> type, Object bean)
+    public ComponentValue(ComponentIdentifier identifier, Class<?> type, Object bean)
     {
+        this.identifier = identifier;
         this.type = type;
         this.bean = bean;
     }
@@ -45,5 +50,13 @@ class BeanValueTypePair
     public Object getBean()
     {
         return bean;
+    }
+
+    /**
+     * @return the component identifier associated with this object bean value and type.
+     */
+    public ComponentIdentifier getIdentifier()
+    {
+        return identifier;
     }
 }

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.config.spring.dsl.processor;
 
+import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 
 import java.util.Optional;
@@ -68,18 +69,30 @@ public interface AttributeDefinitionVisitor
      * Called when the attribute is configured from a list of object with a certain type.
      *
      * @param type type of the list to be set in the attribute.
+     * @param wrapperIdentifier the identifier of the wrapper element that holds the list of components
      */
-    void onComplexChildList(Class<?> type);
+    void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier);
 
     /**
-     * Called when the attribute is configured from an object with a ceratin type.
+     * Called when the attribute is configured from an object with a certain type.
      *
      * @param type type of the attribute value.
+     * @param wrapperIdentifier the identifier of the component
      */
-    void onComplexChild(Class<?> type);
+    void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier);
 
     /**
      * Called when the attribute is configured from the {@code ComponentModel} inner configuration.
      */
     void onValueFromTextContent();
+
+    /**
+     * Called when a multiple configuration parameters or children components objects need
+     * to be set in single object attribute or constructor parameter. The value to be set
+     * is a @{code Map} with the parameters names as key, or the element identifier in case of
+     * a child and the value is the resolved parameter value or component object.
+     *
+     * @param definitions the set of {@code AttributeDefinition} to be used to create
+     */
+    void onMultipleValues(AttributeDefinition[] definitions);
 }

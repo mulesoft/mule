@@ -45,6 +45,8 @@ public class ComponentModel
     private ComponentIdentifier identifier;
     private Map<String, Object> customAttributes = new HashMap<>();
     private Map<String, String> parameters = new HashMap<>();
+    //TODO MULE-9638 This must go away from component model once it's immutable.
+    private ComponentModel parent;
     private List<ComponentModel> innerComponents = new ArrayList<>();
     private String textContent;
 
@@ -140,6 +142,19 @@ public class ComponentModel
     {
         //TODO MULE-9691 : Define a clear mechanism to realize if the object to be build is an scope. For now this works.
         return MessageRouter.class.isAssignableFrom(type);
+    }
+
+    public void setParent(ComponentModel parent)
+    {
+        this.parent = parent;
+    }
+
+    /**
+     * @return the parent component model in the configuration.
+     */
+    public ComponentModel getParent()
+    {
+        return parent;
     }
 
     /**
