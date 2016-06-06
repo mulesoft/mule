@@ -11,7 +11,7 @@
        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <http:connector name="httpConnector">
-        <transports:service-overrides sessionHandler="org.mule.runtime.transport.http.functional.TestSessionHandler"/>
+        <transports:service-overrides sessionHandler="org.mule.compatibility.transport.http.functional.TestSessionHandler"/>
     </http:connector>
 
 </mule>

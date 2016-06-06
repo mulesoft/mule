@@ -11,7 +11,7 @@
        http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd">
 
     <spring:bean name="connectionFactory"
-                 class="org.mule.runtime.transport.jms.JmsReconnectionActiveMQTestCase$CustomConnectionFactory">
+                 class="org.mule.compatibility.transport.jms.JmsReconnectionActiveMQTestCase$CustomConnectionFactory">
         <spring:property name="brokerURL" value="tcp://localhost:${port}"/>
     </spring:bean>
 

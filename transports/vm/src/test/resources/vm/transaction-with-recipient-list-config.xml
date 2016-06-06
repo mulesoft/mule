@@ -18,7 +18,7 @@
 
     <flow name="InputService">
         <vm:inbound-endpoint path="input" exchange-pattern="request-response">
-            <custom-transaction factory-class="org.mule.runtime.transport.vm.VMTransactionFactory"
+            <custom-transaction factory-class="org.mule.compatibility.transport.vm.VMTransactionFactory"
                                 action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <echo-component/>
@@ -29,7 +29,7 @@
 
     <flow name="OutputService">
         <transports:inbound-endpoint address="vm://output" exchange-pattern="request-response">
-            <custom-transaction factory-class="org.mule.runtime.transport.vm.VMTransactionFactory"
+            <custom-transaction factory-class="org.mule.compatibility.transport.vm.VMTransactionFactory"
                                 action="ALWAYS_JOIN"/>
         </transports:inbound-endpoint>
         <test:component appendString=" Received"/>

@@ -78,7 +78,7 @@
 	
 	<flow name="sendToVm">
 		<http:inbound-endpoint connector-ref="connector" address="http://localhost:${port1}" method="POST" />
-		 <component class="org.mule.runtime.transport.http.functional.HttpOutboundHeadersPropagationComponent"/>
+		 <component class="org.mule.compatibility.transport.http.functional.HttpOutboundHeadersPropagationComponent"/>
 		<vm:outbound-endpoint path="out" exchange-pattern="one-way"/>
 	</flow>
 	

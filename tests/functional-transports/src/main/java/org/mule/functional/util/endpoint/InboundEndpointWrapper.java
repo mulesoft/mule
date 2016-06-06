@@ -7,20 +7,20 @@
 
 package org.mule.functional.util.endpoint;
 
+import org.mule.compatibility.core.api.endpoint.EndpointMessageProcessorChainFactory;
+import org.mule.compatibility.core.api.endpoint.EndpointURI;
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
+import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.endpoint.EndpointMessageProcessorChainFactory;
-import org.mule.runtime.core.api.endpoint.EndpointURI;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.api.security.EndpointSecurityFilter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.transport.Connector;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 
 import java.util.List;

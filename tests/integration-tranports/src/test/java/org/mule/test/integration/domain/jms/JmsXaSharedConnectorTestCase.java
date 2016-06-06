@@ -9,8 +9,8 @@ package org.mule.test.integration.domain.jms;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.transport.jms.JmsConnector;
-import org.mule.runtime.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
+import org.mule.compatibility.transport.jms.JmsConnector;
+import org.mule.compatibility.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -12,7 +12,7 @@
 
     <tcp:connector name="connectorWithException" socketMaxWait="3000">
         <transports:dispatcher-threading-profile maxThreadsActive="8"/>
-        <tcp:custom-protocol class="org.mule.runtime.transport.tcp.TcpSocketsPoolTestCase$MockTcpProtocol"/>
+        <tcp:custom-protocol class="org.mule.compatibility.transport.tcp.TcpSocketsPoolTestCase$MockTcpProtocol"/>
     </tcp:connector>
 
     <tcp:connector name="tcpConnector" keepSendSocketOpen="true">

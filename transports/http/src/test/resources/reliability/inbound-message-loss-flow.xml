@@ -42,7 +42,7 @@
             <test:return-data>Here you go</test:return-data>
         </test:component>
         <custom-exception-strategy
-                class="org.mule.runtime.transport.http.reliability.InboundMessageLossTestCase$Handler"/>
+                class="org.mule.compatibility.transport.http.reliability.InboundMessageLossTestCase$Handler"/>
     </flow>
 
     <flow name="FailToHandledTransformerException">
@@ -52,6 +52,6 @@
             <test:return-data>Here you go</test:return-data>
         </test:component>
         <custom-exception-strategy
-                class="org.mule.runtime.transport.http.reliability.InboundMessageLossTestCase$BadHandler"/>
+                class="org.mule.compatibility.transport.http.reliability.InboundMessageLossTestCase$BadHandler"/>
     </flow>
 </mule>

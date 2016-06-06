@@ -21,7 +21,7 @@
 
 
         <component
-            class="org.mule.runtime.transport.vm.functional.VmTransactionTestCase$TestComponent" />
+            class="org.mule.compatibility.transport.vm.functional.VmTransactionTestCase$TestComponent" />
 
 
         <transports:outbound-endpoint address="vm://out"
@@ -38,7 +38,7 @@
 
 
         <component
-            class="org.mule.runtime.transport.vm.functional.VmTransactionTestCase$TestComponent" />
+            class="org.mule.compatibility.transport.vm.functional.VmTransactionTestCase$TestComponent" />
     </flow>
 
 </mule>

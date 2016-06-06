@@ -222,6 +222,7 @@
 /mule-standalone-${productVersion}/lib/opt/cxf-wstx-msv-validation-2.7.15.jar
 /mule-standalone-${productVersion}/lib/opt/dom4j-1.6.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-2.0.0.jar
+/mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-management_1.1_spec-1.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jms_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-jta_1.1_spec-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar

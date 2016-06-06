@@ -21,7 +21,7 @@
         </jms:inbound-endpoint>
         <component>
             <singleton-object
-                    class="org.mule.runtime.transport.jms.integration.JmsXAAlwaysBeginTestCase$TestRollbackComponent"/>
+                    class="org.mule.compatibility.transport.jms.integration.JmsXAAlwaysBeginTestCase$TestRollbackComponent"/>
         </component>
         <jms:outbound-endpoint ref="out">
             <xa-transaction action="ALWAYS_BEGIN"/>

@@ -6,25 +6,25 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.api.transport.MessageDispatcher;
+import org.mule.compatibility.core.api.transport.MessageReceiver;
+import org.mule.compatibility.core.api.transport.MessageRequester;
+import org.mule.compatibility.core.endpoint.AbstractEndpoint;
+import org.mule.compatibility.core.transport.AbstractConnector;
+import org.mule.compatibility.core.transport.AbstractMessageDispatcherFactory;
+import org.mule.compatibility.core.transport.AbstractMessageReceiver;
+import org.mule.compatibility.core.transport.AbstractMessageRequesterFactory;
+import org.mule.compatibility.core.transport.ConfigurableKeyedObjectPool;
+import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.api.transport.MessageDispatcher;
-import org.mule.runtime.core.api.transport.MessageReceiver;
-import org.mule.runtime.core.api.transport.MessageRequester;
-import org.mule.runtime.core.endpoint.AbstractEndpoint;
-import org.mule.runtime.core.transport.AbstractConnector;
-import org.mule.runtime.core.transport.AbstractMessageDispatcherFactory;
-import org.mule.runtime.core.transport.AbstractMessageReceiver;
-import org.mule.runtime.core.transport.AbstractMessageRequesterFactory;
-import org.mule.runtime.core.transport.ConfigurableKeyedObjectPool;
-import org.mule.runtime.core.transport.service.TransportServiceDescriptor;
 
 /**
  * <code>TestConnector</code> use a mock connector

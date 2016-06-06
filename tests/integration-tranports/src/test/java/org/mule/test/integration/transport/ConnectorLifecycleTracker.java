@@ -6,12 +6,12 @@
  */
 package org.mule.test.integration.transport;
 
+import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.transport.AbstractConnector;
 
 import java.util.ArrayList;
 import java.util.List;

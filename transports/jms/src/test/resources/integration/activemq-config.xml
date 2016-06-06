@@ -31,6 +31,6 @@
                             specification="1.1"
                             redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
 
-     <spring:bean name="redeliveryHandlerFactory" class="org.mule.runtime.transport.jms.test.TestRedeliveryHandlerFactory"/>
+     <spring:bean name="redeliveryHandlerFactory" class="org.mule.compatibility.transport.jms.test.TestRedeliveryHandlerFactory"/>
 
 </mule>

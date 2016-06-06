@@ -1,1 +1,1 @@
-http\://www.mulesoft.org/schema/mule/transport/sockets=org.mule.runtime.transport.socket.internal.config.SocketsNamespaceHandler
+http\://www.mulesoft.org/schema/mule/transport/sockets=org.mule.compatibility.transport.socket.internal.config.SocketsNamespaceHandler

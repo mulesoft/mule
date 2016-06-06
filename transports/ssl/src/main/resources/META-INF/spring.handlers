@@ -1,2 +1,2 @@
-http\://www.mulesoft.org/schema/mule/transport/ssl=org.mule.runtime.transport.ssl.config.SslNamespaceHandler
-http\://www.mulesoft.org/schema/mule/transport/tls=org.mule.runtime.transport.ssl.config.TlsNamespaceHandler
+http\://www.mulesoft.org/schema/mule/transport/ssl=org.mule.compatibility.transport.ssl.config.SslNamespaceHandler
+http\://www.mulesoft.org/schema/mule/transport/tls=org.mule.compatibility.transport.ssl.config.TlsNamespaceHandler

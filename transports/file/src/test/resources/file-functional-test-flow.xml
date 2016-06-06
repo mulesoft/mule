@@ -41,7 +41,7 @@
     </flow>
 
     <flow name="recursiveService">
-        <file:inbound-endpoint ref="get" comparator="org.mule.runtime.transport.file.comparator.OlderFirstComparator"
+        <file:inbound-endpoint ref="get" comparator="org.mule.compatibility.transport.file.comparator.OlderFirstComparator"
             reverseOrder="true">
             <file:file-to-byte-array-transformer/>
         </file:inbound-endpoint>

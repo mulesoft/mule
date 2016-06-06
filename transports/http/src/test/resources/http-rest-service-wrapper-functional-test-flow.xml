@@ -85,6 +85,6 @@
 
     <flow name="SendBackContentType">
         <http:inbound-endpoint address="http://localhost:${port2}/echo"/>
-        <component class="org.mule.runtime.transport.http.components.RestServiceWrapperFunctionalTestCase$CopyContentTypeFromRequest"/>
+        <component class="org.mule.compatibility.transport.http.components.RestServiceWrapperFunctionalTestCase$CopyContentTypeFromRequest"/>
     </flow>
 </mule>

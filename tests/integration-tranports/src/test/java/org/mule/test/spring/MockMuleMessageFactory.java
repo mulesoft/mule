@@ -6,7 +6,7 @@
  */
 package org.mule.test.spring;
 
-import org.mule.runtime.core.transport.DefaultMuleMessageFactory;
+import org.mule.compatibility.core.transport.DefaultMuleMessageFactory;
 
 public class MockMuleMessageFactory extends DefaultMuleMessageFactory
 {

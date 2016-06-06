@@ -70,7 +70,7 @@
     <jms:activemq-connector name="jmsConnector5"
                             jndiDestinations="true"
                             connectionFactoryJndiName="ConnectionFactory">
-        <jms:custom-jndi-name-resolver class="org.mule.runtime.transport.jms.jndi.CachedJndiNameResolver">
+        <jms:custom-jndi-name-resolver class="org.mule.compatibility.transport.jms.jndi.CachedJndiNameResolver">
             <spring:property name="jndiInitialFactory" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
             <spring:property name="jndiProviderUrl"
                              value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>

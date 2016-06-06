@@ -6,6 +6,8 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -13,10 +15,8 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.transport.AbstractMessageDispatcher;
 import org.mule.tck.processor.TestNonBlockingProcessor;
 
 public class TestMessageDispatcher extends AbstractMessageDispatcher

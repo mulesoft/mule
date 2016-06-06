@@ -7,12 +7,12 @@
 package org.mule.endpoints;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
+import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
 
+import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.endpoint.EndpointBuilder;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;

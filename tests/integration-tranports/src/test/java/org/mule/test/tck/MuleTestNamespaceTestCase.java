@@ -9,12 +9,12 @@ package org.mule.test.tck;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.compatibility.core.api.transport.Connector;
+import org.mule.compatibility.core.transport.ConfigurableKeyedObjectPool;
+import org.mule.compatibility.core.transport.ConfigurableKeyedObjectPoolFactory;
+import org.mule.compatibility.core.transport.DefaultConfigurableKeyedObjectPool;
+import org.mule.compatibility.core.transport.DefaultConfigurableKeyedObjectPoolFactory;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.transport.Connector;
-import org.mule.runtime.core.transport.ConfigurableKeyedObjectPool;
-import org.mule.runtime.core.transport.ConfigurableKeyedObjectPoolFactory;
-import org.mule.runtime.core.transport.DefaultConfigurableKeyedObjectPool;
-import org.mule.runtime.core.transport.DefaultConfigurableKeyedObjectPoolFactory;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import org.junit.Test;

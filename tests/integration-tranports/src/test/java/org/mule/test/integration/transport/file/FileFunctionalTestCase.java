@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.compatibility.transport.file.FileMessageReceiver;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.functional.FunctionalTestNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
@@ -21,7 +22,6 @@ import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.connector.PollingController;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.transport.file.FileMessageReceiver;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;

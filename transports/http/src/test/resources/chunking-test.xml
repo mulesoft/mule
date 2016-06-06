@@ -13,7 +13,7 @@
         <flow name="/foo">
             <http:inbound-endpoint address="http://localhost:${port1}/foo" exchange-pattern="request-response"/>
             <component>
-                <singleton-object class="org.mule.runtime.transport.http.functional.PartialReadComponent"/>
+                <singleton-object class="org.mule.compatibility.transport.http.functional.PartialReadComponent"/>
             </component>
         </flow>
 

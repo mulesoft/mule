@@ -15,7 +15,7 @@
     <flow name="dlqExceptionInboundEndpoint">
         <vm:inbound-endpoint path="in1">
             <custom-transformer
-                    class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>
+                    class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <test:component/>
@@ -34,7 +34,7 @@
         <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
             <transports:response>
                 <custom-transformer
-                        class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>
+                        class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>
             </transports:response>
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
@@ -73,7 +73,7 @@
         <test:component/>
         <vm:outbound-endpoint path="out" exchange-pattern="one-way">
             <custom-transformer
-                    class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>
+                    class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$FailingTransformer"/>
             <vm:transaction action="ALWAYS_JOIN"/>
         </vm:outbound-endpoint>
         <default-exception-strategy>
@@ -89,7 +89,7 @@
             <vm:transaction action="NONE"/>
         </vm:inbound-endpoint>
         <component
-                class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$DeadLetterQueueComponent"/>
+                class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$DeadLetterQueueComponent"/>
     </flow>
 
     <flow name="outboundFlow">
@@ -97,7 +97,7 @@
             <vm:transaction action="NONE"/>
         </vm:inbound-endpoint>
         <component
-                class="org.mule.runtime.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$OutboundComponent"/>
+                class="org.mule.compatibility.transport.vm.functional.transactions.VmExceptionStrategyOneWayTestCase$OutboundComponent"/>
     </flow>
 
 </mule>

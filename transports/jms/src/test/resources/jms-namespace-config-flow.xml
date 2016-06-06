@@ -14,9 +14,9 @@
         <spring:property name="value" value="foo"/>
     </spring:bean>
 
-    <spring:bean name="connectionFactory" class="org.mule.runtime.transport.jms.test.TestConnectionFactory"/>
+    <spring:bean name="connectionFactory" class="org.mule.compatibility.transport.jms.test.TestConnectionFactory"/>
     
-    <spring:bean name="redeliveryHandlerFactory" class="org.mule.runtime.transport.jms.test.TestRedeliveryHandlerFactory"/>
+    <spring:bean name="redeliveryHandlerFactory" class="org.mule.compatibility.transport.jms.test.TestRedeliveryHandlerFactory"/>
     
     <!-- Default config -->
     <jms:connector name="jmsConnectorDefaults"
@@ -40,7 +40,7 @@
                    password="mypass"
                    embeddedMode="true"/>
 
-    <jms:custom-connector name="jmsConnector2" class="org.mule.runtime.transport.jms.JmsConnector"
+    <jms:custom-connector name="jmsConnector2" class="org.mule.compatibility.transport.jms.JmsConnector"
                           specification="1.1">
          <spring:property name="connectionFactory" ref="connectionFactory"/>
     </jms:custom-connector>
@@ -87,7 +87,7 @@
     </spring:beans>
     
     <jms:connector name="jmsJndiConnector" 
-                   jndiInitialFactory="org.mule.runtime.transport.jms.test.JmsTestContextFactory"
+                   jndiInitialFactory="org.mule.compatibility.transport.jms.test.JmsTestContextFactory"
                    jndiProviderUrl="jndi://test"
                    jndiProviderProperties-ref="providerProperties"
                    connectionFactoryJndiName="jms/connectionFactory" 

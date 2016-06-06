@@ -6,8 +6,8 @@
  */
 package org.mule.functional.config;
 
+import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.runtime.core.endpoint.URIBuilder;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 public class TransportsTestNamespaceHandler extends AbstractMuleNamespaceHandler

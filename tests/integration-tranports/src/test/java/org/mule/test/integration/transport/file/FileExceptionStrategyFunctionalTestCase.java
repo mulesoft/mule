@@ -8,9 +8,9 @@ package org.mule.test.integration.transport.file;
 
 import static org.junit.Assert.fail;
 
+import org.mule.compatibility.transport.file.ExpressionFilenameParser;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.transport.file.ExpressionFilenameParser;
 
 import java.io.File;
 

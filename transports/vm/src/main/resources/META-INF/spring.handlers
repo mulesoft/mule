@@ -1,1 +1,1 @@
-http\://www.mulesoft.org/schema/mule/transport/vm=org.mule.runtime.transport.vm.config.VmNamespaceHandler
+http\://www.mulesoft.org/schema/mule/transport/vm=org.mule.compatibility.transport.vm.config.VmNamespaceHandler

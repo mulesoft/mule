@@ -19,7 +19,7 @@
     <flow name="service">
         <ssl:inbound-endpoint ref="in"/>
         <test:component appendString=" Received">
-            <test:callback class="org.mule.runtime.transport.ssl.SaveCertificateCallback"/>
+            <test:callback class="org.mule.compatibility.transport.ssl.SaveCertificateCallback"/>
         </test:component>
     </flow>
 

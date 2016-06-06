@@ -9,18 +9,18 @@ package org.mule.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.compatibility.core.api.config.MuleEndpointProperties;
+import org.mule.compatibility.core.api.endpoint.EndpointFactory;
+import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.config.MuleEndpointProperties;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.endpoint.EndpointFactory;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.routing.filters.MessagePropertyFilter;
-import org.mule.runtime.core.transport.AbstractConnector;
 
 import org.junit.Test;
 

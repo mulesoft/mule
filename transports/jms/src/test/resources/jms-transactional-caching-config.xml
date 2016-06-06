@@ -31,7 +31,7 @@
             <jms:outbound-endpoint queue="testQueue" connector-ref="JMS"/>
 
             <component>
-                <singleton-object class="org.mule.runtime.transport.jms.JmsTransactionalCachingTestCase$AbortMessageOnEventCount"/>
+                <singleton-object class="org.mule.compatibility.transport.jms.JmsTransactionalCachingTestCase$AbortMessageOnEventCount"/>
             </component>
         </transactional>
     </flow>

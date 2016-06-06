@@ -9,6 +9,8 @@ package org.mule.runtime.module.http.internal.request.grizzly;
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
+
+import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
@@ -34,7 +36,6 @@ import org.mule.runtime.module.http.internal.request.HttpAuthenticationType;
 import org.mule.runtime.module.http.internal.request.HttpClient;
 import org.mule.runtime.module.http.internal.request.HttpClientConfiguration;
 import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
-import org.mule.runtime.transport.socket.api.TcpClientSocketProperties;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;

@@ -31,23 +31,30 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
-         <dependency>
+        
+        <!-- TODO MULE-9814 Remove this dependency -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-jmx</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-impl</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-tools</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-remote</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.yourkit</groupId>
             <artifactId>yjp-controller-api-redist</artifactId>
         </dependency>

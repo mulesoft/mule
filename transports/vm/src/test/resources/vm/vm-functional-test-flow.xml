@@ -9,7 +9,7 @@
                http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd">
 
     <custom-queue-store
-        class="org.mule.runtime.transport.vm.VMFunctionalTestCase$CustomObjectStore"
+        class="org.mule.compatibility.transport.vm.VMFunctionalTestCase$CustomObjectStore"
         name="custom-store" />
     <vm:connector name="vm">
         <vm:queue-profile>

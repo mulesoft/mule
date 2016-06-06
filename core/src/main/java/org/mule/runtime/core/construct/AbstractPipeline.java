@@ -7,6 +7,7 @@
 package org.mule.runtime.core.construct;
 
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
+
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -281,7 +282,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     @Override
-    protected void validateConstruct() throws FlowConstructInvalidException
+    public void validateConstruct() throws FlowConstructInvalidException
     {
         super.validateConstruct();
 

@@ -25,7 +25,7 @@
             workDirectory="${workingDirectory}/workDirectory"
             workFileNamePattern="#[org.mule.runtime.core.util.UUID.getUUID()]"
             recursive="true">
-        <file:custom-filename-parser class="org.mule.runtime.transport.file.DummyFilenameParser"/>
+        <file:custom-filename-parser class="org.mule.compatibility.transport.file.DummyFilenameParser"/>
     </file:connector>
 
     <file:connector name="thirdConnector">

@@ -12,8 +12,8 @@
 
     <vm:connector name="default">
         <transports:service-overrides
-            inboundTransformer="org.mule.runtime.core.transformer.simple.InboundAppendTransformer"
-            outboundTransformer="org.mule.runtime.core.transformer.simple.OutboundAppendTransformer" />
+            inboundTransformer="org.mule.compatibility.core.transformer.simple.InboundAppendTransformer"
+            outboundTransformer="org.mule.compatibility.core.transformer.simple.OutboundAppendTransformer" />
     </vm:connector>
 
     <vm:connector name="queue" />

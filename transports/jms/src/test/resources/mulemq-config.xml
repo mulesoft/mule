@@ -8,7 +8,7 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd">
 
-    <spring:bean name="connectionFactory" class="org.mule.runtime.transport.jms.test.TestConnectionFactory"/>
+    <spring:bean name="connectionFactory" class="org.mule.compatibility.transport.jms.test.TestConnectionFactory"/>
 
     <jms:mulemq-connector name="jmsConnector" connectionFactory-ref="connectionFactory"/>
 </mule>

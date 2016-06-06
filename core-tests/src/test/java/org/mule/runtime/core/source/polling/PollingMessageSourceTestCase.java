@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -112,7 +113,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     {
         FixedFrequencySchedulerFactory factory = new FixedFrequencySchedulerFactory(){
             @Override
-            protected Scheduler doCreate(String name, final Runnable job)
+            public Scheduler doCreate(String name, final Runnable job)
             {
                 return spy(super.doCreate(name,job));
             }

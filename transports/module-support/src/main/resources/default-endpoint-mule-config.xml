@@ -4,6 +4,6 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-    <bean name="_muleEndpointFactory" class="org.mule.runtime.core.endpoint.DefaultEndpointFactory"/>
+    <bean name="_muleEndpointFactory" class="org.mule.compatibility.core.endpoint.DefaultEndpointFactory"/>
 
 </beans>

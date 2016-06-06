@@ -8,12 +8,12 @@ package org.mule.test.config;
 
 import static org.junit.Assert.assertEquals;
 
+import org.mule.compatibility.core.api.config.MuleEndpointProperties;
+import org.mule.compatibility.core.api.endpoint.EndpointFactory;
+import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NameableObject;
-import org.mule.runtime.core.api.config.MuleEndpointProperties;
-import org.mule.runtime.core.api.endpoint.EndpointFactory;
-import org.mule.runtime.core.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.junit.Test;

@@ -6,13 +6,13 @@
  */
 package org.mule.test.integration;
 
+import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
+import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.endpoint.DefaultEndpointFactory;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.util.endpoint.InboundEndpointWrapper;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.endpoint.EndpointBuilder;
-import org.mule.runtime.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.lifecycle.StartException;
-import org.mule.runtime.core.endpoint.DefaultEndpointFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

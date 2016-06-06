@@ -22,14 +22,14 @@
             <transports:inbound-endpoint address="jms://hello.in" exchange-pattern="request-response"/>
             <transports:inbound-endpoint address="jms://topic:thello.in" exchange-pattern="request-response"/>
         </composite-source>
-        <component class="org.mule.runtime.transport.jms.integration.routing.HelloService" />
+        <component class="org.mule.compatibility.transport.jms.integration.routing.HelloService" />
     </flow>
 
     <flow name="InvokerComponent">
         <transports:inbound-endpoint address="vm://invoker.in" exchange-pattern="one-way"/>
         <transports:component>
-            <singleton-object class="org.mule.runtime.transport.jms.integration.routing.Invoker" />
-            <transports:binding interface="org.mule.runtime.transport.jms.integration.routing.HelloInterface">
+            <singleton-object class="org.mule.compatibility.transport.jms.integration.routing.Invoker" />
+            <transports:binding interface="org.mule.compatibility.transport.jms.integration.routing.HelloInterface">
                 <transports:outbound-endpoint address="vm://hello.in" exchange-pattern="request-response" />
             </transports:binding>
         </transports:component>
@@ -40,8 +40,8 @@
 
         <transports:inbound-endpoint address="jms://invoker.in" exchange-pattern="one-way"/>
         <transports:component>
-            <singleton-object class="org.mule.runtime.transport.jms.integration.routing.Invoker" />
-            <transports:binding interface="org.mule.runtime.transport.jms.integration.routing.HelloInterface">
+            <singleton-object class="org.mule.compatibility.transport.jms.integration.routing.Invoker" />
+            <transports:binding interface="org.mule.compatibility.transport.jms.integration.routing.HelloInterface">
                 <transports:outbound-endpoint address="jms://hello.in" exchange-pattern="request-response" />
             </transports:binding>
         </transports:component>
@@ -51,8 +51,8 @@
     <flow name="JmsTopicInvokerComponent">
         <transports:inbound-endpoint address="jms://topic:tinvoker.in" exchange-pattern="one-way"/>
         <transports:component>
-            <singleton-object class="org.mule.runtime.transport.jms.integration.routing.Invoker" />
-            <transports:binding interface="org.mule.runtime.transport.jms.integration.routing.HelloInterface">
+            <singleton-object class="org.mule.compatibility.transport.jms.integration.routing.Invoker" />
+            <transports:binding interface="org.mule.compatibility.transport.jms.integration.routing.HelloInterface">
                 <transports:outbound-endpoint address="jms://topic:thello.in" exchange-pattern="request-response" />
             </transports:binding>
         </transports:component>

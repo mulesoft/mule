@@ -14,10 +14,10 @@
     <regex-filter pattern=".*ABC.*" name="globalMf" />
 
     <custom-processor name="reject1"
-        class="org.mule.runtime.transport.vm.functional.transactions.MessageFilterTestCase$Reject1" />
+        class="org.mule.compatibility.transport.vm.functional.transactions.MessageFilterTestCase$Reject1" />
 
     <custom-processor name="reject2"
-        class="org.mule.runtime.transport.vm.functional.transactions.MessageFilterTestCase$Reject2" />
+        class="org.mule.compatibility.transport.vm.functional.transactions.MessageFilterTestCase$Reject2" />
 
     <message-filter name="acceptAll">
         <regex-filter pattern="." />
@@ -39,7 +39,7 @@
             <processor ref="secondMf" />
             <!-- uncomment this to see the bug: Spring will try to call setUnacceptedMessageProcessor
                 on the endpoint <message-filter> <filter ref="globalMf"/> <custom-processor
-                class="org.mule.runtime.transport.vm.functional.transactions.MessageFilterTestCase$Reject1"/>
+                class="org.mule.compatibility.transport.vm.functional.transactions.MessageFilterTestCase$Reject1"/>
                 </message-filter> -->
             <payload-type-filter expectedType="java.lang.String" />
         </vm:inbound-endpoint>

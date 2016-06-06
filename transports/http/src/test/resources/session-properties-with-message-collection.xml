@@ -43,7 +43,7 @@
 
     <flow name="httpFlow">
     	<http:inbound-endpoint address="http://localhost:${port1}/test" exchange-pattern="request-response" />
-    	<component class="org.mule.runtime.transport.http.functional.SessionPropertiesWithMessageCollectionTestCase$TestSplitterComponent" />
+    	<component class="org.mule.compatibility.transport.http.functional.SessionPropertiesWithMessageCollectionTestCase$TestSplitterComponent" />
     	<vm:outbound-endpoint path="inVM" exchange-pattern="request-response" />
     </flow>
 

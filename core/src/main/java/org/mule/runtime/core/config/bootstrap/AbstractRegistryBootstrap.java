@@ -60,9 +60,9 @@ import org.slf4j.LoggerFactory;
  * Loading transformers has a slightly different notation since you can define the 'returnClass' with optional mime type, and 'name'of
  * the transformer as parameters i.e.
  * <pre>
- * transformer.1=org.mule.runtime.core.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
- * transformer.2=org.mule.runtime.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String:text/xml, name=JMSMessageToString
- * transformer.3=org.mule.runtime.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
+ * transformer.1=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
+ * transformer.2=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String:text/xml, name=JMSMessageToString
+ * transformer.3=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
  * </pre>
  * Note that the key used for transformers must be 'transformer.x' where 'x' is a sequential number.  The transformer name will be
  * automatically generated as JMSMessageToXXX where XXX is the return class name i.e. JMSMessageToString unless a 'name'

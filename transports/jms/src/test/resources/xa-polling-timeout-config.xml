@@ -14,7 +14,7 @@
     <jbossts:transaction-manager/>
 
     <jms:activemq-xa-connector name="jmsConnectorCustomPool" maxRedelivery="-1" specification="1.1" numberOfConsumers="1">
-        <transports:service-overrides xaTransactedMessageReceiver="org.mule.runtime.transport.jms.XaPollingTimeoutTestCase$TestXaTransactedJmsMessageReceiver" />
+        <transports:service-overrides xaTransactedMessageReceiver="org.mule.compatibility.transport.jms.XaPollingTimeoutTestCase$TestXaTransactedJmsMessageReceiver" />
     </jms:activemq-xa-connector>
 
     <flow name="main">

@@ -13,7 +13,7 @@
        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
 
     <http:connector name="httpConnector">
-        <transports:service-overrides messageFactory="org.mule.runtime.transport.http.HttpMultipartMuleMessageFactory"/>
+        <transports:service-overrides messageFactory="org.mule.compatibility.transport.http.HttpMultipartMuleMessageFactory"/>
     </http:connector>
 
     <http:endpoint name="endpoint1" host="localhost" port="${port1}"

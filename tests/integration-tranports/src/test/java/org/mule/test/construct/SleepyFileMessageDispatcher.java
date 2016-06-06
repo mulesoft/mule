@@ -6,9 +6,9 @@
  */
 package org.mule.test.construct;
 
+import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.transport.file.FileMessageDispatcher;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.transport.file.FileMessageDispatcher;
 
 public class SleepyFileMessageDispatcher extends FileMessageDispatcher
 {
