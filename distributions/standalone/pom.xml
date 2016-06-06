@@ -35,6 +35,104 @@
                             </includeGroupIds>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>boot-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <failOnMissingClassifierArtifact>true</failOnMissingClassifierArtifact>
+                            <skip>${skipDistributions}</skip>
+                            <outputDirectory>${project.build.directory}/lib/opt</outputDirectory>
+                            <excludeTypes>zip</excludeTypes>
+                            <includeScope>runtime</includeScope>
+                            <excludeScope>provided</excludeScope>
+                            <!-- Since we don't define any "includes" here, this will suck in the whole
+                            universe of transitive dependencies.  Therefore, we need to explicitly
+                            _exclude_ all libs which should _not_ go into this directory (usually
+                            because they are already in a different directory). -->
+                            <excludeArtifactIds>
+                                <!--Mule API-->
+                                mule-api,
+                                <!--Metadata API-->
+                                mule-metadata-model-api,
+                                mule-metadata-model-java,
+                                mule-metadata-model-persistence,
+                                <!--extensions API-->
+                                mule-extensions-api,
+                                mule-extensions-api-persistence,
+                                <!-- lib/mule -->
+                                mule-common,
+                                mule-mvel2,
+                                mule-core,
+                                mule-extensions-all,
+                                mule-modules-all,
+                                mule-module-artifact,
+                                mule-module-builders,
+                                mule-module-client,
+                                mule-module-cxf,
+                                mule-module-db,
+                                mule-module-extensions-support,
+                                mule-module-extensions-spring-support,
+                                mule-module-file-extension-common,
+                                mule-module-http,
+                                mule-module-http-ext,
+                                mule-module-jaas,
+                                mule-module-jbossts,
+                                mule-module-json,
+                                mule-module-container,
+                                mule-module-launcher,
+                                mule-module-management,
+                                mule-module-oauth,
+                                mule-module-pgp,
+                                mule-module-reboot,
+                                mule-module-scripting,
+                                mule-module-scripting-jruby,
+                                mule-module-schedulers,
+                                mule-module-spring-config,
+                                mule-module-spring-extras,
+                                mule-module-spring-security,
+                                mule-module-sockets,
+                                mule-module-tls,
+                                mule-module-tomcat,
+                                mule-module-ws,
+                                mule-module-xml,
+                                mule-tools-anttasks,
+                                mule-transport-sockets,
+                                <!-- mule-tests-functional dependencies -->
+                                ftpserver-core,
+                                ftplet-api,
+                                sshd-core,
+                                mina-core,
+                                <!-- lib/user -->
+                                junit,
+                                xmlunit,
+                                mule-tests-functional,
+                                mule-tests-unit,
+                                <!-- lib/boot -->
+                                commons-cli,
+                                wrapper,
+                                slf4j-api,
+                                log4j-api,
+                                log4j-core,
+                                log4j-slf4j-impl,
+                                log4j-1.2-api,
+                                log4j-jcl,
+                                log4j-jul,
+                                jcl-over-slf4j,
+                                commons-logging,
+                                disruptor,
+                                <!-- lib/endorsed -->
+                                xml-apis,
+                                xercesImpl,
+                                xml-serializer,
+                                xalan,
+                                <!-- Distributed separately in profiler pack -->
+                                yjp-controller-api-redist
+                            </excludeArtifactIds>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
