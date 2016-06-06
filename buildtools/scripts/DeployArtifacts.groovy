@@ -9,10 +9,13 @@ import groovy.transform.Field
 
 @Field String GET_PLUGIN = "org.apache.maven.plugins:maven-dependency-plugin:2.8:get"
 @Field long FIVE_MINUTES = 300000
+@Field String TEMP_FOLDER_NAME = "tmp"
 @Field int INVALID_ARGUMENTS = 1
 @Field String help = '\nDeploys to a remote Maven repository Mule CE and EE artifacts including distributions, poms, jars, test jars, javadoc jars and source jars.\n'
 @Field String ceRepoId
 @Field String ceRepoUrl
+@Field boolean logErrors
+@Field boolean verbose
 @Field Boolean deployDistro
 @Field String version
 @Field String m2repo
@@ -28,6 +31,7 @@ import groovy.transform.Field
                                'mule-catalog-archetype'  : 'mule-catalog-archetype']
 
 parseArguments(args)
+createFolder(TEMP_FOLDER_NAME)
 deployJars()
 if (deployDistro) { deployCeDistributions() }
 
@@ -46,6 +50,8 @@ def parseArguments(def arguments)
     deploySignatures = options.g ? true : false
     ceRepoId = options.ce.split('::')[0]
     ceRepoUrl = options.ce.split('::')[1]
+    logErrors = options.le ? true : false
+    verbose = options.vb ? true : false
 }
 
 private OptionAccessor parseOptions(arguments)
@@ -58,6 +64,8 @@ private OptionAccessor parseOptions(arguments)
     cliBuilder.d(longOpt: "deploy-distributions", "Deploy Distribution Artifacts")
     cliBuilder.ce(longOpt: "ce-repository", required: true, args: 1, "CE Remote repository (id::repository)")
     cliBuilder.g(longOpt: "deploy-gpg-signatures", required: false, args: 0, "Configures the script to upload GPG signatures")
+    cliBuilder.le(longOpt: "log-errors", required: false, args: 0, "It will be logged in case an error occurs when a maven command is executed")
+    cliBuilder.vb(longOpt: "verbose", required: false, args: 0, "It will log the maven command output")
     return cliBuilder.parse(arguments)
 }
 
@@ -77,7 +85,7 @@ def deployJars()
         def pom = new Artifact(groupId: 'org.mule.' + it, artifactId: 'mule-' + it, version: version, packaging: 'pom')
         assert getDependency(pom, 'target/pom')
         deployToRemote(ceRepoUrl, ceRepoId, pom.groupId, pom.artifactId, version, 'pom')
-        def project = new XmlSlurper().parse('target/pom')
+        def project = new XmlSlurper().parse(TEMP_FOLDER_NAME + '/target/pom')
         project.modules.children().each { module ->
             if (module.text().startsWith('all-'))
             {
@@ -139,7 +147,7 @@ protected void deployToRemote(String repoUrl, String repoId, String groupId, Str
 
 private boolean getDependency(Artifact artifact, String destFilename)
 {
-    return mvn([GET_PLUGIN, "-Dartifact=${artifact}", "-Ddest=${destFilename}", "-Dtransitive=false"], false)
+    return mvn([GET_PLUGIN, "-Dartifact=${artifact}", "-Ddest=${destFilename}", "-Dtransitive=false"], logErrors)
 }
 
 private boolean deployFile(Artifact artifact, String pomFile, String artifactFile, String repoUrl, String repoId)
@@ -149,7 +157,7 @@ private boolean deployFile(Artifact artifact, String pomFile, String artifactFil
     {
         args.add("-Dclassifier=${artifact.classifier}")
     }
-    result = mvn(args)
+    result = mvn(args, logErrors)
     log((result ? "Deployed: " : "Failed to deploy: ") + artifact)
     return result
 }
@@ -172,17 +180,24 @@ def mvn(List mvnArgs, boolean logErrors=false)
     mvnArgs = mvnArgs*.replaceAll(' ', "\\\\ ") // escaping spaces: -Dkey=value\ with\ spaces
     String repoConfig = m2repo ? "-Dmaven.repo.local=${m2repo}" : ""
     String settingsConfig = settings ? "--settings ${settings}" : ""
-    Process proc = "mvn -B ${settingsConfig} ${repoConfig} ${mvnArgs.join(' ')}".execute()
+    Process proc = "mvn -B ${settingsConfig} ${repoConfig} ${mvnArgs.join(' ')}".execute(null, new File("./${TEMP_FOLDER_NAME}"))
     List<String> lines = proc.in.readLines()
     proc.waitForOrKill(FIVE_MINUTES)
     boolean error = lines.find { it.startsWith('[ERROR]') }
-    if (error && logErrors) { lines.each { log it } }
+    if (error && logErrors && ! verbose) { lines.each { log it } }
+    if (verbose) { lines.each { log it } }
     return !error
 }
 
 def log(String message)
 {
     println message
+}
+
+def createFolder(String folderName)
+{
+    Process makeFolder  = "mkdir ${folderName}".execute()
+    makeFolder.waitForOrKill(FIVE_MINUTES)
 }
 
 @AutoClone
@@ -206,3 +221,4 @@ class Artifact
         return clone;
     }
 }
+
