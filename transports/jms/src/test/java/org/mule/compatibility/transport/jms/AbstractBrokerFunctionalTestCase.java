@@ -7,10 +7,8 @@
 package org.mule.compatibility.transport.jms;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.infrastructure.process.rules.ActiveMQBroker;
 
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.broker.TransportConnector;
 import org.junit.Rule;
 
 /**
@@ -20,47 +18,28 @@ public class AbstractBrokerFunctionalTestCase extends FunctionalTestCase
 {
 
     @Rule
-    public DynamicPort port = new DynamicPort("port");
-
-    protected BrokerService broker;
-    protected TransportConnector transportConnector;
-    protected String url;
-
+    public ActiveMQBroker amqBroker = new ActiveMQBroker("port");
 
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        url = "tcp://localhost:" + this.port.getValue();
-        startBroker();
+        amqBroker.start();
     }
 
     @Override
     protected void doTearDownAfterMuleContextDispose() throws Exception
     {
-        stopBroker();
-    }
-
-    protected void startBroker() throws Exception
-    {
-        broker = new BrokerService();
-        broker.setUseJmx(false);
-        broker.setPersistent(false);
-
-        transportConnector = broker.addConnector(this.url);
-
-        broker.start(true);
-        broker.waitUntilStarted();
-    }
-
-    protected void stopBroker() throws Exception
-    {
-        broker.stop();
-        broker.waitUntilStopped();
+        amqBroker.stop();
     }
 
     protected int getConnectionsCount()
     {
-        return transportConnector.getConnections().size();
+        return amqBroker.getConnectionsCount();
+    }
+
+    public String getConnectorUrl()
+    {
+        return amqBroker.getConnectorUrl();
     }
 
 }

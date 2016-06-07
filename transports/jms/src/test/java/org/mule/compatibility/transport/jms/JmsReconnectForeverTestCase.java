@@ -12,8 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.MessageReceiver;
-import org.mule.compatibility.transport.jms.JmsConnector;
-import org.mule.compatibility.transport.jms.MultiConsumerJmsMessageReceiver;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -43,20 +41,20 @@ public class JmsReconnectForeverTestCase extends AbstractBrokerFunctionalTestCas
     }
 
     @Override
-    protected void startBroker() throws Exception
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        super.startBroker();
+        super.doSetUpBeforeMuleContextCreation();
 
         // this is needed because for some reason the broker will reject any connections
         // otherwise
-        connection = new ActiveMQConnectionFactory(this.url).createQueueConnection();
+        connection = new ActiveMQConnectionFactory(getConnectorUrl()).createQueueConnection();
     }
 
     @Override
-    protected void stopBroker() throws Exception
+    protected void doTearDownAfterMuleContextDispose() throws Exception
     {
         connection.close();
-        super.stopBroker();
+        super.doTearDownAfterMuleContextDispose();
     }
 
     @Test
