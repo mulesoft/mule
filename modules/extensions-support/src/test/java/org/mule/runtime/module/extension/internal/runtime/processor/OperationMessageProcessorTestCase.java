@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
@@ -62,6 +63,7 @@ import org.mule.runtime.extension.api.runtime.OperationContext;
 import org.mule.runtime.extension.api.runtime.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -499,7 +501,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     @Test
     public void getOperationDynamicMetadata() throws Exception
     {
-        MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(new DefaultMetadataKey("person", "Person", Collections.emptySet(), Collections.emptySet(), ""));
+        MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(newKey("person", "Person").build());
 
         assertThat(metadata.isSuccess(), is(true));
 

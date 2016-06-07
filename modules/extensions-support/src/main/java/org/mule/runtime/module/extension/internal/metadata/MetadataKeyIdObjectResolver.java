@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.lang.String.format;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.*;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
@@ -107,7 +108,7 @@ final class MetadataKeyIdObjectResolver
 
         if (!missingParts.isEmpty())
         {
-            throw new MetadataResolvingException(String.format("The given MetadataKey does not provide all the required levels. Missing levels: %s", missingParts), FailureCode.INVALID_METADATA_KEY);
+            throw new MetadataResolvingException(String.format("The given MetadataKey does not provide all the required levels. Missing levels: %s", missingParts), INVALID_METADATA_KEY);
         }
 
         return currentParts.entrySet()
