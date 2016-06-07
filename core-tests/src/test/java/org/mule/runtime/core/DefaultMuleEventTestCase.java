@@ -27,6 +27,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
     public static final String PROPERTY_VALUE = "foo";
 
     private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    private final DefaultMuleMessage muleMessage = new DefaultMuleMessage("test-data", (Map<String, Object>) null, muleContext);
+    private final DefaultMuleMessage muleMessage = new DefaultMuleMessage("test-data", (Map<String, Serializable>) null, muleContext);
     private final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, (FlowConstruct) null);
 
     @Test
@@ -130,7 +131,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
     {
         Flow flow = mock(Flow.class);
         when(flow.isSynchronous()).thenReturn(false);
-        muleMessage.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, true, PropertyScope.INBOUND);
+        muleMessage.setInboundProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, true);
         DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, flow);
         assertThat(event.isSynchronous(), equalTo(true));
         assertThat(event.isTransacted(), equalTo(false));
@@ -141,7 +142,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
     {
         Flow flow = mock(Flow.class);
         when(flow.isSynchronous()).thenReturn(false);
-        muleMessage.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, true, PropertyScope.INBOUND);
+        muleMessage.setInboundProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, true);
         DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, MessageExchangePattern.ONE_WAY, flow);
         assertThat(event.isSynchronous(), equalTo(true));
         assertThat(event.isTransacted(), equalTo(false));

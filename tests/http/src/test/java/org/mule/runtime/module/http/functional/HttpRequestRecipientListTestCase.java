@@ -9,13 +9,11 @@ package org.mule.runtime.module.http.functional;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.hamcrest.core.IsInstanceOf;
@@ -44,7 +42,7 @@ public class HttpRequestRecipientListTestCase extends FunctionalTestCase
     public void recipientListWithHttpUrlsWithResponse() throws Exception
     {
         final MuleEvent response = flowRunner("recipientListFlow").withPayload(TEST_MESSAGE)
-                                                                  .withInboundProperty("urls", Arrays.asList(getUrlForPort(port1), getUrlForPort(port2), getUrlForPort(port3)))
+                                                                  .withInboundProperty("urls", new String[]{getUrlForPort(port1), getUrlForPort(port2), getUrlForPort(port3)})
                                                                   .run();
 
         assertThat(response, notNullValue());

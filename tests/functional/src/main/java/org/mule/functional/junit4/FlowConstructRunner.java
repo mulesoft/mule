@@ -65,7 +65,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
      * @param value the value of the inbound property to add
      * @return this {@link FlowRunner}
      */
-    public R withInboundProperty(String key, Object value)
+    public R withInboundProperty(String key, Serializable value)
     {
         eventBuilder.withInboundProperty(key, value);
 
@@ -79,7 +79,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
      * @param properties the inbound properties to add
      * @return this {@link FlowRunner}
      */
-    public R withInboundProperties(Map<String, Object> properties)
+    public R withInboundProperties(Map<String, Serializable> properties)
     {
         eventBuilder.withInboundProperties(properties);
 
@@ -94,7 +94,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
      * @param value the value of the outbound property to add
      * @return this {@link FlowRunner}
      */
-    public R withOutboundProperty(String key, Object value)
+    public R withOutboundProperty(String key, Serializable value)
     {
         eventBuilder.withOutboundProperty(key, value);
 

@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.PropertyScope;
 
 public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase
 {
@@ -25,6 +24,6 @@ public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProces
     {
         flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
         MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
-        assertThat(message.getProperty(PROCESSOR_THREAD, PropertyScope.OUTBOUND), is(Thread.currentThread().getName()));
+        assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
     }
 }

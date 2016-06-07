@@ -13,6 +13,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class InOutOutInTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "bar");
         MuleMessage result = client.send("inboundEndpoint", "some data", props);
         assertNotNull(result);

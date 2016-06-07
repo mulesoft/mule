@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -171,7 +170,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
         router.setEnableCorrelation(CorrelationMode.NEVER);
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        message.setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "MyCustomCorrelationId", PropertyScope.INBOUND);
+        message.setOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, "MyCustomCorrelationId");
 
         assertTrue(router.isMatch(message));
 

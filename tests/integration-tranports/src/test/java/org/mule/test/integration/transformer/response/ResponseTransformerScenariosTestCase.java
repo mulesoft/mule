@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         // This will disable the transformers configured in the VM connector's service-overrides.
         props.put(MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY, "true");
 

@@ -17,6 +17,7 @@ import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     @Override
     protected void doSetUp() throws Exception
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("object", new Apple());
         props.put("number", 1);
         props.put("string", "hello");

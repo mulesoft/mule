@@ -31,6 +31,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -103,7 +104,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
 
     private MuleMessage createMessage(String method, String contentType)
     {
-        Map<String, Object> inboundProperties = new HashMap<String, Object>();
+        Map<String, Serializable> inboundProperties = new HashMap<>();
         inboundProperties.put("http.method", method);
         inboundProperties.put(HEADER_CONTENT_TYPE, contentType);
 

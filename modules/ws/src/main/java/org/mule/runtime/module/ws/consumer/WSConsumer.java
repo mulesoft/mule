@@ -10,7 +10,6 @@ package org.mule.runtime.module.ws.consumer;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -259,7 +258,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 {
                     if (outboundProperty.startsWith(SOAP_HEADERS_PROPERTY_PREFIX))
                     {
-                        event.getMessage().removeProperty(outboundProperty, PropertyScope.OUTBOUND);
+                        event.getMessage().removeOutboundProperty(outboundProperty);
                     }
                 }
                 return super.processRequest(event);
@@ -272,7 +271,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 Object statusCode = response.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY, null);
                 if (statusCode != null && !(statusCode instanceof String))
                 {
-                    response.getMessage().setProperty(HTTP_STATUS_PROPERTY, statusCode.toString(), PropertyScope.INBOUND);
+                    response.getMessage().setInboundProperty(HTTP_STATUS_PROPERTY, statusCode.toString());
                 }
                 return super.processResponse(response, request);
             }

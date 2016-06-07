@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         FileConnector connector =
                 (FileConnector) muleContext.getRegistry().lookupObject("sendConnector");
         connector.setWriteToDirectory(target.getParent());
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put(TARGET_FILE, target.getName());
 
         MuleClient client = muleContext.getClient();

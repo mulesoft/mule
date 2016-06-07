@@ -18,6 +18,7 @@ import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -120,9 +121,9 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         HttpVersion httpVersion;
         String uri;
         String statusCode = null;
-        Map<String, Object> headers;  
-        Map<String, Object> httpHeaders = new HashMap<String, Object>();
-        Map<String, Object> queryParameters = new HashMap<String, Object>();
+        Map<String, Serializable> headers;
+        Map<String, Serializable> httpHeaders = new HashMap<>();
+        Map<String, Serializable> queryParameters = new HashMap<>();
 
         if (transportMessage instanceof HttpRequest)
         {
@@ -183,11 +184,11 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         initEncoding(message, encoding);
     }
 
-    protected Map<String, Object> processIncomingHeaders(Map<String, Object> headers) throws Exception
+    protected Map<String, Serializable> processIncomingHeaders(Map<String, Serializable> headers) throws Exception
     {
-        Map<String, Object> outHeaders = new HashMap<String, Object>();
+        Map<String, Serializable> outHeaders = new HashMap<>();
 
-        for (Map.Entry<String, Object> header : headers.entrySet())
+        for (Map.Entry<String, Serializable> header : headers.entrySet())
         {
             String headerName = header.getKey();
 
@@ -204,10 +205,10 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         return outHeaders;
     }
 
-    Map<String, Object> convertHeadersToMap(Header[] headersArray, String uri)
+    Map<String, Serializable> convertHeadersToMap(Header[] headersArray, String uri)
         throws URISyntaxException
     {
-        Map<String, Object> headersMap = new CaseInsensitiveHashMap();
+        Map<String, Serializable> headersMap = new CaseInsensitiveHashMap();
         for (int i = 0; i < headersArray.length; i++)
         {
             final Header header = headersArray[i];
@@ -247,15 +248,15 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         return headersMap;
     }
 
-    private void putCookieHeaderInMapAsAClient(Map<String, Object> headersMap, final Header header, String uri)
+    private void putCookieHeaderInMapAsAClient(Map<String, Serializable> headersMap, final Header header, String uri)
         throws URISyntaxException
     {
         try
         {
             final Cookie[] newCookies = CookieHelper.parseCookiesAsAClient(header.getValue(), cookieSpec,
                 new URI(uri));
-            final Object preExistentCookies = headersMap.get(HttpConstants.HEADER_COOKIE_SET);
-            final Object mergedCookie = CookieHelper.putAndMergeCookie(preExistentCookies, newCookies);
+            final Serializable preExistentCookies = headersMap.get(HttpConstants.HEADER_COOKIE_SET);
+            final Serializable mergedCookie = (Serializable) CookieHelper.putAndMergeCookie(preExistentCookies, newCookies);
             headersMap.put(HttpConstants.HEADER_COOKIE_SET, mergedCookie);
         }
         catch (MalformedCookieException e)
@@ -264,7 +265,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
-    private void putCookieHeaderInMapAsAServer(Map<String, Object> headersMap, final Header header, String uri)
+    private void putCookieHeaderInMapAsAServer(Map<String, Serializable> headersMap, final Header header, String uri)
         throws URISyntaxException
     {
         if (enableCookies)
@@ -272,19 +273,19 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             Cookie[] newCookies = CookieHelper.parseCookiesAsAServer(header.getValue(), new URI(uri));
             if (newCookies.length > 0)
             {
-                Object oldCookies = headersMap.get(HttpConnector.HTTP_COOKIES_PROPERTY);
-                Object mergedCookies = CookieHelper.putAndMergeCookie(oldCookies, newCookies);
+                Serializable oldCookies = headersMap.get(HttpConnector.HTTP_COOKIES_PROPERTY);
+                Serializable mergedCookies = (Serializable) CookieHelper.putAndMergeCookie(oldCookies, newCookies);
                 headersMap.put(HttpConnector.HTTP_COOKIES_PROPERTY, mergedCookies);
             }
         }
     }
 
-    private String getContentType(Map<String, Object> headers)
+    private String getContentType(Map<String, Serializable> headers)
     {
         return (String) headers.get(HttpConstants.HEADER_CONTENT_TYPE);
     }
 
-    private String getEncoding(Map<String, Object> headers)
+    private String getEncoding(Map<String, Serializable> headers)
     {
         String encoding = DEFAULT_ENCODING;
         Object contentType = headers.get(HttpConstants.HEADER_CONTENT_TYPE);
@@ -312,7 +313,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         message.setEncoding(encoding);
     }
 
-    private void rewriteConnectionAndKeepAliveHeaders(Map<String, Object> headers)
+    private void rewriteConnectionAndKeepAliveHeaders(Map<String, Serializable> headers)
     {
         // rewrite Connection and Keep-Alive headers based on HTTP version
         String headerValue;
@@ -339,7 +340,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         headers.put(HttpConstants.HEADER_KEEP_ALIVE, headerValue);
     }
 
-    private boolean isHttp11(Map<String, Object> headers)
+    private boolean isHttp11(Map<String, Serializable> headers)
     {
         String httpVersion = (String) headers.get(HttpConnector.HTTP_VERSION_PROPERTY);
         return !HttpConstants.HTTP10.equalsIgnoreCase(httpVersion);
@@ -357,9 +358,9 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         headers.put(HttpConnector.HTTP_QUERY_STRING, queryString);
     }
     
-    protected Map<String, Object> processQueryParams(String uri, String encoding) throws UnsupportedEncodingException
+    protected HashMap<String, Serializable> processQueryParams(String uri, String encoding) throws UnsupportedEncodingException
     {
-        Map<String, Object> httpParams = new HashMap<String, Object>();
+        HashMap<String, Serializable> httpParams = new HashMap<>();
         
         int i = uri.indexOf("?");
         if(i > -1)
@@ -384,7 +385,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         return httpParams;
     }
 
-    private void addQueryParamToMap(Map<String, Object> httpParams, String key, String value)
+    private void addQueryParamToMap(Map<String, Serializable> httpParams, String key, String value)
     {
         Object existingValue = httpParams.get(key);
         if (existingValue == null)
@@ -398,7 +399,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         }
         else if (existingValue instanceof String)
         {
-            List<String> list = new ArrayList<String>();
+            ArrayList<String> list = new ArrayList<>();
             list.add((String) existingValue);
             list.add(value);
             httpParams.put(key, list);
@@ -415,7 +416,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     }
     
 
-    protected void convertMultiPartHeaders(Map<String, Object> headers)
+    protected void convertMultiPartHeaders(Map<String, Serializable> headers)
     {
         // template method
     }

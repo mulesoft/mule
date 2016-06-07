@@ -9,7 +9,6 @@ package org.mule.runtime.core.transformer.simple;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.size.SmallTest;
@@ -34,12 +33,12 @@ public class RemovePropertyTransformerTestCase extends AbstractRemoveVariablePro
     @Override
     protected void verifyRemoved(MuleEvent mockEvent, String key)
     {
-        verify(mockEvent.getMessage()).removeProperty(key, PropertyScope.OUTBOUND);
+        verify(mockEvent.getMessage()).removeOutboundProperty(key);
     }
 
     @Override
     protected void verifyNotRemoved(MuleEvent mockEvent, String key)
     {
-        verify(mockEvent.getMessage(), times(0)).removeProperty(key, PropertyScope.OUTBOUND);
+        verify(mockEvent.getMessage(), times(0)).removeOutboundProperty(key);
     }
 }

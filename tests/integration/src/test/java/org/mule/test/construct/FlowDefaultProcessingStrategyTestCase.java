@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.junit4.TransactionConfigEnum;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
@@ -40,7 +39,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
         MuleMessage response = flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run().getMessage();
         assertThat(response.getPayload().toString(), is(TEST_PAYLOAD));
         MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
-        assertThat(message.getProperty(PROCESSOR_THREAD, PropertyScope.OUTBOUND), is(Thread.currentThread().getName()));
+        assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
     }
 
     @Test
@@ -48,7 +47,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
     {
         flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
         MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
-        assertThat(message.getProperty(PROCESSOR_THREAD, PropertyScope.OUTBOUND), is(not(Thread.currentThread().getName())));
+        assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(not(Thread.currentThread().getName())));
     }
 
     @Test
@@ -59,7 +58,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
                           .run();
 
         MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
-        assertThat(message.getProperty(PROCESSOR_THREAD, PropertyScope.OUTBOUND), is(Thread.currentThread().getName()));
+        assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
     }
 
     @Test
@@ -71,7 +70,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
                           .run();
 
         MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
-        assertThat(message.getProperty(PROCESSOR_THREAD, PropertyScope.OUTBOUND), is(Thread.currentThread().getName()));
+        assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
     }
 
     protected void testTransacted(MessageExchangePattern mep) throws Exception
@@ -81,7 +80,7 @@ public class FlowDefaultProcessingStrategyTestCase extends FunctionalTestCase
                           .run();
 
         MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT);
-        assertThat(message.getProperty(PROCESSOR_THREAD, PropertyScope.OUTBOUND), is(Thread.currentThread().getName()));
+        assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
     }
 
 

@@ -89,7 +89,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
             @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
-                event.getMessage().setOutboundProperty("thread", Thread.currentThread());
+                event.setFlowVariable("thread", Thread.currentThread());
                 return event;
             }
         });
@@ -117,8 +117,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
         assertEquals(event, response);
 
         assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString());
-        assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getMessage().getOutboundProperty(
-            "thread"));
+        assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
     }
 
     @Test
@@ -130,13 +129,12 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
             REQUEST_RESPONSE, muleContext));
 
         assertEquals("helloabcdef", response.getMessageAsString());
-        assertEquals(Thread.currentThread(), response.getMessage().getOutboundProperty("thread"));
+        assertEquals(Thread.currentThread(), response.getFlowVariable("thread"));
 
         // Sensed (out) event also is appended with 'def' because it's the same event
         // instance
         assertEquals("helloabcdef", sensingMessageProcessor.event.getMessageAsString());
-        assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getMessage().getOutboundProperty(
-            "thread"));
+        assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
 
     }
 

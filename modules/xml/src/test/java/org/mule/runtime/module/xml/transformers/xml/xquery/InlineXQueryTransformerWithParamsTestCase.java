@@ -13,6 +13,7 @@ import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
     @Override
     public Object getTestData()
     {
-        Map<String, Object> props = new HashMap<String, Object>(2);
+        Map<String, Serializable> props = new HashMap<>(2);
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
         return new DefaultMuleMessage(srcData, props, muleContext);

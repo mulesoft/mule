@@ -241,25 +241,25 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         this(message.getPayload(), message, message.getMuleContext(), getCloningMessageDataType(message));
     }
 
-    public DefaultMuleMessage(Object message, Map<String, Object> outboundProperties, MuleContext muleContext)
+    public DefaultMuleMessage(Object message, Map<String, Serializable> outboundProperties, MuleContext muleContext)
     {
         this(message, outboundProperties, null, muleContext);
     }
 
-    public DefaultMuleMessage(Object message, Map<String, Object> outboundProperties, Map<String, DataHandler> attachments, MuleContext muleContext)
+    public DefaultMuleMessage(Object message, Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments, MuleContext muleContext)
     {
         this(message, null, outboundProperties, attachments, muleContext);
     }
 
-    public DefaultMuleMessage(Object message, Map<String, Object> inboundProperties,
-                              Map<String, Object> outboundProperties, Map<String, DataHandler> attachments,
+    public DefaultMuleMessage(Object message, Map<String, Serializable> inboundProperties,
+                              Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments,
                               MuleContext muleContext)
     {
         this(message, inboundProperties, outboundProperties, attachments, muleContext, createDefaultDataType(message, muleContext));
     }
 
-    public DefaultMuleMessage(Object message, Map<String, Object> inboundProperties,
-                              Map<String, Object> outboundProperties, Map<String, DataHandler> attachments,
+    public DefaultMuleMessage(Object message, Map<String, Serializable> inboundProperties,
+                              Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments,
                               MuleContext muleContext, DataType dataType)
     {
         super(resolveValue(message), dataType);
@@ -279,8 +279,8 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
                 originalPayload = message;
             }
         }
-        addProperties(inboundProperties, INBOUND);
-        addProperties(outboundProperties, OUTBOUND);
+        addInboundProperties(inboundProperties);
+        addOutboundProperties(outboundProperties);
 
         //Add inbound attachments
         if (attachments != null)
@@ -360,23 +360,28 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
 
     private void copyMessageProperties(MuleMessage muleMessage)
     {
-        for (PropertyScope scope : new PropertyScope[]{INBOUND, PropertyScope.OUTBOUND})
+        try
         {
-            try
+            for (String name : muleMessage.getInboundPropertyNames())
             {
-                for (String name : muleMessage.getPropertyNames(scope))
+                Serializable value = muleMessage.getInboundProperty(name);
+                if (value != null)
                 {
-                    Object value = muleMessage.getProperty(name, scope);
-                    if (value != null)
-                    {
-                        setPropertyInternal(name, value, scope, DataTypeFactory.createFromObject(value));
-                    }
+                    setPropertyInternal(name, value, INBOUND, DataTypeFactory.createFromObject(value));
                 }
             }
-            catch (IllegalArgumentException iae)
+            for (String name : muleMessage.getOutboundPropertyNames())
             {
-                // ignore non-registered property scope
+                Serializable value = muleMessage.getOutboundProperty(name);
+                if (value != null)
+                {
+                    setPropertyInternal(name, value, OUTBOUND, DataTypeFactory.createFromObject(value));
+                }
             }
+        }
+        catch (IllegalArgumentException iae)
+        {
+            // ignore non-registered property scope
         }
     }
 
@@ -459,47 +464,43 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         return originalPayload;
     }
 
-    public void setInboundProperty(String key, Object value)
+    public void setInboundProperty(String key, Serializable value)
     {
-        setProperty(key, value, INBOUND);
+        setProperty(key, value, INBOUND, null);
     }
 
-    public void setInboundProperty(String key, Object value, DataType<?> dataType)
+    @Override
+    public <T extends Serializable> void setInboundProperty(String key, T value, DataType<T> dataType)
     {
         setProperty(key, value, INBOUND, dataType);
     }
 
     @Override
-    public void setOutboundProperty(String key, Object value)
+    public void setOutboundProperty(String key, Serializable value)
     {
-        setProperty(key, value, PropertyScope.OUTBOUND, DataTypeFactory.createFromObject(value));
+        setProperty(key, value, OUTBOUND, DataTypeFactory.createFromObject(value));
     }
 
     @Override
-    public void setOutboundProperty(String key, Object value, DataType<?> dataType)
+    public <T extends Serializable> void setOutboundProperty(String key, T value, DataType<T> dataType)
     {
-       setProperty(key, value, PropertyScope.OUTBOUND, dataType);
+       setProperty(key, value, OUTBOUND, dataType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setProperty(String key, Object value, PropertyScope scope)
+    private void setProperty(String key, Serializable value, PropertyScope scope)
     {
         DataType dataType = DataTypeFactory.createFromObject(value);
         setProperty(key, value, scope, dataType);
     }
 
-    @Override
-    public void setProperty(String key, Object value, PropertyScope scope, DataType<?> dataType)
+    private void setProperty(String key, Serializable value, PropertyScope scope, DataType<?> dataType)
     {
         setPropertyInternal(key, value, scope, dataType);
 
         updateDataTypeWithProperty(key, value);
     }
 
-    private void setPropertyInternal(String key, Object value, PropertyScope scope, DataType<?> dataType)
+    private void setPropertyInternal(String key, Serializable value, PropertyScope scope, DataType<?> dataType)
     {
         assertAccess(WRITE);
         if (key != null)
@@ -526,7 +527,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         }
     }
 
-    private void updateDataTypeWithProperty(String key, Object value)
+    private void updateDataTypeWithProperty(String key, Serializable value)
     {
         // updates dataType when encoding is updated using a property instead of using #setEncoding
         if (MuleProperties.MULE_ENCODING_PROPERTY.equals(key))
@@ -566,32 +567,33 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
      * {@inheritDoc}
      */
     @Override
-    public Object removeProperty(String key, PropertyScope scope)
+    public Serializable removeOutboundProperty(String key)
     {
-        assertAccess(WRITE);
-        return properties.removeProperty(key, scope);
+        return (Serializable) properties.removeProperty(key, OUTBOUND);
+    }
+
+    @Override
+    public Serializable removeInboundProperty(String key)
+    {
+        return (Serializable) properties.removeProperty(key, INBOUND);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<String> getPropertyNames(PropertyScope scope)
-    {
-        assertAccess(READ);
-        return properties.getScopedProperties(scope).keySet();
-    }
-
-    @Override
     public Set<String> getInboundPropertyNames()
     {
-        return getPropertyNames(INBOUND);
+        return properties.getPropertyNames(INBOUND);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> getOutboundPropertyNames()
     {
-        return getPropertyNames(PropertyScope.OUTBOUND);
+        return properties.getScopedProperties(OUTBOUND).keySet();
     }
 
     /**
@@ -634,47 +636,38 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getProperty(String name, PropertyScope scope)
-    {
-        assertAccess(READ);
-        return (T) properties.getProperty(name, scope);
-    }
-
-    @Override
-    public <T> T getInboundProperty(String name, T defaultValue)
+    public <T extends Serializable> T getInboundProperty(String name, T defaultValue)
     {
         return getProperty(name, INBOUND, defaultValue);
     }
 
     @Override
-    public <T> T getInboundProperty(String name)
+    public <T extends Serializable> T getInboundProperty(String name)
     {
-        return getProperty(name, INBOUND, (T) null);
+        return getInboundProperty(name, null);
     }
 
     @Override
-    public <T> T getOutboundProperty(String name, T defaultValue)
+    public <T extends Serializable> T getOutboundProperty(String name, T defaultValue)
     {
-        return getProperty(name, PropertyScope.OUTBOUND, defaultValue);
+        return getProperty(name, OUTBOUND, defaultValue);
     }
 
     @Override
-    public <T> T getOutboundProperty(String name)
+    public <T extends Serializable> T getOutboundProperty(String name)
     {
-        return getOutboundProperty(name, (T) null);
+        return getOutboundProperty(name, null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    private <T> T getProperty(String name, PropertyScope scope)
+    {
+        assertAccess(READ);
+        return (T) properties.getProperty(name, scope);
+    }
+
     @SuppressWarnings("unchecked")
-    public <T> T getProperty(String name, PropertyScope scope, T defaultValue)
+    private <T extends Serializable> T getProperty(String name, PropertyScope scope, T defaultValue)
     {
         assertAccess(READ);
         T result;
@@ -746,11 +739,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         assertAccess(WRITE);
         if (StringUtils.isNotBlank(id))
         {
-            setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, id, OUTBOUND);
+            setOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, id, null);
         }
         else
         {
-            removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, OUTBOUND);
+            removeOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
         }
     }
 
@@ -779,11 +772,15 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         assertAccess(WRITE);
         if (replyTo != null)
         {
-            setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo, PropertyScope.OUTBOUND);
+            if(!(replyTo instanceof Serializable))
+            {
+                logger.warn("ReplyTo " + replyTo + " is not serializable and will not be propagated by Mule");
+            }
+            setOutboundProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, (Serializable) replyTo);
         }
         else
         {
-            removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, OUTBOUND);
+            removeOutboundProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
         }
     }
 
@@ -794,11 +791,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public Object getReplyTo()
     {
         assertAccess(READ);
-        Object replyTo = getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, PropertyScope.OUTBOUND);
+        Serializable replyTo = getOutboundProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
         if (replyTo == null)
         {
             // fallback to inbound, use the requestor's setting if the invocation didn't set any
-            replyTo = getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, INBOUND);
+            replyTo = getInboundProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
         }
         return replyTo;
     }
@@ -1008,20 +1005,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         return Collections.unmodifiableSet(outboundAttachments.keySet());
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T findPropertyInAnyScope(String name, T defaultValue)
-    {
-        Object value = findPropertyInSpecifiedScopes(name,
-                                                     OUTBOUND,
-                                                     INBOUND);
-        if (value == null)
-        {
-            return defaultValue;
-        }
-        return (T) value;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -1070,37 +1053,45 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     }
 
     /**
-     * {@inheritDoc}
+     * Adds a map of inbound properties to be associated with this message
+     *
+     * @param properties the properties add to this message
      */
+    public void addInboundProperties(Map<String, Serializable> properties)
+    {
+        assertAccess(WRITE);
+        if (properties != null)
+        {
+            synchronized (properties)
+            {
+                for (Map.Entry<String, Serializable> entry : properties.entrySet())
+                {
+                    setInboundProperty(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+    }
+
     @Override
-    public void addProperties(Map<String, Object> props, PropertyScope scope)
+    public void addOutboundProperties(Map<String, Serializable> props)
     {
         assertAccess(WRITE);
         if (props != null)
         {
             synchronized (props)
             {
-                for (Map.Entry<String, Object> entry : props.entrySet())
+                for (Map.Entry<String, Serializable> entry : props.entrySet())
                 {
-                    setProperty(entry.getKey(), entry.getValue(), scope);
+                    setOutboundProperty(entry.getKey(), entry.getValue());
                 }
             }
         }
     }
 
-    public void addInboundProperties(Map<String, Object> props)
-    {
-        addProperties(props, INBOUND);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void clearProperties(PropertyScope scope)
+    public void clearOutboundProperties()
     {
-        assertAccess(WRITE);
-        properties.clearProperties(scope);
+        properties.clearProperties(OUTBOUND);
     }
 
     /**
@@ -1473,9 +1464,15 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     }
 
     @Override
-    public DataType<?> getPropertyDataType(String name, PropertyScope scope)
+    public DataType<? extends Serializable> getInboundPropertyDataType(String name)
     {
-        return properties.getPropertyDataType(name, scope);
+        return properties.getPropertyDataType(name, INBOUND);
+    }
+
+    @Override
+    public DataType<? extends Serializable> getOutboundPropertyDataType(String name)
+    {
+        return properties.getPropertyDataType(name, OUTBOUND);
     }
 
     @Override
@@ -1544,20 +1541,20 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
             attachments.put(name, getOutboundAttachment(name));
         }
 
-        Map<String, Object> newInboundProperties = new HashMap<String, Object>(3);
+        Map<String, Serializable> newInboundProperties = new HashMap<>(3);
         for (String name : currentMessage.getOutboundPropertyNames())
         {
             newInboundProperties.put(name, currentMessage.getOutboundProperty(name));
         }
 
-        newMessage.clearProperties(INBOUND);
-        newMessage.clearProperties(OUTBOUND);
+        newMessage.properties.clearProperties(INBOUND);
+        newMessage.properties.clearProperties(OUTBOUND);
 
-        for (Map.Entry<String, Object> s : newInboundProperties.entrySet())
+        for (Map.Entry<String, Serializable> s : newInboundProperties.entrySet())
         {
-            DataType<?> propertyDataType = currentMessage.getPropertyDataType(s.getKey(), PropertyScope.OUTBOUND);
+            DataType<?> propertyDataType = currentMessage.getOutboundPropertyDataType(s.getKey());
 
-            newMessage.setInboundProperty(s.getKey(), s.getValue(), propertyDataType);
+            newMessage.setProperty(s.getKey(), s.getValue(), INBOUND, propertyDataType);
         }
 
         newMessage.inboundAttachments.clear();
@@ -1596,5 +1593,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public Serializable getAttributes()
     {
         return attributes;
+    }
+
+    @Override
+    public void copyProperty(String key)
+    {
+        setProperty(key, getInboundProperty(key), OUTBOUND, getInboundPropertyDataType(key));
     }
 }

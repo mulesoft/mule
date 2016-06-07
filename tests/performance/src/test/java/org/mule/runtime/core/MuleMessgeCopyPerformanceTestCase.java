@@ -87,7 +87,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         for (int i = 0; i < 1000; i++)
         {
             message = new DefaultMuleMessage(original);
-            message.setProperty("newKey", "val", PropertyScope.OUTBOUND);
+            message.setOutboundProperty("newKey", "val");
         }
     }
 
@@ -101,7 +101,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
             message = new DefaultMuleMessage(original);
             for (int j = 1; j <= 10; j++)
             {
-                message.setProperty("newKey" + i, "val", PropertyScope.INBOUND);
+                message.setOutboundProperty("newKey" + i, "val");
             }
         }
     }
@@ -114,7 +114,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         for (int i = 0; i < 1000; i++)
         {
             message = new DefaultMuleMessage(original);
-            message.setProperty("newKey", "val", PropertyScope.OUTBOUND);
+            message.setOutboundProperty("newKey", "val");
         }
     }
 
@@ -128,7 +128,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
             message = new DefaultMuleMessage(original);
             for (int j = 1; j <= 50; j++)
             {
-                message.setProperty("newKey" + i, "val", PropertyScope.INBOUND);
+                message.setOutboundProperty("newKey" + i, "val");
             }
         }
     }
@@ -143,11 +143,11 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         MuleMessage message = createMuleMessage();
         for (int i = 1; i <= numProperties; i++)
         {
-            message.setProperty("InBoUnDpRoPeRtYkEy" + i, "val", PropertyScope.INBOUND);
+            message.setOutboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");
         }
         for (int i = 1; i <= numProperties; i++)
         {
-            message.setProperty("OuTBoUnDpRoPeRtYkEy" + i, "val", PropertyScope.OUTBOUND);
+            message.setOutboundProperty("OuTBoUnDpRoPeRtYkEy" + i, "val");
         }
         return message;
     }

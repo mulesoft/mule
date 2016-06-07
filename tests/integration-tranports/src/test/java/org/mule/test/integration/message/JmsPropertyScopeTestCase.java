@@ -37,6 +37,6 @@ public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 
         assertNotNull(result);
         assertEquals("test bar", result.getPayload());
-        assertEquals("fooValue", result.<Object> getInboundProperty("foo"));
+        assertEquals("fooValue", result.getInboundProperty("foo"));
     }
 }

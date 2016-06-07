@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.functional.junit4.FunctionalTestCase;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class CustomSecurityFilterTestCase extends FunctionalTestCase
     @Test
     public void testOutboundAutenticationSend() throws Exception
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("username", "ross");
         props.put("pass", "ross");
 

@@ -30,6 +30,7 @@ import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     public void testTransactionsWithSetRollbackOnly() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
-        final Map<String, Object> props = new HashMap<String, Object>();
+        final Map<String, Serializable> props = new HashMap<>();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
 
@@ -95,7 +96,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     public void testTransactionsWithExceptionThrown() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
-        final Map<String, Object> props = new HashMap<String, Object>();
+        final Map<String, Serializable> props = new HashMap<>();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
 
@@ -148,7 +149,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     public void testTransactionsWithCommit() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
-        final Map<String, Object> props = new HashMap<String, Object>();
+        final Map<String, Serializable> props = new HashMap<>();
         props.put("JMSReplyTo", "replyTo.queue");
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         props.put("transacted", "true");

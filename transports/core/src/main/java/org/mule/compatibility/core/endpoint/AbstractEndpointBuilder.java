@@ -10,7 +10,6 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
 import static org.mule.compatibility.core.util.TransportObjectNameHelper.getEndpointNameFor;
-
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.EndpointMessageProcessorChainFactory;
@@ -57,6 +56,7 @@ import org.mule.runtime.core.util.MapCombiner;
 import org.mule.runtime.core.util.ObjectNameHelper;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -87,7 +87,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     protected URIBuilder uriBuilder;
     protected Connector connector;
     protected String name;
-    protected Map<Object, Object> properties = new HashMap<Object, Object>();
+    protected Map<String, Serializable> properties = new HashMap<>();
     protected TransactionConfig transactionConfig;
     protected Boolean deleteUnacceptedMessages;
     protected Boolean synchronous;
@@ -810,11 +810,11 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
      * NOTE - this appends properties.
      */
     @Override
-    public void setProperties(Map<Object, Object> properties)
+    public void setProperties(Map<String, Serializable> properties)
     {
         if (null == this.properties)
         {
-            this.properties = new HashMap<Object, Object>();
+            this.properties = new HashMap<>();
         }
         this.properties.putAll(properties);
     }
@@ -826,7 +826,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
      * @param value the value of the property
      */
     @Override
-    public void setProperty(Object key, Object value)
+    public void setProperty(String key, Serializable value)
     {
         properties.put(key, value);
     }

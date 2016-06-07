@@ -24,6 +24,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.concurrent.Latch;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +79,7 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements F
 
         String myProperty = "myProperty";
 
-        HashMap<String, Object> props = new HashMap<>();
+        HashMap<String, Serializable> props = new HashMap<>();
         props.put(MuleProperties.MULE_USER_PROPERTY, "alan");
         props.put(MuleProperties.MULE_METHOD_PROPERTY, "onReceive");
         props.put(myProperty, myProperty);

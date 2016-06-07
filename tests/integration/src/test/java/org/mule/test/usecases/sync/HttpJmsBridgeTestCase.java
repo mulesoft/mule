@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class HttpJmsBridgeTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         String payload = "payload";
 
-        Map<String, Object> headers = new HashMap<String, Object>();
+        Map<String, Serializable> headers = new HashMap<>();
         final String customHeader = "X-Custom-Header";
         headers.put(customHeader, "value");
 

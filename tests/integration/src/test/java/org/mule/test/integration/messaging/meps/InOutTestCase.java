@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class InOutTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertEquals("foo header not received", getPayloadAsString(result));
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "bar");
         result = client.send(listenerUrl, "some data", props);
         assertNotNull(result);

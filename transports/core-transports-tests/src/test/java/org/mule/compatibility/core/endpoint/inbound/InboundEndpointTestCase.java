@@ -39,6 +39,7 @@ import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.NullMessageProcessor;
 import org.mule.tck.security.TestSecurityFilter;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -348,7 +349,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
     protected MuleMessage createTestRequestMessage()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("prop1", "value1");
         return new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
     }

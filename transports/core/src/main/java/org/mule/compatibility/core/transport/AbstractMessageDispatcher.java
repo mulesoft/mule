@@ -14,7 +14,6 @@ import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
@@ -205,7 +204,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         }
         if (!remoteSync)
         {
-            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, PropertyScope.OUTBOUND);
+            event.getMessage().removeOutboundProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
             event.removeFlowVariable(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
         }
         return remoteSync;

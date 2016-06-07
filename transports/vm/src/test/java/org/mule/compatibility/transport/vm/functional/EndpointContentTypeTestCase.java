@@ -11,13 +11,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase
     public void testContentTypes() throws Exception
     {
         MuleMessage response;
-        Map<String, Object> messageProperties = new HashMap<String, Object>();
+        Map<String, Serializable> messageProperties = new HashMap<>();
         messageProperties.put("content-type", "text/xml");
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://in1?connector=vm-in1", "<OK/>", messageProperties);
@@ -70,7 +70,7 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
             MuleMessage message = eventContext.getMessage();
-            assertEquals(expectedContentType, message.getProperty("content-type", PropertyScope.INBOUND));
+            assertEquals(expectedContentType, message.getInboundProperty("content-type"));
             return message;
         }
 
@@ -80,4 +80,3 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase
         }
     }
 }
-    

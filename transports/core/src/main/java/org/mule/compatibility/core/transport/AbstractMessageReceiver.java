@@ -14,7 +14,6 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.ResponseOutputStream;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -48,7 +47,6 @@ import org.mule.runtime.core.work.WorkManagerHolder;
 
 import java.io.OutputStream;
 import java.util.List;
-
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all Message
@@ -234,14 +232,14 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         if (rootId != null)
         {
             message.setMessageRootId(rootId);
-            message.removeProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY, PropertyScope.INBOUND);
+            message.removeInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY);
         }
     }
 
     protected void warnIfMuleClientSendUsed(MuleMessage message)
     {
-        final Object remoteSyncProperty = message.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,
-            PropertyScope.INBOUND);
+        final Object remoteSyncProperty = message.removeInboundProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY
+        );
         if (ObjectUtils.getBoolean(remoteSyncProperty, false) && !endpoint.getExchangePattern().hasResponse())
         {
             logger.warn("MuleClient.send() was used but inbound endpoint "
@@ -249,7 +247,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
                         + " is not 'request-response'.  No response will be returned.");
         }
 
-        message.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, PropertyScope.INBOUND);
+        message.removeInboundProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
     }
 
     protected void applyInboundTransformers(MuleEvent event) throws MuleException

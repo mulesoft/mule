@@ -14,6 +14,7 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
+import java.io.Serializable;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> messageProperties = new HashMap<String, Object>();
+        Map<String, Serializable> messageProperties = new HashMap<>();
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, getSendEncoding());
 
         MuleMessage reply = client.send("clientEndpoint", TEST_MESSAGE, messageProperties);
@@ -139,7 +140,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
 
     private MuleMessage runEncodingTest(String encoding, String payload, String httpMethod) throws Exception
     {
-        Map<String, Object> messageProperties = createMessageProperties(encoding, httpMethod);
+        Map<String, Serializable> messageProperties = createMessageProperties(encoding, httpMethod);
 
         MuleClient client = muleContext.getClient();
         String endpointUri = "clientEndpoint." + encoding;
@@ -156,9 +157,9 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         return reply;
     }
 
-    private Map<String, Object> createMessageProperties(String encoding, String httpMethod)
+    private Map<String, Serializable> createMessageProperties(String encoding, String httpMethod)
     {
-        Map<String, Object> messageProperties = new HashMap<String, Object>();
+        Map<String, Serializable> messageProperties = new HashMap<>();
         String contentType = "text/plain;charset=" + encoding;
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, contentType);
         messageProperties.put(HttpConnector.HTTP_METHOD_PROPERTY, httpMethod);

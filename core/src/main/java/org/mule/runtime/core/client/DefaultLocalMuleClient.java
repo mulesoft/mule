@@ -34,6 +34,7 @@ import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.routing.MuleMessageInfoMapping;
 
+import java.io.Serializable;
 import java.util.Map;
 
 public class DefaultLocalMuleClient implements MuleClient
@@ -60,14 +61,14 @@ public class DefaultLocalMuleClient implements MuleClient
     }
 
     @Override
-    public void dispatch(String url, Object payload, Map<String, Object> messageProperties)
+    public void dispatch(String url, Object payload, Map<String, Serializable> messageProperties)
         throws MuleException
     {
         dispatch(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
     }
 
     @Override
-    public MuleMessage send(String url, Object payload, Map<String, Object> messageProperties)
+    public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties)
         throws MuleException
     {
         return send(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
@@ -107,7 +108,7 @@ public class DefaultLocalMuleClient implements MuleClient
     }
 
     @Override
-    public MuleMessage send(String url, Object payload, Map<String, Object> messageProperties, long timeout)
+    public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout)
         throws MuleException
     {
         return send(url, new DefaultMuleMessage(payload, messageProperties, muleContext), timeout);

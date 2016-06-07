@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class ReplyToChainIntegration1TestCase extends FunctionalTestCase
     {
         String message = "test";
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
 
         MuleClient client = muleContext.getClient();

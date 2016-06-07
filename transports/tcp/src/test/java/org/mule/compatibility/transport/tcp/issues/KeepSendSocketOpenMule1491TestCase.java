@@ -16,6 +16,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -52,7 +53,7 @@ public class KeepSendSocketOpenMule1491TestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         MuleMessage result = client.send("clientEndpoint", TEST_TCP_MESSAGE, props);
         assertEquals(TEST_TCP_MESSAGE + " Received", getPayloadAsString(result));
 

@@ -105,7 +105,7 @@ public class MessagePropertiesContext implements Serializable
         return typedValue == null ? null : (T) typedValue.getValue();
     }
 
-    public DataType<?> getPropertyDataType(String key, PropertyScope scope)
+    public DataType<? extends Serializable> getPropertyDataType(String key, PropertyScope scope)
     {
         if (scope == null)
         {

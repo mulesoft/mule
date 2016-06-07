@@ -26,6 +26,7 @@ import org.mule.runtime.core.util.DataTypeUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Locale;
@@ -243,7 +244,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             {
                 // TODO This have to be improved. We shouldn't have to look in all
                 // scopes
-                Object cookiesObject = msg.getOutboundProperty(headerName);
+                Serializable cookiesObject = msg.getOutboundProperty(headerName);
                 if (cookiesObject == null)
                 {
                     cookiesObject = msg.getInboundProperty(headerName);

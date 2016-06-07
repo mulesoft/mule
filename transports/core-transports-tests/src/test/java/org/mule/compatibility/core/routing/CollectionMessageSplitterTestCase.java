@@ -31,6 +31,7 @@ import org.mule.runtime.core.routing.CollectionSplitter;
 import org.mule.runtime.core.routing.outbound.IteratorMessageSequence;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -132,8 +133,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
         Object payload = Collections.emptySet();
         Flow fc = getTestFlow();
         MuleSession session = getTestSession(fc, muleContext);
-        MuleMessage toSplit = new DefaultMuleMessage(payload, new HashMap<String, Object>(),
-            new HashMap<String, Object>(), null, muleContext);
+        MuleMessage toSplit = new DefaultMuleMessage(payload, new HashMap<>(), new HashMap<>(), null, muleContext);
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(toSplit, fc, session);
@@ -152,17 +152,17 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
         Flow fc = getTestFlow();
         MuleSession session = getTestSession(fc, muleContext);
 
-        Map<String, Object> inboundProps = new HashMap<String, Object>();
+        Map<String, Serializable> inboundProps = new HashMap<>();
         inboundProps.put("inbound1", "1");
         inboundProps.put("inbound2", 2);
         inboundProps.put("inbound3", session);
 
-        Map<String, Object> outboundProps = new HashMap<String, Object>();
+        Map<String, Serializable> outboundProps = new HashMap<>();
         outboundProps.put("outbound1", "3");
         outboundProps.put("outbound2", 4);
         outboundProps.put("outbound3", session);
 
-        Map<String, Object> invocationProps = new HashMap<String, Object>();
+        Map<String, Object> invocationProps = new HashMap<>();
         invocationProps.put("invoke1", "5");
         invocationProps.put("invoke2", 6);
         invocationProps.put("invoke3", session);
@@ -196,8 +196,8 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
 
     private void assertSplitParts(int count,
                                   boolean counted,
-                                  Map<String, Object> inboundProps,
-                                  Map<String, Object> outboundProps,
+                                  Map<String, Serializable> inboundProps,
+                                  Map<String, Serializable> outboundProps,
                                   Map<String, Object> invocationProps,
                                   List<MuleEvent> splits,
                                   Set<Object> actualSequences)

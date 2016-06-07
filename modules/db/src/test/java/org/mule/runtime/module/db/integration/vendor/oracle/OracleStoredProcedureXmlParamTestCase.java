@@ -86,7 +86,7 @@ public class OracleStoredProcedureXmlParamTestCase extends AbstractOracleXmlType
 
             final MuleEvent responseEvent = flowRunner("xmlTypeInputParam").withPayload(TEST_MESSAGE)
                                                                            .withInboundProperty("name", "Monguito")
-                                                                           .withInboundProperty(DESCRIPTION_FIELD, xmlType)
+                                                                           .withFlowVariable(DESCRIPTION_FIELD, xmlType)
                                                                            .run();
 
             final MuleMessage response = responseEvent.getMessage();

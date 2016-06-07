@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public class HttpOutboundThrowExceptionTestCase extends AbstractMockHttpServerTe
     public void errorStatusPropagation() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("errorPropagationEndpoint", TEST_MESSAGE, props);
         assertThat((String) result.getInboundProperty("http.status"), is("400"));
@@ -64,7 +65,7 @@ public class HttpOutboundThrowExceptionTestCase extends AbstractMockHttpServerTe
     public void errorStatusThrowException() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("exceptionOnErrorStatusEndpoint", TEST_MESSAGE, props);
         assertThat((String) result.getInboundProperty("http.status"), is("500"));

@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,7 +71,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
 
     protected MuleMessage createTestRequestMessage()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("prop1", "value1");
         return new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
     }

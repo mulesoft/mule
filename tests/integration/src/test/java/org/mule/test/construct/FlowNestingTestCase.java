@@ -12,11 +12,14 @@ import static org.junit.Assert.assertNull;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,11 +38,12 @@ public class FlowNestingTestCase extends FunctionalTestCase
     @Test
     public void testNestingFiltersAccepted() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(new Orange(),  muleContext);
-        request.setProperty("Currency", "MyCurrency", PropertyScope.INBOUND);
-        request.setProperty("AcquirerCountry", "MyCountry", PropertyScope.INBOUND);
-        request.setProperty("Amount", "4999", PropertyScope.INBOUND);
-               
+        Map<String, Serializable> inboundProperties = new HashMap<>();
+        inboundProperties.put("Currency", "MyCurrency");
+        inboundProperties.put("AcquirerCountry", "MyCountry");
+        inboundProperties.put("Amount", "4999");
+        MuleMessage request = new DefaultMuleMessage(new Orange(),  inboundProperties, null, null, muleContext);
+
         MuleClient client = muleContext.getClient();
         
         flowRunner("NestedFilters").withPayload(request).asynchronously().run();
@@ -50,10 +54,11 @@ public class FlowNestingTestCase extends FunctionalTestCase
     @Test
     public void testNestingFiltersRejected() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(new Apple(),  muleContext);
-        request.setProperty("Currency", "MyCurrency", PropertyScope.INBOUND);
-        request.setProperty("AcquirerCountry", "MyCountry", PropertyScope.INBOUND);
-        request.setProperty("Amount", "4999", PropertyScope.INBOUND);
+        Map<String, Serializable> inboundProperties = new HashMap<>();
+        inboundProperties.put("Currency", "MyCurrency");
+        inboundProperties.put("AcquirerCountry", "MyCountry");
+        inboundProperties.put("Amount", "4999");
+        MuleMessage request = new DefaultMuleMessage(new Apple(),  inboundProperties, null, null, muleContext);
                
         MuleClient client = muleContext.getClient();
         
@@ -65,9 +70,10 @@ public class FlowNestingTestCase extends FunctionalTestCase
     @Test
     public void testNestingChoiceAccepted() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(new Apple(),  muleContext);
-        request.setProperty("AcquirerCountry", "MyCountry", PropertyScope.INBOUND);
-        request.setProperty("Amount", "4999", PropertyScope.INBOUND);
+        Map<String, Serializable> inboundProperties = new HashMap<>();
+        inboundProperties.put("AcquirerCountry", "MyCountry");
+        inboundProperties.put("Amount", "4999");
+        MuleMessage request = new DefaultMuleMessage(new Apple(),  inboundProperties, null, null, muleContext);
                
         MuleClient client = muleContext.getClient();
         
@@ -80,9 +86,10 @@ public class FlowNestingTestCase extends FunctionalTestCase
     @Test
     public void testNestingChoiceRejected() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(new Apple(),  muleContext);
-        request.setProperty("AcquirerCountry", "MyCountry", PropertyScope.INBOUND);
-        request.setProperty("Amount", "5000", PropertyScope.INBOUND);
+        Map<String, Serializable> inboundProperties = new HashMap<>();
+        inboundProperties.put("AcquirerCountry", "MyCountry");
+        inboundProperties.put("Amount", "5000");
+        MuleMessage request = new DefaultMuleMessage(new Apple(),  inboundProperties, null, null, muleContext);
                
         MuleClient client = muleContext.getClient();
         

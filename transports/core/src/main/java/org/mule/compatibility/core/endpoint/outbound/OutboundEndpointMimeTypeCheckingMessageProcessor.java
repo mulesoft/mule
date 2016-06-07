@@ -7,7 +7,6 @@
 package org.mule.compatibility.core.endpoint.outbound;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -39,10 +38,10 @@ public class OutboundEndpointMimeTypeCheckingMessageProcessor implements Message
         if (endpointMimeType != null)
         {
             MuleMessage message = event.getMessage();
-            String contentType = message.getProperty(MuleProperties.CONTENT_TYPE_PROPERTY, PropertyScope.OUTBOUND);
+            String contentType = message.getOutboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY);
             if (contentType == null)
             {
-                message.setProperty(MuleProperties.CONTENT_TYPE_PROPERTY, endpointMimeType, PropertyScope.OUTBOUND);
+                message.setOutboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY, endpointMimeType);
             }
             else
             {

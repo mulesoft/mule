@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.functional.junit4.FunctionalTestCase;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,7 +74,7 @@ public class MultiuserSecurityTestCase extends FunctionalTestCase
     {
         EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(user, user, "PBE", strategy));
 
         return flowRunner("testService").withPayload(new DefaultMuleMessage(data, props, null, null, muleContext)).run().getMessage();

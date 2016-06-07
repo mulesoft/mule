@@ -16,9 +16,12 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -30,6 +33,8 @@ import org.apache.cxf.phase.Phase;
 public class MuleProtocolHeadersOutInterceptor
     extends AbstractPhaseInterceptor<Message>
 {
+
+    private static final Log logger = LogFactory.getLog(MuleProtocolHeadersOutInterceptor.class);
 
     public MuleProtocolHeadersOutInterceptor()
     {
@@ -83,10 +88,17 @@ public class MuleProtocolHeadersOutInterceptor
 
     private void extractAndSet(Message message, MuleMessage muleMsg, String cxfHeader, String muleHeader)
     {
-        Object val = message.get(cxfHeader);
-        if (val != null)
+        if(message.get(cxfHeader) instanceof Serializable)
         {
-            muleMsg.setOutboundProperty(muleHeader, val);
+            Serializable val = (Serializable) message.get(cxfHeader);
+            if (val != null)
+            {
+                muleMsg.setOutboundProperty(muleHeader, val);
+            }
+        }
+        else
+        {
+            logger.warn("The header " + cxfHeader + "is not serializable and will not be propagated by Mule");
         }
     }
 

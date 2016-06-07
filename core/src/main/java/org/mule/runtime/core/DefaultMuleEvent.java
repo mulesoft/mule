@@ -530,8 +530,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         return transacted
                || isFlowConstructSynchronous()
                || exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy()
-               || message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
-                                      PropertyScope.INBOUND, Boolean.FALSE);
+               || message.getInboundProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.FALSE);
     }
 
     private boolean isFlowConstructSynchronous()

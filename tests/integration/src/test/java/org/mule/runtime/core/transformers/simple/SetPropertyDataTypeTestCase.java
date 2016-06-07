@@ -9,13 +9,12 @@ package org.mule.runtime.core.transformers.simple;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.PropertyScope;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.runtime.core.transformer.types.MimeTypes;
+import org.mule.tck.junit4.matcher.DataTypeMatcher;
 
 import org.junit.Test;
 
@@ -34,7 +33,7 @@ public class SetPropertyDataTypeTestCase extends FunctionalTestCase
         final MuleEvent muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
 
         MuleMessage response = muleEvent.getMessage();
-        DataType dataType = response.getPropertyDataType("testProperty", PropertyScope.OUTBOUND);
+        DataType dataType = response.getOutboundPropertyDataType("testProperty");
 
         assertThat(dataType, DataTypeMatcher.like(String.class, MimeTypes.XML, UTF_16.name()));
     }

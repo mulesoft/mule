@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
     @Test
     public void testHttpGetNotFiltered() throws Exception
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put(HttpConstants.METHOD_GET, "true");
 
         MuleClient client = muleContext.getClient();
@@ -74,7 +75,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase
     @Test
     public void testHttpGetFiltered() throws Exception
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
         //props.put(HttpConstants.METHOD_GET, "true");
 

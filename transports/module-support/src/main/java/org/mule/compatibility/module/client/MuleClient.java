@@ -40,6 +40,7 @@ import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -234,7 +235,7 @@ public class MuleClient implements Disposable
      *            properties.
      * @throws org.mule.api.MuleException
      */
-    public void dispatch(String url, Object payload, Map<String, Object> messageProperties) throws MuleException
+    public void dispatch(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException
     {
         dispatch(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
     }
@@ -267,7 +268,7 @@ public class MuleClient implements Disposable
      * @throws org.mule.api.MuleException if the dispatch fails or the components or
      *             transfromers cannot be found
      */
-    public FutureMessageResult sendAsync(String url, Object payload, Map<String, Object> messageProperties)
+    public FutureMessageResult sendAsync(String url, Object payload, Map<String, Serializable> messageProperties)
         throws MuleException
     {
         return sendAsync(url, payload, messageProperties, 0);
@@ -303,7 +304,7 @@ public class MuleClient implements Disposable
      */
     public FutureMessageResult sendAsync(final String url,
                                          final Object payload,
-                                         final Map<String, Object> messageProperties,
+                                         final Map<String, Serializable> messageProperties,
                                          final int timeout) throws MuleException
     {
         return sendAsync(url, new DefaultMuleMessage(payload, messageProperties, muleContext), timeout);
@@ -357,7 +358,7 @@ public class MuleClient implements Disposable
      *         explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException
      */
-    public MuleMessage send(String url, Object payload, Map<String, Object> messageProperties) throws MuleException
+    public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException
     {
         return send(url, payload, messageProperties, MuleEvent.TIMEOUT_NOT_SET_VALUE);
     }
@@ -394,17 +395,17 @@ public class MuleClient implements Disposable
      *         explicitly sets a return as <code>null</code>.
      * @throws org.mule.api.MuleException
      */
-    public MuleMessage send(String url, Object payload, Map<String, Object> messageProperties, int timeout)
+    public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties, int timeout)
         throws MuleException
     {
         if (messageProperties == null)
         {
-            messageProperties = new HashMap<String, Object>();
+            messageProperties = new HashMap<>();
         }
         if (messageProperties.get(MuleProperties.MULE_REMOTE_SYNC_PROPERTY) == null)
         {
             // clone the map in case a call used an unmodifiable version
-            messageProperties = new HashMap<String, Object>(messageProperties);
+            messageProperties = new HashMap<>(messageProperties);
             messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
         }
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
@@ -577,11 +578,11 @@ public class MuleClient implements Disposable
      *            properties.
      * @throws org.mule.api.MuleException
      */
-    public void sendNoReceive(String url, Object payload, Map<String, Object> messageProperties) throws MuleException
+    public void sendNoReceive(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException
     {
         if (messageProperties == null)
         {
-            messageProperties = new HashMap<String, Object>();
+            messageProperties = new HashMap<>();
         }
         messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);

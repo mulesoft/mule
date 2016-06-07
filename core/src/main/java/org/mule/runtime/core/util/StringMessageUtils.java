@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 /**
  * Useful methods for formatting message strings for logging or exceptions.
@@ -239,34 +241,38 @@ public final class StringMessageUtils
         StringBuilder buf = new StringBuilder();
         buf.append(SystemUtils.LINE_SEPARATOR).append("Message properties:").append(SystemUtils.LINE_SEPARATOR);
 
-        for (int i = 0; i < PropertyScope.ALL_SCOPES.length; i++)
-        {
-            PropertyScope scope = PropertyScope.ALL_SCOPES[i];
             try
             {
-                Set<Object> names = new TreeSet<Object>(m.getPropertyNames(scope));
-                buf.append("  ").append(scope.getScopeName().toUpperCase()).append(" scoped properties:").append(SystemUtils.LINE_SEPARATOR);
+                Set<String> inboundNames = new TreeSet(m.getInboundPropertyNames());
+                buf.append("  ").append(PropertyScope.INBOUND.toString().toUpperCase()).append(" scoped properties:").append(SystemUtils.LINE_SEPARATOR);
+                appendPropertyValues(m, buf, inboundNames, name -> m.getInboundProperty(name));
 
-                for (Object name : names)
-                {
-                    Object value = m.getProperty(name.toString(), scope);
-                    // avoid calling toString recursively on MuleMessages
-                    if (value instanceof MuleMessage)
-                    {
-                        value = "<<<MuleMessage>>>";
-                    }
-                    if (name.equals("password") || name.toString().contains("secret") || name.equals("pass"))
-                    {
-                        value = "****";
-                    }
-                    buf.append("    ").append(name).append("=").append(value).append(SystemUtils.LINE_SEPARATOR);
-                }
+                Set<String> outboundNames = new TreeSet(m.getOutboundPropertyNames());
+                buf.append("  ").append(PropertyScope.OUTBOUND.toString().toUpperCase()).append(" scoped properties:").append(SystemUtils.LINE_SEPARATOR);
+                appendPropertyValues(m, buf, outboundNames, name -> m.getOutboundProperty(name));
             }
             catch (IllegalArgumentException e)
             {
                 // ignored
             }
-        }
         return buf.toString();
+    }
+
+    private static void appendPropertyValues(MuleMessage m, StringBuilder buf, Set<String> names, Function<String, Serializable> valueResolver)
+    {
+        for (String name : names)
+        {
+            Serializable value = valueResolver.apply(name);
+            // avoid calling toString recursively on MuleMessages
+            if (value instanceof MuleMessage)
+            {
+                value = "<<<MuleMessage>>>";
+            }
+            if (name.equals("password") || name.toString().contains("secret") || name.equals("pass"))
+            {
+                value = "****";
+            }
+            buf.append("    ").append(name).append("=").append(value).append(SystemUtils.LINE_SEPARATOR);
+        }
     }
 }

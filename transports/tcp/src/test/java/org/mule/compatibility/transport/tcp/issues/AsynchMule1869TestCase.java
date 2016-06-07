@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class AsynchMule1869TestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
         // MULE-2754
         Thread.sleep(100);

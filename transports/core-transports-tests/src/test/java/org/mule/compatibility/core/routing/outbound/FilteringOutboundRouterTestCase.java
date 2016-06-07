@@ -29,6 +29,7 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.tck.MuleEventCheckAnswer;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -141,7 +142,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
         assertTrue(router.isUseTemplates());
         assertEquals(filter, router.getFilter());
 
-        Map<String, Object> m = new HashMap<String, Object>();
+        Map<String, Serializable> m = new HashMap<>();
         m.put("barValue", "bar");
         MuleMessage message = new DefaultMuleMessage("test event", m, muleContext);
         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);

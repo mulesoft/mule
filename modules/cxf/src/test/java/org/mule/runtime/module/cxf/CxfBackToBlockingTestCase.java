@@ -24,6 +24,7 @@ import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,7 +70,7 @@ public class CxfBackToBlockingTestCase extends FunctionalTestCase
     public void backToBlocking() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("Content-Type", "application/soap+xml");
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", new DefaultMuleMessage(xml, props, muleContext), HTTP_REQUEST_OPTIONS);

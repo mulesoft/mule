@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -40,7 +41,7 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractRequestR
             List<String> responseProperties = endpoint.getResponseProperties();
             for (String propertyName : responseProperties)
             {
-                Object propertyValue = request.getMessage().getOutboundProperty(propertyName);
+                Serializable propertyValue = request.getMessage().getOutboundProperty(propertyName);
                 if (propertyValue != null)
                 {
                     response.getMessage().setOutboundProperty(propertyName, propertyValue);

@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.el.context;
 
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -134,14 +133,14 @@ public class MessageContext
         event.setMessage(new DefaultMuleMessage(payload, event.getMessage()));
     }
 
-    public Map<String, Object> getInboundProperties()
+    public Map<String, Serializable> getInboundProperties()
     {
-        return new MessagePropertyMapContext(event, PropertyScope.INBOUND);
+        return new InboundPropertiesMapContext(event);
     }
 
-    public Map<String, Object> getOutboundProperties()
+    public Map<String, Serializable> getOutboundProperties()
     {
-        return new MessagePropertyMapContext(event, PropertyScope.OUTBOUND);
+        return new OutboundPropertiesMapContext(event);
     }
 
     public Map<String, DataHandler> getInboundAttachments()

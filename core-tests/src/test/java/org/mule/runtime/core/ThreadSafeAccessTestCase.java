@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.ThreadSafeAccess;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class ThreadSafeAccessTestCase extends AbstractThreadSafeAccessTestCase
     @Test
     public void testMessage() throws InterruptedException
     {
-        Map<String, Object> nullMap = null;
+        Map<String, Serializable> nullMap = null;
         basicPattern(new DefaultMuleMessage(new Object(), nullMap, muleContext));
         newCopy(new DefaultMuleMessage(new Object(), nullMap, muleContext));
         resetAccessControl(new DefaultMuleMessage(new Object(), nullMap, muleContext));

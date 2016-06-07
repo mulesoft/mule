@@ -16,7 +16,6 @@ import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.compatibility.transport.http.multipart.MultiPartInputStream;
 import org.mule.compatibility.transport.http.multipart.PartDataSource;
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -128,8 +127,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
             }
 
             // Allow the user to set HttpMethodParams as an object on the message
-            final HttpMethodParams params = (HttpMethodParams) msg.removeProperty(
-                HttpConnector.HTTP_PARAMS_PROPERTY, PropertyScope.OUTBOUND);
+            final HttpMethodParams params = (HttpMethodParams) msg.removeOutboundProperty(
+                HttpConnector.HTTP_PARAMS_PROPERTY);
             if (params != null)
             {
                 httpMethod.setParams(params);
@@ -322,8 +321,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         // This way client calls can control if a POST body is posted explicitly
         if (!(msg.getPayload() instanceof NullPayload))
         {
-            String outboundMimeType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE,
-                PropertyScope.OUTBOUND);
+            String outboundMimeType = (String) msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE
+            );
             if (outboundMimeType == null)
             {
                 outboundMimeType = (getEndpoint() != null ? getEndpoint().getMimeType() : null);

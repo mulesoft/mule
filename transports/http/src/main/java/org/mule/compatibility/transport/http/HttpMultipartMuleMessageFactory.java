@@ -12,6 +12,7 @@ import org.mule.compatibility.transport.http.multipart.PartDataSource;
 import org.mule.runtime.core.DefaultMuleMessage;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -75,7 +76,7 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
     }
 
     @Override
-    protected void convertMultiPartHeaders(Map<String, Object> headers)
+    protected void convertMultiPartHeaders(Map<String, Serializable> headers)
     {
         if (parts != null)
         {

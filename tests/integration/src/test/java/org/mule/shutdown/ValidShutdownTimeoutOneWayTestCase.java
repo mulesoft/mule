@@ -7,7 +7,6 @@
 package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
-
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -66,7 +65,7 @@ public class ValidShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeoutR
             {
                 try
                 {
-                    DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, new HashMap<String, Object>(), muleContext);
+                    DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, new HashMap<>(), muleContext);
                     flowRunner(flowName).withPayload(muleMessage).asynchronously().run();
 
                     MuleMessage response = client.request("test://response", RECEIVE_TIMEOUT);

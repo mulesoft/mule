@@ -19,6 +19,7 @@ import org.mule.runtime.core.util.IOUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         byte[] msg = loadEncryptedMessage();
-        Map<String, Object> props = createMessageProperties();
+        Map<String, Serializable> props = createMessageProperties();
 
         flowRunner("echo").withPayload(getTestEvent(new DefaultMuleMessage(new String(msg), props, muleContext))).asynchronously().run();
 
@@ -74,9 +75,9 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         return msg;
     }
 
-    private Map<String, Object> createMessageProperties()
+    private Map<String, Serializable> createMessageProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("TARGET_FILE", TARGET);
         props.put(MuleProperties.MULE_USER_PROPERTY, "Mule server <mule_server@mule.com>");
         return props;

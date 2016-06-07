@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
@@ -235,7 +236,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         headers[2] = new Header("k2", "always");
         headers[3] = new Header("k2", "true");
 
-        Map<String, Object> parsedHeaders = messageFactory.convertHeadersToMap(headers, "http://localhost/");
+        Map<String, Serializable> parsedHeaders = messageFactory.convertHeadersToMap(headers, "http://localhost/");
 
         assertEquals(2, parsedHeaders.size());
         assertEquals("top", parsedHeaders.get("k1"));
@@ -254,7 +255,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         headers[2] = new Header("COOKIE", COOKIES[2]);
         headers[3] = new Header("Cookie", COOKIES[3]);
 
-        Map<String, Object> parsedHeaders = messageFactory.convertHeadersToMap(headers, "http://localhost/");
+        Map<String, Serializable> parsedHeaders = messageFactory.convertHeadersToMap(headers, "http://localhost/");
 
         assertThat(parsedHeaders.keySet(), hasSize(2));
         assertThat(parsedHeaders.keySet(), containsInAnyOrder(HttpConstants.HEADER_COOKIE_SET, HttpConnector.HTTP_COOKIES_PROPERTY));
@@ -274,7 +275,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory();
         
         String queryParams = "key1=value1&key2=value2&key1=value4&key3=value3&key1=value5";
-        Map<String, Object> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?" + queryParams, "UTF-8");
+        Map<String, Serializable> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?" + queryParams, "UTF-8");
 
         Object value1 = processedParams.get("key1");
         assertNotNull(value1);
@@ -299,7 +300,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory();
         
         String queryParams = "key1=value%201&key2=value2&key%203=value3&key%203=value4";
-        Map<String, Object> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?" + queryParams, "UTF-8");
+        Map<String, Serializable> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?" + queryParams, "UTF-8");
         
         Object value1 = processedParams.get("key1");
         assertNotNull(value1);
@@ -322,7 +323,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     {
         HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory();
 
-        Map<String, Object> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?wsdl", "UTF-8");
+        Map<String, Serializable> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?wsdl", "UTF-8");
         assertTrue(processedParams.containsKey("wsdl"));
         assertNull(processedParams.get("wsdl"));
     }

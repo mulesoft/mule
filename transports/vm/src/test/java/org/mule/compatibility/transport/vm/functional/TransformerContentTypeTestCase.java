@@ -10,12 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase
     public void testContentTypes() throws Exception
     {
         MuleMessage response;
-        Map<String, Object> messageProperties = new HashMap<String, Object>();
+        Map<String, Serializable> messageProperties = new HashMap<>();
 
         MuleClient client = muleContext.getClient();
 
@@ -71,7 +71,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
             MuleMessage message = eventContext.getMessage();
-            String contentType = message.getProperty("content-type", PropertyScope.INBOUND);
+            String contentType = message.getInboundProperty("content-type");
             MimeType mt = new MimeType(contentType);
             String mimeType = mt.getPrimaryType() + "/" + mt.getSubType();
             assertEquals(expectedMimeType, mimeType);

@@ -21,6 +21,7 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.Map;
 
 import javax.xml.ws.Holder;
@@ -42,7 +43,7 @@ import org.junit.Test;
     @Test
     public void testClientEchoHolder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echoClient", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertNotNull(received);
@@ -57,7 +58,7 @@ import org.junit.Test;
     @Test
     public void testClientProxyEchoHolder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echoClientProxy", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertNotNull(received);
@@ -71,7 +72,7 @@ import org.junit.Test;
     @Test
     public void testClientEcho2Holder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo2Client", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertNotNull(received);
@@ -85,7 +86,7 @@ import org.junit.Test;
     @Test
     public void testClientProxyEcho2Holder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo2ClientProxy", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertNotNull(received);
@@ -98,7 +99,7 @@ import org.junit.Test;
     @Test
     public void testClientEcho3Holder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo3Client", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertNotNull(received);
@@ -111,7 +112,7 @@ import org.junit.Test;
     @Test
     public void testClientProxyEcho3Holder() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("TEST", (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo3ClientProxy", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertNotNull(received);

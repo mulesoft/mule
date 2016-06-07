@@ -32,6 +32,7 @@ import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.cxf.interceptor.Fault;
@@ -75,7 +76,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -86,7 +87,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfServiceWithCatchExceptionStrategyRethrown() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -97,7 +98,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testExceptionThrownInTransformerWithCatchExceptionStrategy() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);

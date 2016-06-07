@@ -17,7 +17,7 @@ public class RemovePropertyTransformer extends AbstractRemoveVariablePropertyTra
     @Override
     protected void removeProperty(MuleEvent event, String propertyName)
     {
-        event.getMessage().removeProperty(propertyName, PropertyScope.OUTBOUND);
+        event.getMessage().removeOutboundProperty(propertyName);
     }
 
     @Override

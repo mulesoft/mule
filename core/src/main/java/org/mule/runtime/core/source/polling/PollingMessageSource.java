@@ -37,6 +37,7 @@ import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTempla
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -209,7 +210,7 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
      */
     public void poll() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Serializable>) null, muleContext);
         pollWith(request);
     }
 

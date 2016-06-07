@@ -39,8 +39,8 @@ public class TestEventBuilder
 
     private Object payload;
     private Serializable attributes;
-    private Map<String, Object> inboundProperties = new HashMap<>();
-    private Map<String, Object> outboundProperties = new HashMap<>();
+    private Map<String, Serializable> inboundProperties = new HashMap<>();
+    private Map<String, Serializable> outboundProperties = new HashMap<>();
     private Map<String, DataHandler> inboundAttachments = new HashMap<>();
     private Map<String, Attachment> outboundAttachments = new HashMap<>();
     private Map<String, Object> sessionProperties = new HashMap<>();
@@ -88,7 +88,7 @@ public class TestEventBuilder
      * @param value the value of the inbound property to add
      * @return this {@link TestEventBuilder}
      */
-    public TestEventBuilder withInboundProperty(String key, Object value)
+    public TestEventBuilder withInboundProperty(String key, Serializable value)
     {
         inboundProperties.put(key, value);
 
@@ -101,7 +101,7 @@ public class TestEventBuilder
      * @param properties the inbound properties to add
      * @return this {@link TestEventBuilder}
      */
-    public TestEventBuilder withInboundProperties(Map<String, Object> properties)
+    public TestEventBuilder withInboundProperties(Map<String, Serializable> properties)
     {
         inboundProperties.putAll(properties);
 
@@ -115,7 +115,7 @@ public class TestEventBuilder
      * @param value the value of the outbound property to add
      * @return this {@link TestEventBuilder}
      */
-    public TestEventBuilder withOutboundProperty(String key, Object value)
+    public TestEventBuilder withOutboundProperty(String key, Serializable value)
     {
         outboundProperties.put(key, value);
 

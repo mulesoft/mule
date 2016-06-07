@@ -9,17 +9,16 @@ package org.mule.compatibility.transport.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.compatibility.transport.file.ExpressionFilenameParser;
-import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -42,11 +41,11 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpoin
         parser = new ExpressionFilenameParser();
         parser.setMuleContext(muleContext);
 
-        message = new DefaultMuleMessage("hello", muleContext);
+        Map<String, Serializable> inboundProperties = new HashMap<>();
+        inboundProperties.put(FileConnector.PROPERTY_ORIGINAL_FILENAME, "originalName");
+        inboundProperties.put(FileConnector.PROPERTY_FILENAME, "newName");
+        message = new DefaultMuleMessage("hello", inboundProperties, null, null, muleContext);
         message.setOutboundProperty("foo", "bar");
-        message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, "originalName", PropertyScope.INBOUND);
-        message.setProperty(FileConnector.PROPERTY_FILENAME, "newName", PropertyScope.INBOUND);
-
         event = new DefaultMuleEvent(message, getTestFlow());
     }
 

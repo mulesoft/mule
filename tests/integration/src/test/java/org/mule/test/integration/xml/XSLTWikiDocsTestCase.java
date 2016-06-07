@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.IOUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
                 "org/mule/test/integration/xml/cd-catalog-result-with-params.xml", getClass());
 
         //These are the message properties that will get passed into the XQuery context
-        Map<String, Object> props = new HashMap<>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
 

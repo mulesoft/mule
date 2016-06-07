@@ -48,13 +48,13 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
 
         MuleMessage message = e.getMessage();
         //Note that we cannot write to the Inbound scope, its read only
-        message.setProperty("Prop", "outbound", PropertyScope.OUTBOUND);
+        message.setOutboundProperty("Prop", "outbound");
 
-        assertEquals("outbound", message.getProperty("Prop", PropertyScope.OUTBOUND));
-        message.removeProperty("Prop", PropertyScope.OUTBOUND);
+        assertEquals("outbound", message.getOutboundProperty("Prop"));
+        message.removeOutboundProperty("Prop");
 
-        assertNull(message.getProperty("Prop", PropertyScope.INBOUND));
-        assertNull(message.getProperty("Prop", PropertyScope.OUTBOUND));
+        assertNull(message.getInboundProperty("Prop"));
+        assertNull(message.getOutboundProperty("Prop"));
     }
 
     @Test

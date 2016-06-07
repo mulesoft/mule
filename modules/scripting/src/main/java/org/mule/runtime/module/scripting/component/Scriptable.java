@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.scripting.component;
 
-import static org.mule.runtime.core.PropertyScope.INBOUND;
 import static org.mule.runtime.core.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.runtime.core.config.i18n.CoreMessages.propertiesNotSet;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsStream;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,8 +19,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.PropertyScope;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.el.context.FlowVariableMapContext;
 import org.mule.runtime.core.el.context.SessionVariableMapContext;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -31,11 +29,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.script.Bindings;
 import javax.script.Compilable;
@@ -420,108 +416,6 @@ public class Scriptable implements Initialisable, MuleContextAware
     protected void setCompiledScript(CompiledScript compiledScript)
     {
         this.compiledScript = compiledScript;
-    }
-
-    private static class MesssagePropertyMap implements Map<String, Object>
-    {
-        MuleMessage message;
-        PropertyScope propertyScope;
-
-        public MesssagePropertyMap(MuleMessage message, PropertyScope propertyScope)
-        {
-            this.message = message;
-            this.propertyScope = propertyScope;
-        }
-
-        @Override
-        public void clear()
-        {
-            message.clearProperties(propertyScope);
-        }
-
-        @Override
-        public boolean containsKey(Object key)
-        {
-            return message.getPropertyNames(propertyScope).contains(key);
-        }
-
-        @Override
-        public boolean containsValue(Object value)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Set<java.util.Map.Entry<String, Object>> entrySet()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Object get(Object key)
-        {
-            return message.getProperty((String) key, propertyScope);
-        }
-
-        @Override
-        public boolean isEmpty()
-        {
-            return message.getPropertyNames(propertyScope).isEmpty();
-        }
-
-        @Override
-        public Set<String> keySet()
-        {
-            return message.getPropertyNames(propertyScope);
-        }
-
-        @Override
-        public Object put(String key, Object value)
-        {
-            if (INBOUND.equals(propertyScope))
-            {
-                throw new UnsupportedOperationException("Inbound message properties are read-only");
-            }
-            else
-            {
-                message.setProperty(key, value, propertyScope);
-                return value;
-            }
-        }
-
-        @Override
-        public void putAll(Map<? extends String, ? extends Object> m)
-        {
-            for (Map.Entry<? extends String, ? extends Object> entry : m.entrySet())
-            {
-                put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        @Override
-        public Object remove(Object key)
-        {
-            if (INBOUND.equals(propertyScope))
-            {
-                throw new UnsupportedOperationException("Inbound message properties are read-only");
-            }
-            else
-            {
-                return message.removeProperty((String) key, propertyScope);
-            }
-        }
-
-        @Override
-        public int size()
-        {
-            return message.getPropertyNames(propertyScope).size();
-        }
-
-        @Override
-        public Collection<Object> values()
-        {
-            throw new UnsupportedOperationException();
-        }
     }
 
 }

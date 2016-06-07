@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeQueryString;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUriParams;
 import static org.mule.runtime.module.http.internal.HttpParser.extractPath;
 import static org.mule.runtime.module.http.internal.HttpParser.extractQueryParams;
-
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.ParameterMap;
 
+import java.io.Serializable;
 import java.security.cert.Certificate;
+import java.util.HashMap;
 import java.util.Map;
 
 public class HttpMessagePropertiesResolver
@@ -71,14 +71,14 @@ public class HttpMessagePropertiesResolver
         return this;
     }
 
-    public void addPropertiesTo(Map<String, Object> propertiesMap)
+    public void addPropertiesTo(Map<String, Serializable> propertiesMap)
     {
         final String resolvedListenerPath = listenerPath.getResolvedPath();
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY, method);
         final String path = extractPath(uri);
         final String rawQueryString = extractQueryParams(uri);
         final ParameterMap queryParams = decodeQueryString(rawQueryString);
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS, queryParams == null ? emptyMap() : queryParams.toImmutableParameterMap());
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS, queryParams == null ? new HashMap<>() : queryParams.toImmutableParameterMap());
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_QUERY_STRING, rawQueryString);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY, path);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY, protocol);

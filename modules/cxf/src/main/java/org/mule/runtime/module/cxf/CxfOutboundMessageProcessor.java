@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.cxf;
 
-import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -28,6 +27,7 @@ import org.mule.runtime.module.cxf.security.WebServiceSecurityException;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -242,7 +242,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         ctx.put(Client.RESPONSE_CONTEXT, props);
 
         // Set Custom Headers on the client
-        Object[] arr = event.getMessage().getPropertyNames(OUTBOUND).toArray();
+        Object[] arr = event.getMessage().getOutboundPropertyNames().toArray();
         String head;
 
         for (int i = 0; i < arr.length; i++)
@@ -250,7 +250,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             head = (String)arr[i];
             if ((head != null) && (!head.startsWith("MULE")))
             {
-                props.put((String)arr[i], event.getMessage().getProperty((String)arr[i], OUTBOUND));
+                props.put((String)arr[i], event.getMessage().getOutboundProperty((String)arr[i]));
             }
         }
         
@@ -293,7 +293,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     public Method getMethod(MuleEvent event) throws Exception
     {
         Method method = null;
-        String opName = (String)event.getMessage().getProperty(CxfConstants.OPERATION, OUTBOUND);
+        String opName = (String)event.getMessage().getOutboundProperty(CxfConstants.OPERATION);
         if (opName != null)
         {
             method = getMethodFromOperation(opName);
@@ -467,7 +467,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         MuleMessage message = transportResponse.getMessage();
 
-        Object httpStatusCode = message.getInboundProperty(HTTP_STATUS_PROPERTY);
+        Serializable httpStatusCode = message.getInboundProperty(HTTP_STATUS_PROPERTY);
         if (isProxy() && httpStatusCode != null)
         {
             message.setOutboundProperty(HTTP_STATUS_PROPERTY, httpStatusCode);

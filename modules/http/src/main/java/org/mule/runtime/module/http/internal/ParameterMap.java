@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.http.internal;
 
-import static java.util.Arrays.toString;
 import static java.util.Collections.unmodifiableMap;
 
 import org.mule.runtime.module.http.api.HttpParameters;

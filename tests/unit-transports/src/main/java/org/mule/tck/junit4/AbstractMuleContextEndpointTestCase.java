@@ -21,6 +21,7 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.MuleEndpointTestUtils;
 import org.mule.tck.testmodels.mule.TestConnector;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -67,21 +68,21 @@ public abstract class AbstractMuleContextEndpointTestCase extends AbstractMuleCo
     }
 
     public static InboundEndpoint getTestInboundEndpoint(String name, String uri,
-                                                         List<Transformer> transformers, Filter filter, Map<Object, Object> properties, Connector connector)
+                                                         List<Transformer> transformers, Filter filter, Map<String, Serializable> properties, Connector connector)
             throws Exception
     {
         return MuleEndpointTestUtils.getTestInboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri,
-                                                           List<Transformer> transformers, Filter filter, Map<Object, Object> properties)
+                                                           List<Transformer> transformers, Filter filter, Map<String, Serializable> properties)
             throws Exception
     {
         return MuleEndpointTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri,
-                                                           List<Transformer> transformers, Filter filter, Map<Object, Object> properties, Connector connector)
+                                                           List<Transformer> transformers, Filter filter, Map<String, Serializable> properties, Connector connector)
             throws Exception
     {
         return MuleEndpointTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);

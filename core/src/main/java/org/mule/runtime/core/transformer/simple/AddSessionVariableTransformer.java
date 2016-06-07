@@ -11,7 +11,7 @@ import org.mule.runtime.api.metadata.DataType;
 
 import java.io.Serializable;
 
-public class AddSessionVariableTransformer extends AbstractAddVariablePropertyTransformer
+public class AddSessionVariableTransformer extends AbstractAddVariablePropertyTransformer<Object>
 {
 
     @Override

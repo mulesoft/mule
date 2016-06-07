@@ -15,6 +15,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.module.ws.consumer.SoapFaultException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
         assertValidResponse(flowName, Collections.emptyMap());
     }
 
-    protected void assertValidResponse(String flowName, Map<String, Object> properties) throws Exception
+    protected void assertValidResponse(String flowName, Map<String, Serializable> properties) throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST, properties, muleContext);
         assertValidResponse(flowName, request);
@@ -63,7 +64,7 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
         assertSoapFault(flowName, message, null, expectedFaultCode);
     }
 
-    protected void assertSoapFault(String flowName, String message, Map<String, Object> properties, String expectedFaultCode) throws Exception
+    protected void assertSoapFault(String flowName, String message, Map<String, Serializable> properties, String expectedFaultCode) throws Exception
     {
         expectedException.expect(SoapFaultException.class);
         expectedException.expect(hasFaultCode(expectedFaultCode));

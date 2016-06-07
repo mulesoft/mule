@@ -7,7 +7,6 @@
 package org.mule.runtime.core.message;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.PropertyScope;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -61,10 +60,10 @@ public class ExceptionMessage implements Serializable
             this.endpointUri = endpointUri.toString();
         }
 
-        for (Iterator iterator = event.getMessage().getPropertyNames(PropertyScope.OUTBOUND).iterator(); iterator.hasNext();)
+        for (Iterator iterator = event.getMessage().getOutboundPropertyNames().iterator(); iterator.hasNext();)
         {
             String propertyKey = (String) iterator.next();
-            setProperty(propertyKey, event.getMessage().getProperty(propertyKey, PropertyScope.OUTBOUND));
+            setProperty(propertyKey, event.getMessage().getOutboundProperty(propertyKey));
         }
     }
 

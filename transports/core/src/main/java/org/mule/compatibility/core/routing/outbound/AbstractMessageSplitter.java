@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.routing.CorrelationMode;
 import org.mule.runtime.core.routing.outbound.FilteringOutboundRouter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,10 +45,10 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
         // Cache the properties here because for some message types getting the
         // properties can be expensive
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         for (String propertyKey : message.getOutboundPropertyNames())
         {
-            Object value = message.getOutboundProperty(propertyKey);
+            Serializable value = message.getOutboundProperty(propertyKey);
             if (value != null)
             {
                 props.put(propertyKey, value);

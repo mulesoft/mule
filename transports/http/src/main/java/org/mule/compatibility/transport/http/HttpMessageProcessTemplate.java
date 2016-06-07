@@ -14,7 +14,6 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
@@ -299,7 +298,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             path = path.substring(0, i);
         }
 
-        muleMessage.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.INBOUND);
+        muleMessage.setInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path);
 
         if (logger.isDebugEnabled())
         {
@@ -312,17 +311,13 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         // the response only needs to be transformed explicitly if
         // A) the request was not served or B) a null result was returned
         String contextPath = HttpConnector.normalizeUrl(getInboundEndpoint().getEndpointURI().getPath());
-        muleMessage.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY,
-                            contextPath,
-                            PropertyScope.INBOUND);
+        muleMessage.setInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, contextPath);
 
-        muleMessage.setProperty(HttpConnector.HTTP_CONTEXT_URI_PROPERTY,
-                                getInboundEndpoint().getEndpointURI().getAddress(),
-                            PropertyScope.INBOUND);
+        muleMessage.setInboundProperty(HttpConnector.HTTP_CONTEXT_URI_PROPERTY,
+                                                              getInboundEndpoint().getEndpointURI().getAddress());
 
-        muleMessage.setProperty(HttpConnector.HTTP_RELATIVE_PATH_PROPERTY,
-                            processRelativePath(contextPath, path),
-                            PropertyScope.INBOUND);
+        muleMessage.setInboundProperty(HttpConnector.HTTP_RELATIVE_PATH_PROPERTY,
+                                                              processRelativePath(contextPath, path));
 
         processRemoteAddresses(muleMessage);
         return muleMessage;
@@ -343,26 +338,25 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
         if (StringUtils.isEmpty(xForwardedFor))
         {
-            muleMessage.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS,
-                    httpServerConnection.getRemoteClientAddress(), PropertyScope.INBOUND);
+            muleMessage.setInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS,
+                                            httpServerConnection.getRemoteClientAddress());
             return;
         }
 
         String[] xForwardedForItems = StringUtils.splitAndTrim(xForwardedFor, ",");
         if (!ArrayUtils.isEmpty(xForwardedForItems))
         {
-            muleMessage.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS,
-                    xForwardedForItems[0], PropertyScope.INBOUND);
+            muleMessage.setInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, xForwardedForItems[0]);
             if (xForwardedForItems.length > 1)
             {
-                muleMessage.setProperty(MuleProperties.MULE_PROXY_ADDRESS,
-                        xForwardedForItems[xForwardedForItems.length-1], PropertyScope.INBOUND);
+                muleMessage.setInboundProperty(MuleProperties.MULE_PROXY_ADDRESS,
+                                                xForwardedForItems[xForwardedForItems.length-1]);
             }
             else
             {
                 // If only one address has been passed, we can assume the connection address is a proxy
-                muleMessage.setProperty(MuleProperties.MULE_PROXY_ADDRESS,
-                        httpServerConnection.getRemoteClientAddress(), PropertyScope.INBOUND);
+                muleMessage.setInboundProperty(MuleProperties.MULE_PROXY_ADDRESS,
+                                                httpServerConnection.getRemoteClientAddress());
             }
         }
     }

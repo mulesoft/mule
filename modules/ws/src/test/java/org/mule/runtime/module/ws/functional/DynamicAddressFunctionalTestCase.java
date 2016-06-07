@@ -9,6 +9,7 @@ package org.mule.runtime.module.ws.functional;
 
 import org.mule.runtime.core.DefaultMuleMessage;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunction
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedInboundProperty() throws Exception
     {
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Serializable> properties = new HashMap<String, Serializable>();
         properties.put("pathInboundProperty", "services/Test");
         assertValidResponse("clientInboundProperty", new DefaultMuleMessage(ECHO_REQUEST, properties, null, null, muleContext));
     }
@@ -34,25 +35,25 @@ public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunction
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedOutboundProperty() throws Exception
     {
-        assertValidResponse("clientOutboundProperty", new HashMap<String, Object>());
+        assertValidResponse("clientOutboundProperty", new HashMap<>());
     }
 
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedFlowVar() throws Exception
     {
-        assertValidResponse("clientFlowVar", new HashMap<String, Object>());
+        assertValidResponse("clientFlowVar", new HashMap<>());
     }
 
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedSessionVar() throws Exception
     {
-        assertValidResponse("clientSessionVar", new HashMap<String, Object>());
+        assertValidResponse("clientSessionVar", new HashMap<>());
     }
 
     @Test
     public void failsWhenInvalidPathIsProvided() throws Exception
     {
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Serializable> properties = new HashMap<>();
         properties.put("clientInboundProperty", "invalid");
         assertSoapFault("clientInboundProperty", ECHO_REQUEST, properties, "Client");
     }

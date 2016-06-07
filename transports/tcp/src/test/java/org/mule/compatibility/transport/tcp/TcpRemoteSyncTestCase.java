@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase
     public void testTcpTcpRemoteSync() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
 
         // must notify the client to wait for a response from the server
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
@@ -63,7 +64,7 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase
     public void testTcpVmRemoteSync() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
 
         //must notify the client to wait for a response from the server
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);

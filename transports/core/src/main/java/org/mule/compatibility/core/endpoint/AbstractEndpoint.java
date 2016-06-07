@@ -30,6 +30,7 @@ import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.util.ClassUtils;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,7 +87,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
      * // TODO This should be final. See MULE-3105
      * // TODO Shouldn't this be guarded from concurrent writes?
      */
-    private Map properties = new HashMap();
+    private Map<String, Serializable> properties = new HashMap();
 
     /**
      * The transaction configuration for this endpoint
@@ -256,7 +257,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
     }
 
     @Override
-    public Map getProperties()
+    public Map<String, Serializable> getProperties()
     {
         return properties;
     }
@@ -478,7 +479,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
     }
 
     @Override
-    public Object getProperty(Object key)
+    public Serializable getProperty(Object key)
     {
         return properties.get(key);
     }

@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.client;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -31,7 +32,7 @@ public interface MuleClient
      * @throws org.mule.api.MuleException
      */
     @Deprecated
-    void dispatch(String url, Object payload, Map<String, Object> messageProperties) throws MuleException;
+    void dispatch(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException;
 
     /**
      * Dispatches an event asynchronously to a endpointUri via a Mule server. The URL determines where to dispatch the
@@ -68,7 +69,7 @@ public interface MuleClient
      * @throws org.mule.api.MuleException
      */
     @Deprecated
-    MuleMessage send(String url, Object payload, Map<String, Object> messageProperties) throws MuleException;
+    MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException;
 
     /**
      *
@@ -110,7 +111,7 @@ public interface MuleClient
      * @throws org.mule.api.MuleException
      */
     @Deprecated
-    MuleMessage send(String url, Object payload, Map<String, Object> messageProperties, long timeout)
+    MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout)
         throws MuleException;
 
     /**

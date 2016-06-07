@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> properties = Collections.emptyMap();
+        Map<String, Serializable> properties = Collections.emptyMap();
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/Flow1s1", "some message", properties);
         assertNotNullAndNotExceptionResponse(response);
     }
@@ -63,7 +64,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> properties = Collections.emptyMap();
+        Map<String, Serializable> properties = Collections.emptyMap();
         MuleMessage response = client.send("http://localhost:" + dynamicPort4.getNumber() + "/Flow1s2", "some message", properties);
         assertNotNullAndNotExceptionResponse(response);
     }

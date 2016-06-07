@@ -11,10 +11,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.el.VariableAssignmentCallback;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.el.context.FlowVariableMapContext;
 import org.mule.runtime.core.el.context.MessageContext;
-import org.mule.runtime.core.el.context.MessagePropertyMapContext;
 import org.mule.runtime.core.el.context.SessionVariableMapContext;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
@@ -49,7 +47,6 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
      * Convenience constructor to allow for more concise creation of VariableResolverFactory chains without
      * and performance overhead incurred by using a builder.
      * 
-     * @param delegate
      * @param next
      */
     public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration,

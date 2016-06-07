@@ -10,18 +10,19 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.api.metadata.SimpleDataType;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -43,7 +44,7 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
     public static final String ENCODING = "encoding";
     public static final String INBOUND_PROPERTY_KEY = "propKey";
     public static final DataType PROPERTY_DATA_TYPE = DataType.STRING_DATA_TYPE;
-    private static final Object PROPERTY_VALUE = new Object();
+    private static final Serializable PROPERTY_VALUE = StringUtils.EMPTY;
 
     @Mock
     private MuleContext mockMuleContext;
@@ -74,12 +75,12 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
     {
         CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
         when(mockMuleMessage.getInboundProperty(INBOUND_PROPERTY_KEY)).thenReturn(PROPERTY_VALUE);
-        when(mockMuleMessage.getPropertyDataType(INBOUND_PROPERTY_KEY, PropertyScope.INBOUND)).thenReturn(PROPERTY_DATA_TYPE);
+        when(mockMuleMessage.getInboundPropertyDataType(INBOUND_PROPERTY_KEY)).thenReturn(PROPERTY_DATA_TYPE);
 
         copyPropertiesTransformer.transform(mockMuleMessage, ENCODING);
 
         verify(mockMuleMessage).getInboundProperty(INBOUND_PROPERTY_KEY);
-        verify(mockMuleMessage).setOutboundProperty(INBOUND_PROPERTY_KEY, PROPERTY_VALUE, PROPERTY_DATA_TYPE);
+        verify(mockMuleMessage).copyProperty(INBOUND_PROPERTY_KEY);
     }
 
     @Test
@@ -102,14 +103,14 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
         when(mockMuleMessage.getInboundProperty("MULE_CORRELATION_ID")).thenReturn(PROPERTY_VALUE);
         when(mockMuleMessage.getInboundProperty("MULE_GROUP_ID")).thenReturn(PROPERTY_VALUE);
         when(mockMuleMessage.getInboundProperty("SomeVar")).thenReturn(PROPERTY_VALUE);
-        when(mockMuleMessage.getPropertyDataType(anyString(), Matchers.<PropertyScope>anyObject())).thenReturn(PROPERTY_DATA_TYPE);
+        when(mockMuleMessage.getInboundPropertyDataType(anyString())).thenReturn(PROPERTY_DATA_TYPE);
 
         copyPropertiesTransformer.transform(mockMuleMessage, ENCODING);
 
         verify(mockMuleMessage, times(0)).setOutboundProperty("SomeVar", PROPERTY_VALUE, PROPERTY_DATA_TYPE);
-        verify(mockMuleMessage).setOutboundProperty("MULE_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE);
-        verify(mockMuleMessage).setOutboundProperty("MULE_CORRELATION_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE);
-        verify(mockMuleMessage).setOutboundProperty("MULE_GROUP_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE);
+        verify(mockMuleMessage).copyProperty("MULE_ID");
+        verify(mockMuleMessage).copyProperty("MULE_CORRELATION_ID");
+        verify(mockMuleMessage).copyProperty("MULE_GROUP_ID");
     }
 
     public CopyPropertiesTransformer createCopyPropertiesTransformer(String inboundPropertyKey) throws InitialisationException
