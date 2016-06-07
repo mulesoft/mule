@@ -29,6 +29,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
@@ -214,6 +215,14 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         verify(source).setSourceContext(any(SourceContext.class));
         verify(muleContext.getInjector()).inject(source);
         verify((Initialisable) source).initialise();
+    }
+
+    @Test
+    public void sourceShouldIsInstantiatedOnce() throws MuleException
+    {
+        messageSource.doInitialise();
+        messageSource.start();
+        verify(sourceFactory, times(1)).createSource();
     }
 
     @Test
