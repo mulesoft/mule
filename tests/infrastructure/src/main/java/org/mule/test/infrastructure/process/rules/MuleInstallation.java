@@ -6,20 +6,20 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
+import static org.apache.commons.io.FileUtils.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.junit.rules.ExternalResource;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * This is a JUnit rule to install Mule Runtime during tests. Usage:
@@ -41,12 +41,11 @@ import org.junit.rules.ExternalResource;
  */
 public class MuleInstallation extends ExternalResource
 {
-
     private static final File WORKING_DIRECTORY = new File(getProperty("user.dir"));
     private static final int BUFFER = 2048;
-
     private File distribution;
     private File muleHome;
+    private String testname;
 
     public MuleInstallation(String zippedDistribution)
     {
@@ -63,6 +62,13 @@ public class MuleInstallation extends ExternalResource
     }
 
     @Override
+    public Statement apply(final Statement base, final Description description)
+    {
+        testname = description.getClassName();
+        return super.apply(base, description);
+    }
+
+    @Override
     protected void before() throws Throwable
     {
         unzip(distribution, WORKING_DIRECTORY);
@@ -71,13 +77,21 @@ public class MuleInstallation extends ExternalResource
     @Override
     protected void after()
     {
-        try
+        File logs = new File(muleHome, "logs");
+        File dest = new File(testname + ".logs");
+        deleteQuietly(dest);
+        String deleteOnExit = getProperty("mule.test.deleteOnExit");
+        if (StringUtils.isEmpty(deleteOnExit) || parseBoolean(deleteOnExit))
         {
-            FileUtils.deleteDirectory(muleHome);
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Couldn't delete directory [" + muleHome + "], delete it manually.", e);
+            try
+            {
+                moveDirectory(logs, dest);
+                deleteDirectory(muleHome);
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException("Couldn't delete directory [" + muleHome + "], delete it manually.", e);
+            }
         }
     }
 
@@ -99,7 +113,7 @@ public class MuleInstallation extends ExternalResource
             }
             else
             {
-                FileUtils.copyInputStreamToFile(zip.getInputStream(entry), destFile);
+                copyInputStreamToFile(zip.getInputStream(entry), destFile);
                 chmodRwx(destFile);
             }
         }
