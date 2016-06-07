@@ -17,6 +17,7 @@ import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromCo
 import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
+import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
@@ -35,6 +36,7 @@ import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFact
 import org.mule.runtime.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -468,6 +470,22 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withTypeDefinition(fromType(StartableCompositeMessageSource.class))
                                                  .withSetterParameterDefinition("messageSources", fromChildListConfiguration(MessageSource.class).build())
                                                  .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
+                                                 .build());
+        componentBuildingDefinitions.add(baseDefinition.copy()
+                                                 .withIdentifier("configuration")
+                                                 .withTypeDefinition(fromType(MuleConfiguration.class))
+                                                 .withObjectFactoryType(MuleConfigurationConfigurator.class)
+                                                 .withSetterParameterDefinition("defaultExceptionStrategyName", fromSimpleParameter("defaultExceptionStrategy-ref").build())
+                                                 .withSetterParameterDefinition("defaultProcessingStrategy", fromSimpleReferenceParameter("defaultProcessingStrategy").build())
+                                                 .withSetterParameterDefinition("defaultResponseTimeout", fromSimpleParameter("defaultResponseTimeout").build())
+                                                 .withSetterParameterDefinition("defaultTransactionTimeout", fromSimpleParameter("defaultTransactionTimeout").build())
+                                                 .withSetterParameterDefinition("shutdownTimeout", fromSimpleParameter("shutdownTimeout").build())
+                                                 .withSetterParameterDefinition("defaultTransactionTimeout", fromSimpleParameter("defaultTransactionTimeout").build())
+                                                 .withSetterParameterDefinition("useExtendedTransformations", fromSimpleParameter("useExtendedTransformations").build())
+                                                 .withSetterParameterDefinition("flowEndingWithOneWayEndpointReturnsNull", fromSimpleParameter("flowEndingWithOneWayEndpointReturnsNull").build())
+                                                 .withSetterParameterDefinition("enricherPropagatesSessionVariableChanges", fromSimpleParameter("enricherPropagatesSessionVariableChanges").build())
+                                                 .withSetterParameterDefinition("extensions", fromChildListConfiguration(Object.class).build())
+                                                 .withSetterParameterDefinition("defaultObjectSerializer", fromSimpleReferenceParameter("defaultObjectSerializer-ref").build())
                                                  .build());
         return componentBuildingDefinitions;
     }

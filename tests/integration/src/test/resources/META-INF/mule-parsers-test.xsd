@@ -13,9 +13,9 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
 
-    <xsd:element name="orphan" type="orphanType"/>
-    <xsd:element name="orphan1" type="namedType"/>
-    <xsd:element name="orphan2" type="namedType"/>
+    <xsd:element name="orphan" type="orphanType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="orphan1" type="namedType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="orphan2" type="namedType" substitutionGroup="mule:abstract-extension"/>
     <xsd:element name="missing" type="abstractBeanType"/>
     <xsd:element name="named" type="dynamicNamedType"/>
     <xsd:element name="inherit" type="inheritType"/>
@@ -126,15 +126,19 @@
     </xsd:complexType>
 
     <xsd:complexType name="abstractBeanType">
-        <xsd:sequence maxOccurs="unbounded">
-            <xsd:element name="map-entry" type="mapEntry" minOccurs="0"/>
-            <xsd:element name="map-entry-combiner" type="mapEntry" minOccurs="0"/>
-            <xsd:element name="list-entry" type="xsd:string" minOccurs="0"/>
-            <xsd:element ref="properties" minOccurs="0"/>
-        </xsd:sequence>
-        <xsd:attribute name="string" type="xsd:string"/>
-        <xsd:attribute name="bar" type="xsd:int"/>
-        <xsd:attribute name="ignored" fixed="false"/>
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence maxOccurs="unbounded">
+                    <xsd:element name="map-entry" type="mapEntry" minOccurs="0"/>
+                    <xsd:element name="map-entry-combiner" type="mapEntry" minOccurs="0"/>
+                    <xsd:element name="list-entry" type="xsd:string" minOccurs="0"/>
+                    <xsd:element ref="properties" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="string" type="xsd:string"/>
+                <xsd:attribute name="bar" type="xsd:int"/>
+                <xsd:attribute name="ignored" fixed="false"/>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="mapEntry">

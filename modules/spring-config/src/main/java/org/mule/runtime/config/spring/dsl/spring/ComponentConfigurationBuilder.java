@@ -294,7 +294,7 @@ class ComponentConfigurationBuilder
             String reference = simpleParameters.get(configAttributeName);
             this.value = reference;
             simpleParameters.remove(configAttributeName);
-            if (configAttributeName.equals(PROCESSING_STRATEGY_ATTRIBUTE))
+            if (configAttributeName.equals(PROCESSING_STRATEGY_ATTRIBUTE) || configAttributeName.equals("defaultProcessingStrategy"))
             {
                 ProcessingStrategy processingStrategy = parseProcessingStrategy(reference);
                 if (processingStrategy != null)

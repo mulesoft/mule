@@ -8,13 +8,14 @@ package org.mule.runtime.config.spring;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
-
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
@@ -132,7 +133,14 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                             String name = resolvedComponent.getNameAttribute();
                             if (name == null)
                             {
-                                name = resolvedComponent.getIdentifier().toString();
+                                if (resolvedComponent.getIdentifier().equals(CONFIGURATION_IDENTIFIER))
+                                {
+                                    name = OBJECT_MULE_CONFIGURATION;
+                                }
+                                else
+                                {
+                                    name = resolvedComponent.getIdentifier().toString();
+                                }
                             }
                             BeanDefinitionFactory.checkElementNameUnique(registry, element);
                             registry.registerBeanDefinition(name, resolvedComponent.getBeanDefinition());

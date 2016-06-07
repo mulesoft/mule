@@ -8,8 +8,6 @@
 
     <bean name="_muleNotificationManager" class="org.mule.runtime.config.spring.ServerNotificationManagerConfigurator"/>
 
-    <bean name="_muleConfiguration" class="org.mule.runtime.config.spring.MuleConfigurationConfigurator"/>
-
     <bean name="_muleDefaultObjectSerializer" class="org.mule.runtime.config.spring.DefaultObjectSerializerFactoryBean" depends-on="_muleConfiguration">
         <constructor-arg ref="_muleContext" />
     </bean>
