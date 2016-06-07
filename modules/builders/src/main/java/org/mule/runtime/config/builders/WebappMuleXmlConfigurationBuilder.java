@@ -83,12 +83,12 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     {
         try
         {
-            configResources = new ConfigResource[configs.length];
+            artifcatConfigResources = new ConfigResource[configs.length];
             for (int i = 0; i < configs.length; i++)
             {
-                configResources[i] = new ServletContextOrClassPathConfigResource(configs[i]);
+                artifcatConfigResources[i] = new ServletContextOrClassPathConfigResource(configs[i]);
             }
-            return configResources;
+            return artifcatConfigResources;
         }
         catch (IOException e)
         {
@@ -97,15 +97,21 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     }
 
     @Override
-    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] configResources, OptionalObjectsController optionalObjectsController)
+    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController)
     {
-        Resource[] servletContextResources = new Resource[configResources.length];
+        Resource[] springServletContextResources = preProcessResources(springResources);
+        Resource[] artifactConfigServletContextResources = preProcessResources(artifactConfigResources);
+        return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, springServletContextResources);
+    }
+
+    private Resource[] preProcessResources(ConfigResource[] configResources)
+    {
+        Resource[] configServletContextResources = new Resource[configResources.length];
         for (int i = 0; i < configResources.length; i++)
         {
-            servletContextResources[i] = new ServletContextOrClassPathResource(context, configResources[i].getResourceName());
+            configServletContextResources[i] = new ServletContextOrClassPathResource(context, configResources[i].getResourceName());
         }
-
-        return new MuleArtifactContext(muleContext, servletContextResources);
+        return configServletContextResources;
     }
 
     /**
@@ -167,6 +173,12 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
             // check path
             Assert.notNull(path, "path is required");
             this.path = StringUtils.cleanPath(path);
+        }
+
+        @Override
+        public String getFilename()
+        {
+            return this.path;
         }
 
         public InputStream getInputStream() throws IOException

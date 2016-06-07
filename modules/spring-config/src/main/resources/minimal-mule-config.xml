@@ -3,12 +3,6 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <!-- Default configuration attributes are configured via default values in mule-core schema mule.xsd.
-         Configuration element is required here so that spring creates a MuleConfiguration instance and
-         populates it with defaults from schema
-    -->
-    <configuration />
-
     <notifications>
         <notification event="CONTEXT"/>
         <notification event="SECURITY"/>

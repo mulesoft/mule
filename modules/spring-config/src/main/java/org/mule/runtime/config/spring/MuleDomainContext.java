@@ -25,14 +25,9 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 final class MuleDomainContext extends MuleArtifactContext
 {
 
-    MuleDomainContext(MuleContext muleContext, ConfigResource[] configResources) throws BeansException
+    MuleDomainContext(MuleContext muleContext, ConfigResource[] applicationConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController) throws BeansException
     {
-        super(muleContext, configResources);
-    }
-
-    MuleDomainContext(MuleContext muleContext, ConfigResource[] configResources, OptionalObjectsController optionalObjectsController) throws BeansException
-    {
-        super(muleContext, configResources, optionalObjectsController);
+        super(muleContext, applicationConfigResources, springResources, optionalObjectsController);
     }
 
     @Override

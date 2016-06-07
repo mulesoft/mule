@@ -25,8 +25,8 @@ public class SpringXmlDomainConfigurationBuilder extends SpringXmlConfigurationB
     }
 
     @Override
-    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] configResources, OptionalObjectsController optionalObjectsController)
+    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] applicationConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController)
     {
-        return new MuleDomainContext(muleContext, configResources, optionalObjectsController);
+        return new MuleDomainContext(muleContext, applicationConfigResources, springResources, optionalObjectsController);
     }
 }

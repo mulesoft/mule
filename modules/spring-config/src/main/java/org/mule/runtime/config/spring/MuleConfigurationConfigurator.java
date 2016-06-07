@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -37,7 +38,7 @@ import org.springframework.beans.factory.SmartFactoryBean;
  * only work if the MuleContext has not yet been started, otherwise the modifications 
  * will be ignored (and warnings logged).
  */
-public class MuleConfigurationConfigurator implements MuleContextAware, SmartFactoryBean
+public class MuleConfigurationConfigurator implements MuleContextAware, SmartFactoryBean, ObjectFactory
 {
     private MuleContext muleContext;
 

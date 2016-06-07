@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
@@ -15,6 +16,8 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.QUEUE_ST
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
+import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
@@ -24,6 +27,7 @@ import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -32,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -130,7 +135,28 @@ public class BeanDefinitionFactory
         }
         resolveComponentBeanDefinition(parentComponentModel, componentModel);
         componentDefinitionModelProcessor.accept(componentModel, registry);
+        //TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
+        //how core constructs are processed.
+        processMuleConfiguration(componentModel, registry);
         return componentModel.getBeanDefinition();
+    }
+
+    private void processMuleConfiguration(ComponentModel componentModel, BeanDefinitionRegistry registry)
+    {
+        if (componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER))
+        {
+            AtomicReference<BeanDefinition> defaultRetryPolicyTemplate = new AtomicReference<>();
+            componentModel.getInnerComponents().stream().forEach(childComponentModel -> {
+                if (areMatchingTypes(RetryPolicyTemplate.class, childComponentModel.getType()))
+                {
+                    defaultRetryPolicyTemplate.set(childComponentModel.getBeanDefinition());
+                }
+            });
+            if (defaultRetryPolicyTemplate.get() != null)
+            {
+                registry.registerBeanDefinition(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, defaultRetryPolicyTemplate.get());
+            }
+        }
     }
 
 

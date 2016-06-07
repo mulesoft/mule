@@ -18,7 +18,6 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.context.ApplicationContext;
@@ -76,7 +75,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             allResources.add(new ConfigResource(MULE_MINIMAL_SPRING_CONFIG));
             allResources.add(new ConfigResource(MULE_MINIMAL_CONFIG));
             allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
-            allResources.addAll(Arrays.asList(configResources));
         }
         else if (useDefaultConfigResource)
         {
@@ -93,12 +91,10 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             {
                 logger.debug("Transports bundle not present.");
             }
-            allResources.addAll(Arrays.asList(configResources));
         }
         else
         {
             allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
-            allResources.addAll(Arrays.asList(configResources));
         }
         return allResources;
     }
@@ -152,12 +148,12 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
         }
 
-        return doCreateApplicationContext(muleContext, configResources, applicationObjectcontroller);
+        return doCreateApplicationContext(muleContext, artifcatConfigResources, configResources, applicationObjectcontroller);
     }
 
-    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] configResources, OptionalObjectsController optionalObjectsController)
+    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController)
     {
-        return new MuleArtifactContext(muleContext, configResources, optionalObjectsController);
+        return new MuleArtifactContext(muleContext, artifactConfigResources, springResources, optionalObjectsController);
     }
 
 

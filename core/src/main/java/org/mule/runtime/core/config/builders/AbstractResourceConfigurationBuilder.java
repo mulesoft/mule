@@ -24,34 +24,34 @@ import java.io.IOException;
  */
 public abstract class AbstractResourceConfigurationBuilder extends AbstractConfigurationBuilder
 {
-    protected ConfigResource[] configResources;
+    protected ConfigResource[] artifcatConfigResources;
 
     /**
-     * @param configResources a comma separated list of configuration files to load,
+     * @param artifcatConfigResources a comma separated list of configuration files to load,
      *            this should be accessible on the classpath or filesystem
      * @throws org.mule.runtime.core.api.config.ConfigurationException usually if the config resources cannot be loaded
      */
-    public AbstractResourceConfigurationBuilder(String configResources) throws ConfigurationException
+    public AbstractResourceConfigurationBuilder(String artifcatConfigResources) throws ConfigurationException
     {
-        this.configResources = loadConfigResources(StringUtils.splitAndTrim(configResources, ",; "));
+        this.artifcatConfigResources = loadConfigResources(StringUtils.splitAndTrim(artifcatConfigResources, ",; "));
     }
 
     /**
-     * @param configResources an array of configuration files to load, this should be
+     * @param artifcatConfigResources an array of configuration files to load, this should be
      *            accessible on the classpath or filesystem
      * @throws org.mule.runtime.core.api.config.ConfigurationException usually if the config resources cannot be loaded
      */
-    public AbstractResourceConfigurationBuilder(String[] configResources) throws ConfigurationException
+    public AbstractResourceConfigurationBuilder(String[] artifcatConfigResources) throws ConfigurationException
     {
-        this.configResources = loadConfigResources(configResources);
+        this.artifcatConfigResources = loadConfigResources(artifcatConfigResources);
     }
 
     /**
-     * @param configResources an array Reader oject that provides acces to a configuration either locally or remotely
+     * @param artifactConfigResources an array Reader oject that provides acces to a configuration either locally or remotely
      */
-    public AbstractResourceConfigurationBuilder(ConfigResource[] configResources)
+    public AbstractResourceConfigurationBuilder(ConfigResource[] artifactConfigResources)
     {
-        this.configResources = configResources;
+        this.artifcatConfigResources = artifactConfigResources;
     }
 
     /**
@@ -61,7 +61,7 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
     @Override
     public void configure(MuleContext muleContext) throws ConfigurationException
     {
-        if (configResources == null)
+        if (artifcatConfigResources == null)
         {
             throw new ConfigurationException(CoreMessages.objectIsNull("Configuration Resources"));
         }
@@ -75,12 +75,12 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
     {
         try
         {
-            configResources = new ConfigResource[configs.length];
+            artifcatConfigResources = new ConfigResource[configs.length];
             for (int i = 0; i < configs.length; i++)
             {
-                configResources[i] = new ConfigResource(configs[i]);
+                artifcatConfigResources[i] = new ConfigResource(configs[i]);
             }
-            return configResources;
+            return artifcatConfigResources;
         }
         catch (IOException e)
         {
@@ -92,10 +92,10 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
     {
         StringBuilder configResourcesString = new StringBuilder();
         configResourcesString.append("[");
-        for (int i = 0; i < configResources.length; i++)
+        for (int i = 0; i < artifcatConfigResources.length; i++)
         {
-            configResourcesString.append(configResources[i]);
-            if (i < configResources.length - 1)
+            configResourcesString.append(artifcatConfigResources[i]);
+            if (i < artifcatConfigResources.length - 1)
             {
                 configResourcesString.append(", ");
             }

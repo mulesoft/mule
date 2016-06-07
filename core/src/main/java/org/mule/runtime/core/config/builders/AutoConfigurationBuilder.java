@@ -49,7 +49,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
     @Override
     protected void doConfigure(MuleContext muleContext) throws ConfigurationException
     {
-        autoConfigure(muleContext, configResources);
+        autoConfigure(muleContext, artifcatConfigResources);
     }
 
     protected void autoConfigure(MuleContext muleContext, ConfigResource[] resources) throws ConfigurationException
