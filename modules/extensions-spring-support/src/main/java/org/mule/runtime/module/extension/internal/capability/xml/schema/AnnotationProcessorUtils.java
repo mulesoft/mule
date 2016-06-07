@@ -338,6 +338,10 @@ public final class AnnotationProcessorUtils
         while (st.hasMoreTokens())
         {
             String nextToken = st.nextToken().trim();
+            if (nextToken.isEmpty())
+            {
+                continue;
+            }
             if (nextToken.startsWith(PARAM))
             {
                 handler.onParam(nextToken);
