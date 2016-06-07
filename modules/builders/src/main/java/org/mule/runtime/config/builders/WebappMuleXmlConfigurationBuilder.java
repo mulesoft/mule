@@ -83,12 +83,12 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     {
         try
         {
-            artifcatConfigResources = new ConfigResource[configs.length];
+            artifactConfigResources = new ConfigResource[configs.length];
             for (int i = 0; i < configs.length; i++)
             {
-                artifcatConfigResources[i] = new ServletContextOrClassPathConfigResource(configs[i]);
+                artifactConfigResources[i] = new ServletContextOrClassPathConfigResource(configs[i]);
             }
-            return artifcatConfigResources;
+            return artifactConfigResources;
         }
         catch (IOException e)
         {

@@ -12,12 +12,4 @@
         </environment>
     </custom-transaction-manager>
 
-    <!--
-    <mule:weblogic-transaction-manager>
-        <mule:environment>
-            <entry key="java.naming.factory.initial" value="weblogic.jndi.WLInitialContextFactory"/>
-            <entry key="java.naming.provider.url" value="t3://localhost:7001"/>
-        </mule:environment>
-    </mule:weblogic-transaction-manager>
-    -->
 </mule>

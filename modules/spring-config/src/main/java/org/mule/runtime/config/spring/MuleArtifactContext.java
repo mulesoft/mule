@@ -153,19 +153,14 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
             useNewParsingMechanism = false;
             return;
         }
-        applicationModel.executeOnEveryComponentTree(new ApplicationModel.ComponentConsumer()
-        {
-            @Override
-            public void consume(ComponentModel componentModel) throws MuleRuntimeException
+        applicationModel.executeOnEveryComponentTree( componentModel -> {
+            Optional<ComponentIdentifier> parentIdentifierOptional = ofNullable(componentModel.getParent())
+                    .flatMap(parentComponentModel ->
+                                     Optional.ofNullable(parentComponentModel.getIdentifier())
+                    );
+            if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier(), parentIdentifierOptional))
             {
-                Optional<ComponentIdentifier> parentIdentifierOptional = ofNullable(componentModel.getParent())
-                        .flatMap(parentComponentModel -> {
-                            return Optional.ofNullable(parentComponentModel.getIdentifier());
-                        });
-                if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier(), parentIdentifierOptional))
-                {
-                    useNewParsingMechanism = false;
-                }
+                useNewParsingMechanism = false;
             }
         });
     }

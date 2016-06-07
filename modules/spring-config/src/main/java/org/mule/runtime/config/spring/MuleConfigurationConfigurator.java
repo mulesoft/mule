@@ -38,6 +38,7 @@ import org.springframework.beans.factory.SmartFactoryBean;
  * only work if the MuleContext has not yet been started, otherwise the modifications 
  * will be ignored (and warnings logged).
  */
+//TODO MULE-9638 remove usage of SmartFactoryBean
 public class MuleConfigurationConfigurator implements MuleContextAware, SmartFactoryBean, ObjectFactory
 {
     private MuleContext muleContext;

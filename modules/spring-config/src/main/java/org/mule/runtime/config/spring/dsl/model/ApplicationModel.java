@@ -24,9 +24,11 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.w3c.dom.Element;
@@ -152,8 +154,8 @@ public class ApplicationModel
             .add(new ComponentIdentifier.Builder().withNamespace(PARSER_TEST_NAMESPACE).withName("kid").build())
             .build();
 
-    private List<ComponentModel> muleComponentModels = new ArrayList<>();
-    private List<ComponentModel> springComponentModels = new ArrayList<>();
+    private List<ComponentModel> muleComponentModels = new LinkedList<>();
+    private List<ComponentModel> springComponentModels = new LinkedList<>();
     private PropertyPlaceholderHelper propertyPlaceholderHelper = new PropertyPlaceholderHelper("${", "}");
     private SystemPropertyPlaceholderResolver systemPropertyPlaceholderResolver = new SystemPropertyPlaceholderResolver("mule config property resolver");
 
@@ -189,9 +191,9 @@ public class ApplicationModel
         }
         return muleComponentModels.get(0).getInnerComponents().stream()
                 .filter(ComponentModel::isRoot)
-                .filter( componentModel -> {
-                    return componentModel.getIdentifier().equals(componentIdentifier);
-                }).findFirst();
+                .filter(componentModel ->
+                                componentModel.getIdentifier().equals(componentIdentifier)
+                ).findFirst();
     }
 
     private void convertConfigFileToComponentModel(ApplicationConfig applicationConfig)
@@ -357,7 +359,7 @@ public class ApplicationModel
         return !componentModel.getIdentifier().getNamespace().equals(ApplicationModel.SPRING_NAMESPACE);
     }
 
-    public void executeOnEveryComponentTree(final ComponentConsumer task)
+    public void executeOnEveryComponentTree(final Consumer<ComponentModel> task)
     {
         for (ComponentModel componentModel : muleComponentModels)
         {
@@ -365,7 +367,7 @@ public class ApplicationModel
         }
     }
 
-    public void executeOnEveryMuleComponentTree(final ComponentConsumer task)
+    public void executeOnEveryMuleComponentTree(final Consumer<ComponentModel> task)
     {
         for (ComponentModel componentModel : muleComponentModels)
         {
@@ -373,7 +375,7 @@ public class ApplicationModel
         }
     }
 
-    private void executeOnComponentTree(final ComponentModel component, final ComponentConsumer task, boolean avoidSpringElements) throws MuleRuntimeException
+    private void executeOnComponentTree(final ComponentModel component, final Consumer<ComponentModel> task, boolean avoidSpringElements) throws MuleRuntimeException
     {
         if (component.getIdentifier().getNamespace().equals(SPRING_NAMESPACE) && avoidSpringElements)
         {
@@ -383,7 +385,7 @@ public class ApplicationModel
         component.getInnerComponents().forEach((innerComponent) -> {
             executeOnComponentTree(innerComponent, task, avoidSpringElements);
         });
-        task.consume(component);
+        task.accept(component);
     }
 
     private List<ComponentModel> extractComponentDefinitionModel(List<ConfigLine> configLines, String configFileName)
@@ -467,39 +469,35 @@ public class ApplicationModel
     }
 
     /**
-     * Functional interface to process a component.
-     */
-    @FunctionalInterface
-    public interface ComponentConsumer
-    {
-
-        void consume(ComponentModel componentModel) throws MuleRuntimeException;
-    }
-
-    /**
      * PlaceholderResolver implementation that resolves against system properties
      * and system environment variables.
      * //TODO MULE-9825: add proper support for property placeholders
      */
-    private static class SystemPropertyPlaceholderResolver implements PropertyPlaceholderHelper.PlaceholderResolver {
+    private static class SystemPropertyPlaceholderResolver implements PropertyPlaceholderHelper.PlaceholderResolver
+    {
 
         private final String text;
 
-        public SystemPropertyPlaceholderResolver(String text) {
+        public SystemPropertyPlaceholderResolver(String text)
+        {
             this.text = text;
         }
 
         @Override
-        public String resolvePlaceholder(String placeholderName) {
-            try {
+        public String resolvePlaceholder(String placeholderName)
+        {
+            try
+            {
                 String propVal = System.getProperty(placeholderName);
-                if (propVal == null) {
+                if (propVal == null)
+                {
                     // Fall back to searching the system environment.
                     propVal = System.getenv(placeholderName);
                 }
                 return propVal;
             }
-            catch (Throwable ex) {
+            catch (Throwable ex)
+            {
                 System.err.println("Could not resolve placeholder '" + placeholderName + "' in [" +
                                    this.text + "] as system property: " + ex);
                 return null;

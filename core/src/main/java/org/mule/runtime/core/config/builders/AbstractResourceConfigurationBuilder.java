@@ -24,26 +24,26 @@ import java.io.IOException;
  */
 public abstract class AbstractResourceConfigurationBuilder extends AbstractConfigurationBuilder
 {
-    protected ConfigResource[] artifcatConfigResources;
+    protected ConfigResource[] artifactConfigResources;
 
     /**
-     * @param artifcatConfigResources a comma separated list of configuration files to load,
+     * @param artifactConfigResources a comma separated list of configuration files to load,
      *            this should be accessible on the classpath or filesystem
      * @throws org.mule.runtime.core.api.config.ConfigurationException usually if the config resources cannot be loaded
      */
-    public AbstractResourceConfigurationBuilder(String artifcatConfigResources) throws ConfigurationException
+    public AbstractResourceConfigurationBuilder(String artifactConfigResources) throws ConfigurationException
     {
-        this.artifcatConfigResources = loadConfigResources(StringUtils.splitAndTrim(artifcatConfigResources, ",; "));
+        this.artifactConfigResources = loadConfigResources(StringUtils.splitAndTrim(artifactConfigResources, ",; "));
     }
 
     /**
-     * @param artifcatConfigResources an array of configuration files to load, this should be
+     * @param artifactConfigResources an array of configuration files to load, this should be
      *            accessible on the classpath or filesystem
      * @throws org.mule.runtime.core.api.config.ConfigurationException usually if the config resources cannot be loaded
      */
-    public AbstractResourceConfigurationBuilder(String[] artifcatConfigResources) throws ConfigurationException
+    public AbstractResourceConfigurationBuilder(String[] artifactConfigResources) throws ConfigurationException
     {
-        this.artifcatConfigResources = loadConfigResources(artifcatConfigResources);
+        this.artifactConfigResources = loadConfigResources(artifactConfigResources);
     }
 
     /**
@@ -51,7 +51,7 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
      */
     public AbstractResourceConfigurationBuilder(ConfigResource[] artifactConfigResources)
     {
-        this.artifcatConfigResources = artifactConfigResources;
+        this.artifactConfigResources = artifactConfigResources;
     }
 
     /**
@@ -61,7 +61,7 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
     @Override
     public void configure(MuleContext muleContext) throws ConfigurationException
     {
-        if (artifcatConfigResources == null)
+        if (artifactConfigResources == null)
         {
             throw new ConfigurationException(CoreMessages.objectIsNull("Configuration Resources"));
         }
@@ -75,12 +75,12 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
     {
         try
         {
-            artifcatConfigResources = new ConfigResource[configs.length];
+            artifactConfigResources = new ConfigResource[configs.length];
             for (int i = 0; i < configs.length; i++)
             {
-                artifcatConfigResources[i] = new ConfigResource(configs[i]);
+                artifactConfigResources[i] = new ConfigResource(configs[i]);
             }
-            return artifcatConfigResources;
+            return artifactConfigResources;
         }
         catch (IOException e)
         {
@@ -92,10 +92,10 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
     {
         StringBuilder configResourcesString = new StringBuilder();
         configResourcesString.append("[");
-        for (int i = 0; i < artifcatConfigResources.length; i++)
+        for (int i = 0; i < artifactConfigResources.length; i++)
         {
-            configResourcesString.append(artifcatConfigResources[i]);
-            if (i < artifcatConfigResources.length - 1)
+            configResourcesString.append(artifactConfigResources[i]);
+            if (i < artifactConfigResources.length - 1)
             {
                 configResourcesString.append(", ");
             }
