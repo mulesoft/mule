@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.test.infrastructure.process.rules;
 
 import org.apache.activemq.broker.BrokerService;
@@ -17,7 +23,8 @@ import org.mule.tck.junit4.rule.SystemProperty;
  *
  * @since 4.0
  */
-public class ActiveMQBroker extends ExternalResource {
+public class ActiveMQBroker extends ExternalResource
+{
 
     protected final DynamicPort dynamicPort;
     
@@ -72,7 +79,8 @@ public class ActiveMQBroker extends ExternalResource {
         }
     }
 
-    public String getConnectorUrl() {
+    public String getConnectorUrl()
+    {
         return connectorUrl;
     }
     
