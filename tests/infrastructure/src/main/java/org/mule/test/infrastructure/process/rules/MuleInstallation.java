@@ -9,6 +9,7 @@ package org.mule.test.infrastructure.process.rules;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 import static org.apache.commons.io.FileUtils.*;
+import static org.apache.commons.lang.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,11 +42,13 @@ import org.junit.runners.model.Statement;
  */
 public class MuleInstallation extends ExternalResource
 {
+
     private static final File WORKING_DIRECTORY = new File(getProperty("user.dir"));
     private static final int BUFFER = 2048;
     private File distribution;
     private File muleHome;
     private String testname;
+    public static final String DELETE_ON_EXIT = getProperty("mule.test.deleteOnExit");
 
     public MuleInstallation(String zippedDistribution)
     {
@@ -64,7 +67,7 @@ public class MuleInstallation extends ExternalResource
     @Override
     public Statement apply(final Statement base, final Description description)
     {
-        testname = description.getClassName();
+        testname = description.getTestClass().getSimpleName();
         return super.apply(base, description);
     }
 
@@ -80,8 +83,7 @@ public class MuleInstallation extends ExternalResource
         File logs = new File(muleHome, "logs");
         File dest = new File(testname + ".logs");
         deleteQuietly(dest);
-        String deleteOnExit = getProperty("mule.test.deleteOnExit");
-        if (StringUtils.isEmpty(deleteOnExit) || parseBoolean(deleteOnExit))
+        if (isEmpty(DELETE_ON_EXIT) || parseBoolean(DELETE_ON_EXIT))
         {
             try
             {
@@ -97,24 +99,26 @@ public class MuleInstallation extends ExternalResource
 
     private void unzip(File file, File destDir) throws IOException
     {
-        ZipFile zip = new ZipFile(file);
-        Enumeration<? extends ZipEntry> zipFileEntries = zip.entries();
-        ZipEntry root = zipFileEntries.nextElement();
-        muleHome = new File(destDir, root.getName());
-        muleHome.mkdirs();
-        chmodRwx(muleHome);
-        while (zipFileEntries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(file))
         {
-            ZipEntry entry = zipFileEntries.nextElement();
-            File destFile = new File(entry.getName());
-            if (entry.isDirectory())
+            Enumeration<? extends ZipEntry> zipFileEntries = zip.entries();
+            ZipEntry root = zipFileEntries.nextElement();
+            muleHome = new File(destDir, root.getName());
+            muleHome.mkdirs();
+            chmodRwx(muleHome);
+            while (zipFileEntries.hasMoreElements())
             {
-                destFile.mkdir();
-            }
-            else
-            {
-                copyInputStreamToFile(zip.getInputStream(entry), destFile);
-                chmodRwx(destFile);
+                ZipEntry entry = zipFileEntries.nextElement();
+                File destFile = new File(entry.getName());
+                if (entry.isDirectory())
+                {
+                    destFile.mkdir();
+                }
+                else
+                {
+                    copyInputStreamToFile(zip.getInputStream(entry), destFile);
+                    chmodRwx(destFile);
+                }
             }
         }
     }
