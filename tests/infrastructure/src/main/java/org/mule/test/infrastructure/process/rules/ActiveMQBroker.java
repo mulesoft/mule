@@ -20,7 +20,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 public class ActiveMQBroker extends ExternalResource {
 
     protected final DynamicPort dynamicPort;
-    private final SystemProperty dynamicPortSystemProperty;
     
     private final String connectorUrl;
     private BrokerService broker;
@@ -33,8 +32,7 @@ public class ActiveMQBroker extends ExternalResource {
      */
     public ActiveMQBroker(String amqBrokerPortName)
     {
-        dynamicPort = new DynamicPort(amqBrokerPortName + "_PORT");
-        dynamicPortSystemProperty = new SystemProperty(amqBrokerPortName, String.valueOf(dynamicPort.getNumber()));
+        dynamicPort = new DynamicPort(amqBrokerPortName);
 
         connectorUrl = "tcp://localhost:" + dynamicPort.getValue();
     }
@@ -43,7 +41,6 @@ public class ActiveMQBroker extends ExternalResource {
     public Statement apply(Statement base, Description description)
     {
         base = dynamicPort.apply(base, description);
-        base = dynamicPortSystemProperty.apply(base, description);
         return super.apply(base, description);
     }
 

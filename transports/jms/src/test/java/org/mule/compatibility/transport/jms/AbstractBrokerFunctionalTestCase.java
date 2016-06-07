@@ -36,7 +36,7 @@ public class AbstractBrokerFunctionalTestCase extends FunctionalTestCase
     {
         return amqBroker.getConnectionsCount();
     }
-    
+
     public String getConnectorUrl()
     {
         return amqBroker.getConnectorUrl();
