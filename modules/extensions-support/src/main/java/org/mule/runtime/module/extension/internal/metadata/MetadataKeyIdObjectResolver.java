@@ -8,17 +8,18 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.lang.String.format;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.api.metadata.resolving.FailureCode.*;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
-import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
@@ -65,40 +66,79 @@ final class MetadataKeyIdObjectResolver
 
     private static Object resolveMetadataKeyWhenPresent(MetadataKey key, List<ParameterModel> metadataKeyParts, ComponentModel componentModel) throws MetadataResolvingException
     {
-        return isSingleLevelKey(metadataKeyParts) ? key.getId() : resolveMultiLevelKey(componentModel, key);
+
+        final MetadataType metadataType = componentModel
+                .getModelProperty(MetadataKeyIdModelProperty.class)
+                .map(MetadataKeyIdModelProperty::getType)
+                .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId parameter associated", componentModel.getName()), new Exception()));
+
+        final Class<?> metadataKeyType = getType(metadataType);
+        final ValueHolder<Object> keyValueHolder = new ValueHolder<>();
+        final ValueHolder<MetadataResolvingException> exceptionValueHolder = new ValueHolder<>();
+
+        metadataType.accept(new MetadataTypeVisitor()
+        {
+            @Override
+            protected void defaultVisit(MetadataType metadataType)
+            {
+                exceptionValueHolder.set(buildException(String.format("'%s' type is invalid for MetadataKeyId parameters, use String type instead. Affecting component: '%s'", metadataKeyType.getSimpleName(), componentModel.getName())));
+            }
+
+            @Override
+            public void visitString(StringType stringType)
+            {
+                keyValueHolder.set(key.getId());
+            }
+
+            @Override
+            public void visitObject(ObjectType objectType)
+            {
+                try
+                {
+                    keyValueHolder.set(resolveMultiLevelKey(componentModel, key, metadataKeyType));
+                }
+                catch (MetadataResolvingException e)
+                {
+                    exceptionValueHolder.set(e);
+                }
+            }
+        });
+
+        if (exceptionValueHolder.get() != null)
+        {
+            throw exceptionValueHolder.get();
+        }
+
+        return keyValueHolder.get();
     }
+
 
     /**
      * Resolves the KeyIdObject for a MultiLevel {@link MetadataKeyId}
      *
-     * @param component model property of the {@link MetadataKeyId} parameter
-     * @param key       key containing the values of each level
+     * @param componentModel model property of the {@link MetadataKeyId} parameter
+     * @param key            key containing the values of each level
      * @return the KeyIdObject for the {@link MetadataKeyId} parameter
      * @throws MetadataResolvingException
      */
-    private static Object resolveMultiLevelKey(ComponentModel component, MetadataKey key) throws MetadataResolvingException
+    private static Object resolveMultiLevelKey(ComponentModel componentModel, MetadataKey key, Class metadataKeyType) throws MetadataResolvingException
     {
-        final MetadataType metadataType = component
-                .getModelProperty(MetadataKeyIdModelProperty.class)
-                .map(MetadataKeyIdModelProperty::getType)
-                .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId parameter associated", component.getName()), new Exception()));
-
-        final Class<?> type = getType(metadataType);
-        final Map<Field, String> fieldValueMap = fillFieldValueMap(type, key);
+        final Map<Field, String> fieldValueMap = fillFieldValueMap(metadataKeyType, key);
 
         Object metadataKeyId;
         try
         {
-            metadataKeyId = type.newInstance();
+            metadataKeyId = metadataKeyType.newInstance();
         }
         catch (Exception e)
         {
-            throw new MetadataResolvingException("Could not instantiate metadata key object", UNKNOWN, e);
+            throw buildException(String.format("MetadataKey object of type '%s' from the component '%s' could not be instantiated", metadataKeyType.getSimpleName(), componentModel.getName()), e);
         }
 
         fieldValueMap.entrySet().forEach(entry -> new FieldSetter<Object, String>(entry.getKey()).set(metadataKeyId, entry.getValue()));
         return metadataKeyId;
     }
+
 
     private static Map<Field, String> fillFieldValueMap(Class type, MetadataKey key) throws MetadataResolvingException
     {
@@ -149,11 +189,6 @@ final class MetadataKeyIdObjectResolver
     {
         return cause == null ? new MetadataResolvingException(message, INVALID_METADATA_KEY)
                              : new MetadataResolvingException(message, INVALID_METADATA_KEY, cause);
-    }
-
-    private static boolean isSingleLevelKey(List<ParameterModel> metadataKeyParts)
-    {
-        return metadataKeyParts.size() == 1;
     }
 
     private static boolean isKeyLessComponent(List<ParameterModel> metadataKeyParts)

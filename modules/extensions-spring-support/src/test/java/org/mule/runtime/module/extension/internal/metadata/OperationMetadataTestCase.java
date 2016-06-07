@@ -132,8 +132,8 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     {
         componentId = new ProcessorId(SIMPLE_MULTILEVEL_KEY_RESOLVER, FIRST_PROCESSOR_INDEX);
         MetadataKey key = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SAN_FRANCISCO, CITY))).build();
-        final MetadataResult<ComponentMetadataDescriptor> metadataKeysResult = metadataManager.getMetadata(componentId, key);
-        assertThat(metadataKeysResult.isSuccess(), is(true));
+        final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, key);
+        assertThat(metadataResult.isSuccess(), is(true));
     }
 
     @Test

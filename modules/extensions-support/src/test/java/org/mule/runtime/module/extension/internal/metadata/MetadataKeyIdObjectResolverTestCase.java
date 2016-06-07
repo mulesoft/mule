@@ -77,7 +77,7 @@ public class MetadataKeyIdObjectResolverTestCase
     public void resolveSingleLevelKey() throws MetadataResolvingException
     {
         setParameters(continentParam);
-
+        setMetadataKeyIdModelProperty(String.class);
         final Object key = resolve(componentModel, newKey(AMERICA, CONTINENT).build());
         assertThat(key, is(instanceOf(String.class)));
         String stringKey = (String) key;
@@ -96,14 +96,13 @@ public class MetadataKeyIdObjectResolverTestCase
         assertThat(locationKey, hasProperty(CONTINENT, is(AMERICA)));
         assertThat(locationKey, hasProperty(COUNTRY, is(USA)));
         assertThat(locationKey, hasProperty(CITY, is(SFO)));
-
     }
 
     @Test
     public void failToResolveWithNotInstantiableKey() throws MetadataResolvingException
     {
         exception.expect(MetadataResolvingException.class);
-        exception.expectMessage(is("Could not instantiate metadata key object"));
+        exception.expectMessage(is("MetadataKey object of type 'NotInstantiableClass' from the component 'SomeOperation' could not be instantiated"));
         exception.expectCause(is(instanceOf(InstantiationException.class)));
 
         setParameters(continentParam, countryParam, cityParam);
@@ -151,6 +150,18 @@ public class MetadataKeyIdObjectResolverTestCase
         setMetadataKeyIdModelProperty(LocationKey.class);
 
         resolve(componentModel, invalidMetadataKey);
+    }
+
+    @Test
+    public void failToResolveWithInvalidKeyIdParam() throws MetadataResolvingException
+    {
+        exception.expect(MetadataResolvingException.class);
+        exception.expectMessage(is("'Boolean' type is invalid for MetadataKeyId parameters, use String type instead. Affecting component: 'SomeOperation'"));
+
+        setParameters(continentParam);
+        setMetadataKeyIdModelProperty(Boolean.class);
+
+        resolve(componentModel, newKey("true", "booleanParam").build());
     }
 
     public void setParameters(ParameterModel... parameterModels)
