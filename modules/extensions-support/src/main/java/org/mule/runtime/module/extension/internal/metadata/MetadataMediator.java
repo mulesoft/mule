@@ -25,6 +25,7 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MetadataAware;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -120,7 +121,7 @@ public class MetadataMediator
             final Set<MetadataKey> enrichedMetadataKeys = metadataKeys
                     .stream()
                     .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partOrder, 1))
-                    .map(PartAwareMetadataKeyBuilder::build)
+                    .map(MetadataKeyBuilder::build)
                     .collect(Collectors.toSet());
 
             return success(enrichedMetadataKeys);
@@ -424,11 +425,11 @@ public class MetadataMediator
      * @param key              {@link MetadataKey} to be cloned and enriched
      * @param partOrderMapping {@link Map} that contains the mapping of the name of each part of the {@link MetadataKey}
      * @param level            the current level of the part of the {@link MetadataKey} to be cloned and enriched
-     * @return a tree of {@link PartAwareMetadataKeyBuilder} with the cloned and enriched keys
+     * @return a {@link MetadataKeyBuilder} with the cloned and enriched keys
      */
-    private PartAwareMetadataKeyBuilder cloneAndEnrichMetadataKey(MetadataKey key, Map<Integer, String> partOrderMapping, int level)
+    private MetadataKeyBuilder cloneAndEnrichMetadataKey(MetadataKey key, Map<Integer, String> partOrderMapping, int level)
     {
-        final PartAwareMetadataKeyBuilder keyBuilder = newKey(key.getId(), partOrderMapping.get(level))
+        final MetadataKeyBuilder keyBuilder = newKey(key.getId(), partOrderMapping.get(level))
                 .withDisplayName(key.getDisplayName());
 
         key.getProperties().stream().forEach(keyBuilder::withProperty);

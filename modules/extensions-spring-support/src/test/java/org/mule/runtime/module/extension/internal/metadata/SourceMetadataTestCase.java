@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,7 +55,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
         assertThat(metadataKeysResult.isSuccess(), is(true));
         final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
         assertThat(metadataKeys.size(), is(3));
-        Assert.assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
+        assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
     }
 
     @Test

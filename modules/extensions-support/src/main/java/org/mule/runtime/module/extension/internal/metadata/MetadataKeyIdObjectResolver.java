@@ -10,9 +10,10 @@ import static java.lang.String.format;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
@@ -24,13 +25,11 @@ import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -59,52 +58,31 @@ final class MetadataKeyIdObjectResolver
      */
     public static Object resolve(ComponentModel component, MetadataKey key) throws MetadataResolvingException
     {
-        final List<ParameterModel> metadataKeyParts = IntrospectionUtils.getMetadataKeyParts(component);
-        final Optional<MetadataKeyIdModelProperty> keyIdModelProperty = component.getModelProperty(MetadataKeyIdModelProperty.class);
-
-        Object keyIdObject;
-
-        if (isKeyLessComponent(metadataKeyParts))
-        {
-            keyIdObject = new NullMetadataKey().getId();
-        }
-        else
-        {
-            checkKeyIdModelIsPresent(component, keyIdModelProperty);
-            keyIdObject = resolveMetadataKeyWhenPresent(key, metadataKeyParts, keyIdModelProperty.get());
-        }
-
-        return keyIdObject;
+        final List<ParameterModel> metadataKeyParts = getMetadataKeyParts(component);
+        return isKeyLessComponent(metadataKeyParts) ? new NullMetadataKey().getId() : resolveMetadataKeyWhenPresent(key, metadataKeyParts, component);
     }
 
-    private static Object resolveMetadataKeyWhenPresent(MetadataKey key, List<ParameterModel> metadataKeyParts, MetadataKeyIdModelProperty keyIdModelProperty) throws MetadataResolvingException
+    private static Object resolveMetadataKeyWhenPresent(MetadataKey key, List<ParameterModel> metadataKeyParts, ComponentModel componentModel) throws MetadataResolvingException
     {
-        Object keyIdObject;
-
-        if (isSingleLevelKey(metadataKeyParts))
-        {
-            return key.getId();
-        }
-        else
-        {
-            keyIdObject = resolveMultiLevelKey(keyIdModelProperty, key);
-        }
-        return keyIdObject;
+        return isSingleLevelKey(metadataKeyParts) ? key.getId() : resolveMultiLevelKey(componentModel, key);
     }
 
     /**
      * Resolves the KeyIdObject for a MultiLevel {@link MetadataKeyId}
      *
-     * @param keyIdModelProperty model property of the {@link MetadataKeyId} parameter
-     * @param key                key containing the values of each level
+     * @param component model property of the {@link MetadataKeyId} parameter
+     * @param key       key containing the values of each level
      * @return the KeyIdObject for the {@link MetadataKeyId} parameter
      * @throws MetadataResolvingException
      */
-    private static Object resolveMultiLevelKey(MetadataKeyIdModelProperty keyIdModelProperty, MetadataKey key) throws MetadataResolvingException
+    private static Object resolveMultiLevelKey(ComponentModel component, MetadataKey key) throws MetadataResolvingException
     {
-        final Class<?> type = getType(keyIdModelProperty.getType());
-        checkInstantiable(type);
+        final MetadataType metadataType = component
+                .getModelProperty(MetadataKeyIdModelProperty.class)
+                .map(MetadataKeyIdModelProperty::getType)
+                .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId parameter associated", component.getName()), new Exception()));
 
+        final Class<?> type = getType(metadataType);
         final Map<Field, String> fieldValueMap = fillFieldValueMap(type, key);
 
         Object metadataKeyId;
@@ -123,12 +101,8 @@ final class MetadataKeyIdObjectResolver
 
     private static Map<Field, String> fillFieldValueMap(Class type, MetadataKey key) throws MetadataResolvingException
     {
-
-        Map<String, Field> metadataKeyParts = getAnnotatedFields(type, MetadataKeyPart.class)
-                .stream().collect(Collectors.toMap(Field::getName, Function.identity()));
-
+        final Map<String, Field> metadataKeyParts = getAnnotatedFields(type, MetadataKeyPart.class).stream().collect(Collectors.toMap(Field::getName, Function.identity()));
         final Map<String, String> currentParts = getCurrentParts(key);
-
         final List<String> missingParts = metadataKeyParts.keySet().stream().filter(partName -> !currentParts.containsKey(partName)).collect(Collectors.toList());
 
         if (!missingParts.isEmpty())
@@ -142,17 +116,27 @@ final class MetadataKeyIdObjectResolver
                 .collect(Collectors.toMap(keyEntry -> metadataKeyParts.get(keyEntry.getKey()), Map.Entry::getValue));
     }
 
-    private static Map<String, String> getCurrentParts(MetadataKey key)
+    private static Map<String, String> getCurrentParts(MetadataKey key) throws MetadataResolvingException
     {
         Map<String, String> metadataKeyParts = new HashMap<>();
         metadataKeyParts.put(key.getPartName(), key.getId());
 
         while (!key.getChilds().isEmpty())
         {
+            checkOneChildPerLevel(key);
             key = key.getChilds().iterator().next();
             metadataKeyParts.put(key.getPartName(), key.getId());
         }
         return metadataKeyParts;
+    }
+
+    private static void checkOneChildPerLevel(MetadataKey key) throws MetadataResolvingException
+    {
+        if (key.getChilds().size() > 1)
+        {
+            final List<String> keyNames = key.getChilds().stream().map(child -> child.getId()).collect(Collectors.toList());
+            throw buildException(String.format("MetadataKey used for Metadata resolution must only have one child per level. Key '%s' has %s as children.", key.getId(), keyNames));
+        }
     }
 
     private static MetadataResolvingException buildException(String message)
@@ -164,14 +148,6 @@ final class MetadataKeyIdObjectResolver
     {
         return cause == null ? new MetadataResolvingException(message, INVALID_METADATA_KEY)
                              : new MetadataResolvingException(message, INVALID_METADATA_KEY, cause);
-    }
-
-    private static void checkKeyIdModelIsPresent(ComponentModel component, Optional<MetadataKeyIdModelProperty> keyIdModelProperty) throws MetadataResolvingException
-    {
-        if (!keyIdModelProperty.isPresent())
-        {
-            throw buildException(format("Component '%s' doesn't have a MetadataKeyId parameter associated", component.getName()));
-        }
     }
 
     private static boolean isSingleLevelKey(List<ParameterModel> metadataKeyParts)

@@ -25,11 +25,12 @@ final public class MetadataKeyMatcher extends TypeSafeMatcher<MetadataKey>
     private final String id;
     private String displayName;
     private String partName;
+    private StringBuilder descriptionBuilder = new StringBuilder();
 
     private MetadataKeyMatcher(String id)
     {
-
         this.id = id;
+        descriptionBuilder.append(String.format("a MetadataKey with id: '%s'", id));
     }
 
     /**
@@ -46,37 +47,23 @@ final public class MetadataKeyMatcher extends TypeSafeMatcher<MetadataKey>
     @Override
     protected boolean matchesSafely(MetadataKey metadataKey)
     {
-
-        if (!metadataKey.getId().equals(id))
+        try
+        {
+            validateEquals(id, metadataKey.getId());
+            validateEquals(displayName, metadataKey.getDisplayName());
+            validateEquals(partName, metadataKey.getPartName());
+            return true;
+        }
+        catch (RuntimeException e)
         {
             return false;
         }
-
-        if (displayName != null && !metadataKey.getDisplayName().equals(displayName))
-        {
-            return false;
-        }
-
-        if (partName != null && !metadataKey.getPartName().equals(partName))
-        {
-            return false;
-        }
-
-        return true;
     }
 
     @Override
     public void describeTo(Description description)
     {
-        description.appendText(format("a MetadataKey with id: '%s'", id));
-        if (displayName != null)
-        {
-            description.appendText(format(", displayName: '%s'", displayName));
-        }
-        if (partName != null)
-        {
-            description.appendText(format(", partName: '%s'", partName));
-        }
+        description.appendText(descriptionBuilder.toString());
     }
 
     /**
@@ -85,9 +72,11 @@ final public class MetadataKeyMatcher extends TypeSafeMatcher<MetadataKey>
      * @param displayName of the {@link MetadataKey}
      * @return the contributed {@link MetadataKeyMatcher}
      */
+
     public MetadataKeyMatcher withDisplayName(String displayName)
     {
         this.displayName = displayName;
+        descriptionBuilder.append(format(", displayName: '%s'", displayName));
         return this;
     }
 
@@ -100,6 +89,15 @@ final public class MetadataKeyMatcher extends TypeSafeMatcher<MetadataKey>
     public MetadataKeyMatcher withPartName(String partName)
     {
         this.partName = partName;
+        descriptionBuilder.append(format(", partName: '%s'", partName));
         return this;
+    }
+
+    private void validateEquals(String actual, String expected)
+    {
+        if (actual != null && !expected.equals(actual))
+        {
+            throw new RuntimeException(String.format("Assertion Error - Actual: '%s' Expected: '%s'", actual, expected));
+        }
     }
 }
