@@ -71,10 +71,13 @@ public class ActiveMQBroker extends ExternalResource
     
     public void stop()
     {
-        try {
+        try
+        {
             broker.stop();
             broker.waitUntilStopped();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RuntimeException(e);
         }
     }
