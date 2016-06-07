@@ -19,6 +19,7 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
@@ -40,7 +41,6 @@ import org.mule.runtime.core.api.processor.CloneableMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -440,7 +440,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
         String scheme = uriBuilder.getEndpoint().getSchemeMetaInfo();
         Properties overrides = getOverrides(conn);
         TransportServiceDescriptor sd = (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(),
-                ServiceType.TRANSPORT, scheme, overrides);
+                LegacyServiceType.TRANSPORT, scheme, overrides);
         if (null != sd)
         {
             return sd;

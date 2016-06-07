@@ -8,6 +8,7 @@ package org.mule.compatibility.core.util;
 
 import static org.mule.runtime.core.config.ExceptionHelper.SERVICE_ROOT;
 
+import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.transport.service.TransportFactory;
 import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.config.ExceptionHelper;
@@ -31,7 +32,7 @@ public class SpiUtils
 
     public static Properties findServiceDescriptor(ServiceType type, String name)
     {
-        if (type.equals(ServiceType.TRANSPORT))
+        if (type.equals(LegacyServiceType.TRANSPORT))
         {
             // for better EE transports support from earlier versions, try the preferred-xxx lookup first without
             // fallback

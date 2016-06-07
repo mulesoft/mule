@@ -14,12 +14,12 @@ import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.EndpointURIBuilder;
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
+import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -226,7 +226,7 @@ public class MuleEndpointURI implements EndpointURI
         {
             String scheme = getFullScheme();
             TransportServiceDescriptor sd;
-            sd = (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), ServiceType.TRANSPORT, scheme, serviceOverrides);
+            sd = (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, scheme, serviceOverrides);
             if (sd == null)
             {
                 throw new ServiceException(TransportCoreMessages.noServiceTransportDescriptor(scheme));

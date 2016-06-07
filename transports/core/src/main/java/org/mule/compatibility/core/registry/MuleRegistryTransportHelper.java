@@ -8,14 +8,14 @@ package org.mule.compatibility.core.registry;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
+import org.mule.compatibility.core.api.registry.AbstractServiceDescriptor;
+import org.mule.compatibility.core.api.registry.ServiceDescriptor;
 import org.mule.compatibility.core.api.registry.ServiceDescriptorFactory;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.util.SpiUtils;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.registry.AbstractServiceDescriptor;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.registry.ServiceDescriptor;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.config.i18n.CoreMessages;

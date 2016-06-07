@@ -11,10 +11,10 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.endpoint.AbstractEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
-import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 
 /**
@@ -45,7 +45,7 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
         // If this is a meta endpoint, then we can wrap it using the meta endpoint builder from the TransportServiceDescriptor
         String scheme = getEndpointBuilder().getEndpoint().getFullScheme();
         TransportServiceDescriptor tsd =
-                (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), ServiceType.TRANSPORT, scheme, null);
+                (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, scheme, null);
         EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(this, muleContext);
 
         OutboundEndpoint outboundEndpoint = getEndpointFactory().getOutboundEndpoint(endpointBuilder);

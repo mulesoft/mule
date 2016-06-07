@@ -4,14 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.registry;
+package org.mule.compatibility.core.api.registry;
+
+import org.mule.runtime.core.api.registry.ServiceType;
 
 /**
- * TODO
+ * @deprecated Transport infrastructure is deprecated.
  */
-public interface ServiceType
+@Deprecated
+public interface LegacyServiceType extends ServiceType
 {
-    public static final ServiceType EXCEPTION = new ServiceType()
+
+    public static final ServiceType TRANSPORT = new ServiceType()
     {
         @Override
         public String toString()
@@ -21,18 +25,13 @@ public interface ServiceType
 
         public String getPath()
         {
-            return "org/mule/runtime/core/config";
+            return "org/mule/runtime/transport";
         }
 
         public String getName()
         {
-            return "exception";
+            return "transport";
         }
     };
 
-    String getPath();
-
-    String getName();
 }
-
-

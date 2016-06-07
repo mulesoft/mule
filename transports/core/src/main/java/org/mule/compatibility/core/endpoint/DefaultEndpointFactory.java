@@ -15,14 +15,13 @@ import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.registry.MuleRegistryTransportHelper;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -130,7 +129,7 @@ public class DefaultEndpointFactory implements EndpointFactory
         {
             logger.debug("Named EndpointBuilder not found, creating endpoint builder for uri");
             EndpointURI epURI = new MuleEndpointURI(uri, muleContext);
-            TransportServiceDescriptor tsd = (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), ServiceType.TRANSPORT,
+            TransportServiceDescriptor tsd = (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT,
                     epURI.getFullScheme(), null);
             endpointBuilder = tsd.createEndpointBuilder(uri, muleContext);
         }

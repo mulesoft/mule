@@ -13,6 +13,7 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.r
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
+import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
@@ -20,7 +21,6 @@ import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.util.TransportObjectNameHelper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.util.BeanUtils;
 
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class TransportFactory
             String scheme = url.getFullScheme();
 
             TransportServiceDescriptor sd = (TransportServiceDescriptor)
-            lookupServiceDescriptor(muleContext.getRegistry(), ServiceType.TRANSPORT, scheme, null);
+            lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, scheme, null);
             if (sd == null)
             {
                 throw new ServiceException(TransportCoreMessages.noServiceTransportDescriptor(scheme));

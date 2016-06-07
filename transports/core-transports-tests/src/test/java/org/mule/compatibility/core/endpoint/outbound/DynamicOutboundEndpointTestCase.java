@@ -27,6 +27,7 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.core.endpoint.DynamicOutboundEndpoint;
 import org.mule.compatibility.core.endpoint.DynamicURIBuilder;
@@ -42,7 +43,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -379,7 +379,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         Properties props = new Properties();
         props.put(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, MyMessageDispatcherFactory.class.getName());
         DefaultTransportServiceDescriptor serviceDescriptor =
-                (DefaultTransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), ServiceType.TRANSPORT, "test", null);
+                (DefaultTransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, "test", null);
         props.put(MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS, "ONE_WAY, REQUEST_RESPONSE");
         props.put(MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, "ONE_WAY, REQUEST_RESPONSE");
         serviceDescriptor.setOverrides(props);

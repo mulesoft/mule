@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.registry;
+package org.mule.compatibility.core.api.registry;
 
 /**
  * Parent interface for any pluggable service in Mule (transport, model, etc.)
