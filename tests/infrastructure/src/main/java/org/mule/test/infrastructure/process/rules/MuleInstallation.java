@@ -6,20 +6,21 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
+import static org.apache.commons.io.FileUtils.*;
+import static org.apache.commons.lang.StringUtils.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.junit.rules.ExternalResource;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * This is a JUnit rule to install Mule Runtime during tests. Usage:
@@ -44,9 +45,10 @@ public class MuleInstallation extends ExternalResource
 
     private static final File WORKING_DIRECTORY = new File(getProperty("user.dir"));
     private static final int BUFFER = 2048;
-
     private File distribution;
     private File muleHome;
+    private String testname;
+    public static final String DELETE_ON_EXIT = getProperty("mule.test.deleteOnExit");
 
     public MuleInstallation(String zippedDistribution)
     {
@@ -63,6 +65,13 @@ public class MuleInstallation extends ExternalResource
     }
 
     @Override
+    public Statement apply(final Statement base, final Description description)
+    {
+        testname = description.getTestClass().getSimpleName();
+        return super.apply(base, description);
+    }
+
+    @Override
     protected void before() throws Throwable
     {
         unzip(distribution, WORKING_DIRECTORY);
@@ -71,36 +80,45 @@ public class MuleInstallation extends ExternalResource
     @Override
     protected void after()
     {
-        try
+        File logs = new File(muleHome, "logs");
+        File dest = new File(testname + ".logs");
+        deleteQuietly(dest);
+        if (isEmpty(DELETE_ON_EXIT) || parseBoolean(DELETE_ON_EXIT))
         {
-            FileUtils.deleteDirectory(muleHome);
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Couldn't delete directory [" + muleHome + "], delete it manually.", e);
+            try
+            {
+                moveDirectory(logs, dest);
+                deleteDirectory(muleHome);
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException("Couldn't delete directory [" + muleHome + "], delete it manually.", e);
+            }
         }
     }
 
     private void unzip(File file, File destDir) throws IOException
     {
-        ZipFile zip = new ZipFile(file);
-        Enumeration<? extends ZipEntry> zipFileEntries = zip.entries();
-        ZipEntry root = zipFileEntries.nextElement();
-        muleHome = new File(destDir, root.getName());
-        muleHome.mkdirs();
-        chmodRwx(muleHome);
-        while (zipFileEntries.hasMoreElements())
+        try (ZipFile zip = new ZipFile(file))
         {
-            ZipEntry entry = zipFileEntries.nextElement();
-            File destFile = new File(entry.getName());
-            if (entry.isDirectory())
+            Enumeration<? extends ZipEntry> zipFileEntries = zip.entries();
+            ZipEntry root = zipFileEntries.nextElement();
+            muleHome = new File(destDir, root.getName());
+            muleHome.mkdirs();
+            chmodRwx(muleHome);
+            while (zipFileEntries.hasMoreElements())
             {
-                destFile.mkdir();
-            }
-            else
-            {
-                FileUtils.copyInputStreamToFile(zip.getInputStream(entry), destFile);
-                chmodRwx(destFile);
+                ZipEntry entry = zipFileEntries.nextElement();
+                File destFile = new File(entry.getName());
+                if (entry.isDirectory())
+                {
+                    destFile.mkdir();
+                }
+                else
+                {
+                    copyInputStreamToFile(zip.getInputStream(entry), destFile);
+                    chmodRwx(destFile);
+                }
             }
         }
     }
