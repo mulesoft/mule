@@ -101,8 +101,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-infrastructure</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- Used by ActiveMQ if persistent=true -->

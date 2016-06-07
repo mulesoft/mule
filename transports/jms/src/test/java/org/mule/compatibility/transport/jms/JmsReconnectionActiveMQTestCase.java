@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.functional.listener.ConnectionListener;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
@@ -66,7 +65,7 @@ public class JmsReconnectionActiveMQTestCase extends AbstractBrokerFunctionalTes
                 .setExpectedAction(ConnectionNotification.CONNECTION_FAILED).setNumberOfExecutionsRequired(3);
 
         CustomConnectionFactory.returnInvalidConnections = true;
-        stopBroker();
+        amqBroker.stop();
 
         connectionListener.waitUntilNotificationsAreReceived();
         assertTrue(jmsConnector.isStopped());
@@ -74,7 +73,7 @@ public class JmsReconnectionActiveMQTestCase extends AbstractBrokerFunctionalTes
 
         // Restart the broker
         CustomConnectionFactory.returnInvalidConnections = false;
-        startBroker();
+        amqBroker.start();
 
         // Wait until jmsConnector is reconnected and started.
         prober.check(new Probe()
