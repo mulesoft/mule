@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.BooleanUtils;
 import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.OneTimeWarning;
 import org.mule.runtime.core.util.StringUtils;
@@ -57,7 +58,6 @@ import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.util.IdleConnectionTimeoutThread;
-import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.LoggerFactory;
 
 /**
