@@ -6,6 +6,10 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static java.util.stream.Collectors.toSet;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -18,7 +22,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.test.metadata.extension.MetadataConnection;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TestMetadataResolverUtils
@@ -32,18 +36,18 @@ public class TestMetadataResolverUtils
     public static final String SIZE = "Size";
     public static final String AGE = "Age";
 
-    public static List<MetadataKey> getKeys(MetadataContext context) throws ConnectionException
+    public static Set<MetadataKey> getKeys(MetadataContext context) throws ConnectionException
     {
         MetadataConnection connection = (MetadataConnection) context.getConnection().get();
 
         return connection.getEntities().stream()
                 .map(e -> MetadataKeyBuilder.newKey(e).build())
-                .collect(Collectors.toList());
+                .collect(toSet());
     }
 
     public static MetadataType getMetadata(String key) throws MetadataResolvingException
     {
-        final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(new MetadataFormat(key, key, APPLICATION_JAVA_MIME_TYPE)).objectType();
+        final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(JAVA).objectType();
 
         switch (key)
         {
@@ -60,7 +64,7 @@ public class TestMetadataResolverUtils
                 objectBuilder.addField().key(AGE).value().numberType();
                 break;
             default:
-                throw new MetadataResolvingException("Uknown key " + key, FailureCode.INVALID_METADATA_KEY);
+                throw new MetadataResolvingException("Unknown key " + key, INVALID_METADATA_KEY);
         }
 
         return objectBuilder.build();

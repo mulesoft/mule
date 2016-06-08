@@ -6,8 +6,10 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.APPLICATION_JAVA_MIME_TYPE;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -21,8 +23,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.test.metadata.extension.LocationKey;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 public class TestMultiLevelKeyResolver implements MetadataKeysResolver, MetadataContentResolver<LocationKey>
 {
@@ -57,11 +58,9 @@ public class TestMultiLevelKeyResolver implements MetadataKeysResolver, Metadata
     }
 
     @Override
-    public List<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
+    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
     {
-        MetadataKey america = buildAmericaKey();
-        MetadataKey europe = buildEuropeKey();
-        return Arrays.asList(america, europe);
+        return newHashSet(buildAmericaKey(), buildEuropeKey());
     }
 
     public static MetadataKey buildEuropeKey()

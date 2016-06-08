@@ -8,6 +8,7 @@ package org.mule.extension.http.api.request;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
@@ -26,8 +27,8 @@ import org.mule.runtime.module.http.internal.ParameterMap;
 
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles all metadata related operations for HTTP requests.
@@ -41,10 +42,10 @@ public class HttpMetadataResolver implements Initialisable, MetadataKeysResolver
 
     private Class[] classes = new Class[]{InputStream.class, NullPayload.class, ParameterMap.class};
     private Map<String, MetadataType> types;
-    private List<MetadataKey> keys;
+    private Set<MetadataKey> keys;
 
     @Override
-    public List<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
+    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
     {
         return keys;
     }

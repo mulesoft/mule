@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
@@ -16,9 +16,10 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
@@ -26,14 +27,16 @@ import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtil
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.EUROPE;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
-import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.buildAmericaKey;
-import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.buildEuropeKey;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+
 import org.mule.functional.listener.Callback;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.runtime.api.metadata.MetadataCache;
@@ -57,8 +60,8 @@ import org.mule.test.metadata.extension.model.shapes.Square;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -80,42 +83,35 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     public void getMetadataKeysWithKeyId() throws Exception
     {
         componentId = new ProcessorId(OUTPUT_METADATA_WITH_KEY_ID, FIRST_PROCESSOR_INDEX);
-        final MetadataResult<List<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+        final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
         assertThat(metadataKeysResult.isSuccess(), is(true));
-        final List<MetadataKey> metadataKeys = metadataKeysResult.get();
+        final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
         assertThat(metadataKeys.size(), is(3));
-        List<String> keyIds = metadataKeys.stream().map(MetadataKey::getId).collect(toList());
-        assertThat(keyIds, hasItems(PERSON, CAR, HOUSE));
+        assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
     }
 
     @Test
     public void getMetadataKeysWithoutKeyId() throws Exception
     {
         componentId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEY_ID, FIRST_PROCESSOR_INDEX);
-        final MetadataResult<List<MetadataKey>> metadataKeys = metadataManager.getMetadataKeys(componentId);
+        final MetadataResult<Set<MetadataKey>> metadataKeys = metadataManager.getMetadataKeys(componentId);
         assertThat(metadataKeys.isSuccess(), is(true));
         assertThat(metadataKeys.get().size(), is(1));
-        assertThat(metadataKeys.get().get(0), instanceOf(NullMetadataKey.class));
+        assertThat(metadataKeys.get().iterator().next(), instanceOf(NullMetadataKey.class));
     }
 
     @Test
     public void getMultilevelKeys() throws Exception
     {
-        MetadataKey expectedAmerica = buildAmericaKey();
-        MetadataKey expectedEurope = buildEuropeKey();
-
         componentId = new ProcessorId(SIMPLE_MULTILEVEL_KEY_RESOLVER, FIRST_PROCESSOR_INDEX);
-        final MetadataResult<List<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+        final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
         assertThat(metadataKeysResult.isSuccess(), is(true));
 
-        final List<MetadataKey> metadataKeys = metadataKeysResult.get();
+        final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
         assertThat(metadataKeys, hasSize(2));
 
-        MetadataKey america = metadataKeys.get(0);
-        assertThat(america, is(expectedAmerica));
-
-        MetadataKey europe = metadataKeys.get(1);
-        assertThat(europe, is(expectedEurope));
+        assertThat(metadataKeys, hasItem(metadataKeyWithId(AMERICA).withDisplayName(AMERICA).withPartName(CONTINENT)));
+        assertThat(metadataKeys, hasItem(metadataKeyWithId(EUROPE).withDisplayName(EUROPE).withPartName(CONTINENT)));
     }
 
     @Test
@@ -135,16 +131,15 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     public void injectComposedMetadataKeyIdInstanceInMetadataResolver() throws Exception
     {
         componentId = new ProcessorId(SIMPLE_MULTILEVEL_KEY_RESOLVER, FIRST_PROCESSOR_INDEX);
-        MetadataKey key = newKey(AMERICA).withChild(newKey(USA).withChild(newKey(SAN_FRANCISCO))).build();
-        final MetadataResult<ComponentMetadataDescriptor> metadataKeysResult = metadataManager.getMetadata(componentId, key);
-        assertThat(metadataKeysResult.isSuccess(), is(true));
+        MetadataKey key = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SAN_FRANCISCO, CITY))).build();
+        final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, key);
+        assertThat(metadataResult.isSuccess(), is(true));
     }
 
     @Test
     public void dynamicOperationMetadata() throws Exception
     {
         componentId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID, FIRST_PROCESSOR_INDEX);
-
         final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
         assertInheritedResolvers(metadataDescriptor);
@@ -539,6 +534,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
      * Test template that sets an "invalid" classloader in TCCL different from the one that was used to register the extension
      * and asserts that, it sets back the original classloader to TCCL.
      * Done in this way due to it is not possible to change extension model classloader property once it is registered.
+     *
      * @param flowName
      * @param doAction
      * @throws Exception

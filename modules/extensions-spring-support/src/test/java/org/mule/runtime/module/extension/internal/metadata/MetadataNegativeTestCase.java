@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.MISSING_ELEMENT_ERROR_MESSAGE;
+
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.ProcessorId;
@@ -21,7 +22,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.InvalidComponentIdException;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -47,14 +48,14 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
         componentId = new ProcessorId(FAIL_WITH_RESOLVING_EXCEPTION, FIRST_PROCESSOR_INDEX);
         MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
 
-        assertFailure(metadata, "", FailureCode.UNKNOWN, MetadataResolvingException.class.getName());
+        assertFailure(metadata, "", FailureCode.CONNECTION_FAILURE, MetadataResolvingException.class.getName());
     }
 
     @Test
     public void getKeysWithRuntimeException() throws Exception
     {
         componentId = new ProcessorId(FAIL_WITH_RUNTIME_EXCEPTION, FIRST_PROCESSOR_INDEX);
-        MetadataResult<List<MetadataKey>> metadata = metadataManager.getMetadataKeys(componentId);
+        MetadataResult<Set<MetadataKey>> metadata = metadataManager.getMetadataKeys(componentId);
 
         assertFailure(metadata, "", FailureCode.UNKNOWN, RuntimeException.class.getName());
     }
@@ -87,6 +88,15 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     }
 
     @Test
+    public void failToGetMetadataFromNonExistingSource() throws IOException
+    {
+        final SourceId notExistingSource = new SourceId(FLOW_WITHOUT_SOURCE);
+        final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(notExistingSource);
+
+        assertFailure(metadataKeysResult, SOURCE_NOT_FOUND, FailureCode.UNKNOWN, InvalidComponentIdException.class.getName());
+    }
+
+    @Test
     public void processorIsNotMetadataAware() throws Exception
     {
         componentId = new ProcessorId(LOGGER_FLOW, FIRST_PROCESSOR_INDEX);
@@ -101,24 +111,25 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
         componentId = new ProcessorId(CONTENT_ONLY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
         MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, nullMetadataKey);
 
-        assertFailure(metadata, MISSING_ELEMENT_ERROR_MESSAGE, FailureCode.UNKNOWN, MetadataResolvingException.class.getName());
-    }
-
-    @Test
-    public void failToGetMetadataFromNonExistingSource() throws IOException
-    {
-        final SourceId notExistingSource = new SourceId(FLOW_WITHOUT_SOURCE);
-        final MetadataResult<List<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(notExistingSource);
-
-        assertFailure(metadataKeysResult, SOURCE_NOT_FOUND, FailureCode.UNKNOWN, InvalidComponentIdException.class.getName());
+        assertFailure(metadata, MISSING_ELEMENT_ERROR_MESSAGE, FailureCode.RESOURCE_UNAVAILABLE, MetadataResolvingException.class.getName());
     }
 
     @Test
     public void failWithDynamicConfigurationWhenRetrievingMetadata() throws IOException
     {
         componentId = new ProcessorId(RESOLVER_WITH_DYNAMIC_CONFIG, FIRST_PROCESSOR_INDEX);
-        MetadataKey key = newKey(AMERICA).withChild(newKey(USA).withChild(newKey(SAN_FRANCISCO))).build();
+        MetadataKey key = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SAN_FRANCISCO, CITY))).build();
         MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId, key);
         assertFailure(result, "Configuration used for Metadata fetch cannot be dynamic", FailureCode.INVALID_CONFIGURATION, MetadataResolvingException.class.getName());
+    }
+
+    @Test
+    public void failToGetMetadataWithMissingMetadataKeyLevels() throws Exception
+    {
+        componentId = new ProcessorId(SIMPLE_MULTILEVEL_KEY_RESOLVER, FIRST_PROCESSOR_INDEX);
+        final MetadataKey metadataKey = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY)).build();
+
+        final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, metadataKey);
+        assertFailure(metadataResult, "city", FailureCode.INVALID_METADATA_KEY, MetadataResolvingException.class.getName());
     }
 }

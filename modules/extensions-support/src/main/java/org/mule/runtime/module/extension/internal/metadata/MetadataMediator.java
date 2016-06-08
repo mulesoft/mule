@@ -6,24 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.typeDescriptor;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContentParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isNullType;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.subTypesAsUnionType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MetadataAware;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -39,20 +43,24 @@ import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
+import org.mule.runtime.extension.api.introspection.ComponentModel;
+import org.mule.runtime.extension.api.introspection.Described;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -75,6 +83,7 @@ public class MetadataMediator
     private final List<ParameterModel> metadataKeyParts;
     private final SubTypesMappingContainer subTypesMappingContainer;
     private final ClassLoader extensionClassLoader;
+    private final MetadataKeyIdObjectResolver keyIdObjectResolver = new MetadataKeyIdObjectResolver();
 
     public MetadataMediator(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel)
     {
@@ -100,18 +109,24 @@ public class MetadataMediator
      * @return Successful {@link MetadataResult} if the keys are obtained without errors
      * Failure {@link MetadataResult} when no Dynamic keys are a available or the retrieval fails for any reason
      */
-    public MetadataResult<List<MetadataKey>> getMetadataKeys(MetadataContext context)
+    public MetadataResult<Set<MetadataKey>> getMetadataKeys(MetadataContext context)
     {
         if (metadataKeyParts.isEmpty())
         {
-            return success(ImmutableList.of(new NullMetadataKey()));
+            return success(ImmutableSet.of(new NullMetadataKey()));
         }
         try
         {
-            return success(resolverFactory.getKeyResolver()
-                                   .getMetadataKeys(context)
-                                   .stream()
-                                   .collect(toList()));
+            final Set<MetadataKey> metadataKeys = resolverFactory.getKeyResolver().getMetadataKeys(context);
+            final Map<Integer, String> partOrder = getPartOrderMapping(metadataKeyParts);
+
+            final Set<MetadataKey> enrichedMetadataKeys = metadataKeys
+                    .stream()
+                    .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partOrder, 1))
+                    .map(MetadataKeyBuilder::build)
+                    .collect(toSet());
+
+            return success(enrichedMetadataKeys);
         }
         catch (Exception e)
         {
@@ -291,9 +306,8 @@ public class MetadataMediator
     }
 
     /**
-     * Given a {@link MetadataKey} of a type and a {@link MetadataContext},
-     * resolves the {@link MetadataType} of the {@link Content} parameter using
-     * the {@link MetadataContentResolver} associated to the current component.
+     * Given a {@link MetadataKey} of a type and a {@link MetadataContext}, resolves the {@link MetadataType} of the
+     * {@link Content} parameter using the {@link MetadataContentResolver} associated to the current component.
      *
      * @param context {@link MetadataContext} of the MetaData resolution
      * @param key     {@link MetadataKey} of the type which's structure has to be resolved
@@ -312,9 +326,8 @@ public class MetadataMediator
     }
 
     /**
-     * Given a {@link MetadataKey} of a type and a {@link MetadataContext},
-     * resolves the {@link MetadataType} of the Components's output using
-     * the {@link MetadataOutputResolver} associated to the current component.
+     * Given a {@link MetadataKey} of a type and a {@link MetadataContext}, resolves the {@link MetadataType} of the
+     * Components's output using the {@link MetadataOutputResolver} associated to the current component.
      *
      * @param context {@link MetadataContext} of the Metadata resolution
      * @param key     {@link MetadataKey} of the type which's structure has to be resolved
@@ -358,8 +371,8 @@ public class MetadataMediator
      *
      * @param staticType static type used as default if no dynamic type is available
      * @param delegate   Delegate which performs the final invocation to the one of the metadata resolvers
-     * @return The {@link MetadataType} resolved by the delegate invocation.
-     * Success if the type has been successfully fetched, Failure otherwise.
+     * @return The {@link MetadataType} resolved by the delegate invocation. Success if the type has been successfully
+     * fetched, Failure otherwise.
      */
     private MetadataResult<MetadataType> resolveMetadataType(MetadataType staticType, MetadataDelegate delegate)
     {
@@ -375,7 +388,7 @@ public class MetadataMediator
     }
 
     /**
-     * Given a {@link MetadataKey} instanciates the assosiated {@link MetadataKeyId} parameter
+     * Given a {@link MetadataKey} instantiates the associated {@link MetadataKeyId} parameter
      * this could be a simple {@link String} if the key contains only one level
      * or a complex type with {@link MetadataKeyPart} annotated fields for a multilevel key
      *
@@ -384,7 +397,7 @@ public class MetadataMediator
      */
     private Object getKeyId(MetadataKey key) throws MetadataResolvingException
     {
-        return metadataKeyParts.size() > 1 ? new MetadataKeyIdObjectResolver(componentModel, key).resolve() : key.getId();
+        return keyIdObjectResolver.resolve(componentModel, key);
     }
 
     private interface MetadataDelegate
@@ -393,4 +406,36 @@ public class MetadataMediator
         MetadataType resolve() throws MetadataResolvingException, ConnectionException;
     }
 
+    /**
+     * Introspect the {@link List} of {@link ParameterModel} of the {@link ComponentModel} and filter the ones that are parts of the
+     * {@link MetadataKey} and creates a mapping with the order number of each part with their correspondent name.
+     *
+     * @param parameterModels of the {@link ComponentModel}
+     * @return the mapping of the order number of each part with their correspondent name
+     */
+    private Map<Integer, String> getPartOrderMapping(List<ParameterModel> parameterModels)
+    {
+        return parameterModels.stream()
+                .filter(part -> part.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+                .collect(toMap(part -> part.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder(), Described::getName));
+    }
+
+    /**
+     * Given a {@link MetadataKey}, this is navigated recursively cloning each {@link MetadataKey} of the tree structure
+     * creating a {@link PartAwareMetadataKeyBuilder} and adding the partName of each {@link MetadataKey} found.
+     *
+     * @param key              {@link MetadataKey} to be cloned and enriched
+     * @param partOrderMapping {@link Map} that contains the mapping of the name of each part of the {@link MetadataKey}
+     * @param level            the current level of the part of the {@link MetadataKey} to be cloned and enriched
+     * @return a {@link MetadataKeyBuilder} with the cloned and enriched keys
+     */
+    private MetadataKeyBuilder cloneAndEnrichMetadataKey(MetadataKey key, Map<Integer, String> partOrderMapping, int level)
+    {
+        final MetadataKeyBuilder keyBuilder = newKey(key.getId(), partOrderMapping.get(level))
+                .withDisplayName(key.getDisplayName());
+
+        key.getProperties().stream().forEach(keyBuilder::withProperty);
+        key.getChilds().forEach(childKey -> keyBuilder.withChild(cloneAndEnrichMetadataKey(childKey, partOrderMapping, level + 1)));
+        return keyBuilder;
+    }
 }

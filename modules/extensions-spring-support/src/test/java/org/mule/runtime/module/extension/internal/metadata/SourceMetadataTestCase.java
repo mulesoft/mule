@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
+
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -25,6 +26,7 @@ import com.google.common.reflect.TypeToken;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,11 +51,11 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
     @Test
     public void getSourceMetadataKeys()
     {
-        final MetadataResult<List<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
+        final MetadataResult<Set<MetadataKey>> metadataKeysResult = metadataManager.getMetadataKeys(componentId);
         assertThat(metadataKeysResult.isSuccess(), is(true));
-        final List<MetadataKey> metadataKeys = metadataKeysResult.get();
+        final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
         assertThat(metadataKeys.size(), is(3));
-        assertThat(metadataKeys.stream().map(MetadataKey::getId).collect(toList()), hasItems(PERSON, CAR, HOUSE));
+        assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
     }
 
     @Test

@@ -17,7 +17,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.core.util.ValueHolder;
 
-import java.util.List;
+import java.util.Set;
 
 public class TestThreadContextClassLoaderResolver implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String>
 {
@@ -34,7 +34,7 @@ public class TestThreadContextClassLoaderResolver implements MetadataKeysResolve
     }
 
     @Override
-    public List<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
+    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException
     {
         contextClassLoader.set(Thread.currentThread().getContextClassLoader());
         return TestMetadataResolverUtils.getKeys(context);

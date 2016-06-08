@@ -18,17 +18,17 @@ import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TestNoConfigMetadataResolver implements MetadataKeysResolver, MetadataOutputResolver<Object>, MetadataContentResolver<Object>
 {
 
-    public List<MetadataKey> getMetadataKeys(MetadataContext context)
+    public Set<MetadataKey> getMetadataKeys(MetadataContext context)
     {
         return Arrays.stream(KeyIds.values())
                 .map(e -> MetadataKeyBuilder.newKey(e.name()).build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     public MetadataType getContentMetadata(MetadataContext context, Object key)
