@@ -83,6 +83,7 @@ public class MetadataMediator
     private final List<ParameterModel> metadataKeyParts;
     private final SubTypesMappingContainer subTypesMappingContainer;
     private final ClassLoader extensionClassLoader;
+    private final MetadataKeyIdObjectResolver keyIdObjectResolver = new MetadataKeyIdObjectResolver();
 
     public MetadataMediator(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel)
     {
@@ -396,7 +397,7 @@ public class MetadataMediator
      */
     private Object getKeyId(MetadataKey key) throws MetadataResolvingException
     {
-        return new MetadataKeyIdObjectResolver().resolve(componentModel, key);
+        return keyIdObjectResolver.resolve(componentModel, key);
     }
 
     private interface MetadataDelegate

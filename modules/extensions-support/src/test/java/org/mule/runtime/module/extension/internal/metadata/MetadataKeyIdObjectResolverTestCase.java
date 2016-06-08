@@ -47,6 +47,7 @@ public class MetadataKeyIdObjectResolverTestCase
     private static final MetadataKey MULTILEVEL_KEY = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SFO, CITY))).build();
     private static final MetadataKey INCOMPLETE_MULTILEVEL_KEY = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY)).build();
     private static final String OPERATION_NAME = "SomeOperation";
+    private final MetadataKeyIdObjectResolver keyIdObjectResolver = new MetadataKeyIdObjectResolver();
 
     @Mock
     public ComponentModel componentModel;
@@ -62,8 +63,6 @@ public class MetadataKeyIdObjectResolverTestCase
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
-
-    MetadataKeyIdObjectResolver keyIdObjectResolver = new MetadataKeyIdObjectResolver();
 
     @Before
     public void setUp()

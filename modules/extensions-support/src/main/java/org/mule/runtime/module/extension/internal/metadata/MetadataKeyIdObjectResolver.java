@@ -66,7 +66,7 @@ final class MetadataKeyIdObjectResolver
         return isKeyLessComponent(metadataKeyParts) ? new NullMetadataKey().getId() : resolveMetadataKeyWhenPresent(key, component);
     }
 
-    private static Object resolveMetadataKeyWhenPresent(MetadataKey key, ComponentModel componentModel) throws MetadataResolvingException
+    private Object resolveMetadataKeyWhenPresent(MetadataKey key, ComponentModel componentModel) throws MetadataResolvingException
     {
 
         final MetadataType metadataType = componentModel
@@ -123,7 +123,7 @@ final class MetadataKeyIdObjectResolver
      * @return the KeyIdObject for the {@link MetadataKeyId} parameter
      * @throws MetadataResolvingException
      */
-    private static Object resolveMultiLevelKey(ComponentModel componentModel, MetadataKey key, Class metadataKeyType) throws MetadataResolvingException
+    private Object resolveMultiLevelKey(ComponentModel componentModel, MetadataKey key, Class metadataKeyType) throws MetadataResolvingException
     {
         final Map<Field, String> fieldValueMap = toFieldValueMap(metadataKeyType, key);
 
@@ -142,7 +142,7 @@ final class MetadataKeyIdObjectResolver
     }
 
 
-    private static Map<Field, String> toFieldValueMap(Class type, MetadataKey key) throws MetadataResolvingException
+    private Map<Field, String> toFieldValueMap(Class type, MetadataKey key) throws MetadataResolvingException
     {
         final Map<String, Field> metadataKeyParts = getAnnotatedFields(type, MetadataKeyPart.class).stream().collect(toMap(Field::getName, identity()));
         final Map<String, String> currentParts = getCurrentParts(key);
@@ -159,7 +159,7 @@ final class MetadataKeyIdObjectResolver
                 .collect(toMap(keyEntry -> metadataKeyParts.get(keyEntry.getKey()), Map.Entry::getValue));
     }
 
-    private static Map<String, String> getCurrentParts(MetadataKey key) throws MetadataResolvingException
+    private Map<String, String> getCurrentParts(MetadataKey key) throws MetadataResolvingException
     {
         Map<String, String> metadataKeyParts = new HashMap<>();
         metadataKeyParts.put(key.getPartName(), key.getId());
@@ -173,7 +173,7 @@ final class MetadataKeyIdObjectResolver
         return metadataKeyParts;
     }
 
-    private static void checkOneChildPerLevel(MetadataKey key) throws MetadataResolvingException
+    private void checkOneChildPerLevel(MetadataKey key) throws MetadataResolvingException
     {
         if (key.getChilds().size() > 1)
         {
@@ -182,18 +182,18 @@ final class MetadataKeyIdObjectResolver
         }
     }
 
-    private static MetadataResolvingException buildException(String message)
+    private MetadataResolvingException buildException(String message)
     {
         return buildException(message, null);
     }
 
-    private static MetadataResolvingException buildException(String message, Exception cause)
+    private MetadataResolvingException buildException(String message, Exception cause)
     {
         return cause == null ? new MetadataResolvingException(message, INVALID_METADATA_KEY)
                              : new MetadataResolvingException(message, INVALID_METADATA_KEY, cause);
     }
 
-    private static boolean isKeyLessComponent(List<ParameterModel> metadataKeyParts)
+    private boolean isKeyLessComponent(List<ParameterModel> metadataKeyParts)
     {
         return metadataKeyParts.isEmpty();
     }
