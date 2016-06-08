@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -14,18 +16,15 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,14 +63,14 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     public void responseHeadersAreMappedAsInboundProperties() throws MessagingException
     {
         httpResponseToMuleEvent.convert(event, httpResponse, null);
-        assertThat((String) event.getMessage().getInboundProperty(TEST_HEADER), equalTo(TEST_VALUE));
-        assertThat((List<String>) event.getMessage().getInboundProperty(TEST_MULTIPLE_HEADER), equalTo(Arrays.asList(TEST_VALUE, TEST_VALUE)));
+        assertThat(event.getMessage().getInboundProperty(TEST_HEADER), equalTo(TEST_VALUE));
+        assertThat(event.getMessage().getInboundProperty(TEST_MULTIPLE_HEADER), equalTo(asList(TEST_VALUE, TEST_VALUE)));
     }
 
     @Test
     public void previousInboundPropertiesAreRemoved() throws Exception
     {
-        event = getTestEvent(new DefaultMuleMessage(null, Collections.singletonMap("TestInboundProperty", TEST_VALUE), null, null, muleContext));
+        event = getTestEvent(new DefaultMuleMessage(null, singletonMap("TestInboundProperty", TEST_VALUE), null, null, muleContext));
         httpResponseToMuleEvent.convert(event, httpResponse, null);
         assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
     }
@@ -88,14 +87,14 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     public void statusCodeIsSetAsInboundProperty() throws MessagingException
     {
         httpResponseToMuleEvent.convert(event, httpResponse, null);
-        assertThat((Integer) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(200));
+        assertThat(event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(200));
     }
 
     @Test
     public void responsePhraseIsSetAsInboundProperty() throws MessagingException
     {
         httpResponseToMuleEvent.convert(event, httpResponse, null);
-        assertThat((String) event.getMessage().getInboundProperty(HTTP_REASON_PROPERTY), equalTo("OK"));
+        assertThat(event.getMessage().getInboundProperty(HTTP_REASON_PROPERTY), equalTo("OK"));
     }
 
 }

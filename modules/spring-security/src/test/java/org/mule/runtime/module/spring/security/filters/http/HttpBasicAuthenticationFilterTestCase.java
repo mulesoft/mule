@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.spring.security.filters.http;
 
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -22,8 +23,6 @@ import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.Collections;
-
 import org.junit.Test;
 
 public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTestCase
@@ -34,7 +33,7 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
     {
         MuleEvent oldEvent = RequestContext.getEvent();
 
-        MuleEvent event = getTestEvent(new DefaultMuleMessage("a", Collections.singletonMap(AUTHORIZATION, "Basic a"), null, null, muleContext));
+        MuleEvent event = getTestEvent(new DefaultMuleMessage("a", singletonMap(AUTHORIZATION, "Basic a"), null, null, muleContext));
         RequestContext.setEvent(event);
 
         HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();

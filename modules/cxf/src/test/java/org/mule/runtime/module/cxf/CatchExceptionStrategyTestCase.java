@@ -76,7 +76,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String, Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
