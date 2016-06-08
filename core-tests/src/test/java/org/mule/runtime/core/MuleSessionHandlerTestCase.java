@@ -175,7 +175,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     {
         final Serializable outbound = event.getMessage().removeOutboundProperty(MULE_SESSION_PROPERTY);
         final Object invocation = event.getFlowVariable(MULE_SESSION_PROPERTY);
-        event.removeFlowVariable((MULE_SESSION_PROPERTY));
+        event.removeFlowVariable(MULE_SESSION_PROPERTY);
         return outbound != null ? outbound : (Serializable) invocation;
     }
 
