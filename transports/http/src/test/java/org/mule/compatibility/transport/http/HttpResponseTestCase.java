@@ -11,14 +11,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -49,7 +48,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testHttpResponseError() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Serializable> properties = new HashMap<>();
         properties.put("errorMessage", "ERROR !!!! ");
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/error", muleMessage);
@@ -65,7 +64,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/move", muleMessage);
         assertEquals(HTTP_BODY, getPayloadAsString(response));
         assertEquals("" + HttpConstants.SC_MOVED_PERMANENTLY, response.getInboundProperty("http.status"));
-        assertEquals("http://localhost:9090/resources/moved", response.<Object>getInboundProperty("Location"));
+        assertEquals("http://localhost:9090/resources/moved", response.getInboundProperty("Location"));
     }
 
     @Test
@@ -90,7 +89,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testHttpResponseAllWithExpressions() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> properties = populateProperties();
+        Map<String, Serializable> properties = populateProperties();
 
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties, muleContext);
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/allExpressions",  muleMessage);
@@ -137,9 +136,9 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertThat((String) response.getOutboundProperty("testHeader"), equalTo("testValue"));
     }
 
-    private Map<String, Object> populateProperties()
+    private Map<String, Serializable> populateProperties()
     {
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Serializable> properties = new HashMap<>();
         properties.put("customBody", "Custom body");
         properties.put("contentType", "text/html");
         properties.put("status", HttpConstants.SC_NOT_FOUND);

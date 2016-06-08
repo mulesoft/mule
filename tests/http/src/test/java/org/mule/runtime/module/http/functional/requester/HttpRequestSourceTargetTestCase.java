@@ -65,7 +65,7 @@ public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
     public void responseBodyToCustomTarget() throws Exception
     {
         MuleEvent event = flowRunner("customTargetFlow").withPayload(TEST_MESSAGE).run();
-        InputStream customTarget = event.getMessage().getOutboundProperty("customTarget");
+        InputStream customTarget = event.getFlowVariable("customTarget");
         assertThat(customTarget, notNullValue());
         assertThat(IOUtils.toString(customTarget), equalTo(DEFAULT_RESPONSE));
         assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));

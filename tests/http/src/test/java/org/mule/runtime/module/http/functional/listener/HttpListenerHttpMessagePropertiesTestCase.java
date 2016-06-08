@@ -83,7 +83,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH), is(BASE_PATH));
         assertThat(message.<String>getInboundProperty(HttpConstants.RequestProperties.HTTP_QUERY_STRING), is(""));
         assertThat(message.getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS), notNullValue());
-        assertThat(message.<Map>getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS).isEmpty(), is(true));
+        assertThat(message.<ParameterMap>getInboundProperty(HttpConstants.RequestProperties.HTTP_URI_PARAMS).isEmpty(), is(true));
         final Map queryParams = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_QUERY_PARAMS);
         assertThat(queryParams, IsNull.notNullValue());
         assertThat(queryParams.size(), is(0));

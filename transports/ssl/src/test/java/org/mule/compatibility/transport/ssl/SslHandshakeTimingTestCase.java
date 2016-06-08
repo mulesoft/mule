@@ -11,16 +11,14 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.transport.ssl.SslConnector;
-import org.mule.compatibility.transport.ssl.SslMessageReceiver;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -74,7 +72,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
         SslConnector connector = new SslConnector(muleContext);
         connector.setSslHandshakeTimeout(1000);
 
-        Map<String, Object> properties = Collections.emptyMap();
+        Map<String, Serializable> properties = Collections.emptyMap();
 
         InboundEndpoint endpoint = mock(InboundEndpoint.class);
         when(endpoint.getProperties()).thenReturn(properties);

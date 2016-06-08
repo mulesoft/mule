@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public class HttpContinueFunctionalTestCase extends FunctionalTestCase
         params.setVersion(HttpVersion.HTTP_1_1);
         params.setBooleanParameter(HttpClientParams.USE_EXPECT_CONTINUE, true);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put(HttpConnector.HTTP_PARAMS_PROPERTY, params);
 
         stopWatch.start();

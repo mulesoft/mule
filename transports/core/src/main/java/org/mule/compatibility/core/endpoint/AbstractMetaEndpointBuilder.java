@@ -14,6 +14,7 @@ import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.BeanUtils;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -53,10 +54,10 @@ public abstract class AbstractMetaEndpointBuilder extends EndpointURIEndpointBui
     }
 
     @Override
-    public void setProperties(Map<Object, Object> properties)
+    public void setProperties(Map<String, Serializable> properties)
     {
         //This is required since properties were historically set as a properties map
-        for (Map.Entry<Object, Object> entry : properties.entrySet())
+        for (Map.Entry<String, Serializable> entry : properties.entrySet())
         {
             try
             {

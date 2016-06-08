@@ -6,23 +6,22 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static java.lang.Boolean.FALSE;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.transport.file.FileConnector;
-import org.mule.compatibility.transport.file.FileMessageReceiver;
-import org.mule.compatibility.transport.file.FileMuleMessageFactory;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.CreateException;
@@ -215,8 +214,8 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
         when(mockInboundEndpoint.getFilter()).thenReturn(null);
         when(mockFileConnector.createMuleMessageFactory()).thenReturn(mockMessageFactory);
         mockMessageFactory = new FileMuleMessageFactory();
-        when(mockMessage.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, PropertyScope.INBOUND, Boolean.FALSE)).thenReturn(true);
-        when(mockMessage.getInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY)).thenReturn(UUID.getUUID());
+        when(mockMessage.getInboundProperty(MULE_FORCE_SYNC_PROPERTY, FALSE)).thenReturn(true);
+        when(mockMessage.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY)).thenReturn(UUID.getUUID());
         when(mockHandledMessagingException.getEvent()).thenReturn(mockMuleEvent);
         when(mockUnhandledMessagingException.getEvent()).thenReturn(mockMuleEvent);
         when(mockMuleEvent.getFlowConstruct().getExceptionListener()).thenReturn(mockMessagingExceptionHandler);
@@ -237,8 +236,8 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
                 }
             }
         });
-        when(mockInboundEndpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mockMessageManager);
-        when(mockInboundEndpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
+        when(mockInboundEndpoint.getMuleContext().getRegistry().get(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mockMessageManager);
+        when(mockInboundEndpoint.getMuleContext().getRegistry().get(OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
     }
 
     private void configureWorkingDirectory(String workingDirectory)

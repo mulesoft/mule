@@ -15,6 +15,7 @@ import org.mule.runtime.module.cxf.example.HelloWorld;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import javax.jws.WebService;
@@ -48,7 +49,7 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
     @Test
     public void testReceivesComponentExceptionMessage() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Object>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null, muleContext);
 
         MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
 

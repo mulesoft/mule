@@ -24,6 +24,7 @@ import org.mule.runtime.module.xml.util.XMLTestUtils;
 import org.mule.runtime.module.xml.util.XMLUtils;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -74,7 +75,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
     @Override
     public Object getTestData()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
         return new DefaultMuleMessage(srcData, props, muleContext);

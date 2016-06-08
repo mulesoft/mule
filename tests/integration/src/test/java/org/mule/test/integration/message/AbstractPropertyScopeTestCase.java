@@ -30,7 +30,7 @@ public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase
                                               .getMessage();
 
         assertThat(result.getPayload(), is("test bar"));
-        assertThat(result.<Object> getOutboundProperty("foo"), is("fooValue"));
+        assertThat(result.getOutboundProperty("foo"), is("fooValue"));
     }
 
 }

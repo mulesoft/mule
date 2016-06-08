@@ -10,7 +10,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -78,7 +77,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
 
     private void removeProperty(MuleMessage message)
     {
-        message.removeProperty("foo", OUTBOUND);
+        message.removeOutboundProperty("foo");
     }
 
     @Test

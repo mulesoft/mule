@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
     public void testSendWithParams() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "noo");
         props.put("far", "nar");
         MuleMessage result = client.send("clientEndpoint2", null, props);
@@ -57,7 +58,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
     public void testSendWithBadParams() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("hoo", "noo");
         props.put("har", "nar");
 

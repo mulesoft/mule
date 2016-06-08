@@ -9,7 +9,6 @@ package org.mule.compatibility.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpRequest;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -17,6 +16,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,11 +84,11 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 
     private void doRequest(String path, Object cookiesObject) throws Exception
     {
-        Map<String, Object> outboundProperties = new HashMap<String, Object>();
+        Map<String, Serializable> outboundProperties = new HashMap<>();
 
         outboundProperties.put("COOKIE_HEADER", "MYCOOKIE");
         outboundProperties.put("PATH", path);
-        outboundProperties.put("cookies", cookiesObject);
+        outboundProperties.put("cookies", (Serializable) cookiesObject);
 
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, outboundProperties, muleContext);

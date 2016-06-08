@@ -32,7 +32,7 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase
                                              .getMessage();
 
         assertThat(result.getPayload(), is("test bar"));
-        assertThat(result.<Object> getOutboundProperty("foo4"), is("fooValue"));
+        assertThat(result.getOutboundProperty("foo4"), is("fooValue"));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.request("test://queueOut", RECEIVE_TIMEOUT);
         assertThat(result.getPayload(), is("test bar"));
-        assertThat(result.<Object> getOutboundProperty("foo2"), is("fooValue"));
+        assertThat(result.getOutboundProperty("foo2"), is("fooValue"));
     }
 
     @Test
@@ -60,6 +60,6 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.request("test://rrQueueOut", RECEIVE_TIMEOUT);
         assertThat(result.getPayload(), is("test baz"));
-        assertThat(result.<Object> getOutboundProperty("foo2"), is("rrfooValue"));
+        assertThat(result.getOutboundProperty("foo2"), is("rrfooValue"));
     }
 }

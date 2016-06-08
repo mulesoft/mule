@@ -19,6 +19,7 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase
         private String resultUri;
         private MuleMessage message;
         {
-            Map<String, Object> inbound = new HashMap<String, Object>();
+            Map<String, Serializable> inbound = new HashMap<>();
             inbound.put("prop1", "apple");
             inbound.put("prop2", "orange");
             inbound.put("prop3", "banana");

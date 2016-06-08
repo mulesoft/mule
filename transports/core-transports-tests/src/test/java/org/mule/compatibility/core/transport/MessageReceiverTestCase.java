@@ -16,7 +16,6 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -90,9 +89,8 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     {
         MuleMessage request = Mockito.mock(MuleMessage.class);
         when(request.getMuleContext()).thenReturn(muleContext);
-        when(
-            request.getProperty(Mockito.anyString(), any(PropertyScope.class), Mockito.eq(false)))
-            .thenReturn(Boolean.FALSE);
+        when(request.getInboundProperty(Mockito.anyString(), Mockito.eq(false))).thenReturn(Boolean.FALSE);
+        when(request.getOutboundProperty(Mockito.anyString(), Mockito.eq(false))).thenReturn(Boolean.FALSE);
         return request;
     }
 

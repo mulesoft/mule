@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import static org.mule.runtime.core.PropertyScope.INBOUND;
+import static org.mule.runtime.core.PropertyScope.OUTBOUND;
+import static org.mule.runtime.core.util.ClassUtils.equal;
+import static org.mule.runtime.core.util.ClassUtils.hash;
+import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static org.mule.runtime.core.util.ClassUtils.equal;
-import static org.mule.runtime.core.util.ClassUtils.hash;
 
 /**
  * <code>MessagePropertyFilter</code> can be used to filter against properties on
@@ -42,7 +43,7 @@ public class MessagePropertyFilter implements Filter
 
     private String propertyName;
     private String propertyValue;
-    private PropertyScope scope = PropertyScope.OUTBOUND;
+    private PropertyScope scope = OUTBOUND;
 
     private WildcardFilter wildcardFilter;
 
@@ -62,7 +63,16 @@ public class MessagePropertyFilter implements Filter
         {
             return false;
         }
-        Object value = message.getProperty(propertyName, scope);
+        Object value;
+        if(scope.equals(INBOUND))
+        {
+            value = message.getInboundProperty(propertyName);
+        }
+        else
+        {
+            value = message.getOutboundProperty(propertyName);
+        }
+
         boolean match;
         if (value == null)
         {

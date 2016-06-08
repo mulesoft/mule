@@ -8,16 +8,15 @@ package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
-
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import org.junit.Ignore;
@@ -66,7 +65,7 @@ public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutd
             {
                 try
                 {
-                    DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, new HashMap<String, Object>(), muleContext);
+                    DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, new HashMap<String, Serializable>(), muleContext);
                     MuleMessage result = client.send(url, muleMessage, HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation().method(POST.name()).build());
                     results[0] = result.getExceptionPayload().getException() instanceof DispatchException;
                 }

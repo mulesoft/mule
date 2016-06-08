@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -144,13 +145,13 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     }
 
     @Override
-    public Map getProperties()
+    public Map<String, Serializable> getProperties()
     {
         return endpoint.getProperties();
     }
 
     @Override
-    public Object getProperty(Object key)
+    public Serializable getProperty(Object key)
     {
         return endpoint.getProperty(key);
     }

@@ -17,7 +17,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -203,7 +202,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         Assert.assertSame(in, out);
         Assert.assertSame(in.getMessage(), out.getMessage());
         assertEquals(in.getMessage().getUniqueId(), out.getMessage().getUniqueId());
-        assertEquals(in.getMessage().getPropertyNames(OUTBOUND), out.getMessage().getPropertyNames(OUTBOUND));
+        assertEquals(in.getMessage().getOutboundPropertyNames(), out.getMessage().getOutboundPropertyNames());
         assertEquals("bar", out.getMessage().getOutboundProperty("foo"));
         assertEquals(in.getMessage().getPayload(), out.getMessage().getPayload());
     }
@@ -230,7 +229,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         Assert.assertNotSame(in, out);
         Assert.assertSame(in.getMessage(), out.getMessage());
         assertEquals(in.getMessage().getUniqueId(), out.getMessage().getUniqueId());
-        assertEquals(in.getMessage().getPropertyNames(OUTBOUND), out.getMessage().getPropertyNames(OUTBOUND));
+        assertEquals(in.getMessage().getOutboundPropertyNames(), out.getMessage().getOutboundPropertyNames());
         assertEquals("bar", out.getMessage().getOutboundProperty("foo"));
         assertEquals("", out.getMessage().getPayload());
     }

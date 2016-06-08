@@ -27,6 +27,7 @@ import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -246,14 +247,14 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
     }
 
-    private Map<String, Object> getMessageProperties()
+    private Map<String, Serializable> getMessageProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("host", "localhost");
         return props;
     }
 
-    private void testTransactionalScope(String flowName, String expected, Map<String, Object> messageProperties) throws Exception
+    private void testTransactionalScope(String flowName, String expected, Map<String, Serializable> messageProperties) throws Exception
     {
         flowRunner(flowName).withPayload(MESSAGE)
                             .withInboundProperties(messageProperties)
@@ -266,7 +267,7 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         assertNotNull(response);
     }
 
-    private void testExceptionStrategy(String flowName, Map<String, Object> messageProperties) throws Exception
+    private void testExceptionStrategy(String flowName, Map<String, Serializable> messageProperties) throws Exception
     {
         latch = spy(new CountDownLatch(2));
         flowRunner(flowName).withPayload(MESSAGE)

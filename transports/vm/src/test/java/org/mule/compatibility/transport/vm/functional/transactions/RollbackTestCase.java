@@ -10,6 +10,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.concurrent.Latch;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -37,7 +38,7 @@ public class RollbackTestCase extends FunctionalTestCase
         totalAccepted = new AtomicInteger(0);
         latch = new Latch();
         MuleClient client = muleContext.getClient();
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         for (int i = 0; i < 100; i++)
         {
             client.dispatch("vm://async", "Hello " + i, props);

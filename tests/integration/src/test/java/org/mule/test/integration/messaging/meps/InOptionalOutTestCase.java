@@ -15,6 +15,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class InOptionalOutTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertEquals(StringUtils.EMPTY, getPayloadAsString(result));
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "bar");
         result = client.send(listenerUrl, "some data", props);
         assertNotNull(result);

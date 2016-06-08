@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing.filters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleMessage;
@@ -144,7 +143,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
 
     private void removeProperty(MuleMessage message, String property)
     {
-        message.removeProperty(property, OUTBOUND);
+        message.removeOutboundProperty(property);
     }
 
     @Test

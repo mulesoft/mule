@@ -35,6 +35,7 @@ import com.google.common.net.MediaType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -84,7 +85,7 @@ public class HttpResponseToMuleEvent
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
         String encoding = getEncoding(responseContentType);
 
-        Map<String, Object> inboundProperties = getInboundProperties(response);
+        Map<String, Serializable> inboundProperties = getInboundProperties(response);
         Map<String, DataHandler> inboundAttachments = null;
         Object payload = responseInputStream;
 
@@ -163,9 +164,9 @@ public class HttpResponseToMuleEvent
         return encoding;
     }
 
-    private Map<String, Object> getInboundProperties(HttpResponse response)
+    private Map<String, Serializable> getInboundProperties(HttpResponse response)
     {
-        Map<String, Object> properties = new HashMap<>();
+        Map<String, Serializable> properties = new HashMap<>();
 
         for (String headerName : response.getHeaderNames())
         {
@@ -178,7 +179,7 @@ public class HttpResponseToMuleEvent
         return properties;
     }
 
-    private Object getHeaderValueToProperty(HttpResponse response, String headerName)
+    private Serializable getHeaderValueToProperty(HttpResponse response, String headerName)
     {
         Collection<String> headerValues = response.getHeaderValues(headerName);
         if (headerValues.size() > 1)

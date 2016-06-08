@@ -109,7 +109,7 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
     public void invalidSoapHeaderOutboundPropertyType() throws Exception
     {
         MessagingException e = flowRunner("testFlow").withPayload(ECHO_HEADERS_REQUEST)
-                              .withOutboundProperty(SOAP_HEADER_IN, new Object())
+                              .withOutboundProperty(SOAP_HEADER_IN, new String())
                               .runExpectingException();
 
         assertThat("Expected as header can't be converted to XML", e, instanceOf(TransformerMessagingException.class));

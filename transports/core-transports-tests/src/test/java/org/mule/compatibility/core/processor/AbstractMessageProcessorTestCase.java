@@ -44,6 +44,7 @@ import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -141,7 +142,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
 
     protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint) throws Exception
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("prop1", "value1");
         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext),
                 getTestFlow(), getTestSession(null, muleContext));
@@ -222,7 +223,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
 
     protected MuleEvent createTestOutboundEvent(MessagingExceptionHandler exceptionListener) throws Exception
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("prop1", "value1");
         props.put("port", 12345);
 

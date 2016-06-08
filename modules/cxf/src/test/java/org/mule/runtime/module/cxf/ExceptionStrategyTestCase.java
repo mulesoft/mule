@@ -29,6 +29,7 @@ import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -79,7 +80,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
         muleContext.registerListener(new ExceptionNotificationListener() {
@@ -99,7 +100,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testExceptionInCxfService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
         muleContext.registerListener(new ExceptionNotificationListener() {

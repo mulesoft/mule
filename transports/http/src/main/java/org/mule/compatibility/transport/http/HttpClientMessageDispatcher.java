@@ -29,6 +29,7 @@ import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
 
@@ -175,7 +176,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         MuleMessage msg = event.getMessage();
 
-        Object cookiesProperty = msg.getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+        Serializable cookiesProperty = msg.getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
         String cookieSpecProperty = (String) msg.getInboundProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY);
         processCookies(cookiesProperty, cookieSpecProperty, event);
 
@@ -230,7 +231,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     protected void setPropertyFromEndpoint(MuleEvent event, MuleMessage msg, String prop)
     {
-        Object o = msg.getOutboundProperty(prop);
+        Serializable o = msg.getOutboundProperty(prop);
         if (o == null)
         {
             o = endpoint.getProperty(prop);

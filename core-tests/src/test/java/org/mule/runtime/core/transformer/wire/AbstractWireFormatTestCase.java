@@ -6,24 +6,24 @@
  */
 package org.mule.runtime.core.transformer.wire;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
+import org.mule.runtime.core.transformer.simple.ObjectToString;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.runtime.core.transformer.simple.ObjectToString;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractWireFormatTestCase extends AbstractMuleContextTestCase
 {
@@ -32,7 +32,7 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleContextTest
     public void testWriteReadMessage() throws Exception
     {
         // Create message to send over wire
-        Map<String, Object> messageProerties = new HashMap<String, Object>();
+        Map<String, Serializable> messageProerties = new HashMap<>();
         messageProerties.put("key1", "val1");
         MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties, muleContext);
 

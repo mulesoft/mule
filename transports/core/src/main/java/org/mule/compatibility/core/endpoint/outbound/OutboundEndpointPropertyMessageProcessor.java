@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 /**
@@ -44,7 +45,7 @@ public class OutboundEndpointPropertyMessageProcessor implements MessageProcesso
             for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
             {
                 String prop = (String) iterator.next();
-                Object value = endpoint.getProperties().get(prop);
+                Serializable value = endpoint.getProperties().get(prop);
                 // don't overwrite property on the message
                 if (!ignoreProperty(event.getMessage(), prop))
                 {

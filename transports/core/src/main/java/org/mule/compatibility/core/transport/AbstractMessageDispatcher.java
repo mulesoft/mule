@@ -7,14 +7,14 @@
 package org.mule.compatibility.core.transport;
 
 import static org.mule.runtime.core.OptimizedRequestContext.unsafeSetEvent;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.ThreadSafeAccess;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -72,8 +71,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         {
             connect();
 
-            String prop = event.getMessage().getOutboundProperty(
-                MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY);
+            String prop = event.getMessage().getOutboundProperty(MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY);
             boolean disableTransportTransformer = (prop != null && Boolean.parseBoolean(prop))
                                                   || endpoint.isDisableTransportTransformer();
 
@@ -205,8 +203,8 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         }
         if (!remoteSync)
         {
-            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, PropertyScope.OUTBOUND);
-            event.removeFlowVariable(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+            event.getMessage().removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+            event.removeFlowVariable(MULE_REMOTE_SYNC_PROPERTY);
         }
         return remoteSync;
     }

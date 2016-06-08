@@ -6,6 +6,30 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static org.apache.commons.httpclient.HttpVersion.HTTP_1_1;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_CONTEXT_PATH_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_CONTEXT_URI_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_RELATIVE_PATH_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConstants.CRLF;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONNECTION;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_EXPECT;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_X_FORWARDED_FOR;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_CONNECT;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_DELETE;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_HEAD;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_OPTIONS;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PATCH;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_TRACE;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_BAD_REQUEST;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_CONTINUE;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROXY_ADDRESS;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.transport.AbstractTransportMessageProcessTemplate;
@@ -14,14 +38,12 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.execution.EndPhaseTemplate;
 import org.mule.runtime.core.execution.RequestResponseFlowProcessingPhaseTemplate;
@@ -122,7 +144,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
                     if (response.getHttpVersion().equals(HttpVersion.HTTP_1_0))
                     {
-                        connectionHeader = new Header(HttpConstants.HEADER_CONNECTION, "Keep-Alive");
+                        connectionHeader = new Header(HEADER_CONNECTION, "Keep-Alive");
                         response.setHeader(connectionHeader);
                     }
                 }
@@ -131,7 +153,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                     response.setKeepAlive(false);
                 }
             }
-            else if (request.getRequestLine().getHttpVersion().equals(HttpVersion.HTTP_1_1))
+            else if (request.getRequestLine().getHttpVersion().equals(HTTP_1_1))
             {
                 response.setKeepAlive(endpointKeepAliveValue);
             }
@@ -235,16 +257,16 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         // the processing will continue and the request will be fully
         // read immediately after
         HttpVersion requestVersion = requestLine.getHttpVersion();
-        if (HttpVersion.HTTP_1_1.equals(requestVersion))
+        if (HTTP_1_1.equals(requestVersion))
         {
-            Header expectHeader = request.getFirstHeader(HttpConstants.HEADER_EXPECT);
+            Header expectHeader = request.getFirstHeader(HEADER_EXPECT);
             if (expectHeader != null)
             {
                 String expectHeaderValue = expectHeader.getValue();
-                if (HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
+                if (HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
                 {
                     HttpResponse expected = new HttpResponse();
-                    expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
+                    expected.setStatusLine(requestLine.getHttpVersion(), SC_CONTINUE);
                     final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
                             getMuleContext()), getFlowConstruct());
                     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
@@ -292,18 +314,18 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     protected MuleMessage createMessageFromSource(Object message) throws MuleException
     {
         MuleMessage muleMessage = super.createMessageFromSource(message);
-        String path = muleMessage.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        String path = muleMessage.getInboundProperty(HTTP_REQUEST_PROPERTY);
         int i = path.indexOf('?');
         if (i > -1)
         {
             path = path.substring(0, i);
         }
 
-        muleMessage.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.INBOUND);
+        muleMessage.setInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path);
 
         if (logger.isDebugEnabled())
         {
-            logger.debug(muleMessage.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+            logger.debug(muleMessage.getInboundProperty(HTTP_REQUEST_PROPERTY));
         }
 
         // determine if the request path on this request denotes a different receiver
@@ -312,17 +334,11 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         // the response only needs to be transformed explicitly if
         // A) the request was not served or B) a null result was returned
         String contextPath = HttpConnector.normalizeUrl(getInboundEndpoint().getEndpointURI().getPath());
-        muleMessage.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY,
-                            contextPath,
-                            PropertyScope.INBOUND);
+        muleMessage.setInboundProperty(HTTP_CONTEXT_PATH_PROPERTY, contextPath);
 
-        muleMessage.setProperty(HttpConnector.HTTP_CONTEXT_URI_PROPERTY,
-                                getInboundEndpoint().getEndpointURI().getAddress(),
-                            PropertyScope.INBOUND);
+        muleMessage.setInboundProperty(HTTP_CONTEXT_URI_PROPERTY, getInboundEndpoint().getEndpointURI().getAddress());
 
-        muleMessage.setProperty(HttpConnector.HTTP_RELATIVE_PATH_PROPERTY,
-                            processRelativePath(contextPath, path),
-                            PropertyScope.INBOUND);
+        muleMessage.setInboundProperty(HTTP_RELATIVE_PATH_PROPERTY, processRelativePath(contextPath, path));
 
         processRemoteAddresses(muleMessage);
         return muleMessage;
@@ -339,30 +355,26 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
      */
     protected void processRemoteAddresses(MuleMessage muleMessage)
     {
-        String xForwardedFor = muleMessage.getInboundProperty(HttpConstants.HEADER_X_FORWARDED_FOR);
+        String xForwardedFor = muleMessage.getInboundProperty(HEADER_X_FORWARDED_FOR);
 
         if (StringUtils.isEmpty(xForwardedFor))
         {
-            muleMessage.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS,
-                    httpServerConnection.getRemoteClientAddress(), PropertyScope.INBOUND);
+            muleMessage.setInboundProperty(MULE_REMOTE_CLIENT_ADDRESS, httpServerConnection.getRemoteClientAddress());
             return;
         }
 
         String[] xForwardedForItems = StringUtils.splitAndTrim(xForwardedFor, ",");
         if (!ArrayUtils.isEmpty(xForwardedForItems))
         {
-            muleMessage.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS,
-                    xForwardedForItems[0], PropertyScope.INBOUND);
+            muleMessage.setInboundProperty(MULE_REMOTE_CLIENT_ADDRESS, xForwardedForItems[0]);
             if (xForwardedForItems.length > 1)
             {
-                muleMessage.setProperty(MuleProperties.MULE_PROXY_ADDRESS,
-                        xForwardedForItems[xForwardedForItems.length-1], PropertyScope.INBOUND);
+                muleMessage.setInboundProperty(MULE_PROXY_ADDRESS, xForwardedForItems[xForwardedForItems.length-1]);
             }
             else
             {
                 // If only one address has been passed, we can assume the connection address is a proxy
-                muleMessage.setProperty(MuleProperties.MULE_PROXY_ADDRESS,
-                        httpServerConnection.getRemoteClientAddress(), PropertyScope.INBOUND);
+                muleMessage.setInboundProperty(MULE_PROXY_ADDRESS, httpServerConnection.getRemoteClientAddress());
             }
         }
     }
@@ -410,15 +422,15 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
             String method = requestLine.getMethod();
 
-            if (!(method.equals(HttpConstants.METHOD_GET)
-                || method.equals(HttpConstants.METHOD_HEAD)
-                || method.equals(HttpConstants.METHOD_POST)
-                || method.equals(HttpConstants.METHOD_OPTIONS)
-                || method.equals(HttpConstants.METHOD_PUT)
-                || method.equals(HttpConstants.METHOD_DELETE)
-                || method.equals(HttpConstants.METHOD_TRACE)
-                || method.equals(HttpConstants.METHOD_CONNECT)
-                || method.equals(HttpConstants.METHOD_PATCH)))
+            if (!(method.equals(METHOD_GET)
+                || method.equals(METHOD_HEAD)
+                || method.equals(METHOD_POST)
+                || method.equals(METHOD_OPTIONS)
+                || method.equals(METHOD_PUT)
+                || method.equals(METHOD_DELETE)
+                || method.equals(METHOD_TRACE)
+                || method.equals(METHOD_CONNECT)
+                || method.equals(METHOD_PATCH)))
             {
                 badRequest = true;
                 return false;
@@ -454,8 +466,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
         OptimizedRequestContext.unsafeSetEvent(event);
         HttpResponse response = new HttpResponse();
-        response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
-        response.setBody(HttpMessages.malformedSyntax().toString() + HttpConstants.CRLF);
+        response.setStatusLine(requestLine.getHttpVersion(), SC_BAD_REQUEST);
+        response.setBody(HttpMessages.malformedSyntax().toString() + CRLF);
         return transformResponse(response);
     }
 
@@ -492,8 +504,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     {
         MuleEvent response = exception.getEvent();
         response.getMessage().setPayload(exception.getMessage());
-        httpStatus = response.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(response.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString()) : httpStatus;
-        response.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, httpStatus);
+        httpStatus = response.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(response.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY).toString()) : httpStatus;
+        response.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, httpStatus);
         HttpResponse httpResponse = transformResponse(response.getMessage());
         httpServerConnection.writeResponse(httpResponse, getThrottlingHeaders());
     }

@@ -14,6 +14,7 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class InOptionalOutOutOptionalInTestCase extends FunctionalTestCase
         // I don't think this is right for Out-Optional-In, but probably should be the behaviour for Out-In
         assertEquals("Received", result.getInboundProperty("externalApp"));
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "bar");
         result = client.send("inboundEndpoint", "some data", props);
         assertNotNull(result);

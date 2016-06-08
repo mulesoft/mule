@@ -8,12 +8,12 @@ package org.mule.test.integration.routing.replyto;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,8 +32,8 @@ public class ReplyToChainIntegration1TestCase extends FunctionalTestCase
     {
         String message = "test";
 
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
+        Map<String, Serializable> props = new HashMap<>();
+        props.put(MULE_REMOTE_SYNC_PROPERTY, "false");
 
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://pojo1", message, props);

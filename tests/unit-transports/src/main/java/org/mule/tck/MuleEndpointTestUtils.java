@@ -41,6 +41,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,7 @@ public final class MuleEndpointTestUtils
                                                          String uri,
                                                          List<Transformer> transformers,
                                                          Filter filter,
-                                                         Map<Object, Object> properties,
+                                                         Map<String, Serializable> properties,
                                                          Connector connector)
             throws Exception
     {
@@ -98,7 +99,7 @@ public final class MuleEndpointTestUtils
                                                            String uri,
                                                            List<Transformer> transformers,
                                                            Filter filter,
-                                                           Map<Object, Object> properties)
+                                                           Map<String, Serializable> properties)
             throws Exception
     {
         return (OutboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context,
@@ -117,7 +118,7 @@ public final class MuleEndpointTestUtils
                                                          String uri,
                                                          List<Transformer> transformers,
                                                          Filter filter,
-                                                         Map<Object, Object> properties)
+                                                         Map<String, Serializable> properties)
             throws Exception
     {
         return (InboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context,
@@ -136,7 +137,7 @@ public final class MuleEndpointTestUtils
                                                            String uri,
                                                            List<Transformer> transformers,
                                                            Filter filter,
-                                                           Map<Object, Object> properties,
+                                                           Map<String, Serializable> properties,
                                                            final Connector connector)
             throws Exception
     {
@@ -255,13 +256,13 @@ public final class MuleEndpointTestUtils
                                                      String uri,
                                                      List<Transformer> transformers,
                                                      Filter filter,
-                                                     Map<Object, Object> properties,
+                                                     Map<String, Serializable> properties,
                                                      MuleContext context,
                                                      EndpointSource source,
                                                      Connector connector)
             throws Exception
     {
-        final Map<String, Object> props = new HashMap<String, Object>();
+        final Map<String, Serializable> props = new HashMap<>();
         props.put("name", name);
         props.put("endpointURI", new MuleEndpointURI("test://test", context));
         props.put("connector", "testConnector");

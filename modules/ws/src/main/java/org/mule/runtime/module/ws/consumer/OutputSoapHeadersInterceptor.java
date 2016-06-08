@@ -6,17 +6,16 @@
  */
 package org.mule.runtime.module.ws.consumer;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.module.cxf.CxfConstants;
 
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -64,7 +63,7 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor
                     String key = WSConsumer.SOAP_HEADERS_PROPERTY_PREFIX + header.getName().getLocalPart();
                     String value = (String) transformer.transform(header.getObject());
 
-                    event.getMessage().setProperty(key, value, PropertyScope.INBOUND);
+                    event.getMessage().setInboundProperty(key, value);
                 }
                 catch (TransformerException e)
                 {

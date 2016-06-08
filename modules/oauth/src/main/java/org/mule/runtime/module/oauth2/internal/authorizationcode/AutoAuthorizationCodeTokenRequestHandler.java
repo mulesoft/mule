@@ -23,9 +23,7 @@ import static org.mule.runtime.module.oauth2.internal.OAuthConstants.REDIRECT_UR
 import static org.mule.runtime.module.oauth2.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.springframework.util.StringUtils.isEmpty;
-
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -274,7 +272,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         try
         {
             final MuleEvent muleEvent = DefaultMuleEvent.copy(currentEvent);
-            muleEvent.getMessage().clearProperties(PropertyScope.OUTBOUND);
+            muleEvent.getMessage().clearOutboundProperties();
             final String userRefreshToken = resourceOwnerOAuthContext.getRefreshToken();
             if (userRefreshToken == null)
             {

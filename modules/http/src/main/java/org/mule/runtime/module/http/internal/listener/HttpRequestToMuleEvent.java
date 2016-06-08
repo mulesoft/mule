@@ -15,12 +15,15 @@ import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedB
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
@@ -29,15 +32,14 @@ import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.util.IOUtils;
 
 import com.google.common.net.MediaType;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,8 +53,8 @@ public class HttpRequestToMuleEvent
     {
         final HttpRequest request = requestContext.getRequest();
         final Collection<String> headerNames = request.getHeaderNames();
-        Map<String, Object> inboundProperties = new HashMap<>();
-        Map<String, Object> outboundProperties = new HashMap<>();
+        Map<String, Serializable> inboundProperties = new HashMap<>();
+        Map<String, Serializable> outboundProperties = new HashMap<>();
         for (String headerName : headerNames)
         {
             final Collection<String> values = request.getHeaderValues(headerName);
@@ -62,7 +64,7 @@ public class HttpRequestToMuleEvent
             }
             else
             {
-                inboundProperties.put(headerName, values);
+                inboundProperties.put(headerName, new ArrayList<>(values));
             }
         }
 

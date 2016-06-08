@@ -21,6 +21,7 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,7 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
     {
         ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry()
             .lookupTransformer(name);
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "moo");
         props.put("bar", "mar");
 
@@ -117,7 +118,7 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
     {
         ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry()
             .lookupTransformer("testTransformer");
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "moo");
 
         MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props,
@@ -141,7 +142,7 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
     {
         ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry()
             .lookupTransformer("testTransformer2");
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "moo");
         props.put("bar", "mar");
 
@@ -167,7 +168,7 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
     {
         ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry()
             .lookupTransformer(name);
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "moo");
         props.put("bar", "mar");
 

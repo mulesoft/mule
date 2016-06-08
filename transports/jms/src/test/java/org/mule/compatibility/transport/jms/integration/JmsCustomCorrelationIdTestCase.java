@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class JmsCustomCorrelationIdTestCase extends AbstractJmsFunctionalTestCas
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("customCorrelation", "abcdefghij");
 
         MuleMessage response = client.send("vm://in4", TEST_MESSAGE, props);

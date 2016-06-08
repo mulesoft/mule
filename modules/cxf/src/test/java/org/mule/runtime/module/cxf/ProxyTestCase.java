@@ -36,6 +36,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -361,7 +362,7 @@ public class ProxyTestCase extends FunctionalTestCase
 
     private MuleMessage executeSoapCall(String msg, String soapAction, String path) throws MuleException
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         if (soapAction != null)
         {
             props.put("SOAPAction", soapAction);
@@ -628,23 +629,23 @@ public class ProxyTestCase extends FunctionalTestCase
                + "</soap:Body>" + "</soap:Envelope>";
     }
 
-    protected Map<String, Object> prepareOneWayTestProperties()
+    protected Map<String, Serializable> prepareOneWayTestProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("SOAPAction", "");
         return props;
     }
 
-    protected Map<String, Object> prepareOneWayWithSoapActionTestProperties()
+    protected Map<String, Serializable> prepareOneWayWithSoapActionTestProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("SOAPAction", "send");
         return props;
     }
 
-    protected Map<String, Object> prepareOneWaySpoofingTestProperties()
+    protected Map<String, Serializable> prepareOneWaySpoofingTestProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("SOAPAction", "hiddenAction");
         return props;
     }

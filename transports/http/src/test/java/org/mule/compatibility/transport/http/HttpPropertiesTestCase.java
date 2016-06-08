@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -46,7 +47,7 @@ public class HttpPropertiesTestCase extends FunctionalTestCase
     public void testPropertiesPostMethod() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        HashMap<String, Object> properties = new HashMap<String, Object>();
+        HashMap<String, Serializable> properties = new HashMap<>();
         properties.put("Content-Type","application/x-www-form-urlencoded");
 
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/client", new DefaultMuleMessage("name=John&lastname=Galt", properties, muleContext));

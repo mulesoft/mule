@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +65,7 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertEquals(NullPayload.getInstance(), result.getPayload());
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "bar");
         result = client.send("inboundEndpoint", "some data", props, 20000);
 

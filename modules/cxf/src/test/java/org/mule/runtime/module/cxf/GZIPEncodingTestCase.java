@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     @Test
     public void proxyWithGZIPRequestAndResponse() throws Exception
     {
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Serializable> properties = new HashMap<>();
         properties.put(CONTENT_ENCODING, "gzip,deflate");
         MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", new DefaultMuleMessage(gzip(getAllRequest), properties, muleContext), HTTP_REQUEST_OPTIONS);
         validateResponse(response);

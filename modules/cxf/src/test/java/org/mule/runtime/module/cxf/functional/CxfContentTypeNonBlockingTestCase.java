@@ -17,6 +17,7 @@ import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.junit.Rule;
@@ -46,7 +47,7 @@ public class CxfContentTypeNonBlockingTestCase extends FunctionalTestCase
     @Test
     public void testCxfService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         String contentType = received.getInboundProperty("content-type");
@@ -57,7 +58,7 @@ public class CxfContentTypeNonBlockingTestCase extends FunctionalTestCase
     @Test
     public void testCxfClient() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClient", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         String contentType = received.getInboundProperty("contentType");
@@ -69,7 +70,7 @@ public class CxfContentTypeNonBlockingTestCase extends FunctionalTestCase
     @Test
     public void testCxfClientProxy() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Object>)null, muleContext);
+        MuleMessage request = new DefaultMuleMessage("hello", (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClientProxy", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         String contentType = received.getInboundProperty("contentType");
@@ -80,7 +81,7 @@ public class CxfContentTypeNonBlockingTestCase extends FunctionalTestCase
 
     private SensingNullRequestResponseMessageProcessor getSensingInstance(String instanceBeanName)
     {
-        return ((SensingNullRequestResponseMessageProcessor)muleContext.getRegistry().lookupObject(instanceBeanName));
+        return ((SensingNullRequestResponseMessageProcessor) muleContext.getRegistry().lookupObject(instanceBeanName));
     }
 
 }

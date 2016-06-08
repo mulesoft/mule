@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core;
 
+import static org.mule.runtime.core.api.config.MuleProperties.ENDPOINT_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CREDENTIALS_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -16,7 +20,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.ThreadSafeAccess;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -92,7 +95,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     private final ProcessingTime processingTime;
     private Object replyToDestination;
 
-    protected String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
+    protected String[] ignoredPropertyOverrides = new String[]{MULE_METHOD_PROPERTY};
     private boolean notificationsEnabled = true;
 
     private transient Map<String, Object> serializedData = null;
@@ -530,8 +533,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         return transacted
                || isFlowConstructSynchronous()
                || exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy()
-               || message.getProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY,
-                                      PropertyScope.INBOUND, Boolean.FALSE);
+               || message.getInboundProperty(MULE_FORCE_SYNC_PROPERTY, Boolean.FALSE);
     }
 
     private boolean isFlowConstructSynchronous()
@@ -560,7 +562,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      */
     public boolean ignoreProperty(String key)
     {
-        if (key == null || key.startsWith(MuleProperties.ENDPOINT_PROPERTY_PREFIX))
+        if (key == null || key.startsWith(ENDPOINT_PROPERTY_PREFIX))
         {
             return true;
         }
@@ -579,7 +581,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public Credentials getCredentials()
     {
-        MuleCredentials creds = message.getOutboundProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY);
+        MuleCredentials creds = message.getOutboundProperty(MULE_CREDENTIALS_PROPERTY);
         return (credentials != null ? credentials : creds);
     }
 

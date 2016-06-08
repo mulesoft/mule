@@ -24,6 +24,7 @@ import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -437,7 +438,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         dispatchMessage(payload, null);
     }
 
-    protected void dispatchMessage(Object payload, Map<String, Object> props) throws Exception
+    protected void dispatchMessage(Object payload, Map<String, Serializable> props) throws Exception
     {
         client.dispatch(getInboundEndpoint(), payload, props);
     }

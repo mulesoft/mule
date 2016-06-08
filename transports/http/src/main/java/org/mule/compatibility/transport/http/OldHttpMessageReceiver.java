@@ -6,6 +6,35 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static org.apache.commons.httpclient.HttpVersion.HTTP_1_0;
+import static org.apache.commons.httpclient.HttpVersion.HTTP_1_1;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_CONTEXT_PATH_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_CONTEXT_URI_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_COOKIE_SPEC_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_RELATIVE_PATH_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PATH_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConstants.CRLF;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONNECTION;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_EXPECT;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_CONNECT;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_DELETE;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_HEAD;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_OPTIONS;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PATCH;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
+import static org.mule.compatibility.transport.http.HttpConstants.METHOD_TRACE;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_BAD_REQUEST;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_CONTINUE;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_METHOD_NOT_ALLOWED;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_NOT_ACCEPTABLE;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_NOT_FOUND;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
@@ -19,14 +48,12 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -190,7 +217,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
                         if (e instanceof MessagingException)
                         {
                             MuleEvent event = ((MessagingException) e).getEvent();
-                            httpStatus = event.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(event.getMessage().getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY).toString()) : httpStatus;
+                            httpStatus = event.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(event.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY).toString()) : httpStatus;
                             conn.writeResponse(buildFailureResponse(event, e.getMessage(),httpStatus));
                         }
                         else
@@ -235,15 +262,15 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             RequestLine requestLine = request.getRequestLine();
             String method = requestLine.getMethod();
 
-            if (method.equals(HttpConstants.METHOD_GET)
-                || method.equals(HttpConstants.METHOD_HEAD)
-                || method.equals(HttpConstants.METHOD_POST)
-                || method.equals(HttpConstants.METHOD_OPTIONS)
-                || method.equals(HttpConstants.METHOD_PUT)
-                || method.equals(HttpConstants.METHOD_DELETE)
-                || method.equals(HttpConstants.METHOD_TRACE)
-                || method.equals(HttpConstants.METHOD_CONNECT)
-                || method.equals(HttpConstants.METHOD_PATCH))
+            if (method.equals(METHOD_GET)
+                || method.equals(METHOD_HEAD)
+                || method.equals(METHOD_POST)
+                || method.equals(METHOD_OPTIONS)
+                || method.equals(METHOD_PUT)
+                || method.equals(METHOD_DELETE)
+                || method.equals(METHOD_TRACE)
+                || method.equals(METHOD_CONNECT)
+                || method.equals(METHOD_PATCH))
             {
                 return doRequest(request);
             }
@@ -259,18 +286,18 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
 
             final MuleMessage message = createMuleMessage(request);
 
-            String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+            String path = message.getInboundProperty(HTTP_REQUEST_PROPERTY);
             int i = path.indexOf('?');
             if (i > -1)
             {
                 path = path.substring(0, i);
             }
 
-            message.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.INBOUND);
+            message.setInboundProperty(HTTP_REQUEST_PATH_PROPERTY, path);
 
             if (logger.isDebugEnabled())
             {
-                logger.debug(message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+                logger.debug(message.getInboundProperty(HTTP_REQUEST_PROPERTY));
             }
 
             // determine if the request path on this request denotes a different receiver
@@ -282,17 +309,11 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             if (receiver != null)
             {
                 String contextPath = HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath());
-                message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY,
-                                    contextPath,
-                                    PropertyScope.INBOUND);
+                message.setInboundProperty(HTTP_CONTEXT_PATH_PROPERTY, contextPath);
 
-                message.setProperty(HttpConnector.HTTP_CONTEXT_URI_PROPERTY,
-                                    receiver.getEndpointURI().getAddress(),
-                                    PropertyScope.INBOUND);
+                message.setInboundProperty(HTTP_CONTEXT_URI_PROPERTY, receiver.getEndpointURI().getAddress());
 
-                message.setProperty(HttpConnector.HTTP_RELATIVE_PATH_PROPERTY,
-                                    processRelativePath(contextPath, path),
-                                    PropertyScope.INBOUND);
+                message.setInboundProperty(HTTP_RELATIVE_PATH_PROPERTY, processRelativePath(contextPath, path));
 
                 ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
 
@@ -357,9 +378,9 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
                     {
                         response.setKeepAlive(true);
 
-                        if (response.getHttpVersion().equals(HttpVersion.HTTP_1_0))
+                        if (response.getHttpVersion().equals(HTTP_1_0))
                         {
-                            connectionHeader = new Header(HttpConstants.HEADER_CONNECTION, "Keep-Alive");
+                            connectionHeader = new Header(HEADER_CONNECTION, "Keep-Alive");
                             response.setHeader(connectionHeader);
                         }
                     }
@@ -374,8 +395,8 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
                 EndpointURI uri = endpoint.getEndpointURI();
                 String failedPath = String.format("%s://%s:%d%s",
                                                   uri.getScheme(), uri.getHost(), uri.getPort(),
-                                                  message.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
-                response = buildFailureResponse(request.getRequestLine().getHttpVersion(), HttpConstants.SC_NOT_FOUND,
+                                                  message.getInboundProperty(HTTP_REQUEST_PATH_PROPERTY));
+                response = buildFailureResponse(request.getRequestLine().getHttpVersion(), SC_NOT_FOUND,
                                                 HttpMessages.cannotBindToAddress(failedPath).toString());
             }
             return response;
@@ -403,8 +424,8 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, (InboundEndpoint) endpoint);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
-            response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_METHOD_NOT_ALLOWED);
-            response.setBody(HttpMessages.methodNotAllowed(method).toString() + HttpConstants.CRLF);
+            response.setStatusLine(requestLine.getHttpVersion(), SC_METHOD_NOT_ALLOWED);
+            response.setBody(HttpMessages.methodNotAllowed(method).toString() + CRLF);
             return transformResponse(response, event);
         }
 
@@ -415,8 +436,8 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, (InboundEndpoint) endpoint);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
-            response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
-            response.setBody(HttpMessages.malformedSyntax().toString() + HttpConstants.CRLF);
+            response.setStatusLine(requestLine.getHttpVersion(), SC_BAD_REQUEST);
+            response.setBody(HttpMessages.malformedSyntax().toString() + CRLF);
             return transformResponse(response, event);
         }
 
@@ -429,16 +450,16 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             // the processing will continue and the request will be fully
             // read immediately after
             HttpVersion requestVersion = requestLine.getHttpVersion();
-            if (HttpVersion.HTTP_1_1.equals(requestVersion))
+            if (HTTP_1_1.equals(requestVersion))
             {
-                Header expectHeader = request.getFirstHeader(HttpConstants.HEADER_EXPECT);
+                Header expectHeader = request.getFirstHeader(HEADER_EXPECT);
                 if (expectHeader != null)
                 {
                     String expectHeaderValue = expectHeader.getValue();
-                    if (HttpConstants.HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
+                    if (HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue))
                     {
                         HttpResponse expected = new HttpResponse();
-                        expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
+                        expected.setStatusLine(requestLine.getHttpVersion(), SC_CONTINUE);
                         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
                                 getEndpoint().getMuleContext()), flowConstruct);
                         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, (InboundEndpoint) endpoint);
@@ -451,7 +472,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
 
         private HttpResponse buildFailureResponse(MuleEvent event, String description, int httpStatusCode) throws MuleException
         {
-            event.getMessage().setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY,httpStatusCode);
+            event.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, httpStatusCode);
             event.getMessage().setPayload(description);
             return transformResponse(event.getMessage(), event);
         }
@@ -471,7 +492,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
 
         protected void preRouteMessage(MuleMessage message) throws MessagingException
         {
-            message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress, PropertyScope.INBOUND);
+            message.setInboundProperty(MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress);
         }
 
         @Override
@@ -495,7 +516,7 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
     protected MessageReceiver getTargetReceiver(MuleMessage message, ImmutableEndpoint ep)
             throws ConnectException
     {
-        String path = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        String path = message.getInboundProperty(HTTP_REQUEST_PROPERTY);
         int i = path.indexOf('?');
         if (i > -1)
         {
@@ -592,11 +613,11 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
             factory = (HttpMuleMessageFactory) super.createMuleMessageFactory();
 
             boolean enableCookies = MapUtils.getBooleanValue(endpoint.getProperties(),
-                                                             HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector) connector).isEnableCookies());
+                                                             HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector) connector).isEnableCookies());
             factory.setEnableCookies(enableCookies);
 
             String cookieSpec = MapUtils.getString(endpoint.getProperties(),
-                                                   HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
+                                                   HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector) connector).getCookieSpec());
             factory.setCookieSpec(cookieSpec);
 
             factory.setExchangePattern(endpoint.getExchangePattern());
@@ -616,11 +637,11 @@ public class OldHttpMessageReceiver extends TcpMessageReceiver
         if (logger.isDebugEnabled())
         {
             logger.debug("Message request '"
-                         + message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY)
+                         + message.getInboundProperty(HTTP_REQUEST_PROPERTY)
                          + "' is being rejected since it does not match the filter on this endpoint: "
                          + endpoint);
         }
-        message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(HttpConstants.SC_NOT_ACCEPTABLE));
+        message.setOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(SC_NOT_ACCEPTABLE));
         return message;
     }
 }

@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.StringMessageUtils;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -167,7 +168,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
     {
         for (String name : magicProperties)
         {
-            Object value = in.getInboundProperty(name);
+            Serializable value = in.getInboundProperty(name);
             if (value != null)
             {
                 out.setOutboundProperty(name, value);

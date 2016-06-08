@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.cxf;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.PropertyScope;
 
 import java.util.Iterator;
 
@@ -53,7 +55,7 @@ public class MuleSoapHeaders
         setCorrelationSequence(String.valueOf(event.getMessage().getCorrelationSequence()));
 
         // only propogate the reply to header if it's in the outbound scope
-        Object replyTo = event.getMessage().getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, PropertyScope.OUTBOUND);
+        Object replyTo = event.getMessage().getOutboundProperty(MULE_REPLY_TO_PROPERTY);
         if (replyTo != null)
         {
             setReplyTo(replyTo.toString());
@@ -106,19 +108,19 @@ public class MuleSoapHeaders
                 String localName = element.getLocalName();
                 String elementValue = getStringValue(element);
 
-                if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(localName))
+                if (MULE_CORRELATION_ID_PROPERTY.equals(localName))
                 {
                     correlationId = elementValue;
                 }
-                else if (MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(localName))
+                else if (MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(localName))
                 {
                     correlationGroup = elementValue;
                 }
-                else if (MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(localName))
+                else if (MULE_CORRELATION_SEQUENCE_PROPERTY.equals(localName))
                 {
                     correlationSequence = elementValue;
                 }
-                else if (MuleProperties.MULE_REPLY_TO_PROPERTY.equals(localName))
+                else if (MULE_REPLY_TO_PROPERTY.equals(localName))
                 {
                     replyTo = elementValue;
                 }
@@ -169,18 +171,18 @@ public class MuleSoapHeaders
 
         if (correlationId != null)
         {
-            SOAPElement e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
-                MULE_NAMESPACE);
+            SOAPElement e = muleHeader.addChildElement(MULE_CORRELATION_ID_PROPERTY,
+                                                       MULE_NAMESPACE);
             e.addTextNode(correlationId);
-            e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-                MULE_NAMESPACE);
+            e = muleHeader.addChildElement(MULE_CORRELATION_GROUP_SIZE_PROPERTY,
+                                           MULE_NAMESPACE);
             e.addTextNode(correlationGroup);
-            e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, MULE_NAMESPACE);
+            e = muleHeader.addChildElement(MULE_CORRELATION_SEQUENCE_PROPERTY, MULE_NAMESPACE);
             e.addTextNode(correlationSequence);
         }
         if (replyTo != null)
         {
-            SOAPElement e = muleHeader.addChildElement(MuleProperties.MULE_REPLY_TO_PROPERTY, MULE_NAMESPACE);
+            SOAPElement e = muleHeader.addChildElement(MULE_REPLY_TO_PROPERTY, MULE_NAMESPACE);
             // String enc = (String)encoder.transform(replyTo);
             // e.addTextNode(enc);
             e.addTextNode(replyTo);
@@ -203,24 +205,24 @@ public class MuleSoapHeaders
         if (correlationId != null)
         {
             Node e = muleHeader.appendChild(new DOMElement(new QName(
-                MuleProperties.MULE_CORRELATION_ID_PROPERTY, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
+                MULE_CORRELATION_ID_PROPERTY, new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
             e.setNodeValue(correlationId);
 
             e = muleHeader.appendChild(new DOMElement(new QName(
-                MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, new Namespace(MULE_NAMESPACE,
+                MULE_CORRELATION_GROUP_SIZE_PROPERTY, new Namespace(MULE_NAMESPACE,
                     MULE_10_ACTOR))));
             e.setNodeValue(correlationGroup);
 
             e = muleHeader.appendChild(new DOMElement(new QName(
-                MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, new Namespace(MULE_NAMESPACE,
+                MULE_CORRELATION_SEQUENCE_PROPERTY, new Namespace(MULE_NAMESPACE,
                     MULE_10_ACTOR))));
             e.setNodeValue(correlationSequence);
         }
         if (replyTo != null)
         {
 
-            Node e = muleHeader.appendChild(new DOMElement(new QName(MuleProperties.MULE_REPLY_TO_PROPERTY,
-                new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
+            Node e = muleHeader.appendChild(new DOMElement(new QName(MULE_REPLY_TO_PROPERTY,
+                                                                     new Namespace(MULE_NAMESPACE, MULE_10_ACTOR))));
             e.setNodeValue(replyTo);
         }
         return muleHeader;

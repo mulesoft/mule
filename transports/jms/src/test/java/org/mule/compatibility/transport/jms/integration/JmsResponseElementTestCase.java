@@ -8,13 +8,12 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +40,7 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://vminbound", "some message", null);
         assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
-        assertThat(response.<String>getProperty("test", PropertyScope.INBOUND), Is.is("test"));
+        assertThat(response.getInboundProperty("test"), Is.is("test"));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
     }
 
@@ -59,9 +58,9 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Object> messageProperties = new HashMap<String, Object>();
+        Map<String, Serializable> messageProperties = new HashMap<>();
         String replyToUri = "jms://out2";
-        messageProperties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, replyToUri);
+        messageProperties.put(MULE_REPLY_TO_PROPERTY, replyToUri);
 
         client.dispatch("jms://out", MESSAGE, messageProperties);
 

@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.transformer.wire;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWireFormatTestCase
 {
@@ -25,7 +25,7 @@ public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWire
     public void testWriteReadMessage() throws Exception
     {
         // Create message to send over wire
-        Map<String, Object> messageProerties = new HashMap<String, Object>();
+        Map<String, Serializable> messageProerties = new HashMap<>();
         messageProerties.put("key1", "val1");
         MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties, muleContext);
 

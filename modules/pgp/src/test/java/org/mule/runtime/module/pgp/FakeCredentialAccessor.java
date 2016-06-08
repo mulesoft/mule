@@ -9,6 +9,8 @@ package org.mule.runtime.module.pgp;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 
+import java.io.Serializable;
+
 public class FakeCredentialAccessor implements CredentialsAccessor
 {
     private String credentials = "Mule client <mule_client@mule.com>";
@@ -33,12 +35,12 @@ public class FakeCredentialAccessor implements CredentialsAccessor
         this.credentials = credentials;
     }
 
-    public Object getCredentials(MuleEvent event)
+    public Serializable getCredentials(MuleEvent event)
     {
         return this.credentials;
     }
 
-    public void setCredentials(MuleEvent event, Object credentials)
+    public void setCredentials(MuleEvent event, Serializable credentials)
     {
         // dummy
     }

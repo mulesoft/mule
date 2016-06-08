@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.spring.security.filters.http;
 
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -13,16 +14,12 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
-
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -36,9 +33,7 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
     {
         MuleEvent oldEvent = RequestContext.getEvent();
 
-        MuleEvent event = this.getTestEvent("a");
-        MuleMessage message = event.getMessage();
-        message.setProperty(AUTHORIZATION, "Basic a", PropertyScope.INBOUND);
+        MuleEvent event = getTestEvent(new DefaultMuleMessage("a", singletonMap(AUTHORIZATION, "Basic a"), null, null, muleContext));
         RequestContext.setEvent(event);
 
         HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();
@@ -46,8 +41,7 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
         SecurityManager manager = mock(SecurityManager.class);
         filter.setSecurityManager(manager);
 
-        doThrow(new UnauthorisedException(null, (MuleEvent) null)).when(manager).authenticate(
-            (Authentication) anyObject());
+        doThrow(new UnauthorisedException(null, (MuleEvent) null)).when(manager).authenticate(anyObject());
 
         try
         {
@@ -56,8 +50,8 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
         }
         catch (UnauthorisedException e)
         {
-            assertNotNull(event.getMessage().getProperty("WWW-Authenticate", OUTBOUND));
-            assertEquals("Basic realm=", event.getMessage().getProperty("WWW-Authenticate", OUTBOUND));
+            assertNotNull(event.getMessage().getOutboundProperty("WWW-Authenticate"));
+            assertEquals("Basic realm=", event.getMessage().getOutboundProperty("WWW-Authenticate"));
             verify(manager);
         }
         RequestContext.setEvent(oldEvent);

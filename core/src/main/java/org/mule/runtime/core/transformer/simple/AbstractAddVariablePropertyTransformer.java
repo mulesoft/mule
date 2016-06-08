@@ -19,7 +19,7 @@ import org.mule.runtime.core.util.StringUtils;
 
 import java.text.MessageFormat;
 
-public abstract class AbstractAddVariablePropertyTransformer extends AbstractMessageTransformer
+public abstract class AbstractAddVariablePropertyTransformer<T> extends AbstractMessageTransformer
 {
     private AttributeEvaluator identifierEvaluator;
     private AttributeEvaluator valueEvaluator;
@@ -49,7 +49,7 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
         }
         else
         {
-            TypedValue typedValue = valueEvaluator.resolveTypedValue(event);
+            TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
             if (typedValue.getValue() == null || typedValue.getValue() instanceof NullPayload)
             {
                 removeProperty(event, key);
@@ -86,7 +86,7 @@ public abstract class AbstractAddVariablePropertyTransformer extends AbstractMes
      * @param value   value of the property or variable to add
      * @param dataType  data type of the property or variable to add
      */
-    protected abstract void addProperty(MuleEvent event, String propertyName, Object value, DataType dataType);
+    protected abstract void addProperty(MuleEvent event, String propertyName, T value, DataType dataType);
 
     /**
      * Removes the property from a property or variables scope.

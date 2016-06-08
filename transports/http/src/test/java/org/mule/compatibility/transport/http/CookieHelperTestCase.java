@@ -6,8 +6,12 @@
  */
 package org.mule.compatibility.transport.http;
 
-import org.mule.compatibility.transport.http.CookieHelper;
-import org.mule.compatibility.transport.http.CookieStorageType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Date;
@@ -18,13 +22,6 @@ import java.util.Map;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.cookie.MalformedCookieException;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class CookieHelperTestCase extends AbstractMuleTestCase
 {
@@ -147,7 +144,7 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
     @Test
     public void testAsArrayOfCookies_CookiesInMap() throws Exception
     {
-        Map<String, String> cookiesObject = new LinkedHashMap<String, String>();
+        Map<String, String> cookiesObject = new LinkedHashMap<>();
         cookiesObject.put(COOKIE_1_NAME, COOKIE_1_ORIGINAL_VALUE);
         cookiesObject.put(COOKIE_2_NAME, COOKIE_2_VALUE);
 
@@ -177,7 +174,7 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
 
         try
         {
-            CookieStorageType.resolveCookieStorageType(new Object());
+            CookieStorageType.resolveCookieStorageType(new String());
             fail("It should have thrown an exception since Object it is not a valid type");
         }
         catch (IllegalArgumentException e)

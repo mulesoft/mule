@@ -14,13 +14,10 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
-import org.mule.compatibility.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -29,6 +26,7 @@ import org.mule.runtime.core.message.OutputHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -127,13 +125,13 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
         final String contentType = "text/xml";
         final String wrongContentType = "text/json";
-        Map<String, Object> outboundProperties =  new HashMap<String, Object>();
+        Map<String, Serializable> outboundProperties =  new HashMap<>();
         outboundProperties.put(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);
         MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
         MuleMessage msg = new DefaultMuleMessage(null,outboundProperties, muleContext);
         //Making sure that the outbound property overrides both invocation and inbound
         msg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);
-        msg.setProperty(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType, PropertyScope.INBOUND);
+        msg.setInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);
         
         msg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
 

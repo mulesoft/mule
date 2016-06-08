@@ -10,12 +10,12 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -26,10 +26,14 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MuleProtocolHeadersOutInterceptor
     extends AbstractPhaseInterceptor<Message>
 {
+
+    private static final Logger logger = LoggerFactory.getLogger(MuleProtocolHeadersOutInterceptor.class);
 
     public MuleProtocolHeadersOutInterceptor()
     {
@@ -83,10 +87,17 @@ public class MuleProtocolHeadersOutInterceptor
 
     private void extractAndSet(Message message, MuleMessage muleMsg, String cxfHeader, String muleHeader)
     {
-        Object val = message.get(cxfHeader);
-        if (val != null)
+        if(message.get(cxfHeader) instanceof Serializable)
         {
-            muleMsg.setOutboundProperty(muleHeader, val);
+            Serializable val = (Serializable) message.get(cxfHeader);
+            if (val != null)
+            {
+                muleMsg.setOutboundProperty(muleHeader, val);
+            }
+        }
+        else
+        {
+            logger.warn("The header " + cxfHeader + "is not serializable and will not be propagated by Mule");
         }
     }
 

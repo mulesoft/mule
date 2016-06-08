@@ -9,7 +9,6 @@ package org.mule.compatibility.transport.tcp.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
@@ -91,7 +90,7 @@ public class StreamingTestCase extends FunctionalTestCase
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
 
         client.dispatch(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("testComponent")).getMessageSource()).getAddress(),
-            TEST_MESSAGE, new HashMap<String, Object>());
+            TEST_MESSAGE, new HashMap());
 
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT, message.get());

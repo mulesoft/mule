@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.connector;
 
-import static org.mule.runtime.core.PropertyScope.OUTBOUND;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -62,13 +61,13 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
 
         // make sure remove the replyTo property as not cause a a forever
         // replyto loop
-        returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, OUTBOUND);
-        event.removeFlowVariable(MuleProperties.MULE_REPLY_TO_PROPERTY);
+        returnMessage.removeOutboundProperty(MULE_REPLY_TO_PROPERTY);
+        event.removeFlowVariable(MULE_REPLY_TO_PROPERTY);
 
         // MULE-4617. This is fixed with MULE-4620, but lets remove this property
         // anyway as it should never be true from a replyTo dispatch
-        returnMessage.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, OUTBOUND);
-        event.removeFlowVariable(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+        returnMessage.removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+        event.removeFlowVariable(MULE_REMOTE_SYNC_PROPERTY);
 
         //TODO See MULE-9307 - re-add behaviour to process reply to destination dispatching with new connectors
     }

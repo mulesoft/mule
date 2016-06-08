@@ -60,7 +60,7 @@ public class ExpiredShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeou
             {
                 try
                 {
-                    DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, new HashMap<String, Object>(), muleContext);
+                    DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, new HashMap(), muleContext);
                     flowRunner(flowName).withPayload(muleMessage).asynchronously().run();
 
                     MuleMessage response = client.request("test://response", RECEIVE_TIMEOUT);

@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -80,7 +81,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
     }
 
     @Override
-    protected void assertValidResponse(String address, Map<String, Object> properties) throws Exception
+    protected void assertValidResponse(String address, Map<String, Serializable> properties) throws Exception
     {
         MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST, properties, muleContext);
         MuleClient client = muleContext.getClient();

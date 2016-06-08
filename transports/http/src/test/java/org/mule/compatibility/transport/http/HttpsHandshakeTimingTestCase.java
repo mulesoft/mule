@@ -9,14 +9,8 @@ package org.mule.compatibility.transport.http;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.compatibility.transport.http.HttpMessageProcessTemplate;
-import org.mule.compatibility.transport.http.HttpServerConnection;
-import org.mule.compatibility.transport.http.HttpsConnector;
-import org.mule.compatibility.transport.http.HttpsMessageReceiver;
 import org.mule.compatibility.transport.ssl.MockHandshakeCompletedEvent;
 import org.mule.compatibility.transport.ssl.MockSslSocket;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -29,6 +23,7 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.ByteArrayInputStream;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
@@ -77,8 +72,8 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
         messageContext.acquireMessage();
         serverConnection.readRequest();
         MuleEvent muleEvent = messageContext.beforeRouteEvent(getTestEvent(message));
-        assertNotNull(muleEvent.getMessage().<Object>getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
-        assertNotNull(muleEvent.getMessage().<Object>getOutboundProperty(HttpsConnector.PEER_CERTIFICATES));
+        assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
+        assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.PEER_CERTIFICATES));
     }
 
     private void invokeHandshakeCompleted(HttpServerConnection serverConnection, MockSslSocket socket) throws Exception
@@ -92,7 +87,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
         HttpsConnector httpsConnector = new HttpsConnector(muleContext);
         httpsConnector.setSslHandshakeTimeout(1000);
 
-        Map<String, Object> properties = Collections.emptyMap();
+        Map<String, Serializable> properties = Collections.emptyMap();
 
         InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class, Answers.RETURNS_DEEP_STUBS.get());
         when(inboundEndpoint.getConnector()).thenReturn(httpsConnector);

@@ -83,7 +83,7 @@ public interface ImmutableEndpoint extends Serializable, NamedObject, LegacyImmu
      *
      * @return a map of properties for this endpoint
      */
-    Map getProperties();
+    Map<String, Serializable> getProperties();
 
     /**
      * Retrieves a property set on the endpoint
@@ -91,7 +91,7 @@ public interface ImmutableEndpoint extends Serializable, NamedObject, LegacyImmu
      * @param key the name of the property
      * @return the property value or null if it does not exist
      */
-    Object getProperty(Object key);
+    Serializable getProperty(Object key);
 
     /**
      * The transport protocol name that the message endpoint communicates over. i.e.

@@ -23,6 +23,7 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
         {
             if ("component1".equals(context.getFlowConstruct().getName()))
             {
-                Map<String, Object> props = new HashMap<String, Object>();
+                Map<String, Serializable> props = new HashMap<>();
                 props.put("stringParam", "param1");
                 props.put("objectParam", new Apple());
                 props.put("doubleParam", 12345.6);

@@ -12,7 +12,6 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.size.SmallTest;
@@ -37,13 +36,13 @@ public class AddPropertyTransformerTestCase extends AbstractAddVariablePropertyT
     @Override
     protected void verifyNotAdded(MuleEvent event)
     {
-        verify(event.getMessage(), times(0)).setProperty((String) isNull(), anyString(),
-                                                                                 argThat(equalTo(PropertyScope.OUTBOUND)));
+        verify(event.getMessage(), times(0)).setOutboundProperty((String) isNull(), anyString()
+        );
     }
 
     @Override
     protected void verifyRemoved(MuleEvent event, String key)
     {
-        verify(event.getMessage()).removeProperty(key, PropertyScope.OUTBOUND);
+        verify(event.getMessage()).removeOutboundProperty(key);
     }
 }
