@@ -26,8 +26,10 @@ import org.mule.compatibility.module.cxf.component.WebServiceWrapperComponent;
 import org.mule.compatibility.module.cxf.config.JaxWsClientWithDecoupledEndpointFactoryBean;
 import org.mule.compatibility.module.cxf.config.ProxyClientWithDecoupledEndpointFactoryBean;
 import org.mule.compatibility.module.cxf.config.SimpleClientWithDecoupledEndpointFactoryBean;
+import org.mule.compatibility.module.management.agent.DefaultTransportJmxSupportAgent;
 import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.AddAttribute;
@@ -102,7 +104,8 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
 
         // Management
         registerBeanDefinitionParser("publish-notifications", new DefaultNameMuleOrphanDefinitionParser(EndpointNotificationLoggerAgent.class));
-        registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
-
+        MuleDefinitionParserConfiguration defaultJmxParser = registerMuleBeanDefinitionParser("jmx-default-config", new DefaultNameMuleOrphanDefinitionParser(DefaultTransportJmxSupportAgent.class));
+        defaultJmxParser.addAlias("registerMx4jAdapter", "loadMx4jAgent");
+        defaultJmxParser.addAlias("registerLog4j", "loadLog4jAgent");
     }
 }

@@ -9,7 +9,7 @@ package org.mule.compatibility.management.mbeans;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.compatibility.module.management.agent.TranspotsJmxApplicationAgent;
+import org.mule.compatibility.module.management.agent.TransportsJmxApplicationAgent;
 import org.mule.compatibility.module.management.agent.mbean.ConnectorService;
 import org.mule.compatibility.module.management.agent.mbean.EndpointService;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -46,7 +46,7 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        TranspotsJmxApplicationAgent jmxAgent = (TranspotsJmxApplicationAgent) muleContext.getRegistry().lookupAgent("transports-jmx-agent");
+        TransportsJmxApplicationAgent jmxAgent = (TransportsJmxApplicationAgent) muleContext.getRegistry().lookupAgent("transports-jmx-agent");
         jmxSupport = jmxAgent.getJmxSupportFactory().getJmxSupport();
         domainName = jmxSupport.getDomainName(muleContext);
         mBeanServer = jmxAgent.getMBeanServer();

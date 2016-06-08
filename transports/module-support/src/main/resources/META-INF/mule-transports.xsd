@@ -832,6 +832,8 @@
     </xsd:complexType>
     
     <!-- Management -->
+    <xsd:element name="jmx-default-config" type="management:jmxDefaultConfigType" substitutionGroup="mule:abstract-agent"/>
+
     <xsd:element name="publish-notifications" type="publishNotificationType" substitutionGroup="mule:abstract-agent"/>
     <xsd:complexType name="publishNotificationType">
         <xsd:complexContent>
