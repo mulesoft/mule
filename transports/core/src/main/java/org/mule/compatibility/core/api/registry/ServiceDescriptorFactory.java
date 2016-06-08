@@ -15,9 +15,7 @@ import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
 import org.mule.compatibility.core.util.SpiUtils;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.registry.ServiceDescriptor;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.api.registry.ServiceFinder;
 import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.ClassUtils;
@@ -80,7 +78,7 @@ public class ServiceDescriptorFactory
         String serviceFinderClass = (String) props.remove(MuleProperties.SERVICE_FINDER);
 
         ServiceDescriptor sd;
-        if (type.equals(ServiceType.TRANSPORT))
+        if (type.equals(LegacyServiceType.TRANSPORT))
         {
             try
             {
@@ -126,7 +124,7 @@ public class ServiceDescriptorFactory
             {
                 // Recursively look up the service descriptor for the real service.
                 return lookupServiceDescriptor(muleContext.getRegistry(),
-                        ServiceType.TRANSPORT, realService, overrides);
+                        LegacyServiceType.TRANSPORT, realService, overrides);
             }
             else
             {

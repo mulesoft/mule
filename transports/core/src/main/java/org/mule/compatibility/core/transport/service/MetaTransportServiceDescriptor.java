@@ -6,11 +6,11 @@
  */
 package org.mule.compatibility.core.transport.service;
 
+import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.util.SpiUtils;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.PropertiesUtils;
 
@@ -29,7 +29,7 @@ public class MetaTransportServiceDescriptor extends DefaultTransportServiceDescr
     {
         super(metaScheme, props, classLoader);
         this.metaScheme = metaScheme;
-        Properties p = SpiUtils.findServiceDescriptor(ServiceType.TRANSPORT, scheme);
+        Properties p = SpiUtils.findServiceDescriptor(LegacyServiceType.TRANSPORT, scheme);
         //Load any overrides for the for the endpoint scheme
         if (p == null)
         {

@@ -13,6 +13,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.ConnectorException;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
@@ -58,7 +59,6 @@ import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
@@ -2363,7 +2363,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         try
         {
             serviceDescriptor = (TransportServiceDescriptor) lookupServiceDescriptor(muleContext.getRegistry(),
-                    ServiceType.TRANSPORT, getProtocol().toLowerCase(), serviceOverrides);
+                    LegacyServiceType.TRANSPORT, getProtocol().toLowerCase(), serviceOverrides);
             if (serviceDescriptor == null)
             {
                 throw new ServiceException(TransportCoreMessages.noServiceTransportDescriptor(getProtocol()));

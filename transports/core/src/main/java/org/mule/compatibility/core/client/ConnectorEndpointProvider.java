@@ -11,6 +11,7 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 import org.mule.compatibility.core.api.client.LocalMuleClient;
 import org.mule.compatibility.core.api.endpoint.EndpointCache;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.ConnectorConfiguration;
 import org.mule.compatibility.core.endpoint.SimpleEndpointCache;
@@ -22,7 +23,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.RequestCacheKey;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.client.AbstractPriorizableConnectorMessageProcessorProvider;
 import org.mule.runtime.core.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
 
@@ -69,7 +69,7 @@ public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessa
         {
             try
             {
-                lookupServiceDescriptor(muleContext.getRegistry(), ServiceType.TRANSPORT, schema, null);
+                lookupServiceDescriptor(muleContext.getRegistry(), LegacyServiceType.TRANSPORT, schema, null);
             }
             catch (ServiceException e)
             {
