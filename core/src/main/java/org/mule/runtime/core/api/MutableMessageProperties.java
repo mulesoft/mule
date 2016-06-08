@@ -41,7 +41,6 @@ public interface MutableMessageProperties extends MessageProperties
      */
     void addOutboundProperties(Map<String, Serializable> properties);
 
-
     /**
      * Removes an outbound property on this message.
      *
@@ -86,6 +85,5 @@ public interface MutableMessageProperties extends MessageProperties
      * @param key the inbound property key to copy to outbound
      */
     void copyProperty(String key);
-
 
 }
