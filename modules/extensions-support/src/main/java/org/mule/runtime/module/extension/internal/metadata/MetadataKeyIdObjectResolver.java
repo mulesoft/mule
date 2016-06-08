@@ -7,6 +7,9 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.lang.String.format;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
@@ -19,6 +22,7 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
@@ -32,8 +36,6 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Provides an instance of the annotated {@link MetadataKeyId} parameter type.
@@ -50,7 +52,7 @@ final class MetadataKeyIdObjectResolver
      *
      * @param component the component model that contains the parameter annotated with {@link MetadataKeyId}
      * @param key       the {@link MetadataKey} associated to the {@link MetadataKeyId}
-     * @return a new instance of the {@link MetadataKeyId} parameter {@code type} with the values of the passed {@link Map}
+     * @return a new instance of the {@link MetadataKeyId} parameter {@code type} with the values of the passed {@link MetadataKey}
      * @throws MetadataResolvingException if:
      *                                    <ul>
      *                                    <li>Parameter types is not instantiable</li>
@@ -58,19 +60,19 @@ final class MetadataKeyIdObjectResolver
      *                                    <li>{@link MetadataKeyId} is not found in the {@link ComponentModel}</li>
      *                                    </ul>
      */
-    public static Object resolve(ComponentModel component, MetadataKey key) throws MetadataResolvingException
+    public Object resolve(ComponentModel component, MetadataKey key) throws MetadataResolvingException
     {
         final List<ParameterModel> metadataKeyParts = getMetadataKeyParts(component);
-        return isKeyLessComponent(metadataKeyParts) ? new NullMetadataKey().getId() : resolveMetadataKeyWhenPresent(key, metadataKeyParts, component);
+        return isKeyLessComponent(metadataKeyParts) ? new NullMetadataKey().getId() : resolveMetadataKeyWhenPresent(key, component);
     }
 
-    private static Object resolveMetadataKeyWhenPresent(MetadataKey key, List<ParameterModel> metadataKeyParts, ComponentModel componentModel) throws MetadataResolvingException
+    private static Object resolveMetadataKeyWhenPresent(MetadataKey key, ComponentModel componentModel) throws MetadataResolvingException
     {
 
         final MetadataType metadataType = componentModel
                 .getModelProperty(MetadataKeyIdModelProperty.class)
                 .map(MetadataKeyIdModelProperty::getType)
-                .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId parameter associated", componentModel.getName()), new Exception()));
+                .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId parameter associated", componentModel.getName())));
 
         final Class<?> metadataKeyType = getType(metadataType);
         final ValueHolder<Object> keyValueHolder = new ValueHolder<>();
@@ -123,12 +125,12 @@ final class MetadataKeyIdObjectResolver
      */
     private static Object resolveMultiLevelKey(ComponentModel componentModel, MetadataKey key, Class metadataKeyType) throws MetadataResolvingException
     {
-        final Map<Field, String> fieldValueMap = fillFieldValueMap(metadataKeyType, key);
+        final Map<Field, String> fieldValueMap = toFieldValueMap(metadataKeyType, key);
 
         Object metadataKeyId;
         try
         {
-            metadataKeyId = metadataKeyType.newInstance();
+            metadataKeyId = ClassUtils.instanciateClass(metadataKeyType);
         }
         catch (Exception e)
         {
@@ -140,11 +142,11 @@ final class MetadataKeyIdObjectResolver
     }
 
 
-    private static Map<Field, String> fillFieldValueMap(Class type, MetadataKey key) throws MetadataResolvingException
+    private static Map<Field, String> toFieldValueMap(Class type, MetadataKey key) throws MetadataResolvingException
     {
-        final Map<String, Field> metadataKeyParts = getAnnotatedFields(type, MetadataKeyPart.class).stream().collect(Collectors.toMap(Field::getName, Function.identity()));
+        final Map<String, Field> metadataKeyParts = getAnnotatedFields(type, MetadataKeyPart.class).stream().collect(toMap(Field::getName, identity()));
         final Map<String, String> currentParts = getCurrentParts(key);
-        final List<String> missingParts = metadataKeyParts.keySet().stream().filter(partName -> !currentParts.containsKey(partName)).collect(Collectors.toList());
+        final List<String> missingParts = metadataKeyParts.keySet().stream().filter(partName -> !currentParts.containsKey(partName)).collect(toList());
 
         if (!missingParts.isEmpty())
         {
@@ -154,7 +156,7 @@ final class MetadataKeyIdObjectResolver
         return currentParts.entrySet()
                 .stream()
                 .filter(keyEntry -> metadataKeyParts.containsKey(keyEntry.getKey()))
-                .collect(Collectors.toMap(keyEntry -> metadataKeyParts.get(keyEntry.getKey()), Map.Entry::getValue));
+                .collect(toMap(keyEntry -> metadataKeyParts.get(keyEntry.getKey()), Map.Entry::getValue));
     }
 
     private static Map<String, String> getCurrentParts(MetadataKey key) throws MetadataResolvingException
@@ -175,7 +177,7 @@ final class MetadataKeyIdObjectResolver
     {
         if (key.getChilds().size() > 1)
         {
-            final List<String> keyNames = key.getChilds().stream().map(child -> child.getId()).collect(Collectors.toList());
+            final List<String> keyNames = key.getChilds().stream().map(MetadataKey::getId).collect(toList());
             throw buildException(String.format("MetadataKey used for Metadata resolution must only have one child per level. Key '%s' has %s as children.", key.getId(), keyNames));
         }
     }

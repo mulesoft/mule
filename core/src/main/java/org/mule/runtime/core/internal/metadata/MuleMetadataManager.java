@@ -212,6 +212,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
         }
     }
 
+    @FunctionalInterface
     private interface MetadataDelegate<T>
     {
 

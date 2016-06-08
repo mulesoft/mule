@@ -25,13 +25,14 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
+import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.java.JavaTypeLoader;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DefaultMetadataKey;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -63,7 +64,6 @@ import org.mule.runtime.extension.api.runtime.OperationContext;
 import org.mule.runtime.extension.api.runtime.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -77,7 +77,6 @@ import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -475,8 +474,8 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         final Set<MetadataKey> metadataKeys = metadataKeysResult.get();
         assertThat(metadataKeys.size(), is(2));
 
-        assertThat(metadataKeys, hasItem(MetadataKeyMatcher.metadataKeyWithId(TestNoConfigMetadataResolver.KeyIds.BOOLEAN.name())));
-        assertThat(metadataKeys, hasItem(MetadataKeyMatcher.metadataKeyWithId(TestNoConfigMetadataResolver.KeyIds.STRING.name())));
+        assertThat(metadataKeys, hasItem(MetadataKeyMatcher.metadataKeyWithId(BOOLEAN.name())));
+        assertThat(metadataKeys, hasItem(MetadataKeyMatcher.metadataKeyWithId(STRING.name())));
     }
 
     @Test

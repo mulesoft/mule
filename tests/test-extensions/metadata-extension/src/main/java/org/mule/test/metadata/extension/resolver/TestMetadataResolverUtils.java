@@ -6,6 +6,10 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static java.util.stream.Collectors.toSet;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -38,12 +42,12 @@ public class TestMetadataResolverUtils
 
         return connection.getEntities().stream()
                 .map(e -> MetadataKeyBuilder.newKey(e).build())
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
     public static MetadataType getMetadata(String key) throws MetadataResolvingException
     {
-        final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA).objectType();
+        final ObjectTypeBuilder objectBuilder = BaseTypeBuilder.create(JAVA).objectType();
 
         switch (key)
         {
@@ -60,7 +64,7 @@ public class TestMetadataResolverUtils
                 objectBuilder.addField().key(AGE).value().numberType();
                 break;
             default:
-                throw new MetadataResolvingException("Unknown key " + key, FailureCode.INVALID_METADATA_KEY);
+                throw new MetadataResolvingException("Unknown key " + key, INVALID_METADATA_KEY);
         }
 
         return objectBuilder.build();

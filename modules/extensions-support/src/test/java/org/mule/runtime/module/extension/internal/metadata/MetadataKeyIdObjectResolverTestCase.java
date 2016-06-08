@@ -11,7 +11,6 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.extension.internal.metadata.MetadataKeyIdObjectResolver.resolve;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 
 import org.mule.metadata.java.JavaTypeLoader;
@@ -64,6 +63,8 @@ public class MetadataKeyIdObjectResolverTestCase
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
+    MetadataKeyIdObjectResolver keyIdObjectResolver = new MetadataKeyIdObjectResolver();
+
     @Before
     public void setUp()
     {
@@ -78,7 +79,7 @@ public class MetadataKeyIdObjectResolverTestCase
     {
         setParameters(continentParam);
         setMetadataKeyIdModelProperty(String.class);
-        final Object key = resolve(componentModel, newKey(AMERICA, CONTINENT).build());
+        final Object key = keyIdObjectResolver.resolve(componentModel, newKey(AMERICA, CONTINENT).build());
         assertThat(key, is(instanceOf(String.class)));
         String stringKey = (String) key;
         assertThat(stringKey, is(AMERICA));
@@ -90,7 +91,7 @@ public class MetadataKeyIdObjectResolverTestCase
         setParameters(continentParam, countryParam, cityParam);
         setMetadataKeyIdModelProperty(LocationKey.class);
 
-        final Object key = resolve(componentModel, MULTILEVEL_KEY);
+        final Object key = keyIdObjectResolver.resolve(componentModel, MULTILEVEL_KEY);
         assertThat(key, is(instanceOf(LocationKey.class)));
         LocationKey locationKey = (LocationKey) key;
         assertThat(locationKey, hasProperty(CONTINENT, is(AMERICA)));
@@ -103,12 +104,12 @@ public class MetadataKeyIdObjectResolverTestCase
     {
         exception.expect(MetadataResolvingException.class);
         exception.expectMessage(is("MetadataKey object of type 'NotInstantiableClass' from the component 'SomeOperation' could not be instantiated"));
-        exception.expectCause(is(instanceOf(InstantiationException.class)));
+        exception.expectCause(is(instanceOf(NoSuchMethodException.class)));
 
         setParameters(continentParam, countryParam, cityParam);
         setMetadataKeyIdModelProperty(NotInstantiableClass.class);
 
-        resolve(componentModel, MULTILEVEL_KEY);
+        keyIdObjectResolver.resolve(componentModel, MULTILEVEL_KEY);
     }
 
     @Test
@@ -120,7 +121,7 @@ public class MetadataKeyIdObjectResolverTestCase
         setParameters(continentParam, countryParam, cityParam);
         setMetadataKeyIdModelProperty(LocationKey.class);
 
-        resolve(componentModel, INCOMPLETE_MULTILEVEL_KEY);
+        keyIdObjectResolver.resolve(componentModel, INCOMPLETE_MULTILEVEL_KEY);
     }
 
     @Test
@@ -132,7 +133,7 @@ public class MetadataKeyIdObjectResolverTestCase
         setParameters(continentParam, countryParam, cityParam);
         when(componentModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(Optional.empty());
 
-        resolve(componentModel, MULTILEVEL_KEY);
+        keyIdObjectResolver.resolve(componentModel, MULTILEVEL_KEY);
     }
 
     @Test
@@ -149,7 +150,7 @@ public class MetadataKeyIdObjectResolverTestCase
         setParameters(continentParam, countryParam, cityParam);
         setMetadataKeyIdModelProperty(LocationKey.class);
 
-        resolve(componentModel, invalidMetadataKey);
+        keyIdObjectResolver.resolve(componentModel, invalidMetadataKey);
     }
 
     @Test
@@ -161,7 +162,7 @@ public class MetadataKeyIdObjectResolverTestCase
         setParameters(continentParam);
         setMetadataKeyIdModelProperty(Boolean.class);
 
-        resolve(componentModel, newKey("true", "booleanParam").build());
+        keyIdObjectResolver.resolve(componentModel, newKey("true", "booleanParam").build());
     }
 
     public void setParameters(ParameterModel... parameterModels)

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.typeDescriptor;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -59,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -122,7 +123,7 @@ public class MetadataMediator
                     .stream()
                     .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partOrder, 1))
                     .map(MetadataKeyBuilder::build)
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
 
             return success(enrichedMetadataKeys);
         }
@@ -395,7 +396,7 @@ public class MetadataMediator
      */
     private Object getKeyId(MetadataKey key) throws MetadataResolvingException
     {
-        return MetadataKeyIdObjectResolver.resolve(componentModel, key);
+        return new MetadataKeyIdObjectResolver().resolve(componentModel, key);
     }
 
     private interface MetadataDelegate
@@ -415,7 +416,7 @@ public class MetadataMediator
     {
         return parameterModels.stream()
                 .filter(part -> part.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
-                .collect(Collectors.toMap(part -> part.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder(), Described::getName));
+                .collect(toMap(part -> part.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder(), Described::getName));
     }
 
     /**
