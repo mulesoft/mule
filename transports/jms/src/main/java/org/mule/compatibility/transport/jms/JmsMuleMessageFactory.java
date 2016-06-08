@@ -20,13 +20,13 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
 {
 
-    private static final Log logger = LogFactory.getLog(JmsMuleMessageFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(JmsMuleMessageFactory.class);
 
     @Override
     protected Class<?>[] getSupportedTransportMessageTypes()

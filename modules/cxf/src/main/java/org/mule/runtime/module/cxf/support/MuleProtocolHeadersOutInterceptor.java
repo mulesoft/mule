@@ -10,7 +10,6 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -20,8 +19,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -29,12 +26,14 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MuleProtocolHeadersOutInterceptor
     extends AbstractPhaseInterceptor<Message>
 {
 
-    private static final Log logger = LogFactory.getLog(MuleProtocolHeadersOutInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MuleProtocolHeadersOutInterceptor.class);
 
     public MuleProtocolHeadersOutInterceptor()
     {
