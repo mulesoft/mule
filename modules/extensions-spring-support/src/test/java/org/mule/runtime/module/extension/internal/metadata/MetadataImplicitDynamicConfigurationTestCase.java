@@ -29,7 +29,7 @@ public class MetadataImplicitDynamicConfigurationTestCase extends MetadataExtens
     public void resolveMetadataWithImplicitDynamicConfig() throws Exception
     {
         componentId = new ProcessorId(CONTENT_METADATA_WITH_KEY_ID, FIRST_PROCESSOR_INDEX);
-        final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, personKey);
+        final MetadataResult<ComponentMetadataDescriptor> metadataResult = getMetadata(personKey.getId());
         assertFailure(metadataResult, "Configuration used for Metadata fetch cannot be dynamic",
                       FailureCode.INVALID_CONFIGURATION, MetadataResolvingException.class.getName());
     }

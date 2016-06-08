@@ -6,7 +6,13 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
@@ -15,15 +21,20 @@ import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 public class TestContentAndOutputResolverWithoutKeyResolver implements MetadataContentResolver<String>, MetadataOutputResolver<String>
 {
 
+    private static final ObjectType OBJECT_TYPE = BaseTypeBuilder.create(MetadataFormat.JAVA).objectType().build();
+    private static final String KEY_SHOULD_BE_EMPTY = "Metadata resolvers without Key Resolver should get a NullMetadataKey as Key";
+
     @Override
     public MetadataType getContentMetadata(MetadataContext context, String key) throws MetadataResolvingException
     {
-        return TestMetadataResolverUtils.getMetadata(key);
+        checkArgument(isBlank(key), KEY_SHOULD_BE_EMPTY);
+        return OBJECT_TYPE;
     }
 
     @Override
     public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException
     {
-        return TestMetadataResolverUtils.getMetadata(key);
+        checkArgument(isBlank(key), KEY_SHOULD_BE_EMPTY);
+        return OBJECT_TYPE;
     }
 }

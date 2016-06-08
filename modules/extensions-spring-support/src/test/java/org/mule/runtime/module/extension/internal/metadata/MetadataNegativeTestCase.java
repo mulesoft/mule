@@ -11,6 +11,7 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.MISSING_ELEMENT_ERROR_MESSAGE;
+
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.ProcessorId;
@@ -21,7 +22,10 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.InvalidComponentIdException;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -45,9 +49,9 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     public void getOperationMetadataWithResolvingException() throws Exception
     {
         componentId = new ProcessorId(FAIL_WITH_RESOLVING_EXCEPTION, FIRST_PROCESSOR_INDEX);
-        MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
+        MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(personKey.getId());
 
-        assertFailure(metadata, "", FailureCode.UNKNOWN, MetadataResolvingException.class.getName());
+        assertFailure(metadata, "", FailureCode.CONNECTION_FAILURE, MetadataResolvingException.class.getName());
     }
 
     @Test
@@ -63,7 +67,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     public void getOperationMetadataWithRuntimeException() throws Exception
     {
         componentId = new ProcessorId(FAIL_WITH_RUNTIME_EXCEPTION, FIRST_PROCESSOR_INDEX);
-        MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
+        MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(personKey.getId());
 
         assertFailure(metadata, "", FailureCode.UNKNOWN, RuntimeException.class.getName());
     }
@@ -72,7 +76,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     public void flowDoesNotExist() throws Exception
     {
         componentId = new ProcessorId(NON_EXISTING_FLOW, FIRST_PROCESSOR_INDEX);
-        MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
+        MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(personKey.getId());
 
         assertFailure(metadata, "Processor doesn't exist ", FailureCode.UNKNOWN, InvalidComponentIdException.class.getName());
     }
@@ -81,7 +85,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     public void processorDoesNotExist() throws Exception
     {
         componentId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID, "10");
-        MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
+        MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(personKey.getId());
 
         assertFailure(metadata, "Processor doesn't exist", FailureCode.UNKNOWN, IndexOutOfBoundsException.class.getName());
     }
@@ -90,7 +94,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     public void processorIsNotMetadataAware() throws Exception
     {
         componentId = new ProcessorId(LOGGER_FLOW, FIRST_PROCESSOR_INDEX);
-        MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
+        MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(personKey.getId());
 
         assertFailure(metadata, "not MetadataAware", FailureCode.UNKNOWN, ClassCastException.class.getName());
     }
@@ -99,9 +103,10 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     public void fetchMissingElementFromCache() throws Exception
     {
         componentId = new ProcessorId(CONTENT_ONLY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
-        MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, nullMetadataKey);
 
-        assertFailure(metadata, MISSING_ELEMENT_ERROR_MESSAGE, FailureCode.UNKNOWN, MetadataResolvingException.class.getName());
+        MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(nullMetadataKey.getId());
+
+        assertFailure(metadata, MISSING_ELEMENT_ERROR_MESSAGE, FailureCode.RESOURCE_UNAVAILABLE, MetadataResolvingException.class.getName());
     }
 
     @Test
@@ -117,8 +122,19 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     public void failWithDynamicConfigurationWhenRetrievingMetadata() throws IOException
     {
         componentId = new ProcessorId(RESOLVER_WITH_DYNAMIC_CONFIG, FIRST_PROCESSOR_INDEX);
-        MetadataKey key = newKey(AMERICA).withChild(newKey(USA).withChild(newKey(SAN_FRANCISCO))).build();
-        MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId, key);
+        MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId, getMultilevelKey());
         assertFailure(result, "Configuration used for Metadata fetch cannot be dynamic", FailureCode.INVALID_CONFIGURATION, MetadataResolvingException.class.getName());
+    }
+
+    @Test
+    public void failToGetMetadataWithMissingMetadataKeyLevels() throws Exception
+    {
+        componentId = new ProcessorId(SIMPLE_MULTILEVEL_KEY_RESOLVER, FIRST_PROCESSOR_INDEX);
+        final HashMap<String, String> map = new HashMap<>();
+        map.put("continent", AMERICA);
+        map.put("country", USA);
+
+        final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, map);
+        assertFailure(metadataResult, "city", FailureCode.INVALID_METADATA_KEY, MetadataResolvingException.class.getName());
     }
 }

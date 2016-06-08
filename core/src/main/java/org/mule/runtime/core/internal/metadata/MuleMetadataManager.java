@@ -117,7 +117,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable
      * {@inheritDoc}
      */
     @Override
-    public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId, MetadataKey key)
+    public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId, Map<String, String> key)
     {
         return exceptionHandledMetadataFetch(componentId, processor -> processor.getMetadata(key),
                                              format(EXCEPTION_RESOLVING_COMPONENT_METADATA, componentId));

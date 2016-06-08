@@ -31,8 +31,7 @@ public class MetadataNoRefStaticConfigurationTestCase extends MetadataExtensionF
     public void resolveMetadataWithNoRefStaticConfig() throws Exception
     {
         componentId = new ProcessorId(RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG, FIRST_PROCESSOR_INDEX);
-        MetadataKey key = newKey(AMERICA).withChild(newKey(USA).withChild(newKey(SAN_FRANCISCO))).build();
-        final MetadataResult<ComponentMetadataDescriptor> metadataKeysResult = metadataManager.getMetadata(componentId, key);
+        final MetadataResult<ComponentMetadataDescriptor> metadataKeysResult = metadataManager.getMetadata(componentId, getMultilevelKey());
         assertThat(metadataKeysResult.isSuccess(), is(false));
     }
 }

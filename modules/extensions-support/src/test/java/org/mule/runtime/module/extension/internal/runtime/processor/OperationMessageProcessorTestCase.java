@@ -24,8 +24,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.java.JavaTypeLoader;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -50,6 +53,7 @@ import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFac
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
+import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -70,6 +74,7 @@ import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -166,6 +171,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         when(operationModel.getName()).thenReturn(getClass().getName());
         when(operationModel.getReturnType()).thenReturn(toMetadataType(String.class));
         when(operationModel.getExecutor()).thenReturn(operationExecutorFactory);
+        when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(Optional.of(new MetadataKeyIdModelProperty(new JavaTypeLoader(getClass().getClassLoader()).load(String.class))));
         when(operationExecutorFactory.createExecutor()).thenReturn(operationExecutor);
 
         when(operationModel.getName()).thenReturn(OPERATION_NAME);
@@ -187,7 +193,6 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         when(contentMock.getType()).thenReturn(stringType);
         when(contentMock.getModelProperty(MetadataContentModelProperty.class)).thenReturn(Optional.of(new MetadataContentModelProperty()));
         when(contentMock.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(Optional.empty());
-
 
         when(operationModel.getParameterModels()).thenReturn(Arrays.asList(keyParamMock, contentMock));
 
@@ -467,7 +472,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         assertThat(metadataKeys.get().size(), is(2));
 
         assertThat(metadataKeys.get().get(0).getId(), equalTo(TestNoConfigMetadataResolver.KeyIds.BOOLEAN.name()));
-        assertThat(metadataKeys.get().get(1).getId(), equalTo(TestNoConfigMetadataResolver.KeyIds.STRING.name()));
+        assertThat(metadataKeys.get().get(1).getId(), equalTo(STRING.name()));
     }
 
     @Test
@@ -492,9 +497,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     @Test
     public void getOperationDynamicMetadata() throws Exception
     {
-        MetadataKey keyMock = mock(MetadataKey.class);
-        when(keyMock.getId()).thenReturn(TestNoConfigMetadataResolver.KeyIds.STRING.name());
-        MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(keyMock);
+        MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(Collections.singletonMap("key", STRING.name()));
 
         assertThat(metadata.isSuccess(), is(true));
 

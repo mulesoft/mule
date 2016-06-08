@@ -18,6 +18,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isNullType;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.subTypesAsUnionType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
@@ -46,12 +47,12 @@ import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -159,7 +160,7 @@ public class MetadataMediator
      * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors
      * Failure {@link MetadataResult} when the Metadata retrieval of any element fails for any reason
      */
-    public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context, MetadataKey key)
+    public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context, Map<String, String> key)
     {
         MetadataResult<OutputMetadataDescriptor> outputResult = getOutputMetadataDescriptor(context, key);
         Optional<MetadataResult<TypeMetadataDescriptor>> contentDescriptor = getContentMetadataDescriptor(context, key);
@@ -240,7 +241,7 @@ public class MetadataMediator
      * returning {@link Optional#empty()} if no Content parameter is present
      * Failure if the dynamic resolution fails for any reason.
      */
-    private Optional<MetadataResult<TypeMetadataDescriptor>> getContentMetadataDescriptor(MetadataContext context, MetadataKey key)
+    private Optional<MetadataResult<TypeMetadataDescriptor>> getContentMetadataDescriptor(MetadataContext context, Map<String, String> key)
     {
         if (!contentParameter.isPresent())
         {
@@ -275,10 +276,10 @@ public class MetadataMediator
      * @param context current {@link MetadataContext} that will be used by the {@link MetadataContentResolver}
      * @param key     {@link MetadataKey} of the type which's structure has to be resolved
      * @return Success with an {@link OutputMetadataDescriptor} representing the Component's output metadata, resolved
-     * using the {@link MetadataOutputResolver} if one is available to resolve its {@link MetadataType}.
+     * using the {@link MetadataOutputResolver} if one is available to resolveMultiLevelKey its {@link MetadataType}.
      * Failure if the dynamic resolution fails for any reason.
      */
-    private MetadataResult<OutputMetadataDescriptor> getOutputMetadataDescriptor(MetadataContext context, MetadataKey key)
+    private MetadataResult<OutputMetadataDescriptor> getOutputMetadataDescriptor(MetadataContext context, Map<String, String> key)
     {
         MetadataResult<MetadataType> outputMetadataResult = getOutputMetadata(context, key);
         MetadataResult<MetadataType> attributesMetadataResult = getOutputAttributesMetadata(context, key);
@@ -291,16 +292,15 @@ public class MetadataMediator
     }
 
     /**
-     * Given a {@link MetadataKey} of a type and a {@link MetadataContext},
-     * resolves the {@link MetadataType} of the {@link Content} parameter using
-     * the {@link MetadataContentResolver} associated to the current component.
+     * Given a {@link MetadataKey} of a type and a {@link MetadataContext}, resolves the {@link MetadataType} of the
+     * {@link Content} parameter using the {@link MetadataContentResolver} associated to the current component.
      *
      * @param context {@link MetadataContext} of the MetaData resolution
      * @param key     {@link MetadataKey} of the type which's structure has to be resolved
      * @return Success with the {@link MetadataType} of the {@link Content} parameter
      * Failure if the component has no {@link Content} parameter
      */
-    private MetadataResult<MetadataType> getContentMetadata(MetadataContext context, MetadataKey key)
+    private MetadataResult<MetadataType> getContentMetadata(MetadataContext context, Map<String, String> key)
     {
         if (!contentParameter.isPresent())
         {
@@ -312,15 +312,14 @@ public class MetadataMediator
     }
 
     /**
-     * Given a {@link MetadataKey} of a type and a {@link MetadataContext},
-     * resolves the {@link MetadataType} of the Components's output using
-     * the {@link MetadataOutputResolver} associated to the current component.
+     * Given a {@link MetadataKey} of a type and a {@link MetadataContext}, resolves the {@link MetadataType} of the
+     * Components's output using the {@link MetadataOutputResolver} associated to the current component.
      *
      * @param context {@link MetadataContext} of the Metadata resolution
      * @param key     {@link MetadataKey} of the type which's structure has to be resolved
      * @return the {@link MetadataType} of the components output
      */
-    private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final MetadataKey key)
+    private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final Map<String, String> key)
     {
         if (isVoid(componentModel))
         {
@@ -340,7 +339,7 @@ public class MetadataMediator
      * @param key     {@link MetadataKey} of the type which's structure has to be resolved
      * @return the {@link MetadataType} of the components output {@link MuleMessage#getAttributes()}
      */
-    private MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, final MetadataKey key)
+    private MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, final Map<String, String> key)
     {
         if (isVoid(componentModel))
         {
@@ -358,8 +357,8 @@ public class MetadataMediator
      *
      * @param staticType static type used as default if no dynamic type is available
      * @param delegate   Delegate which performs the final invocation to the one of the metadata resolvers
-     * @return The {@link MetadataType} resolved by the delegate invocation.
-     * Success if the type has been successfully fetched, Failure otherwise.
+     * @return The {@link MetadataType} resolved by the delegate invocation. Success if the type has been successfully
+     * fetched, Failure otherwise.
      */
     private MetadataResult<MetadataType> resolveMetadataType(MetadataType staticType, MetadataDelegate delegate)
     {
@@ -375,16 +374,16 @@ public class MetadataMediator
     }
 
     /**
-     * Given a {@link MetadataKey} instanciates the assosiated {@link MetadataKeyId} parameter
+     * Given a {@link MetadataKey} instantiates the associated {@link MetadataKeyId} parameter
      * this could be a simple {@link String} if the key contains only one level
      * or a complex type with {@link MetadataKeyPart} annotated fields for a multilevel key
      *
      * @param key the key assosiated to the {@link MetadataKeyId} parameter.
      * @return the instance of the {@link MetadataKeyId} parameter.
      */
-    private Object getKeyId(MetadataKey key) throws MetadataResolvingException
+    private Object getKeyId(Map<String, String> key) throws MetadataResolvingException
     {
-        return metadataKeyParts.size() > 1 ? new MetadataKeyIdObjectResolver(componentModel, key).resolve() : key.getId();
+        return MetadataKeyIdObjectResolver.resolve(componentModel, key);
     }
 
     private interface MetadataDelegate

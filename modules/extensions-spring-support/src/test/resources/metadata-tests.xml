@@ -94,11 +94,11 @@
     </flow>
 
     <flow name="resolverContentWithContextClassLoader">
-        <metadata:resolver-content-with-context-class-loader config-ref="config"/>
+        <metadata:resolver-content-with-context-class-loader config-ref="config" type="Person"/>
     </flow>
 
     <flow name="resolverOutputWithContextClassLoader">
-        <metadata:resolver-output-with-context-class-loader config-ref="config"/>
+        <metadata:resolver-output-with-context-class-loader config-ref="config" type="Person"/>
     </flow>
 
     <flow name="outputAndMetadataKeyCacheResolver">

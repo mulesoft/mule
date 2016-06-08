@@ -32,7 +32,7 @@ public class MetadataNoRefDynamicConfigurationTestCase extends MetadataExtension
     {
         componentId = new ProcessorId(RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG, FIRST_PROCESSOR_INDEX);
         MetadataKey key = newKey(AMERICA).withChild(newKey(USA).withChild(newKey(SAN_FRANCISCO))).build();
-        final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, key);
+        final MetadataResult<ComponentMetadataDescriptor> metadataResult = getMetadata(key.getId());
         assertFailure(metadataResult, "Configuration used for Metadata fetch cannot be dynamic", FailureCode.INVALID_CONFIGURATION, MetadataResolvingException.class.getName());
     }
 }

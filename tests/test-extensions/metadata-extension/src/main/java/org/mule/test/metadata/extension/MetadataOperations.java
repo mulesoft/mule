@@ -138,12 +138,12 @@ public class MetadataOperations extends MetadataOperationsParent
     }
 
     @MetadataScope(contentResolver = TestThreadContextClassLoaderResolver.class)
-    public void resolverContentWithContextClassLoader(@Content Object content)
+    public void resolverContentWithContextClassLoader(@Content Object content, @MetadataKeyId String type)
     {
     }
 
     @MetadataScope(outputResolver = TestThreadContextClassLoaderResolver.class)
-    public Object resolverOutputWithContextClassLoader()
+    public Object resolverOutputWithContextClassLoader(@MetadataKeyId String type)
     {
         return null;
     }

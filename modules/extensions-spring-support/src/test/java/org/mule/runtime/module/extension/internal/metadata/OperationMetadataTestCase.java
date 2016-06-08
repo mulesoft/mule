@@ -16,7 +16,6 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
@@ -33,7 +32,10 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+
 import org.mule.functional.listener.Callback;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.runtime.api.metadata.MetadataCache;
@@ -57,6 +59,7 @@ import org.mule.test.metadata.extension.model.shapes.Square;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +72,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     private static final String MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA = "messageAttributesNullTypeMetadata";
     private static final String CONFIG = "config";
     private static final String ALTERNATIVE_CONFIG = "alternative-config";
+    private MetadataType emptyType = BaseTypeBuilder.create(MetadataFormat.JAVA).objectType().build();
 
     @Override
     protected String getConfigFile()
@@ -135,8 +139,12 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     public void injectComposedMetadataKeyIdInstanceInMetadataResolver() throws Exception
     {
         componentId = new ProcessorId(SIMPLE_MULTILEVEL_KEY_RESOLVER, FIRST_PROCESSOR_INDEX);
-        MetadataKey key = newKey(AMERICA).withChild(newKey(USA).withChild(newKey(SAN_FRANCISCO))).build();
-        final MetadataResult<ComponentMetadataDescriptor> metadataKeysResult = metadataManager.getMetadata(componentId, key);
+        final HashMap<String, String> map = new HashMap<>();
+        map.put("continent", AMERICA);
+        map.put("country", USA);
+        map.put("city", SAN_FRANCISCO);
+
+        final MetadataResult<ComponentMetadataDescriptor> metadataKeysResult = metadataManager.getMetadata(componentId, map);
         assertThat(metadataKeysResult.isSuccess(), is(true));
     }
 
@@ -230,10 +238,10 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
 
         final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
-        assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
+        assertExpectedOutput(metadataDescriptor.getOutputMetadata(), emptyType, void.class);
 
         assertThat(metadataDescriptor.getContentMetadata().isPresent(), is(true));
-        assertExpectedType(metadataDescriptor.getContentMetadata().get(), "content", personType);
+        assertExpectedType(metadataDescriptor.getContentMetadata().get(), "content", emptyType);
 
         assertThat(metadataDescriptor.getParametersMetadata(), is(empty()));
     }
@@ -361,7 +369,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     {
         componentId = new ProcessorId(CONTENT_METADATA_WITHOUT_KEY_ID, FIRST_PROCESSOR_INDEX);
 
-        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata(nullMetadataKey);
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata(nullMetadataKey.getId());
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, void.class);
 
@@ -376,7 +384,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     {
         componentId = new ProcessorId(OUTPUT_METADATA_WITHOUT_KEY_PARAM, FIRST_PROCESSOR_INDEX);
 
-        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata(nullMetadataKey);
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata(nullMetadataKey.getId());
 
         assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, void.class);
 
@@ -390,7 +398,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     public void dynamicOutputAndContentWithCache() throws Exception
     {
         componentId = new ProcessorId(CONTENT_AND_OUTPUT_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
-        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata(nullMetadataKey);
+        final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata(nullMetadataKey.getId());
 
         assertThat(metadataDescriptor.getContentMetadata().get().getType(),
                    is(equalTo(metadataDescriptor.getOutputMetadata().getPayloadMetadata().getType())));

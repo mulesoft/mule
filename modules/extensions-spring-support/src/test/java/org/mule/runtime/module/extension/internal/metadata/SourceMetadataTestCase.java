@@ -65,14 +65,14 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
     @Test
     public void getSourceDynamicOutputMetadata() throws Exception
     {
-        final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(personKey);
+        final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(personKey.getId());
         assertExpectedOutput(componentMetadata.getOutputMetadata(), personType, String.class);
     }
 
     @Test
     public void sourceDoesNotSupportDynamicContentMetadata() throws Exception
     {
-        final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(personKey);
+        final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(personKey.getId());
         assertThat(componentMetadata.getContentMetadata().isPresent(), is(false));
     }
 
