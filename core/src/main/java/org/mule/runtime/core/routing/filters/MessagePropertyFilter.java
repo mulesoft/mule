@@ -164,7 +164,7 @@ public class MessagePropertyFilter implements Filter
 
     public String getScope()
     {
-        return scope.getScopeName();
+        return scope.getName();
     }
 
     public void setScope(String scope)
@@ -175,7 +175,7 @@ public class MessagePropertyFilter implements Filter
             return;
         }
 
-        PropertyScope ps = PropertyScope.get(scope.toLowerCase().trim());
+        PropertyScope ps = PropertyScope.valueOf(scope.toUpperCase().trim());
         if (ps == null)
         {
             throw new IllegalArgumentException(String.format("'%s' is not a valid property scope.", scope));

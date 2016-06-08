@@ -6,19 +6,17 @@
  */
 package org.mule.runtime.core;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MutableMessageProperties;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.TypedValue;
-import org.mule.runtime.core.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.MapUtils;
+import org.mule.runtime.core.util.ObjectUtils;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,8 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This object maintains a scoped map of properties. This means that certain properties will only be visible
- * under some scopes. The scopes supported by Mule are:
+ * This object maintains case-sensitive inbound and outbound scoped messages properties.
  * <ol>
  * <li> {@link PropertyScope#INBOUND} Contains properties that were on the message when
  * it was received by Mule. This scope is read-only.</li>
@@ -35,15 +32,14 @@ import org.apache.commons.logging.LogFactory;
  * to any outbound messages resulting from this message. This is the default scope.</li>
  * </ol>
  */
-public class MessagePropertiesContext implements Serializable
+public class MessagePropertiesContext implements MutableMessageProperties, Serializable
 {
     private static final long serialVersionUID = -5230693402768953742L;
-    private static final PropertyScope DEFAULT_SCOPE = PropertyScope.OUTBOUND;
+    private static final Log logger = LogFactory.getLog(MessagePropertiesContext.class);
 
-    private static Log logger = LogFactory.getLog(MessagePropertiesContext.class);
 
-    protected CopyOnWriteCaseInsensitiveMap<String, TypedValue> inboundMap;
-    protected CopyOnWriteCaseInsensitiveMap<String, TypedValue> outboundMap;
+    protected CopyOnWriteCaseInsensitiveMap<String, TypedValue<? extends Serializable>> inboundMap;
+    protected CopyOnWriteCaseInsensitiveMap<String, TypedValue<? extends Serializable>> outboundMap;
 
     public MessagePropertiesContext()
     {
@@ -57,152 +53,184 @@ public class MessagePropertiesContext implements Serializable
         outboundMap = previous.outboundMap.clone();
     }
 
-    protected Map<String, TypedValue> getScopedProperties(PropertyScope scope)
+    @Override
+    public <T extends Serializable> T getInboundProperty(String name)
     {
-        if (PropertyScope.INBOUND.equals(scope))
+        return getInboundProperty(name, null);
+    }
+
+    @Override
+    public <T extends Serializable> T getInboundProperty(String name, T defaultValue)
+    {
+        TypedValue typedValue = inboundMap.get(name);
+        return getValueOrDefault(typedValue == null ? null : (T) typedValue.getValue(), defaultValue);
+    }
+
+    @Override
+    public <T extends Serializable> T getOutboundProperty(String name)
+    {
+        return getOutboundProperty(name, null);
+    }
+
+    @Override
+    public <T extends Serializable> T getOutboundProperty(String name, T defaultValue)
+    {
+        TypedValue typedValue = outboundMap.get(name);
+        return getValueOrDefault(typedValue == null ? null : (T) typedValue.getValue(), defaultValue);
+    }
+
+    @Override
+    public void setInboundProperty(String key, Serializable value)
+    {
+        setInboundProperty(key, value, DataTypeFactory.createFromObject(value));
+    }
+
+    @Override
+    public <T extends Serializable> void setInboundProperty(String key, T value, DataType<T> dataType)
+    {
+        if (key != null)
         {
-            return inboundMap;
-        }
-        else if (PropertyScope.OUTBOUND.equals(scope))
-        {
-            return outboundMap;
+            if (value == null || value instanceof NullPayload)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("setProperty(key, value) called with null value; removing key: " + key);
+                }
+                removeInboundProperty(key);
+            }
+            else
+            {
+                inboundMap.put(key, new TypedValue(value, dataType));
+            }
         }
         else
         {
-            throw new IllegalArgumentException("Scope not registered: " + scope);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("setProperty(key, value) invoked with null key. Ignoring this entry");
+            }
         }
     }
 
-    public PropertyScope getDefaultScope()
-    {
-        return DEFAULT_SCOPE;
-    }
-
-    protected void addInboundProperties(Map<String, Object> properties)
+    @Override
+    public void addInboundProperties(Map<String, Serializable> properties)
     {
         if (properties != null)
         {
-            Map<String, TypedValue> propertyDatas = new HashMap<>();
-            for (String key : properties.keySet())
+            synchronized (properties)
             {
-                propertyDatas.put(key, new TypedValue(properties.get(key), DataType.OBJECT_DATA_TYPE));
+                for (Map.Entry<String, Serializable> entry : properties.entrySet())
+                {
+                    setInboundProperty(entry.getKey(), entry.getValue());
+                }
             }
-
-            getScopedProperties(PropertyScope.INBOUND).putAll(propertyDatas);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T getProperty(String key, PropertyScope scope)
+    @Override
+    public void setOutboundProperty(String key, Serializable value)
     {
-        if (scope == null)
-        {
-            scope = PropertyScope.OUTBOUND;
-        }
-
-        TypedValue typedValue = getScopedProperties(scope).get(key);
-
-        return typedValue == null ? null : (T) typedValue.getValue();
+        setOutboundProperty(key, value, DataTypeFactory.createFromObject(value));
     }
 
-    public DataType<? extends Serializable> getPropertyDataType(String key, PropertyScope scope)
+    @Override
+    public <T extends Serializable> void setOutboundProperty(String key, T value, DataType<T> dataType)
     {
-        if (scope == null)
+        if (key != null)
         {
-            scope = PropertyScope.OUTBOUND;
+            if (value == null || value instanceof NullPayload)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("setProperty(key, value) called with null value; removing key: " + key);
+                }
+                removeOutboundProperty(key);
+            }
+            else
+            {
+                outboundMap.put(key, new TypedValue(value, dataType));
+            }
         }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("setProperty(key, value) invoked with null key. Ignoring this entry");
+            }
+        }
+    }
 
-        TypedValue typedValue = getScopedProperties(scope).get(key);
+    @Override
+    public void addOutboundProperties(Map<String, Serializable> properties)
+    {
+        if (properties != null)
+        {
+            synchronized (properties)
+            {
+                for (Map.Entry<String, Serializable> entry : properties.entrySet())
+                {
+                    setOutboundProperty(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+    }
 
+    @Override
+    public <T extends Serializable> T removeInboundProperty(String key)
+    {
+        TypedValue value = inboundMap.remove(key);
+        return value == null ? null : (T) value.getValue();
+    }
+
+    @Override
+    public <T extends Serializable> T removeOutboundProperty(String key)
+    {
+        TypedValue value = outboundMap.remove(key);
+        return value == null ? null : (T) value.getValue();
+    }
+
+    @Override
+    public void clearInboundProperties()
+    {
+        inboundMap.clear();
+    }
+
+    @Override
+    public void clearOutboundProperties()
+    {
+        outboundMap.clear();
+    }
+
+    @Override
+    public void copyProperty(String key)
+    {
+        outboundMap.put(key, new TypedValue(getInboundProperty(key), getInboundPropertyDataType(key)));
+    }
+
+    @Override
+    public DataType<? extends Serializable> getInboundPropertyDataType(String name)
+    {
+        TypedValue typedValue = inboundMap.get(name);
         return typedValue == null ? null : typedValue.getDataType();
     }
 
-    /**
-     * Removes all properties from all scopes except for SESSION and INBOUND (which is read-only). You may
-     * explicitly clear the session properties by calling clearProperties(PropertyScope.SESSION)
-     */
-    public void clearProperties()
+    @Override
+    public DataType<? extends Serializable> getOutboundPropertyDataType(String name)
     {
-        Map<String, TypedValue> props = getScopedProperties(PropertyScope.OUTBOUND);
-        props.clear();
+        TypedValue typedValue = outboundMap.get(name);
+        return typedValue == null ? null : typedValue.getDataType();
     }
 
-    public void clearProperties(PropertyScope scope)
+    @Override
+    public Set<String> getInboundPropertyNames()
     {
-        if (scope == null)
-        {
-            clearProperties();
-            return;
-        }
-
-        Map<String, TypedValue> props = getScopedProperties(scope);
-        props.clear();
+        return inboundMap.keySet();
     }
 
-    /**
-     * Removes a property from all scopes except for SESSION and INBOUND (which is read-only). You may
-     * explicitly remove a session property by calling removeProperty(key, PropertyScope.SESSION)
-     *
-     * @param key the property key to remove
-     * @return the removed property value or null if the property did not exist
-     */
-    public Object removeProperty(String key)
+    @Override
+    public Set<String> getOutboundPropertyNames()
     {
-        TypedValue value = getScopedProperties(PropertyScope.OUTBOUND).remove(key);
-
-        return value == null ? null : value.getValue();
-    }
-
-    /**
-     * Removes a property from the specified property scope.
-     *
-     * @param key the property key to remove
-     * @return the removed property value or null if the property did not exist
-     */
-    public Object removeProperty(String key, PropertyScope scope)
-    {
-        if (scope == null)
-        {
-            return removeProperty(key);
-        }
-
-        TypedValue value = getScopedProperties(scope).remove(key);
-
-        return value == null ? null : value.getValue();
-    }
-
-    /**
-     * Set a property on the message
-     *
-     * @param key the key on which to associate the value
-     * @param value the property value
-     * @param scope the scope to se the property on
-     * @see PropertyScope
-     */
-    public void setProperty(String key, Object value, PropertyScope scope)
-    {
-        setProperty(key, value, scope, DataTypeFactory.createFromObject(value));
-    }
-
-    /**
-     * Set a property on the message
-     *
-     * @param key the key on which to associate the value
-     * @param value the property value
-     * @param scope the scope to se the property on
-     * @see PropertyScope
-     */
-    public void setProperty(String key, Object value, PropertyScope scope, DataType<?> dataType)
-    {
-        getScopedProperties(scope).put(key, new TypedValue(value, dataType));
-    }
-
-    /**
-     * @return all property keys on this message for the given scope
-     */
-    public Set<String> getPropertyNames(PropertyScope scope)
-    {
-        return Collections.unmodifiableSet(getScopedProperties(scope).keySet());
+        return outboundMap.keySet();
     }
 
     @Override
@@ -219,79 +247,62 @@ public class MessagePropertiesContext implements Serializable
         return buf.toString();
     }
 
-    /**
-     * Check for properties that can't be serialized
-     */
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException
+    private <T extends Serializable> T getValueOrDefault(T value, T defaultValue)
     {
-        for (Map.Entry<String, TypedValue> entry : inboundMap.entrySet())
+        //Note that we need to keep the (redundant) casts in here because the compiler compiler complains
+        //about primitive types being cast to a generic type
+        if (defaultValue == null)
         {
-            Object value = entry.getValue().getValue();
-            if (value != null && !(value instanceof Serializable))
+            return value;
+        }
+        else if (defaultValue instanceof Boolean)
+        {
+            return  (T) (Boolean) ObjectUtils.getBoolean(value, (Boolean) defaultValue);
+        }
+        else if (defaultValue instanceof Byte)
+        {
+            return (T) (Byte) ObjectUtils.getByte(value, (Byte) defaultValue);
+        }
+        else if (defaultValue instanceof Integer)
+        {
+            return (T) (Integer) ObjectUtils.getInt(value, (Integer) defaultValue);
+        }
+        else if (defaultValue instanceof Short)
+        {
+            return (T) (Short) ObjectUtils.getShort(value, (Short) defaultValue);
+        }
+        else if (defaultValue instanceof Long)
+        {
+            return (T) (Long) ObjectUtils.getLong(value, (Long) defaultValue);
+        }
+        else if (defaultValue instanceof Float)
+        {
+            return (T) (Float) ObjectUtils.getFloat(value, (Float) defaultValue);
+        }
+        else if (defaultValue instanceof Double)
+        {
+            return (T) (Double) ObjectUtils.getDouble(value, (Double) defaultValue);
+        }
+        else if (defaultValue instanceof String)
+        {
+            return (T) ObjectUtils.getString(value, (String) defaultValue);
+        }
+        else
+        {
+            if (value == null)
             {
-                String message = String.format(
-                    "Unable to serialize the %s message property %s, which is of type %s ",
-                    PropertyScope.INBOUND, entry.getKey(), value);
-                logger.error(message);
-                throw new IOException(message);
+                return defaultValue;
+            }
+            //If defaultValue is set and the result is not null, then validate that they are assignable
+            else if (defaultValue.getClass().isAssignableFrom(value.getClass()))
+            {
+                return value;
+            }
+            else
+            {
+                throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(value.getClass(), defaultValue.getClass()).getMessage());
             }
         }
-        for (Map.Entry<String, TypedValue> entry : outboundMap.entrySet())
-        {
-            Object value = entry.getValue().getValue();
-            if (value != null && !(value instanceof Serializable))
-            {
-                String message = String.format(
-                    "Unable to serialize the %s message property %s, which is of type %s ",
-                    PropertyScope.OUTBOUND, entry.getKey(), value);
-                logger.error(message);
-                throw new IOException(message);
-            }
-        }
-        out.defaultWriteObject();
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-    {
-        in.defaultReadObject();
-    }
-
-    private static class UndefinedSessionPropertiesMap extends AbstractMap<String, TypedValue>
-        implements Serializable
-    {
-
-        private static final long serialVersionUID = -7982608304570908737L;
-
-        @Override
-        public Set<java.util.Map.Entry<String, TypedValue>> entrySet()
-        {
-            return Collections.emptySet();
-        }
-
-        @Override
-        public TypedValue put(String key, TypedValue value)
-        {
-            throw new IllegalStateException(
-                String.format(
-                    "Detected an attempt to set a invocation or session property, "
-                                    + "but a MuleEvent hasn't been created using this message yet. Key/value: %s=%s",
-                    key, value));
-        }
-
-        @Override
-        public TypedValue get(Object key)
-        {
-            logger.warn(String.format(
-                "Detected an attempt to get a invocation or session property, "
-                                + "but a MuleEvent hasn't been created using this message yet. Key: %s", key));
-            return null;
-        }
-    }
-
-    private static class UndefinedInvocationPropertiesMap extends CaseInsensitiveHashMap
-    {
-        private static final long serialVersionUID = 8400889672358403911L;
-
     }
 
 }

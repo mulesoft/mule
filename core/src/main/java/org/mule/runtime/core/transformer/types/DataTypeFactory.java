@@ -109,14 +109,14 @@ public class DataTypeFactory
      *          object
      * @return a data type that represents the object type.
      */
-    public static DataType<?> createFromObject(Object value)
+    public static <T> DataType<T> createFromObject(T value)
     {
         if (value instanceof DataType)
         {
-            return (DataType<?>) value;
+            return (DataType<T>) value;
         }
 
-        Class<?> type = getObjectType(value);
+        Class<T> type = (Class<T>) getObjectType(value);
         String mime = getObjectMimeType(value);
 
         return create(type, mime);

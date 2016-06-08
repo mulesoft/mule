@@ -7,6 +7,7 @@
 package org.mule.runtime.core;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
@@ -370,10 +371,10 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     public void copyProperty() throws Exception
     {
         DefaultMuleMessage message = createMuleMessage();
-        message.setInboundProperty(FOO_PROPERTY, NullPayload.getInstance());
+        message.setInboundProperty(FOO_PROPERTY, "bar");
         message.copyProperty(FOO_PROPERTY);
 
-        assertThat(message.getOutboundProperty(FOO_PROPERTY), is(nullValue()));
+        assertThat(message.getOutboundProperty(FOO_PROPERTY), equalTo("bar"));
     }
 
 }

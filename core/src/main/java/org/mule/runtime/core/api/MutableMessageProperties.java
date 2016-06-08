@@ -72,12 +72,24 @@ public interface MutableMessageProperties extends MessageProperties
     <T extends Serializable> void setInboundProperty(String key, T value, DataType<T> dataType);
 
     /**
+     * Adds a map of inbound properties to be associated with this message
+     *
+     * @param properties the inbound properties add to this message
+     */
+    void addInboundProperties(Map<String, Serializable> properties);
+
+    /**
      * Removes an inbound property on this message.
      *
      * @param key the inbound property key to remove
      * @return the removed property value or null if the property did not exist
      */
     <T extends Serializable> T removeInboundProperty(String key);
+
+    /**
+     * Removes all inbound properties on this message.
+     */
+    void clearInboundProperties();
 
     /**
      * Copy property with the given key from inbound to outbound scope.

@@ -18,7 +18,7 @@
     <flow name="In-Only_Optional-Out--Service">
         <script:component>
             <script:script engine="groovy">
-                if (message.getProperty("foo", org.mule.runtime.core.PropertyScope.INBOUND))
+                if (message.getInboundProperty("foo"))
                     return "foo header received"
                 else
                     return null

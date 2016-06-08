@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core;
 
+import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.core.PropertyScope.INBOUND;
-import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
@@ -52,7 +51,6 @@ import java.io.Serializable;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -321,13 +319,13 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
 
-        if (message instanceof MuleMessage)
+        if(message instanceof MuleMessage)
         {
             copyMessageProperties((MuleMessage) message);
         }
         else
         {
-            copyMessagePropertiesContext(previous);
+            copyMessageProperties(previous);
         }
 
         if (muleContext.getConfiguration().isCacheMessageOriginalPayload())
@@ -348,45 +346,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         copyAttachments(previous);
 
         resetAccessControl();
-    }
-
-    private void copyMessagePropertiesContext(MuleMessage muleMessage)
-    {
-        if (muleMessage instanceof DefaultMuleMessage)
-        {
-            properties = new MessagePropertiesContext(((DefaultMuleMessage) muleMessage).properties);
-        }
-        else
-        {
-            copyMessageProperties(muleMessage);
-        }
-    }
-
-    private void copyMessageProperties(MuleMessage muleMessage)
-    {
-        try
-        {
-            for (String name : muleMessage.getInboundPropertyNames())
-            {
-                Serializable value = muleMessage.getInboundProperty(name);
-                if (value != null)
-                {
-                    setPropertyInternal(name, value, INBOUND, DataTypeFactory.createFromObject(value));
-                }
-            }
-            for (String name : muleMessage.getOutboundPropertyNames())
-            {
-                Serializable value = muleMessage.getOutboundProperty(name);
-                if (value != null)
-                {
-                    setPropertyInternal(name, value, OUTBOUND, DataTypeFactory.createFromObject(value));
-                }
-            }
-        }
-        catch (IllegalArgumentException iae)
-        {
-            // ignore non-registered property scope
-        }
     }
 
     private void copyAttachments(MuleMessage previous)
@@ -468,138 +427,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         return originalPayload;
     }
 
-    public void setInboundProperty(String key, Serializable value)
-    {
-        setProperty(key, value, INBOUND, null);
-    }
-
-    @Override
-    public <T extends Serializable> void setInboundProperty(String key, T value, DataType<T> dataType)
-    {
-        setProperty(key, value, INBOUND, dataType);
-    }
-
-    @Override
-    public void setOutboundProperty(String key, Serializable value)
-    {
-        setProperty(key, value, OUTBOUND, DataTypeFactory.createFromObject(value));
-    }
-
-    @Override
-    public <T extends Serializable> void setOutboundProperty(String key, T value, DataType<T> dataType)
-    {
-       setProperty(key, value, OUTBOUND, dataType);
-    }
-
-    private void setProperty(String key, Serializable value, PropertyScope scope)
-    {
-        DataType dataType = DataTypeFactory.createFromObject(value);
-        setProperty(key, value, scope, dataType);
-    }
-
-    private void setProperty(String key, Serializable value, PropertyScope scope, DataType<?> dataType)
-    {
-        setPropertyInternal(key, value, scope, dataType);
-
-        updateDataTypeWithProperty(key, value);
-    }
-
-    private void setPropertyInternal(String key, Serializable value, PropertyScope scope, DataType<?> dataType)
-    {
-        assertAccess(WRITE);
-        if (key != null)
-        {
-            if (value == null || value instanceof NullPayload)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("setProperty(key, value) called with null value; removing key: " + key);
-                }
-                properties.removeProperty(key);
-            }
-            else
-            {
-                properties.setProperty(key, value, scope, dataType);
-            }
-        }
-        else
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("setProperty(key, value) invoked with null key. Ignoring this entry");
-            }
-        }
-    }
-
-    private void updateDataTypeWithProperty(String key, Serializable value)
-    {
-        // updates dataType when encoding is updated using a property instead of using #setEncoding
-        if (MULE_ENCODING_PROPERTY.equals(key))
-        {
-            getDataType().setEncoding((String) value);
-        }
-        else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
-        {
-            try
-            {
-                MimeType mimeType = new MimeType((String) value);
-                getDataType().setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
-                String encoding = mimeType.getParameter("charset");
-                if (!StringUtils.isEmpty(encoding))
-                {
-                    getDataType().setEncoding(encoding);
-                }
-            }
-            catch (MimeTypeParseException e)
-            {
-                if (Boolean.parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
-                {
-                    throw new IllegalArgumentException("Invalid Content-Type property value", e);
-                }
-                else
-                {
-                    String encoding = Charset.defaultCharset().name();
-                    logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
-                    logger.warn(String.format("Using defualt encoding: %s", encoding));
-                    getDataType().setEncoding(encoding);
-                }
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Serializable removeOutboundProperty(String key)
-    {
-        return (Serializable) properties.removeProperty(key, OUTBOUND);
-    }
-
-    @Override
-    public Serializable removeInboundProperty(String key)
-    {
-        return (Serializable) properties.removeProperty(key, INBOUND);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<String> getInboundPropertyNames()
-    {
-        return properties.getPropertyNames(INBOUND);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<String> getOutboundPropertyNames()
-    {
-        return properties.getScopedProperties(OUTBOUND).keySet();
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -640,103 +467,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         }
     }
 
-    @Override
-    public <T extends Serializable> T getInboundProperty(String name, T defaultValue)
-    {
-        return getProperty(name, INBOUND, defaultValue);
-    }
-
-    @Override
-    public <T extends Serializable> T getInboundProperty(String name)
-    {
-        return getInboundProperty(name, null);
-    }
-
-    @Override
-    public <T extends Serializable> T getOutboundProperty(String name, T defaultValue)
-    {
-        return getProperty(name, OUTBOUND, defaultValue);
-    }
-
-    @Override
-    public <T extends Serializable> T getOutboundProperty(String name)
-    {
-        return getOutboundProperty(name, null);
-    }
-
-    private <T> T getProperty(String name, PropertyScope scope)
-    {
-        assertAccess(READ);
-        return (T) properties.getProperty(name, scope);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T extends Serializable> T getProperty(String name, PropertyScope scope, T defaultValue)
-    {
-        assertAccess(READ);
-        T result;
-
-        //Note that we need to keep the (redundant) casts in here because the compiler compiler complains
-        //about primitive types being cast to a generic type
-        if (defaultValue instanceof Boolean)
-        {
-            result = (T) (Boolean) ObjectUtils.getBoolean(getProperty(name, scope), (Boolean) defaultValue);
-        }
-        else if (defaultValue instanceof Byte)
-        {
-            result = (T) (Byte) ObjectUtils.getByte(getProperty(name, scope), (Byte) defaultValue);
-        }
-        else if (defaultValue instanceof Integer)
-        {
-            result = (T) (Integer) ObjectUtils.getInt(getProperty(name, scope), (Integer) defaultValue);
-        }
-        else if (defaultValue instanceof Short)
-        {
-            result = (T) (Short) ObjectUtils.getShort(getProperty(name, scope), (Short) defaultValue);
-        }
-        else if (defaultValue instanceof Long)
-        {
-            result = (T) (Long) ObjectUtils.getLong(getProperty(name, scope), (Long) defaultValue);
-        }
-        else if (defaultValue instanceof Float)
-        {
-            result = (T) (Float) ObjectUtils.getFloat(getProperty(name, scope), (Float) defaultValue);
-        }
-        else if (defaultValue instanceof Double)
-        {
-            result = (T) (Double) ObjectUtils.getDouble(getProperty(name, scope), (Double) defaultValue);
-        }
-        else if (defaultValue instanceof String)
-        {
-            result = (T) ObjectUtils.getString(getProperty(name, scope), (String) defaultValue);
-        }
-        else
-        {
-            Object temp = getProperty(name, scope);
-            if (temp == null)
-            {
-                return defaultValue;
-            }
-            else if (defaultValue == null)
-            {
-                return (T) temp;
-            }
-            //If defaultValue is set and the result is not null, then validate that they are assignable
-            else if (defaultValue.getClass().isAssignableFrom(temp.getClass()))
-            {
-                result = (T) temp;
-            }
-            else
-            {
-                throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(temp.getClass(), defaultValue.getClass()).getMessage());
-            }
-        }
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setCorrelationId(String id)
     {
@@ -812,8 +542,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Object correlationSequence = findPropertyInSpecifiedScopes(MULE_CORRELATION_SEQUENCE_PROPERTY, OUTBOUND,
-                                                                   INBOUND);
+        Object correlationSequence = findProperty(MULE_CORRELATION_SEQUENCE_PROPERTY);
         return ObjectUtils.getInt(correlationSequence, -1);
     }
 
@@ -835,8 +564,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Object correlationGroupSize = findPropertyInSpecifiedScopes(MULE_CORRELATION_GROUP_SIZE_PROPERTY, OUTBOUND,
-                                                                    INBOUND);
+        Object correlationGroupSize = findProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY);
         return ObjectUtils.getInt(correlationGroupSize, -1);
     }
 
@@ -997,14 +725,14 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public Set<String> getInboundAttachmentNames()
     {
         assertAccess(READ);
-        return Collections.unmodifiableSet(inboundAttachments.keySet());
+        return unmodifiableSet(inboundAttachments.keySet());
     }
 
     @Override
     public Set<String> getOutboundAttachmentNames()
     {
         assertAccess(READ);
-        return Collections.unmodifiableSet(outboundAttachments.keySet());
+        return unmodifiableSet(outboundAttachments.keySet());
     }
 
     /**
@@ -1052,48 +780,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     {
         assertAccess(WRITE);
         getDataType().setMimeType(mimeType);
-    }
-
-    /**
-     * Adds a map of inbound properties to be associated with this message
-     *
-     * @param properties the properties add to this message
-     */
-    public void addInboundProperties(Map<String, Serializable> properties)
-    {
-        assertAccess(WRITE);
-        if (properties != null)
-        {
-            synchronized (properties)
-            {
-                for (Map.Entry<String, Serializable> entry : properties.entrySet())
-                {
-                    setInboundProperty(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-    }
-
-    @Override
-    public void addOutboundProperties(Map<String, Serializable> props)
-    {
-        assertAccess(WRITE);
-        if (props != null)
-        {
-            synchronized (props)
-            {
-                for (Map.Entry<String, Serializable> entry : props.entrySet())
-                {
-                    setOutboundProperty(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-    }
-
-    @Override
-    public void clearOutboundProperties()
-    {
-        properties.clearProperties(OUTBOUND);
     }
 
     /**
@@ -1466,38 +1152,28 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     }
 
     @Override
-    public DataType<? extends Serializable> getInboundPropertyDataType(String name)
-    {
-        return properties.getPropertyDataType(name, INBOUND);
-    }
-
-    @Override
-    public DataType<? extends Serializable> getOutboundPropertyDataType(String name)
-    {
-        return properties.getPropertyDataType(name, OUTBOUND);
-    }
-
-    @Override
     public <Payload, Attributes extends Serializable> org.mule.runtime.api.message.MuleMessage<Payload, Attributes> asNewMessage()
     {
         return (org.mule.runtime.api.message.MuleMessage<Payload, Attributes>) this;
     }
 
     /**
-     * Find property in one of the specified scopes, in order
+     * Find property by searching outbound and then inbound scopes in order.
+     * @param name name of the property to find
+     * @return value of the property or null if property is not found in either scope
      */
     @SuppressWarnings("unchecked")
-    public <T> T findPropertyInSpecifiedScopes(String name, PropertyScope... scopesToSearch)
+    private <T> T findProperty(String name)
     {
-        for (PropertyScope scope : scopesToSearch)
+        T result = getOutboundProperty(name);
+        if (result != null)
         {
-            Object result = getProperty(name, scope);
-            if (result != null)
-            {
-                return (T) result;
-            }
+            return result;
         }
-        return null;
+        else
+        {
+            return getInboundProperty(name);
+        }
     }
 
     @Override
@@ -1549,14 +1225,14 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
             newInboundProperties.put(name, currentMessage.getOutboundProperty(name));
         }
 
-        newMessage.properties.clearProperties(INBOUND);
-        newMessage.properties.clearProperties(OUTBOUND);
+        newMessage.properties.clearInboundProperties();
+        newMessage.properties.clearOutboundProperties();
 
         for (Map.Entry<String, Serializable> s : newInboundProperties.entrySet())
         {
             DataType<?> propertyDataType = currentMessage.getOutboundPropertyDataType(s.getKey());
 
-            newMessage.setProperty(s.getKey(), s.getValue(), INBOUND, propertyDataType);
+            newMessage.setInboundProperty(s.getKey(), s.getValue(), (DataType<Serializable>) propertyDataType);
         }
 
         newMessage.inboundAttachments.clear();
@@ -1576,6 +1252,12 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     }
 
     @Override
+    public Serializable getAttributes()
+    {
+        return attributes;
+    }
+
+    @Override
     public boolean equals(Object obj)
     {
         if (!(obj instanceof DefaultMuleMessage))
@@ -1592,14 +1274,193 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     }
 
     @Override
-    public Serializable getAttributes()
+    public <T extends Serializable> T getInboundProperty(String name)
     {
-        return attributes;
+        return properties.getInboundProperty(name);
+    }
+
+    @Override
+    public <T extends Serializable> T getInboundProperty(String name, T defaultValue)
+    {
+        return properties.getInboundProperty(name, defaultValue);
+    }
+
+    @Override
+    public <T extends Serializable> T getOutboundProperty(String name)
+    {
+        return properties.getOutboundProperty(name);
+    }
+
+    @Override
+    public <T extends Serializable> T getOutboundProperty(String name, T defaultValue)
+    {
+        return properties.getOutboundProperty(name, defaultValue);
+    }
+
+    @Override
+    public void setInboundProperty(String key, Serializable value)
+    {
+        properties.setInboundProperty(key, value);
+        updateDataTypeWithProperty(key, value);
+    }
+
+    @Override
+    public <T extends Serializable> void setInboundProperty(String key, T value, DataType<T> dataType)
+    {
+        properties.setInboundProperty(key, value, dataType);
+        updateDataTypeWithProperty(key, value);
+    }
+
+    @Override
+    public void addInboundProperties(Map<String, Serializable> props)
+    {
+        assertAccess(WRITE);
+        properties.addInboundProperties(props);
+        if (props != null)
+        {
+            props.entrySet().stream().forEach(entry -> updateDataTypeWithProperty(entry.getKey(), entry.getValue()));
+        }
+    }
+
+    @Override
+    public void setOutboundProperty(String key, Serializable value)
+    {
+        properties.setOutboundProperty(key, value);
+        updateDataTypeWithProperty(key, value);
+    }
+
+    @Override
+    public <T extends Serializable> void setOutboundProperty(String key, T value, DataType<T> dataType)
+    {
+        properties.setOutboundProperty(key, value, dataType);
+        updateDataTypeWithProperty(key, value);
+    }
+
+    @Override
+    public void addOutboundProperties(Map<String, Serializable> props)
+    {
+        assertAccess(WRITE);
+        properties.addOutboundProperties(props);
+        if (props != null)
+        {
+            props.entrySet().stream().forEach(entry -> updateDataTypeWithProperty(entry.getKey(), entry.getValue()));
+        }
+    }
+
+    @Override
+    public Serializable removeInboundProperty(String key)
+    {
+        return properties.removeInboundProperty(key);
+    }
+
+    @Override
+    public Serializable removeOutboundProperty(String key)
+    {
+        return properties.removeOutboundProperty(key);
+    }
+
+    @Override
+    public void clearInboundProperties()
+    {
+        properties.clearInboundProperties();
+    }
+
+    @Override
+    public void clearOutboundProperties()
+    {
+        properties.clearOutboundProperties();
+    }
+
+    @Override
+    public Set<String> getInboundPropertyNames()
+    {
+        return unmodifiableSet(properties.getInboundPropertyNames());
+    }
+
+    @Override
+    public Set<String> getOutboundPropertyNames()
+    {
+        return properties.getOutboundPropertyNames();
     }
 
     @Override
     public void copyProperty(String key)
     {
-        setProperty(key, getInboundProperty(key), OUTBOUND, getInboundPropertyDataType(key));
+        properties.copyProperty(key);
+    }
+
+    @Override
+    public DataType<? extends Serializable> getInboundPropertyDataType(String name)
+    {
+        return properties.getInboundPropertyDataType(name);
+    }
+
+    @Override
+    public DataType<? extends Serializable> getOutboundPropertyDataType(String name)
+    {
+        return properties.getOutboundPropertyDataType(name);
+    }
+
+    private void copyMessageProperties(MuleMessage muleMessage)
+    {
+        if (muleMessage instanceof DefaultMuleMessage)
+        {
+            properties = new MessagePropertiesContext(((DefaultMuleMessage) muleMessage).properties);
+        }
+        else
+        {
+            for (String name : muleMessage.getInboundPropertyNames())
+            {
+                Serializable value = muleMessage.getInboundProperty(name);
+                if (value != null)
+                {
+                    properties.setInboundProperty(name, value, muleMessage.getInboundPropertyDataType(name).cloneDataType());
+                }
+            }
+            for (String name : muleMessage.getOutboundPropertyNames())
+            {
+                Serializable value = muleMessage.getOutboundProperty(name);
+                if (value != null)
+                {
+                    properties.setOutboundProperty(name, value, muleMessage.getOutboundPropertyDataType(name).cloneDataType());
+                }
+            }
+        }
+    }
+
+    private void updateDataTypeWithProperty(String key, Object value)
+    {
+        // updates dataType when encoding is updated using a property instead of using #setEncoding
+        if (MULE_ENCODING_PROPERTY.equals(key))
+        {
+            getDataType().setEncoding((String) value);
+        }
+        else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
+        {
+            try
+            {
+                MimeType mimeType = new MimeType((String) value);
+                getDataType().setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
+                String encoding = mimeType.getParameter("charset");
+                if (!StringUtils.isEmpty(encoding))
+                {
+                    getDataType().setEncoding(encoding);
+                }
+            }
+            catch (MimeTypeParseException e)
+            {
+                if (Boolean.parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
+                {
+                    throw new IllegalArgumentException("Invalid Content-Type property value", e);
+                }
+                else
+                {
+                    String encoding = Charset.defaultCharset().name();
+                    logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
+                    logger.warn(String.format("Using defualt encoding: %s", encoding));
+                    getDataType().setEncoding(encoding);
+                }
+            }
+        }
     }
 }

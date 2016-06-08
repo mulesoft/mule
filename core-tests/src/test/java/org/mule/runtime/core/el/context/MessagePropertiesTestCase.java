@@ -7,7 +7,10 @@
 package org.mule.runtime.core.el.context;
 
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -133,8 +136,8 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
         mock(DataHandler.class);
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
-        assertEquals("foo", evaluate("message.inboundProperties.keySet().toArray()[0]", event));
-        assertEquals("bar", evaluate("message.inboundProperties.keySet().toArray()[1]", event));
+        assertThat(evaluate("message.inboundProperties.keySet().toArray()[0]", event), anyOf(equalTo("foo"),equalTo("bar")));
+        assertThat(evaluate("message.inboundProperties.keySet().toArray()[1]", event), anyOf(equalTo("foo"),equalTo("bar")));
     }
 
     @Test
@@ -231,8 +234,8 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
         MuleMessage message = event.getMessage();
         message.setOutboundProperty("foo", "abc");
         message.setOutboundProperty("bar", "xyz");
-        assertEquals("foo", evaluate("message.outboundProperties.keySet().toArray()[0]", event));
-        assertEquals("bar", evaluate("message.outboundProperties.keySet().toArray()[1]", event));
+        assertThat(evaluate("message.outboundProperties.keySet().toArray()[0]", event), anyOf(equalTo("foo"),equalTo("bar")));
+        assertThat(evaluate("message.outboundProperties.keySet().toArray()[1]", event), anyOf(equalTo("foo"),equalTo("bar")));
     }
 
     @Test
