@@ -8,11 +8,10 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -61,7 +60,7 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
 
         Map<String, Serializable> messageProperties = new HashMap<>();
         String replyToUri = "jms://out2";
-        messageProperties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, replyToUri);
+        messageProperties.put(MULE_REPLY_TO_PROPERTY, replyToUri);
 
         client.dispatch("jms://out", MESSAGE, messageProperties);
 

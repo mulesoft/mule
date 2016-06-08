@@ -9,8 +9,13 @@ package org.mule.runtime.core;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.core.PropertyScope.INBOUND;
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
+import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -19,7 +24,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.ThreadSafeAccess;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -530,11 +534,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     private void updateDataTypeWithProperty(String key, Serializable value)
     {
         // updates dataType when encoding is updated using a property instead of using #setEncoding
-        if (MuleProperties.MULE_ENCODING_PROPERTY.equals(key))
+        if (MULE_ENCODING_PROPERTY.equals(key))
         {
             getDataType().setEncoding((String) value);
         }
-        else if (MuleProperties.CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
+        else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
         {
             try
             {
@@ -739,11 +743,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         assertAccess(WRITE);
         if (StringUtils.isNotBlank(id))
         {
-            setOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, id, null);
+            setOutboundProperty(MULE_CORRELATION_ID_PROPERTY, id, null);
         }
         else
         {
-            removeOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+            removeOutboundProperty(MULE_CORRELATION_ID_PROPERTY);
         }
     }
 
@@ -754,10 +758,10 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public String getCorrelationId()
     {
         assertAccess(READ);
-        String correlationId = getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+        String correlationId = getOutboundProperty(MULE_CORRELATION_ID_PROPERTY);
         if (correlationId == null)
         {
-            correlationId = getInboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+            correlationId = getInboundProperty(MULE_CORRELATION_ID_PROPERTY);
         }
 
         return correlationId;
@@ -776,11 +780,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
             {
                 logger.warn("ReplyTo " + replyTo + " is not serializable and will not be propagated by Mule");
             }
-            setOutboundProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, (Serializable) replyTo);
+            setOutboundProperty(MULE_REPLY_TO_PROPERTY, (Serializable) replyTo);
         }
         else
         {
-            removeOutboundProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+            removeOutboundProperty(MULE_REPLY_TO_PROPERTY);
         }
     }
 
@@ -791,11 +795,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public Object getReplyTo()
     {
         assertAccess(READ);
-        Serializable replyTo = getOutboundProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+        Serializable replyTo = getOutboundProperty(MULE_REPLY_TO_PROPERTY);
         if (replyTo == null)
         {
             // fallback to inbound, use the requestor's setting if the invocation didn't set any
-            replyTo = getInboundProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+            replyTo = getInboundProperty(MULE_REPLY_TO_PROPERTY);
         }
         return replyTo;
     }
@@ -808,8 +812,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Object correlationSequence = findPropertyInSpecifiedScopes(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
-                                                                   PropertyScope.OUTBOUND,
+        Object correlationSequence = findPropertyInSpecifiedScopes(MULE_CORRELATION_SEQUENCE_PROPERTY, OUTBOUND,
                                                                    INBOUND);
         return ObjectUtils.getInt(correlationSequence, -1);
     }
@@ -821,7 +824,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public void setCorrelationSequence(int sequence)
     {
         assertAccess(WRITE);
-        setOutboundProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
+        setOutboundProperty(MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
     }
 
     /**
@@ -832,8 +835,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Object correlationGroupSize = findPropertyInSpecifiedScopes(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-                                                                    PropertyScope.OUTBOUND,
+        Object correlationGroupSize = findPropertyInSpecifiedScopes(MULE_CORRELATION_GROUP_SIZE_PROPERTY, OUTBOUND,
                                                                     INBOUND);
         return ObjectUtils.getInt(correlationGroupSize, -1);
     }
@@ -845,7 +847,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public void setCorrelationGroupSize(int size)
     {
         assertAccess(WRITE);
-        setOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
+        setOutboundProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
     }
 
     /**
@@ -1021,7 +1023,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
                 return encoding;
             }
         }
-        encoding = getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY);
+        encoding = getOutboundProperty(MULE_ENCODING_PROPERTY);
         if (encoding != null)
         {
             return encoding;

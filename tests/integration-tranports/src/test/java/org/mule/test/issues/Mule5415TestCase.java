@@ -18,6 +18,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.hamcrest.core.IsNull;
 import org.junit.Rule;
@@ -39,7 +40,7 @@ public class Mule5415TestCase extends FunctionalTestCase
     public void testFirstRequestDoesntFail() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        HashMap<String, Serializable> properties = new HashMap<>();
+        Map<String, Serializable> properties = new HashMap<>();
         properties.put("Content-Type","application/x-www-form-urlencoded");
         MuleMessage message = client.send(String.format("http://localhost:%s?param1=1&param2=3", port1.getNumber()), new DefaultMuleMessage("message", properties, muleContext), newOptions().method(POST.name()).build());
         assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());

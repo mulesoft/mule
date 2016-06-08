@@ -9,9 +9,10 @@ package org.mule.test.integration.client;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerEndpoint;
-
-import org.mule.compatibility.core.api.config.MuleEndpointProperties;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
@@ -21,11 +22,9 @@ import org.mule.compatibility.module.client.MuleClient;
 import org.mule.compatibility.transport.jms.JmsTransactionFactory;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -50,7 +49,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         final MuleClient client = new MuleClient(muleContext);
         final Map<String, Serializable> props = new HashMap<>();
         props.put("JMSReplyTo", "replyTo.queue");
-        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
+        props.put(MULE_REMOTE_SYNC_PROPERTY, "false");
 
         // Empty reply queue
         while (client.request("jms://replyTo.queue", 2000) != null)
@@ -58,7 +57,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             // slurp
         }
 
-        MuleTransactionConfig tc = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
+        MuleTransactionConfig tc = new MuleTransactionConfig(ACTION_ALWAYS_BEGIN);
         tc.setFactory(new JmsTransactionFactory());
 
         // This enpoint needs to be registered prior to use cause we need to set
@@ -98,7 +97,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         final MuleClient client = new MuleClient(muleContext);
         final Map<String, Serializable> props = new HashMap<>();
         props.put("JMSReplyTo", "replyTo.queue");
-        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
+        props.put(MULE_REMOTE_SYNC_PROPERTY, "false");
 
         // Empty reply queue
         while (client.request("jms://replyTo.queue", 2000) != null)
@@ -106,7 +105,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             // hmm..mesages
         }
 
-        MuleTransactionConfig tc = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
+        MuleTransactionConfig tc = new MuleTransactionConfig(ACTION_ALWAYS_BEGIN);
         tc.setFactory(new JmsTransactionFactory());
 
         // This enpoint needs to be registered prior to use cause we need to set
@@ -151,7 +150,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         final MuleClient client = new MuleClient(muleContext);
         final Map<String, Serializable> props = new HashMap<>();
         props.put("JMSReplyTo", "replyTo.queue");
-        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
+        props.put(MULE_REMOTE_SYNC_PROPERTY, "false");
         props.put("transacted", "true");
 
         // Empty reply queue
@@ -160,7 +159,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             // yum!
         }
 
-        MuleTransactionConfig tc = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
+        MuleTransactionConfig tc = new MuleTransactionConfig(ACTION_ALWAYS_BEGIN);
         tc.setFactory(new JmsTransactionFactory());
 
         // This enpoint needs to be registered prior to use cause we need to set
@@ -199,7 +198,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     protected void emptyReplyQueue() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
-        MuleTransactionConfig tc = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_BEGIN);
+        MuleTransactionConfig tc = new MuleTransactionConfig(ACTION_ALWAYS_BEGIN);
         tc.setFactory(new JmsTransactionFactory());
         ExecutionTemplate<Void> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, tc);
         executionTemplate.execute(new ExecutionCallback<Void>()
@@ -219,7 +218,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
 
     public EndpointFactory getEndpointFactory()
     {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+        return (EndpointFactory) muleContext.getRegistry().lookupObject(OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
 }

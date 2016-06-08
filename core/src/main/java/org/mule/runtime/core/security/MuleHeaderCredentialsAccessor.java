@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.security;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 
 import java.io.Serializable;
@@ -20,11 +20,11 @@ public class MuleHeaderCredentialsAccessor implements CredentialsAccessor
 {
     public Serializable getCredentials(MuleEvent event)
     {
-        return event.getMessage().getInboundProperty(MuleProperties.MULE_USER_PROPERTY);
+        return event.getMessage().getInboundProperty(MULE_USER_PROPERTY);
     }
 
     public void setCredentials(MuleEvent event, Serializable credentials)
     {
-        event.getMessage().setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, credentials);
+        event.getMessage().setOutboundProperty(MULE_USER_PROPERTY, credentials);
     }
 }

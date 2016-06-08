@@ -6,6 +6,12 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_DIRECTORY;
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_FILENAME;
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_DIRECTORY;
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_FILENAME;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
@@ -17,7 +23,6 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -141,7 +146,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             synchronousProcessing = ((Flow)getFlowConstruct()).getProcessingStrategy() instanceof SynchronousProcessingStrategy;
         }
         this.poolOnPrimaryInstanceOnly = Boolean.valueOf(System.getProperty(MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE,"false")) || !synchronousProcessing;
-        ObjectStoreManager objectStoreManager = getEndpoint().getMuleContext().getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
+        ObjectStoreManager objectStoreManager = getEndpoint().getMuleContext().getRegistry().get(OBJECT_STORE_MANAGER);
         filesBeingProcessingObjectStore = objectStoreManager.getObjectStore(getEndpoint().getName(),false,1000,60000,20000);
     }
 
@@ -291,8 +296,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
         DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, getEndpoint().getMuleContext());
-        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
-        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
+        fileParserMessasge.setInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+        fileParserMessasge.setInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
 
         final DefaultMuleEvent event = new DefaultMuleEvent(fileParserMessasge, (FlowConstruct) null);
 
@@ -355,20 +360,20 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         if (workDir != null)
         {
-            message.setInboundProperty(FileConnector.PROPERTY_SOURCE_DIRECTORY, file.getParent());
-            message.setInboundProperty(FileConnector.PROPERTY_SOURCE_FILENAME, file.getName());
+            message.setInboundProperty(PROPERTY_SOURCE_DIRECTORY, file.getParent());
+            message.setInboundProperty(PROPERTY_SOURCE_FILENAME, file.getName());
         }
 
-        message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
-        message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+        message.setInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
+        message.setInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
 
         // TODO
-        message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
-        message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+        message.setOutboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
+        message.setOutboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
 
         if (forceSync)
         {
-            message.setInboundProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE);
+            message.setInboundProperty(MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE);
         }
 
         final Object originalPayload = message.getPayload();
@@ -573,8 +578,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // create new Message for destinationFile
             message = createMuleMessage(destinationFile, endpoint.getEncoding());
             message.setInboundProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
-            message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
-            message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
+            message.setInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+            message.setInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
         }
 
         // finally deliver the file message

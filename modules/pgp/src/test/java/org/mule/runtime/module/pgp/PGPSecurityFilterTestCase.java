@@ -8,13 +8,12 @@ package org.mule.runtime.module.pgp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.FileInputStream;
@@ -79,7 +78,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     {
         Map<String, Serializable> props = new HashMap<>();
         props.put("TARGET_FILE", TARGET);
-        props.put(MuleProperties.MULE_USER_PROPERTY, "Mule server <mule_server@mule.com>");
+        props.put(MULE_USER_PROPERTY, "Mule server <mule_server@mule.com>");
         return props;
     }
 }

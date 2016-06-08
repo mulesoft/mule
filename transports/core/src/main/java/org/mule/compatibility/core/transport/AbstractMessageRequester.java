@@ -6,6 +6,9 @@
  */
 package org.mule.compatibility.core.transport;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
+import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.compatibility.core.api.transport.ReceiveException;
@@ -14,7 +17,6 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -87,7 +89,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
             if (connector.isEnableMessageEvents())
             {
                 MuleMessage dummyMessage = new DefaultMuleMessage(NullPayload.getInstance(), endpoint.getMuleContext());
-                beginNotification = new EndpointMessageNotification(dummyMessage, endpoint, null, EndpointMessageNotification.MESSAGE_REQUEST_BEGIN);
+                beginNotification = new EndpointMessageNotification(dummyMessage, endpoint, null, MESSAGE_REQUEST_BEGIN);
             }
             // Make sure we are connected
             connect();
@@ -95,11 +97,11 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
             result = doRequest(timeout);
             if (result != null)
             {
-                String rootId = result.getInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY);
+                String rootId = result.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
                 if (rootId != null)
                 {
                     result.setMessageRootId(rootId);
-                    result.removeInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY);
+                    result.removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
                 }
                 if (beginNotification != null)
                 {
@@ -113,7 +115,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
                 {
                     connector.fireNotification(beginNotification);
                     connector.fireNotification(new EndpointMessageNotification(result, endpoint, null,
-                        EndpointMessageNotification.MESSAGE_REQUEST_END));
+                        MESSAGE_REQUEST_END));
                 }
             }
             return result;

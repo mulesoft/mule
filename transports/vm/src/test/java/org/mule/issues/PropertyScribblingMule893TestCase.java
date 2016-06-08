@@ -8,11 +8,10 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -33,7 +32,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         Map<String, Serializable> properties = new HashMap<>();
-        properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "receive");
+        properties.put(MULE_REPLY_TO_PROPERTY, "receive");
 
         client.dispatch("dispatch", "Message", properties);
         MuleMessage response = client.request("receive", 3000L);

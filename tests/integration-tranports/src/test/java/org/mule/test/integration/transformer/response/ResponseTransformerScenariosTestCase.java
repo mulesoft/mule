@@ -10,11 +10,10 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.Serializable;
@@ -70,7 +69,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
 
         Map<String, Serializable> props = new HashMap<>();
         // This will disable the transformers configured in the VM connector's service-overrides.
-        props.put(MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY, "true");
+        props.put(MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY, "true");
 
         MuleMessage message = client.send("vm://syncResponseTransformer", "request", props);
         assertThat(message, notNullValue());

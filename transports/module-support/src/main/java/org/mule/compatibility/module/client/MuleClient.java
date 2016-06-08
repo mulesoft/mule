@@ -6,7 +6,12 @@
  */
 package org.mule.compatibility.module.client;
 
-import org.mule.compatibility.core.api.config.MuleEndpointProperties;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MuleEvent.TIMEOUT_NOT_SET_VALUE;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
@@ -28,7 +33,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -251,8 +255,8 @@ public class MuleClient implements Disposable
      */
     public void dispatch(String url, MuleMessage message) throws MuleException
     {
-        OutboundEndpoint endpoint = getOutboundEndpoint(url, MessageExchangePattern.ONE_WAY, null);
-        MuleEvent event = getEvent(message, MessageExchangePattern.ONE_WAY);
+        OutboundEndpoint endpoint = getOutboundEndpoint(url, ONE_WAY, null);
+        MuleEvent event = getEvent(message, ONE_WAY);
         endpoint.process(event);
     }
 
@@ -286,7 +290,7 @@ public class MuleClient implements Disposable
      */
     public FutureMessageResult sendAsync(final String url, final MuleMessage message) throws MuleException
     {
-        return sendAsync(url, message, MuleEvent.TIMEOUT_NOT_SET_VALUE);
+        return sendAsync(url, message, TIMEOUT_NOT_SET_VALUE);
     }
 
     /**
@@ -360,7 +364,7 @@ public class MuleClient implements Disposable
      */
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException
     {
-        return send(url, payload, messageProperties, MuleEvent.TIMEOUT_NOT_SET_VALUE);
+        return send(url, payload, messageProperties, TIMEOUT_NOT_SET_VALUE);
     }
 
     /**
@@ -376,7 +380,7 @@ public class MuleClient implements Disposable
      */
     public MuleMessage send(String url, MuleMessage message) throws MuleException
     {
-        return send(url, message, MuleEvent.TIMEOUT_NOT_SET_VALUE);
+        return send(url, message, TIMEOUT_NOT_SET_VALUE);
     }
 
     /**
@@ -402,11 +406,11 @@ public class MuleClient implements Disposable
         {
             messageProperties = new HashMap<>();
         }
-        if (messageProperties.get(MuleProperties.MULE_REMOTE_SYNC_PROPERTY) == null)
+        if (messageProperties.get(MULE_REMOTE_SYNC_PROPERTY) == null)
         {
             // clone the map in case a call used an unmodifiable version
             messageProperties = new HashMap<>(messageProperties);
-            messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
+            messageProperties.put(MULE_REMOTE_SYNC_PROPERTY, "true");
         }
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
         return send(url, message, timeout);
@@ -428,9 +432,9 @@ public class MuleClient implements Disposable
     public MuleMessage send(String url, MuleMessage message, int timeout) throws MuleException
     {
         OutboundEndpoint endpoint =
-            getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, timeout);
+            getOutboundEndpoint(url, REQUEST_RESPONSE, timeout);
 
-        MuleEvent event = getEvent(message, MessageExchangePattern.REQUEST_RESPONSE);
+        MuleEvent event = getEvent(message, REQUEST_RESPONSE);
 
         MuleEvent response = endpoint.process(event);
         if (response != null && !VoidMuleEvent.getInstance().equals(response))
@@ -507,8 +511,8 @@ public class MuleClient implements Disposable
     {
         if (user != null)
         {
-            message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY,
-                MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
+            message.setOutboundProperty(MULE_USER_PROPERTY,
+                                        MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
         }
         return new DefaultMuleEvent(message, exchangePattern,
                 new MuleClientFlowConstruct(muleContext));
@@ -584,12 +588,12 @@ public class MuleClient implements Disposable
         {
             messageProperties = new HashMap<>();
         }
-        messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
+        messageProperties.put(MULE_REMOTE_SYNC_PROPERTY, "false");
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
 
         OutboundEndpoint endpoint =
-            getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, null);
-        MuleEvent event = getEvent(message, MessageExchangePattern.REQUEST_RESPONSE);
+            getOutboundEndpoint(url, REQUEST_RESPONSE, null);
+        MuleEvent event = getEvent(message, REQUEST_RESPONSE);
         endpoint.process(event);
     }
 
@@ -643,7 +647,7 @@ public class MuleClient implements Disposable
 
     private EndpointFactory getEndpointFactory()
     {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+        return (EndpointFactory) muleContext.getRegistry().lookupObject(OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
 }

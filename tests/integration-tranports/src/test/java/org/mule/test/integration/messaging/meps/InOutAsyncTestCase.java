@@ -8,11 +8,10 @@ package org.mule.test.integration.messaging.meps;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -37,7 +36,7 @@ public class InOutAsyncTestCase extends FunctionalTestCase
 
         Map<String, Serializable> props = new HashMap<>();
         //Almost any endpoint can be used here
-        props.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "jms://client-reply");
+        props.put(MULE_REPLY_TO_PROPERTY, "jms://client-reply");
 
         MuleMessage result = client.send("inboundEndpoint", "some data", props);
         assertNotNull(result);
