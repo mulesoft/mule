@@ -7,10 +7,12 @@
 package org.mule.runtime.config.spring.parsers;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.config.spring.parsers.beans.SimpleCollectionObject;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +64,7 @@ public class SimpleParameterParsingTestCase extends FunctionalTestCase
         SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("onlyComplexChildrenListParameterObject");
         Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
         assertThat(simpleParameters.size(), is(1));
-        assertOtherChildren(simpleParameters);
+        assertCollectionChildrenContent((List<SimpleCollectionObject>) simpleParameters.get("other-children"));
     }
 
     @Test
@@ -74,14 +76,24 @@ public class SimpleParameterParsingTestCase extends FunctionalTestCase
         assertFirstChildParameters(simpleParameters);
         assertFirstChildParameters(((SimpleCollectionObject) simpleParameters.get("first-child")).getSimpleParameters());
         assertSecondChildParameters(((SimpleCollectionObject) simpleParameters.get("second-child")).getSimpleParameters());
-        assertOtherChildren(simpleParameters);
+        assertCollectionChildrenContent((List<SimpleCollectionObject>) simpleParameters.get("other-children"));
     }
 
-    private void assertOtherChildren(Map<Object, Object> simpleParameters)
+    @Test
+    public void customCollectionTypeObject()
     {
-        List<SimpleCollectionObject> collectionObject = (List<SimpleCollectionObject>) simpleParameters.get("other-children");
-        assertFirstChildParameters(collectionObject.get(0).getSimpleParameters());
-        assertSecondChildParameters(collectionObject.get(1).getSimpleParameters());
+        SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("customCollectionTypeObject");
+        Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
+        assertThat(simpleParameters.size(), is(1));
+        List<SimpleCollectionObject> collectionObject = (List<SimpleCollectionObject>) simpleParameters.get("other-children-custom-collection-type");
+        assertThat(collectionObject, instanceOf(LinkedList.class));
+        assertCollectionChildrenContent(collectionObject);
+    }
+
+    private void assertCollectionChildrenContent(List<SimpleCollectionObject> collectionObjects)
+    {
+        assertFirstChildParameters(collectionObjects.get(0).getSimpleParameters());
+        assertSecondChildParameters(collectionObjects.get(1).getSimpleParameters());
     }
 
     private void assertFirstChildParameters(Map<Object, Object> simpleParameters)

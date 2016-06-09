@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.dsl.processor;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -50,7 +51,7 @@ public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVi
     }
 
     @Override
-    public void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier)
+    public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionTypeOptional)
     {
     }
 
