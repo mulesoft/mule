@@ -56,15 +56,21 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy
 
         for (String packageName : lookupStrategies.keySet())
         {
-            ClassLoaderLookupStrategy lookupStrategy = lookupStrategies.get(packageName);
+            result.put(normalizePackageName(packageName), lookupStrategies.get(packageName));
+        }
+
+        return result;
+    }
+
+    private void validateLookupPolicies(Map<String, ClassLoaderLookupStrategy> lookupStrategies)
+    {
+        for (String packageName : lookupStrategies.keySet())
+        {
             if (isSystemPackage(packageName))
             {
                 throw new IllegalArgumentException("Attempt to override lookup strategy for system package: " + packageName);
             }
-            result.put(normalizePackageName(packageName), lookupStrategy);
         }
-
-        return result;
     }
 
     private String normalizePackageName(String packageName)
@@ -124,6 +130,7 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy
     @Override
     public ClassLoaderLookupPolicy extend(Map<String, ClassLoaderLookupStrategy> lookupStrategies)
     {
+        validateLookupPolicies(lookupStrategies);
         final HashMap<String, ClassLoaderLookupStrategy> newLookupStraetgies = new HashMap<>(this.configuredlookupStrategies);
 
         for (String packageName : lookupStrategies.keySet())
@@ -134,7 +141,9 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy
             }
         }
 
-        return new MuleClassLoaderLookupPolicy(newLookupStraetgies, rootSystemPackages);
+        final MuleClassLoaderLookupPolicy muleClassLoaderLookupPolicy = new MuleClassLoaderLookupPolicy(newLookupStraetgies, rootSystemPackages);
+
+        return muleClassLoaderLookupPolicy;
     }
 
     private boolean isSystemPackage(String packageName)

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher;
 
-import org.mule.runtime.container.ContainerClassLoaderFactory;
+import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;

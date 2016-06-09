@@ -5,11 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.container;
+package org.mule.runtime.container.internal;
 
-import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
-import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
@@ -18,9 +17,11 @@ import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -83,6 +84,8 @@ public class ContainerClassLoaderFactory
             "org.mule.mvel2"
     );
 
+    private ModuleDiscoverer moduleDiscoverer = new ClasspathModuleDiscoverer(this.getClass().getClassLoader());
+
     /**
      * Creates the classLoader to represent the Mule container.
      *
@@ -94,7 +97,10 @@ public class ContainerClassLoaderFactory
     {
         final Set<String> parentOnlyPackages = new HashSet<>(BOOT_PACKAGES);
         parentOnlyPackages.addAll(SYSTEM_PACKAGES);
-        final MuleClassLoaderLookupPolicy containerLookupPolicy = new MuleClassLoaderLookupPolicy(Collections.emptyMap(), parentOnlyPackages);
+
+        final List<MuleModule> muleModules = moduleDiscoverer.discover();
+        final Map<String, ClassLoaderLookupStrategy> lookupStrategies = buildClassLoaderLookupStrategy(muleModules);
+        final MuleClassLoaderLookupPolicy containerLookupPolicy = new MuleClassLoaderLookupPolicy(lookupStrategies, parentOnlyPackages);
         final ArtifactClassLoader containerClassLoader = new MuleArtifactClassLoader("mule", new URL[0], parentClassLoader, containerLookupPolicy)
         {
             @Override
@@ -112,11 +118,30 @@ public class ContainerClassLoaderFactory
             }
         };
 
-        return createContainerFilteringClassLoader(containerClassLoader);
+        return createContainerFilteringClassLoader(muleModules, containerClassLoader);
     }
 
-    private FilteringArtifactClassLoader createContainerFilteringClassLoader(ArtifactClassLoader containerClassLoader)
+    public void setModuleDiscoverer(ModuleDiscoverer moduleDiscoverer)
     {
-        return new FilteringContainerClassLoader(containerClassLoader, new ContainerClassLoaderFilterFactory().create(BOOT_PACKAGES));
+        this.moduleDiscoverer = moduleDiscoverer;
+    }
+
+    private Map<String, ClassLoaderLookupStrategy> buildClassLoaderLookupStrategy(List<MuleModule> muleModules)
+    {
+        final Map<String, ClassLoaderLookupStrategy> result = new HashMap<>();
+        for (MuleModule muleModule : muleModules)
+        {
+            for (String exportedPackage : muleModule.getExportedPackages())
+            {
+                result.put(exportedPackage, ClassLoaderLookupStrategy.PARENT_ONLY);
+            }
+        }
+
+        return result;
+    }
+
+    private FilteringArtifactClassLoader createContainerFilteringClassLoader(List<MuleModule> muleModules, ArtifactClassLoader containerClassLoader)
+    {
+        return new FilteringContainerClassLoader(containerClassLoader, new ContainerClassLoaderFilterFactory().create(BOOT_PACKAGES, muleModules));
     }
 }

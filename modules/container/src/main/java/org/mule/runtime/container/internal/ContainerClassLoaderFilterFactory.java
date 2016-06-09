@@ -7,19 +7,12 @@
 
 package org.mule.runtime.container.internal;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.core.util.PropertiesUtils.discoverProperties;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -32,71 +25,38 @@ import java.util.Set;
 public class ContainerClassLoaderFilterFactory
 {
 
-    public static final String MODULE_PROPERTIES = "META-INF/mule-module.properties";
-
-    public ClassLoaderFilter create(Set<String> bootPackages)
+    public ClassLoaderFilter create(Set<String> bootPackages, List<MuleModule> muleModules)
     {
+        final Set<String> resources = getExportedResourcePaths(muleModules);
+        final Set<String> packages = getModuleExportedPackages(muleModules);
+        final ArtifactClassLoaderFilter artifactClassLoaderFilter = new ArtifactClassLoaderFilter(packages, resources);
 
-        Map<String, String> packages = new HashMap<>();
-        Set<String> modules = new HashSet<>();
+        return new ContainerClassLoaderFilter(artifactClassLoaderFilter, bootPackages);
+    }
 
+    private Set<String> getExportedResourcePaths(List<MuleModule> muleModules)
+    {
         Set<String> resources = new HashSet<>();
         // Adds default SPI resource folder
         resources.add("/META-INF/services");
 
-        try
+        for (MuleModule muleModule : muleModules)
         {
-            for (Properties muleModule : discoverProperties(MODULE_PROPERTIES))
-            {
-                final String moduleName = (String) muleModule.get("module.name");
-                if (isEmpty(moduleName))
-                {
-                    throw new IllegalStateException("Mule-module.properties must contain module.name property");
-                }
-
-                if (modules.contains(moduleName))
-                {
-                    throw new IllegalStateException(String.format("Module '%s' was already defined", moduleName));
-                }
-                modules.add(moduleName);
-
-                final String exportedPackagesProperty = (String) muleModule.get(EXPORTED_CLASS_PACKAGES_PROPERTY);
-                if (!isEmpty(exportedPackagesProperty))
-                {
-                    for (String packageName : exportedPackagesProperty.split(","))
-                    {
-                        packageName = packageName.trim();
-                        if (!isEmpty(packageName))
-                        {
-                            packages.put(packageName, moduleName);
-                        }
-                    }
-                }
-
-                final String exportedResourcesProperty = (String) muleModule.get(EXPORTED_RESOURCE_PACKAGES_PROPERTY);
-                if (!isEmpty(exportedResourcesProperty))
-                {
-                    for (String resource : exportedResourcesProperty.split(","))
-                    {
-                        if (!isEmpty(resource.trim()))
-                        {
-                            if (resource.startsWith("/"))
-                            {
-                                resource = resource.substring(1);
-                            }
-                            resources.add(resource);
-                        }
-                    }
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Cannot discover mule modules", e);
+            resources.addAll(muleModule.getExportedPaths());
         }
 
-        final ArtifactClassLoaderFilter artifactClassLoaderFilter = new ArtifactClassLoaderFilter(packages.keySet(), resources);
-        return new ContainerClassLoaderFilter(artifactClassLoaderFilter, bootPackages);
+        return resources;
+    }
+
+    private Set<String> getModuleExportedPackages(List<MuleModule> muleModules)
+    {
+        Set<String> packages = new HashSet<>();
+        for (MuleModule muleModule : muleModules)
+        {
+            packages.addAll(muleModule.getExportedPackages());
+        }
+
+        return packages;
     }
 
     public static class ContainerClassLoaderFilter implements ClassLoaderFilter

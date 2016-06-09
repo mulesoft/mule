@@ -28,9 +28,9 @@ public class MuleClassLoaderLookupPolicyTestCase extends AbstractMuleTestCase
 {
 
     @Test(expected = IllegalArgumentException.class)
-    public void forbidsCustomLookupStrategyForSystemPackage() throws Exception
+    public void extendingCustomLookupStrategyForSystemPackage() throws Exception
     {
-        new MuleClassLoaderLookupPolicy(Collections.singletonMap(Object.class.getName(), CHILD_FIRST), singleton("java"));
+        new MuleClassLoaderLookupPolicy(Collections.emptyMap(), singleton("java")).extend(Collections.singletonMap(Object.class.getName(), CHILD_FIRST));
     }
 
     @Test
