@@ -11,6 +11,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_C
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
+import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLineProvider;
@@ -70,9 +71,14 @@ public class XmlApplicationParser
         while (iterator.hasNext())
         {
             XmlNamespaceInfoProvider namespaceInfoProvider = iterator.next();
-            if (namespaceUri.startsWith(namespaceInfoProvider.getNamespaceUriPrefix()))
+            Optional<XmlNamespaceInfo> matchingXmlNamespaceInfo = namespaceInfoProvider
+                    .getXmlNamespacesInfo()
+                    .stream()
+                    .filter(xmlNamespaceInfo -> namespaceUri.startsWith(xmlNamespaceInfo.getNamespaceUriPrefix()))
+                    .findFirst();
+            if (matchingXmlNamespaceInfo.isPresent())
             {
-                return namespaceInfoProvider.getNamespace();
+                return matchingXmlNamespaceInfo.get().getNamespace();
             }
         }
         //TODO MULE-9638 for now since just return a fake value since guava cache does not support null values. When done right throw a configuration exception with a meaningful message if there's no info provider defined

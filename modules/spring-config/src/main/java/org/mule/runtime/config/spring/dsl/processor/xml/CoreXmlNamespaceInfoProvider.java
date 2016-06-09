@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.config.spring.dsl.processor.xml;
 
+import static java.util.Arrays.asList;
+import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
+
+import java.util.Collection;
 
 /**
  * Provides the core namespace XML information.
@@ -19,14 +23,21 @@ public class CoreXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
     public static final String CORE_NAMESPACE_NAME = "mule";
 
     @Override
-    public String getNamespaceUriPrefix()
+    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
     {
-        return "http://www.mulesoft.org/schema/mule/core";
-    }
+        return asList(new XmlNamespaceInfo()
+        {
+            @Override
+            public String getNamespaceUriPrefix()
+            {
+                return "http://www.mulesoft.org/schema/mule/core";
+            }
 
-    @Override
-    public String getNamespace()
-    {
-        return CORE_NAMESPACE_NAME;
+            @Override
+            public String getNamespace()
+            {
+                return CORE_NAMESPACE_NAME;
+            }
+        });
     }
 }

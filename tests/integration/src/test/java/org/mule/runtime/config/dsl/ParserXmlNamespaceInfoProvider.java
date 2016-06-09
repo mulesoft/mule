@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.config.dsl;
 
+import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 public class ParserXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
 {
@@ -14,14 +18,21 @@ public class ParserXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
     public static final String PARSERS_TEST_NAMESACE = "parsers-test";
 
     @Override
-    public String getNamespaceUriPrefix()
+    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
     {
-        return "http://www.mulesoft.org/schema/mule/parsers-test";
-    }
+        return Arrays.asList(new XmlNamespaceInfo()
+        {
+            @Override
+            public String getNamespaceUriPrefix()
+            {
+                return "http://www.mulesoft.org/schema/mule/parsers-test";
+            }
 
-    @Override
-    public String getNamespace()
-    {
-        return PARSERS_TEST_NAMESACE;
+            @Override
+            public String getNamespace()
+            {
+                return PARSERS_TEST_NAMESACE;
+            }
+        });
     }
 }

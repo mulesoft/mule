@@ -6,7 +6,11 @@
  */
 package org.mule.compatibility.transport.vm.config;
 
+import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * {@link XmlNamespaceInfoProvider} for VM transport.
@@ -19,14 +23,21 @@ public class VmXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
     public static final String VM_TRANSPORT_NAMESPACE = "vm";
 
     @Override
-    public String getNamespaceUriPrefix()
+    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
     {
-        return "http://www.mulesoft.org/schema/mule/transport/vm";
-    }
+        return Arrays.asList(new XmlNamespaceInfo()
+        {
+            @Override
+            public String getNamespaceUriPrefix()
+            {
+                return "http://www.mulesoft.org/schema/mule/transport/vm";
+            }
 
-    @Override
-    public String getNamespace()
-    {
-        return VM_TRANSPORT_NAMESPACE;
+            @Override
+            public String getNamespace()
+            {
+                return VM_TRANSPORT_NAMESPACE;
+            }
+        });
     }
 }
