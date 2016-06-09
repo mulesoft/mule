@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
@@ -78,6 +79,14 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase
         InterceptorFactory factory = captor.getValue();
         assertThat(factory, is(notNullValue()));
         assertThat(factory.createInterceptor(), is(instanceOf(ConnectionInterceptor.class)));
+    }
+
+    @Test
+    public void enrichOnlyOnceWhenFlyweight() throws Exception
+    {
+        when(extensionDeclaration.getOperations()).thenReturn(asList(connectedOperation, connectedOperation, notConnectedOperation));
+        enricher.enrich(describingContext);
+        verify(connectedOperation, times(1)).addInterceptorFactory(any());
     }
 
     @Test

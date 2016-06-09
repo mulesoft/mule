@@ -32,7 +32,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
  *
  * @since 4.0.0
  */
-final class ConnectionProviderSchemaDelegate extends AbstractSchemaDelegate
+final class ConnectionProviderSchemaDelegate
 {
 
     private final ObjectFactory objectFactory = new ObjectFactory();
@@ -46,11 +46,6 @@ final class ConnectionProviderSchemaDelegate extends AbstractSchemaDelegate
 
     public void registerConnectionProviderElement(ConnectionProviderModel providerModel)
     {
-        if (trackElement(providerModel.getName()))
-        {
-            return;
-        }
-
         Element providerElement = new TopLevelElement();
         providerElement.setName(providerModel.getName());
         providerElement.setSubstitutionGroup(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);

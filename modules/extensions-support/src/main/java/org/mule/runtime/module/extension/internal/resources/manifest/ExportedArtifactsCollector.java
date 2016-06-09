@@ -17,7 +17,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.core.util.ValueHolder;
-import org.mule.runtime.extension.api.BaseExtensionWalker;
+import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -145,7 +145,7 @@ final class ExportedArtifactsCollector
 
     private void collectDefault()
     {
-        new BaseExtensionWalker()
+        new ExtensionWalker()
         {
             @Override
             public void onConfiguration(ConfigurationModel model)

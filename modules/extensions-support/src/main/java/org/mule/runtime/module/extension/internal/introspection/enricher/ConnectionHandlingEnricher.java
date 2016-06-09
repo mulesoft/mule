@@ -9,12 +9,12 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
-
-import java.util.List;
+import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
 
 /**
@@ -33,12 +33,13 @@ public final class ConnectionHandlingEnricher implements ModelEnricher
     public void enrich(DescribingContext describingContext)
     {
         final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getDeclaration();
-        doEnrich(declaration.getConnectionProviders());
-        declaration.getConfigurations().forEach(c -> doEnrich(c.getConnectionProviders()));
-    }
-
-    private void doEnrich(List<ConnectionProviderDeclaration> providers)
-    {
-        providers.forEach(declaration -> declaration.addModelProperty(new ConnectionHandlingTypeModelProperty(declaration.getFactory().newInstance())));
+        new IdempotentDeclarationWalker()
+        {
+            @Override
+            public void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration providerDeclaration)
+            {
+                providerDeclaration.addModelProperty(new ConnectionHandlingTypeModelProperty(providerDeclaration.getFactory().newInstance()));
+            }
+        }.walk(declaration);
     }
 }

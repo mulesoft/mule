@@ -11,7 +11,8 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.extension.api.BaseExtensionWalker;
+import org.mule.runtime.core.api.util.Reference;
+import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.Described;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -61,7 +62,7 @@ public final class NameClashModelValidator implements ModelValidator
     {
 
         private final ExtensionModel extensionModel;
-        private final Set<Reference<Described>> namedObjects = new HashSet<>();
+        private final Set<DescribedReference<Described>> namedObjects = new HashSet<>();
         private final Multimap<String, TopLevelParameter> topLevelParameters = LinkedListMultimap.create();
 
         public ValidationDelegate(ExtensionModel extensionModel)
@@ -71,7 +72,7 @@ public final class NameClashModelValidator implements ModelValidator
 
         private void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
         {
-            new BaseExtensionWalker()
+            new ExtensionWalker()
             {
 
                 @Override
@@ -113,7 +114,7 @@ public final class NameClashModelValidator implements ModelValidator
 
                 private void registerNamedObject(Described described)
                 {
-                    namedObjects.add(new Reference<>(described));
+                    namedObjects.add(new DescribedReference<>(described));
                 }
             }.walk(extensionModel);
 
@@ -294,30 +295,24 @@ public final class NameClashModelValidator implements ModelValidator
         }
     }
 
-    private class Reference<T extends Described> implements Described
+    private class DescribedReference<T extends Described> extends Reference<T> implements Described
     {
 
-        private final T value;
-
-        public Reference(T value)
+        private DescribedReference(T value)
         {
-            this.value = value;
-        }
-
-        public T get()
-        {
-            return value;
+            super(value);
         }
 
         @Override
         public String getName()
         {
-            return value.getName();
+            return get().getName();
         }
 
         @Override
         public String getDescription()
         {
+            Described value = get();
             if (value instanceof ConfigurationModel)
             {
                 return "configuration";
@@ -337,22 +332,6 @@ public final class NameClashModelValidator implements ModelValidator
 
             return "";
         }
-
-        @Override
-        public boolean equals(Object obj)
-        {
-            if (obj instanceof Reference)
-            {
-                return value == ((Reference) obj).value;
-            }
-
-            return false;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return value.hashCode();
-        }
     }
+
 }
