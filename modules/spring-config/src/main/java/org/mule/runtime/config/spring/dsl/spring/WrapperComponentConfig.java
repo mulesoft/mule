@@ -11,6 +11,8 @@ import java.util.Optional;
 
 /**
  * Holder for wrapper element configuration configuration
+ *
+ * @since 4.0
  */
 public class WrapperComponentConfig
 {
