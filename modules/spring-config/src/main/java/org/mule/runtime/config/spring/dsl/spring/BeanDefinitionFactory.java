@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_ELEMENT;
@@ -17,6 +18,8 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceI
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
+import static org.mule.runtime.config.spring.dsl.spring.WrapperComponentConfig.ChildType.COLLECTION;
+import static org.mule.runtime.config.spring.dsl.spring.WrapperComponentConfig.ChildType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
@@ -32,6 +35,7 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,10 +81,6 @@ public class BeanDefinitionFactory
 
     private ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
     private BeanDefinitionCreator componentModelProcessor;
-    private enum ChildType
-    {
-        SINGLE, COLLECTION
-    }
 
     /**
      * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the artifact.
@@ -185,9 +185,9 @@ public class BeanDefinitionFactory
     {
         componentModel.setType(componentModel.getInnerComponents().get(0).getType());
         ComponentBuildingDefinition parentBuildingDefinition = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getParent().getIdentifier()).get();
-        Map<String, ChildType> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(parentBuildingDefinition);
-        ChildType wrapperType = wrapperIdentifierAndTypeMap.get(componentModel.getIdentifier().getName());
-        if (wrapperType.equals(ChildType.COLLECTION))
+        Map<String, WrapperComponentConfig> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(parentBuildingDefinition);
+        WrapperComponentConfig wrapperComponentConfig = wrapperIdentifierAndTypeMap.get(componentModel.getIdentifier().getName());
+        if (wrapperComponentConfig.getChildType().equals(COLLECTION))
         {
             ManagedList<Object> managedList = new ManagedList<>();
             for (ComponentModel innerComponentModel : componentModel.getInnerComponents())
@@ -195,7 +195,7 @@ public class BeanDefinitionFactory
                 Object value = innerComponentModel.getBeanDefinition() != null ? innerComponentModel.getBeanDefinition() : innerComponentModel.getBeanReference();
                 managedList.add(value);
             }
-            componentModel.setBeanDefinition(genericBeanDefinition(ArrayList.class)
+            componentModel.setBeanDefinition(genericBeanDefinition(wrapperComponentConfig.getCollectionTypeOptional().orElse(ArrayList.class))
                                                      .addConstructorArgValue(managedList)
                                                      .getBeanDefinition());
         }
@@ -259,20 +259,20 @@ public class BeanDefinitionFactory
         {
             return false;
         }
-        final Map<String, ChildType> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(buildingDefinitionOptional.get());
+        final Map<String, WrapperComponentConfig> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(buildingDefinitionOptional.get());
         return wrapperIdentifierAndTypeMap.containsKey(componentModel.getName());
     }
 
-    private Map<String, ChildType> getWrapperIdentifierAndTypeMap(ComponentBuildingDefinition buildingDefinition)
+    private Map<String, WrapperComponentConfig> getWrapperIdentifierAndTypeMap(ComponentBuildingDefinition buildingDefinition)
     {
-        final Map<String, ChildType> wrapperIdentifierAndTypeMap = new HashMap<>();
+        final Map<String, WrapperComponentConfig> wrapperIdentifierAndTypeMap = new HashMap<>();
         AbstractAttributeDefinitionVisitor wrapperIdentifiersCollector = new AbstractAttributeDefinitionVisitor()
         {
             @Override
-            public void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier)
+            public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionTypeOptional)
             {
                 wrapperIdentifier.ifPresent( identifier -> {
-                    wrapperIdentifierAndTypeMap.put(identifier, ChildType.COLLECTION);
+                    wrapperIdentifierAndTypeMap.put(identifier, new WrapperComponentConfig(COLLECTION, collectionTypeOptional));
                 });
             }
 
@@ -280,7 +280,7 @@ public class BeanDefinitionFactory
             public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
             {
                 wrapperIdentifier.ifPresent(identifier -> {
-                    wrapperIdentifierAndTypeMap.put(identifier, ChildType.SINGLE);
+                    wrapperIdentifierAndTypeMap.put(identifier, new WrapperComponentConfig(SINGLE, empty()));
                 });
             }
 

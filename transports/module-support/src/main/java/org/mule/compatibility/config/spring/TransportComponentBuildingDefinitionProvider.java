@@ -8,7 +8,7 @@ package org.mule.compatibility.config.spring;
 
 import static org.mule.compatibility.config.spring.TransportXmlNamespaceInfoProvider.TRANSPORTS_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildListConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleReferenceParameter;
@@ -20,7 +20,6 @@ import org.mule.compatibility.config.spring.factories.InboundEndpointFactoryBean
 import org.mule.compatibility.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.compatibility.core.component.DefaultInterfaceBinding;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
@@ -32,12 +31,9 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicy;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -120,7 +116,7 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
                 .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
                 .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
                 .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-                .withSetterParameterDefinition("messageProcessors", fromChildListConfiguration(MessageProcessor.class).build())
+                .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
                 .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
                 .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
                 .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
@@ -144,7 +140,7 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
                 .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
                 .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
                 .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-                .withSetterParameterDefinition("messageProcessors", fromChildListConfiguration(MessageProcessor.class).build())
+                .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
                 .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
                 .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
                 .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build())
@@ -170,7 +166,7 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
                 .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
                 .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
                 .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-                .withSetterParameterDefinition("messageProcessors", fromChildListConfiguration(MessageProcessor.class).build())
+                .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
                 .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
                 .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
                 .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build())
@@ -191,32 +187,27 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
 
     private TypeConverter<String, Byte> getTransactionActionTypeConverter()
     {
-        return new TypeConverter<String, Byte>()
-        {
-            @Override
-            public Byte convert(String action)
+        return action -> {
+            switch (action)
             {
-                switch (action)
-                {
-                    case "ALWAYS_BEGIN":
-                        return TransactionConfig.ACTION_ALWAYS_BEGIN;
-                    case "ALWAYS_JOIN":
-                        return TransactionConfig.ACTION_ALWAYS_JOIN;
-                    case "JOIN_IF_POSSIBLE":
-                        return TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
-                    case "NONE":
-                        return TransactionConfig.ACTION_NONE;
-                    case "BEGIN_OR_JOIN":
-                        return TransactionConfig.ACTION_BEGIN_OR_JOIN;
-                    case "INDIFFERENT":
-                        return TransactionConfig.ACTION_INDIFFERENT;
-                    case "NEVER":
-                        return TransactionConfig.ACTION_NEVER;
-                    case "NOT_SUPPORTED":
-                        return TransactionConfig.ACTION_NOT_SUPPORTED;
-                    default:
-                        throw new MuleRuntimeException(createStaticMessage("Wrong transaction action configuration parameter: " + action));
-                }
+                case "ALWAYS_BEGIN":
+                    return TransactionConfig.ACTION_ALWAYS_BEGIN;
+                case "ALWAYS_JOIN":
+                    return TransactionConfig.ACTION_ALWAYS_JOIN;
+                case "JOIN_IF_POSSIBLE":
+                    return TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
+                case "NONE":
+                    return TransactionConfig.ACTION_NONE;
+                case "BEGIN_OR_JOIN":
+                    return TransactionConfig.ACTION_BEGIN_OR_JOIN;
+                case "INDIFFERENT":
+                    return TransactionConfig.ACTION_INDIFFERENT;
+                case "NEVER":
+                    return TransactionConfig.ACTION_NEVER;
+                case "NOT_SUPPORTED":
+                    return TransactionConfig.ACTION_NOT_SUPPORTED;
+                default:
+                    throw new MuleRuntimeException(createStaticMessage("Wrong transaction action configuration parameter: " + action));
             }
         };
     }

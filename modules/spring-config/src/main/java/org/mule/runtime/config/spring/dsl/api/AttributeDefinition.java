@@ -7,8 +7,11 @@
 package org.mule.runtime.config.spring.dsl.api;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
 import org.mule.runtime.core.util.Preconditions;
+
+import java.util.Collection;
 
 /**
  * Defines how to build an attribute from an object.
@@ -36,6 +39,7 @@ public class AttributeDefinition
     private TypeConverter typeConverter;
     private AttributeDefinition[] definitions;
     private String wrapperIdentifier;
+    private Class<? extends Collection> collectionType;
 
     private AttributeDefinition()
     {
@@ -72,7 +76,7 @@ public class AttributeDefinition
         }
         else if (childObjectType != null && collection)
         {
-            visitor.onComplexChildList(childObjectType, ofNullable(wrapperIdentifier));
+            visitor.onComplexChildCollection(childObjectType, ofNullable(wrapperIdentifier), ofNullable(collectionType));
         }
         else if (childObjectType != null)
         {
@@ -156,7 +160,7 @@ public class AttributeDefinition
          */
         public Builder withWrapperIdentifier(String identifier)
         {
-            Preconditions.checkState(attributeDefinition.childObjectType != null, "Identifier can only be used with children component definitions");
+            checkState(attributeDefinition.childObjectType != null, "Identifier can only be used with children component definitions");
             attributeDefinition.wrapperIdentifier = identifier;
             return this;
         }
@@ -255,12 +259,26 @@ public class AttributeDefinition
          * @param type the collection object type.
          * @return the builder
          */
-        public static Builder fromChildListConfiguration(Class<?> type)
+        public static Builder fromChildCollectionConfiguration(Class<?> type)
         {
             Builder builder = new Builder();
             builder.attributeDefinition.childObjectType = type;
             builder.attributeDefinition.collection = true;
             return builder;
+        }
+
+        /**
+         * Used when the attribute type is collection and the collection implementation must
+         * be of a given type.
+         *
+         * @param type collection type.
+         * @return the builder.
+         */
+        public Builder withCollectionType(Class<? extends Collection> type)
+        {
+            checkState(this.attributeDefinition.collection, "Collection type can only be set when the attribute is a collection");
+            this.attributeDefinition.collectionType = type;
+            return this;
         }
 
         /**

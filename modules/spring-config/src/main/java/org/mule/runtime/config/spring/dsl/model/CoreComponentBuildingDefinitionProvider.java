@@ -8,7 +8,7 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildListConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
@@ -149,7 +149,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
         LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions = new LinkedList<>();
 
-        AttributeDefinition messageProcessorListAttributeDefinition = fromChildListConfiguration(MessageProcessor.class).build();
+        AttributeDefinition messageProcessorListAttributeDefinition = fromChildCollectionConfiguration(MessageProcessor.class).build();
         ComponentBuildingDefinition.Builder exceptionStrategyBaseBuilder = baseDefinition.copy()
                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, messageProcessorListAttributeDefinition)
                 .withSetterParameterDefinition("globalName", fromSimpleParameter(NAME).build());
@@ -161,14 +161,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.copy()
                                                  .withIdentifier(CATCH_EXCEPTION_STRATEGY)
                                                  .withTypeDefinition(fromType(CatchMessagingExceptionStrategy.class))
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
                                                  .asPrototype()
                                                  .build());
         componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.copy()
                                                  .withIdentifier(ROLLBACK_EXCEPTION_STRATEGY)
                                                  .withTypeDefinition(fromType(RollbackMessagingExceptionStrategy.class))
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
                                                  .withSetterParameterDefinition("maxRedeliveryAttempts", fromSimpleParameter("maxRedeliveryAttempts").build())
                                                  .withSetterParameterDefinition("redeliveryExceeded", fromChildConfiguration(RedeliveryExceeded.class).build())
@@ -177,7 +177,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier("on-redelivery-attempts-exceeded")
                                                  .withTypeDefinition(fromType(RedeliveryExceeded.class))
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .asScope()
                                                  .build());
         componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.copy()
@@ -185,7 +185,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withTypeDefinition(fromType(DefaultMessagingExceptionStrategy.class))
                                                  .withSetterParameterDefinition(NAME_EXCEPTION_STRATEGY_ATTRIBUTE, fromSimpleParameter(NAME).build())
                                                  .withSetterParameterDefinition("stopMessageProcessing", fromSimpleParameter("stopMessageProcessing").build())
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .withSetterParameterDefinition("commitTxFilter", fromChildConfiguration(WildcardFilter.class).build())
                                                  .withSetterParameterDefinition("rollbackTxFilter", fromChildConfiguration(WildcardFilter.class).build())
                                                  .asPrototype()
@@ -203,14 +203,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(CUSTOM_EXCEPTION_STRATEGY)
                                                  .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .asPrototype()
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(CHOICE_EXCEPTION_STRATEGY)
                                                  .withTypeDefinition(fromType(ChoiceMessagingExceptionStrategy.class))
                                                  .withSetterParameterDefinition("globalName", fromSimpleParameter(NAME).build())
-                                                 .withSetterParameterDefinition("exceptionListeners", fromChildListConfiguration(MessagingExceptionHandler.class).build())
+                                                 .withSetterParameterDefinition("exceptionListeners", fromChildCollectionConfiguration(MessagingExceptionHandler.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(SET_PAYLOAD)
@@ -248,14 +248,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withIdentifier(PROCESSOR_CHAIN)
                                                  .withTypeDefinition(fromType(MessageProcessor.class))
                                                  .withObjectFactoryType(MessageProcessorChainFactoryBean.class)
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .asPrototype()
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(SUB_FLOW)
                                                  .withTypeDefinition(fromType(MessageProcessor.class))
                                                  .withObjectFactoryType(SubflowMessageProcessorChainFactoryBean.class)
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
                                                  .asPrototype()
                                                  .build());
@@ -263,7 +263,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withIdentifier(RESPONSE)
                                                  .withTypeDefinition(fromType(ResponseMessageProcessorAdapter.class))
                                                  .withObjectFactoryType(ResponseMessageProcessorsFactoryBean.class)
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(MESSAGE_FILTER)
@@ -280,7 +280,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
                                                  .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
                                                  .withSetterParameterDefinition("messageSource", fromChildConfiguration(MessageSource.class).build())
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .withSetterParameterDefinition(EXCEPTION_LISTENER_ATTRIBUTE, fromChildConfiguration(MessagingExceptionHandler.class).build())
                                                  .withSetterParameterDefinition("processingStrategy", fromSimpleReferenceParameter("processingStrategy").build())
                                                  .withSetterParameterDefinition("messageInfoMapping", fromChildConfiguration(MessageInfoMapping.class).build())
@@ -292,7 +292,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
                                                  .withSetterParameterDefinition("aggregationStrategy", fromChildConfiguration(AggregationStrategy.class).build())
                                                  .withSetterParameterDefinition("threadingProfile", fromChildConfiguration(ThreadingProfile.class).build())
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .asScope()
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
@@ -307,7 +307,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withObjectFactoryType(MessageEnricherObjectFactory.class)
                                                  .withTypeDefinition(fromType(MessageEnricher.class))
                                                  .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(MessageProcessor.class).build())
-                                                 .withSetterParameterDefinition("enrichExpressionPairs", fromChildListConfiguration(MessageEnricher.EnrichExpressionPair.class).build())
+                                                 .withSetterParameterDefinition("enrichExpressionPairs", fromChildCollectionConfiguration(MessageEnricher.EnrichExpressionPair.class).build())
                                                  .withSetterParameterDefinition("source", fromSimpleParameter("source").build())
                                                  .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
                                                  .build());
@@ -322,7 +322,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withTypeDefinition(fromType(AsyncDelegateMessageProcessor.class))
                                                  .withObjectFactoryType(AsyncMessageProcessorsFactoryBean.class)
                                                  .withSetterParameterDefinition("processingStrategy", fromSimpleReferenceParameter("processingStrategy").build())
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
@@ -330,7 +330,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withTypeDefinition(fromType(TransactionalMessageProcessor.class))
                                                  .withObjectFactoryType(TransactionalMessageProcessorsFactoryBean.class)
                                                  .withSetterParameterDefinition("exceptionListener", fromChildConfiguration(MessagingExceptionHandler.class).build())
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .withSetterParameterDefinition("action", fromSimpleParameter("action").build())
                                                  .build());
 
@@ -346,7 +346,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition("ackExpression", fromSimpleParameter("ackExpression").build())
                                                  .withSetterParameterDefinition("synchronous", fromSimpleParameter("synchronous").build())
                                                  .withSetterParameterDefinition("threadingProfile", fromChildConfiguration(ThreadingProfile.class).build())
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(FOREACH)
@@ -355,44 +355,44 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition("batchSize", fromSimpleParameter("batchSize").build())
                                                  .withSetterParameterDefinition("rootMessageVariableName", fromSimpleParameter("rootMessageVariableName").build())
                                                  .withSetterParameterDefinition("counterVariableName", fromSimpleParameter("counterVariableName").build())
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(FIRST_SUCCESSFUL)
                                                  .withTypeDefinition(fromType(FirstSuccessful.class))
                                                  .withSetterParameterDefinition("failureExpression", fromSimpleParameter("failureExpression").build())
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(ROUND_ROBIN)
                                                  .withTypeDefinition(fromType(RoundRobin.class))
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(CHOICE)
                                                  .withTypeDefinition(fromType(ChoiceRouter.class))
                                                  .withObjectFactoryType(ChoiceRouterFactoryBean.class)
-                                                 .withSetterParameterDefinition("routes", fromChildListConfiguration(MessageProcessorFilterPair.class).build())
+                                                 .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorFilterPair.class).build())
                                                  .withSetterParameterDefinition("defaultRoute", fromChildConfiguration(MessageProcessorFilterPair.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(WHEN)
                                                  .withTypeDefinition(fromType(MessageProcessorFilterPair.class))
                                                  .withObjectFactoryType(MessageProcessorFilterPairFactoryBean.class)
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(OTHERWISE)
                                                  .withTypeDefinition(fromType(MessageProcessorFilterPair.class))
                                                  .withObjectFactoryType(MessageProcessorFilterPairFactoryBean.class)
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .withSetterParameterDefinition("expression", fromFixedValue("true").build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(ALL)
                                                  .withTypeDefinition(fromType(MulticastingRouter.class))
-                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildListConfiguration(MessageProcessor.class).build())
+                                                 .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier(REQUEST_REPLY)
@@ -468,7 +468,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         componentBuildingDefinitions.add(baseDefinition.copy()
                                                  .withIdentifier("composite-source")
                                                  .withTypeDefinition(fromType(StartableCompositeMessageSource.class))
-                                                 .withSetterParameterDefinition("messageSources", fromChildListConfiguration(MessageSource.class).build())
+                                                 .withSetterParameterDefinition("messageSources", fromChildCollectionConfiguration(MessageSource.class).build())
                                                  .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
                                                  .build());
         componentBuildingDefinitions.add(baseDefinition.copy()
@@ -484,7 +484,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition("useExtendedTransformations", fromSimpleParameter("useExtendedTransformations").build())
                                                  .withSetterParameterDefinition("flowEndingWithOneWayEndpointReturnsNull", fromSimpleParameter("flowEndingWithOneWayEndpointReturnsNull").build())
                                                  .withSetterParameterDefinition("enricherPropagatesSessionVariableChanges", fromSimpleParameter("enricherPropagatesSessionVariableChanges").build())
-                                                 .withSetterParameterDefinition("extensions", fromChildListConfiguration(Object.class).build())
+                                                 .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
                                                  .withSetterParameterDefinition("defaultObjectSerializer", fromSimpleReferenceParameter("defaultObjectSerializer-ref").build())
                                                  .build());
         return componentBuildingDefinitions;

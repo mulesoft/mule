@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
@@ -20,6 +21,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.util.ClassUtils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,10 +217,10 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier)
+        public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionType)
         {
             ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
-            valueExtractor.onComplexChildList(type, wrapperIdentifier);
+            valueExtractor.onComplexChildCollection(type, wrapperIdentifier, collectionType);
             valueConsumer.accept(valueExtractor.getValue());
         }
 
@@ -332,11 +334,11 @@ class ComponentConfigurationBuilder
         @Override
         public void onUndefinedComplexParameters()
         {
-            this.value = constructManagedList(fromBeanDefinitionTypePairToBeanDefinition(complexParameters));
+            this.value = constructManagedList(fromBeanDefinitionTypePairToBeanDefinition(complexParameters), empty());
         }
 
         @Override
-        public void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier)
+        public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionTypeOptional)
         {
             Predicate<ComponentValue> matchesTypeAndIdentifierPredicate = getTypeAndIdentifierPredicate(type, wrapperIdentifier);
             List<ComponentValue> matchingComponentValues = complexParameters.stream()
@@ -354,7 +356,7 @@ class ComponentConfigurationBuilder
             {
                 if (!matchingComponentValues.isEmpty())
                 {
-                    this.value = constructManagedList(fromBeanDefinitionTypePairToBeanDefinition(matchingComponentValues));
+                    this.value = constructManagedList(fromBeanDefinitionTypePairToBeanDefinition(matchingComponentValues), collectionTypeOptional);
                 }
             }
         }
@@ -450,7 +452,7 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier)
+        public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionTypeOptional)
         {
             this.key = type;
             wrapperIdentifier.ifPresent( (identifier) -> {
@@ -461,7 +463,7 @@ class ComponentConfigurationBuilder
         @Override
         public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
         {
-            onComplexChildList(type, wrapperIdentifier);
+            onComplexChildCollection(type, wrapperIdentifier, empty());
         }
 
         @Override
@@ -480,9 +482,10 @@ class ComponentConfigurationBuilder
         }
     }
 
-    private ManagedList constructManagedList(List<Object> beans)
+    private ManagedList constructManagedList(List<Object> beans, Optional<? extends Class<? extends Collection>> collectionTypeOptional)
     {
         ManagedList managedList = new ManagedList();
+        collectionTypeOptional.ifPresent( collectionType -> managedList.setElementTypeName(collectionType.getTypeName()));
         managedList.addAll(beans);
         return managedList;
     }

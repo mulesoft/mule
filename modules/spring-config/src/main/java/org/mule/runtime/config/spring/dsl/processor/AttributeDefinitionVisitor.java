@@ -10,6 +10,7 @@ package org.mule.runtime.config.spring.dsl.processor;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -68,10 +69,11 @@ public interface AttributeDefinitionVisitor
     /**
      * Called when the attribute is configured from a list of object with a certain type.
      *
-     * @param type type of the list to be set in the attribute.
-     * @param wrapperIdentifier the identifier of the wrapper element that holds the list of components
+     * @param type                   type of the list to be set in the attribute.
+     * @param wrapperIdentifier      the identifier of the wrapper element that holds the list of components
+     * @param collectionTypeOptional type of the collection to use for storing the elements
      */
-    void onComplexChildList(Class<?> type, Optional<String> wrapperIdentifier);
+    void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionTypeOptional);
 
     /**
      * Called when the attribute is configured from an object with a certain type.

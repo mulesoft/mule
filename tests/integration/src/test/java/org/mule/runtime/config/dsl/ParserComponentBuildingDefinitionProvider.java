@@ -8,7 +8,7 @@ package org.mule.runtime.config.dsl;
 
 import static org.mule.runtime.config.dsl.ParserXmlNamespaceInfoProvider.PARSERS_TEST_NAMESACE;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildListConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromType;
@@ -18,6 +18,7 @@ import org.mule.runtime.config.spring.parsers.beans.SimpleCollectionObject;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ParserComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider
@@ -42,7 +43,8 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                                                                                            fromSimpleParameter("age").build(),
                                                                                                            fromChildConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("first-child").build(),
                                                                                                            fromChildConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("second-child").build(),
-                                                                                                           fromChildListConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("other-children").build())
+                                                                                                           fromChildCollectionConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("other-children").build(),
+                                                                                                           fromChildCollectionConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("other-children-custom-collection-type").withCollectionType(LinkedList.class).build())
                                         .build())
                                 .build());
         return definitions;

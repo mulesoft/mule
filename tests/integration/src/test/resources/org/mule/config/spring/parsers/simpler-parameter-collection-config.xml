@@ -40,4 +40,11 @@
         </parsers-test:other-children>
     </parsers-test:parameter-collection-parser>
 
+    <parsers-test:parameter-collection-parser name="customCollectionTypeObject">
+        <parsers-test:other-children-custom-collection-type>
+            <parsers-test:parameter-collection-parser firstname="Pablo" lastname="La Greca" age="32"/>
+            <parsers-test:parameter-collection-parser firstname="Mariano" lastname="Gonzalez" age="31"/>
+        </parsers-test:other-children-custom-collection-type>
+    </parsers-test:parameter-collection-parser>
+
 </mule>
