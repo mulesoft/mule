@@ -6,7 +6,11 @@
  */
 package org.mule.compatibility.transport.jms.config;
 
+import static java.util.Arrays.asList;
+import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
+
+import java.util.Collection;
 
 /**
  * {@link XmlNamespaceInfoProvider} for JMS transport.
@@ -19,14 +23,21 @@ public class JmsXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
     public static final String JMS_NAMESPACE = "jms";
 
     @Override
-    public String getNamespaceUriPrefix()
+    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
     {
-        return "http://www.mulesoft.org/schema/mule/transport/jms";
-    }
+        return asList(new XmlNamespaceInfo()
+        {
+            @Override
+            public String getNamespaceUriPrefix()
+            {
+                return "http://www.mulesoft.org/schema/mule/transport/jms";
+            }
 
-    @Override
-    public String getNamespace()
-    {
-        return JMS_NAMESPACE;
+            @Override
+            public String getNamespace()
+            {
+                return JMS_NAMESPACE;
+            }
+        });
     }
 }

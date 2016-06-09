@@ -6,7 +6,11 @@
  */
 package org.mule.functional.config;
 
+import static java.util.Arrays.asList;
+import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
+
+import java.util.Collection;
 
 /**
  * {@link XmlNamespaceInfoProvider} for TEST module.
@@ -19,14 +23,21 @@ public class TestXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider
     public static final String TEST_NAMESPACE = "test";
 
     @Override
-    public String getNamespaceUriPrefix()
+    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
     {
-        return "http://www.mulesoft.org/schema/mule/test";
-    }
+        return asList(new XmlNamespaceInfo()
+        {
+            @Override
+            public String getNamespaceUriPrefix()
+            {
+                return "http://www.mulesoft.org/schema/mule/test";
+            }
 
-    @Override
-    public String getNamespace()
-    {
-        return TEST_NAMESPACE;
+            @Override
+            public String getNamespace()
+            {
+                return TEST_NAMESPACE;
+            }
+        });
     }
 }

@@ -6,7 +6,11 @@
  */
 package org.mule.compatibility.config.spring;
 
+import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Provides the core transport namespace XML information.
@@ -19,14 +23,21 @@ public class TransportXmlNamespaceInfoProvider implements XmlNamespaceInfoProvid
     public static final String TRANSPORTS_NAMESPACE_NAME = "transports";
 
     @Override
-    public String getNamespaceUriPrefix()
+    public Collection<XmlNamespaceInfo> getXmlNamespacesInfo()
     {
-        return "http://www.mulesoft.org/schema/mule/transports";
-    }
+        return Arrays.asList(new XmlNamespaceInfo()
+        {
+            @Override
+            public String getNamespaceUriPrefix()
+            {
+                return "http://www.mulesoft.org/schema/mule/transports";
+            }
 
-    @Override
-    public String getNamespace()
-    {
-        return TRANSPORTS_NAMESPACE_NAME;
+            @Override
+            public String getNamespace()
+            {
+                return TRANSPORTS_NAMESPACE_NAME;
+            }
+        });
     }
 }
