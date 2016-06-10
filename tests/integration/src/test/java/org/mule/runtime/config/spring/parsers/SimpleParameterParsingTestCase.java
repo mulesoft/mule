@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.config.spring.parsers;
 
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.config.spring.parsers.beans.SimpleCollectionObject;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +91,24 @@ public class SimpleParameterParsingTestCase extends FunctionalTestCase
         List<SimpleCollectionObject> collectionObject = (List<SimpleCollectionObject>) simpleParameters.get("other-children-custom-collection-type");
         assertThat(collectionObject, instanceOf(LinkedList.class));
         assertCollectionChildrenContent(collectionObject);
+    }
+
+    @Test
+    public void simpleTypeObject()
+    {
+        SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("simpleTypeObject");
+        assertSimpleTypeCollectionValues(simpleCollectionObject.getSimpleTypeList());
+        assertThat(simpleCollectionObject.getSimpleTypeSet(), instanceOf(HashSet.class));
+        assertSimpleTypeCollectionValues(simpleCollectionObject.getSimpleTypeSet());
+        Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
+        assertThat(simpleParameters.size(), is(1));
+        assertSimpleTypeCollectionValues((List<String>) simpleParameters.get("other-simple-type-child-list-custom-key"));
+    }
+
+    private void assertSimpleTypeCollectionValues(Collection<String> simpleTypeCollectionValues)
+    {
+        assertThat(simpleTypeCollectionValues.size(), is(2));
+        assertThat(simpleTypeCollectionValues, hasItems("value1", "value2"));
     }
 
     private void assertCollectionChildrenContent(List<SimpleCollectionObject> collectionObjects)

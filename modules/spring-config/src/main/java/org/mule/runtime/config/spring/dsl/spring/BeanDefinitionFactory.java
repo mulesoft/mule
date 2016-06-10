@@ -18,13 +18,14 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceI
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
-import static org.mule.runtime.config.spring.dsl.spring.WrapperComponentConfig.ChildType.COLLECTION;
-import static org.mule.runtime.config.spring.dsl.spring.WrapperComponentConfig.ChildType.SINGLE;
+import static org.mule.runtime.config.spring.dsl.spring.WrapperComponentConfig.WrapperType.COLLECTION;
+import static org.mule.runtime.config.spring.dsl.spring.WrapperComponentConfig.WrapperType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
+import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
@@ -187,15 +188,16 @@ public class BeanDefinitionFactory
         ComponentBuildingDefinition parentBuildingDefinition = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getParent().getIdentifier()).get();
         Map<String, WrapperComponentConfig> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(parentBuildingDefinition);
         WrapperComponentConfig wrapperComponentConfig = wrapperIdentifierAndTypeMap.get(componentModel.getIdentifier().getName());
-        if (wrapperComponentConfig.getChildType().equals(COLLECTION))
+        if (wrapperComponentConfig.getWrapperType().equals(COLLECTION))
         {
+            Class<? extends Collection> type = wrapperComponentConfig.getCollectionTypeOptional().orElse(ArrayList.class);
             ManagedList<Object> managedList = new ManagedList<>();
             for (ComponentModel innerComponentModel : componentModel.getInnerComponents())
             {
                 Object value = innerComponentModel.getBeanDefinition() != null ? innerComponentModel.getBeanDefinition() : innerComponentModel.getBeanReference();
                 managedList.add(value);
             }
-            componentModel.setBeanDefinition(genericBeanDefinition(wrapperComponentConfig.getCollectionTypeOptional().orElse(ArrayList.class))
+            componentModel.setBeanDefinition(genericBeanDefinition(type)
                                                      .addConstructorArgValue(managedList)
                                                      .getBeanDefinition());
         }
@@ -223,11 +225,13 @@ public class BeanDefinitionFactory
         ExceptionStrategyRefBeanDefinitionCreator exceptionStrategyRefBeanDefinitionCreator = new ExceptionStrategyRefBeanDefinitionCreator();
         FilterReferenceBeanDefinitionCreator filterReferenceBeanDefinitionCreator = new FilterReferenceBeanDefinitionCreator();
         ReferenceBeanDefinitionCreator referenceBeanDefinitionCreator = new ReferenceBeanDefinitionCreator();
+        SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
         CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator();
         exceptionStrategyRefBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
         exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);
         filterReferenceBeanDefinitionCreator.setNext(referenceBeanDefinitionCreator);
-        referenceBeanDefinitionCreator.setNext(commonComponentModelProcessor);
+        referenceBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
+        simpleTypeBeanDefinitionCreator.setNext(commonComponentModelProcessor);
         return exceptionStrategyRefBeanDefinitionCreator;
     }
 
@@ -285,11 +289,11 @@ public class BeanDefinitionFactory
             }
 
             @Override
-            public void onMultipleValues(AttributeDefinition[] definitions)
+            public void onMultipleValues(KeyAttributeDefinitionPair[] definitions)
             {
-                for (AttributeDefinition attributeDefinition : definitions)
+                for (KeyAttributeDefinitionPair attributeDefinition : definitions)
                 {
-                    attributeDefinition.accept(this);
+                    attributeDefinition.getAttributeDefinition().accept(this);
                 }
             }
         };

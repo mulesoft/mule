@@ -47,4 +47,19 @@
         </parsers-test:other-children-custom-collection-type>
     </parsers-test:parameter-collection-parser>
 
+    <parsers-test:parameter-collection-parser name="simpleTypeObject">
+        <parsers-test:simple-type-child-list>
+            <parsers-test:simple-type-child value="value1"/>
+            <parsers-test:simple-type-child value="value2"/>
+        </parsers-test:simple-type-child-list>
+        <parsers-test:simple-type-child-set>
+            <parsers-test:simple-type-child value="value1"/>
+            <parsers-test:simple-type-child value="value2"/>
+        </parsers-test:simple-type-child-set>
+        <parsers-test:other-simple-type-child-list>
+            <parsers-test:simple-type-child value="value1"/>
+            <parsers-test:simple-type-child value="value2"/>
+        </parsers-test:other-simple-type-child-list>
+    </parsers-test:parameter-collection-parser>
+
 </mule>
