@@ -249,7 +249,7 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
     {
         if (typedValue == null)
         {
-            return null;
+            return defaultValue;
         }
         T value = typedValue.getValue();
         //Note that we need to keep the (redundant) casts in here because the compiler compiler complains
