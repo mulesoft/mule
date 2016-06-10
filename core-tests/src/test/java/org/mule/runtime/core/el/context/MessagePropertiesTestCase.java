@@ -9,12 +9,12 @@ package org.mule.runtime.core.el.context;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -26,10 +26,11 @@ import java.util.Set;
 
 import javax.activation.DataHandler;
 
-import junit.framework.Assert;
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import org.junit.Before;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 public class MessagePropertiesTestCase extends AbstractELTestCase
 {
@@ -138,8 +139,8 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
         mock(DataHandler.class);
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
-        assertThat((String[]) evaluate("message.inboundProperties.keySet().toArray()", event),
-                   is(arrayContainingInAnyOrder(equalTo("foo"), equalTo("bar"))));
+        assertThat((Iterable<String>) evaluate("message.inboundProperties.keySet()", event),
+                hasItems("foo", "bar"));
     }
 
     @Test
