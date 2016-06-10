@@ -12,9 +12,11 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
@@ -46,6 +48,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.verification.VerificationMode;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -122,14 +125,36 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractInterce
     public void connectionBinded() throws Exception
     {
         interceptable.initialise();
+        assertBinded();
+    }
+
+    private void assertBinded() throws Exception
+    {
         if (connectionProvider.isPresent())
         {
-            verify(connectionManager).bind(value, connectionProvider.get());
+            verify(connectionManager, times(1)).bind(value, connectionProvider.get());
         }
         else
         {
-            verify(connectionManager, never()).bind(anyObject(), anyObject());
+            verify(connectionManager, never()).bind(same(value), anyObject());
         }
+    }
+
+    private VerificationMode getBindingVerificationMode()
+    {
+        return connectionProvider.map(p -> times(1)).orElse(never());
+    }
+
+    @Test
+    public void connectionReBindedAfterStopStart() throws Exception
+    {
+        connectionBinded();
+        interceptable.stop();
+        verify(connectionManager, getBindingVerificationMode()).unbind(value);
+
+        reset(connectionManager);
+        interceptable.start();
+        assertBinded();
     }
 
     @Test

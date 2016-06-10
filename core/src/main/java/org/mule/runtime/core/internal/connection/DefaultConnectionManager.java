@@ -7,19 +7,22 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.util.Reference;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 
 import java.util.HashMap;
@@ -44,7 +47,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConnectionManager.class);
 
-    private final Map<ConnectionKey, ConnectionHandlingStrategyAdapter> connections = new HashMap<>();
+    private final Map<Reference<Object>, ConnectionHandlingStrategyAdapter> connections = new HashMap<>();
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
@@ -82,7 +85,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
         writeLock.lock();
         try
         {
-            previous = connections.put(new ConnectionKey(owner), managementStrategy);
+            previous = connections.put(new Reference<>(owner), managementStrategy);
         }
         finally
         {
@@ -98,6 +101,15 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     /**
      * {@inheritDoc}
      */
+    @Override
+    public boolean hasBinding(Object config)
+    {
+        return connections.containsKey(new Reference<>(config));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     //TODO: MULE-9082
     @Override
     public void unbind(Object config)
@@ -106,7 +118,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
         writeLock.lock();
         try
         {
-            managementStrategy = connections.remove(new ConnectionKey(config));
+            managementStrategy = connections.remove(new Reference<>(config));
         }
         finally
         {
@@ -129,7 +141,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
         readLock.lock();
         try
         {
-            handlingStrategy = connections.get(new ConnectionKey(config));
+            handlingStrategy = connections.get(new Reference<>(config));
         }
         finally
         {
@@ -197,47 +209,19 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     @Override
     public void dispose()
     {
-        LifecycleUtils.disposeIfNeeded(retryPolicyTemplate, LOGGER);
+        disposeIfNeeded(retryPolicyTemplate, LOGGER);
     }
 
     @Override
     public void initialise() throws InitialisationException
     {
-        LifecycleUtils.initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
+        initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
     }
 
     @Override
     public void start() throws MuleException
     {
-        LifecycleUtils.startIfNeeded(retryPolicyTemplate);
-    }
-
-    private class ConnectionKey
-    {
-
-        private final Object key;
-
-        private ConnectionKey(Object key)
-        {
-            this.key = key;
-        }
-
-        @Override
-        public boolean equals(Object obj)
-        {
-            if (obj instanceof ConnectionKey)
-            {
-                return key == ((ConnectionKey) obj).key;
-            }
-
-            return false;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return System.identityHashCode(key);
-        }
+        startIfNeeded(retryPolicyTemplate);
     }
 
     /**

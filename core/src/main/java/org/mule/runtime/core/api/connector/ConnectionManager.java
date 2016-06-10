@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api.connector;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionProvider;
 
 /**
  * Manages all the connections opened between the boundaries of an application.
@@ -42,6 +42,12 @@ public interface ConnectionManager
      * @param <Connection>       the generic type of the connections to be produced
      */
     <Config, Connection> void bind(Config config, ConnectionProvider<Config, Connection> connectionProvider);
+
+    /**
+     * @param config the config that acts as the binding key
+     * @return whether the {@code config} is currently bound to a {@link ConnectionProvider}
+     */
+    boolean hasBinding(Object config);
 
     /**
      * Breaks the binding that was previously produced by invoking {@link #bind(Object, ConnectionProvider)} with
