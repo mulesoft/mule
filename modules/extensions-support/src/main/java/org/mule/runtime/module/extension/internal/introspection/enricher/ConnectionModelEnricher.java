@@ -6,15 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connector.ConnectionInterceptor;
-
-import java.util.List;
+import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
 /**
  * Adds a {@link ConnectionInterceptor} to all {@link OperationModel operations} which
@@ -28,15 +26,13 @@ public class ConnectionModelEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getDeclaration();
-        doEnrich(declaration.getOperations());
-        declaration.getConfigurations().forEach(config -> doEnrich(config.getOperations()));
-    }
-
-    private void doEnrich(List<OperationDeclaration> operations)
-    {
-        operations.stream()
-                .filter(operation -> operation.getModelProperty(ConnectionTypeModelProperty.class).isPresent())
-                .forEach(operation -> operation.addInterceptorFactory(ConnectionInterceptor::new));
+        new IdempotentDeclarationWalker()
+        {
+            @Override
+            protected void onOperation(OperationDeclaration declaration)
+            {
+                declaration.getModelProperty(ConnectionTypeModelProperty.class).ifPresent(p -> declaration.addInterceptorFactory(ConnectionInterceptor::new));
+            }
+        }.walk(describingContext.getExtensionDeclarer().getDeclaration());
     }
 }

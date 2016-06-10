@@ -17,8 +17,8 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.config.spring.MuleArtifactContext;
-import org.mule.runtime.extension.api.BaseExtensionWalker;
 import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
@@ -151,7 +151,7 @@ public class ExtensionNamespaceHandler extends NamespaceHandlerSupport
         Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
         SubTypesMappingContainer typeMapping = new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : Collections.emptyMap());
 
-        new BaseExtensionWalker() {
+        new ExtensionWalker() {
 
             @Override
             public void onParameter(ParameterizedModel owner, ParameterModel model)

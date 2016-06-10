@@ -31,7 +31,7 @@ import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.extension.api.BaseExtensionWalker;
+import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -518,7 +518,7 @@ public final class IntrospectionUtils
     public static Set<Class<?>> getParameterClasses(ExtensionModel extensionModel)
     {
         ImmutableSet.Builder<Class<?>> parameterClasses = ImmutableSet.builder();
-        new BaseExtensionWalker()
+        new ExtensionWalker()
         {
             @Override
             public void onParameter(ParameterizedModel owner, ParameterModel model)

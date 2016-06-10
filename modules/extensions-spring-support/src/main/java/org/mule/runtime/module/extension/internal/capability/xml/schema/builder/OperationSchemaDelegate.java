@@ -31,7 +31,7 @@ import javax.xml.namespace.QName;
  *
  * @since 4.0.0
  */
-class OperationSchemaDelegate extends AbstractSchemaDelegate
+class OperationSchemaDelegate
 {
 
     private final SchemaBuilder builder;
@@ -43,11 +43,6 @@ class OperationSchemaDelegate extends AbstractSchemaDelegate
 
     public void registerOperation(OperationModel operationModel)
     {
-        if (trackElement(operationModel.getName()))
-        {
-            return;
-        }
-
         String typeName = capitalize(operationModel.getName()) + TYPE_SUFFIX;
         registerProcessorElement(operationModel, typeName);
         registerOperationType(typeName, operationModel);

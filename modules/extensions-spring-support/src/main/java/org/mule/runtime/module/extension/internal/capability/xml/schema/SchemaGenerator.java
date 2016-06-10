@@ -10,20 +10,17 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_PREFIX;
-import org.mule.runtime.extension.api.BaseExtensionWalker;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.connection.HasConnectionProviderModels;
-import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
-import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
+import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
 
 import java.io.StringWriter;
 
@@ -57,7 +54,8 @@ public class SchemaGenerator
         validate(extensionModel, xmlModelProperty);
         SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(extensionModel, xmlModelProperty);
 
-        new BaseExtensionWalker() {
+        new IdempotentExtensionWalker()
+        {
             @Override
             public void onConfiguration(ConfigurationModel model)
             {
@@ -65,19 +63,19 @@ public class SchemaGenerator
             }
 
             @Override
-            public void onOperation(HasOperationModels owner, OperationModel model)
+            public void onOperation(OperationModel model)
             {
                 schemaBuilder.registerOperation(model);
             }
 
             @Override
-            public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model)
+            public void onConnectionProvider(ConnectionProviderModel model)
             {
                 schemaBuilder.registerConnectionProviderElement(model);
             }
 
             @Override
-            public void onSource(HasSourceModels owner, SourceModel model)
+            public void onSource(SourceModel model)
             {
                 schemaBuilder.registerMessageSource(model);
             }

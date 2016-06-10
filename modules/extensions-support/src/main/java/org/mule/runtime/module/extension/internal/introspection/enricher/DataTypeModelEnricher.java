@@ -11,6 +11,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENC
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingMethod;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
@@ -18,11 +19,10 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Extension
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
+import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  * Enriches operations which were defined in methods annotated with {@link DataTypeParameters} so that
@@ -41,31 +41,30 @@ public final class DataTypeModelEnricher extends AbstractAnnotatedModelEnricher
     public void enrich(DescribingContext describingContext)
     {
         final ExtensionDeclaration declaration = describingContext.getExtensionDeclarer().getDeclaration();
-        doEnrich(declaration, declaration.getOperations());
-        declaration.getConfigurations().forEach(config -> doEnrich(declaration, config.getOperations()));
-    }
-
-    private void doEnrich(ExtensionDeclaration declaration, List<OperationDeclaration> operations)
-    {
-        operations.forEach(operation -> {
-            Method method = getImplementingMethod(operation);
-            if (method != null)
+        new IdempotentDeclarationWalker()
+        {
+            @Override
+            protected void onOperation(OperationDeclaration declaration)
             {
-                DataTypeParameters annotation = method.getAnnotation(DataTypeParameters.class);
-                if (annotation != null)
+                Method method = getImplementingMethod(declaration);
+                if (method != null)
                 {
-                    if (isVoid(method))
+                    DataTypeParameters annotation = method.getAnnotation(DataTypeParameters.class);
+                    if (annotation != null)
                     {
-                        throw new IllegalModelDefinitionException(String.format(
-                                "Operation '%s' of extension '%s' is void yet requires the ability to change the content metadata." +
-                                " Mutating the content metadata requires an operation with a return type.",
-                                operation.getName(), declaration.getName()));
+                        if (isVoid(method))
+                        {
+                            throw new IllegalModelDefinitionException(String.format(
+                                    "Operation '%s' of extension '%s' is void yet requires the ability to change the content metadata." +
+                                    " Mutating the content metadata requires an operation with a return type.",
+                                    declaration.getName(), declaration.getName()));
+                        }
+                        declaration.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs."));
+                        declaration.addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs."));
                     }
-                    operation.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs."));
-                    operation.addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs."));
                 }
             }
-        });
+        }.walk(declaration);
     }
 
     private ParameterDeclaration newParameter(String name, String description)

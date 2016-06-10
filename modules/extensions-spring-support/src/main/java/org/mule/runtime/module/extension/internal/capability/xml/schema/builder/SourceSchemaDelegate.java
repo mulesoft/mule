@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
  *
  * @since 4.0.0
  */
-class SourceSchemaDelegate extends AbstractSchemaDelegate
+class SourceSchemaDelegate
 {
 
     private final SchemaBuilder builder;
@@ -37,11 +37,6 @@ class SourceSchemaDelegate extends AbstractSchemaDelegate
 
     public void registerMessageSource(SourceModel sourceModel)
     {
-        if (trackElement(sourceModel.getName()))
-        {
-            return;
-        }
-
         String typeName = capitalize(sourceModel.getName()) + TYPE_SUFFIX;
         registerSourceElement(sourceModel, typeName);
         registerSourceType(typeName, sourceModel);
