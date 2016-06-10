@@ -11,10 +11,10 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromType;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.parsers.beans.SimpleCollectionObject;
 import org.mule.runtime.core.api.MuleContext;
 
@@ -44,35 +44,35 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                 .withSetterParameterDefinition("simpleTypeList", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-list").build())
                                 .withSetterParameterDefinition("simpleTypeSet", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-set").withCollectionType(HashSet.class).build())
                                 .withSetterParameterDefinition("simpleParameters", fromMultipleDefinitions(
-                                        new KeyAttributeDefinitionPair.Builder()
+                                        newBuilder()
                                                 .withAttributeDefinition(fromSimpleParameter("firstname").build())
                                                 .withKey("firstname")
                                                 .build(),
-                                        new KeyAttributeDefinitionPair.Builder()
+                                        newBuilder()
                                                 .withAttributeDefinition(fromSimpleParameter("lastname").build())
                                                 .withKey("lastname")
                                                 .build(),
-                                        new KeyAttributeDefinitionPair.Builder()
+                                        newBuilder()
                                                 .withAttributeDefinition(fromSimpleParameter("age").build())
                                                 .withKey("age")
                                                 .build(),
-                                        new KeyAttributeDefinitionPair.Builder()
+                                        newBuilder()
                                                 .withAttributeDefinition(fromChildConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("first-child").build())
                                                 .withKey("first-child")
                                                 .build(),
-                                        new KeyAttributeDefinitionPair.Builder()
+                                        newBuilder()
                                                 .withAttributeDefinition(fromChildConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("second-child").build())
                                                 .withKey("second-child")
                                                 .build(),
-                                        new KeyAttributeDefinitionPair.Builder()
+                                        newBuilder()
                                                 .withAttributeDefinition(fromChildCollectionConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("other-children").build())
                                                 .withKey("other-children")
                                                 .build(),
-                                        new KeyAttributeDefinitionPair.Builder()
+                                        newBuilder()
                                                 .withAttributeDefinition(fromChildCollectionConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("other-children-custom-collection-type").withCollectionType(LinkedList.class).build())
                                                 .withKey("other-children-custom-collection-type")
                                                 .build(),
-                                        new KeyAttributeDefinitionPair.Builder()
+                                        newBuilder()
                                                 .withAttributeDefinition(fromChildCollectionConfiguration(String.class).withWrapperIdentifier("other-simple-type-child-list").build())
                                                 .withKey("other-simple-type-child-list-custom-key")
                                                 .build())

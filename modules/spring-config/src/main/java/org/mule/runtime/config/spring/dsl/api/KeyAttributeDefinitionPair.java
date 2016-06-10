@@ -41,9 +41,21 @@ public class KeyAttributeDefinitionPair
         return attributeDefinition;
     }
 
+    /**
+     * @return builder for {@code KeyAttributeDefinitionPair}
+     */
+    public static Builder newBuilder()
+    {
+        return new Builder();
+    }
+
     public static class Builder
     {
         private KeyAttributeDefinitionPair attributeDefinitionPair = new KeyAttributeDefinitionPair();
+
+        private Builder()
+        {
+        }
 
         /**
          * @param key key to use to hold the value.

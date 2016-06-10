@@ -342,9 +342,7 @@ class ComponentConfigurationBuilder
                     .filter(matchesTypeAndIdentifierPredicate)
                     .collect(toList());
 
-            matchingComponentValues.stream().forEach(componentValue -> {
-                complexParameters.remove(componentValue);
-            });
+            matchingComponentValues.stream().forEach(complexParameters::remove);
             if (wrapperIdentifier.isPresent() && !matchingComponentValues.isEmpty())
             {
                 this.value = matchingComponentValues.get(0).getBean();

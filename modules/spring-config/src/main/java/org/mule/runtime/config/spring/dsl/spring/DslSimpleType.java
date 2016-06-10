@@ -18,14 +18,14 @@ import java.util.Set;
 public class DslSimpleType
 {
 
-    private final static Set<Class<?>> simpleTypes = of(Byte.class,
-                                                                     Short.class,
-                                                                     Integer.class,
-                                                                     Long.class,
-                                                                     Character.class,
-                                                                     Float.class,
-                                                                     Double.class,
-                                                                     String.class);
+    private final static Set<Class<?>> simpleTypes = of(Byte.class, byte.class,
+                                                        Short.class, short.class,
+                                                        Integer.class, int.class,
+                                                        Long.class, long.class,
+                                                        Character.class, char.class,
+                                                        Float.class, float.class,
+                                                        Double.class, double.class,
+                                                        String.class);
 
     public static boolean isSimpleType(Class<?> type)
     {
