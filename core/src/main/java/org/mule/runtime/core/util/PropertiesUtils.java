@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.mule.runtime.core.util.ClassUtils.getResources;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
@@ -341,7 +343,7 @@ public final class PropertiesUtils
     }
 
     /**
-     * Discovers properties files available on the execution context
+     * Discovers properties files available on the classloader that loaded {@link PropertiesUtils} class
      *
      * @param resource resource to find. Not empty
      * @return a non null list of Properties
@@ -349,9 +351,25 @@ public final class PropertiesUtils
      */
     public static List<Properties> discoverProperties(String resource) throws IOException
     {
+        return discoverProperties(PropertiesUtils.class.getClassLoader(), resource);
+    }
+
+    /**
+     * Discovers properties files available on the given classloader.
+     *
+     * @param classLoader classloader used to find properties resources. Not null.
+     * @param resource resource to find. Not empty
+     * @return a non null list of Properties
+     * @throws IOException when a property file cannot be processed
+     */
+    public static List<Properties> discoverProperties(ClassLoader classLoader, String resource) throws IOException
+    {
+        checkArgument(!StringUtils.isEmpty(resource), "Resource cannot be empty");
+        checkArgument(classLoader != null, "ClassLoader cannot be null");
+
         List<Properties> result = new LinkedList<Properties>();
 
-        Enumeration<URL> allPropertiesResources = ClassUtils.getResources(resource, PropertiesUtils.class);
+        Enumeration<URL> allPropertiesResources = getResources(resource, classLoader);
         while (allPropertiesResources.hasMoreElements())
         {
             URL propertiesResource = allPropertiesResources.nextElement();

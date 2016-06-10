@@ -43,7 +43,7 @@ import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
-import org.mule.runtime.container.ContainerClassLoaderFactory;
+import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;

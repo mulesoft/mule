@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
@@ -146,8 +148,32 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return url;
     }
 
+    @Deprecated
     public static Enumeration<URL> getResources(final String resourceName, final Class<?> callingClass)
     {
+        return getResources(resourceName, callingClass.getClassLoader());
+    }
+
+    /**
+     * Find resources with a given name.
+     * <p/>
+     * Resources are searched in the following order:
+     * <ul>
+     * <li>current thread's context classLoader</li>
+     * <li>{@link ClassUtils}s class classLoader</li>
+     * <li>fallbackClassLoader passed on the parameter</li>
+     * </ul>
+     * Search stops as soon as any of the mentioned classLoaders has found a matching resource.
+     *
+     * @param resourceName resource being searched. Non empty.
+     * @param fallbackClassLoader classloader used to fallback the search. Non null.
+     * @return a non null {@link Enumeration} containing the found resources. Can be empty.
+     */
+    public static Enumeration<URL> getResources(final String resourceName, final ClassLoader fallbackClassLoader)
+    {
+        checkArgument(!isEmpty(resourceName), "ResourceName cannot be empty");
+        checkArgument(fallbackClassLoader != null, "FallbackClassLoader cannot be null");
+
         Enumeration<URL> enumeration = AccessController.doPrivileged((PrivilegedAction<Enumeration<URL>>) () -> {
             try
             {
@@ -179,7 +205,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             enumeration = AccessController.doPrivileged((PrivilegedAction<Enumeration<URL>>) () -> {
                 try
                 {
-                    return callingClass.getClassLoader().getResources(resourceName);
+                    return fallbackClassLoader.getResources(resourceName);
                 }
                 catch (IOException e)
                 {
