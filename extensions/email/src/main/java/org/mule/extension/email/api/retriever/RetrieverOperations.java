@@ -8,7 +8,7 @@ package org.mule.extension.email.api.retriever;
 
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.INBOX_FOLDER;
 import org.mule.extension.email.api.EmailAttributes;
-import org.mule.extension.email.api.retriever.matcher.EmailPredicateBuilder;
+import org.mule.extension.email.api.EmailPredicateBuilder;
 import org.mule.extension.email.internal.commands.ListCommand;
 import org.mule.extension.email.internal.commands.StoreCommand;
 import org.mule.runtime.api.message.MuleMessage;
@@ -35,44 +35,50 @@ public class RetrieverOperations
     private MuleContext context;
 
     private final ListCommand listCommand = new ListCommand();
-    private final StoreCommand storeOperation = new StoreCommand();
+    private final StoreCommand storeCommand = new StoreCommand();
 
 
     /**
-     * List all the emails in the configured folder that match with the specified {@code matchWith} criteria.
+     * List all the emails in the configured mailBoxFolder that match with the specified {@code matchWith} criteria.
      *
-     * @param config     the {@link RetrieverConfiguration} associated to this operation.
-     * @param connection the corresponding {@link RetrieverConnection} instance.
-     * @param folder     the folder where the emails are going to be fetched
-     * @param matchWith  a {@link EmailPredicateBuilder} used to filter the output emails.
+     * @param config        the {@link RetrieverConfiguration} associated to this operation.
+     * @param connection    the corresponding {@link RetrieverConnection} instance.
+     * @param mailBoxFolder the mailbox folder where the emails are going to be fetched
+     * @param matchWith     a {@link EmailPredicateBuilder} used to filter the output emails.
      * @return a {@link List} of {@link MuleMessage} carrying all the emails and it's corresponding attributes.
      */
     //TODO: ADD PAGINATION SUPPORT WHEN AVAILABLE
     public List<MuleMessage<String, EmailAttributes>> list(@UseConfig RetrieverConfiguration config,
                                                            @Connection RetrieverConnection connection,
-                                                           @Optional(defaultValue = INBOX_FOLDER) String folder,
+                                                           @Optional(defaultValue = INBOX_FOLDER) String mailBoxFolder,
                                                            @Optional EmailPredicateBuilder matchWith)
     {
-        return listCommand.list(connection, context, folder, config.isEagerlyFetchContent(), buildMatcher(matchWith));
+        return listCommand.list(connection, context, mailBoxFolder, config.isEagerlyFetchContent(), buildMatcher(matchWith));
     }
 
     /**
      * Store the email from the configured mailbox that match with the specified {@code matchWith} criteria
-     * in the specified {@code directory}.
+     * in the specified {@code localDirectory}.
      *
-     * @param connection  the corresponding {@link RetrieverConnection} instance.
-     * @param muleMessage the incoming {@link MuleMessage}.
-     * @param folder      the folder where the emails are going to be fetched
-     * @param directory   the directory where the email files are going to be stored
-     * @param emailId     the optional number of the email to be marked. for default the email is taken from the incoming {@link MuleMessage}.
+     * @param connection     the corresponding {@link RetrieverConnection} instance.
+     * @param muleMessage    the incoming {@link MuleMessage}.
+     * @param localDirectory the local directory where the email files are going to be stored
+     * @param mailBoxFolder  the mailbox folder where the emails are going to be fetched
+     * @param fileName       the name of the file that is going to be stored, Defaults to the email subject.
+     *                       the operation will append the email number and received date at the end.
+     * @param emailId        the optional number of the email to be marked. for default the email is taken from the incoming {@link MuleMessage}.
+     * @param overwrite      if should overwrite a file that already exist, or not.
      */
+    // TODO: annotated the parameter localDirectory with @Path when available
     public void store(@Connection RetrieverConnection connection,
                       MuleMessage muleMessage,
-                      String directory,
-                      @Optional(defaultValue = INBOX_FOLDER) String folder,
-                      @Optional Integer emailId)
+                      String localDirectory,
+                      @Optional(defaultValue = INBOX_FOLDER) String mailBoxFolder,
+                      @Optional String fileName,
+                      @Optional Integer emailId,
+                      @Optional(defaultValue = "false") boolean overwrite)
     {
-        storeOperation.store(connection, muleMessage, folder, directory, emailId);
+        storeCommand.store(connection, muleMessage, mailBoxFolder, localDirectory, fileName, emailId, overwrite);
     }
 
     private Predicate<EmailAttributes> buildMatcher(EmailPredicateBuilder matchWith)

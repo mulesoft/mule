@@ -11,6 +11,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
+import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.EmailConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -46,14 +48,24 @@ public abstract class EmailConnectorTestCase extends ExtensionFunctionalTestCase
         ServerSetup serverSetup = new ServerSetup(PORT.getNumber(), null, getProtocol());
         server = new GreenMail(serverSetup);
         server.start();
-        assertThat(server, is(not(nullValue())));
         user = server.setUser(JUANI_EMAIL, JUANI_EMAIL, "password");
     }
 
     @Override
     protected void doTearDownAfterMuleContextDispose() throws Exception
     {
+        assertThat(server, is(not(nullValue())));
         server.stop();
+    }
+
+    protected void assertBodyContent(String content)
+    {
+        assertThat(content, is(EMAIL_CONTENT));
+    }
+
+    protected void assertSubject(String content)
+    {
+        assertThat(content, is(EMAIL_SUBJECT));
     }
 
     public abstract String getProtocol();

@@ -7,17 +7,14 @@
                http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
 
-    <email:pop3 name="config" host="127.0.0.1" port="${port}">
-        <email:pop3s-connection  password="password" user="juan.desimoni@mulesoft.com">
+    <email:pop3 name="config">
+        <email:pop3s-connection host="127.0.0.1" port="${port}" password="password" user="juan.desimoni@mulesoft.com">
             <tls:context enabledProtocols="TLSv1.2">
 
-                <!-- TODO: test with a custom keystore and trustore. take in mind that the green mail server by default,
+                <!-- TODO: test with a custom keystore and truststore. take in mind that the green mail server by default,
                 the factory loads the resource <code>greenmail.jks</code> from classpath. GreenMail provides the keystore resource.
                 For customization, place your greenmail.jks before greenmail JAR in the classpath.
                 Now is working in insecure mode -->
-
-                <!--<tls:trust-store path="greenmail.jks" password="changeit"/>-->
-
                 <tls:trust-store insecure="true"/>
             </tls:context>
         </email:pop3s-connection>

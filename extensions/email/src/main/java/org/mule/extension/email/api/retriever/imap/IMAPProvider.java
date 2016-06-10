@@ -6,12 +6,15 @@
  */
 package org.mule.extension.email.api.retriever.imap;
 
-import static org.mule.extension.email.internal.util.EmailConstants.PROTOCOL_IMAP;
+import static org.mule.extension.email.internal.EmailProtocol.IMAP;
+import static org.mule.extension.email.internal.EmailProtocol.IMAP_PORT;
 import org.mule.extension.email.api.retriever.AbstractRetrieverProvider;
 import org.mule.extension.email.api.retriever.RetrieverConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
  * A {@link ConnectionProvider} that returns instances of imap based {@link RetrieverConnection}s.
@@ -23,16 +26,23 @@ public class IMAPProvider extends AbstractRetrieverProvider<IMAPConfiguration, R
 {
 
     /**
+     * The port number of the mail server.
+     */
+    @Parameter
+    @Optional(defaultValue = IMAP_PORT)
+    private String port;
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public RetrieverConnection connect(IMAPConfiguration config) throws ConnectionException
     {
-        return new RetrieverConnection(PROTOCOL_IMAP,
-                                       user,
-                                       password,
-                                       config.getHost(),
-                                       config.getPort(),
+        return new RetrieverConnection(IMAP,
+                                       settings.getUser(),
+                                       settings.getPassword(),
+                                       settings.getHost(),
+                                       port,
                                        config.getConnectionTimeout(),
                                        config.getReadTimeout(),
                                        config.getWriteTimeout(),

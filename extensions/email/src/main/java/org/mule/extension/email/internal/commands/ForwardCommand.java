@@ -7,19 +7,18 @@
 package org.mule.extension.email.internal.commands;
 
 import static java.lang.String.format;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEmailAttributes;
-import static org.mule.extension.email.internal.util.EmailConstants.TEXT;
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
+import org.mule.extension.email.api.sender.SenderConnection;
 import org.mule.extension.email.internal.exception.EmailSenderException;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.List;
 import java.util.Map;
-
-import javax.mail.Session;
 
 /**
  * Represents the forward operation.
@@ -34,20 +33,20 @@ public final class ForwardCommand
     /**
      * Forwards an email message. The message will be sent to all recipient
      * {@code toAddresses}.
-     *
+     * <p>
      * The forwarded content is taken from the incoming {@link MuleMessage}'s payload. If not possible
      * this operation is going to fail.
      *
-     * @param session the {@link Session} through which the message is going to be sent.
-     * @param muleMessage the incoming {@link MuleMessage} from which the email is going to getPropertiesInstance the content.
-     * @param content the content of the email.
-     * @param subject the subject of the email.
-     * @param from the person who sends the email.
-     * @param toAddresses the primary recipient addresses of the email.
-     * @param ccAddresses the carbon copy recipient addresses of the email.
+     * @param connection   the connection associated to the operation.
+     * @param muleMessage  the incoming {@link MuleMessage} from which the email is going to getPropertiesInstance the content.
+     * @param content      the content of the email.
+     * @param subject      the subject of the email.
+     * @param from         the person who sends the email.
+     * @param toAddresses  the primary recipient addresses of the email.
+     * @param ccAddresses  the carbon copy recipient addresses of the email.
      * @param bccAddresses the blind carbon copy recipient addresses of the email.
      */
-    public void forward(Session session,
+    public void forward(SenderConnection connection,
                         MuleMessage muleMessage,
                         EmailContent content,
                         String subject,
@@ -59,7 +58,7 @@ public final class ForwardCommand
     {
 
         EmailAttributes attributes = getAttributesFromMessage(muleMessage)
-                                            .orElseThrow(() -> new EmailSenderException("Cannot perform the forward operation if no email is provided."));
+                .orElseThrow(() -> new EmailSenderException("Cannot perform the forward operation if no email is provided."));
 
         if (subject == null)
         {
@@ -70,7 +69,7 @@ public final class ForwardCommand
         String forwardBody = content != null ? format("%s\r\n\r\n%s", content.getBody(), body) : body;
         EmailContent forwardContent = new EmailContent(forwardBody, TEXT);
         List<EmailAttachment> emailAttachments = mapToEmailAttributes(attributes.getAttachments());
-        sendCommand.send(session, forwardContent, subject, toAddresses, from, ccAddresses, bccAddresses, headers, emailAttachments);
+        sendCommand.send(connection, forwardContent, subject, toAddresses, from, ccAddresses, bccAddresses, headers, emailAttachments);
 
     }
 }

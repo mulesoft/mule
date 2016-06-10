@@ -6,7 +6,8 @@
  */
 package org.mule.extension.email.api.sender;
 
-import static org.mule.extension.email.internal.util.EmailConstants.PROTOCOL_SMTP;
+import static org.mule.extension.email.internal.EmailProtocol.SMTPS;
+import static org.mule.extension.email.internal.EmailProtocol.SMTPS_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.extension.email.api.retriever.RetrieverConnection;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
  * A {@link ConnectionProvider} that returns instances of smtps based {@link RetrieverConnection}s.
@@ -25,8 +27,14 @@ import org.mule.runtime.extension.api.annotation.Parameter;
  * @since 4.0
  */
 @Alias("smtps")
-public class SMTPSProvider extends SMTPProvider implements Initialisable
+public class SMTPSProvider extends AbstractSenderProvider implements Initialisable
 {
+    /**
+     * The port number of the mail server.
+     */
+    @Parameter
+    @Optional(defaultValue = SMTPS_PORT)
+    private String port;
 
     /**
      * A factory for TLS contexts. A TLS context is configured with a key store and a trust store.
@@ -50,11 +58,11 @@ public class SMTPSProvider extends SMTPProvider implements Initialisable
     @Override
     public SenderConnection connect(SMTPConfiguration config) throws ConnectionException
     {
-        return new SenderConnection(PROTOCOL_SMTP,
-                                    user,
-                                    password,
-                                    config.getHost(),
-                                    config.getPort(),
+        return new SenderConnection(SMTPS,
+                                    settings.getUser(),
+                                    settings.getPassword(),
+                                    settings.getHost(),
+                                    port,
                                     config.getConnectionTimeout(),
                                     config.getReadTimeout(),
                                     config.getWriteTimeout(),

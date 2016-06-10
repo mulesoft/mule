@@ -6,16 +6,13 @@
  */
 package org.mule.extension.email.api.sender;
 
-import static org.mule.extension.email.internal.util.EmailConstants.PROTOCOL_SMTP;
+import static org.mule.extension.email.internal.EmailProtocol.SMTP;
+import static org.mule.extension.email.internal.EmailProtocol.SMTP_PORT;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.display.Password;
 
 /**
  * A {@link ConnectionProvider} that returns instances of smtp based {@link SenderConnection}s.
@@ -23,22 +20,14 @@ import org.mule.runtime.extension.api.annotation.param.display.Password;
  * @since 4.0
  */
 @Alias("smtp")
-public class SMTPProvider implements ConnectionProvider<SMTPConfiguration, SenderConnection>
+public class SMTPProvider extends AbstractSenderProvider
 {
     /**
-     * the username used to connect with the mail server.
+     * The port number of the mail server.
      */
     @Parameter
-    @Optional
-    protected String user;
-
-    /**
-     * the password corresponding to the {@code username}.
-     */
-    @Parameter
-    @Password
-    @Optional
-    protected String password;
+    @Optional(defaultValue = SMTP_PORT)
+    private String port;
 
     /**
      * {@inheritDoc}
@@ -46,41 +35,14 @@ public class SMTPProvider implements ConnectionProvider<SMTPConfiguration, Sende
     @Override
     public SenderConnection connect(SMTPConfiguration config) throws ConnectionException
     {
-        return new SenderConnection(PROTOCOL_SMTP,
-                                    user,
-                                    password,
-                                    config.getHost(),
-                                    config.getPort(),
+        return new SenderConnection(SMTP,
+                                    settings.getUser(),
+                                    settings.getPassword(),
+                                    settings.getHost(),
+                                    port,
                                     config.getConnectionTimeout(),
                                     config.getReadTimeout(),
                                     config.getWriteTimeout(),
                                     config.getProperties());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void disconnect(SenderConnection connection)
-    {
-        connection.disconnect();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionValidationResult validate(SenderConnection connection)
-    {
-        return connection.validate();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ConnectionHandlingStrategy<SenderConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<SMTPConfiguration, SenderConnection> handlingStrategyFactory)
-    {
-        return handlingStrategyFactory.supportsPooling();
     }
 }

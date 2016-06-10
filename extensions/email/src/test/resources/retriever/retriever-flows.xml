@@ -22,7 +22,12 @@
     </flow>
 
     <flow name="storeMessages">
-        <email:store config-ref="config" directory="${storePath}"/>
+        <email:list config-ref="config"/>
+        <email:store config-ref="config" localDirectory="${storePath}"/>
+    </flow>
+
+    <flow name="storeSingleMessage">
+        <email:store config-ref="config" localDirectory="${storePath}" emailId="1"/>
     </flow>
 
 </mule>

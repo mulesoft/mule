@@ -6,8 +6,10 @@
  */
 package org.mule.extension.email.api.retriever.pop3;
 
-import static org.mule.extension.email.internal.util.EmailConstants.PROTOCOL_POP3;
+import static org.mule.extension.email.internal.EmailProtocol.POP3S;
+import static org.mule.extension.email.internal.EmailProtocol.POP3S_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import org.mule.extension.email.api.retriever.AbstractRetrieverProvider;
 import org.mule.extension.email.api.retriever.RetrieverConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -16,6 +18,7 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
  * A {@link ConnectionProvider} that returns instances of pop3s (secured) based {@link RetrieverConnection}s.
@@ -25,8 +28,16 @@ import org.mule.runtime.extension.api.annotation.Parameter;
  * @since 4.0
  */
 @Alias("pop3s")
-public class POP3SProvider extends POP3Provider implements Initialisable
+public class POP3SProvider extends AbstractRetrieverProvider<POP3Configuration, RetrieverConnection> implements Initialisable
 {
+
+    /**
+     * The port number of the mail server.
+     */
+    @Parameter
+    @Optional(defaultValue = POP3S_PORT)
+    private String port;
+
     /**
      * A factory for TLS contexts. A TLS context is configured with a key store and a trust store.
      * Allows to create a TLS secured connections.
@@ -49,11 +60,11 @@ public class POP3SProvider extends POP3Provider implements Initialisable
     @Override
     public RetrieverConnection connect(POP3Configuration config) throws ConnectionException
     {
-        return new RetrieverConnection(PROTOCOL_POP3,
-                                       user,
-                                       password,
-                                       config.getHost(),
-                                       config.getPort(),
+        return new RetrieverConnection(POP3S,
+                                       settings.getUser(),
+                                       settings.getPassword(),
+                                       settings.getHost(),
+                                       port,
                                        config.getConnectionTimeout(),
                                        config.getReadTimeout(),
                                        config.getWriteTimeout(),

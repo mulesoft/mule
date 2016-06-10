@@ -35,7 +35,7 @@ public class SenderOperations
     private final ForwardCommand forwardCommand = new ForwardCommand();
     private final ReplyCommand replyOperation = new ReplyCommand();
 
-    // TODO: REMOVE WHEN THERE IS DEFAULT PAYLOAD IN THE OPTIONAL ANNOTATION
+    // TODO: REMOVE WHEN THERE IS DEFAULT PAYLOAD IN THE OPTIONAL ANNOTATION - MULE-9918
     private static final String PAYLOAD = "#[payload]";
 
     /**
@@ -68,7 +68,7 @@ public class SenderOperations
                      @Optional Map<String, String> headers,
                      @Optional List<EmailAttachment> attachments)
     {
-        sendOperation.send(connection.getSession(),
+        sendOperation.send(connection,
                            content,
                            subject,
                            toAddresses,
@@ -104,7 +104,7 @@ public class SenderOperations
                         @Optional List<String> bccAddresses,
                         @Optional Map<String, String> headers)
     {
-        forwardCommand.forward(connection.getSession(),
+        forwardCommand.forward(connection,
                                muleMessage,
                                content,
                                subject,
@@ -138,7 +138,7 @@ public class SenderOperations
                       @Optional Map<String, String> headers,
                       @Optional(defaultValue = "false") Boolean replyToAll)
     {
-        replyOperation.reply(connection.getSession(),
+        replyOperation.reply(connection,
                              muleMessage,
                              content,
                              subject,

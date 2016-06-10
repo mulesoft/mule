@@ -6,15 +6,12 @@
  */
 package org.mule.extension.email.api.retriever.pop3;
 
-import static org.mule.extension.email.internal.util.EmailConstants.PORT_POP3;
 import org.mule.extension.email.api.AbstractEmailConfiguration;
 import org.mule.extension.email.api.retriever.RetrieverConfiguration;
 import org.mule.extension.email.api.retriever.RetrieverOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
  * Configuration for operations that are performed through the POP3
@@ -29,13 +26,6 @@ public class POP3Configuration extends AbstractEmailConfiguration implements Ret
 {
 
     /**
-     * The port number of the mail server. The default value for pop3 mail servers is 110.
-     */
-    @Parameter
-    @Optional(defaultValue = PORT_POP3)
-    private String port;
-
-    /**
      * {@inheritDoc}
      * <p>
      * The pop3 protocol always read the content when retrieves an email.
@@ -44,14 +34,5 @@ public class POP3Configuration extends AbstractEmailConfiguration implements Ret
     public boolean isEagerlyFetchContent()
     {
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPort()
-    {
-        return port;
     }
 }

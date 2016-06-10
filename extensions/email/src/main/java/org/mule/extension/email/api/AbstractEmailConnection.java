@@ -7,24 +7,23 @@
 package org.mule.extension.email.api;
 
 import static org.apache.commons.lang.StringUtils.join;
+import org.mule.extension.email.internal.EmailProtocol;
 import org.mule.extension.email.internal.PasswordAuthenticator;
 import org.mule.extension.email.internal.exception.EmailConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
-import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Session;
-import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 
 /**
  * Generic implementation for an email connection of a connector which operates
- * over the SMTP, IMAP or POP3 protocols.
+ * over the SMTP, IMAP, POP3 and it's secure versions protocols.
  * <p>
  * Performs the creation of a persistent set of properties that are used
  * to configure the {@link Session} instance.
@@ -42,94 +41,12 @@ public abstract class AbstractEmailConnection
 {
 
     /**
-     * The host name of the mail server.
-     */
-    private static final String HOST_PROPERTY_MASK = "mail.%s.host";
-
-    /**
-     * The port number of the mail server.
-     */
-    private static final String PORT_PROPERTY_MASK = "mail.%s.port";
-
-    /**
-     * Socket connection timeout value in milliseconds. Default is infinite timeout.
-     */
-    private static final String CONNECTION_TIMEOUT_PROPERTY_MASK = "mail.%s.connectiontimeout";
-
-    /**
-     * Socket write timeout value in milliseconds. Default is infinite timeout.
-     */
-    private static final String WRITE_TIMEOUT_PROPERTY_MASK = "mail.%s.writetimeout";
-
-    /**
-     * Indicates if should attempt to authorize or not. Defaults to false.
-     */
-    private static final String MAIL_AUTH_PROPERTY_MASK = "mail.%s.auth";
-
-    /**
-     * Indicates if the STARTTLS command shall be used to initiate a TLS-secured connection.
-     */
-    private static final String START_TLS_PROPERTY_MASK = "mail.%s.starttls.enable";
-
-    /**
-     * Specifies the {@link SocketFactory} class to create smtp sockets.
-     */
-    private static final String SOCKET_FACTORY_PROPERTY_MASK = "mail.%s.ssl.socketFactory";
-
-    /**
-     * Whether to use {@link Socket} as a fallback if the initial connection fails or not.
-     */
-    private static final String SOCKET_FACTORY_FALLBACK_PROPERTY_MASK = "mail.%s.socketFactory.fallback";
-
-    /**
-     * Specifies the SSL cipher suites that will be enabled for SSL connections.
-     */
-    private static final String SSL_CIPHERSUITES_MASK = "mail.%s.ssl.ciphersuites";
-
-    /**
-     * Specifies the SSL protocols that will be enabled for SSL connections.
-     */
-    private static final String SSL_PROTOCOLS_MASK = "mail.%s.ssl.protocols";
-
-    /**
-     * Specifies the trusted hosts.
-     */
-    private static final String SSL_TRUST_MASK = "mail.%s.ssl.trust";
-
-    /**
-     * Specifies if ssl is enabled or not.
-     */
-    private static final String SSL_ENABLE = "mail.%s.ssl.enable";
-
-    /**
-     * Specifies the port to connect to when using a socket factory.
-     */
-    private static final String SOCKET_FACTORY_PORT_MASK = "mail.%s.socketFactory.port";
-
-    /**
-     * Specifies the default transport protocol.
-     */
-    private static final String TRANSPORT_PROTOCOL = "mail.transport.protocol";
-
-    /**
-     * Socket read timeout value in milliseconds. This timeout is implemented by {@link Socket}. Default is infinite timeout.
-     */
-    private static final String TIMEOUT_PROPERTY_MASK = "mail.%s.timeout";
-
-    /**
-     * Defines the default mime charset to use when none has been specified for the message.
-     */
-    private static final String MAIL_MIME_CHARSET = "mail.mime.charset";
-
-    /**
-     * A separator used to separate some tokens from a property that accepts multiple values, e.g.: mail.{protocol}.ciphersuites
+     * A separator used to separate some tokens from a property that accepts multiple values, e.g.: mail.{name}.ciphersuites
      */
     private static final String WHITESPACE_SEPARATOR = " ";
 
-
-    private final String protocol;
+    protected final EmailProtocol protocol;
     protected final Session session;
-
 
     /**
      * Base constructor for {@link AbstractEmailConnection} implementations.
@@ -144,7 +61,7 @@ public abstract class AbstractEmailConnection
      * @param writeTimeout      the socket write timeout
      * @param properties        the custom properties added to configure the session.
      */
-    public AbstractEmailConnection(String protocol,
+    public AbstractEmailConnection(EmailProtocol protocol,
                                    String username,
                                    String password,
                                    String host,
@@ -173,7 +90,7 @@ public abstract class AbstractEmailConnection
      * @param properties        the custom properties added to configure the session.
      * @param tlsContextFactory the tls context factory for creating the context to secure the connection
      */
-    public AbstractEmailConnection(String protocol,
+    public AbstractEmailConnection(EmailProtocol protocol,
                                    String username,
                                    String password,
                                    String host,
@@ -185,8 +102,12 @@ public abstract class AbstractEmailConnection
                                    TlsContextFactory tlsContextFactory) throws EmailConnectionException
     {
         this.protocol = protocol;
+        Properties sessionProperties = buildBasicSessionProperties(host, port, connectionTimeout, readTimeout, writeTimeout);
 
-        Properties sessionProperties = buildSessionProperties(host, port, connectionTimeout, readTimeout, writeTimeout, tlsContextFactory);
+        if (protocol.isSecure())
+        {
+            sessionProperties.putAll(buildSecureProperties(tlsContextFactory));
+        }
 
         if (properties != null)
         {
@@ -196,7 +117,7 @@ public abstract class AbstractEmailConnection
         PasswordAuthenticator authenticator = null;
         if (username != null && password != null)
         {
-            set(sessionProperties, MAIL_AUTH_PROPERTY_MASK, "true");
+            sessionProperties.setProperty(protocol.getMailAuthProperty(), "true");
             authenticator = new PasswordAuthenticator(username, password);
         }
 
@@ -205,76 +126,64 @@ public abstract class AbstractEmailConnection
 
 
     /**
-     * Creates a new instance and set all the properties required by the specified {@code protocol}.
+     * Creates a new {@link Properties} instance and set all the basic properties required by the specified {@code protocol}.
      */
-    private Properties buildSessionProperties(String host, String port, long connectionTimeout, long readTimeout, long writeTimeout, TlsContextFactory tlsContextFactory) throws EmailConnectionException
+    private Properties buildBasicSessionProperties(String host, String port, long connectionTimeout, long readTimeout, long writeTimeout) throws EmailConnectionException
     {
         Properties properties = new Properties();
-        set(properties, PORT_PROPERTY_MASK, port);
-        set(properties, HOST_PROPERTY_MASK, host);
-
-        if (tlsContextFactory != null)
-        {
-            setSecureProperties(tlsContextFactory, properties);
-        }
-
-        set(properties, TIMEOUT_PROPERTY_MASK, Long.toString(readTimeout));
-        set(properties, CONNECTION_TIMEOUT_PROPERTY_MASK, Long.toString(connectionTimeout));
+        properties.setProperty(protocol.getPortProperty(), port);
+        properties.setProperty(protocol.getHostProperty(), host);
+        properties.setProperty(protocol.getReadTimeoutProperty(), Long.toString(readTimeout));
+        properties.setProperty(protocol.getConnectionTimeoutProperty(), Long.toString(connectionTimeout));
 
         // Note: "mail." + protocol + ".writetimeout" breaks TLS/SSL Dummy Socket and makes tests run 6x slower!!!
         if (writeTimeout > 0L)
         {
-            set(properties, WRITE_TIMEOUT_PROPERTY_MASK, Long.toString(writeTimeout));
+            properties.setProperty(protocol.getWriteTimeoutProperty(), Long.toString(writeTimeout));
         }
 
-        set(properties, TRANSPORT_PROTOCOL, protocol);
+        properties.setProperty(protocol.getTransportProtocolProperty(), protocol.getName());
         return properties;
     }
 
-    private void setSecureProperties(TlsContextFactory tlsContextFactory, Properties properties) throws EmailConnectionException
+    /**
+     * Creates a new {@link Properties} instance and set all the secure properties required by the specified secure {@code protocol}.
+     */
+    private Properties buildSecureProperties(TlsContextFactory tlsContextFactory) throws EmailConnectionException
     {
-        set(properties, START_TLS_PROPERTY_MASK, "true");
+        Properties properties = new Properties();
+        properties.setProperty(protocol.getStartTlsProperty(), "true");
+        properties.setProperty(protocol.getSslEnableProperty(), "true");
+        properties.setProperty(protocol.getSocketFactoryFallbackProperty(), "false");
 
         if (tlsContextFactory.getTrustStoreConfiguration().isInsecure())
         {
-            set(properties, SSL_TRUST_MASK, "*");
+            properties.setProperty(protocol.getSslTrustProperty(), "*");
         }
-
-        set(properties, SSL_ENABLE, "true");
-        set(properties, SOCKET_FACTORY_FALLBACK_PROPERTY_MASK, "false");
 
         String[] cipherSuites = tlsContextFactory.getEnabledCipherSuites();
         if (cipherSuites != null)
         {
-            set(properties, SSL_CIPHERSUITES_MASK, join(cipherSuites, WHITESPACE_SEPARATOR));
+            properties.setProperty(protocol.getSslCiphersuitesProperty(), join(cipherSuites, WHITESPACE_SEPARATOR));
         }
 
-        String[] protocols = tlsContextFactory.getEnabledProtocols();
-        if (protocols != null)
+        String[] sslProtocols = tlsContextFactory.getEnabledProtocols();
+        if (sslProtocols != null)
         {
-            set(properties, SSL_PROTOCOLS_MASK, join(protocols, WHITESPACE_SEPARATOR));
+            properties.setProperty(protocol.getSslProtocolsProperty(), join(sslProtocols, WHITESPACE_SEPARATOR));
         }
 
         try
         {
             SSLContext sslContext = tlsContextFactory.createSslContext();
-            properties.put(SOCKET_FACTORY_PROPERTY_MASK, sslContext.getSocketFactory());
+            properties.put(protocol.getSocketFactoryProperty(), sslContext.getSocketFactory());
         }
         catch (KeyManagementException | NoSuchAlgorithmException e)
         {
             throw new EmailConnectionException("Failed when creating SSL context.");
         }
-    }
 
-    /**
-     * Sets a value to the specified property.
-     *
-     * @param property the property to be set.
-     * @param value    the corresponding value for the specified {@code property}
-     */
-    private void set(Properties properties, String property, String value)
-    {
-        properties.setProperty(String.format(property, protocol), value);
+        return properties;
     }
 
     /**

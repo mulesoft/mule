@@ -14,8 +14,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.EmailAttributes;
-import org.mule.extension.email.api.retriever.matcher.EmailPredicateBuilder;
-import org.mule.extension.email.internal.EmailFlags;
+import org.mule.extension.email.api.EmailPredicateBuilder;
+import org.mule.extension.email.api.EmailFlags;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +25,7 @@ import org.junit.Test;
 public class EmailPredicateTestCase
 {
     private static final LocalDateTime RECEIVED_DATE = LocalDateTime.of(2015, 4, 20, 00, 00);
+    private static final LocalDateTime SENT_DATE = LocalDateTime.of(2014, 4, 10, 00, 00);
 
     private EmailAttributes attributes;
     private EmailPredicateBuilder builder;
@@ -44,6 +45,7 @@ public class EmailPredicateTestCase
         when(attributes.getFromAddresses()).thenReturn(singletonList(JUANI_EMAIL));
         when(attributes.getFlags()).thenReturn(flags);
         when(attributes.getReceivedDate()).thenReturn(RECEIVED_DATE);
+        when(attributes.getSentDate()).thenReturn(SENT_DATE);
     }
 
 
@@ -108,6 +110,14 @@ public class EmailPredicateTestCase
     {
         builder.setReceivedSince(RECEIVED_DATE.minusYears(1));
         builder.setReceivedUntil(RECEIVED_DATE.plusYears(1));
+        assertMatch();
+    }
+
+    @Test
+    public void matchSentDate()
+    {
+        builder.setSentSince(SENT_DATE.minusYears(1));
+        builder.setSentUntil(SENT_DATE.plusYears(1));
         assertMatch();
     }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.core.util;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
+import org.mule.runtime.core.message.ds.InputStreamDataSource;
 import org.mule.runtime.core.message.ds.StringDataSource;
 
 import java.io.File;
@@ -36,13 +37,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class IOUtils extends org.apache.commons.io.IOUtils
 {
-<<<<<<< a8308d5fd16801cc6d8fb2f87cc604700e327397
-    /** Logger. */
-    private static final Logger logger = LoggerFactory.getLogger(IOUtils.class);
-=======
 
     private static final Log logger = LogFactory.getLog(IOUtils.class);
->>>>>>> MULE-9677: Implement new Email connector
 
     protected static int bufferSize = NumberUtils.toInt(
             System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
@@ -323,6 +319,10 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         else if (object instanceof byte[] && contentType != null)
         {
             dh = new DataHandler(new ByteArrayDataSource((byte[]) object, contentType, name));
+        }
+        else if (object instanceof InputStream && contentType != null)
+        {
+            dh = new DataHandler(new InputStreamDataSource((InputStream) object, contentType, name));
         }
         else
         {

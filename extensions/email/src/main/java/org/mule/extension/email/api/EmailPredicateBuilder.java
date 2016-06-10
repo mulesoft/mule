@@ -4,10 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.api.retriever.matcher;
+package org.mule.extension.email.api;
 
 import static java.util.regex.Pattern.compile;
-import org.mule.extension.email.api.EmailAttributes;
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -44,18 +43,32 @@ public class EmailPredicateBuilder
     private static final TimeSinceFunction TIME_SINCE = new TimeSinceFunction();
 
     /**
-     * Files received before this date are rejected.
+     * Emails received before this date are rejected.
      */
     @Parameter
     @Optional
     private LocalDateTime receivedSince;
 
     /**
-     * Files received after this date are rejected.
+     * Emails received after this date are rejected.
      */
     @Parameter
     @Optional
     private LocalDateTime receivedUntil;
+
+    /**
+     * Emails sent before this date are rejected.
+     */
+    @Parameter
+    @Optional
+    private LocalDateTime sentSince;
+
+    /**
+     * Emails sent after this date are rejected.
+     */
+    @Parameter
+    @Optional
+    private LocalDateTime sentUntil;
 
     /**
      * If {@code true}, the predicate will only accept emails that has been seen.
@@ -136,6 +149,18 @@ public class EmailPredicateBuilder
                                                     TIME_UNTIL.apply(receivedUntil, attributes.getReceivedDate()));
         }
 
+        if (sentSince != null)
+        {
+            predicate = predicate.and(attributes -> attributes.getSentDate() != null &&
+                                                    TIME_SINCE.apply(sentSince, attributes.getSentDate()));
+        }
+
+        if (sentUntil != null)
+        {
+            predicate = predicate.and(attributes -> attributes.getSentDate() != null &&
+                                                    TIME_UNTIL.apply(sentUntil, attributes.getSentDate()));
+        }
+
         if (recent != null)
         {
             predicate = predicate.and(attributes -> recent == attributes.getFlags().isRecent());
@@ -204,6 +229,18 @@ public class EmailPredicateBuilder
     public EmailPredicateBuilder setSubjectRegex(String subjectRegex)
     {
         this.subjectRegex = subjectRegex;
+        return this;
+    }
+
+    public EmailPredicateBuilder setSentSince(LocalDateTime sentSince)
+    {
+        this.sentSince = sentSince;
+        return this;
+    }
+
+    public EmailPredicateBuilder setSentUntil(LocalDateTime sentUntil)
+    {
+        this.sentUntil = sentUntil;
         return this;
     }
 }

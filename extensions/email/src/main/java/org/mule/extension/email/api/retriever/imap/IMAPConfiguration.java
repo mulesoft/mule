@@ -6,8 +6,6 @@
  */
 package org.mule.extension.email.api.retriever.imap;
 
-import static org.mule.extension.email.internal.util.EmailConstants.DEFAULT_FOLDER;
-import static org.mule.extension.email.internal.util.EmailConstants.PORT_IMAP;
 import org.mule.extension.email.api.AbstractEmailConfiguration;
 import org.mule.extension.email.api.retriever.RetrieverConfiguration;
 import org.mule.extension.email.api.retriever.RetrieverOperations;
@@ -30,21 +28,6 @@ public class IMAPConfiguration extends AbstractEmailConfiguration implements Ret
 {
 
     /**
-     * The port number of the mail server. The default value for imap mail servers is 143.
-     */
-    @Parameter
-    @Optional(defaultValue = PORT_IMAP)
-    private String port;
-
-    /**
-     * The folder from which emails are going to be
-     * retrieved. The default one is the "INBOX" folder.
-     */
-    @Parameter
-    @Optional(defaultValue = DEFAULT_FOLDER)
-    private String folder;
-
-    /**
      * Indicates whether the retrieved emails should be opened
      * and read. The default value is {@code true}.
      */
@@ -61,12 +44,4 @@ public class IMAPConfiguration extends AbstractEmailConfiguration implements Ret
         return eagerlyFetchContent;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPort()
-    {
-        return port;
-    }
 }

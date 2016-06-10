@@ -8,20 +8,18 @@
 package org.mule.extension.email.retriever;
 
 import static java.lang.String.format;
+import static java.util.Arrays.stream;
 import static javax.mail.Flags.Flag;
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.RECENT;
 import static javax.mail.Flags.Flag.SEEN;
+import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.junit.runners.Parameterized.*;
-import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
-import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
+import static org.junit.runners.Parameterized.Parameters;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.api.MuleEvent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +37,6 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
 {
 
     private static final String RETRIEVE_AND_DONT_READ = "retrieveAndDontRead";
-    private static final String RETRIEVE_AND_THEN_EXPUNGE_DELETE = "retrieveAndThenExpungeDelete";
     private static final String RETRIEVE_AND_MARK_AS_DELETE = "retrieveAndMarkDelete";
     private static final String RETRIEVE_AND_MARK_AS_READ = "retrieveAndMarkRead";
     private static final String RETRIEVE_MATCH_NOT_READ = "retrieveOnlyNotReadEmails";
@@ -70,14 +67,10 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
     @Test
     public void retrieveAndRead() throws Exception
     {
-        deliver10To(JUANI_EMAIL);
-        MuleEvent event = runFlow(RETRIEVE_AND_READ);
-        List<MuleMessage> messages = (List<MuleMessage>) event.getMessage().getPayload();
+        List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
         assertThat(messages, hasSize(10));
-
         messages.forEach(m -> {
-            assertThat(m.getPayload(), instanceOf(String.class));
-            assertThat(m.getPayload(), is(EMAIL_CONTENT));
+            assertBodyContent((String) m.getPayload());
             assertThat(((EmailAttributes) m.getAttributes()).getFlags().isSeen(), is(true));
         });
     }
@@ -85,9 +78,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
     @Test
     public void retrieveAndDontRead() throws Exception
     {
-        deliver10To(JUANI_EMAIL);
-        MuleEvent event = runFlow(RETRIEVE_AND_DONT_READ);
-        List<MuleMessage> messages = (List<MuleMessage>) event.getMessage().getPayload();
+        List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_DONT_READ);
         assertThat(messages, hasSize(10));
         messages.forEach(m -> assertThat(((EmailAttributes) m.getAttributes()).getFlags().isSeen(), is(false)));
     }
@@ -95,33 +86,19 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
     @Test
     public void retrieveAndThenRead() throws Exception
     {
-        deliver10To(JUANI_EMAIL);
         runFlow(RETRIEVE_AND_MARK_AS_READ);
         MimeMessage[] messages = server.getReceivedMessages();
-        assertThat(messages.length, is(10));
-        for (MimeMessage message : messages)
-        {
-            assertThat(message.getFlags().contains(SEEN), is(true));
-        }
+        assertThat(messages, arrayWithSize(10));
+        stream(server.getReceivedMessages()).forEach(m -> assertFlag(m, SEEN, true));
     }
 
     @Test
     public void retrieveAndMarkAsDelete() throws Exception
     {
-        deliver10To(JUANI_EMAIL);
-
-        for (MimeMessage m : server.getReceivedMessages())
-        {
-            assertThat(m.getFlags().contains(DELETED), is(false));
-        }
-
+        stream(server.getReceivedMessages()).forEach(m -> assertFlag(m, DELETED, false));
         runFlow(RETRIEVE_AND_MARK_AS_DELETE);
-        assertThat(server.getReceivedMessages().length, is(10));
-
-        for (MimeMessage m : server.getReceivedMessages())
-        {
-            assertThat(m.getFlags().contains(DELETED), is(true));
-        }
+        assertThat(server.getReceivedMessages(), arrayWithSize(10));
+        stream(server.getReceivedMessages()).forEach(m -> assertFlag(m, DELETED, true));
     }
 
     @Test
@@ -136,33 +113,17 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
         testMatcherFlag(RETRIEVE_MATCH_RECENT, RECENT, false);
     }
 
-    public void testMatcherFlag(String flowName, Flag flag, boolean flagState) throws Exception
+    private void testMatcherFlag(String flowName, Flag flag, boolean flagState) throws Exception
     {
-        deliver10To(JUANI_EMAIL);
-
         for (int i = 0; i < 3; i++)
         {
             MimeMessage message = server.getReceivedMessages()[i];
             message.setFlag(flag, flagState);
         }
 
-        List<MuleMessage> messages = (List<MuleMessage>) runFlow(flowName).getMessage().getPayload();
-        assertThat(server.getReceivedMessages().length, is(10));
+        List<MuleMessage> messages= runFlowAndGetMessages(flowName);
+        assertThat(server.getReceivedMessages(), arrayWithSize(10));
         assertThat(messages, hasSize(7));
-    }
-
-    // TODO: CHECK IF THIS IS POSSIBLE IN POP3.
-    @Test
-    public void retrieveAndExpungeDelete() throws Exception
-    {
-        deliver10To(JUANI_EMAIL);
-
-        for (MimeMessage m : server.getReceivedMessages())
-        {
-            assertThat(m.getFlags().contains(DELETED), is(false));
-        }
-        runFlow(RETRIEVE_AND_THEN_EXPUNGE_DELETE);
-        assertThat(server.getReceivedMessages().length, is(0));
     }
 
 }

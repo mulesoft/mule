@@ -6,8 +6,8 @@
                http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
 
-    <email:smtp name="config" host="127.0.0.1" port="${port}">
-        <email:smtp-connection/>
+    <email:smtp name="config">
+        <email:smtp-connection host="127.0.0.1" port="${port}"/>
     </email:smtp>
 
     <spring:beans>

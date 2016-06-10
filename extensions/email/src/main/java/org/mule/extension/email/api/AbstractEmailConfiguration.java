@@ -20,12 +20,6 @@ public abstract class AbstractEmailConfiguration
 {
 
     /**
-     * The host name of the mail server.
-     */
-    @Parameter
-    protected String host;
-
-    /**
      * Additional custom properties to configure the session.
      */
     @Parameter
@@ -33,33 +27,25 @@ public abstract class AbstractEmailConfiguration
     protected Map<String, String> properties;
 
     /**
-     * the client socket connection timeout.
+     * the client socket connection timeout in milliseconds.
      */
     @Parameter
     @Optional(defaultValue = "5000")
     protected long connectionTimeout;
 
     /**
-     * the client socket read timeout.
+     * the client socket read timeout in milliseconds.
      */
     @Parameter
     @Optional(defaultValue = "5000")
     protected long readTimeout;
 
     /**
-     * the client socket write timeout.
+     * the client socket write timeout in milliseconds.
      */
     @Parameter
     @Optional(defaultValue = "0")
     protected long writeTimeout;
-
-    /**
-     * @return the host name of the mail server.
-     */
-    public String getHost()
-    {
-        return host;
-    }
 
     /**
      * @return the additional custom properties to configure the session.
@@ -93,8 +79,4 @@ public abstract class AbstractEmailConfiguration
         return writeTimeout;
     }
 
-    /**
-     * @return the port number of the mail server.
-     */
-    public abstract String getPort();
 }

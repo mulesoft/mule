@@ -6,16 +6,12 @@
  */
 package org.mule.extension.email.util;
 
-import static java.util.Collections.singletonList;
+import static java.lang.Thread.currentThread;
 import static javax.mail.Message.RecipientType.TO;
 import static javax.mail.Part.ATTACHMENT;
-import static javax.mail.Part.INLINE;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.transformer.types.MimeTypes.TEXT;
-import org.mule.extension.email.internal.builder.MessageBuilder;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
@@ -53,53 +49,40 @@ public class EmailTestUtils
     public static final Session testSession = Session.getDefaultInstance(new Properties());
 
 
-    public static MimeMessage buildMultipartMessage() throws Exception
+    public static MimeMessage getMultipartTestMessage() throws Exception
     {
+        MimeBodyPart body = new MimeBodyPart();
+        body.setContent(EMAIL_CONTENT, TEXT);
+
+        MimeBodyPart textAttachment = new MimeBodyPart();
+        textAttachment.setDisposition(ATTACHMENT);
+        textAttachment.setFileName(EMAIL_TEXT_PLAIN_ATTACHMENT_NAME);
+        textAttachment.setContent(EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT, TEXT);
+
+        MimeBodyPart jsonAttachment = new MimeBodyPart();
+        URL resource = currentThread().getContextClassLoader().getResource(EMAIL_JSON_ATTACHMENT_NAME);
+        jsonAttachment.setFileName(EMAIL_JSON_ATTACHMENT_NAME);
+        jsonAttachment.setDataHandler(new DataHandler(resource));
+
         Multipart multipart = new MimeMultipart();
-        MimeBodyPart bodyPart = new MimeBodyPart();
-        bodyPart.setContent(EMAIL_CONTENT, TEXT);
-        bodyPart.setDisposition(INLINE);
-        multipart.addBodyPart(bodyPart);
-
-        URL resource = Thread.currentThread().getContextClassLoader().getResource(EMAIL_JSON_ATTACHMENT_NAME);
-        assertThat(resource, is(not(nullValue())));
-        bodyPart = new MimeBodyPart();
-        bodyPart.setDisposition(ATTACHMENT);
-        bodyPart.setFileName(EMAIL_JSON_ATTACHMENT_NAME);
-        bodyPart.setDataHandler(new DataHandler(resource));
-        multipart.addBodyPart(bodyPart);
-
-        bodyPart = new MimeBodyPart();
-        bodyPart.setDisposition(ATTACHMENT);
-        bodyPart.setFileName(EMAIL_TEXT_PLAIN_ATTACHMENT_NAME);
-        bodyPart.setContent(EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT, TEXT);
-        multipart.addBodyPart(bodyPart);
+        multipart.addBodyPart(body);
+        multipart.addBodyPart(textAttachment);
+        multipart.addBodyPart(jsonAttachment);
 
         MimeMessage message = new MimeMessage(testSession);
         message.setContent(multipart);
         message.setSubject(EMAIL_SUBJECT);
         message.setRecipient(TO, new InternetAddress(ESTEBAN_EMAIL));
-
         return message;
     }
 
-    public static Message buildSinglePartMessage() throws IOException, MessagingException
+    public static Message getSinglePartTestMessage() throws IOException, MessagingException
     {
         Message message = new MimeMessage(testSession);
-        message.setDataHandler(new DataHandler(EMAIL_CONTENT, TEXT));
+        message.setText(EMAIL_CONTENT);
         message.setSubject(EMAIL_SUBJECT);
         message.setRecipient(TO, new InternetAddress(ESTEBAN_EMAIL));
-
         return message;
-    }
-
-    public static MessageBuilder createDefaultMimeMessageBuilder(String to) throws MessagingException
-    {
-        return MessageBuilder.newMessage(testSession)
-                .to(singletonList(to))
-                .cc(singletonList(ALE_EMAIL))
-                .withContent(EMAIL_CONTENT)
-                .withSubject(EMAIL_SUBJECT);
     }
 
     public static void assertAttachmentContent(Map<String, DataHandler> attachments, String attachmentKey, Object expectedResult) throws IOException

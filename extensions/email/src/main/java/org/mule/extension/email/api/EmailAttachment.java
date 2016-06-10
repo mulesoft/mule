@@ -37,7 +37,7 @@ public class EmailAttachment
     /**
      * the content of the attachment.
      */
-    //TODO add @NoRef when is available
+    //TODO add @NoRef when is available - MULE-9811
     @Parameter
     private Object content;
 

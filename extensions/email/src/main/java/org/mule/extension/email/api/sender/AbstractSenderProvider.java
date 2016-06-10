@@ -4,25 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.api.retriever;
+package org.mule.extension.email.api.sender;
 
-import org.mule.extension.email.api.AbstractEmailConfiguration;
-import org.mule.extension.email.api.AbstractEmailConnection;
 import org.mule.extension.email.api.EmailConnectionSettings;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
-/**
- * Generic contract for all email retriever {@link ConfigurationProvider}s.
- *
- * @since 4.0
- */
-public abstract class AbstractRetrieverProvider<Config extends AbstractEmailConfiguration, Connection extends AbstractEmailConnection> implements ConnectionProvider<Config, Connection>
+public abstract class AbstractSenderProvider implements ConnectionProvider<SMTPConfiguration, SenderConnection>
 {
+
     /**
      * A basic set of parameters for email connections.
      */
@@ -33,7 +26,7 @@ public abstract class AbstractRetrieverProvider<Config extends AbstractEmailConf
      * {@inheritDoc}
      */
     @Override
-    public void disconnect(Connection connection)
+    public void disconnect(SenderConnection connection)
     {
         connection.disconnect();
     }
@@ -42,7 +35,7 @@ public abstract class AbstractRetrieverProvider<Config extends AbstractEmailConf
      * {@inheritDoc}
      */
     @Override
-    public ConnectionValidationResult validate(Connection connection)
+    public ConnectionValidationResult validate(SenderConnection connection)
     {
         return connection.validate();
     }
@@ -51,8 +44,8 @@ public abstract class AbstractRetrieverProvider<Config extends AbstractEmailConf
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, Connection> connectionHandlingStrategyFactory)
+    public ConnectionHandlingStrategy<SenderConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<SMTPConfiguration, SenderConnection> handlingStrategyFactory)
     {
-        return connectionHandlingStrategyFactory.supportsPooling();
+        return handlingStrategyFactory.supportsPooling();
     }
 }

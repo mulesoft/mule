@@ -11,7 +11,7 @@ import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
 import static javax.mail.Part.ATTACHMENT;
 import static javax.mail.Part.INLINE;
-import static org.mule.extension.email.internal.util.EmailConstants.MULTIPART;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.MULTIPART;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.toAddressArray;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.email.api.EmailAttachment;
@@ -287,26 +287,25 @@ public final class MessageBuilder
      */
     public MimeMessage build() throws MessagingException
     {
-        DataHandler contentDataHandler = new DataHandler(content, contentType);
         if (attachments != null && !attachments.isEmpty())
         {
-            // first part of the message is the content
             MimeMultipart multipart = new MimeMultipart();
-            MimeBodyPart mimeBodyPart = new MimeBodyPart();
-            mimeBodyPart.setDisposition(INLINE);
-            mimeBodyPart.setDataHandler(contentDataHandler);
-            multipart.addBodyPart(mimeBodyPart);
+            MimeBodyPart bodyPart = new MimeBodyPart();
+            bodyPart.setDisposition(INLINE);
+            bodyPart.setContent(content, contentType);
+            multipart.addBodyPart(bodyPart);
 
+            MimeBodyPart attachmentPart;
             for (String attachment : attachments.keySet())
             {
                 try
                 {
-                    mimeBodyPart = new MimeBodyPart();
-                    mimeBodyPart.setDisposition(ATTACHMENT);
-                    mimeBodyPart.setFileName(attachment);
+                    attachmentPart = new MimeBodyPart();
+                    attachmentPart.setDisposition(ATTACHMENT);
+                    attachmentPart.setFileName(attachment);
                     DataHandler attachmentDataHandler = attachments.get(attachment);
-                    mimeBodyPart.setDataHandler(attachmentDataHandler);
-                    multipart.addBodyPart(mimeBodyPart);
+                    attachmentPart.setDataHandler(attachmentDataHandler);
+                    multipart.addBodyPart(attachmentPart);
                 }
                 catch (Exception e)
                 {
@@ -319,7 +318,7 @@ public final class MessageBuilder
         else
         {
             this.message.setDisposition(INLINE);
-            this.message.setDataHandler(contentDataHandler);
+            this.message.setContent(content, contentType);
         }
 
         return message;

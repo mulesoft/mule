@@ -30,8 +30,8 @@ public class IMAPOperations
     @Inject
     private MuleContext context;
 
-    private final SetFlagCommand setFlagOperation = new SetFlagCommand();
-    private final ExpungeCommand expungeOperation = new ExpungeCommand();
+    private final SetFlagCommand setFlagCommand = new SetFlagCommand();
+    private final ExpungeCommand expungeCommand = new ExpungeCommand();
 
     /**
      * Marks an incoming email as READ
@@ -49,7 +49,7 @@ public class IMAPOperations
                            @Optional(defaultValue = INBOX_FOLDER) String folder,
                            @Optional Integer emailNumber)
     {
-        setFlagOperation.set(message, connection, folder, emailNumber, SEEN);
+        setFlagCommand.set(message, connection, folder, emailNumber, SEEN);
     }
 
     /**
@@ -63,17 +63,16 @@ public class IMAPOperations
      * @param folder     the folder where the emails are going to be fetched
      * @param emailNumber an optional email number to look up in the folder, if there is no email in the incoming {@link MuleMessage}.
      */
-    public void markAsDeleted(MuleMessage message,
-                              @Connection RetrieverConnection connection,
-                              @Optional(defaultValue = INBOX_FOLDER) String folder,
-                              @Optional Integer emailNumber)
+    public void delete(MuleMessage message,
+                       @Connection RetrieverConnection connection,
+                       @Optional(defaultValue = INBOX_FOLDER) String folder,
+                       @Optional Integer emailNumber)
     {
-        setFlagOperation.set(message, connection, folder, emailNumber, DELETED);
+        setFlagCommand.set(message, connection, folder, emailNumber, DELETED);
     }
 
     /**
-     * Removes from the mailbox all deleted messages
-     * if the flag is setted true.
+     * Removes from the mailbox all deleted marked messages.
      *
      * @param connection the associated {@link RetrieverConnection}.
      * @param folder     the folder where the emails are going to be fetched
@@ -81,6 +80,6 @@ public class IMAPOperations
     public void expunge(@Connection RetrieverConnection connection,
                         @Optional(defaultValue = INBOX_FOLDER) String folder)
     {
-        expungeOperation.expunge(connection, folder);
+        expungeCommand.expunge(connection, folder);
     }
 }

@@ -9,19 +9,23 @@ package org.mule.extension.email.sender;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.mule.extension.email.internal.builder.EmailAttributesBuilder.fromMessage;
+import static org.junit.runners.Parameterized.Parameter;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.extension.email.internal.EmailContentProcessor.process;
+import static org.mule.extension.email.internal.commands.ReplyCommand.IN_REPLY_TO_HEADER;
 import static org.mule.extension.email.internal.commands.ReplyCommand.NO_EMAIL_FOUND;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getTextBody;
+import static org.mule.extension.email.util.EmailTestUtils.ALE_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
+import static org.mule.extension.email.util.EmailTestUtils.EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.MG_EMAIL;
-import static org.mule.extension.email.util.EmailTestUtils.createDefaultMimeMessageBuilder;
 import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.internal.exception.EmailException;
@@ -34,13 +38,12 @@ import java.util.Collection;
 import javax.activation.DataHandler;
 import javax.mail.Address;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.internal.matchers.StartsWith;
 
@@ -57,12 +60,12 @@ public class SMTPTestCase extends EmailConnectorTestCase
     public String protocol;
 
     @Parameters
-    public static Collection<Object[]> data() {
+    public static Collection<Object[]> data()
+    {
         return Arrays.asList(new Object[][] {
                 {"smtp"}, {"smtps"}
         });
     }
-
 
     @Override
     protected String getConfigFile()
@@ -80,54 +83,53 @@ public class SMTPTestCase extends EmailConnectorTestCase
     public void sendEmail() throws Exception
     {
         runFlow(SEND_EMAIL);
-        assertThat(server.waitForIncomingEmail(5000, 1), is(true));
-        Message[] messages = server.getReceivedMessages();
-        assertThat(messages.length, is(1));
-        assertThat(messages[0].getSubject(), is(EMAIL_SUBJECT));
-        assertThat(getTextBody(messages[0]).trim(), is(EMAIL_CONTENT));
+        Message[] messages = getReceivedMessagesAndAssertCount(1);
+        Message sentMessage = messages[0];
+        assertSubject(sentMessage.getSubject());
+        assertBodyContent(process(sentMessage).getBody());
     }
 
-    // TODO: This test fails if the attachment content-type is specified
     @Test
     public void sendEmailWithAttachment() throws Exception
     {
         runFlow(SEND_EMAIL_WITH_ATTACHMENT);
-        assertThat(server.waitForIncomingEmail(5000, 4), is(true));
-        Message[] messages = server.getReceivedMessages();
-        assertThat(messages.length, is(4));
-
+        Message[] messages = getReceivedMessagesAndAssertCount(4);
         for (Message message : messages)
         {
-            Multipart content = (Multipart)message.getContent();
-            assertThat(content.getCount(), is(2));
+            Multipart content = (Multipart) message.getContent();
+            assertThat(content.getCount(), is(3));
 
-            Object bodyContent = content.getBodyPart(0).getContent();
-            assertThat(bodyContent, is(EMAIL_CONTENT));
+            Object body = content.getBodyPart(0).getContent();
+            assertBodyContent((String) body);
 
-            DataHandler dataHandler = content.getBodyPart(1).getDataHandler();
-            assertThat(dataHandler.getContent(), instanceOf(InputStream.class));
-            assertThat(EMAIL_JSON_ATTACHMENT_CONTENT, is(IOUtils.toString((InputStream) dataHandler.getContent())));
+            String textAttachment = (String) content.getBodyPart(1).getContent();
+            assertThat(EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT, is(textAttachment));
+
+            DataHandler jsonAttachment = content.getBodyPart(2).getDataHandler();
+            assertThat(EMAIL_JSON_ATTACHMENT_CONTENT, is(IOUtils.toString((InputStream) jsonAttachment.getContent())));
         }
     }
 
     @Test
     public void replyEmail() throws Exception
     {
-        EmailAttributes attributes = fromMessage(createDefaultMimeMessageBuilder(JUANI_EMAIL)
-                                                              .replyTo(singletonList(MG_EMAIL))
-                                                              .build());
+        EmailAttributes attributes = getTestAttributes();
+        when(attributes.getReplyToAddresses()).thenReturn(singletonList(MG_EMAIL));
+
         flowRunner(REPLY_EMAIL)
                 .withPayload(EMAIL_CONTENT)
                 .withAttributes(attributes)
                 .run();
 
-        assertThat(server.waitForIncomingEmail(5000, 1), is(true));
-        MimeMessage[] messages = server.getReceivedMessages();
-        assertThat(messages.length, is(1));
-        assertThat(messages[0].getSubject(), new StartsWith("Re"));
-        Address[] recipients = messages[0].getAllRecipients();
-        assertThat(recipients.length, is(1));
+        Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];
+        String subject = repliedMessage.getSubject();
+        Address[] recipients = repliedMessage.getAllRecipients();
+        String inReplyHeaderValue = repliedMessage.getHeader(IN_REPLY_TO_HEADER)[0];
+
+        assertThat(subject, new StartsWith("Re"));
+        assertThat(recipients, arrayWithSize(1));
         assertThat(recipients[0].toString(), is(MG_EMAIL));
+        assertThat(inReplyHeaderValue, is(Integer.toString(attributes.getId())));
     }
 
     @Test
@@ -141,18 +143,30 @@ public class SMTPTestCase extends EmailConnectorTestCase
     @Test
     public void forwardEmail() throws Exception
     {
-        EmailAttributes attributes = fromMessage(createDefaultMimeMessageBuilder(JUANI_EMAIL)
-                                                         .replyTo(singletonList(MG_EMAIL))
-                                                         .build());
         flowRunner(FORWARD_EMAIL)
                 .withPayload(EMAIL_CONTENT)
-                .withAttributes(attributes)
+                .withAttributes(getTestAttributes())
                 .run();
 
-        assertThat(server.waitForIncomingEmail(5000, 1), is(true));
-        MimeMessage[] messages = server.getReceivedMessages();
-        assertThat(messages.length, is(1));
-        assertThat(IOUtils.toString((InputStream) messages[0].getContent()).trim(), is(EMAIL_CONTENT));
+        Message[] messages = getReceivedMessagesAndAssertCount(1);
+        String body = process(messages[0]).getBody();
+        assertBodyContent(body);
     }
 
+    private Message[] getReceivedMessagesAndAssertCount(int receivedNumber)
+    {
+        assertThat(server.waitForIncomingEmail(5000, receivedNumber), is(true));
+        Message[] messages = server.getReceivedMessages();
+        assertThat(messages, arrayWithSize(receivedNumber));
+        return messages;
+    }
+
+    private EmailAttributes getTestAttributes() throws MessagingException
+    {
+        EmailAttributes attributes = mock(EmailAttributes.class);
+        when(attributes.getCcAddresses()).thenReturn(singletonList(ALE_EMAIL));
+        when(attributes.getToAddresses()).thenReturn(singletonList(JUANI_EMAIL));
+        when(attributes.getSubject()).thenReturn(EMAIL_SUBJECT);
+        return attributes;
+    }
 }

@@ -14,9 +14,9 @@ import static javax.mail.Flags.Flag.SEEN;
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttachments;
+import static org.mule.extension.email.internal.EmailContentProcessor.process;
 import org.mule.extension.email.api.EmailAttributes;
-import org.mule.extension.email.internal.EmailFlags;
+import org.mule.extension.email.api.EmailFlags;
 import org.mule.extension.email.internal.exception.EmailException;
 
 import java.time.LocalDateTime;
@@ -310,7 +310,7 @@ public final class EmailAttributesBuilder
                     .answered(flags.contains(ANSWERED))
                     .deleted(flags.contains(DELETED));
 
-            return withAttachments ? builder.withAttachments(getAttachments(msg)).build()
+            return withAttachments ? builder.withAttachments(process(msg).getAttachments()).build()
                                    : builder.build();
         }
         catch (MessagingException mse)

@@ -6,14 +6,12 @@
                http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
 
-    <email:imap name="config" host="127.0.0.1" port="${port}">
-        <email:imap-connection password="password" user="juan.desimoni@mulesoft.com">
-        </email:imap-connection>
+    <email:imap name="config">
+        <email:imap-connection host="127.0.0.1" port="${port}" password="password" user="juan.desimoni@mulesoft.com"/>
     </email:imap>
 
-    <email:imap name="config-dont-read"  eagerlyFetchContent="false" host="127.0.0.1" port="${port}">
-        <email:imap-connection password="password" user="juan.desimoni@mulesoft.com">
-        </email:imap-connection>
+    <email:imap name="config-dont-read"  eagerlyFetchContent="false">
+        <email:imap-connection host="127.0.0.1" port="${port}" password="password" user="juan.desimoni@mulesoft.com"/>
     </email:imap>
 
     <spring:beans>

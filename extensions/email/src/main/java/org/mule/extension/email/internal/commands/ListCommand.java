@@ -8,11 +8,9 @@ package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.extension.email.internal.builder.EmailAttributesBuilder.fromMessage;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.closeFolder;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getOpenFolder;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getTextBody;
-import org.mule.extension.email.api.retriever.RetrieverConnection;
 import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.retriever.RetrieverConnection;
+import org.mule.extension.email.internal.EmailContentProcessor;
 import org.mule.extension.email.internal.exception.EmailRetrieverException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -56,9 +54,9 @@ public final class ListCommand
                                                            boolean readContent,
                                                            Predicate<EmailAttributes> matcher)
     {
-        Folder folder = getOpenFolder(folderName, READ_ONLY, connection.getStore());
         try
         {
+            Folder folder = connection.getFolder(folderName, READ_ONLY);
             List<MuleMessage<String, EmailAttributes>> list = new LinkedList<>();
             for (Message m : folder.getMessages())
             {
@@ -68,13 +66,12 @@ public final class ListCommand
                 {
                     if (readContent)
                     {
-                        body = getTextBody(m);
+                        body = EmailContentProcessor.process(m).getBody();
                         attributes = fromMessage(m);
                     }
                     list.add((MuleMessage) new DefaultMuleMessage(body, null, attributes, context));
                 }
             }
-            closeFolder(folder, false);
             return list;
         }
         catch (MessagingException me)

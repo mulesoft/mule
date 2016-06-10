@@ -8,11 +8,16 @@ package org.mule.extension.email.api.sender;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.email.api.AbstractEmailConnection;
+import org.mule.extension.email.internal.EmailProtocol;
 import org.mule.extension.email.internal.exception.EmailConnectionException;
+import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
 import java.util.Map;
+
+import javax.mail.NoSuchProviderException;
+import javax.mail.Transport;
 
 /**
  * A connection with a mail server for sending emails.
@@ -35,7 +40,7 @@ public final class SenderConnection extends AbstractEmailConnection
      * @param writeTimeout      the socket write timeout
      * @param properties        the custom properties added to configure the session.
      */
-    public SenderConnection(String protocol,
+    public SenderConnection(EmailProtocol protocol,
                             String username,
                             String password,
                             String host,
@@ -62,7 +67,7 @@ public final class SenderConnection extends AbstractEmailConnection
      * @param properties        the custom properties added to configure the session.
      * @param tlsContextFactory the tls context factory for creating the context to secure the connection
      */
-    public SenderConnection(String protocol,
+    public SenderConnection(EmailProtocol protocol,
                             String username,
                             String password,
                             String host,
@@ -96,4 +101,15 @@ public final class SenderConnection extends AbstractEmailConnection
         return success();
     }
 
+    public Transport getTransport()
+    {
+        try
+        {
+            return session.getTransport(protocol.getName());
+        }
+        catch (NoSuchProviderException e)
+        {
+            throw new EmailException("Error while obtaining transport: " + e.getMessage(), e);
+        }
+    }
 }

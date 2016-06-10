@@ -9,20 +9,18 @@ package org.mule.extension.email.internal.commands;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static javax.mail.Folder.READ_ONLY;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.closeFolder;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getOpenFolder;
-import static org.mule.runtime.core.util.FileUtils.createFile;
-import org.mule.extension.email.api.EmailAttributes;
+import static org.mule.runtime.core.util.FileUtils.write;
 import org.mule.extension.email.api.retriever.RetrieverConnection;
 import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.extension.email.internal.exception.EmailRetrieverException;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.util.FileUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
 import java.util.List;
 
 import javax.mail.Folder;
@@ -37,12 +35,10 @@ import javax.mail.MessagingException;
 public final class StoreCommand
 {
 
-    private static final String NO_ID_ERROR = "Expecting an explicit emailId value or email attributes in the incoming mule message in order to store an email.";
-
-    //TODO: annotated the parameter directory with @Path when available
+    private final EmailIdConsumerExecutor executor = new EmailIdConsumerExecutor();
 
     /**
-     * Stores the specified email of id {@code emailId} into the configured {@code directory}.
+     * Stores the specified email of id {@code emailId} into the configured {@code localDirectory}.
      * <p>
      * if no emailId is specified, the operation will try to find an email or {@link List} of emails
      * in the incoming {@link MuleMessage}.
@@ -55,72 +51,87 @@ public final class StoreCommand
      * The name of the email file is composed by the subject and
      * the received date of the email.
      *
-     * @param connection  the associated {@link RetrieverConnection}.
-     * @param muleMessage the incoming {@link MuleMessage}.
-     * @param folderName  the name of the folder where the email(s) is going to be fetched.
-     * @param directory   the directory where the emails are going to be stored.
-     * @param emailId     the optional number of the email to be marked. for default the email is taken from the incoming {@link MuleMessage}.
+     * @param connection     the associated {@link RetrieverConnection}.
+     * @param muleMessage    the incoming {@link MuleMessage}.
+     * @param folderName     the name of the folder where the email(s) is going to be fetched.
+     * @param localDirectory the localDirectory where the emails are going to be stored.
+     * @param fileName       the name of the file that is going to be stored. The operation will append the email number and received date in the end.
+     * @param emailId        the optional number of the email to be marked. for default the email is taken from the incoming {@link MuleMessage}.
+     * @param overwrite      if should overwrite a file that already exist or not.
      */
-    public void store(RetrieverConnection connection, MuleMessage muleMessage, String folderName, String directory, Integer emailId)
+    public void store(RetrieverConnection connection,
+                      MuleMessage muleMessage,
+                      String folderName,
+                      String localDirectory,
+                      final String fileName,
+                      Integer emailId,
+                      boolean overwrite)
     {
-        try
+        Folder folder = connection.getFolder(folderName, READ_ONLY);
+        executor.execute(muleMessage, emailId, id ->
         {
-            Folder folder = getOpenFolder(folderName, READ_ONLY, connection.getStore());
-            if (emailId == null)
+            try
             {
-                Object payload = muleMessage.getPayload();
-                if (payload instanceof List)
+                Message message = folder.getMessage(id);
+                Path emailFilePath = get(localDirectory, formatEmailFileName(message, fileName));
+                File emailFile = emailFilePath.toFile();
+                if (emailFile.exists())
                 {
-                    for (Object o : (List) payload)
+                    if (overwrite)
                     {
-                        if (o instanceof MuleMessage)
-                        {
-                            emailId = getIdOrFail(((MuleMessage) o));
-                            storeMessage(emailId, folder, directory);
-                        }
-                        else
-                        {
-                            throw new EmailException("Cannot perform operation for the incoming payload");
-                        }
+                        Files.delete(emailFilePath);
+                        writeContent(message, emailFile);
                     }
-                    return;
                 }
-                emailId = getIdOrFail(muleMessage);
+                else
+                {
+                    writeContent(message, emailFile);
+                }
             }
-            storeMessage(emailId, folder, directory);
-            closeFolder(folder, false);
-        }
-        catch (MessagingException | IOException me)
-        {
-            throw new EmailRetrieverException(me);
-        }
+            catch (MessagingException | IOException me)
+            {
+                throw new EmailRetrieverException(me);
+            }
+        });
+
     }
 
     /**
-     * Stores a single {@link Message} into the specified {@code directory}.
+     * Writes an email into a file.
      *
-     * @param emailId   the emailId corresponding to the message that is going to be stored
-     * @param folder    the folder to look for the email
-     * @param directory the directory where the message is going to be stored
+     * @param message   the email to be stored.
+     * @param emailFile the file where the email will be written.
      */
-    private void storeMessage(int emailId, Folder folder, String directory) throws IOException, MessagingException
+    private void writeContent(Message message, File emailFile) throws IOException, MessagingException
     {
-        Message message = folder.getMessage(emailId);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         message.writeTo(outputStream);
-        String fileName = format("%s-%s_%s.txt", message.getSubject(), message.getMessageNumber(), message.getReceivedDate());
-        File emailFile = createFile(get(directory, fileName).toString());
-        FileUtils.write(emailFile, outputStream.toString());
+        write(emailFile, outputStream.toString());
     }
 
     /**
-     * Gets an emailId from a MuleMessage of fails if the MuleMessage does
-     * not contains attributes of {@link EmailAttributes} type.
+     * Formats the name of the email file to be stored, the
+     * generated name will follow a {fileName|subject}-emailId_receivedDate format.
+     * <p>
+     * if the fileName is not specified the emailSubject will be used for it.
+     *
+     * @param message  the message to be stored
+     * @param fileName the fileName specified by the user. Can be null.
+     * @return a file name in a {fileName|subject}-emailId_receivedDate format.
      */
-    private int getIdOrFail(MuleMessage muleMessage)
+    private String formatEmailFileName(Message message, String fileName)
     {
-        return getAttributesFromMessage(muleMessage)
-                .orElseThrow(() -> new EmailException(NO_ID_ERROR))
-                .getId();
+        int messageNumber = message.getMessageNumber();
+        try
+        {
+            Date receivedDate = message.getReceivedDate() != null ? message.getReceivedDate() : new Date();
+            String subject = message.getSubject();
+            return format("%s-%s_%s.txt", fileName != null ? fileName : subject, messageNumber, receivedDate);
+        }
+        catch (MessagingException e)
+        {
+            throw new EmailException(format("Error while formatting email number [%s] file name", messageNumber), e);
+        }
     }
+
 }

@@ -6,15 +6,15 @@
  */
 package org.mule.extension.email.api.retriever.pop3;
 
-import static org.mule.extension.email.internal.util.EmailConstants.PROTOCOL_POP3;
+import static org.mule.extension.email.internal.EmailProtocol.POP3;
+import static org.mule.extension.email.internal.EmailProtocol.POP3_PORT;
 import org.mule.extension.email.api.retriever.AbstractRetrieverProvider;
 import org.mule.extension.email.api.retriever.RetrieverConnection;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
-import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
  * A {@link ConnectionProvider} that returns instances of pop3 based {@link RetrieverConnection}s.
@@ -24,6 +24,12 @@ import org.mule.runtime.extension.api.annotation.Alias;
 @Alias("pop3")
 public class POP3Provider extends AbstractRetrieverProvider<POP3Configuration, RetrieverConnection>
 {
+    /**
+     * The port number of the mail server.
+     */
+    @Parameter
+    @Optional(defaultValue = POP3_PORT)
+    private String port;
 
     /**
      * {@inheritDoc}
@@ -31,11 +37,11 @@ public class POP3Provider extends AbstractRetrieverProvider<POP3Configuration, R
     @Override
     public RetrieverConnection connect(POP3Configuration config) throws ConnectionException
     {
-        return new RetrieverConnection(PROTOCOL_POP3,
-                                       user,
-                                       password,
-                                       config.getHost(),
-                                       config.getPort(),
+        return new RetrieverConnection(POP3,
+                                       settings.getUser(),
+                                       settings.getPassword(),
+                                       settings.getHost(),
+                                       port,
                                        config.getConnectionTimeout(),
                                        config.getReadTimeout(),
                                        config.getWriteTimeout(),

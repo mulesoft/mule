@@ -8,6 +8,7 @@ package org.mule.extension.email.internal.commands;
 
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailContent;
+import org.mule.extension.email.api.sender.SenderConnection;
 import org.mule.extension.email.internal.builder.MessageBuilder;
 import org.mule.extension.email.internal.exception.EmailSenderException;
 
@@ -18,7 +19,6 @@ import java.util.Map;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.Transport;
 
 /**
@@ -34,7 +34,7 @@ public final class SendCommand
      * {@code toAddresses}, {@code ccAddresses}, {@code bccAddresses}
      * specified in the message.
      *
-     * @param session      the {@link Session} through which the message is going to be sent.
+     * @param connection   the connection associated to the operation.
      * @param content      the text content of the email.
      * @param subject      the subject of the email.
      * @param toAddresses  the "to" (primary) addresses to deliver the email.
@@ -44,7 +44,7 @@ public final class SendCommand
      * @param headers      a set of custom headers that are bounded with the email.
      * @param attachments  the attachments that are bounded in the content of the email.
      */
-    public void send(Session session,
+    public void send(SenderConnection connection,
                      EmailContent content,
                      String subject,
                      List<String> toAddresses,
@@ -56,7 +56,7 @@ public final class SendCommand
     {
         try
         {
-            Message message = MessageBuilder.newMessage(session)
+            Message message = MessageBuilder.newMessage(connection.getSession())
                     .withSentDate(Calendar.getInstance().getTime())
                     .fromAddresses(fromAddress)
                     .to(toAddresses)

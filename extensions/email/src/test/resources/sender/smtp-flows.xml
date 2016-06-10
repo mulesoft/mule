@@ -27,7 +27,8 @@
                 <email:bcc-address value="alejandro.g.marra@mulesoft.com"/>
             </email:bcc-addresses>
             <email:attachments>
-                <email:email-attachment content="#[Thread.currentThread().getContextClassLoader().getResource('attachment.json')]" id="id"/>
+                <email:email-attachment content="#[Thread.currentThread().getContextClassLoader().getResource('attachment.json')]" id="json-attachment"/>
+                <email:email-attachment content="#['This is the email text attachment']" id="text-attachment" contentType="text/plain"/>
             </email:attachments>
         </email:send>
     </flow>

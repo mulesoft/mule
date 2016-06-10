@@ -6,7 +6,6 @@
  */
 package org.mule.extension.email.api;
 
-import org.mule.extension.email.internal.EmailFlags;
 import org.mule.runtime.api.message.MuleMessage;
 
 import com.google.common.collect.ImmutableList;

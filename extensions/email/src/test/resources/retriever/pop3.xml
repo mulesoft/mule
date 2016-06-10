@@ -6,9 +6,8 @@
                http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
 
-    <email:pop3 name="config" host="127.0.0.1" port="${port}">
-        <email:pop3-connection  password="password" user="juan.desimoni@mulesoft.com">
-        </email:pop3-connection>
+    <email:pop3 name="config">
+        <email:pop3-connection host="127.0.0.1" port="${port}" password="password" user="juan.desimoni@mulesoft.com"/>
     </email:pop3>
 
     <spring:beans>

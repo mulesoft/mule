@@ -9,14 +9,9 @@ package org.mule.extension.email.retriever;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
-import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
-import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.api.MuleEvent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,14 +50,8 @@ public class POP3TestCase extends AbstractEmailRetrieverTestCase
     @Test
     public void retrieveAndRead() throws Exception
     {
-        deliver10To(JUANI_EMAIL);
-        MuleEvent event = runFlow(RETRIEVE_AND_READ);
-        List<MuleMessage> messages = (List<MuleMessage>) event.getMessage().getPayload();
+        List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
         assertThat(messages, hasSize(10));
-
-        messages.forEach(m -> {
-            assertThat(m.getPayload(), instanceOf(String.class));
-            assertThat(m.getPayload().toString().trim(), is(EMAIL_CONTENT));
-        });
+        messages.forEach(m -> assertBodyContent((String) m.getPayload()));
     }
 }

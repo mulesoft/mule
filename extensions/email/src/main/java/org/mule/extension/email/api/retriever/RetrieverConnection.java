@@ -11,12 +11,15 @@ import static org.mule.runtime.api.connection.ConnectionExceptionCode.CREDENTIAL
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.email.api.AbstractEmailConnection;
+import org.mule.extension.email.internal.EmailProtocol;
 import org.mule.extension.email.internal.exception.EmailConnectionException;
+import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
 import java.util.Map;
 
+import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Store;
 
@@ -34,6 +37,7 @@ public class RetrieverConnection extends AbstractEmailConnection
     private static final Logger LOGGER = LoggerFactory.getLogger(RetrieverConnection.class);
 
     private final Store store;
+    private Folder folder;
 
     /**
      * Creates a new instance of the of the {@link RetrieverConnection} secured by TLS.
@@ -49,7 +53,7 @@ public class RetrieverConnection extends AbstractEmailConnection
      * @param properties        additional custom properties.
      * @param tlsContextFactory the tls context factory for creating the context to secure the connection
      */
-    public RetrieverConnection(String protocol,
+    public RetrieverConnection(EmailProtocol protocol,
                                String username,
                                String password,
                                String host,
@@ -63,7 +67,7 @@ public class RetrieverConnection extends AbstractEmailConnection
         super(protocol, username, password, host, port, connectionTimeout, readTimeout, writeTimeout, properties, tlsContextFactory);
         try
         {
-            this.store = session.getStore(protocol);
+            this.store = session.getStore(protocol.getName());
             this.store.connect(username, password);
         }
         catch (MessagingException e)
@@ -85,7 +89,7 @@ public class RetrieverConnection extends AbstractEmailConnection
      * @param writeTimeout      the socket write timeout
      * @param properties        additional custom properties.
      */
-    public RetrieverConnection(String protocol,
+    public RetrieverConnection(EmailProtocol protocol,
                                String username,
                                String password,
                                String host,
@@ -98,6 +102,60 @@ public class RetrieverConnection extends AbstractEmailConnection
         this(protocol, username, password, host, port, connectionTimeout, readTimeout, writeTimeout, properties, null);
     }
 
+
+    /**
+     * Opens and return the email {@link Folder} of name {@code mailBoxFolder}.
+     * The folder can contain Messages, other Folders or both.
+     *
+     * @param mailBoxFolder the name of the folder to be opened.
+     * @param openMode   open the folder in READ_ONLY or READ_WRITE mode
+     * @return the opened {@link Folder}
+     */
+    public Folder getFolder(String mailBoxFolder, int openMode)
+    {
+        try
+        {
+            folder = store.getFolder(mailBoxFolder);
+
+            if (!folder.isOpen())
+            {
+                folder.open(openMode);
+                return folder;
+            }
+
+            if (folder.getMode() != openMode)
+            {
+                folder.close(false);
+                folder.open(openMode);
+            }
+
+            return folder;
+        }
+        catch (MessagingException e)
+        {
+            throw new EmailException(format("Error while opening folder %s", mailBoxFolder), e);
+        }
+    }
+
+    /**
+     * Closes the specified {@code folder}
+     *
+     */
+    public void closeFolder(boolean expunge)
+    {
+        try
+        {
+            if (folder != null)
+            {
+                folder.close(expunge);
+            }
+        }
+        catch (MessagingException e)
+        {
+            throw new EmailException(format("Error while closing mailbox folder %s", folder.getName()), e);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -106,11 +164,22 @@ public class RetrieverConnection extends AbstractEmailConnection
     {
         try
         {
-            store.close();
+            closeFolder(false);
         }
         catch (Exception e)
         {
-            LOGGER.error(format("Error while disconnecting: %s", e.getMessage()));
+            LOGGER.error(format("Error while closing mailbox folder [%s] when disconnecting: %s", folder.getName(), e.getMessage()));
+        }
+        finally
+        {
+            try
+            {
+                store.close();
+            }
+            catch(Exception e)
+            {
+                LOGGER.error(format("Error while closing store while disconnecting: %s", e.getMessage()));
+            }
         }
     }
 
@@ -123,13 +192,5 @@ public class RetrieverConnection extends AbstractEmailConnection
         String errorMessage = "Store is not connected";
         return store.isConnected() ? success()
                                    : failure(errorMessage, CREDENTIALS_EXPIRED, new EmailConnectionException(errorMessage));
-    }
-
-    /**
-     * @return The configured connection {@link Store}
-     */
-    public Store getStore()
-    {
-        return store;
     }
 }

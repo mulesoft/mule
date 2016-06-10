@@ -12,6 +12,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEm
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
+import org.mule.extension.email.api.sender.SenderConnection;
 import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
 
@@ -19,8 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.mail.Session;
 
 /**
  * Represents the reply operation.
@@ -30,7 +29,9 @@ import javax.mail.Session;
 public final class ReplyCommand
 {
 
+    public static final String IN_REPLY_TO_HEADER = "In-Reply-To";
     public static final String NO_EMAIL_FOUND = "Cannot perform the reply operation if no email is provided";
+
     private final SendCommand sendCommand = new SendCommand();
 
     /**
@@ -40,7 +41,7 @@ public final class ReplyCommand
      * <p>
      * If no email message is found in the incoming {@link MuleMessage} this operation will fail.
      *
-     * @param session     the {@link Session} through which the message is going to be sent.
+     * @param connection  the connection associated to the operation
      * @param muleMessage the incoming {@link MuleMessage} from which the email is going to getPropertiesInstance the content.
      * @param content     the content of the reply message.
      * @param subject     the subject of the email. is none is set then one will be created using the subject from the replying email.
@@ -48,7 +49,7 @@ public final class ReplyCommand
      * @param headers     a custom set of headers.
      * @param replyToAll  if this reply should be sent to all recipients of this message, or only the sender of the received email.
      */
-    public void reply(Session session,
+    public void reply(SenderConnection connection,
                       MuleMessage muleMessage,
                       EmailContent content,
                       String subject,
@@ -75,9 +76,10 @@ public final class ReplyCommand
             headers = new HashMap<>();
         }
 
-        headers.put("In-Reply-To", Integer.toString(attributes.getId()));
+        headers.put(IN_REPLY_TO_HEADER, Integer.toString(attributes.getId()));
+        headers.putAll(attributes.getHeaders());
         List<String> ccAddresses = replyToAll ? attributes.getCcAddresses() : new ArrayList<>();
         List<EmailAttachment> emailAttachments = mapToEmailAttributes(attributes.getAttachments());
-        sendCommand.send(session, content, subject, replyTo, from, ccAddresses, new ArrayList<>(), attributes.getHeaders(), emailAttachments);
+        sendCommand.send(connection, content, subject, replyTo, from, ccAddresses, new ArrayList<>(), headers, emailAttachments);
     }
 }
