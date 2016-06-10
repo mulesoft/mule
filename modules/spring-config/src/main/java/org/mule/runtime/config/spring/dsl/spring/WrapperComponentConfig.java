@@ -17,23 +17,23 @@ import java.util.Optional;
 public class WrapperComponentConfig
 {
 
-    private ChildType childType;
+    private WrapperType wrapperType;
     private Optional<Class<? extends Collection>> collectionTypeOptional;
 
-    public enum ChildType
+    public enum WrapperType
     {
         SINGLE, COLLECTION
     }
 
-    public WrapperComponentConfig(ChildType childType, Optional<Class<? extends Collection>> collectionTypeOptional)
+    public WrapperComponentConfig(WrapperType wrapperType, Optional<Class<? extends Collection>> collectionTypeOptional)
     {
-        this.childType = childType;
+        this.wrapperType = wrapperType;
         this.collectionTypeOptional = collectionTypeOptional;
     }
 
-    public ChildType getChildType()
+    public WrapperType getWrapperType()
     {
-        return childType;
+        return wrapperType;
     }
 
     public Optional<Class<? extends Collection>> getCollectionTypeOptional()

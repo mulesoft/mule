@@ -37,7 +37,7 @@ public class AttributeDefinition
     private boolean collection;
     private boolean valueFromTextContent;
     private TypeConverter typeConverter;
-    private AttributeDefinition[] definitions;
+    private KeyAttributeDefinitionPair[] definitions;
     private String wrapperIdentifier;
     private Class<? extends Collection> collectionType;
 
@@ -298,10 +298,10 @@ public class AttributeDefinition
          * single attribute. The attribute must be of type Map where the key are
          * the attribute name or the child element name and the value is the actual object.
          *
-         * @param definitions the set of attribute definitions
+         * @param definitions the set of attribute definitions along with its keys
          * @return the builder
          */
-        public static Builder fromMultipleDefinitions(AttributeDefinition... definitions)
+        public static Builder fromMultipleDefinitions(KeyAttributeDefinitionPair... definitions)
         {
             Builder builder = new Builder();
             builder.attributeDefinition.definitions = definitions;

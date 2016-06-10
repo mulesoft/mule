@@ -7,11 +7,13 @@
 package org.mule.runtime.config.spring.parsers.beans;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SimpleCollectionObject
 {
 
+    private List<String> simpleTypeCollection;
     private Map<Object, Object> simpleParameters = new HashMap<>();
 
     public void setSimpleParameters(Map<Object, Object> simpleParameters)
@@ -22,5 +24,15 @@ public class SimpleCollectionObject
     public Map<Object, Object> getSimpleParameters()
     {
         return simpleParameters;
+    }
+
+    public List<String> getSimpleTypeCollection()
+    {
+        return simpleTypeCollection;
+    }
+
+    public void setSimpleTypeCollection(List<String> simpleTypeCollection)
+    {
+        this.simpleTypeCollection = simpleTypeCollection;
     }
 }

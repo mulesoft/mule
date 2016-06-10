@@ -11,13 +11,12 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.spring.util.ProcessingStrategyUtils.parseProcessingStrategy;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
+import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -245,19 +244,17 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onMultipleValues(AttributeDefinition[] definitions)
+        public void onMultipleValues(KeyAttributeDefinitionPair[] definitions)
         {
             ManagedMap managedMap = new ManagedMap();
-            for (AttributeDefinition definition : definitions)
+            for (KeyAttributeDefinitionPair definition : definitions)
             {
                 ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
-                KeyExtractorAttributeDefinitionVisitor keyExtractor = new KeyExtractorAttributeDefinitionVisitor();
-                definition.accept(keyExtractor);
-                definition.accept(valueExtractor);
+                definition.getAttributeDefinition().accept(valueExtractor);
                 Object value = valueExtractor.getValue();
                 if (value != null)
                 {
-                    managedMap.put(keyExtractor.getKey(), value);
+                    managedMap.put(definition.getKey(), value);
                 }
             }
             valueConsumer.accept(managedMap);
@@ -345,8 +342,8 @@ class ComponentConfigurationBuilder
                     .filter(matchesTypeAndIdentifierPredicate)
                     .collect(toList());
 
-            matchingComponentValues.stream().forEach(beanDefinitionTypePair -> {
-                complexParameters.remove(beanDefinitionTypePair);
+            matchingComponentValues.stream().forEach(componentValue -> {
+                complexParameters.remove(componentValue);
             });
             if (wrapperIdentifier.isPresent() && !matchingComponentValues.isEmpty())
             {
@@ -373,14 +370,14 @@ class ComponentConfigurationBuilder
             });
         }
 
-        private Predicate<ComponentValue> getTypeAndIdentifierPredicate(Class<?> type, Optional<String> identifierOptional)
+        private Predicate<ComponentValue> getTypeAndIdentifierPredicate(Class<?> type, Optional<String> wrapperIdentifierOptional)
         {
-            return beanDefinitionTypePair -> {
+            return componentValue -> {
                         AtomicReference<Boolean> matchesIdentifier = new AtomicReference<>(true);
-                        identifierOptional.ifPresent(identifier -> {
-                            matchesIdentifier.set(identifier.equals(beanDefinitionTypePair.getIdentifier().getName()));
+                        wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> {
+                            matchesIdentifier.set(wrapperIdentifier.equals(componentValue.getIdentifier().getName()));
                         });
-                        return areMatchingTypes(type, beanDefinitionTypePair.getType()) && matchesIdentifier.get();
+                        return matchesIdentifier.get() && areMatchingTypes(type, componentValue.getType());
                     };
         }
 
@@ -391,93 +388,11 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onMultipleValues(AttributeDefinition[] definitions)
+        public void onMultipleValues(KeyAttributeDefinitionPair[] definitions)
         {
-            for (AttributeDefinition definition : definitions)
+            for (KeyAttributeDefinitionPair definition : definitions)
             {
-                definition.accept(this);
-            }
-        }
-    }
-
-    /**
-     * {code AttributeDefinitionVisitor} that generates a key from an {@code AttributeDefinition} to be used when
-     * {@link AttributeDefinition.Builder#fromMultipleDefinitions(org.mule.runtime.config.spring.dsl.api.AttributeDefinition...)}
-     * is used to define an object attribute. Such attribute will receive a {@code Map} with several configuration values
-     * and the keys will be generated using this visitor.
-     */
-    private class KeyExtractorAttributeDefinitionVisitor implements AttributeDefinitionVisitor
-    {
-        private Object key;
-
-        public Object getKey()
-        {
-            return key;
-        }
-
-        @Override
-        public void onReferenceObject(Class<?> objectType)
-        {
-            this.key = objectType;
-        }
-
-        @Override
-        public void onReferenceSimpleParameter(final String configAttributeName)
-        {
-            this.key = configAttributeName;
-        }
-
-        @Override
-        public void onFixedValue(Object value)
-        {
-            this.key = value;
-        }
-
-        @Override
-        public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter)
-        {
-            this.key = parameterName;
-        }
-
-        @Override
-        public void onUndefinedSimpleParameters()
-        {
-            throw new MuleRuntimeException(createStaticMessage("onUndefinedSimpleParameters is not supported for multiple configuration attributes injection"));
-        }
-
-        @Override
-        public void onUndefinedComplexParameters()
-        {
-            throw new MuleRuntimeException(createStaticMessage("onUndefinedComplexParameters is not supported for multiple configuration attributes injection"));
-        }
-
-        @Override
-        public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionTypeOptional)
-        {
-            this.key = type;
-            wrapperIdentifier.ifPresent( (identifier) -> {
-                this.key = identifier;
-            });
-        }
-
-        @Override
-        public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
-        {
-            onComplexChildCollection(type, wrapperIdentifier, empty());
-        }
-
-        @Override
-        public void onValueFromTextContent()
-        {
-            this.key = "context";
-        }
-
-        @Override
-        public void onMultipleValues(AttributeDefinition[] definitions)
-        {
-            for (AttributeDefinition definition : definitions)
-            {
-                definition.accept(this);
+                definition.getAttributeDefinition().accept(this);
             }
         }
     }

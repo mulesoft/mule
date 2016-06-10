@@ -8,6 +8,7 @@
 package org.mule.runtime.config.spring.dsl.processor;
 
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
+import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 
 import java.util.Collection;
@@ -91,10 +92,10 @@ public interface AttributeDefinitionVisitor
     /**
      * Called when a multiple configuration parameters or children components objects need
      * to be set in single object attribute or constructor parameter. The value to be set
-     * is a @{code Map} with the parameters names as key, or the element identifier in case of
-     * a child and the value is the resolved parameter value or component object.
+     * is a @{code Map} with the {@code KeyAttributeDefinitionPair#getKey()} as key
+     * and the value is the resolved parameter value or component object.
      *
      * @param definitions the set of {@code AttributeDefinition} to be used to create
      */
-    void onMultipleValues(AttributeDefinition[] definitions);
+    void onMultipleValues(KeyAttributeDefinitionPair[] definitions);
 }

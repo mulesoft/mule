@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
-import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
+import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 
 import java.util.Collection;
@@ -66,7 +66,7 @@ public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVi
     }
 
     @Override
-    public void onMultipleValues(AttributeDefinition[] definitions)
+    public void onMultipleValues(KeyAttributeDefinitionPair[] definitions)
     {
     }
 }
