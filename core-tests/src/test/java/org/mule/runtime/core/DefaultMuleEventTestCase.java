@@ -16,6 +16,7 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_XML;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -57,8 +58,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
     @Test
     public void setFlowVariableCustomDataType() throws Exception
     {
-        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
-        dataType.setEncoding(CUSTOM_ENCODING);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML, CUSTOM_ENCODING);
 
         muleEvent.setFlowVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 
@@ -78,8 +78,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
     @Test
     public void setSessionVariableCustomDataType() throws Exception
     {
-        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
-        dataType.setEncoding(CUSTOM_ENCODING);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML, CUSTOM_ENCODING);
 
         muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 

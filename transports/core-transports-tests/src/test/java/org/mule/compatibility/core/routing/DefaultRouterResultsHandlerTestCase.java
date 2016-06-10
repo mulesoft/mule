@@ -109,14 +109,14 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
         DefaultMuleEvent event1 = new DefaultMuleEvent(message1, flow);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event1, endpoint);
 
-        event1.setFlowVariable("key1", "value1", simpleDateType1.cloneDataType());
+        event1.setFlowVariable("key1", "value1", simpleDateType1);
         MuleSession session = event1.getSession();
         DefaultMuleEvent event2 = new DefaultMuleEvent(message2, flow, session);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event2, endpoint);
-        event2.setFlowVariable("key2", "value2", simpleDateType1.cloneDataType());
+        event2.setFlowVariable("key2", "value2", simpleDateType1);
         DefaultMuleEvent event3 = new DefaultMuleEvent(message3, flow, session);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event3, endpoint);
-        event3.setFlowVariable("key3", "value3", simpleDateType1.cloneDataType());
+        event3.setFlowVariable("key3", "value3", simpleDateType1);
         event1.getSession().setProperty("key", "value");
         event2.getSession().setProperty("key1", "value1");
         event2.getSession().setProperty("key2", "value2");

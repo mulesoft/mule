@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core;
 
+import static java.lang.String.format;
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
@@ -15,6 +17,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_S
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.transformer.types.DataTypeFactory.createFromDataType;
+import static org.mule.runtime.core.transformer.types.DataTypeFactory.createFromDataTypeWithMimeType;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -49,7 +55,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,8 +65,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -124,8 +127,9 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         }
         else
         {
-            DataType<?> dataType = DataTypeFactory.create(payload.getClass(), previous.getDataType().getMimeType());
-            dataType.setEncoding(previous.getDataType().getEncoding());
+            DataType<?> dataType = DataTypeFactory.create(payload.getClass(),
+                    previous.getDataType().getMimeType(),
+                    previous.getDataType().getEncoding());
 
             return dataType;
         }
@@ -133,8 +137,9 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
 
     private static DataType<?> getCloningMessageDataType(MuleMessage previous)
     {
-        DataType<?> dataType = DataTypeFactory.create(previous.getDataType().getType(), previous.getDataType().getMimeType());
-        dataType.setEncoding(previous.getDataType().getEncoding());
+        DataType<?> dataType = DataTypeFactory.create(previous.getDataType().getType(),
+                previous.getDataType().getMimeType(),
+                previous.getDataType().getEncoding());
 
         return dataType;
     }
@@ -314,7 +319,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
 
     public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext, DataType<?> dataType)
     {
-        super(resolveValue(message), dataType.cloneDataType());
+        super(resolveValue(message), (DataType<Object>) dataType);
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
@@ -384,8 +389,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     private static DataType<?> createDefaultDataType(Object payload, MuleContext muleContext)
     {
         Class<?> type = payload == null ? Object.class : payload.getClass();
-        DataType<?> dataType = DataTypeFactory.create(type);
-        dataType.setEncoding(SystemUtils.getDefaultEncoding(muleContext));
+        DataType<?> dataType = DataTypeFactory.create(type, null, getDefaultEncoding(muleContext));
 
         return dataType;
     }
@@ -769,7 +773,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public void setEncoding(String encoding)
     {
         assertAccess(WRITE);
-        getDataType().setEncoding(encoding);
+        setDataType(createFromDataType(getDataType(), encoding));
     }
 
     /**
@@ -779,7 +783,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     public void setMimeType(String mimeType)
     {
         assertAccess(WRITE);
-        getDataType().setMimeType(mimeType);
+        setDataType(createFromDataType(getDataType(), mimeType, getDataType().getEncoding()));
     }
 
     /**
@@ -1414,7 +1418,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
                 Serializable value = muleMessage.getInboundProperty(name);
                 if (value != null)
                 {
-                    properties.setInboundProperty(name, value, muleMessage.getInboundPropertyDataType(name).cloneDataType());
+                    properties.setInboundProperty(name, value, muleMessage.getInboundPropertyDataType(name));
                 }
             }
             for (String name : muleMessage.getOutboundPropertyNames())
@@ -1422,7 +1426,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
                 Serializable value = muleMessage.getOutboundProperty(name);
                 if (value != null)
                 {
-                    properties.setOutboundProperty(name, value, muleMessage.getOutboundPropertyDataType(name).cloneDataType());
+                    properties.setOutboundProperty(name, value, muleMessage.getOutboundPropertyDataType(name));
                 }
             }
         }
@@ -1433,21 +1437,15 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         // updates dataType when encoding is updated using a property instead of using #setEncoding
         if (MULE_ENCODING_PROPERTY.equals(key))
         {
-            getDataType().setEncoding((String) value);
+            setDataType(createFromDataType(getDataType(), (String) value));
         }
         else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
         {
             try
             {
-                MimeType mimeType = new MimeType((String) value);
-                getDataType().setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
-                String encoding = mimeType.getParameter("charset");
-                if (!StringUtils.isEmpty(encoding))
-                {
-                    getDataType().setEncoding(encoding);
-                }
+                setDataType(createFromDataTypeWithMimeType(getDataType(), (String) value));
             }
-            catch (MimeTypeParseException e)
+            catch (IllegalArgumentException e)
             {
                 if (Boolean.parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
                 {
@@ -1455,10 +1453,10 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
                 }
                 else
                 {
-                    String encoding = Charset.defaultCharset().name();
-                    logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
-                    logger.warn(String.format("Using defualt encoding: %s", encoding));
-                    getDataType().setEncoding(encoding);
+                    String encoding = defaultCharset().name();
+                    logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
+                    logger.warn(format("Using defualt encoding: %s", encoding));
+                    setDataType(createFromDataType(getDataType(), encoding));
                 }
             }
         }

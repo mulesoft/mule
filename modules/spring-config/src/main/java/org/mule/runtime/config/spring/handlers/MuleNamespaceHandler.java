@@ -61,6 +61,7 @@ import org.mule.runtime.config.spring.parsers.specific.MessageEnricherDefinition
 import org.mule.runtime.config.spring.parsers.specific.MessageFilterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorChainDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.MessageProcessorWithDataTypeDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
@@ -275,12 +276,13 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("custom-transformer", new TransformerMessageProcessorDefinitionParser());
         registerBeanDefinitionParser("auto-transformer", new TransformerMessageProcessorDefinitionParser(AutoTransformer.class));
-        registerMuleBeanDefinitionParser("set-property", new MessageProcessorDefinitionParser(AddPropertyTransformer.class)).addAlias(PROPERTY_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
+        registerMuleBeanDefinitionParser("set-property", new MessageProcessorWithDataTypeDefinitionParser(AddPropertyTransformer.class)).addAlias(PROPERTY_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
         registerMuleBeanDefinitionParser("remove-property", new MessageProcessorDefinitionParser(RemovePropertyTransformer.class)).addAlias(PROPERTY_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
         registerBeanDefinitionParser("copy-properties", new MessageProcessorDefinitionParser(CopyPropertiesTransformer.class));
-        registerMuleBeanDefinitionParser("set-variable", new MessageProcessorDefinitionParser(AddFlowVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
+        registerMuleBeanDefinitionParser("set-variable", new MessageProcessorWithDataTypeDefinitionParser(AddFlowVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
         registerMuleBeanDefinitionParser("remove-variable", new MessageProcessorDefinitionParser(RemoveFlowVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
-        registerMuleBeanDefinitionParser("set-session-variable", new MessageProcessorDefinitionParser(AddSessionVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
+        registerMuleBeanDefinitionParser("set-session-variable", new MessageProcessorWithDataTypeDefinitionParser(AddSessionVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE,
+                IDENTIFIER_PROPERTY);
         registerMuleBeanDefinitionParser("remove-session-variable", new MessageProcessorDefinitionParser(RemoveSessionVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
         registerBeanDefinitionParser("set-attachment", new MessageProcessorDefinitionParser(AddAttachmentTransformer.class));
         registerBeanDefinitionParser("remove-attachment", new MessageProcessorDefinitionParser(RemoveAttachmentTransformer.class));

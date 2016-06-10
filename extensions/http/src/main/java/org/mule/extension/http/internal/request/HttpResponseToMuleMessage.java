@@ -7,16 +7,18 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.transformer.types.DataTypeFactory.createFromDataType;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -105,6 +107,11 @@ public class HttpResponseToMuleMessage
         }
 
         HttpResponseAttributes responseAttributes = createAttributes(response, parts);
+
+        if (encoding != null)
+        {
+            dataType = createFromDataType(dataType, encoding);
+        }
         MuleMessage responseMessage = new DefaultMuleMessage(payload, dataType, responseAttributes);
 
         String requestMessageId = muleEvent.getMessage().getUniqueId();
@@ -113,11 +120,6 @@ public class HttpResponseToMuleMessage
         // Setting uniqueId and rootId in order to correlate messages from request to response generated.
         ((DefaultMuleMessage) responseMessage).setUniqueId(requestMessageId);
         ((DefaultMuleMessage) responseMessage).setMessageRootId(requestMessageRootId);
-
-        if (encoding != null)
-        {
-            responseMessage.getDataType().setEncoding(encoding);
-        }
 
         return responseMessage;
     }

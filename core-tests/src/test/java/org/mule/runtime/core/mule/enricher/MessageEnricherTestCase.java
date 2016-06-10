@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.mule.enricher;
 
+import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -45,7 +46,6 @@ import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -547,8 +547,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 
     private void doEnrichDataTypePropagationTest(EnrichExpressionPair pair) throws Exception
     {
-        final DataType<?> dataType = DataTypeFactory.create(String.class, JSON);
-        dataType.setEncoding(StandardCharsets.UTF_16.name());
+        final DataType<?> dataType = DataTypeFactory.create(String.class, JSON, UTF_16.name());
 
         MessageEnricher enricher = new MessageEnricher();
         enricher.setMuleContext(muleContext);
@@ -569,6 +568,6 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         MuleEvent out = enricher.process(in);
 
         assertEquals("bar", out.getFlowVariable("foo"));
-        assertThat(out.getFlowVariableDataType("foo"), DataTypeMatcher.like(String.class, JSON, StandardCharsets.UTF_16.name()));
+        assertThat(out.getFlowVariableDataType("foo"), DataTypeMatcher.like(String.class, JSON, UTF_16.name()));
     }
 }

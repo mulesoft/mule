@@ -7,10 +7,12 @@
 package org.mule.runtime.module.extension.file.api;
 
 import static java.lang.String.format;
+
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
@@ -20,7 +22,6 @@ import org.mule.runtime.module.extension.file.api.command.ReadCommand;
 import org.mule.runtime.module.extension.file.api.command.RenameCommand;
 import org.mule.runtime.module.extension.file.api.command.WriteCommand;
 import org.mule.runtime.module.extension.file.api.lock.PathLock;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -176,11 +177,11 @@ public abstract class AbstractFileSystem implements FileSystem
     @Override
     public DataType<InputStream> getFileMessageDataType(DataType<?> originalDataType, FileAttributes attributes)
     {
-        DataType<InputStream> newDataType = DataTypeFactory.create(InputStream.class);
-        newDataType.setEncoding(originalDataType.getEncoding());
-
         String presumedMimeType = mimetypesFileTypeMap.getContentType(attributes.getPath());
-        newDataType.setMimeType(presumedMimeType != null ? presumedMimeType : originalDataType.getMimeType());
+
+        DataType<InputStream> newDataType = DataTypeFactory.create(InputStream.class,
+                presumedMimeType != null ? presumedMimeType : originalDataType.getMimeType(),
+                originalDataType.getEncoding());
 
         return newDataType;
     }

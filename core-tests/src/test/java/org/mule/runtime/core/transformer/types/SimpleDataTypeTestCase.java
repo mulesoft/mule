@@ -11,6 +11,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
+
 import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -26,8 +27,7 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     @Test
     public void acceptsSupportedEncoding() throws Exception
     {
-        SimpleDataType<Object> dataType = new SimpleDataType<>(Object.class, null);
-        dataType.setEncoding(UTF_8.name());
+        SimpleDataType<Object> dataType = new SimpleDataType<>(Object.class, null, UTF_8.name());
 
         assertThat(dataType.getEncoding(), equalTo(UTF_8.name()));
     }
@@ -35,15 +35,13 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     @Test(expected = UnsupportedCharsetException.class)
     public void rejectsUnsupportedEncoding() throws Exception
     {
-        SimpleDataType<Object> dataType = new SimpleDataType<>(Object.class, null);
-        dataType.setEncoding("unsupportedEncoding");
+        SimpleDataType<Object> dataType = new SimpleDataType<>(Object.class, null, "unsupportedEncoding");
     }
 
     @Test
     public void acceptsValidMimeType() throws Exception
     {
-        SimpleDataType<Object> dataType = new SimpleDataType<>(Object.class, null);
-        dataType.setMimeType(JSON);
+        SimpleDataType<Object> dataType = new SimpleDataType<>(Object.class, JSON);
 
         assertThat(dataType.getMimeType(), equalTo(JSON));
     }
@@ -51,7 +49,6 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalArgumentException.class)
     public void rejectsValidMimeType() throws Exception
     {
-        SimpleDataType<Object> dataType = new SimpleDataType<>(Object.class, null);
-        dataType.setMimeType("invalidMimeType");
+        SimpleDataType<Object> dataType = new SimpleDataType<>(Object.class, "invalidMimeType");
     }
 }

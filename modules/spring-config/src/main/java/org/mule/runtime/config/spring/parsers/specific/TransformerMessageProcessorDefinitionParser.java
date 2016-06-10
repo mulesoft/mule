@@ -8,14 +8,10 @@
 package org.mule.runtime.config.spring.parsers.specific;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.SimpleDataType;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
 
 /**
  *  Parses transformers message processors to map data type attributes
@@ -23,12 +19,10 @@ import org.w3c.dom.Element;
  *
  *  @since 4.0.0
  */
-public class TransformerMessageProcessorDefinitionParser extends MessageProcessorDefinitionParser
+public class TransformerMessageProcessorDefinitionParser extends MessageProcessorWithDataTypeDefinitionParser
 {
 
     private static final String RETURN_CLASS = "returnClass";
-    private static final String ENCODING = "encoding";
-    private static final String MIME_TYPE = "mimeType";
 
     public TransformerMessageProcessorDefinitionParser(Class messageProcessor)
     {
@@ -41,38 +35,18 @@ public class TransformerMessageProcessorDefinitionParser extends MessageProcesso
     }
 
     @Override
-    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
-    {
-        final AbstractBeanDefinition abstractBeanDefinition = super.parseInternal(element, parserContext);
-
-        MutablePropertyValues props = abstractBeanDefinition.getPropertyValues();
-        final AbstractBeanDefinition dataTypeBeanDefinition = parseDataType(props);
-        if (dataTypeBeanDefinition != null)
-        {
-            props.add("returnDataType", dataTypeBeanDefinition);
-            removeDataTypeProperties(props);
-        }
-
-        return abstractBeanDefinition;
-    }
-
-    private void removeDataTypeProperties(MutablePropertyValues props)
+    protected void removeDataTypeProperties(MutablePropertyValues props)
     {
         props.removePropertyValue(RETURN_CLASS);
-        props.removePropertyValue(MIME_TYPE);
-        props.removePropertyValue(ENCODING);
+        super.removeDataTypeProperties(props);
     }
 
-    private AbstractBeanDefinition parseDataType(PropertyValues sourceProperties)
+    @Override
+    protected AbstractBeanDefinition parseDataType(PropertyValues sourceProperties)
     {
-        if (sourceProperties.contains(RETURN_CLASS) || sourceProperties.contains(ENCODING) || sourceProperties.contains(MIME_TYPE))
+        if (sourceProperties.contains(RETURN_CLASS) || isDataTypeConfigured(sourceProperties))
         {
-            BeanDefinitionBuilder dataTypeBuilder = BeanDefinitionBuilder.genericBeanDefinition(SimpleDataType.class);
-            dataTypeBuilder.addConstructorArgValue(getClassName(sourceProperties));
-            dataTypeBuilder.addConstructorArgValue(getMimeType(sourceProperties));
-            dataTypeBuilder.addPropertyValue(ENCODING, getEncoding(sourceProperties));
-
-            return dataTypeBuilder.getBeanDefinition();
+            return buildDataTypeDefinition(getClassName(sourceProperties), sourceProperties);
         }
         else
         {
@@ -80,19 +54,9 @@ public class TransformerMessageProcessorDefinitionParser extends MessageProcesso
         }
     }
 
-    private String getEncoding(PropertyValues sourceProperties)
-    {
-        return sourceProperties.contains(ENCODING) ? (String) sourceProperties.getPropertyValue(ENCODING).getValue() : null;
-    }
-
     private String getClassName(PropertyValues sourceProperties)
     {
         return (String) (sourceProperties.contains(RETURN_CLASS) ? sourceProperties.getPropertyValue(RETURN_CLASS).getValue() : Object.class.getName());
-    }
-
-    private String getMimeType(PropertyValues sourceProperties)
-    {
-        return (String) (sourceProperties.contains(MIME_TYPE) ? sourceProperties.getPropertyValue(MIME_TYPE).getValue() : null);
     }
 
 }

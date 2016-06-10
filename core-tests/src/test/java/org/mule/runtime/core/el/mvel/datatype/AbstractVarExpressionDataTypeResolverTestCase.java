@@ -9,10 +9,16 @@ package org.mule.runtime.core.el.mvel.datatype;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
-import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
-import org.mule.runtime.core.api.MuleEvent;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
+import org.mule.mvel2.MVEL;
+import org.mule.mvel2.ParserConfiguration;
+import org.mule.mvel2.ParserContext;
+import org.mule.mvel2.compiler.CompiledExpression;
+import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.el.mvel.DelegateVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.GlobalVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -20,13 +26,8 @@ import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
 import org.mule.runtime.core.el.mvel.MessageVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.StaticVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.VariableVariableResolverFactory;
-import org.mule.mvel2.MVEL;
-import org.mule.mvel2.ParserConfiguration;
-import org.mule.mvel2.ParserContext;
-import org.mule.mvel2.compiler.CompiledExpression;
-import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -69,8 +70,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
 
     protected void doVarDataTypeTest(String expression) throws Exception
     {
-        final DataType expectedDataType = DataTypeFactory.create(String.class, JSON);
-        expectedDataType.setEncoding(CUSTOM_ENCODING);
+        final DataType expectedDataType = DataTypeFactory.create(String.class, JSON, CUSTOM_ENCODING);
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
         setVariable(testEvent, EXPRESSION_VALUE, expectedDataType);

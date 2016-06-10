@@ -44,8 +44,7 @@ public class TransformerObjectFactory implements ObjectFactory<Transformer>
         AbstractTransformer transformerInstance = createInstance();
         if (returnClass != null || encoding != null || mimeType != null)
         {
-            SimpleDataType<Object> dataType = new SimpleDataType<>(getReturnType(), mimeType);
-            dataType.setEncoding(encoding);
+            SimpleDataType<Object> dataType = new SimpleDataType(getReturnType(), mimeType, encoding);
             transformerInstance.setReturnDataType(dataType);
         }
         transformerInstance.setIgnoreBadInput(ignoreBadInput);

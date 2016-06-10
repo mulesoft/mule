@@ -24,7 +24,6 @@ public class TypedValue<T> implements Serializable
     private transient T value;
 
     // TODO MULE-9279 Make 'final' once MuleMessage is immutable
-    // TODO MULE-9288 DataType should be immutable
     private DataType<T> dataType;
 
     public TypedValue(T value, DataType<T> dataType)
@@ -54,8 +53,7 @@ public class TypedValue<T> implements Serializable
     // TODO MULE-9279 Remove method once MuleMessage is immutable
     protected void setDataType(DataType<T> dataType)
     {
-        // TODO MULE-9288 DataType should be immutable
-        this.dataType = dataType.cloneDataType();
+        this.dataType = dataType;
     }
 
     // TODO MULE-9279 Remove method once MuleMessage is immutable
