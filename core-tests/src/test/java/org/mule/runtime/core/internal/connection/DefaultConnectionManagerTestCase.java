@@ -16,7 +16,6 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -77,7 +76,21 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase
     public void assertUnboundedConnection() throws Exception
     {
         connectionManager.getConnection(config);
+    }
 
+    @Test
+    public void hasBinding() throws Exception
+    {
+        assertBound(false);
+        connectionManager.bind(config, connectionProvider);
+        assertBound(true);
+        connectionManager.unbind(config);
+        assertBound(false);
+    }
+
+    private void assertBound(boolean bound)
+    {
+        assertThat(connectionManager.hasBinding(config), is(bound));
     }
 
     @Test

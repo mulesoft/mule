@@ -6,26 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static org.mule.runtime.core.api.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
 import static org.mule.runtime.core.util.Preconditions.checkState;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.core.time.TimeSupplier;
 import org.mule.runtime.extension.api.introspection.Interceptable;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.Interceptor;
 import org.mule.runtime.module.extension.internal.introspection.AbstractInterceptable;
-import org.mule.runtime.core.time.TimeSupplier;
 
 import java.util.List;
 import java.util.Optional;
@@ -134,7 +134,14 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
     @Override
     public void start() throws MuleException
     {
-        startIfNeeded(connectionProvider);
+        if (connectionProvider.isPresent())
+        {
+            startIfNeeded(connectionProvider);
+            if (!connectionManager.hasBinding(value))
+            {
+                connectionManager.bind(value, connectionProvider.get());
+            }
+        }
         startIfNeeded(value);
         super.start();
     }
