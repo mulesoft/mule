@@ -20,8 +20,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This object maintains case-sensitive inbound and outbound scoped messages properties.
@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
 public class MessagePropertiesContext implements MutableMessageProperties, Serializable
 {
     private static final long serialVersionUID = -5230693402768953742L;
-    private static final Log logger = LogFactory.getLog(MessagePropertiesContext.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessagePropertiesContext.class);
 
 
     protected CopyOnWriteCaseInsensitiveMap<String, TypedValue<? extends Serializable>> inboundMap;
@@ -62,8 +62,7 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
     @Override
     public <T extends Serializable> T getInboundProperty(String name, T defaultValue)
     {
-        TypedValue typedValue = inboundMap.get(name);
-        return getValueOrDefault(typedValue == null ? null : (T) typedValue.getValue(), defaultValue);
+        return getValueOrDefault((TypedValue<T>) inboundMap.get(name), defaultValue);
     }
 
     @Override
@@ -75,8 +74,7 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
     @Override
     public <T extends Serializable> T getOutboundProperty(String name, T defaultValue)
     {
-        TypedValue typedValue = outboundMap.get(name);
-        return getValueOrDefault(typedValue == null ? null : (T) typedValue.getValue(), defaultValue);
+        return getValueOrDefault((TypedValue<T>) outboundMap.get(name), defaultValue);
     }
 
     @Override
@@ -247,8 +245,13 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
         return buf.toString();
     }
 
-    private <T extends Serializable> T getValueOrDefault(T value, T defaultValue)
+    private <T extends Serializable> T getValueOrDefault(TypedValue<T> typedValue, T defaultValue)
     {
+        if (typedValue == null)
+        {
+            return null;
+        }
+        T value = typedValue.getValue();
         //Note that we need to keep the (redundant) casts in here because the compiler compiler complains
         //about primitive types being cast to a generic type
         if (defaultValue == null)

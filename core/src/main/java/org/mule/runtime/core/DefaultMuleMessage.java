@@ -1230,7 +1230,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
 
         for (Map.Entry<String, Serializable> s : newInboundProperties.entrySet())
         {
-            DataType<?> propertyDataType = currentMessage.getOutboundPropertyDataType(s.getKey());
+            DataType<? extends Serializable> propertyDataType = currentMessage.getOutboundPropertyDataType(s.getKey());
 
             newMessage.setInboundProperty(s.getKey(), s.getValue(), (DataType<Serializable>) propertyDataType);
         }

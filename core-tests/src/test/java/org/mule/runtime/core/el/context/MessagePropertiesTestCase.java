@@ -9,6 +9,8 @@ package org.mule.runtime.core.el.context;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -136,8 +138,8 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
         mock(DataHandler.class);
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
-        assertThat(evaluate("message.inboundProperties.keySet().toArray()[0]", event), anyOf(equalTo("foo"),equalTo("bar")));
-        assertThat(evaluate("message.inboundProperties.keySet().toArray()[1]", event), anyOf(equalTo("foo"),equalTo("bar")));
+        assertThat((String[]) evaluate("message.inboundProperties.keySet().toArray()", event),
+                   is(arrayContainingInAnyOrder(equalTo("foo"), equalTo("bar"))));
     }
 
     @Test
