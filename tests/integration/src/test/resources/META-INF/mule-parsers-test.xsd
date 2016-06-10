@@ -49,6 +49,13 @@
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
+                    <xsd:element name="simple-type-child-set" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="simple-type-child" minOccurs="1" maxOccurs="unbounded" type="simpleTypeChildType"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
                     <xsd:element name="other-simple-type-child-list" minOccurs="0">
                         <xsd:complexType>
                             <xsd:sequence>

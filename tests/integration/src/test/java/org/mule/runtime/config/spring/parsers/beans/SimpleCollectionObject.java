@@ -9,11 +9,13 @@ package org.mule.runtime.config.spring.parsers.beans;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SimpleCollectionObject
 {
 
-    private List<String> simpleTypeCollection;
+    private List<String> simpleTypeList;
+    private Set<String> simpleTypeSet;
     private Map<Object, Object> simpleParameters = new HashMap<>();
 
     public void setSimpleParameters(Map<Object, Object> simpleParameters)
@@ -26,13 +28,23 @@ public class SimpleCollectionObject
         return simpleParameters;
     }
 
-    public List<String> getSimpleTypeCollection()
+    public List<String> getSimpleTypeList()
     {
-        return simpleTypeCollection;
+        return simpleTypeList;
     }
 
-    public void setSimpleTypeCollection(List<String> simpleTypeCollection)
+    public void setSimpleTypeList(List<String> simpleTypeList)
     {
-        this.simpleTypeCollection = simpleTypeCollection;
+        this.simpleTypeList = simpleTypeList;
+    }
+
+    public Set<String> getSimpleTypeSet()
+    {
+        return simpleTypeSet;
+    }
+
+    public void setSimpleTypeSet(Set<String> simpleTypeSet)
+    {
+        this.simpleTypeSet = simpleTypeSet;
     }
 }

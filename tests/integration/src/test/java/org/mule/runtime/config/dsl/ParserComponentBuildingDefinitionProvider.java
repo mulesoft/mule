@@ -19,6 +19,7 @@ import org.mule.runtime.config.spring.parsers.beans.SimpleCollectionObject;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,7 +41,8 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                 .copy()
                                 .withIdentifier("parameter-collection-parser")
                                 .withTypeDefinition(fromType(SimpleCollectionObject.class))
-                                .withSetterParameterDefinition("simpleTypeCollection", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-list").build())
+                                .withSetterParameterDefinition("simpleTypeList", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-list").build())
+                                .withSetterParameterDefinition("simpleTypeSet", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-set").withCollectionType(HashSet.class).build())
                                 .withSetterParameterDefinition("simpleParameters", fromMultipleDefinitions(
                                         new KeyAttributeDefinitionPair.Builder()
                                                 .withAttributeDefinition(fromSimpleParameter("firstname").build())

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import com.google.common.collect.ImmutableSet;
+import static com.google.common.collect.ImmutableSet.of;
 
 import java.util.Set;
 
@@ -18,7 +18,7 @@ import java.util.Set;
 public class DslSimpleType
 {
 
-    private final static Set<Class<?>> simpleTypes = ImmutableSet.of(Byte.class,
+    private final static Set<Class<?>> simpleTypes = of(Byte.class,
                                                                      Short.class,
                                                                      Integer.class,
                                                                      Long.class,

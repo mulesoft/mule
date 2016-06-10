@@ -52,6 +52,10 @@
             <parsers-test:simple-type-child value="value1"/>
             <parsers-test:simple-type-child value="value2"/>
         </parsers-test:simple-type-child-list>
+        <parsers-test:simple-type-child-set>
+            <parsers-test:simple-type-child value="value1"/>
+            <parsers-test:simple-type-child value="value2"/>
+        </parsers-test:simple-type-child-set>
         <parsers-test:other-simple-type-child-list>
             <parsers-test:simple-type-child value="value1"/>
             <parsers-test:simple-type-child value="value2"/>
