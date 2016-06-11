@@ -7,8 +7,8 @@
 package org.mule.runtime.core.transformer.simple;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.api.metadata.DataType.STRING_DATA_TYPE;
-import static org.mule.runtime.core.transformer.types.DataTypeFactory.create;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -46,12 +46,12 @@ public class BasicTypeAutoTransformationTestCase extends AbstractMuleContextTest
 
     private Transformer lookupFromStringTransformer(Class to) throws TransformerException
     {
-        return muleContext.getRegistry().lookupTransformer(STRING_DATA_TYPE, create(to));
+        return muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.forJavaType(to));
     }
 
     private Transformer lookupToStringTransformer(Class from) throws TransformerException
     {
-        return muleContext.getRegistry().lookupTransformer(create(from), STRING_DATA_TYPE);
+        return muleContext.getRegistry().lookupTransformer(DataType.forJavaType(from), DataType.STRING);
     }
 
 }

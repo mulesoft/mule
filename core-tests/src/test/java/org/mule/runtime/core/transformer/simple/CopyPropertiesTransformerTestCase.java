@@ -13,8 +13,8 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -44,7 +44,7 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
 {
     public static final String ENCODING = "encoding";
     public static final String INBOUND_PROPERTY_KEY = "propKey";
-    public static final DataType PROPERTY_DATA_TYPE = DataType.STRING_DATA_TYPE;
+    public static final DataType PROPERTY_DATA_TYPE = DataType.STRING;
     private static final Serializable PROPERTY_VALUE = StringUtils.EMPTY;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
@@ -61,7 +61,7 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
         Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(
                 invocation -> (String) invocation.getArguments()[0]);
 
-        muleMessage = new DefaultMuleMessage("", new SimpleDataType(String.class), mockMuleContext);
+        muleMessage = new DefaultMuleMessage("", PROPERTY_DATA_TYPE, mockMuleContext);
     }
 
     @Test

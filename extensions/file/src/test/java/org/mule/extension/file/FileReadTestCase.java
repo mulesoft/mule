@@ -10,15 +10,16 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.transformer.types.MimeTypes.BINARY;
-import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import static org.mule.runtime.api.metadata.MimeType.JSON;
+
 import org.mule.extension.file.api.LocalFileAttributes;
+import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -69,7 +70,7 @@ public class FileReadTestCase extends FileConnectorTestCase
 
         MuleEvent response = getPath(binaryFile.getAbsolutePath());
 
-        assertThat(response.getMessage().getDataType().getMimeType(), is(BINARY));
+        assertThat(response.getMessage().getDataType().getMimeType(), is(MimeType.BINARY));
 
         AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
         assertThat(payload.isLocked(), is(false));

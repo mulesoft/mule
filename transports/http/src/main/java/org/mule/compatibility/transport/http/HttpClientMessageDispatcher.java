@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.TransformerChain;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
@@ -252,7 +251,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
         else if (body instanceof byte[])
         {
-            byte[] buffer = event.transformMessage(DataType.BYTE_ARRAY_DATA_TYPE);
+            byte[] buffer = event.transformMessage(DataType.BYTE_ARRAY);
             postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getEncoding()));
             httpMethod = postMethod;
         }
@@ -260,7 +259,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             if (!(body instanceof OutputHandler))
             {
-                body = event.transformMessage(DataTypeFactory.create(OutputHandler.class));
+                body = event.transformMessage(DataType.forJavaType(OutputHandler.class));
             }
 
             OutputHandler outputHandler = (OutputHandler) body;

@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import org.apache.cxf.binding.soap.SoapHeader;
@@ -57,8 +56,8 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor
 
                 try
                 {
-                    DataType sourceType = DataTypeFactory.createFromObject(header.getObject());
-                    transformer = muleContext.getRegistry().lookupTransformer(sourceType, DataType.STRING_DATA_TYPE);
+                    DataType sourceType = DataType.createFromObject(header.getObject());
+                    transformer = muleContext.getRegistry().lookupTransformer(sourceType, DataType.STRING);
 
                     String key = WSConsumer.SOAP_HEADERS_PROPERTY_PREFIX + header.getName().getLocalPart();
                     String value = (String) transformer.transform(header.getObject());

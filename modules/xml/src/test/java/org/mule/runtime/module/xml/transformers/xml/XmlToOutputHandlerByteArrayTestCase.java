@@ -8,9 +8,9 @@ package org.mule.runtime.module.xml.transformers.xml;
 
 import static org.junit.Assert.fail;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.transformer.XmlToOutputHandler;
 
@@ -38,7 +38,7 @@ public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerT
     public Transformer getTransformer() throws Exception
     {
         Transformer trans = createObject(XmlToOutputHandler.class);
-        trans.setReturnDataType(DataTypeFactory.create(OutputHandler.class));
+        trans.setReturnDataType(DataType.forJavaType(OutputHandler.class));
 
         return trans;
     }

@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.xml.transformers.xml.xquery;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.module.xml.transformer.XQueryTransformer;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.xml.transformer.XQueryTransformer;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
@@ -39,7 +39,7 @@ public class InlineXQueryTransformerTestCase extends AbstractTransformerTestCase
                 "    for $cd in $document/catalog/cd\n" +
                 "    return <cd-title>{data($cd/title)}</cd-title>\n" +
                 "} </cd-listings>");
-        transformer.setReturnDataType(DataTypeFactory.STRING);
+        transformer.setReturnDataType(DataType.STRING);
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;

@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.module.xml.transformers.xml;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.transformer.DomDocumentToXml;
 import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
 import org.mule.runtime.module.xml.util.XMLTestUtils;
 import org.mule.runtime.module.xml.util.XMLUtils;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,9 +35,6 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
 {
 
@@ -53,7 +53,7 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
     public Transformer getTransformer() throws Exception
     {
         XmlToDomDocument trans = createObject(XmlToDomDocument.class);
-        trans.setReturnDataType(DataTypeFactory.create(org.w3c.dom.Document.class));
+        trans.setReturnDataType(DataType.forJavaType(org.w3c.dom.Document.class));
         return trans;
     }
 
@@ -61,7 +61,7 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
     public Transformer getRoundTripTransformer() throws Exception
     {
         DomDocumentToXml trans = createObject(DomDocumentToXml.class);
-        trans.setReturnDataType(DataTypeFactory.STRING);
+        trans.setReturnDataType(DataType.STRING);
         return trans;
     }
 

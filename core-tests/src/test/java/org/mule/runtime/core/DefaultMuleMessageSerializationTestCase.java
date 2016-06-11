@@ -9,12 +9,11 @@ package org.mule.runtime.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.api.metadata.SimpleDataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -97,8 +96,8 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         public NonSerializableToByteArray()
         {
             super();
-            registerSourceType(new SimpleDataType<NonSerializable>(NonSerializable.class));
-            setReturnDataType(DataTypeFactory.BYTE_ARRAY);
+            registerSourceType(DataType.forJavaType(NonSerializable.class));
+            setReturnDataType(DataType.BYTE_ARRAY);
         }
 
         @Override

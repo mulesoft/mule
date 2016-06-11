@@ -9,10 +9,11 @@ package org.mule.runtime.core.util;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.runtime.core.transformer.types.MimeTypes.HTML;
-import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
-import static org.mule.runtime.core.transformer.types.MimeTypes.TEXT;
-import static org.mule.runtime.core.transformer.types.MimeTypes.XML;
+import static org.mule.runtime.api.metadata.MimeType.HTML;
+import static org.mule.runtime.api.metadata.MimeType.JSON;
+import static org.mule.runtime.api.metadata.MimeType.TEXT;
+import static org.mule.runtime.api.metadata.MimeType.XML;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

@@ -10,18 +10,18 @@ package org.mule.runtime.core.agent.registry;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
+import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,20 +30,20 @@ import org.junit.Test;
 public class MuleRegistryHelperTransformersAsObjectsTestCase extends AbstractMuleTestCase
 {
 
-    private static final DataType<Apple> APPLE_DATA_TYPE = DataTypeFactory.create(Apple.class);
+    private static final DataType<Apple> APPLE_DATA_TYPE = DataType.forJavaType(Apple.class);
 
     private final DefaultRegistryBroker registry = mock(DefaultRegistryBroker.class);
     private final MuleContext muleContext = mock(MuleContext.class);
     private final MuleRegistryHelper muleRegistryHelper = new MuleRegistryHelper(registry, muleContext);
-    private final Converter stringToApple = new MockConverterBuilder().from(DataTypeFactory.STRING).to(APPLE_DATA_TYPE).build();
-    private final Converter appleToString = new MockConverterBuilder().from(APPLE_DATA_TYPE).to(DataTypeFactory.STRING).build();
+    private final Converter stringToApple = new MockConverterBuilder().from(DataType.STRING).to(APPLE_DATA_TYPE).build();
+    private final Converter appleToString = new MockConverterBuilder().from(APPLE_DATA_TYPE).to(DataType.STRING).build();
 
     @Before
     public void setUp() throws Exception
     {
         TransformerResolver transformerResolver = mock(TransformerResolver.class);
-        when(transformerResolver.resolve(DataTypeFactory.STRING, APPLE_DATA_TYPE)).thenReturn(stringToApple);
-        when(transformerResolver.resolve(APPLE_DATA_TYPE, DataTypeFactory.STRING)).thenReturn(appleToString);
+        when(transformerResolver.resolve(DataType.STRING, APPLE_DATA_TYPE)).thenReturn(stringToApple);
+        when(transformerResolver.resolve(APPLE_DATA_TYPE, DataType.STRING)).thenReturn(appleToString);
 
         muleRegistryHelper.registerObject("mockTransformerResolver", transformerResolver);
 
@@ -54,8 +54,8 @@ public class MuleRegistryHelperTransformersAsObjectsTestCase extends AbstractMul
     @Test
     public void testRegisterTransformersAsNamedObjects() throws Exception
     {
-        Transformer transformer1 = muleRegistryHelper.lookupTransformer(DataTypeFactory.STRING, APPLE_DATA_TYPE);
-        Transformer transformer2 = muleRegistryHelper.lookupTransformer(APPLE_DATA_TYPE, DataTypeFactory.STRING);
+        Transformer transformer1 = muleRegistryHelper.lookupTransformer(DataType.STRING, APPLE_DATA_TYPE);
+        Transformer transformer2 = muleRegistryHelper.lookupTransformer(APPLE_DATA_TYPE, DataType.STRING);
 
         assertEquals(stringToApple, transformer1);
         assertEquals(appleToString, transformer2);

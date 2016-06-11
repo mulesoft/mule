@@ -12,14 +12,14 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +51,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
         gu.setMuleContext(muleContext);
-        gu.setReturnDataType(DataTypeFactory.STRING);
+        gu.setReturnDataType(DataType.STRING);
         assertNotNull(message.getPayload());
         String result = (String)gu.transform(getPayloadAsBytes(message));
         assertThat(result, is("<string>payload</string>"));

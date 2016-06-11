@@ -9,11 +9,11 @@ package org.mule.compatibility.transport.http.transformers;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.compatibility.transport.http.ResponseWriter;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,8 +33,8 @@ public class HttpResponseToString extends AbstractTransformer
 
     public HttpResponseToString()
     {
-        registerSourceType(DataTypeFactory.create(HttpResponse.class));
-        setReturnDataType(DataTypeFactory.STRING);
+        registerSourceType(DataType.forJavaType(HttpResponse.class));
+        setReturnDataType(DataType.STRING);
     }
 
     /**

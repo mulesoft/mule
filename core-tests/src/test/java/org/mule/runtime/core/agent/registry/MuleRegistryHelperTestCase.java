@@ -13,17 +13,15 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.BloodOrange;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.metadata.SimpleDataType;
-import org.mule.runtime.core.util.Predicate;
 
 import java.util.List;
 
@@ -33,23 +31,27 @@ import org.junit.Test;
 public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase
 {
 
+    private static final DataType<Orange> ORANGE_DATA_TYPE = DataType.forJavaType(Orange.class);
+    private static final DataType<BloodOrange> BLOOD_ORANGE_DATA_TYPE = DataType.forJavaType(BloodOrange.class);
+    private static final DataType<Fruit> FRUIT_DATA_TYPE = DataType.forJavaType(Fruit.class);
+
     private Transformer t1;
     private Transformer t2;
 
     @Before
     public void setUp() throws Exception
     {
-        t1 = new MockConverterBuilder().named("t1").from(DataTypeFactory.create(Orange.class)).to(DataTypeFactory.create(Fruit.class)).build();
+        t1 = new MockConverterBuilder().named("t1").from(ORANGE_DATA_TYPE).to(FRUIT_DATA_TYPE).build();
         muleContext.getRegistry().registerTransformer(t1);
 
-        t2 = new MockConverterBuilder().named("t2").from(DataTypeFactory.OBJECT).to(DataTypeFactory.create(Fruit.class)).build();
+        t2 = new MockConverterBuilder().named("t2").from(DataType.OBJECT).to(FRUIT_DATA_TYPE).build();
         muleContext.getRegistry().registerTransformer(t2);
     }
 
     @Test
     public void lookupsTransformersByType() throws Exception
     {
-        List trans =  muleContext.getRegistry().lookupTransformers(new SimpleDataType(BloodOrange.class), new SimpleDataType(Fruit.class));
+        List trans = muleContext.getRegistry().lookupTransformers(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
         assertEquals(2, trans.size());
         assertTrue(trans.contains(t1));
         assertTrue(trans.contains(t2));
@@ -58,7 +60,7 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase
     @Test
     public void lookupsTransformerByPriority() throws Exception
     {
-        Transformer result =  muleContext.getRegistry().lookupTransformer(new SimpleDataType(BloodOrange.class), new SimpleDataType(Fruit.class));
+        Transformer result = muleContext.getRegistry().lookupTransformer(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
         assertNotNull(result);
         assertEquals(t1, result);
     }
@@ -77,14 +79,7 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase
     {
         Scheduler scheduler = scheduler();
         register(scheduler);
-        assertEquals(scheduler, muleContext.getRegistry().lookupScheduler(new Predicate<String>()
-        {
-            @Override
-            public boolean evaluate(String s)
-            {
-                return s.equalsIgnoreCase("schedulerName");
-            }
-        }).iterator().next());
+        assertEquals(scheduler, muleContext.getRegistry().lookupScheduler(s -> s.equalsIgnoreCase("schedulerName")).iterator().next());
     }
 
     @Test

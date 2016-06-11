@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -163,7 +162,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         };
 
         // Use this class as a bogus source type to enforce a simple invalid transformer
-        transformer.registerSourceType(DataTypeFactory.create(this.getClass()));
+        transformer.registerSourceType(DataType.forJavaType(this.getClass()));
         
         return transformer;
     }
@@ -179,7 +178,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
             }
         };
         
-        DataType<Integer> integerDataType = DataTypeFactory.create(Integer.class);
+        DataType<Integer> integerDataType = DataType.forJavaType(Integer.class);
         transformer.registerSourceType(integerDataType);
         transformer.setReturnDataType(integerDataType);
 

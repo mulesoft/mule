@@ -22,11 +22,11 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.MessageProcessors;
+import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapper;
-import org.mule.runtime.core.transformer.types.TypedValue;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;

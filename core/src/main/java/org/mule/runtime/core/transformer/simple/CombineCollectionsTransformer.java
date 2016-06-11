@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
@@ -35,10 +37,9 @@ public class CombineCollectionsTransformer implements MessageProcessor
         MuleMessage msg = event.getMessage();
 
         List<Object> payload = new ArrayList<Object>();
-        // TODO MULE-9187 Use Message DataType to determine if Message contains a list of messages.
-        if (msg.getPayload() instanceof Collection && ((List)msg.getPayload()).get(0) instanceof MuleMessage)
+        if (msg.getDataType().isCompatibleWith(MULE_MESSAGE_COLLECTION))
         {
-            for (MuleMessage child : (List<MuleMessage>)msg.getPayload())
+            for (MuleMessage child : (Collection<MuleMessage>) msg.getPayload())
             {
                 Object childPayload = child.getPayload();
                 if (childPayload instanceof Collection)

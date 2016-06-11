@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.xml.util.XMLUtils;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,17 +30,17 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
 
     public XmlToOutputHandler()
     {
-        registerSourceType(DataTypeFactory.STRING);
-        registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        registerSourceType(DataTypeFactory.create(Source.class));
-        registerSourceType(DataTypeFactory.create(Document.class));
-        registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
-        registerSourceType(DataTypeFactory.create(org.w3c.dom.Element.class));
-        registerSourceType(DataTypeFactory.INPUT_STREAM);
-        registerSourceType(DataTypeFactory.create(OutputHandler.class));
-        registerSourceType(DataTypeFactory.create(XMLStreamReader.class));
-        registerSourceType(DataTypeFactory.create(DelayedResult.class));
-        setReturnDataType(DataTypeFactory.create(OutputHandler.class));
+        registerSourceType(DataType.STRING);
+        registerSourceType(DataType.BYTE_ARRAY);
+        registerSourceType(DataType.forJavaType(Source.class));
+        registerSourceType(DataType.forJavaType(Document.class));
+        registerSourceType(DataType.forJavaType(org.w3c.dom.Document.class));
+        registerSourceType(DataType.forJavaType(org.w3c.dom.Element.class));
+        registerSourceType(DataType.INPUT_STREAM);
+        registerSourceType(DataType.forJavaType(OutputHandler.class));
+        registerSourceType(DataType.forJavaType(XMLStreamReader.class));
+        registerSourceType(DataType.forJavaType(DelayedResult.class));
+        setReturnDataType(DataType.forJavaType(OutputHandler.class));
     }
 
     @Override
@@ -49,6 +49,7 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
         final Object src = event.getMessage().getPayload();
         return new OutputHandler()
         {
+            @Override
             public void write(MuleEvent event, OutputStream out) throws IOException
             {
                 writeXml(src, encoding, out);
@@ -97,11 +98,13 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
         }
     }
 
+    @Override
     public int getPriorityWeighting()
     {
         return priorityWeighting;
     }
 
+    @Override
     public void setPriorityWeighting(int priorityWeighting)
     {
         this.priorityWeighting = priorityWeighting;

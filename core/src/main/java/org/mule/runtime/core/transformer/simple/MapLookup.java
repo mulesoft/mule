@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.Map;
 
@@ -24,8 +24,8 @@ public class MapLookup extends AbstractTransformer
 
     public MapLookup()
     {
-        registerSourceType(DataTypeFactory.create(Map.class));
-        setReturnDataType(DataTypeFactory.OBJECT);
+        registerSourceType(DataType.forJavaType(Map.class));
+        setReturnDataType(DataType.OBJECT);
     }
 
     @Override

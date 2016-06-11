@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
@@ -29,8 +29,8 @@ public class GetBeanProperty extends AbstractTransformer
     public GetBeanProperty()
     {
         super();
-        registerSourceType(DataTypeFactory.OBJECT);
-        setReturnDataType(DataTypeFactory.OBJECT);
+        registerSourceType(DataType.OBJECT);
+        setReturnDataType(DataType.OBJECT);
     }
 
     @Override

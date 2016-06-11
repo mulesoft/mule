@@ -7,12 +7,13 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.concurrent.Executors.newScheduledThreadPool;
-import static org.mule.runtime.api.metadata.DataType.STRING_DATA_TYPE;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -125,7 +126,7 @@ public class HeisenbergSource extends Source<Void, Serializable> implements Init
         }
 
         String payload = String.format("Meth Batch %d. If found by DEA contact %s", ++initialBatchNumber, connection.getSaulPhoneNumber());
-        return new DefaultMuleMessage(payload, null, STRING_DATA_TYPE, muleContext);
+        return new DefaultMuleMessage(payload, null, DataType.STRING, muleContext);
     }
 
 

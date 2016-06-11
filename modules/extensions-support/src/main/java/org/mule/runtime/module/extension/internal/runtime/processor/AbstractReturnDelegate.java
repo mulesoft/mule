@@ -13,7 +13,6 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
 import java.io.Serializable;
@@ -105,6 +104,6 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
             encoding = muleContext.getConfiguration().getDefaultEncoding();
         }
 
-        return DataTypeFactory.create(type, mimeType, encoding);
+        return DataType.builder(value.getClass()).mimeType(mimeType).encoding(encoding).build();
     }
 }

@@ -7,8 +7,6 @@
 package org.mule.runtime.module.json.validation;
 
 import static com.github.fge.jackson.JsonLoader.fromString;
-import static org.junit.runners.Parameterized.Parameter;
-import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.FAKE_SCHEMA_URI;
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_INLINE;
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_JSON;
@@ -21,13 +19,14 @@ import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoo
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoodFstabInline;
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoodFstabInlineAsJsonData;
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.toStream;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -35,6 +34,8 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase
@@ -133,14 +134,14 @@ public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase
         private AppleToJson(Object value)
         {
             this.value = value;
-            registerSourceType(DataTypeFactory.create(Apple.class));
+            registerSourceType(DataType.forJavaType(Apple.class));
             if (value instanceof InputStream)
             {
-                setReturnDataType(DataTypeFactory.create(InputStream.class));
+                setReturnDataType(DataType.forJavaType(InputStream.class));
             }
             else
             {
-                setReturnDataType(DataTypeFactory.create(value.getClass()));
+                setReturnDataType(DataType.forJavaType(value.getClass()));
             }
         }
 

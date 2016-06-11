@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.runtime.module.xml.util.XMLUtils;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -29,13 +29,13 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
     public XmlToXMLStreamReader()
     {
         super();
-        registerSourceType(DataTypeFactory.create(Source.class));
-        registerSourceType(DataTypeFactory.INPUT_STREAM);
-        registerSourceType(DataTypeFactory.create(Document.class));
-        registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataType.forJavaType(Source.class));
+        registerSourceType(DataType.INPUT_STREAM);
+        registerSourceType(DataType.forJavaType(Document.class));
+        registerSourceType(DataType.BYTE_ARRAY);
+        registerSourceType(DataType.STRING);
 
-        setReturnDataType(DataTypeFactory.create(XMLStreamReader.class));
+        setReturnDataType(DataType.forJavaType(XMLStreamReader.class));
     }
 
     @Override
@@ -76,11 +76,13 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
         this.reversible = reversible;
     }
 
+    @Override
     public int getPriorityWeighting()
     {
         return priorityWeighting;
     }
 
+    @Override
     public void setPriorityWeighting(int priorityWeighting)
     {
         this.priorityWeighting = priorityWeighting;

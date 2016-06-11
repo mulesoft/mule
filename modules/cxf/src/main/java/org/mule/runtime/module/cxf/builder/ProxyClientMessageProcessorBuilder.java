@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.cxf.builder;
 
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
@@ -18,7 +19,6 @@ import org.mule.runtime.module.cxf.support.ResetStaxInterceptor;
 import org.mule.runtime.module.cxf.support.ReversibleStaxInInterceptor;
 import org.mule.runtime.module.cxf.support.StreamClosingInterceptor;
 import org.mule.runtime.module.cxf.transport.MuleUniversalConduit;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
@@ -123,7 +123,7 @@ public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageP
     @Override
     protected String getMimeType()
     {
-        return MimeTypes.XML;
+        return MimeType.XML;
     }
 
 }

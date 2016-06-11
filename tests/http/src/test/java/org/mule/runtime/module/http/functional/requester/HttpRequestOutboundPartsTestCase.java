@@ -10,12 +10,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.transformer.types.MimeTypes.HTML;
-import static org.mule.runtime.core.transformer.types.MimeTypes.TEXT;
+import static org.mule.runtime.api.metadata.MimeType.HTML;
+import static org.mule.runtime.api.metadata.MimeType.TEXT;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+
 import org.mule.extension.http.api.HttpPart;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.MuleEvent;

@@ -8,8 +8,8 @@
 package org.mule.runtime.core.el.mvel.datatype;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.mvel2.compiler.CompiledExpression;
-import org.mule.runtime.core.transformer.types.TypedValue;
 
 /**
  * Propagates {@link org.mule.runtime.api.metadata.DataType} from the right to the left side

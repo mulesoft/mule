@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -26,10 +26,10 @@ public class StringAppendTransformer extends AbstractTransformer
     public StringAppendTransformer(String message)
     {
         this.message = message;
-        registerSourceType(DataTypeFactory.STRING);
-        registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        registerSourceType(DataTypeFactory.INPUT_STREAM);
-        setReturnDataType(DataTypeFactory.STRING);
+        registerSourceType(DataType.STRING);
+        registerSourceType(DataType.BYTE_ARRAY);
+        registerSourceType(DataType.INPUT_STREAM);
+        setReturnDataType(DataType.STRING);
     }
 
     @Override

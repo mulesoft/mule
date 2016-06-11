@@ -102,7 +102,7 @@ public class XPath3FunctionTestCase extends AbstractELTestCase
     @Test(expected = ExpressionRuntimeException.class)
     public void tooManyArgs() throws Exception
     {
-        doEvaluate("xpath3('/root/@foo', payload, 'STRING', 'one too many')", getTestEvent(ROOT_FOO_BAR));
+        doEvaluate("xpath3('/root/@foo', payload, 'STRING_DATA_TYPE', 'one too many')", getTestEvent(ROOT_FOO_BAR));
     }
 
     @Test(expected = ExpressionRuntimeException.class)

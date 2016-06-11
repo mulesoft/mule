@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.spring.remoting;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -25,10 +25,10 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
     public ObjectToRemoteInvocationTransformer()
     {
         super();
-        this.registerSourceType(DataTypeFactory.create(RemoteInvocation.class));
-        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
-        this.setReturnDataType(DataTypeFactory.create(RemoteInvocation.class));
+        this.registerSourceType(DataType.forJavaType(RemoteInvocation.class));
+        this.registerSourceType(DataType.BYTE_ARRAY);
+        this.registerSourceType(DataType.INPUT_STREAM);
+        this.setReturnDataType(DataType.forJavaType(RemoteInvocation.class));
     }
 
     @Override

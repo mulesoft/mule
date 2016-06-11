@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -124,7 +123,7 @@ public class TransformerUtils
 
         if (transformer.getReturnDataType() != null)
         {
-            DataType<?> dt = DataTypeFactory.create(value.getClass());
+            DataType<?> dt = DataType.forJavaType(value.getClass());
             if (!transformer.getReturnDataType().isCompatibleWith(dt))
             {
                 throw new TransformerException(
@@ -141,7 +140,7 @@ public class TransformerUtils
 
     public static <T> Object transformToAny(T input, MuleContext muleContext, DataType<?>... supportedTypes)
     {
-        final DataType sourceType = DataTypeFactory.create(input.getClass());
+        final DataType<T> sourceType = (DataType<T>) DataType.forJavaType(input.getClass());
         Object transformedData = null;
 
         for (DataType<?> supportedType : supportedTypes)

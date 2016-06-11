@@ -7,6 +7,8 @@
 package org.mule.runtime.module.cxf;
 
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -22,10 +24,9 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.module.cxf.i18n.CxfMessages;
 import org.mule.runtime.module.cxf.security.WebServiceSecurityException;
-import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -116,6 +117,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         return args;
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         try
@@ -245,12 +247,12 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         Object[] arr = event.getMessage().getOutboundPropertyNames().toArray();
         String head;
 
-        for (int i = 0; i < arr.length; i++)
+        for (Object element : arr)
         {
-            head = (String)arr[i];
+            head = (String)element;
             if ((head != null) && (!head.startsWith("MULE")))
             {
-                props.put((String)arr[i], event.getMessage().getOutboundProperty((String)arr[i]));
+                props.put((String)element, event.getMessage().getOutboundProperty((String)element));
             }
         }
         
@@ -473,7 +475,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             }
 
             Class payloadClass = payload != null ? payload.getClass() : Object.class;
-            msg.setPayload(payload, DataTypeFactory.create(payloadClass, getMimeType()));
+            msg.setPayload(payload, DataType.builder(payloadClass).mimeType(getMimeType()).build());
             return msg;
         }));
 

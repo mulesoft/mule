@@ -12,9 +12,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import org.junit.Test;
 
@@ -35,6 +35,6 @@ public class SetSessionVariableDataTypeTestCase extends FunctionalTestCase
         MuleMessage response = muleEvent.getMessage();
         DataType dataType = muleEvent.getSession().getPropertyDataType("testVariable");
 
-        assertThat(dataType, DataTypeMatcher.like(String.class, MimeTypes.XML, UTF_16.name()));
+        assertThat(dataType, DataTypeMatcher.like(String.class, MimeType.XML, UTF_16.name()));
     }
 }

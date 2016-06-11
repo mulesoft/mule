@@ -7,6 +7,8 @@
 
 package org.mule.runtime.config.spring.parsers.specific;
 
+import static org.mule.runtime.config.spring.parsers.specific.DataTypeFactoryBean.buildDataTypeDefinition;
+
 import org.mule.runtime.api.metadata.DataType;
 
 import org.springframework.beans.MutablePropertyValues;

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.xml.transformers.xml;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.transformer.DomDocumentToXml;
 import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
@@ -36,7 +36,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
     public Transformer getTransformer() throws Exception
     {
         Transformer trans = createObject(DomDocumentToXml.class);
-        trans.setReturnDataType(DataTypeFactory.STRING);
+        trans.setReturnDataType(DataType.STRING);
 
         return trans;
     }
@@ -45,7 +45,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
     public Transformer getRoundTripTransformer() throws Exception
     {
         XmlToDomDocument trans = createObject(XmlToDomDocument.class); // encoding is not interesting
-        trans.setReturnDataType(DataTypeFactory.create(org.w3c.dom.Document.class));
+        trans.setReturnDataType(DataType.forJavaType(org.w3c.dom.Document.class));
         return trans;
     }
 

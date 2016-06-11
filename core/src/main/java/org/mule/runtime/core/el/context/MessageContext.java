@@ -12,7 +12,6 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -113,7 +112,7 @@ public class MessageContext
      */
     public <T> T payloadAs(Class<T> type) throws TransformerException
     {
-        event.setMessage(muleContext.getTransformationService().transform(event.getMessage(), DataTypeFactory.create(type)));
+        event.setMessage(muleContext.getTransformationService().transform(event.getMessage(), DataType.forJavaType(type)));
         return (T) event.getMessage().getPayload();
     }
 

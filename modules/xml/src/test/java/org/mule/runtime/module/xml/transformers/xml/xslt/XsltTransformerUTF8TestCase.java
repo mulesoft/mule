@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.xml.transformers.xml.xslt;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.transformer.XsltTransformer;
 import org.mule.runtime.module.xml.transformers.xml.AbstractXmlTransformerTestCase;
@@ -31,7 +31,7 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setXslFile("cdcatalog.xsl");
-        transformer.setReturnDataType(DataTypeFactory.STRING);
+        transformer.setReturnDataType(DataType.STRING);
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;

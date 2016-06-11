@@ -14,15 +14,16 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.getReaso
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
+
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.util.DataTypeUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.UUID;
@@ -89,7 +90,7 @@ public class MuleEventToHttpResponse
         if (!headers.containsKey(CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
-            if (!MimeTypes.ANY.equals(dataType.getMimeType()))
+            if (!MimeType.ANY.equals(dataType.getMimeType()))
             {
                 httpResponseHeaderBuilder.addHeader(CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
             }

@@ -65,7 +65,7 @@ public class TreeNode implements Serializable, Iterable
         public static Builder forDirectory(FileAttributes attributes)
         {
             Builder builder = new Builder();
-            builder.message = new DefaultMuleMessage(NullPayload.getInstance(), DataType.OBJECT_DATA_TYPE, attributes).asNewMessage();
+            builder.message = new DefaultMuleMessage(NullPayload.getInstance(), DataType.OBJECT, attributes).asNewMessage();
 
             return builder;
         }

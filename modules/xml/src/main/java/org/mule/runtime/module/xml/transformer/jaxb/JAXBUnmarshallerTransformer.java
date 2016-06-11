@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.xml.transformer.jaxb;
 
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -43,15 +42,15 @@ public class JAXBUnmarshallerTransformer extends AbstractTransformer
 
     public JAXBUnmarshallerTransformer()
     {
-        registerSourceType(DataTypeFactory.STRING);
-        registerSourceType(DataTypeFactory.create(Writer.class));
-        registerSourceType(DataTypeFactory.create(File.class));
-        registerSourceType(DataTypeFactory.create(URL.class));
-        registerSourceType(DataTypeFactory.create(Node.class));
-        registerSourceType(DataTypeFactory.INPUT_STREAM);
-        registerSourceType(DataTypeFactory.create(Source.class));
-        registerSourceType(DataTypeFactory.create(XMLStreamReader.class));
-        registerSourceType(DataTypeFactory.create(XMLEventReader.class));
+        registerSourceType(DataType.STRING);
+        registerSourceType(DataType.forJavaType(Writer.class));
+        registerSourceType(DataType.forJavaType(File.class));
+        registerSourceType(DataType.forJavaType(URL.class));
+        registerSourceType(DataType.forJavaType(Node.class));
+        registerSourceType(DataType.INPUT_STREAM);
+        registerSourceType(DataType.forJavaType(Source.class));
+        registerSourceType(DataType.forJavaType(XMLStreamReader.class));
+        registerSourceType(DataType.forJavaType(XMLEventReader.class));
     }
 
     public JAXBUnmarshallerTransformer(JAXBContext jaxbContext, DataType<?> returnType)

@@ -10,6 +10,7 @@ import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -18,18 +19,16 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.transformer.TransformerUtils;
 import org.mule.runtime.module.xml.transformer.DelayedResult;
 import org.mule.runtime.module.xml.util.NamespaceManager;
 import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.runtime.module.xml.xpath.XPathEvaluator;
 import org.mule.runtime.module.xml.xpath.XPathReturnType;
-import org.mule.runtime.core.transformer.TransformerUtils;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Supplier;
@@ -47,8 +46,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 /**
- * A MEL function capable of evaluation XPath expressions by delegating into an instance
- * of {@link XPathEvaluator}
+ * A MEL function capable of evaluation XPath expressions by delegating into an instance of
+ * {@link XPathEvaluator}
  * <p/>
  * The function will now accept the following arguments (in order):
  * <p/>
@@ -59,23 +58,29 @@ import org.xml.sax.InputSource;
  * </tr>
  * <tr>
  * <td><b>input</b> (optional Object, defaults to the message payload)</td>
- * <td>The input data on which the expression is going to be evaluated. This is an optional argument, it defaults to the message payload if not provided.</td>
+ * <td>The input data on which the expression is going to be evaluated. This is an optional
+ * argument, it defaults to the message payload if not provided.</td>
  * </tr>
  * <tr>
  * <td>Output type (optional String, defaults to ?STRING?)</td>
- * <td>When executing an XPath expression, a developer might have very different intents. Sometimes you want to retrieve actual data,
- * sometimes you just want to verify if a node exists. Also, the JAXP API (JSR-206) defines the standard way for a Java application to handle XML, and therefore,
- * how to execute XPath expressions. This API accounts for the different intents a developer might have and allows choosing from a list of possible output types.
- * We consider this to be a really useful features in JAXP, and we also consider that many Java developers that are familiar with this API would appreciate
- * that Mule accounts for this while hiding the rest of the API's complexity. That is why there's a third parameter (optional, String),
- * which will allow specifying one of the following:
+ * <td>When executing an XPath expression, a developer might have very different intents. Sometimes
+ * you want to retrieve actual data, sometimes you just want to verify if a node exists. Also, the
+ * JAXP API (JSR-206) defines the standard way for a Java application to handle XML, and therefore,
+ * how to execute XPath expressions. This API accounts for the different intents a developer might
+ * have and allows choosing from a list of possible output types. We consider this to be a really
+ * useful features in JAXP, and we also consider that many Java developers that are familiar with
+ * this API would appreciate that Mule accounts for this while hiding the rest of the API's
+ * complexity. That is why there's a third parameter (optional, String), which will allow specifying
+ * one of the following:
  * <ul>
- * <li>BOOLEAN: returns the effective boolean value of the expression, as a java.lang.Boolean. This is the same as wrapping the expression in a call of the XPath boolean() function.</li>
- * <li>STRING: returns the result of the expression converted to a string, as a java.lang.String. This is the same as wrapping the expression in a call of the XPath string() function.</li>
- * <li>NUMBER: returns the result of the expression converted to a double as a java.lang.Double. This is the same as wrapping the expression in a call of the XPath number() function.</li>
+ * <li>BOOLEAN: returns the effective boolean value of the expression, as a java.lang.Boolean. This
+ * is the same as wrapping the expression in a call of the XPath boolean() function.</li>
+ * <li>STRING: returns the result of the expression converted to a string, as a java.lang.String.
+ * This is the same as wrapping the expression in a call of the XPath string() function.</li>
+ * <li>NUMBER: returns the result of the expression converted to a double as a java.lang.Double.
+ * This is the same as wrapping the expression in a call of the XPath number() function.</li>
  * <li>NODE: returns the result the result as a node object.</li>
- * <li>NODESET: returns a {@link NodeList}.</li>
- * </td>
+ * <li>NODESET: returns a {@link NodeList}.</li></td>
  * </ul>
  * </tr>
  * </table>
@@ -85,23 +90,42 @@ import org.xml.sax.InputSource;
  * This function supports the following input types:
  * <p/>
  * <li>
- * <ul>{@link Document}</ul>
- * <ul>{@link Node}</ul>
- * <ul>{@link InputSource}</ul>
- * <ul>{@link OutputHandler}</ul>
- * <ul>{@code byte[]}</ul>
- * <ul>{@link InputStream}</ul>
- * <ul>{@link XMLStreamReader}</ul>
- * <ul>{@link DelayedResult}</ul>
+ * <ul>
+ * {@link Document}
+ * </ul>
+ * <ul>
+ * {@link Node}
+ * </ul>
+ * <ul>
+ * {@link InputSource}
+ * </ul>
+ * <ul>
+ * {@link OutputHandler}
+ * </ul>
+ * <ul>
+ * {@code byte[]}
+ * </ul>
+ * <ul>
+ * {@link InputStream}
+ * </ul>
+ * <ul>
+ * {@link XMLStreamReader}
+ * </ul>
+ * <ul>
+ * {@link DelayedResult}
+ * </ul>
  * </li>
  * <p/>
  * <p/>
- * If the input if not of any of these types, then we'll attempt to use a registered transformer to transform the input into a DOM document or Node.
- * If no such transformer can be found, then an {@link IllegalArgumentException} will be thrown.
+ * If the input if not of any of these types, then we'll attempt to use a registered transformer to
+ * transform the input into a DOM document or Node. If no such transformer can be found, then an
+ * {@link IllegalArgumentException} will be thrown.
  * <p/>
- * This function will verify if the input is a consumable type (streams, readers, etc). Because evaluating the expression over a consumable input
- * will cause that source to be exhausted, in the cases in which the input value was the actual message payload
- * (no matter if it was given explicitly or by default), it will update the output message payload with the result obtained from consuming the input.
+ * This function will verify if the input is a consumable type (streams, readers, etc). Because
+ * evaluating the expression over a consumable input will cause that source to be exhausted, in the
+ * cases in which the input value was the actual message payload (no matter if it was given
+ * explicitly or by default), it will update the output message payload with the result obtained
+ * from consuming the input.
  *
  * @since 3.6.0
  */
@@ -111,7 +135,10 @@ public class XPath3Function implements ExpressionLanguageFunction
     private static final Logger LOGGER = LoggerFactory.getLogger(XPath3Function.class);
 
     private static final XPathReturnType DEFAULT_RETURN_TYPE = XPathReturnType.STRING;
-    private static final DataType<?>[] SUPPORTED_TYPES = new DataType<?>[] {DataTypeFactory.create(Document.class), DataTypeFactory.create(Node.class)};
+    private static final DataType<?>[] SUPPORTED_TYPES = new DataType<?>[] {
+                                                                            DataType.forJavaType(Document.class),
+                                                                            DataType.forJavaType(Node.class)
+    };
     private static final String SUPPORTED_TYPES_AS_STRING = Joiner.on(',').join(SUPPORTED_TYPES);
 
     private final MuleContext muleContext;

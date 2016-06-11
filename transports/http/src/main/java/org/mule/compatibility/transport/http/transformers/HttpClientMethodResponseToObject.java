@@ -9,10 +9,10 @@ package org.mule.compatibility.transport.http.transformers;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.ReleasingInputStream;
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +32,8 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
 
     public HttpClientMethodResponseToObject()
     {
-        registerSourceType(DataTypeFactory.create(HttpMethod.class));
-        setReturnDataType(DataTypeFactory.MULE_MESSAGE);
+        registerSourceType(DataType.forJavaType(HttpMethod.class));
+        setReturnDataType(DataType.MULE_MESSAGE);
     }
 
     @Override
@@ -65,14 +65,14 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
         Map headerProps = new HashMap();
         Header[] headers = httpMethod.getResponseHeaders();
         String name;
-        for (int i = 0; i < headers.length; i++)
+        for (Header header : headers)
         {
-            name = headers[i].getName();
+            name = header.getName();
             if (name.startsWith(HttpConstants.X_PROPERTY_PREFIX))
             {
                 name = name.substring(2);
             }
-            headerProps.put(name, headers[i].getValue());
+            headerProps.put(name, header.getValue());
         }
         // Set Mule Properties
 

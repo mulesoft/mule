@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.transformer.codec;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.Base64;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -23,10 +23,10 @@ public class Base64Decoder extends AbstractTransformer
 {
     public Base64Decoder()
     {
-        registerSourceType(DataTypeFactory.STRING);
-        registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        registerSourceType(DataTypeFactory.INPUT_STREAM);
-        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataType.STRING);
+        registerSourceType(DataType.BYTE_ARRAY);
+        registerSourceType(DataType.INPUT_STREAM);
+        setReturnDataType(DataType.BYTE_ARRAY);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class Base64Decoder extends AbstractTransformer
 
             byte[] result = Base64.decode(data);
 
-            if (DataTypeFactory.STRING.equals(getReturnDataType()))
+            if (DataType.STRING.equals(getReturnDataType()))
             {
                 return new String(result, outputEncoding);
             }

@@ -9,11 +9,11 @@ package org.mule.test.transformers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -80,8 +80,8 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
         public TestStringTransformer()
         {
             super();
-            registerSourceType(DataTypeFactory.STRING);
-            setReturnDataType(DataTypeFactory.STRING);
+            registerSourceType(DataType.STRING);
+            setReturnDataType(DataType.STRING);
         }
 
         @Override
@@ -97,8 +97,8 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
         public TestByteArrayTransformer()
         {
             super();
-            registerSourceType(DataTypeFactory.BYTE_ARRAY);
-            setReturnDataType(DataTypeFactory.STRING);
+            registerSourceType(DataType.BYTE_ARRAY);
+            setReturnDataType(DataType.STRING);
         }
 
         @Override
@@ -114,8 +114,8 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
         public TestInputStreamTransformer()
         {
             super();
-            registerSourceType(DataTypeFactory.INPUT_STREAM);
-            setReturnDataType(DataTypeFactory.STRING);
+            registerSourceType(DataType.INPUT_STREAM);
+            setReturnDataType(DataType.STRING);
         }
 
         @Override

@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.module.cxf.support;
 
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.module.xml.transformer.DelayedResult;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,7 +22,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.sax.SAXResult;
 
-import javanet.staxutils.ContentHandlerToXMLStreamWriter;
 import org.apache.cxf.databinding.stax.XMLStreamWriterCallback;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -35,6 +33,8 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.xml.sax.SAXException;
 
+import javanet.staxutils.ContentHandlerToXMLStreamWriter;
+
 public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
 {
 
@@ -43,6 +43,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
         super(Phase.PRE_LOGICAL);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void handleMessage(Message message) throws Fault
     {
@@ -73,6 +74,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                     {
                         o = new XMLStreamWriterCallback()
                         {
+                            @Override
                             public void write(XMLStreamWriter writer) throws Fault, XMLStreamException
                             {
                                 XMLStreamReader xsr = (XMLStreamReader)payload;
@@ -88,7 +90,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                     }
                     else
                     {
-                        o = muleMsg.getMuleContext().getTransformationService().transform(muleMsg, DataTypeFactory.create(XMLStreamReader.class)).getPayload();
+                        o = muleMsg.getMuleContext().getTransformationService().transform(muleMsg, DataType.forJavaType(XMLStreamReader.class)).getPayload();
                     }
     
                     objs.add(o);
@@ -151,23 +153,19 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
 
     private void sortPartsByIndex(List<MessagePartInfo> parts)
     {
-        Collections.sort(parts, new Comparator<MessagePartInfo>()
+        Collections.sort(parts, (o1, o2) ->
         {
-
-            public int compare(MessagePartInfo o1, MessagePartInfo o2)
+            if (o1.getIndex() < o2.getIndex())
             {
-                if (o1.getIndex() < o2.getIndex())
-                {
-                    return -1;
-                }
-                else if (o1.getIndex() == o2.getIndex())
-                {
-                    return 0;
-                }
-                else
-                {
-                    return 1;
-                }
+                return -1;
+            }
+            else if (o1.getIndex() == o2.getIndex())
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
             }
         });
     }
@@ -206,6 +204,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
     {
         return new XMLStreamWriterCallback()
         {
+            @Override
             public void write(XMLStreamWriter writer) throws Fault, XMLStreamException
             {
                 ContentHandlerToXMLStreamWriter handler = new ContentHandlerToXMLStreamWriter(writer) {

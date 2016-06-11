@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.core.expression.transformers;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -41,8 +40,8 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageTrans
     public AbstractExpressionTransformer()
     {
         //No type checking by default
-        registerSourceType(DataTypeFactory.OBJECT);
-        setReturnDataType(DataTypeFactory.OBJECT);
+        registerSourceType(DataType.OBJECT);
+        setReturnDataType(DataType.OBJECT);
         arguments = new ArrayList<ExpressionArgument>(4);
     }
 
@@ -71,9 +70,8 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageTrans
             throw new InitialisationException(CoreMessages.objectIsNull("arguments[]"), this);
         }
 
-        for (Iterator<ExpressionArgument> iterator = arguments.iterator(); iterator.hasNext();)
+        for (ExpressionArgument argument : arguments)
         {
-            ExpressionArgument argument = iterator.next();
             argument.setMuleContext(muleContext);
             argument.setExpressionEvaluationClassLoader(Thread.currentThread().getContextClassLoader());
             try

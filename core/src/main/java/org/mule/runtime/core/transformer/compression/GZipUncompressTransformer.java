@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.core.transformer.compression;
 
-import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.compression.GZipCompression;
 
 import java.io.IOException;
@@ -26,10 +25,10 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
     {
         super();
         this.setStrategy(new GZipCompression());
-        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
+        this.registerSourceType(DataType.BYTE_ARRAY);
+        this.registerSourceType(DataType.INPUT_STREAM);
         // No type checking for the return type by default. It could either be a byte array, an input stream or an object.
-        this.setReturnDataType(DataTypeFactory.OBJECT);
+        this.setReturnDataType(DataType.OBJECT);
     }
 
     @Override
@@ -47,11 +46,11 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
                 DataType<?> returnDataType = getReturnDataType();
 
                 // If a return type has been specified, then deserialize the uncompressed byte array.
-                if (DataTypeFactory.STRING.equals(returnDataType))
+                if (DataType.STRING.equals(returnDataType))
                 {
                     return new String(buffer, outputEncoding);
                 }
-                else if (!DataTypeFactory.OBJECT.equals(returnDataType) && !DataTypeFactory.BYTE_ARRAY.equals(returnDataType))
+                else if (!DataType.OBJECT.equals(returnDataType) && !DataType.BYTE_ARRAY.equals(returnDataType))
                 {
                     try
                     {

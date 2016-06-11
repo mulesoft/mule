@@ -6,8 +6,8 @@
  */
 package org.mule.compatibility.transport.file.transformers;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.UnsupportedEncodingException;
 
@@ -19,7 +19,7 @@ public class FileToString extends FileToByteArray
 
     public FileToString()
     {
-        setReturnDataType(DataTypeFactory.STRING);
+        setReturnDataType(DataType.STRING);
     }
 
     /**

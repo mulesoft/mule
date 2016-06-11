@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.module.xml.util;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.runtime.module.xml.stax.StaxSource;
 import org.mule.runtime.module.xml.transformer.DelayedResult;
 import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -170,7 +170,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils
             // TODO Find a more direct way to do this
             XmlToDomDocument tr = new XmlToDomDocument();
             tr.setMuleContext(muleContext);
-            tr.setReturnDataType(DataTypeFactory.create(org.dom4j.Document.class));
+            tr.setReturnDataType(DataType.forJavaType(org.dom4j.Document.class));
             return (org.dom4j.Document) tr.transform(obj);
         }
         else if (obj instanceof java.io.InputStream)
@@ -728,6 +728,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils
             this.document = document;
         }
 
+        @Override
         public String getNamespaceURI(String prefix)
         {
             if (prefix == null || prefix.equals(""))
@@ -740,11 +741,13 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils
             }
         }
 
+        @Override
         public String getPrefix(String namespaceURI)
         {
             return document.lookupPrefix(namespaceURI);
         }
 
+        @Override
         public Iterator<String> getPrefixes(String namespaceURI)
         {
             List<String> list = new ArrayList<String>();

@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -25,10 +25,10 @@ public class ObjectToByteArray extends SerializableToByteArray
 {
     public ObjectToByteArray()
     {
-        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
-        this.registerSourceType(DataTypeFactory.STRING);
-        this.registerSourceType(DataTypeFactory.create(OutputHandler.class));
-        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
+        this.registerSourceType(DataType.INPUT_STREAM);
+        this.registerSourceType(DataType.STRING);
+        this.registerSourceType(DataType.forJavaType(OutputHandler.class));
+        setReturnDataType(DataType.BYTE_ARRAY);
     }
 
     @Override

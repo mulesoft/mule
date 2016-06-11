@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -13,11 +14,8 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.xml.i18n.XmlMessages;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
-
-import com.saxonica.xqj.SaxonXQDataSource;
+import org.mule.runtime.module.xml.i18n.XmlMessages;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -38,7 +36,6 @@ import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
 
-import net.sf.saxon.Configuration;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.dom4j.io.DOMWriter;
@@ -46,6 +43,10 @@ import org.dom4j.io.DocumentSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import com.saxonica.xqj.SaxonXQDataSource;
+
+import net.sf.saxon.Configuration;
 
 /**
  * The XQuery Module gives users the ability to perform XQuery transformations on XML messages in Mule
@@ -77,14 +78,14 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
 
-        registerSourceType(DataTypeFactory.STRING);
-        registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        registerSourceType(DataTypeFactory.create(DocumentSource.class));
-        registerSourceType(DataTypeFactory.create(org.dom4j.Document.class));
-        registerSourceType(DataTypeFactory.create(Document.class));
-        registerSourceType(DataTypeFactory.create(Element.class));
-        registerSourceType(DataTypeFactory.INPUT_STREAM);
-        setReturnDataType(DataTypeFactory.create(List.class));
+        registerSourceType(DataType.STRING);
+        registerSourceType(DataType.BYTE_ARRAY);
+        registerSourceType(DataType.forJavaType(DocumentSource.class));
+        registerSourceType(DataType.forJavaType(org.dom4j.Document.class));
+        registerSourceType(DataType.forJavaType(Document.class));
+        registerSourceType(DataType.forJavaType(Element.class));
+        registerSourceType(DataType.INPUT_STREAM);
+        setReturnDataType(DataType.forJavaType(List.class));
     }
 
     public XQueryTransformer(String xqueryFile)

@@ -8,10 +8,11 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -45,12 +46,12 @@ public class WildcardFilter implements Filter, ObjectFilter
         this.setPattern(pattern);
     }
 
+    @Override
     public boolean accept(MuleMessage message)
     {
         try
         {
-            return accept(message.getMuleContext().getTransformationService().transform(message, DataTypeFactory
-                    .STRING).getPayload());
+            return accept(message.getMuleContext().getTransformationService().transform(message, DataType.STRING).getPayload());
         }
         catch (Exception e)
         {
@@ -59,6 +60,7 @@ public class WildcardFilter implements Filter, ObjectFilter
         }
     }
 
+    @Override
     public boolean accept(Object object)
     {
         if (object == null || pattern ==null)
@@ -175,6 +177,7 @@ public class WildcardFilter implements Filter, ObjectFilter
         this.caseSensitive = caseSensitive;
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
@@ -186,6 +189,7 @@ public class WildcardFilter implements Filter, ObjectFilter
                 && caseSensitive == other.caseSensitive;
     }
 
+    @Override
     public int hashCode()
     {
         return hash(new Object[]{this.getClass(), pattern, patterns, caseSensitive});

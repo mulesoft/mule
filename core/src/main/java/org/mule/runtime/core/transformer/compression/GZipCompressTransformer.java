@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.transformer.compression;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.compression.GZipCompression;
 
 import java.io.InputStream;
@@ -23,11 +23,11 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
     {
         super();
         this.setStrategy(new GZipCompression());
-        this.registerSourceType(DataTypeFactory.create(Serializable.class));
-        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
+        this.registerSourceType(DataType.forJavaType(Serializable.class));
+        this.registerSourceType(DataType.BYTE_ARRAY);
+        this.registerSourceType(DataType.INPUT_STREAM);
         // No type checking for the return type by default. It could either be a byte array or an input stream.
-        this.setReturnDataType(DataTypeFactory.OBJECT);
+        this.setReturnDataType(DataType.OBJECT);
     }
 
     @Override

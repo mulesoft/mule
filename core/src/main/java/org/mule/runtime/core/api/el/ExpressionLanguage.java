@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.el;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
-import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.metadata.TypedValue;
 
 import java.util.Map;
 

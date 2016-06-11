@@ -9,15 +9,16 @@ package org.mule.runtime.core.transformer;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -118,7 +119,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
 
     public void doTestBadReturnType(Transformer tran, Object src) throws Exception
     {
-        tran.setReturnDataType(DataTypeFactory.create(InvalidSatsuma.class));
+        tran.setReturnDataType(DataType.forJavaType(InvalidSatsuma.class));
         try
         {
             tran.transform(src);

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.cxf.builder;
 
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -24,7 +25,6 @@ import org.mule.runtime.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.runtime.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.runtime.module.cxf.support.MuleServiceConfiguration;
 import org.mule.runtime.module.cxf.support.WSDLQueryHandler;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -213,7 +213,7 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
 
     protected String getMimeType()
     {
-        return MimeTypes.ANY;
+        return MimeType.ANY;
     }
 
     protected QueryHandler getWSDLQueryHandler()

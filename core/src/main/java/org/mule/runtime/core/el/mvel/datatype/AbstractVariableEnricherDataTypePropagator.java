@@ -8,6 +8,7 @@
 package org.mule.runtime.core.el.mvel.datatype;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.AssignmentNode;
 import org.mule.mvel2.ast.DeepAssignmentNode;
@@ -17,7 +18,6 @@ import org.mule.mvel2.compiler.ExecutableLiteral;
 import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessor;
 import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessorNest;
 import org.mule.mvel2.optimizers.impl.refl.nodes.VariableAccessor;
-import org.mule.runtime.core.transformer.types.TypedValue;
 
 import java.lang.reflect.Field;
 

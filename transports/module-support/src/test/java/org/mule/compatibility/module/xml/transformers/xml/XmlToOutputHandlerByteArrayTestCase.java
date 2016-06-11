@@ -16,10 +16,10 @@ import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.transport.service.DefaultEndpointAwareTransformer;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.module.xml.transformer.XmlToOutputHandler;
@@ -49,7 +49,7 @@ public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerT
     public Transformer getTransformer() throws Exception
     {
         EndpointAwareTransformer trans = new DefaultEndpointAwareTransformer(createObject(XmlToOutputHandler.class), SystemUtils.getDefaultEncoding(muleContext));
-        trans.setReturnDataType(DataTypeFactory.create(OutputHandler.class));
+        trans.setReturnDataType(DataType.forJavaType(OutputHandler.class));
 
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setEncoding("UTF-8");

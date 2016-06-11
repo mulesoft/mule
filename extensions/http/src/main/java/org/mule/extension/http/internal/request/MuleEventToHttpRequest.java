@@ -20,11 +20,11 @@ import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.util.DataTypeUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -101,7 +101,7 @@ public class MuleEventToHttpRequest
         if (!builder.getHeaders().containsKey(MuleProperties.CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
-            if (!MimeTypes.ANY.equals(dataType.getMimeType()))
+            if (!MimeType.ANY.equals(dataType.getMimeType()))
             {
                 builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
             }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer.wire;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -13,7 +14,6 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
@@ -40,6 +40,7 @@ public class TransformerPairWireFormat implements WireFormat
     protected Transformer outboundTransformer;
     protected MuleContext muleContext;
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -47,13 +48,14 @@ public class TransformerPairWireFormat implements WireFormat
         outboundTransformer.setMuleContext(muleContext);
     }
 
+    @Override
     public Object read(InputStream in) throws MuleException
     {
         if (inboundTransformer == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("inboundTransformer").getMessage());
         }
-        if (inboundTransformer.isSourceDataTypeSupported(DataTypeFactory.INPUT_STREAM))
+        if (inboundTransformer.isSourceDataTypeSupported(DataType.INPUT_STREAM))
         {
             return inboundTransformer.transform(in);
         }
@@ -72,6 +74,7 @@ public class TransformerPairWireFormat implements WireFormat
         }
     }
 
+    @Override
     public void write(OutputStream out, Object o, String encoding) throws MuleException
     {
         if (outboundTransformer == null)

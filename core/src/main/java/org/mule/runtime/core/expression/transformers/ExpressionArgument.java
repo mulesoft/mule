@@ -7,6 +7,8 @@
 package org.mule.runtime.core.expression.transformers;
 
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -15,7 +17,6 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.expression.ExpressionConfig;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 /**
  * TODO
@@ -48,6 +49,7 @@ public class ExpressionArgument implements MuleContextAware
         this.returnClass = returnClass;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -121,7 +123,7 @@ public class ExpressionArgument implements MuleContextAware
                 try
                 {
                     Transformer t = muleContext.getRegistry().lookupTransformer(
-                        DataTypeFactory.createFromObject(result), DataTypeFactory.create(getReturnClass()));
+                            DataType.createFromObject(result), DataType.forJavaType(getReturnClass()));
                     result = t.transform(result);
                 }
                 catch (TransformerException e)

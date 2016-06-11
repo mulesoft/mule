@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
@@ -34,12 +34,12 @@ public class XmlToObject extends AbstractXStreamTransformer
 
     public XmlToObject()
     {
-        registerSourceType(DataTypeFactory.STRING);
-        registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        registerSourceType(DataTypeFactory.INPUT_STREAM);
-        registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
-        registerSourceType(DataTypeFactory.create(org.dom4j.Document.class));
-        setReturnDataType(DataTypeFactory.OBJECT);
+        registerSourceType(DataType.STRING);
+        registerSourceType(DataType.BYTE_ARRAY);
+        registerSourceType(DataType.INPUT_STREAM);
+        registerSourceType(DataType.forJavaType(org.w3c.dom.Document.class));
+        registerSourceType(DataType.forJavaType(org.dom4j.Document.class));
+        setReturnDataType(DataType.OBJECT);
     }
 
     @Override

@@ -6,19 +6,19 @@
  */
 package org.mule.runtime.module.xml.transformers.xml;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.transformer.XsltTransformer;
 import org.mule.runtime.module.xml.util.XMLTestUtils;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {
@@ -42,7 +42,7 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
                             + "<xsl:output method='xml'/>\n" + "<xsl:template match='/'>\n"
                             + "  <some-xml>\n" + "    <xsl:copy-of select='.'/>\n" + "  </some-xml>\n"
                             + "</xsl:template>\n" + "</xsl:stylesheet>");
-        transformer.setReturnDataType(DataTypeFactory.STRING);
+        transformer.setReturnDataType(DataType.STRING);
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;
