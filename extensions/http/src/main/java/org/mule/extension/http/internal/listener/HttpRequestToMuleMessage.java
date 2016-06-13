@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
@@ -31,6 +32,7 @@ import org.mule.runtime.module.http.internal.listener.ListenerPath;
 
 import com.google.common.net.MediaType;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +54,6 @@ public class HttpRequestToMuleMessage
     public static MuleMessage transform(final HttpRequestContext requestContext, final MuleContext muleContext, Boolean parseRequest, ListenerPath listenerPath) throws HttpRequestParsingException
     {
         final HttpRequest request = requestContext.getRequest();
-        DataType dataType = DataTypeFactory.create(Object.class);
         final String contentTypeValue = request.getHeaderValueIgnoreCase(CONTENT_TYPE);
         MediaType mediaType = null;
         String encoding = null;
@@ -62,8 +63,6 @@ public class HttpRequestToMuleMessage
             {
                 mediaType = MediaType.parse(contentTypeValue);
                 encoding = mediaType.charset().isPresent() ? mediaType.charset().get().name() : Charset.defaultCharset().name();
-                dataType.setMimeType(mediaType.toString());
-                dataType.setEncoding(encoding);
             }
             catch (IllegalArgumentException e)
             {
@@ -77,13 +76,13 @@ public class HttpRequestToMuleMessage
                     encoding = Charset.defaultCharset().name();
                     logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), contentTypeValue, e.getMessage()));
                     logger.warn(String.format("Using default encoding: %s", encoding));
-                    dataType.setEncoding(encoding);
                 }
             }
         }
 
         final Map<String, DataHandler> parts = new HashMap<>();
         Object payload = NullPayload.getInstance();
+        Class type = NullPayload.class;
         if (parseRequest)
         {
             final HttpEntity entity = request.getEntity();
@@ -102,6 +101,7 @@ public class HttpRequestToMuleMessage
                             try
                             {
                                 payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), encoding);
+                                type = ParameterMap.class;
                             }
                             catch (IllegalArgumentException e)
                             {
@@ -111,11 +111,13 @@ public class HttpRequestToMuleMessage
                         else if (entity instanceof InputStreamHttpEntity)
                         {
                             payload = ((InputStreamHttpEntity) entity).getInputStream();
+                            type = InputStream.class;
                         }
                     }
                     else if (entity instanceof InputStreamHttpEntity)
                     {
                         payload = ((InputStreamHttpEntity) entity).getInputStream();
+                        type = InputStream.class;
                     }
                 }
             }
@@ -126,11 +128,14 @@ public class HttpRequestToMuleMessage
             if (inputStreamEntity != null)
             {
                 payload = inputStreamEntity.getInputStream();
+                type = InputStream.class;
             }
         }
 
         HttpRequestAttributes attributes = new HttpRequestAttributesBuilder().setRequestContext(requestContext)
                 .setListenerPath(listenerPath).setParts(parts).build();
+        String resolvedMimeType = mediaType != null ? mediaType.toString() : null;
+        DataType dataType = DataTypeFactory.create(type, resolvedMimeType, encoding);
 
         return new DefaultMuleMessage(payload, dataType, attributes, muleContext);
     }
