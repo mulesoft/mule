@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.util.sftp.SftpServer.PASSWORD;
 import static org.mule.functional.util.sftp.SftpServer.USERNAME;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.APPEND;
+import static org.mule.runtime.module.extension.file.api.FileWriteMode.OVERWRITE;
 import org.mule.extension.AbstractFtpTestHarness;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.ftp.api.FtpFileAttributes;
@@ -125,6 +126,15 @@ public class SftpTestHarness extends AbstractFtpTestHarness
         final String dir = "files";
         makeDir(dir);
         write(dir, HELLO_FILE_NAME, HELLO_WORLD);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createBinaryFile() throws Exception
+    {
+        sftpClient.write(BINARY_FILE_NAME, new ByteArrayInputStream(HELLO_WORLD.getBytes()), OVERWRITE);
     }
 
     /**

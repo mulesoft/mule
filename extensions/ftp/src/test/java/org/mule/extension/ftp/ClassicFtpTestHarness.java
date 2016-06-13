@@ -109,6 +109,15 @@ public class ClassicFtpTestHarness extends AbstractFtpTestHarness
      * {@inheritDoc}
      */
     @Override
+    public void createBinaryFile() throws Exception
+    {
+        ftpClient.putFile(BINARY_FILE_NAME, HELLO_WORLD.getBytes());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void makeDir(String directoryPath) throws Exception
     {
         ftpClient.makeDir(directoryPath);

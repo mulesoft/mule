@@ -10,13 +10,16 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.transformer.types.MimeTypes.BINARY;
 import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.extension.file.api.LocalFileAttributes;
+import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.runtime.core.util.IOUtils;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,6 +56,26 @@ public class FileReadTestCase extends FileConnectorTestCase
         AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
         assertThat(payload.isLocked(), is(false));
         assertThat(IOUtils.toString(payload), is(HELLO_WORLD));
+    }
+
+    @Test
+    public void readBinary() throws Exception
+    {
+        final byte[] binaryPayload = HELLO_WORLD.getBytes();
+        final String binaryFileName = "binary.bin";
+        File binaryFile = new File(temporaryFolder.getRoot(), binaryFileName);
+        FileUtils.writeByteArrayToFile(binaryFile, binaryPayload);
+
+        MuleEvent response = getPath(binaryFile.getAbsolutePath());
+
+        assertThat(response.getMessage().getDataType().getMimeType(), is(BINARY));
+
+        AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
+        assertThat(payload.isLocked(), is(false));
+
+        byte[] readContent = new byte[new Long(binaryFile.length()).intValue()];
+        IOUtils.read(payload, readContent);
+        assertThat(new String(readContent), is(HELLO_WORLD));
     }
 
     @Test
