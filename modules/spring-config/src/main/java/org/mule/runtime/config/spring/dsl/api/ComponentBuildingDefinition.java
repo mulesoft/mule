@@ -8,6 +8,8 @@ package org.mule.runtime.config.spring.dsl.api;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
 import static org.mule.runtime.core.util.Preconditions.checkState;
@@ -45,7 +47,7 @@ public class ComponentBuildingDefinition
     private Class<?> objectFactoryType;
     private boolean prototype;
     private ComponentIdentifier componentIdentifier;
-    private TypeConverter typeConverter;
+    private Optional<TypeConverter> typeConverter = empty();
 
     private ComponentBuildingDefinition()
     {
@@ -119,7 +121,7 @@ public class ComponentBuildingDefinition
      */
     public Optional<TypeConverter> getTypeConverter()
     {
-        return ofNullable(typeConverter);
+        return typeConverter;
     }
 
     /**
@@ -212,7 +214,7 @@ public class ComponentBuildingDefinition
          */
         public Builder withTypeConverter(TypeConverter typeConverter)
         {
-            definition.typeConverter = typeConverter;
+            definition.typeConverter = of(typeConverter);
             return this;
         }
 
@@ -286,8 +288,8 @@ public class ComponentBuildingDefinition
             checkState(identifier != null, "You must specify the identifier");
             checkState(namespace != null, "You must specify the namespace");
             Optional<Class> componentType = getType();
-            checkState(definition.typeConverter == null || (definition.typeConverter != null && componentType.isPresent()), TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE);
-            checkState(definition.typeConverter == null || (definition.typeConverter != null && isSimpleType(componentType.get())), format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE, componentType.orElse(Object.class).getName()));
+            checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && componentType.isPresent()), TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE);
+            checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && isSimpleType(componentType.get())), format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE, componentType.orElse(Object.class).getName()));
             definition.componentIdentifier = new ComponentIdentifier.Builder().withName(identifier).withNamespace(namespace).build();
             return definition;
         }
