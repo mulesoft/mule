@@ -14,4 +14,13 @@
     <flow name="NotAnnotatedBridge">
         <echo-component/>
     </flow>
+
+    <flow name="WithRefExceptionStrategy" doc:name="With Referenced Exception Strategy">
+        <echo-component doc:name="echo_ex"/>
+        <exception-strategy ref="Catch_Exception_Strategy" doc:name="Reference Exception Strategy"/>
+    </flow>
+
+    <catch-exception-strategy name="Catch_Exception_Strategy" doc:name="Catch Exception Strategy">
+        <logger message="Exception! " level="ERROR" doc:name="Logger"/>
+    </catch-exception-strategy>
 </mule>

@@ -12,14 +12,12 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.AnnotatedObject;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.SystemUtils;
-
-import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
@@ -70,6 +68,24 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
                                               "</annotations>" + SystemUtils.LINE_SEPARATOR +
                                               "<echo-component doc:name=\"echo\">" +
                                               "</echo-component>" + SystemUtils.LINE_SEPARATOR +
+                                              "</flow>"));
+    }
+
+    @Test
+    public void testFlowWithExceptionStrategyAnnotations()
+    {
+        FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct("WithRefExceptionStrategy");
+        assertThat(flow, not(nullValue()));
+        assertThat(getDocName(flow), is("With Referenced Exception Strategy"));
+        assertThat(getDocDescription(flow), is(nullValue()));
+        assertThat(getSourceFile(flow), is("annotations.xml"));
+        assertThat(getSourceFileLine(flow), is(18));
+        assertThat(getSourceElement(flow), is("<flow name=\"WithRefExceptionStrategy\" doc:name=\"With Referenced Exception Strategy\">" +
+                                              SystemUtils.LINE_SEPARATOR +
+                                              "<echo-component doc:name=\"echo_ex\">" +
+                                              "</echo-component>" + SystemUtils.LINE_SEPARATOR +
+                                              "<exception-strategy ref=\"Catch_Exception_Strategy\" doc:name=\"Reference Exception Strategy\">" +
+                                              "</exception-strategy>" + SystemUtils.LINE_SEPARATOR +
                                               "</flow>"));
     }
 

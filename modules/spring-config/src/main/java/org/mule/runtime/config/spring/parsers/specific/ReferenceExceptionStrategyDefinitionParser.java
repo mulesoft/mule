@@ -9,7 +9,10 @@ package org.mule.runtime.config.spring.parsers.specific;
 import static org.mule.runtime.config.spring.parsers.specific.ExceptionStrategyDefinitionParser.createNoNameAttributePreProcessor;
 
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.generic.ParentDefinitionParser;
+
+import org.w3c.dom.Attr;
 
 public class ReferenceExceptionStrategyDefinitionParser extends ParentDefinitionParser
 {
@@ -17,6 +20,15 @@ public class ReferenceExceptionStrategyDefinitionParser extends ParentDefinition
     {
         addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "exceptionListener");
         registerPreProcessor(createNoNameAttributePreProcessor());
+    }
+
+    @Override
+    protected void processProperty(Attr attribute, BeanAssembler assembler)
+    {
+        if (!"http://www.mulesoft.org/schema/mule/documentation".equals(attribute.getNamespaceURI()))
+        {
+            assembler.extendBean(attribute);
+        }
     }
 
 }
