@@ -78,7 +78,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
         params.put("testName1", "testValueNew");
         params.put("testName2", "testValue2");
         flowRunner("headerOverride").withPayload(TEST_MESSAGE)
-                .withFlowVariable("headers", params)
+                                    .withFlowVariable("headers", params)
                                     .run();
 
         final Collection<String> values = headers.get("testName1");
