@@ -10,13 +10,16 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.FtpTestHarness.BINARY_FILE_NAME;
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+import static org.mule.runtime.core.transformer.types.MimeTypes.BINARY;
 import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 
 import java.io.InputStream;
@@ -54,6 +57,23 @@ public class FtpReadTestCase extends FtpConnectorTestCase
         AbstractFileInputStream payload = (AbstractFileInputStream) message.getPayload();
         assertThat(payload.isLocked(), is(false));
         assertThat(getPayloadAsString(message), is(HELLO_WORLD));
+    }
+
+    @Test
+    public void readBinary() throws Exception
+    {
+        testHarness.createBinaryFile();
+
+        MuleMessage response = readPath(BINARY_FILE_NAME);
+
+        assertThat(response.getDataType().getMimeType(), is(BINARY));
+
+        AbstractFileInputStream payload = (AbstractFileInputStream) response.getPayload();
+        assertThat(payload.isLocked(), is(false));
+
+        byte[] readContent = new byte[new Long(HELLO_WORLD.length()).intValue()];
+        IOUtils.read(payload, readContent);
+        assertThat(new String(readContent), is(HELLO_WORLD));
     }
 
     @Test

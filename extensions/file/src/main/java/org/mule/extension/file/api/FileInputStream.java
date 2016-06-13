@@ -11,11 +11,10 @@ import org.mule.runtime.module.extension.file.api.lock.PathLock;
 import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.runtime.module.extension.file.api.stream.LazyStreamSupplier;
 
+import java.io.BufferedInputStream;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.apache.commons.io.input.ReaderInputStream;
 
 /**
  * {@link AbstractFileInputStream} implementation used to obtain
@@ -47,7 +46,7 @@ public final class FileInputStream extends AbstractFileInputStream
         super(new LazyStreamSupplier(() -> {
             try
             {
-                return new ReaderInputStream(Files.newBufferedReader(path));
+                return new BufferedInputStream(Files.newInputStream(path));
             }
             catch (Exception e)
             {

@@ -86,7 +86,7 @@ public abstract class FileConnectorTestCase extends ExtensionFunctionalTestCase
         return getPath(path).getMessage().asNewMessage();
     }
 
-    private MuleEvent getPath(String path) throws Exception
+    protected MuleEvent getPath(String path) throws Exception
     {
         return flowRunner("read")
                 .withFlowVariable("path", path)

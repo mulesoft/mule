@@ -23,6 +23,7 @@ public interface FtpTestHarness extends TestRule
 
     String HELLO_WORLD = "Hello World!";
     String HELLO_FILE_NAME = "hello.json";
+    String BINARY_FILE_NAME = "binary.bin";
     String HELLO_PATH = "files/" + HELLO_FILE_NAME;
     String DEFAULT_FTP_HOST = "localhost";
     String FTP_SERVER_BASE_DIR = "target/ftpserver";
@@ -33,6 +34,11 @@ public interface FtpTestHarness extends TestRule
      * Creates a test hello world file
      */
     void createHelloWorldFile() throws Exception;
+
+    /**
+     * Creates a test binary file
+     */
+    void createBinaryFile() throws Exception;
 
     /**
      * @return the {@link ExpectedException} rule used for the current test

@@ -114,8 +114,21 @@ public class FTPTestClient
      */
     public boolean putFile(String path, String content) throws IOException
     {
+        return putFile(path, content.getBytes());
+    }
+
+    /**
+     * Upload a file to the ftp server
+     *
+     * @param path    the path to write in
+     * @param content the file's binary content
+     * @return true if successful, false if not
+     * @throws IOException
+     */
+    public boolean putFile(String path, byte[] content) throws IOException
+    {
         connect();
-        return client.storeFile(path, new ByteArrayInputStream(content.getBytes()));
+        return client.storeFile(path, new ByteArrayInputStream(content));
     }
 
     /**
