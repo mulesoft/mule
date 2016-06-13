@@ -28,7 +28,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
 {
     private static final long serialVersionUID = 3600944898597616006L;
 
-    private final Class<C> collectionType;
+    private final Class<T> itmesType;
 
     /**
      * Creates an untyped collection data type
@@ -37,37 +37,37 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
      */
     public CollectionDataType(Class<C> collectionType)
     {
-        super(Object.class);
+        super(collectionType);
         checkCollectionTypeForNull(collectionType);
-        this.collectionType = collectionType;
+        this.itmesType = (Class<T>) Object.class;
     }
 
     public CollectionDataType(Class<C> collectionType, String mimeType)
     {
-        super(Object.class, mimeType);
+        super(collectionType, mimeType);
         checkCollectionTypeForNull(collectionType);
-        this.collectionType = collectionType;
+        this.itmesType = (Class<T>) Object.class;
     }
 
     public CollectionDataType(Class<C> collectionType, Class<T> type, String mimeType)
     {
-        super(type, mimeType);
+        super(collectionType, mimeType);
         checkCollectionTypeForNull(collectionType);
-        this.collectionType = collectionType;
+        this.itmesType = type;
     }
 
     public CollectionDataType(Class<C> collectionType, Class<T> type, String mimeType, String encoding)
     {
-        super(type, mimeType, encoding);
+        super(collectionType, mimeType, encoding);
         checkCollectionTypeForNull(collectionType);
-        this.collectionType = collectionType;
+        this.itmesType = type;
     }
 
     public CollectionDataType(Class<C> collectionType, Class<T> type)
     {
-        super(type);
+        super(collectionType);
         checkCollectionTypeForNull(collectionType);
-        this.collectionType = collectionType;
+        this.itmesType = type;
     }
 
     protected void checkCollectionTypeForNull(Class<C> collectionType)
@@ -77,13 +77,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
 
     public Class<T> getItemType()
     {
-        return (Class<T>) type;
-    }
-
-    @Override
-    public Class<C> getType()
-    {
-        return collectionType;
+        return itmesType;
     }
 
     public static CollectionDataType createFromMethodReturn(Method m)

@@ -81,7 +81,7 @@ public class DataTypeFactory
         // Special case where proxies are used for testing
         if (isProxyClass(type))
         {
-            return new SimpleDataType<>(type.getInterfaces()[0], mimeType, encoding);
+            return new SimpleDataType<>((Class<T>) type.getInterfaces()[0], mimeType, encoding);
         }
 
         return new SimpleDataType<>(type, mimeType, encoding);
