@@ -7,16 +7,24 @@
 package org.mule.runtime.config.spring.dsl.api;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.processor.TypeDefinition;
+import org.mule.runtime.config.spring.dsl.processor.TypeDefinitionVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Defines the mapping between a component configuration and how the object that represents
@@ -27,6 +35,9 @@ import java.util.Set;
 public class ComponentBuildingDefinition
 {
 
+    public static final String TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE = "Type converter cannot be used with a type definition from a configuration attribute.";
+    public static final String TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE = "Type converter can only be used with simple types. You can't use it with %s";
+
     private TypeDefinition typeDefinition;
     private boolean scope;
     private List<AttributeDefinition> constructorAttributeDefinition = new ArrayList<>();
@@ -36,6 +47,7 @@ public class ComponentBuildingDefinition
     private Class<?> objectFactoryType;
     private boolean prototype;
     private ComponentIdentifier componentIdentifier;
+    private Optional<TypeConverter> typeConverter = empty();
 
     private ComponentBuildingDefinition()
     {
@@ -102,6 +114,14 @@ public class ComponentBuildingDefinition
     public ComponentIdentifier getComponentIdentifier()
     {
         return componentIdentifier;
+    }
+
+    /**
+     * @return a converter to be applied to the configuration value.
+     */
+    public Optional<TypeConverter> getTypeConverter()
+    {
+        return typeConverter;
     }
 
     /**
@@ -183,6 +203,22 @@ public class ComponentBuildingDefinition
         }
 
         /**
+         * This method allows to convert a simple type to another type using a converter.
+         *
+         * {@code TypeConverter} are only allowed when the produce type by the component is
+         * any of java primitive types, its wrapper or string.
+         *
+         * @param typeConverter converter from the configuration value to a custom type.
+         * @return the builder
+         * @return
+         */
+        public Builder withTypeConverter(TypeConverter typeConverter)
+        {
+            definition.typeConverter = of(typeConverter);
+            return this;
+        }
+
+        /**
          * Used to declare that object to be created is an scope.
          *
          * @return the builder
@@ -251,6 +287,9 @@ public class ComponentBuildingDefinition
             checkState(definition.typeDefinition != null, "You must specify the type");
             checkState(identifier != null, "You must specify the identifier");
             checkState(namespace != null, "You must specify the namespace");
+            Optional<Class> componentType = getType();
+            checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && componentType.isPresent()), TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE);
+            checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && isSimpleType(componentType.get())), format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE, componentType.orElse(Object.class).getName()));
             definition.componentIdentifier = new ComponentIdentifier.Builder().withName(identifier).withNamespace(namespace).build();
             return definition;
         }
@@ -261,6 +300,25 @@ public class ComponentBuildingDefinition
         {
             definition.prototype = true;
             return this;
+        }
+
+        private Optional<Class> getType()
+        {
+            final AtomicReference<Class> typeReference = new AtomicReference<>();
+            definition.typeDefinition.visit(new TypeDefinitionVisitor()
+            {
+                @Override
+                public void onType(Class<?> type)
+                {
+                    typeReference.set(type);
+                }
+
+                @Override
+                public void onConfigurationAttribute(String attributeName)
+                {
+                }
+            });
+            return ofNullable(typeReference.get());
         }
     }
 }

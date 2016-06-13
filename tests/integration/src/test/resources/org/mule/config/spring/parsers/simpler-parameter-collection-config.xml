@@ -62,4 +62,11 @@
         </parsers-test:other-simple-type-child-list>
     </parsers-test:parameter-collection-parser>
 
+    <parsers-test:parameter-collection-parser name="simpleTypeObjectWithConverter">
+        <parsers-test:simple-type-child-list-with-converter>
+            <parsers-test:simple-type-child-with-converter value="value1"/>
+            <parsers-test:simple-type-child-with-converter value="value2"/>
+        </parsers-test:simple-type-child-list-with-converter>
+    </parsers-test:parameter-collection-parser>
+
 </mule>

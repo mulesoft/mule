@@ -20,6 +20,11 @@ import org.junit.Test;
 public class DslSimpleTypeTestCase extends AbstractMuleTestCase
 {
 
+    private enum TestEnum
+    {
+        TEST
+    }
+
     @Test
     public void simpleTypes()
     {
@@ -39,6 +44,7 @@ public class DslSimpleTypeTestCase extends AbstractMuleTestCase
         assertThat(isSimpleType(Character.class), is(true));
         assertThat(isSimpleType(String.class), is(true));
         assertThat(isSimpleType(Object.class), is(false));
+        assertThat(isSimpleType(TestEnum.class), is(true));
         assertThat(isSimpleType(AtomicInteger.class), is(false));
     }
 

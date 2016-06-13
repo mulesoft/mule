@@ -63,6 +63,13 @@
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
+                    <xsd:element name="simple-type-child-list-with-converter" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="simple-type-child-with-converter" minOccurs="1" maxOccurs="unbounded" type="simpleTypeChildType"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="firstname"/>
                 <xsd:attribute name="lastname"/>
