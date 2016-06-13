@@ -9,6 +9,7 @@ package org.mule.runtime.module.http.functional.listener;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.CREATED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
@@ -29,6 +30,9 @@ import org.junit.Test;
 
 public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
 {
+
+    private static final String FAIL = "fail";
+    public static final int TIMEOUT = 100000;
 
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
@@ -68,7 +72,7 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
     public void statusLineResponseBuilder() throws Exception
     {
         final String url = getUrl(statusResponseBuilderPath);
-        HttpResponse httpResponse = statusLineResponseBuilderTest(url, 201);
+        HttpResponse httpResponse = statusLineResponseBuilderTest(url, CREATED.getStatusCode());
         assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), is("0"));
     }
 
@@ -79,7 +83,7 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
         simpleHeaderTest(url);
     }
 
-    @Ignore("Not currently supported.")
+    @Ignore("Not currently supported. MULE-9864: Support expressions in HTTP headers attribute.")
     @Test
     public void headersResponseBuilder() throws Exception
     {
@@ -98,7 +102,7 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
     public void errorStatusLineResponseBuilder() throws Exception
     {
         final String url = getUrl(errorStatusResponseBuilderPath);
-        HttpResponse httpResponse = statusLineResponseBuilderTest(url, 201);
+        HttpResponse httpResponse = statusLineResponseBuilderTest(url, CREATED.getStatusCode());
         //we'll get the Exception message in the body
         assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), is(not("0")));
     }
@@ -110,7 +114,7 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
         simpleHeaderTest(url);
     }
 
-    @Ignore("Not currently supported.")
+    @Ignore("Not currently supported. MULE-9864: Support expressions in HTTP headers attribute.")
     @Test
     public void errorHeadersResponseBuilder() throws Exception
     {
@@ -122,9 +126,9 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
     public void responseBuilderIsDifferentFromErrorResponseBuilder() throws Exception
     {
         final String url = getUrl(responseBuilderAndErrorResponseBuilderNotTheSamePath);
-        final Response successfulResponse = Request.Get(url).connectTimeout(100000).socketTimeout(10000000).execute();
+        final Response successfulResponse = Request.Get(url).connectTimeout(TIMEOUT).socketTimeout(10000000).execute();
         assertThat(successfulResponse.returnResponse().getStatusLine().getStatusCode(), is(202));
-        final Response failureResponse = Request.Get(url).addHeader("fail", "true").connectTimeout(100000).socketTimeout(100000).execute();
+        final Response failureResponse = Request.Get(url).addHeader(FAIL, "true").connectTimeout(TIMEOUT).socketTimeout(TIMEOUT).execute();
         assertThat(failureResponse.returnResponse().getStatusLine().getStatusCode(), is(505));
     }
 
@@ -135,7 +139,7 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
 
     private HttpResponse statusLineResponseBuilderTest(String url, int expectedStatus, String expectedReasonPhrase) throws IOException
     {
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
+        final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
         final HttpResponse httpResponse = response.returnResponse();
         System.out.println(ArrayUtils.toString(httpResponse.getAllHeaders()));
         assertThat(httpResponse.getAllHeaders().length, is(2));
@@ -151,13 +155,13 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
 
     private void emptyResponseBuilderTest(String url, int expectedStatusCode) throws IOException
     {
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
+        final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
         assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(expectedStatusCode));
     }
 
     private void simpleHeaderTest(String url) throws IOException
     {
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
+        final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
         final HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.USER_AGENT).getValue(), is("Mule 3.6.0"));
         assertThat(isDateValid(httpResponse.getFirstHeader(HttpHeaders.Names.DATE).getValue()), is(true));

@@ -113,7 +113,6 @@ public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHtt
                 writer.close();
                 socket.close();
                 serverSocket.close();
-                System.out.println("??????End");
                 finishedLatch.release();
             }
             catch (IOException e)

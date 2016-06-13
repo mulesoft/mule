@@ -16,7 +16,6 @@ import org.mule.runtime.extension.api.annotation.Parameter;
  *
  * @since 4.0
  */
-
 public class RamlApiConfiguration
 {
 

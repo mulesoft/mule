@@ -284,7 +284,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase
         assertThat(lowerCaseHeaderNames.size(), is(httpResponse.getAllHeaders().length));
     }
 
-    @Ignore("Not currently supported.")
+    @Ignore("Setting a headers expression and single elements is not currently supported: Builders meant to be replaced by DW.")
     @Test
     public void setXForwardedForHeader() throws Exception
     {

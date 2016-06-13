@@ -35,8 +35,6 @@ import org.junit.Test;
 public class HttpListenerResponseStreamingExceptionStrategyTestCase extends AbstractHttpTestCase
 {
 
-    private static final int DEFAULT_TIMEOUT = 1000;
-
     public static InputStream stream;
 
     @Rule

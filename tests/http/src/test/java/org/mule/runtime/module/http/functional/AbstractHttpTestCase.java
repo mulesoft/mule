@@ -12,6 +12,8 @@ import org.mule.module.socket.api.SocketsExtension;
 
 public abstract class AbstractHttpTestCase extends ExtensionFunctionalTestCase
 {
+    protected static final int DEFAULT_TIMEOUT = 1000;
+
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
     {

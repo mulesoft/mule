@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
@@ -67,7 +68,7 @@ public class HttpRequestToMuleMessage
             catch (IllegalArgumentException e)
             {
                 //need to support invalid Content-Types
-                if (Boolean.parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
+                if (parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
                 {
                     throw e;
                 }

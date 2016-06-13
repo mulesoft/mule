@@ -45,7 +45,7 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase
         assertThat(uri, equalTo("/testPath?testName1=testValue1&testName2=testValue2"));
     }
 
-    @Ignore("Not currently supported.")
+    @Ignore("Setting a queryParams expression and single elements is not currently supported: Builders meant to be replaced by DW.")
     @Test
     public void queryParamsOverride() throws Exception
     {

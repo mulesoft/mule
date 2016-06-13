@@ -70,7 +70,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
         assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
     }
 
-    @Ignore("Not currently supported.")
+    @Ignore("Setting a headers expression and single elements is not currently supported: Builders meant to be replaced by DW.")
     @Test
     public void overridesHeaders() throws Exception
     {
@@ -78,7 +78,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase
         params.put("testName1", "testValueNew");
         params.put("testName2", "testValue2");
         flowRunner("headerOverride").withPayload(TEST_MESSAGE)
-                                    .withFlowVariable("headers", params)
+                .withFlowVariable("headers", params)
                                     .run();
 
         final Collection<String> values = headers.get("testName1");
