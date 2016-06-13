@@ -21,7 +21,7 @@ import org.mule.tck.util.sftp.SftpServer;
 import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
-import org.apache.sshd.server.auth.password.PasswordAuthenticator;
+import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
 import org.junit.Rule;
 import org.junit.Test;
