@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.transformer.types;
 
+import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.util.generics.GenericsUtils;
@@ -70,10 +72,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
 
     protected void checkCollectionTypeForNull(Class<C> collectionType)
     {
-        if (collectionType == null)
-        {
-            throw new IllegalArgumentException("'collectionType' cannot be null.");
-        }
+        checkNotNull(collectionType, "'collectionType' cannot be null.");
     }
 
     public Class<T> getItemType()
