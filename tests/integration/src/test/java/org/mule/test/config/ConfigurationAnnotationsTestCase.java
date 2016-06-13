@@ -99,6 +99,24 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testFlowWithExceptionStrategyAnnotations()
+    {
+        FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct("WithRefExceptionStrategy");
+        assertThat(flow, not(nullValue()));
+        assertThat(getDocName(flow), is("With Referenced Exception Strategy"));
+        assertThat(getDocDescription(flow), is(nullValue()));
+        assertThat(getSourceFile(flow), is("annotations.xml"));
+        assertThat(getSourceFileLine(flow), is(28));
+        assertThat(getSourceElement(flow), is("<flow name=\"WithRefExceptionStrategy\" doc:name=\"With Referenced Exception Strategy\">" +
+                                              SystemUtils.LINE_SEPARATOR +
+                                              "<echo-component doc:name=\"echo\">" +
+                                              "</echo-component>" + SystemUtils.LINE_SEPARATOR +
+                                              "<exception-strategy ref=\"Catch_Exception_Strategy\" doc:name=\"Reference Exception Strategy\">" +
+                                              "</exception-strategy>" + SystemUtils.LINE_SEPARATOR +
+                                              "</flow>"));
+    }
+
+    @Test
     public void testDefaultAnnotationsInNotAnnotatedObject()
     {
         FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct("NotAnnotatedBridge");
