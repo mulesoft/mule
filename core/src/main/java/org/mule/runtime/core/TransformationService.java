@@ -8,11 +8,12 @@ package org.mule.runtime.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -287,9 +288,7 @@ public class TransformationService
         // In case if the transformed dataType is an Object type we could keep the original type if it is compatible/assignable (String->Object we want to keep String as transformed DataType)
         Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataTypeFactory.create(payloadTransformedClass, mimeType)) ? original.getType() : transformed.getType();
 
-        DataType mergedDataType = DataTypeFactory.create(type, mimeType);
-        mergedDataType.setEncoding(encoding);
-        return mergedDataType;
+        return DataTypeFactory.create(type, mimeType, encoding);
     }
 
     /**

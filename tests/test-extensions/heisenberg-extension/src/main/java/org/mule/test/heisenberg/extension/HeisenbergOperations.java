@@ -7,6 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
@@ -70,13 +71,13 @@ public class HeisenbergOperations
 
     public MuleMessage<String, Integer> getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
     {
-        org.mule.runtime.api.metadata.DataType<String> dt = DataTypeFactory.create(String.class);
         Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
-        dt.setEncoding(lastSupportedEncoding.toString());
-        dt.setMimeType("dead/dead");
+        org.mule.runtime.api.metadata.DataType<String> dt = DataTypeFactory.create(String.class,
+                "dead/dead",
+                lastSupportedEncoding.toString());
 
         MuleMessage message = new DefaultMuleMessage(config.getEnemies().get(index), dt, index);
-        return (MuleMessage<String, Integer>) message;
+        return message;
     }
 
     public String kill(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage) throws Exception

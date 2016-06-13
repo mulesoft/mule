@@ -13,20 +13,32 @@ import java.util.List;
  *
  * @since 3.0
  */
-public class ListDataType<T> extends CollectionDataType<T>
+public class ListDataType<L extends List<T>, T> extends CollectionDataType<L, T>
 {
+    private static final long serialVersionUID = 6547019606739446616L;
+
+    protected static <L> Class<L> getListClass()
+    {
+        return (Class<L>) List.class;
+    }
+
     public ListDataType()
     {
-        super(List.class);
+        super(getListClass());
     }
 
-    public ListDataType(Class type, String mimeType)
+    public ListDataType(Class<T> type, String mimeType, String encoding)
     {
-        super(List.class, type, mimeType);
+        super(getListClass(), type, mimeType, encoding);
     }
 
-    public ListDataType(Class type)
+    public ListDataType(Class<T> type, String mimeType)
     {
-        super(List.class, type);
+        super(getListClass(), type, mimeType);
+    }
+
+    public ListDataType(Class<T> type)
+    {
+        super(getListClass(), type);
     }
 }

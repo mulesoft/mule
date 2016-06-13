@@ -7,15 +7,16 @@
 
 package org.mule.runtime.core.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_JSON;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.MimeTypes;
-
-import java.nio.charset.StandardCharsets;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
@@ -26,8 +27,7 @@ public class DataTypeUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void generatesContentTypeWithCharset() throws Exception
     {
-        DataType<Object> dataType = DataTypeFactory.create(Object.class, MimeTypes.APPLICATION_JSON);
-        dataType.setEncoding(StandardCharsets.UTF_8.name());
+        DataType<Object> dataType = DataTypeFactory.create(Object.class, APPLICATION_JSON, UTF_8.name());
 
         String contentType = DataTypeUtils.getContentType(dataType);
         assertThat(contentType, equalTo("application/json; charset=UTF-8"));

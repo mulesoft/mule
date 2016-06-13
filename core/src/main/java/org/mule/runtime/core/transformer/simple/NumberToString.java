@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.metadata.SimpleDataType;
 
 import java.text.NumberFormat;
 
@@ -29,7 +29,7 @@ public class NumberToString extends AbstractTransformer implements DiscoverableT
 
     public NumberToString()
     {
-        registerSourceType(new SimpleDataType<Object>(Number.class));
+        registerSourceType(new SimpleDataType<>(Number.class));
         setReturnDataType(DataTypeFactory.STRING);
     }
 
@@ -57,11 +57,13 @@ public class NumberToString extends AbstractTransformer implements DiscoverableT
         }
     }
 
+    @Override
     public int getPriorityWeighting()
     {
         return priorityWeighting;
     }
 
+    @Override
     public void setPriorityWeighting(int priorityWeighting)
     {
         this.priorityWeighting = priorityWeighting;

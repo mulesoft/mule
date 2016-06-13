@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.transformer.types;
 
-import org.mule.runtime.api.metadata.ImmutableDataType;
-import org.mule.runtime.api.metadata.SimpleDataType;
+import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.util.generics.GenericsUtils;
 import org.mule.runtime.core.util.generics.MethodParameter;
 
@@ -16,53 +17,67 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 
 /**
- * A data type that represents a generified collection.  When checked for compatability both the colection type and the
- * generic item type will be compared.
+ * A data type that represents a generified collection.
+ * <p>
+ * When checked for compatibility both the collection type and the generic item type will be
+ * compared.
  *
  * @since 3.0
  */
-public class CollectionDataType<T> extends SimpleDataType<T>
+public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataType<C>
 {
-    private Class<? extends Collection> collectionType;
+    private static final long serialVersionUID = 3600944898597616006L;
+
+    private final Class<T> itmesType;
 
     /**
      * Creates an untyped collection data type
      *
      * @param collectionType the collection class type
      */
-    public CollectionDataType(Class<? extends Collection> collectionType)
+    public CollectionDataType(Class<C> collectionType)
     {
-        super(Object.class);
-        this.collectionType = collectionType;
+        super(collectionType);
+        checkCollectionTypeForNull(collectionType);
+        this.itmesType = (Class<T>) Object.class;
     }
 
-    public CollectionDataType(Class<? extends Collection> collectionType, String mimeType)
+    public CollectionDataType(Class<C> collectionType, String mimeType)
     {
-        super(Object.class, mimeType);
-        this.collectionType = collectionType;
+        super(collectionType, mimeType);
+        checkCollectionTypeForNull(collectionType);
+        this.itmesType = (Class<T>) Object.class;
     }
 
-    public CollectionDataType(Class<? extends Collection> collectionType, Class type, String mimeType)
+    public CollectionDataType(Class<C> collectionType, Class<T> type, String mimeType)
     {
-        super(type, mimeType);
-        this.collectionType = collectionType;
+        super(collectionType, mimeType);
+        checkCollectionTypeForNull(collectionType);
+        this.itmesType = type;
     }
 
-    public CollectionDataType(Class<? extends Collection> collectionType, Class type)
+    public CollectionDataType(Class<C> collectionType, Class<T> type, String mimeType, String encoding)
     {
-        super(type);
-        this.collectionType = collectionType;
+        super(collectionType, mimeType, encoding);
+        checkCollectionTypeForNull(collectionType);
+        this.itmesType = type;
     }
 
-    public Class<?> getItemType()
+    public CollectionDataType(Class<C> collectionType, Class<T> type)
     {
-        return type;
+        super(collectionType);
+        checkCollectionTypeForNull(collectionType);
+        this.itmesType = type;
     }
 
-    @Override
-    public Class getType()
+    protected void checkCollectionTypeForNull(Class<C> collectionType)
     {
-        return collectionType;
+        checkNotNull(collectionType, "'collectionType' cannot be null.");
+    }
+
+    public Class<T> getItemType()
+    {
+        return itmesType;
     }
 
     public static CollectionDataType createFromMethodReturn(Method m)
@@ -116,10 +131,6 @@ public class CollectionDataType<T> extends SimpleDataType<T>
     @Override
     public boolean isCompatibleWith(DataType dataType)
     {
-        if (dataType instanceof ImmutableDataType)
-        {
-            dataType = ((ImmutableDataType)dataType).getWrappedDataType();
-        }
         if (!(dataType instanceof CollectionDataType))
         {
             return false;

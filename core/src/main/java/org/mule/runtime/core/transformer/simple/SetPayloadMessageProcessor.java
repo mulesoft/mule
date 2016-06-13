@@ -7,6 +7,9 @@
 
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -16,10 +19,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.transformer.types.TypedValue;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -84,8 +84,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     {
         Class type = (value == null || value instanceof NullPayload) ? Object.class : value.getClass();
 
-        SimpleDataType simpleDataType = new SimpleDataType(type, mimeType);
-        simpleDataType.setEncoding(encoding);
+        SimpleDataType simpleDataType = new SimpleDataType(type, mimeType, encoding);
 
         return simpleDataType;
     }

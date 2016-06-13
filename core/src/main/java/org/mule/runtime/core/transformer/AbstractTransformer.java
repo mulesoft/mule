@@ -30,8 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
@@ -77,12 +75,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      * Allows a transformer to return a null result
      */
     private boolean allowNullReturn = false;
-
-    /*
-     *  Mime type and encoding for transformer output
-     */
-    protected String mimeType;
-    protected String encoding;
 
     /**
      * default constructor required for discovery
@@ -170,9 +162,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     @Override
     public void setReturnDataType(DataType<?> type)
     {
-        this.returnType = type.cloneDataType();
-        this.encoding = type.getEncoding();
-        this.mimeType = type.getMimeType();
+        this.returnType = type;
     }
 
     @Override
@@ -181,42 +171,16 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         return returnType;
     }
 
-    public void setMimeType(String mimeType) throws MimeTypeParseException
-    {
-        if (mimeType == null)
-        {
-            this.mimeType = null;
-        }
-        else
-        {
-            MimeType mt = new MimeType(mimeType);
-            this.mimeType = mt.getPrimaryType() + "/" + mt.getSubType();
-        }
-        if (returnType != null)
-        {
-            returnType.setMimeType(mimeType);
-        }
-    }
-
     @Override
     public String getMimeType()
     {
-        return mimeType;
+        return returnType.getMimeType();
     }
 
     @Override
     public String getEncoding()
     {
-        return encoding;
-    }
-
-    public void setEncoding(String encoding)
-    {
-        this.encoding = encoding;
-        if (returnType != null)
-        {
-            returnType.setEncoding(encoding);
-        }
+        return returnType.getEncoding();
     }
 
     public boolean isAllowNullReturn()
@@ -275,7 +239,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     @Override
     public final Object transform(Object src) throws TransformerException
     {
-        String enc = encoding != null ? encoding : getEncoding(src);
+        String enc = returnType.getEncoding() != null ? returnType.getEncoding() : getEncoding(src);
         return transform(src, enc);
     }
 

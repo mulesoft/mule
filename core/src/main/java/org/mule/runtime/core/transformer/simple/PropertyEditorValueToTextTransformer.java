@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.metadata.SimpleDataType;
 
 import java.beans.PropertyEditor;
 
@@ -30,7 +30,7 @@ public class PropertyEditorValueToTextTransformer extends AbstractTransformer im
 
     public PropertyEditorValueToTextTransformer(PropertyEditor propertyEditor, Class<?> clazz)
     {
-        registerSourceType(new SimpleDataType<Object>(clazz));
+        registerSourceType(new SimpleDataType<>(clazz));
         setReturnDataType(DataTypeFactory.STRING);
         this.propertyEditor = propertyEditor;
     }
@@ -45,11 +45,13 @@ public class PropertyEditorValueToTextTransformer extends AbstractTransformer im
         }
     }
 
+    @Override
     public int getPriorityWeighting()
     {
         return priorityWeighting;
     }
 
+    @Override
     public void setPriorityWeighting(int priorityWeighting)
     {
         this.priorityWeighting = priorityWeighting;

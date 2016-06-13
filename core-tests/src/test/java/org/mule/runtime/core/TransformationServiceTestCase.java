@@ -13,18 +13,18 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
 import org.mule.runtime.core.transformer.builder.MockTransformerBuilder;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.metadata.SimpleDataType;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -66,9 +66,9 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase
         this.transformationService = new TransformationService(muleContext);
     }
 
-    private static final DataType<Object> dataTypeB = new SimpleDataType<Object>(B.class);
-    private static final DataType<Object> dataTypeC = new SimpleDataType<Object>(C.class);
-    private static final DataType<Object> dataTypeD = new SimpleDataType<Object>(D.class);
+    private static final DataType<B> dataTypeB = new SimpleDataType<>(B.class);
+    private static final DataType<C> dataTypeC = new SimpleDataType<>(C.class);
+    private static final DataType<D> dataTypeD = new SimpleDataType<>(D.class);
 
     @Test
     public void failsOnConverterWhenSourceAndReturnTypeDoesNotMatchAndThereIsNoImplicitConversion() throws MuleException

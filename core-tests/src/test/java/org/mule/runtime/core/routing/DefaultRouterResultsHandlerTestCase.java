@@ -95,12 +95,12 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
         MuleEvent event1 = new DefaultMuleEvent(message1, flow);
-        event1.setFlowVariable("key1", "value1", simpleDateType1.cloneDataType());
+        event1.setFlowVariable("key1", "value1", simpleDateType1);
         MuleSession session = event1.getSession();
         MuleEvent event2 = new DefaultMuleEvent(message2, flow, session);
-        event2.setFlowVariable("key2", "value2", simpleDateType1.cloneDataType());
+        event2.setFlowVariable("key2", "value2", simpleDateType1);
         MuleEvent event3 = new DefaultMuleEvent(message3, flow, session);
-        event3.setFlowVariable("key3", "value3", simpleDateType1.cloneDataType());
+        event3.setFlowVariable("key3", "value3", simpleDateType1);
         event1.getSession().setProperty("key", "value");
         event2.getSession().setProperty("key1", "value1");
         event2.getSession().setProperty("key2", "value2");

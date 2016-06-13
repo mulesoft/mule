@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.transformer.types.MimeTypes.BINARY;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.transformer.types.CollectionDataType;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.transformer.types.MimeTypes;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,10 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @SmallTest
 public class DataTypesTestCase extends AbstractMuleTestCase
@@ -52,7 +52,7 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
-        dt.setMimeType(MimeTypes.BINARY);
+        dt = DataTypeFactory.create(Exception.class, BINARY);
 
         assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
@@ -85,7 +85,7 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
-        dt.setMimeType(MimeTypes.BINARY);
+        dt = DataTypeFactory.create(List.class, BINARY);
 
         assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
@@ -119,7 +119,7 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 
-        dt.setMimeType(MimeTypes.BINARY);
+        dt = DataTypeFactory.create(List.class, Exception.class, BINARY);
 
         assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));

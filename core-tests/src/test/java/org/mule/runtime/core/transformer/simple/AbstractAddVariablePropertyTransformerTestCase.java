@@ -12,20 +12,22 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_XML;
+
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.matcher.DataTypeMatcher;
-import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.matcher.DataTypeMatcher;
+import org.mule.tck.size.SmallTest;
 
 import javax.activation.MimeTypeParseException;
 
@@ -61,8 +63,7 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
     @Before
     public void setUpTest() throws MimeTypeParseException
     {
-        addVariableTransformer.setEncoding(null);
-        addVariableTransformer.setMimeType(null);
+        addVariableTransformer.setReturnDataType(new SimpleDataType(Object.class));
 
         when(mockEvent.getMessage()).thenReturn(mockMessage);
         when(mockEvent.getSession()).thenReturn(mockSession);
@@ -116,7 +117,7 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
         addVariableTransformer.setValue(PLAIN_STRING_VALUE);
         addVariableTransformer.initialise();
-        addVariableTransformer.setEncoding(CUSTOM_ENCODING);
+        addVariableTransformer.setReturnDataType(new SimpleDataType<>(Object.class, null, CUSTOM_ENCODING));
         addVariableTransformer.transform(mockEvent, ENCODING);
 
         verifyAdded(mockEvent, PLAIN_STRING_KEY, PLAIN_STRING_VALUE, dataTypeCaptor);
@@ -129,7 +130,7 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
         addVariableTransformer.setValue(PLAIN_STRING_VALUE);
         addVariableTransformer.initialise();
-        addVariableTransformer.setMimeType(APPLICATION_XML);
+        addVariableTransformer.setReturnDataType(new SimpleDataType<>(Object.class, APPLICATION_XML));
         addVariableTransformer.transform(mockEvent, ENCODING);
 
         verifyAdded(mockEvent, PLAIN_STRING_KEY, PLAIN_STRING_VALUE, dataTypeCaptor);

@@ -13,20 +13,32 @@ import java.util.Set;
  *
  * @since 3.0
  */
-public class SetDataType<T> extends CollectionDataType<T>
+public class SetDataType<S extends Set<T>, T> extends CollectionDataType<S, T>
 {
+    private static final long serialVersionUID = 4604600409023719034L;
+
+    protected static <S> Class<S> getSetClass()
+    {
+        return (Class<S>) Set.class;
+    }
+    
     public SetDataType()
     {
-        super(Set.class);
+        super(getSetClass());
     }
 
-    public SetDataType(Class type, String mimeType)
+    public SetDataType(Class<T> type, String mimeType, String encoding)
     {
-        super(Set.class, type, mimeType);
+        super(getSetClass(), type, mimeType, encoding);
     }
 
-    public SetDataType(Class type)
+    public SetDataType(Class<T> type, String mimeType)
     {
-        super(Set.class, type);
+        super(getSetClass(), type, mimeType);
+    }
+
+    public SetDataType(Class<T> type)
+    {
+        super(getSetClass(), type);
     }
 }

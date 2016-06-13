@@ -27,6 +27,7 @@ import static org.mule.runtime.core.transformer.types.MimeTypes.ANY;
 import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_XML;
 import static org.mule.tck.MuleTestUtils.getTestEvent;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
@@ -110,8 +111,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void setsDataTypeFromPreviousMessageOnCreation() throws Exception
     {
         DefaultMuleMessage previousMuleMessage = new DefaultMuleMessage(1, muleContext);
-        DataType dataType = DataTypeFactory.create(Long.class, APPLICATION_XML);
-        dataType.setEncoding("UTF-16");
+        DataType dataType = DataTypeFactory.create(Long.class, APPLICATION_XML, "UTF-16");
         previousMuleMessage.setDataType(dataType);
 
         assertDataType(new DefaultMuleMessage(previousMuleMessage), previousMuleMessage.getDataType());
@@ -143,8 +143,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
 
-        DataType<Integer> newDataType = DataTypeFactory.create(Integer.class, APPLICATION_XML);
-        newDataType.setEncoding(CUSTOM_ENCODING);
+        DataType<Integer> newDataType = DataTypeFactory.create(Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
 
         muleMessage.setPayload(null, newDataType);
 
@@ -157,8 +156,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
 
-        DataType<Integer> newDataType = DataTypeFactory.create(Integer.class, APPLICATION_XML);
-        newDataType.setEncoding(CUSTOM_ENCODING);
+        DataType<Integer> newDataType = DataTypeFactory.create(Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
 
         muleMessage.setPayload(TEST, newDataType);
 
@@ -185,8 +183,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         Transformer transformer = mock(Transformer.class);
         when(transformer.isSourceDataTypeSupported(org.mockito.Matchers.<DataType<?>>any())).thenReturn(true);
-        DataType outputDataType = DataTypeFactory.create(Integer.class, ANY);
-        outputDataType.setEncoding(null);
+        DataType outputDataType = DataTypeFactory.create(Integer.class, ANY, null);
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
         when(transformer.transform(anyObject())).thenReturn(1);
 
@@ -206,8 +203,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         Transformer transformer = mock(Transformer.class);
         when(transformer.isSourceDataTypeSupported(org.mockito.Matchers.<DataType<?>>any())).thenReturn(true);
-        DataType outputDataType = DataTypeFactory.create(Integer.class, null);
-        outputDataType.setEncoding(CUSTOM_ENCODING);
+        DataType outputDataType = DataTypeFactory.create(Integer.class, null, CUSTOM_ENCODING);
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
         when(transformer.transform(anyObject())).thenReturn(Integer.valueOf(1));
 
@@ -270,8 +266,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         Transformer transformer = mock(Transformer.class);
         when(transformer.isSourceDataTypeSupported(org.mockito.Matchers.<DataType<?>>any())).thenReturn(true);
-        DataType outputDataType = DataTypeFactory.create(Integer.class, APPLICATION_XML);
-        outputDataType.setEncoding(null);
+        DataType outputDataType = DataTypeFactory.create(Integer.class, APPLICATION_XML, null);
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
 
         MuleEvent muleEvent = mock(MuleEvent.class);
@@ -342,8 +337,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void setsCustomOutboundPropertyDataType() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
-        dataType.setEncoding(CUSTOM_ENCODING);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML, CUSTOM_ENCODING);
 
         muleMessage.setOutboundProperty(TEST_PROPERTY, TEST, dataType);
 
@@ -372,8 +366,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void setsCustomInboundPropertyDataType() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
-        dataType.setEncoding(CUSTOM_ENCODING);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML, CUSTOM_ENCODING);
 
         muleMessage.setInboundProperty(TEST_PROPERTY, TEST, dataType);
 
@@ -402,8 +395,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void setsCustomFlowVariableDataType() throws Exception
     {
         MuleEvent muleEvent = getTestEvent(TEST, muleContext);
-        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
-        dataType.setEncoding(CUSTOM_ENCODING);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML, CUSTOM_ENCODING);
 
         muleEvent.setFlowVariable(TEST_PROPERTY, TEST, dataType);
 
@@ -423,8 +415,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void setsCustomSessionVariableDataType() throws Exception
     {
         MuleEvent muleEvent = getTestEvent(TEST, muleContext);
-        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
-        dataType.setEncoding(CUSTOM_ENCODING);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML, CUSTOM_ENCODING);
 
         muleEvent.getSession().setProperty(TEST_PROPERTY, TEST, dataType);
 
@@ -435,8 +426,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void setsDataTypeWhenCreatesInboundMessage() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
-        dataType.setEncoding(CUSTOM_ENCODING);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML, CUSTOM_ENCODING);
 
         muleMessage.setOutboundProperty(TEST_PROPERTY, TEST, dataType);
 
@@ -449,8 +439,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void setsCustomPropertyDataType() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
-        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML);
-        dataType.setEncoding(CUSTOM_ENCODING);
+        DataType dataType = DataTypeFactory.create(String.class, APPLICATION_XML, CUSTOM_ENCODING);
 
         muleMessage.setOutboundProperty(TEST_PROPERTY, TEST, dataType);
 

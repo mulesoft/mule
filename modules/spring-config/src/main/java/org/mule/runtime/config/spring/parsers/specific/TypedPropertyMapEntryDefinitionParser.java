@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.transformer.types.TypedValue;
 
 import org.springframework.beans.MutablePropertyValues;
@@ -111,7 +111,7 @@ public class TypedPropertyMapEntryDefinitionParser extends ChildMapEntryDefiniti
             dataTypeBuilder.addConstructorArgValue(Object.class);
             String value = (String) (sourceProperties.contains(MIME_TYPE) ? sourceProperties.getPropertyValue(MIME_TYPE).getValue() : null);
             dataTypeBuilder.addConstructorArgValue(value);
-            dataTypeBuilder.addPropertyValue(ENCODING, sourceProperties.contains(ENCODING) ? (String) sourceProperties.getPropertyValue(ENCODING).getValue() : null);
+            dataTypeBuilder.addConstructorArgValue(sourceProperties.contains(ENCODING) ? (String) sourceProperties.getPropertyValue(ENCODING).getValue() : null);
 
             return dataTypeBuilder.getBeanDefinition();
         }

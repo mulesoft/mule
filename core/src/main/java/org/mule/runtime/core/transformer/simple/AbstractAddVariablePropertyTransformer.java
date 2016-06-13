@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.TypedValue;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -63,10 +63,9 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
             }
             else
             {
-                if (!StringUtils.isEmpty(mimeType) || !StringUtils.isEmpty(encoding))
+                if (!StringUtils.isEmpty(returnType.getMimeType()) || !StringUtils.isEmpty(returnType.getEncoding()))
                 {
-                    DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), getMimeType());
-                    dataType.setEncoding(getEncoding());
+                    DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), getMimeType(), getEncoding());
                     addProperty(event, key, typedValue.getValue(), dataType);
                 }
                 else

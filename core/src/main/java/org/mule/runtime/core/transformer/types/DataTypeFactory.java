@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.core.transformer.types;
 
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.ImmutableDataType;
 import org.mule.runtime.api.metadata.SimpleDataType;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.generics.GenericsUtils;
 import org.mule.runtime.core.util.generics.MethodParameter;
 
@@ -31,6 +30,7 @@ import javax.activation.DataSource;
  * @since 3.0
  */
 //TODO: MULE-8946 this should move to Mule API
+// TODO MULE-9895 refactor into a builder
 public class DataTypeFactory
 {
     public static final DataType<String> TEXT_STRING = new SimpleDataType<>(String.class, MimeTypes.TEXT);
@@ -52,19 +52,17 @@ public class DataTypeFactory
         return create(type, MimeTypes.ANY);
     }
 
-    public static <T> DataType<T> createImmutable(Class<T> type)
-    {
-        return new ImmutableDataType<>(create(type, MimeTypes.ANY));
-    }
-
     public static <T> DataType<T> createWithEncoding(Class<T> type, String encoding)
     {
-        DataType<T> dataType = create(type);
-        dataType.setEncoding(encoding);
-        return dataType;
+        return create(type, null, encoding);
     }
 
     public static <T> DataType<T> create(Class<T> type, String mimeType)
+    {
+        return create(type, mimeType, null);
+    }
+
+    public static <T> DataType<T> create(Class<T> type, String mimeType, String encoding)
     {
         if (Collection.class.isAssignableFrom(type))
         {
@@ -72,29 +70,29 @@ public class DataTypeFactory
             Class<?> itemType = GenericsUtils.getCollectionType(collectionType);
             if (itemType == null)
             {
-                return new CollectionDataType(collectionType, mimeType);
+                return new CollectionDataType(collectionType, Object.class, mimeType, encoding);
             }
             else
             {
-                return new CollectionDataType(collectionType, itemType, mimeType);
+                return new CollectionDataType(collectionType, itemType, mimeType, encoding);
             }
         }
 
         // Special case where proxies are used for testing
         if (isProxyClass(type))
         {
-            return new SimpleDataType<>(type.getInterfaces()[0], mimeType);
+            return new SimpleDataType<>((Class<T>) type.getInterfaces()[0], mimeType, encoding);
         }
 
-        return new SimpleDataType<>(type, mimeType);
+        return new SimpleDataType<>(type, mimeType, encoding);
     }
 
-    public static <T> DataType create(Class<? extends Collection> collClass, Class<T> itemType)
+    public static <C extends Collection<T>, T> DataType<C> create(Class<C> collClass, Class<T> itemType)
     {
         return create(collClass, itemType, null);
     }
 
-    public static <T> DataType create(Class<? extends Collection> collClass, Class<T> itemType, String mimeType)
+    public static <C extends Collection<T>, T> DataType<C> create(Class<C> collClass, Class<T> itemType, String mimeType)
     {
         return new CollectionDataType(collClass, itemType, mimeType);
     }
@@ -308,4 +306,54 @@ public class DataTypeFactory
         proxyClassCache.put(typeName, new ProxyIndicator(type, isProxy));
         return isProxy;
     }
+
+    // TODO MULE-9895: Provide a builder api for creating DataType s
+    public static <T> DataType<T> createFromDataType(DataType<T> typeFrom, String mimeType, String encoding)
+    {
+        if (typeFrom instanceof CollectionDataType)
+        {
+            Class<? extends Collection<?>> collectionType = (Class<? extends Collection<?>>) typeFrom.getType();
+            Class<?> itemType = ((CollectionDataType) typeFrom).getItemType();
+            if (itemType == null)
+            {
+                return new CollectionDataType(collectionType, Object.class, mimeType, encoding);
+            }
+            else
+            {
+                return new CollectionDataType(collectionType, itemType, mimeType, encoding);
+            }
+        }
+        else
+        {
+            return new SimpleDataType<>(typeFrom.getType(), mimeType, encoding);
+        }
+    }
+
+    // TODO MULE-9895: Provide a builder api for creating DataType s
+    public static <T> DataType<T> createFromDataTypeWithMimeType(DataType<T> typeFrom, String mimeType)
+    {
+        if (typeFrom instanceof CollectionDataType)
+        {
+            Class<? extends Collection<?>> collectionType = (Class<? extends Collection<?>>) typeFrom.getType();
+            Class<?> itemType = ((CollectionDataType) typeFrom).getItemType();
+            if (itemType == null)
+            {
+                return new CollectionDataType(collectionType, Object.class, mimeType);
+            }
+            else
+            {
+                return new CollectionDataType(collectionType, itemType, mimeType);
+            }
+        }
+        else
+        {
+            return new SimpleDataType<>(typeFrom.getType(), mimeType);
+        }
+    }
+
+    public static <T> DataType<T> createFromDataType(DataType<T> typeFrom, String encoding)
+    {
+        return createFromDataType(typeFrom, typeFrom.getMimeType(), encoding);
+    }
+
 }

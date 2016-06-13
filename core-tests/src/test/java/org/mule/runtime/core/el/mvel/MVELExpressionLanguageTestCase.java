@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el.mvel;
 
+import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -15,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.CompileException;
@@ -37,7 +39,6 @@ import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.transformer.types.TypedValue;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -50,7 +51,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -501,15 +501,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Test
     public void returnsDataType() throws Exception
     {
-        DataType<?> dataType = DataTypeFactory.create(String.class, MimeTypes.JSON);
-        dataType.setEncoding(StandardCharsets.UTF_16.name());
+        DataType<?> dataType = DataTypeFactory.create(String.class, JSON, UTF_16.name());
 
         MuleEvent event = createMockEvent(TEST_MESSAGE, dataType);
 
         TypedValue typedValue = evaluateTyped("payload", event);
 
         assertThat((String) typedValue.getValue(), equalTo(TEST_MESSAGE));
-        assertThat(typedValue.getDataType(), like(String.class, MimeTypes.JSON, StandardCharsets.UTF_16.name()));
+        assertThat(typedValue.getDataType(), like(String.class, JSON, UTF_16.name()));
     }
 
     protected Object evaluate(String expression)
