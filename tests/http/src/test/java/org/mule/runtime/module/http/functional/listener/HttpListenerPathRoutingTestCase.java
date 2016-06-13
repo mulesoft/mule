@@ -8,8 +8,7 @@ package org.mule.runtime.module.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -25,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class HttpListenerPathRoutingTestCase extends FunctionalTestCase
+public class HttpListenerPathRoutingTestCase extends AbstractHttpTestCase
 {
 
     @Rule

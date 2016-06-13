@@ -2,11 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <configuration>
         <expression-language>
@@ -15,10 +15,12 @@
         </expression-language>
     </configuration>
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
 
     <flow name="exceptionBuildingResponse">
-        <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
+        <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
         <set-payload value="#[inputStreamPayload]"/>
 
         <catch-exception-strategy>
@@ -28,7 +30,7 @@
     </flow>
 
     <flow name="exceptionSendingResponse">
-        <http:listener config-ref="listenerConfig" path="/exceptionSendingResponse" responseStreamingMode="ALWAYS"/>
+        <httpn:listener config-ref="listenerConfig" path="/exceptionSendingResponse" responseStreamingMode="ALWAYS"/>
         <set-payload value="#[inputStreamPayload]"/>
 
         <catch-exception-strategy>
@@ -38,7 +40,7 @@
     </flow>
 
     <flow name="exceptionBuildingResponseFailAgain">
-        <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponseFailAgain" responseStreamingMode="NEVER"/>
+        <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponseFailAgain" responseStreamingMode="NEVER"/>
         <set-payload value="#[inputStreamPayload]"/>
 
         <catch-exception-strategy>
@@ -48,7 +50,7 @@
     </flow>
 
     <flow name="exceptionSendingResponseFailAgain">
-        <http:listener config-ref="listenerConfig" path="/exceptionSendingResponseFailAgain" responseStreamingMode="ALWAYS"/>
+        <httpn:listener config-ref="listenerConfig" path="/exceptionSendingResponseFailAgain" responseStreamingMode="ALWAYS"/>
         <set-payload value="#[inputStreamPayload]"/>
 
         <catch-exception-strategy>

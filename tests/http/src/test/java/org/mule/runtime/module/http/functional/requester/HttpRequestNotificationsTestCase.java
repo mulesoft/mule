@@ -12,9 +12,11 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.context.notification.ServerNotification.getActionName;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.functional.TestConnectorMessageNotificationListener.register;
+import static org.mule.runtime.module.http.functional.matcher.HttpMessageAttributesMatchers.hasReasonPhrase;
+import static org.mule.runtime.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
@@ -48,7 +50,7 @@ public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCas
         TestConnectorMessageNotificationListener listener = new TestConnectorMessageNotificationListener(latch, "http://localhost:" + httpPort.getValue() + "/basePath/requestPath");
         muleContext.getNotificationManager().addListener(listener);
 
-        flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+        MuleMessage response = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run().getMessage();
 
         latch.await(1000, TimeUnit.MILLISECONDS);
 
@@ -56,8 +58,9 @@ public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCas
 
         // End event should have appended http.status and http.reason as inbound properties
         MuleMessage message = listener.getNotifications(getActionName(MESSAGE_REQUEST_END)).get(0).getSource();
-        assertThat((Integer) message.getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(200));
-        assertThat((String) message.getInboundProperty(HTTP_REASON_PROPERTY), equalTo("OK"));
+        // For now, check the response, since we no longer have control over the MuleEvent generated, only the MuleMessage
+        assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(OK.getStatusCode()));
+        assertThat((HttpResponseAttributes) response.getAttributes(), hasReasonPhrase(OK.getReasonPhrase()));
 
         MuleMessage requestMessage = listener.getNotifications(getActionName(MESSAGE_REQUEST_BEGIN)).get(0).getSource();
         assertThat(requestMessage.getUniqueId(), equalTo(message.getUniqueId()));

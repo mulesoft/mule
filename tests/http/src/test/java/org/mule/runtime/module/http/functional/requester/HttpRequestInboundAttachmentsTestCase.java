@@ -11,12 +11,12 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.api.MuleEvent;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.servlet.http.HttpServletRequest;
@@ -43,16 +43,17 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
 
         assertThat(event.getMessage().getPayload(), is(instanceOf(NullPayload.class)));
 
-        assertThat(event.getMessage().getInboundAttachmentNames().size(), is(2));
-        assertAttachment(event.getMessage(), "partName1", "Test part 1", "text/plain");
-        assertAttachment(event.getMessage(), "partName2", "Test part 2", "text/html");
+        Map<String, DataHandler> parts = ((HttpResponseAttributes) event.getMessage().getAttributes()).getParts();
+        assertThat(parts.size(), is(2));
+        assertAttachment(parts, "partName1", "Test part 1", "text/plain");
+        assertAttachment(parts, "partName2", "Test part 2", "text/html");
     }
 
-    private void assertAttachment(MuleMessage message, String attachmentName, String attachmentContents, String contentType) throws IOException
+    private void assertAttachment(Map<String, DataHandler> parts, String attachmentName, String attachmentContents, String contentType) throws IOException
     {
-        assertTrue(message.getInboundAttachmentNames().contains(attachmentName));
+        assertTrue(parts.keySet().contains(attachmentName));
 
-        DataHandler handler = message.getInboundAttachment(attachmentName);
+        DataHandler handler = parts.get(attachmentName);
         assertThat(handler.getContentType(), equalTo(contentType));
 
         assertThat(IOUtils.toString(handler.getInputStream()), equalTo(attachmentContents));

@@ -4,15 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.http;
+package org.mule.runtime.module.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -29,7 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase extends FunctionalTestCase
+public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase extends AbstractHttpTestCase
 {
 
     @Rule
@@ -100,7 +99,7 @@ public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase ext
     private SSLSocket createSocket(String[] cipherSuites, String[] enabledProtocols) throws Exception
     {
         DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
-        tlsContextFactory.setTrustStorePath("trustStore");
+        tlsContextFactory.setTrustStorePath("tls/trustStore");
         tlsContextFactory.setTrustStorePassword("mulepassword");
         tlsContextFactory.initialise();
 

@@ -6,23 +6,24 @@
  */
 package org.mule.runtime.module.http.functional.listener;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.runtime.module.http.functional.matcher.ParamMapMatcher.isEqual;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.ParameterMap;
-import org.mule.runtime.module.http.functional.matcher.ParamMapMatcher;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.util.StringUtils;
-
-import com.google.common.base.Charsets;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -34,11 +35,10 @@ import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
+public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase
 {
 
     public static final String PARAM_1_NAME = "param1";
@@ -68,11 +68,11 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
                 .bodyForm(new BasicNameValuePair(PARAM_1_NAME, PARAM_1_VALUE),
                           new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE)).execute();
         final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000);
-        assertThat(receivedMessage.getPayload(), IsInstanceOf.instanceOf(ParameterMap.class));
+        assertThat(receivedMessage.getPayload(), instanceOf(ParameterMap.class));
         ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload();
         assertThat(payloadAsMap.size(), is(2));
-        assertThat(payloadAsMap.get(PARAM_1_NAME), Is.is(PARAM_1_VALUE));
-        assertThat(payloadAsMap.get(PARAM_2_NAME), Is.is(PARAM_2_VALUE));
+        assertThat(payloadAsMap.get(PARAM_1_NAME), is(PARAM_1_VALUE));
+        assertThat(payloadAsMap.get(PARAM_2_NAME), is(PARAM_2_VALUE));
 
         compareParameterMaps(response, payloadAsMap);
     }
@@ -89,7 +89,7 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
 
         assertThat(httpResponse.getStatusLine().getStatusCode(), equalTo(200));
 
-        assertThat(URLDecoder.decode(IOUtils.toString(httpResponse.getEntity().getContent()), Charsets.UTF_8.name()), is("Invalid url encoded content"));
+        assertThat(URLDecoder.decode(IOUtils.toString(httpResponse.getEntity().getContent()), UTF_8.name()), is("Invalid url encoded content"));
     }
 
     @Test
@@ -100,13 +100,13 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
                           new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE_1),
                           new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE_2)).execute();
         final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000);
-        assertThat(receivedMessage.getPayload(), IsInstanceOf.instanceOf(ParameterMap.class));
+        assertThat(receivedMessage.getPayload(), instanceOf(ParameterMap.class));
         ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload();
         assertThat(payloadAsMap.size(), is(2));
-        assertThat(payloadAsMap.get(PARAM_1_NAME), Is.<Object>is(PARAM_1_VALUE));
-        assertThat(payloadAsMap.getAll(PARAM_2_NAME).size(), Is.is(2));
-        assertThat(payloadAsMap.getAll(PARAM_2_NAME).get(0), Is.is(PARAM_2_VALUE_1));
-        assertThat(payloadAsMap.getAll(PARAM_2_NAME).get(1), Is.is(PARAM_2_VALUE_2));
+        assertThat(payloadAsMap.get(PARAM_1_NAME), is(PARAM_1_VALUE));
+        assertThat(payloadAsMap.getAll(PARAM_2_NAME).size(), is(2));
+        assertThat(payloadAsMap.getAll(PARAM_2_NAME).get(0), is(PARAM_2_VALUE_1));
+        assertThat(payloadAsMap.getAll(PARAM_2_NAME).get(1), is(PARAM_2_VALUE_2));
 
         compareParameterMaps(response, payloadAsMap);
     }
@@ -131,19 +131,19 @@ public class HttpListenerUrlEncodedTestCase extends FunctionalTestCase
     private void assertNullPayloadAndEmptyResponse(Response response) throws Exception
     {
         final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000);
-        assertThat(receivedMessage.getPayload(), IsInstanceOf.instanceOf(NullPayload.class));
+        assertThat(receivedMessage.getPayload(), instanceOf(NullPayload.class));
 
         final HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_LENGTH).getValue(), Is.is("0"));
+        assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), Is.is("0"));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(StringUtils.EMPTY));
     }
 
     private void compareParameterMaps(Response response, ParameterMap payloadAsMap) throws IOException
     {
         final HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue(), Is.is(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
+        assertThat(httpResponse.getFirstHeader(CONTENT_TYPE).getValue(), startsWith(APPLICATION_X_WWW_FORM_URLENCODED));
         final String responseContent = IOUtils.toString(httpResponse.getEntity().getContent());
-        assertThat(payloadAsMap, ParamMapMatcher.isEqual(HttpParser.decodeUrlEncodedBody(responseContent, Charsets.UTF_8.name()).toListValuesMap()));
+        assertThat(payloadAsMap, isEqual(HttpParser.decodeUrlEncodedBody(responseContent, UTF_8.name()).toListValuesMap()));
     }
 
     private String getListenerUrl()

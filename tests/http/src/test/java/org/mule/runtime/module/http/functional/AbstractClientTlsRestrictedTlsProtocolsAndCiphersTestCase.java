@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.http;
+package org.mule.runtime.module.http.functional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -12,11 +12,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +35,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase extends FunctionalTestCase
+public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase extends AbstractHttpTestCase
 {
 
     private static final String CLIENT_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256";
@@ -129,7 +128,7 @@ public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase 
     private Server createTlsServer(String disabledCipherSuite, String disabledProtocol) throws Exception
     {
         SslContextFactory sslContextFactory = new SslContextFactory();
-        sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("serverKeystore", getClass()));
+        sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("tls/serverKeystore", getClass()));
         sslContextFactory.setKeyStorePassword("mulepassword");
         sslContextFactory.setKeyManagerPassword("mulepassword");
         sslContextFactory.addExcludeCipherSuites(disabledCipherSuite);

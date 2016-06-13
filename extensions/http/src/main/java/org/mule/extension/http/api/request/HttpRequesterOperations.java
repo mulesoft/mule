@@ -123,7 +123,7 @@ public class HttpRequesterOperations
         // Encode spaces to generate a valid HTTP request.
         String resolvedPath = HttpParser.encodeSpaces(path);
 
-        return String.format("%s://%s:%s%s", scheme, host, port, resolvedPath);
+        return String.format("%s://%s:%s%s", scheme.getScheme(), host, port, resolvedPath);
     }
 
     private int resolveResponseTimeout(MuleEvent muleEvent, HttpRequesterConfig config, Integer responseTimeout)

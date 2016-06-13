@@ -1,46 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:request-config name="config" host="localhost" port="${httpPort}" />
+    <httpn:request-config name="config">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
 
     <flow name="uriParamList">
-        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}" >
-            <http:request-builder>
-                <http:uri-param paramName="testParam1" value="testValue1" />
-                <http:uri-param paramName="#[paramName]" value="#[paramValue]" />
-            </http:request-builder>
-        </http:request>
+        <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}" key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder>
+                    <httpn:uri-params>
+                        <httpn:uri-param key="testParam1" value="testValue1" />
+                        <httpn:uri-param key="#[paramName]" value="#[paramValue]" />
+                    </httpn:uri-params>
+                </httpn:requester-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
     <flow name="uriParamMap">
-        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}" >
-            <http:request-builder>
-                <http:uri-params expression="#[params]" />
-            </http:request-builder>
-        </http:request>
+        <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}" key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder uriParams="#[params]"/>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
     <flow name="uriParamOverride">
-        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}" >
-            <http:request-builder>
-                <http:uri-param paramName="testParam1" value="testValue1" />
-                <http:uri-params expression="#[params]" />
-            </http:request-builder>
-        </http:request>
+        <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}" key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder uriParams="#[params]">
+                    <httpn:uri-params>
+                        <httpn:uri-param key="testParam1" value="testValue1" />
+                    </httpn:uri-params>
+                </httpn:requester-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
     <flow name="uriParamNull">
-        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}" >
-            <http:request-builder>
-                <http:uri-param paramName="testParam1" value="testValue1" />
-                <http:uri-param paramName="testParam2" value="#[payload]" />
-            </http:request-builder>
-        </http:request>
+        <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}" key="ANY">
+            <httpn:request-builder>
+                <httpn:requester-request-builder>
+                    <httpn:uri-params>
+                        <httpn:uri-param key="testParam1" value="testValue1" />
+                        <httpn:uri-param key="testParam2" value="#[payload]" />
+                    </httpn:uri-params>
+                </httpn:requester-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 
 </mule>

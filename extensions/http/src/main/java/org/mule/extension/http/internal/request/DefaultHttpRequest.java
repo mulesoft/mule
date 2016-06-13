@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.request;
 
 import org.mule.module.http.internal.domain.BaseHttpMessage;
+import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpProtocol;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
@@ -14,8 +15,6 @@ import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,11 +29,11 @@ public class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest
     private final String path;
     private final String method;
     private HttpProtocol version;
-    private Map<String, String> headers;
-    private Map<String, String> queryParams;
+    private ParameterMap headers;
+    private ParameterMap queryParams;
     private HttpEntity entity;
 
-    DefaultHttpRequest(String uri, String path, String method, Map headers, Map queryParams, HttpEntity entity)
+    DefaultHttpRequest(String uri, String path, String method, ParameterMap headers, ParameterMap queryParams, HttpEntity entity)
     {
         this.uri = uri;
         this.path = path;
@@ -86,9 +85,7 @@ public class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest
     @Override
     public Collection<String> getHeaderValues(String headerName)
     {
-        List<String> list = new LinkedList<>();
-        list.add(headers.get(headerName));
-        return list;
+        return headers.getAll(headerName);
     }
 
     @Override

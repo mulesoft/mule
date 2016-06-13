@@ -6,7 +6,7 @@
       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
     
     <httpn:request-config name="reqConfig">
-        <httpn:requester-connection host="localhost" protocol="HTTP" port="${clientPort}"/>
+        <httpn:request-connection host="localhost" protocol="HTTP" port="${clientPort}"/>
     </httpn:request-config>
     
     <httpn:listener-config name="lisConfig">

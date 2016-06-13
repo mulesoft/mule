@@ -9,10 +9,10 @@ package org.mule.runtime.module.http.functional.requester;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.runtime.core.api.MuleEvent;
+import static org.mule.runtime.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.NetworkUtils;
 
 import com.ning.http.client.ntlm.NTLMEngine;
@@ -98,10 +98,10 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
     @Test
     public void validNtlmAuth() throws Exception
     {
-        MuleEvent event = runFlow(getFlowName());
+        MuleMessage response = runFlow(getFlowName()).getMessage();
 
-        assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
-        assertThat(getPayloadAsString(event.getMessage()), equalTo(AUTHORIZED));
+        assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_OK));
+        assertThat(getPayloadAsString(response), equalTo(AUTHORIZED));
     }
 
     protected String getFlowName()

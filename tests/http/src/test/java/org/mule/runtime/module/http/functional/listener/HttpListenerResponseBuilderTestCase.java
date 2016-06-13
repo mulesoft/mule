@@ -6,36 +6,33 @@
  */
 package org.mule.runtime.module.http.functional.listener;
 
-import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isOneOf;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_RELATIVE_PATH;
-import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.CREATED;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
+public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
 {
+
+    private static final String FAIL = "fail";
+    public static final int TIMEOUT = 100000;
 
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
@@ -44,32 +41,19 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     @Rule
     public SystemProperty statusResponseBuilderPath = new SystemProperty("statusResponseBuilderPath","statusResponseBuilderPath");
     @Rule
-    public SystemProperty statusResponseBuilderOverridePath = new SystemProperty("statusResponseBuilderOverridePath","statusResponseBuilderOverridePath");
-    @Rule
-    public SystemProperty reasonPhraseResponseBuilderOverridePath = new SystemProperty("reasonPhraseResponseBuilderOverridePath", "reasonPhraseResponseBuilderOverridePath");
-    @Rule
-    public SystemProperty statusReasonPhraseResponseBuilderWontOverridePath =
-            new SystemProperty("statusReasonPhraseResponseBuilderWontOverridePath", "statusReasonPhraseResponseBuilderWontOverridePath");
-    @Rule
     public SystemProperty headerResponseBuilderPath = new SystemProperty("headerResponseBuilderPath","headerResponseBuilderPath");
     @Rule
     public SystemProperty headersResponseBuilderPath = new SystemProperty("headersResponseBuilderPath","headersResponseBuilderPath");
     @Rule
-    public SystemProperty headerDuplicatesResponseBuilderPath = new SystemProperty("headerDuplicatesResponseBuilderPath","headerDuplicatesResponseBuilderPath");
+    public SystemProperty errorEmptyResponseBuilderPath = new SystemProperty("errorEmptyResponseBuilderPath","errorEmptyResponseBuilderPath");
     @Rule
-    public SystemProperty errorEmptyResponseBuilderPath = new SystemProperty("emptyResponseBuilderPath","emptyResponseBuilderPath");
+    public SystemProperty errorStatusResponseBuilderPath = new SystemProperty("errorStatusResponseBuilderPath","errorStatusResponseBuilderPath");
     @Rule
-    public SystemProperty errorStatusResponseBuilderPath = new SystemProperty("statusResponseBuilderPath","statusResponseBuilderPath");
+    public SystemProperty errorHeaderResponseBuilderPath = new SystemProperty("errorHeaderResponseBuilderPath","errorHeaderResponseBuilderPath");
     @Rule
-    public SystemProperty errorHeaderResponseBuilderPath = new SystemProperty("headerResponseBuilderPath","headerResponseBuilderPath");
-    @Rule
-    public SystemProperty errorHeadersResponseBuilderPath = new SystemProperty("headersResponseBuilderPath","headersResponseBuilderPath");
-    @Rule
-    public SystemProperty errorHeaderDuplicatesResponseBuilderPath = new SystemProperty("headerDuplicatesResponseBuilderPath","headerDuplicatesResponseBuilderPath");
+    public SystemProperty errorHeadersResponseBuilderPath = new SystemProperty("errorHeadersResponseBuilderPath","errorHeadersResponseBuilderPath");
     @Rule
     public SystemProperty responseBuilderAndErrorResponseBuilderNotTheSamePath = new SystemProperty("responseBuilderAndErrorResponseBuilderNotTheSamePath","responseBuilderAndErrorResponseBuilderNotTheSamePath");
-    @Rule
-    public SystemProperty httpHeadersResponseBuilderPath = new SystemProperty("httpHeadersResponseBuilderPath","httpHeadersResponseBuilderPath");
 
     @Override
     protected String getConfigFile()
@@ -81,35 +65,15 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     public void emptyResponseBuilder() throws Exception
     {
         final String url = getUrl(emptyResponseBuilderPath);
-        emptyResponseBuilderTest(url);
+        emptyResponseBuilderTest(url, 200);
     }
 
     @Test
     public void statusLineResponseBuilder() throws Exception
     {
         final String url = getUrl(statusResponseBuilderPath);
-        statusLineResponseBuilderTest(url, 201);
-    }
-
-    @Test
-    public void statusLineWithCodeOverrideResponseBuilder() throws Exception
-    {
-        final String url = getUrl(statusResponseBuilderOverridePath);
-        statusLineResponseBuilderTest(url, 202);
-    }
-
-    @Test
-    public void reasonPhraseResponseBuilderOverrideResponseBuilder() throws Exception
-    {
-        final String url = getUrl(reasonPhraseResponseBuilderOverridePath);
-        statusLineResponseBuilderTest(url, 200, "response success!");
-    }
-
-    @Test
-    public void statusReasonPhraseResponseBuilderWontOverrideResponseBuilder() throws Exception
-    {
-        final String url = getUrl(statusReasonPhraseResponseBuilderWontOverridePath);
-        statusLineResponseBuilderTest(url, 200, "OK");
+        HttpResponse httpResponse = statusLineResponseBuilderTest(url, CREATED.getStatusCode());
+        assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), is("0"));
     }
 
     @Test
@@ -119,6 +83,7 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
         simpleHeaderTest(url);
     }
 
+    @Ignore("Not currently supported. MULE-9864: Support expressions in HTTP headers attribute.")
     @Test
     public void headersResponseBuilder() throws Exception
     {
@@ -127,24 +92,19 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void headerWithDuplicatesResponseBuilder() throws Exception
-    {
-        final String url = getUrl(headerDuplicatesResponseBuilderPath);
-        headersWithDuplicatesResponseBuilderTest(url);
-    }
-
-    @Test
     public void errorEmptyResponseBuilder() throws Exception
     {
         final String url = getUrl(errorEmptyResponseBuilderPath);
-        emptyResponseBuilderTest(url);
+        emptyResponseBuilderTest(url, 500);
     }
 
     @Test
     public void errorStatusLineResponseBuilder() throws Exception
     {
         final String url = getUrl(errorStatusResponseBuilderPath);
-        statusLineResponseBuilderTest(url, 201);
+        HttpResponse httpResponse = statusLineResponseBuilderTest(url, CREATED.getStatusCode());
+        //we'll get the Exception message in the body
+        assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), is(not("0")));
     }
 
     @Test
@@ -154,6 +114,7 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
         simpleHeaderTest(url);
     }
 
+    @Ignore("Not currently supported. MULE-9864: Support expressions in HTTP headers attribute.")
     @Test
     public void errorHeadersResponseBuilder() throws Exception
     {
@@ -162,33 +123,13 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void errorHeaderWithDuplicatesResponseBuilder() throws Exception
-    {
-        final String url = getUrl(errorHeaderDuplicatesResponseBuilderPath);
-        headersWithDuplicatesResponseBuilderTest(url);
-    }
-
-    @Test
     public void responseBuilderIsDifferentFromErrorResponseBuilder() throws Exception
     {
         final String url = getUrl(responseBuilderAndErrorResponseBuilderNotTheSamePath);
-        final Response successfulResponse = Request.Get(url).connectTimeout(100000).socketTimeout(10000000).execute();
+        final Response successfulResponse = Request.Get(url).connectTimeout(TIMEOUT).socketTimeout(10000000).execute();
         assertThat(successfulResponse.returnResponse().getStatusLine().getStatusCode(), is(202));
-        final Response failureResponse = Request.Get(url).addHeader("FAIL", "true").connectTimeout(100000).socketTimeout(100000).execute();
+        final Response failureResponse = Request.Get(url).addHeader(FAIL, "true").connectTimeout(TIMEOUT).socketTimeout(TIMEOUT).execute();
         assertThat(failureResponse.returnResponse().getStatusLine().getStatusCode(), is(505));
-    }
-
-    @Test
-    public void httpHeadersResponseBuilder() throws Exception
-    {
-        final String url = getUrl(httpHeadersResponseBuilderPath);
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
-        final HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getFirstHeader(HTTP_RELATIVE_PATH).getValue(), is("relativePath"));
-        Header[] requestPathHeaders = httpResponse.getHeaders(HTTP_REQUEST_PATH_PROPERTY);
-        assertThat(requestPathHeaders, is(arrayWithSize(2)));
-        assertThat(requestPathHeaders[0].getValue(), isOneOf("requestPath1", "requestPath2"));
-        assertThat(requestPathHeaders[1].getValue(), isOneOf("requestPath1", "requestPath2"));
     }
 
     private String getUrl(SystemProperty pathSystemProperty)
@@ -196,48 +137,31 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
         return String.format("http://localhost:%s/%s", listenPort.getNumber(), pathSystemProperty.getValue());
     }
 
-    private void statusLineResponseBuilderTest(String url, int expectedStatus, String expectedReasonPhrase) throws IOException
+    private HttpResponse statusLineResponseBuilderTest(String url, int expectedStatus, String expectedReasonPhrase) throws IOException
     {
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
+        final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
         final HttpResponse httpResponse = response.returnResponse();
+        System.out.println(ArrayUtils.toString(httpResponse.getAllHeaders()));
         assertThat(httpResponse.getAllHeaders().length, is(2));
-        assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.CONTENT_LENGTH).getValue(), is("0"));
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(expectedStatus));
         assertThat(httpResponse.getStatusLine().getReasonPhrase(), is(expectedReasonPhrase));
+        return httpResponse;
     }
 
-    private void statusLineResponseBuilderTest(String url, int expectedStatus) throws IOException
+    private HttpResponse statusLineResponseBuilderTest(String url, int expectedStatus) throws IOException
     {
-        statusLineResponseBuilderTest(url, expectedStatus, "everything works!");
+        return statusLineResponseBuilderTest(url, expectedStatus, "everything works!");
     }
 
-    private void emptyResponseBuilderTest(String url) throws IOException
+    private void emptyResponseBuilderTest(String url, int expectedStatusCode) throws IOException
     {
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
-        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
-    }
-
-    private void headersWithDuplicatesResponseBuilderTest(String url) throws IOException
-    {
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
-        final HttpResponse httpResponse = response.returnResponse();
-        final Header[] userAgentHeaders = httpResponse.getHeaders(HttpHeaders.Names.USER_AGENT);
-        final Collection<String> headerValues = CollectionUtils.collect(Arrays.asList(userAgentHeaders), new Transformer()
-        {
-            @Override
-            public Object transform(Object input)
-            {
-                Header header = (Header) input;
-                return header.getValue();
-            }
-        });
-        assertThat(userAgentHeaders.length, is(5));
-        assertThat(headerValues, Matchers.containsInAnyOrder(Arrays.asList("Mule 3.5.0", "Mule 3.6.0", "Mule 3.7.0", "Mule 3.8.0", "Mule 3.9.0").toArray(new String[4])));
+        final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
+        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(expectedStatusCode));
     }
 
     private void simpleHeaderTest(String url) throws IOException
     {
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
+        final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
         final HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.USER_AGENT).getValue(), is("Mule 3.6.0"));
         assertThat(isDateValid(httpResponse.getFirstHeader(HttpHeaders.Names.DATE).getValue()), is(true));

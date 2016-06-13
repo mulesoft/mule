@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import static com.google.common.collect.ImmutableMap.copyOf;
+import org.mule.runtime.module.http.internal.ParameterMap;
 
 import java.security.cert.Certificate;
 import java.util.Map;
@@ -55,15 +55,15 @@ public class HttpRequestAttributes extends HttpAttributes
     /**
      * Query parameters map built from the parsed string. Former 'http.query.params'.
      */
-    private final Map<String, String> queryParams;
+    private final ParameterMap queryParams;
     /**
      * URI parameters extracted from the request path. Former 'http.uri.params'.
      */
-    private final Map<String, String> uriParams;
+    private final ParameterMap uriParams;
     /**
      * Remote host address from the sender. Former 'http.remote.address'.
      */
-    private final String remoteHostAddress;
+    private final String remoteAddress;
     /**
      * Client certificate (if 2 way TLS is enabled). Former 'http.client.cert'.
      */
@@ -71,8 +71,8 @@ public class HttpRequestAttributes extends HttpAttributes
 
     public HttpRequestAttributes(Map<String, Object> headers, Map<String, DataHandler> parts, String listenerPath,
                                  String relativePath, String version, String scheme, String method, String requestPath,
-                                 String requestUri, String queryString, Map<String, String> queryParams,
-                                 Map<String, String> uriParams, String remoteHostAddress, Certificate clientCertificate)
+                                 String requestUri, String queryString, ParameterMap queryParams,
+                                 ParameterMap uriParams, String remoteAddress, Certificate clientCertificate)
     {
         super(headers, parts);
         this.listenerPath = listenerPath;
@@ -83,9 +83,9 @@ public class HttpRequestAttributes extends HttpAttributes
         this.requestPath = requestPath;
         this.requestUri = requestUri;
         this.queryString = queryString;
-        this.queryParams = copyOf(queryParams);
-        this.uriParams = copyOf(uriParams);
-        this.remoteHostAddress = remoteHostAddress;
+        this.queryParams = queryParams.toImmutableParameterMap();
+        this.uriParams = uriParams.toImmutableParameterMap();
+        this.remoteAddress = remoteAddress;
         this.clientCertificate = clientCertificate;
     }
 
@@ -129,19 +129,19 @@ public class HttpRequestAttributes extends HttpAttributes
         return queryString;
     }
 
-    public Map<String, String> getQueryParams()
+    public ParameterMap getQueryParams()
     {
         return queryParams;
     }
 
-    public Map<String, String> getUriParams()
+    public ParameterMap getUriParams()
     {
         return uriParams;
     }
 
-    public String getRemoteHostAddress()
+    public String getRemoteAddress()
     {
-        return remoteHostAddress;
+        return remoteAddress;
     }
 
     public Certificate getClientCertificate()

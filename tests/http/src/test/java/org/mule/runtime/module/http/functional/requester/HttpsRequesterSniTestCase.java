@@ -10,12 +10,11 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
-
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +44,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpsRequesterSniTestCase extends FunctionalTestCase
+public class HttpsRequesterSniTestCase extends AbstractHttpTestCase
 {
     private static final String FQDN = "localhost.localdomain";
 

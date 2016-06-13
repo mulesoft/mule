@@ -46,7 +46,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-@Alias("requester")
+@Alias("request")
 public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterConfig, HttpClient>, Initialisable
 {
     private static final int UNLIMITED_CONNECTIONS = -1;
@@ -57,6 +57,7 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
      * Host where the requests will be sent.
      */
     @Parameter
+    @Optional
     private Function<MuleEvent, String> host;
 
     /**
@@ -193,6 +194,8 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
 
         if (protocol.equals(HTTPS) && tlsContextFactory == null)
         {
+            //MULE-9480
+            initialiseIfNeeded(defaultTlsContextFactoryBuilder);
             tlsContextFactory = defaultTlsContextFactoryBuilder.buildDefault();
         }
         if (tlsContextFactory != null)
@@ -214,5 +217,20 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
         {
             connectionIdleTimeout = 0;
         }
+    }
+
+    public Function<MuleEvent, Integer> getPort()
+    {
+        return port;
+    }
+
+    public ProxyConfig getProxyConfig()
+    {
+        return proxyConfig;
+    }
+
+    public TlsContextFactory getTlsContext()
+    {
+        return tlsContextFactory;
     }
 }

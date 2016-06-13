@@ -11,10 +11,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +34,7 @@ import org.junit.runners.Parameterized;
  * Verifies that only the insecure client is successful.
  */
 @RunWith(Parameterized.class)
-public class HttpRequestTlsInsecureTestCase extends FunctionalTestCase
+public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase
 {
     @Parameterized.Parameter
     public String config;
@@ -65,6 +65,7 @@ public class HttpRequestTlsInsecureTestCase extends FunctionalTestCase
         assertThat(res.getMessageAsString(), is(TEST_PAYLOAD));
     }
 
+    @Ignore("MULE-9815")
     @Test
     public void secureRequest() throws Exception
     {

@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:request-config name="config" host="localhost" port="${httpPort}" />
+    <httpn:request-config name="config">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
 
     <flow name="payloadSourceFlow">
-        <http:request config-ref="config" path="test" method="POST" source="#[payload]" />
+        <httpn:request config-ref="config" path="test" method="POST" source="#[payload]"  key="ANY"/>
     </flow>
 
     <flow name="customSourceFlow">
-        <http:request config-ref="config" path="test" method="POST" source="#[customSource]" />
+        <httpn:request config-ref="config" path="test" method="POST" source="#[customSource]"  key="ANY"/>
     </flow>
 
     <flow name="payloadTargetFlow">
-        <http:request config-ref="config" path="test" method="POST" target="#[payload]" />
+        <httpn:request config-ref="config" path="test" method="POST" key="ANY"/>
     </flow>
 
     <flow name="customTargetFlow">
-        <http:request config-ref="config" path="test" method="POST" target="#[flowVars.customTarget]" />
+        <httpn:request config-ref="config" path="test" method="POST" target="customTarget"  key="ANY"/>
     </flow>
 
 </mule>

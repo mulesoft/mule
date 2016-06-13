@@ -8,11 +8,10 @@ package org.mule.runtime.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.functional.functional.FlowAssert;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
@@ -20,7 +19,7 @@ import java.io.InputStream;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestAttachmentsTestCase extends FunctionalTestCase
+public class HttpRequestAttachmentsTestCase extends AbstractHttpTestCase
 {
 
     @Rule

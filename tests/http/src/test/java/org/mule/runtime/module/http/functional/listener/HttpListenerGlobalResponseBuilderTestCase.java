@@ -8,9 +8,8 @@ package org.mule.runtime.module.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.module.http.api.HttpHeaders;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -28,10 +27,12 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerGlobalResponseBuilderTestCase extends FunctionalTestCase
+@Ignore("Currently not supported: Builders meant to be replaced by DW.")
+public class HttpListenerGlobalResponseBuilderTestCase extends AbstractHttpTestCase
 {
 
     @Rule
@@ -72,7 +73,7 @@ public class HttpListenerGlobalResponseBuilderTestCase extends FunctionalTestCas
 
     private void testResponseHeaders(String url, Collection<String> userAgentHeaderValues) throws IOException
     {
-        final Response response = Request.Get(url).connectTimeout(1000).execute();
+        final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
         final HttpResponse httpResponse = response.returnResponse();
         assertThat(isDateValid(httpResponse.getFirstHeader(HttpHeaders.Names.DATE).getValue()), Is.is(true));
         final Header[] userAgentHeaders = httpResponse.getHeaders(HttpHeaders.Names.USER_AGENT);

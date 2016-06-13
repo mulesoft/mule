@@ -10,10 +10,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -26,7 +25,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class HttpListenerMethodRoutingTestCase extends FunctionalTestCase
+public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase
 {
 
     @Rule
@@ -73,7 +72,8 @@ public class HttpListenerMethodRoutingTestCase extends FunctionalTestCase
     {
         MuleEvent event = flowRunner("requestFlow").withPayload(payload).withFlowVariable("method", method).run();
 
-        assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(OK.getStatusCode()));
+        HttpResponseAttributes attributes = (HttpResponseAttributes) event.getMessage().getAttributes();
+        assertThat(attributes.getStatusCode(), is(OK.getStatusCode()));
         assertThat(event.getMessageAsString(), is(expectedContent));
     }
 

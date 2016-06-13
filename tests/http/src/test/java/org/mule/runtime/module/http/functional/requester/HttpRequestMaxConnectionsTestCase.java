@@ -15,6 +15,8 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.util.concurrent.Latch;
 
+import com.ning.http.client.filter.FilterException;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +53,8 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
 
         MessagingException e = runner.runExpectingException();
         // Max connections should be reached
-        assertThat(e.getCause(), instanceOf(IOException.class));
+        assertThat(e, instanceOf(MessagingException.class));
+        assertThat(e.getCause(), instanceOf(FilterException.class));
 
         messageHold.release();
         t1.join();

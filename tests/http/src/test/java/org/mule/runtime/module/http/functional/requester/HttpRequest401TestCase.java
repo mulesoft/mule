@@ -9,7 +9,8 @@ package org.mule.runtime.module.http.functional.requester;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.MuleMessage;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class HttpRequest401TestCase extends AbstractHttpRequestTestCase
     public void returns401Response() throws Exception
     {
         MuleMessage response = runFlow("executeRequest").getMessage();
-        assertThat((int) response.getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_UNAUTHORIZED));
+        assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_UNAUTHORIZED));
         assertThat(getPayloadAsString(response), is(UNAUTHORIZED_MESSAGE));
     }
 

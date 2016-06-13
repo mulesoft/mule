@@ -11,23 +11,20 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.runtime.module.http.internal.HttpParser.appendQueryParam;
 import static org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyServerManager.MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY;
-
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerHeaderSizeTestCase extends FunctionalTestCase
+public class HttpListenerHeaderSizeTestCase extends AbstractHttpTestCase
 {
 
     private static final int SIZE_DELTA = 1000;
@@ -37,33 +34,34 @@ public class HttpListenerHeaderSizeTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
 
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-listener-max-header-size-config.xml";
+    }
+
     @Test
     public void maxHeaderSizeExceeded() throws Exception
     {
-        MuleMessage response = sendRequestWithQueryParam(Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) + SIZE_DELTA);
-        assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(BAD_REQUEST.getStatusCode()));
-        assertThat(response.<String>getInboundProperty(HTTP_REASON_PROPERTY), is(BAD_REQUEST.getReasonPhrase()));
+        HttpResponse response = sendRequestWithQueryParam(Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) + SIZE_DELTA);
+        StatusLine statusLine = response.getStatusLine();
+        assertThat(statusLine.getStatusCode(), is(BAD_REQUEST.getStatusCode()));
+        assertThat(statusLine.getReasonPhrase(), is(BAD_REQUEST.getReasonPhrase()));
     }
 
     @Test
     public void maxHeaderSizeNotExceeded() throws Exception
     {
         int queryParamSize = Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) - SIZE_DELTA;
-        MuleMessage response = sendRequestWithQueryParam(queryParamSize);
-        assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(OK.getStatusCode()));
-        assertThat(getPayloadAsBytes(response).length, is(queryParamSize));
+        HttpResponse response = sendRequestWithQueryParam(queryParamSize);
+        assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
+        assertThat((int) response.getEntity().getContentLength(), is(queryParamSize));
     }
 
-    private MuleMessage sendRequestWithQueryParam(int queryParamSize) throws MuleException
+    private HttpResponse sendRequestWithQueryParam(int queryParamSize) throws Exception
     {
         String longQueryParamValue = RandomStringUtils.randomAlphanumeric(queryParamSize);
         String urlWithQueryParameter = appendQueryParam(format("http://localhost:%d/", dynamicPort.getNumber()), "longQueryParam", longQueryParamValue);
-        return muleContext.getClient().send(urlWithQueryParameter, getTestMuleMessage(), newOptions().disableStatusCodeValidation().build());
-    }
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "http-listener-max-header-size-config.xml";
+        return Request.Post(urlWithQueryParameter).execute().returnResponse();
     }
 }

@@ -10,10 +10,9 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.KEEP_ALIVE;
-
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,7 +28,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 
-public abstract class HttpListenerPersistentConnectionsTestCase extends FunctionalTestCase
+public abstract class HttpListenerPersistentConnectionsTestCase extends AbstractHttpTestCase
 {
 
     private static final int HTTP_OK = 200;

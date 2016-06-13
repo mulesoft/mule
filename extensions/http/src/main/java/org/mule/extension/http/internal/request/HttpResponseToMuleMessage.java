@@ -167,7 +167,8 @@ public class HttpResponseToMuleMessage
 
         for (HttpPartDataSource httpPart : httpParts)
         {
-            attachments.put(httpPart.getName(), new DataHandler(httpPart));
+            String name = httpPart.getName();
+            attachments.put(name == null ? "null" : name, new DataHandler(httpPart));
         }
 
         return attachments;

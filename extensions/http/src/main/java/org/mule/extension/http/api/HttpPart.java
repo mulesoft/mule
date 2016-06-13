@@ -34,6 +34,7 @@ public class HttpPart
      * Content type from the data.
      */
     @Parameter
+    @Optional
     private String contentType;
 
     /**
@@ -42,6 +43,18 @@ public class HttpPart
     @Parameter
     @Optional
     private String filename;
+
+    public HttpPart()
+    {
+    }
+
+    public HttpPart(String id, Object data, String contentType, String filename)
+    {
+        this.id = id;
+        this.data = data;
+        this.contentType = contentType;
+        this.filename = filename;
+    }
 
     public Object getData()
     {

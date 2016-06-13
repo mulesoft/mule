@@ -111,7 +111,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
     @Parameter
     @Optional
     @Expression(NOT_SUPPORTED)
-    private RamlApiConfiguration ramlApiConfiguration;
+    private RamlApiConfiguration apiConfiguration;
 
     @Inject
     private MuleContext muleContext;
@@ -172,9 +172,9 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
         return enableCookies;
     }
 
-    public RamlApiConfiguration getRamlApiConfiguration()
+    public RamlApiConfiguration getApiConfiguration()
     {
-        return ramlApiConfiguration;
+        return apiConfiguration;
     }
 
     public CookieManager getCookieManager()

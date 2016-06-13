@@ -8,6 +8,7 @@ package org.mule.extension.http.api.request.proxy;
 
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 
 /**
@@ -34,12 +35,14 @@ public class DefaultProxyConfig implements ProxyConfig
      * The username to authenticate against the proxy.
      */
     @Parameter
+    @Optional
     private String username;
 
     /**
      * The password to authenticate against the proxy.
      */
     @Parameter
+    @Optional
     @Password
     private String password;
 

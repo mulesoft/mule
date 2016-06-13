@@ -9,18 +9,16 @@ package org.mule.runtime.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.EXPECT;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.CONTINUE;
-
+import static org.mule.runtime.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
-
 
 public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase
 {
@@ -33,12 +31,13 @@ public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderSer
         return "http-request-expect-header-config.xml";
     }
 
+    @Ignore("MULE-9892: Fix flaky")
     @Test
     public void handlesContinueResponse() throws Exception
     {
         startExpectContinueServer();
 
-        flowRunner(REQUEST_FLOW_NAME).withPayload(TEST_MESSAGE).withOutboundProperty(EXPECT, CONTINUE).run();
+        flowRunner(REQUEST_FLOW_NAME).withPayload(TEST_MESSAGE).run();
         assertThat(requestBody, equalTo(TEST_MESSAGE));
 
         stopServer();
@@ -58,10 +57,10 @@ public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderSer
             {
                 throw new IOException("Payload should not be consumed");
             }
-        }).withOutboundProperty(EXPECT, CONTINUE).run();
+        }).run();
 
-        assertThat(response.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY),
-                   equalTo(EXPECTATION_FAILED.getStatusCode()));
+        assertThat((HttpResponseAttributes) response.getMessage().getAttributes(),
+                   hasStatusCode(EXPECTATION_FAILED.getStatusCode()));
 
         stopServer();
     }

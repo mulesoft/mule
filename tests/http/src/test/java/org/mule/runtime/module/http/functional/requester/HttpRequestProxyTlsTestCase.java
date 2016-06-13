@@ -9,16 +9,14 @@ package org.mule.runtime.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
+import static org.mule.runtime.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.functional.functional.EventCallback;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +34,7 @@ import org.junit.runners.Parameterized;
 
 
 @RunWith(Parameterized.class)
-public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
+public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase
 {
 
     private static final String OK_RESPONSE = "OK";
@@ -87,14 +85,9 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
     @Test
     public void requestIsSentCorrectlyThroughHttpsProxy() throws Exception
     {
-        getFunctionalTestComponent("serverFlow").setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                requestPayload = getPayloadAsString(context.getMessage());
-                requestURI = context.getMessage().getInboundProperty(HTTP_REQUEST_URI);
-            }
+        getFunctionalTestComponent("serverFlow").setEventCallback((context, component) -> {
+            requestPayload = getPayloadAsString(context.getMessage());
+            requestURI =((HttpRequestAttributes) context.getMessage().getAttributes()).getRequestUri();
         });
 
         proxyServer.start();
@@ -106,7 +99,7 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
 
         assertThat(requestPayload, equalTo(TEST_MESSAGE));
         assertThat(requestURI, equalTo(PATH));
-        assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(OK.getStatusCode()));
+        assertThat((HttpResponseAttributes) event.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
         assertThat(getPayloadAsString(event.getMessage()), equalTo(OK_RESPONSE));
 
         proxyServer.stop();
@@ -136,20 +129,15 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
         {
             serverSocket = new ServerSocket(proxyServerPort);
 
-            serverThread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
+            serverThread = new Thread(() -> {
+                try
                 {
-                    try
-                    {
-                        Socket clientSocket = serverSocket.accept();
-                        handleRequest(clientSocket);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new RuntimeException(e);
-                    }
+                    Socket clientSocket = serverSocket.accept();
+                    handleRequest(clientSocket);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
                 }
             });
 

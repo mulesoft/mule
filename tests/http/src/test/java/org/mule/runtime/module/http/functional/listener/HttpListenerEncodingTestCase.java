@@ -9,7 +9,7 @@ package org.mule.runtime.module.http.functional.listener;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.nio.charset.Charset;
@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class HttpListenerEncodingTestCase extends FunctionalTestCase
+public class HttpListenerEncodingTestCase extends AbstractHttpTestCase
 {
     @Rule
     public DynamicPort port = new DynamicPort("port");

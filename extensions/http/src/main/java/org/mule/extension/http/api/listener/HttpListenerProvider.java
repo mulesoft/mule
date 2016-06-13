@@ -6,6 +6,9 @@
  */
 package org.mule.extension.http.api.listener;
 
+import static java.lang.String.format;
+import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
@@ -28,6 +31,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.listener.Server;
+import org.mule.runtime.module.http.internal.listener.ServerAddress;
 
 import java.io.IOException;
 
@@ -63,6 +67,7 @@ public class HttpListenerProvider implements ConnectionProvider<HttpListenerConf
      * user needs to configure at least the keystore in the tls:context child element of this listener-config.
      */
     @Parameter
+    @Optional(defaultValue = "HTTP")
     @Expression(NOT_SUPPORTED)
     private HttpConstants.Protocols protocol;
 
@@ -163,13 +168,23 @@ public class HttpListenerProvider implements ConnectionProvider<HttpListenerConf
     @Override
     public ConnectionValidationResult validate(Server server)
     {
-        return ConnectionValidationResult.success();
+        if (server.isStopped() || server.isStopping())
+        {
+            ServerAddress serverAddress = server.getServerAddress();
+            return failure(format("Server on host %s and port %s is stopped.", serverAddress.getIp(), serverAddress.getPort()),
+                           UNKNOWN,
+                           new ConnectionException("Server stopped."));
+        }
+        else
+        {
+            return ConnectionValidationResult.success();
+        }
     }
 
     @Override
     public ConnectionHandlingStrategy<Server> getHandlingStrategy(ConnectionHandlingStrategyFactory<HttpListenerConfig, Server> handlingStrategyFactory)
     {
-        return handlingStrategyFactory.none();
+        return handlingStrategyFactory.cached();
     }
 
     private void verifyConnectionsParameters() throws InitialisationException

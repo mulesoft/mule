@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:sockets="http://www.mulesoft.org/schema/mule/transport/sockets"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/transport/sockets http://www.mulesoft.org/schema/mule/transport/sockets/current/mule-transport-sockets.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <sockets:server-socket-properties name="globalTcpProperties" keepAlive="true" receiveBacklog="1024"
                                   receiveBufferSize="1024" reuseAddress="true" sendBufferSize="1024"
                                   sendTcpNoDelay="true" serverTimeout="1000" linger="1000" />
 
-    <http:listener-config name="globalConfig" host="localhost" port="${port1}" />
+    <httpn:listener-config name="globalConfig">
+        <httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
 
     <flow name="globalConfigFlow">
-        <http:listener config-ref="globalConfig" path="/global"/>
+        <httpn:listener config-ref="globalConfig" path="/global"/>
         <echo-component />
     </flow>
 

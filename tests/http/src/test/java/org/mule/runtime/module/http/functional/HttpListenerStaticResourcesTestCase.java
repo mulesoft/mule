@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.http;
+package org.mule.runtime.module.http.functional;
 
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
@@ -25,9 +25,11 @@ import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import java.io.IOException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("MULE-9699: Not currently supported.")
 public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
 {
 
@@ -101,7 +103,7 @@ public class HttpListenerStaticResourcesTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void contentTypeShouldBeDetermintedFromResource() throws Exception
+    public void contentTypeShouldBeDeterminedFromResource() throws Exception
     {
         String url = format("http://localhost:%d/static/image.gif", port1.getNumber());
         executeRequest(url, true);

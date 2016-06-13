@@ -9,8 +9,10 @@ package org.mule.runtime.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("Currently not supported: Builders meant to be replaced by DW.")
 public class HttpRequestBuilderCompositionTestCase extends AbstractHttpRequestTestCase
 {
 

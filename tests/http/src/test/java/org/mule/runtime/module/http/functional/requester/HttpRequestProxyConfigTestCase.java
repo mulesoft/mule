@@ -6,24 +6,25 @@
  */
 package org.mule.runtime.module.http.functional.requester;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
+import org.mule.extension.http.api.request.HttpRequesterProvider;
+import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
+import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.runtime.module.http.internal.request.DefaultHttpRequester;
-import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
@@ -35,7 +36,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
+public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase
 {
 
     private static final String PROXY_HOST = "localhost";
@@ -63,12 +64,12 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][] {
-                {"refAnonymousProxy", ProxyType.ANONYMOUS},
-                {"innerAnonymousProxy", ProxyType.ANONYMOUS},
-                {"refUserPassProxy", ProxyType.USER_PASS},
-                {"innerUserPassProxy", ProxyType.USER_PASS},
-                {"refNtlmProxy", ProxyType.NTLM},
-                {"innerNtlmProxy", ProxyType.NTLM}});
+                {"RefAnonymousProxy", ProxyType.ANONYMOUS},
+                {"InnerAnonymousProxy", ProxyType.ANONYMOUS},
+                {"RefUserPassProxy", ProxyType.USER_PASS},
+                {"InnerUserPassProxy", ProxyType.USER_PASS},
+                {"RefNtlmProxy", ProxyType.NTLM},
+                {"InnerNtlmProxy", ProxyType.NTLM}});
     }
 
     @Override
@@ -97,14 +98,16 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
     @Test
     public void testProxy() throws Exception
     {
-        checkProxyConfig((Flow) getFlowConstruct(flowName));
+        checkProxyConfig();
         ensureRequestGoesThroughProxy(flowName);
     }
 
-    private void checkProxyConfig(Flow flow)
+    private void checkProxyConfig() throws Exception
     {
-        DefaultHttpRequester httpRequester = (DefaultHttpRequester) flow.getMessageProcessors().get(0);
-        ProxyConfig proxyConfig = httpRequester.getConfig().getProxyConfig();
+        ConfigurationInstance config = getConfigurationInstanceFromRegistry("config" + flowName, getTestEvent(TEST_PAYLOAD));
+        ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
+        HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+        ProxyConfig proxyConfig = provider.getProxyConfig();
 
         assertThat(proxyConfig.getHost(), is(PROXY_HOST));
         assertThat(proxyConfig.getPort(), is(Integer.valueOf(proxyPort.getValue())));
@@ -127,7 +130,7 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
         // Request should go through the proxy.
         assertThat(e.getCauseException(), is(instanceOf(IOException.class)));
         assertThat(e.getCauseException().getMessage(), is("Remotely closed"));
-        latch.await(1, TimeUnit.SECONDS);
+        latch.await(1, SECONDS);
     }
 
     private enum ProxyType

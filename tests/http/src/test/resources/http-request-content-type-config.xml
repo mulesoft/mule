@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+            http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:listener-config name="httpConf" host="localhost" port="${httpPort}"/>
+    <httpn:listener-config name="httpConf">
+        <httpn:listener-connection  host="localhost" port="${httpPort}"/>
+    </httpn:listener-config>
 
-    <http:request-config name="requesterConfig" host="localhost" port="${httpPort}" />
+    <httpn:request-config name="requesterConfig">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
 
     <flow name="requesterContentTypeClient" >
-        <http:listener config-ref="httpConf" path="requestClient"/>
+        <httpn:listener config-ref="httpConf" path="requestClient"/>
 
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
 
-        <http:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET" />
+        <httpn:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET"  key="ANY"/>
     </flow>
 
     <flow name="requesterContentTypeServer" >
-        <http:listener config-ref="httpConf" path="requestServer"/>
+        <httpn:listener config-ref="httpConf" path="requestServer"/>
 
-        <set-payload value="#[message.inboundProperties['Content-Type']]"/>
+        <set-payload value="#[message.getAttributes().getHeaders().get('content-type')]"/>
     </flow>
 </mule>

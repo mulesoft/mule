@@ -11,10 +11,9 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import org.junit.Test;
  * Verifies that a request using a certificate not present in the trust-store
  * only works for the insecure server.
  */
-public class HttpListenerTlsInsecureTestCase extends FunctionalTestCase
+public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");

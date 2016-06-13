@@ -1,42 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
 
     <flow name="testFlow1">
-        <http:listener config-ref="listenerConfig" path="${formDataPath}"/>
-        <copy-attachments attachmentName="*"/>
+        <httpn:listener config-ref="listenerConfig" path="${formDataPath}">
+            <httpn:response-builder>
+                <httpn:http-response-builder parts="#[parts]"/>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[message.getAttributes()]"/>
         <test:queue name="out"/>
     </flow>
 
     <flow name="testFlow2">
-        <http:listener config-ref="listenerConfig" path="${mixedPath}"/>
-        <copy-attachments attachmentName="*"/>
-        <set-property propertyName="Content-Type" value="multipart/mixed"/>
+        <httpn:listener config-ref="listenerConfig" path="${mixedPath}">
+            <httpn:response-builder>
+                <httpn:http-response-builder parts="#[parts]">
+                    <httpn:headers>
+                        <httpn:header key="Content-Type" value="multipart/mixed"/>
+                    </httpn:headers>
+                </httpn:http-response-builder>
+            </httpn:response-builder>
+        </httpn:listener>
+        <set-payload value="#[message.getAttributes()]"/>
         <test:queue name="out"/>
     </flow>
 
     <flow name="testFlow3">
-        <http:listener config-ref="listenerConfig" path="${contentLength}"/>
-        <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
+        <httpn:listener config-ref="listenerConfig" path="${contentLength}">
+            <httpn:response-builder>
+                <httpn:http-response-builder parts="#[parts]"/>
+            </httpn:response-builder>
+        </httpn:listener>
+        <echo-component/>
     </flow>
 
     <flow name="testFlow4">
-        <http:listener config-ref="listenerConfig" path="${chunked}" responseStreamingMode="ALWAYS"/>
-        <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
+        <httpn:listener config-ref="listenerConfig" path="${chunked}" responseStreamingMode="ALWAYS">
+            <httpn:response-builder>
+                <httpn:http-response-builder parts="#[parts]"/>
+            </httpn:response-builder>
+        </httpn:listener>
+        <echo-component/>
     </flow>
 
     <flow name="testFlow5">
-        <http:listener config-ref="listenerConfig" path="${filePath}" />
-        <custom-processor class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$CustomAttachmentMessageProcessor"/>
-        <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
+        <httpn:listener config-ref="listenerConfig" path="${filePath}">
+            <httpn:response-builder>
+                <httpn:http-response-builder parts="#[parts]"/>
+            </httpn:response-builder>        
+        </httpn:listener>
+        <echo-component/>
     </flow>
 
 </mule>

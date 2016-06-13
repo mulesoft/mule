@@ -37,13 +37,6 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     }
 
     @Test
-    public void stringWithContentLengthOutboundProperty() throws Exception
-    {
-        final String url = getUrl("stringWithContentLengthOutboundProperty");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
     public void stringWithTransferEncodingHeader() throws Exception
     {
         final String url = getUrl("stringWithTransferEncodingHeader");
@@ -51,37 +44,9 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     }
 
     @Test
-    public void stringWithTransferEncodingOutboundProperty() throws Exception
-    {
-        final String url = getUrl("stringWithTransferEncodingOutboundProperty");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
     public void stringWithTransferEncodingAndContentLengthHeader() throws Exception
     {
         final String url = getUrl("stringWithTransferEncodingAndContentLengthHeader");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
-    public void stringWithTransferEncodingAndContentLengthOutboundProperty() throws Exception
-    {
-        final String url = getUrl("stringWithTransferEncodingAndContentLengthOutboundProperty");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
-    public void stringWithTransferEncodingHeaderAndContentLengthOutboundProperty() throws Exception
-    {
-        final String url = getUrl("stringWithTransferEncodingHeaderAndContentLengthOutboundProperty");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
-    public void stringWithTransferEncodingOutboundPropertyAndContentLengthHeader() throws Exception
-    {
-        final String url = getUrl("stringWithTransferEncodingOutboundPropertyAndContentLengthHeader");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
     }
 
@@ -102,13 +67,6 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     }
 
     @Test
-    public void inputStreamWithContentLengthOutboundProperty() throws Exception
-    {
-        final String url = getUrl("inputStreamWithContentLengthOutboundProperty");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
     public void inputStreamWithTransferEncodingHeader() throws Exception
     {
         final String url = getUrl("inputStreamWithTransferEncodingHeader");
@@ -116,37 +74,9 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     }
 
     @Test
-    public void inputStreamWithTransferEncodingOutboundProperty() throws Exception
-    {
-        final String url = getUrl("inputStreamWithTransferEncodingOutboundProperty");
-        testResponseIsNotChunkedEncoding(url, getHttpVersion());
-    }
-
-    @Test
     public void inputStreamWithTransferEncodingAndContentLengthHeader() throws Exception
     {
         final String url = getUrl("inputStreamWithTransferEncodingAndContentLengthHeader");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
-    public void inputStreamWithTransferEncodingAndContentLengthOutboundProperty() throws Exception
-    {
-        final String url = getUrl("inputStreamWithTransferEncodingAndContentLengthOutboundProperty");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
-    public void inputStreamWithTransferEncodingHeaderAndContentLengthOutboundProperty() throws Exception
-    {
-        final String url = getUrl("inputStreamWithTransferEncodingHeaderAndContentLengthOutboundProperty");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
-    public void inputStreamWithTransferEncodingOutboundPropertyAndContentLengthHeader() throws Exception
-    {
-        final String url = getUrl("inputStreamWithTransferEncodingOutboundPropertyAndContentLengthHeader");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
     }
 
@@ -166,13 +96,6 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
         testResponseIsContentLengthEncoding(url, getHttpVersion());
     }
 
-    @Test
-    public void neverStringTransferEncodingOutboundProperty() throws Exception
-    {
-        final String url = getUrl("neverStringTransferEncodingOutboundProperty");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
     // NEVER - InputStream
 
     @Test
@@ -186,13 +109,6 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     public void neverInputStreamTransferEncodingHeader() throws Exception
     {
         final String url = getUrl("neverInputStreamTransferEncodingHeader");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
-    public void neverInputStreamTransferEncodingOutboundProperty() throws Exception
-    {
-        final String url = getUrl("neverInputStreamTransferEncodingOutboundProperty");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
     }
 
@@ -217,13 +133,6 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
         testResponseIsContentLengthEncoding(url, getHttpVersion());
     }
 
-    @Test
-    public void alwaysStringContentLengthOutboundProperty() throws Exception
-    {
-        final String url = getUrl("alwaysStringContentLengthOutboundProperty");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
     // ALWAYS - InputStream
 
     @Test
@@ -237,13 +146,6 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     public void alwaysInputStreamContentLengthHeader() throws Exception
     {
         final String url = getUrl("alwaysInputStreamContentLengthHeader");
-        testResponseIsContentLengthEncoding(url, getHttpVersion());
-    }
-
-    @Test
-    public void alwaysInputStreamContentLengthOutboundProperty() throws Exception
-    {
-        final String url = getUrl("alwaysInputStreamContentLengthOutboundProperty");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
     }
 

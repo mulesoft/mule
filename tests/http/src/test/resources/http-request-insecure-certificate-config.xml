@@ -1,43 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <tls:context name="globalTlsContext">
         <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
     </tls:context>
 
-    <http:listener-config name="hostnameListener" protocol="HTTPS" host="localhost" port="${port1}" tlsContext-ref="globalTlsContext"/>
+    <httpn:listener-config name="hostnameListener">
+        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${port1}" tlsContext="globalTlsContext"/>
+    </httpn:listener-config>
 
-    <http:request-config name="insecureClient" protocol="HTTPS" host="localhost" port="${port1}">
-        <tls:context>
-            <tls:trust-store insecure="true"/>
-        </tls:context>
-    </http:request-config>
+    <httpn:request-config name="insecureClient">
+        <httpn:request-connection protocol="HTTPS" host="localhost" port="${port1}">
+            <tls:context>
+                <tls:trust-store insecure="true"/>
+            </tls:context>
+        </httpn:request-connection>
+    </httpn:request-config>
 
-    <http:request-config name="secureClient" protocol="HTTPS" host="localhost" port="${port1}">
-        <tls:context>
-            <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="false"/>
-        </tls:context>
-    </http:request-config>
+    <httpn:request-config name="secureClient">
+        <httpn:request-connection protocol="HTTPS" host="localhost" port="${port1}">
+            <tls:context>
+                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="false"/>
+            </tls:context>
+        </httpn:request-connection>
+    </httpn:request-config>
 
     <flow name="testFlowNestedContext">
-        <http:listener config-ref="hostnameListener" path="/" allowedMethods="POST"/>
+        <httpn:listener config-ref="hostnameListener" path="/" allowedMethods="POST"/>
         <echo-component/>
     </flow>
 
     <flow name="testInsecureRequest">
-        <http:request config-ref="insecureClient" path="/" method="POST" />
+        <httpn:request config-ref="insecureClient" path="/" method="POST"  key="ANY"/>
     </flow>
 
     <flow name="testSecureRequest">
-        <http:request config-ref="secureClient" path="/" method="POST" />
+        <httpn:request config-ref="secureClient" path="/" method="POST"  key="ANY"/>
     </flow>
 </mule>

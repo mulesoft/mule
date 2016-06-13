@@ -15,13 +15,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,10 +32,8 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerResponseStreamingExceptionStrategyTestCase extends FunctionalTestCase
+public class HttpListenerResponseStreamingExceptionStrategyTestCase extends AbstractHttpTestCase
 {
-
-    private static final int DEFAULT_TIMEOUT = 1000;
 
     public static InputStream stream;
 
