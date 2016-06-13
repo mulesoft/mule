@@ -7,9 +7,13 @@
 package org.mule.test.config;
 
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.api.AnnotatedObject;
@@ -62,6 +66,16 @@ public class ConfigurationAnnotationsTestCase extends FunctionalTestCase
         assertNotNull(out);
         assertEquals("outbound vm endpoint", getDocName(out));
         assertEquals("Accepts outbound messages", getDocDescription(out));
+    }
+
+
+    @Test
+    public void testFlowWithExceptionStrategyAnnotations()
+    {
+        FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct("WithRefExceptionStrategy");
+        assertThat(flow, not(nullValue()));
+        assertThat(getDocName(flow), is("With Referenced Exception Strategy"));
+        assertThat(getDocDescription(flow), is(nullValue()));
     }
 
     protected String getDocName(Object obj)
