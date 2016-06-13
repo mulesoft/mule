@@ -36,31 +36,44 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
     public CollectionDataType(Class<C> collectionType)
     {
         super(Object.class);
+        checkCollectionTypeForNull(collectionType);
         this.collectionType = collectionType;
     }
 
     public CollectionDataType(Class<C> collectionType, String mimeType)
     {
         super(Object.class, mimeType);
+        checkCollectionTypeForNull(collectionType);
         this.collectionType = collectionType;
     }
 
     public CollectionDataType(Class<C> collectionType, Class<T> type, String mimeType)
     {
         super(type, mimeType);
+        checkCollectionTypeForNull(collectionType);
         this.collectionType = collectionType;
     }
 
     public CollectionDataType(Class<C> collectionType, Class<T> type, String mimeType, String encoding)
     {
         super(type, mimeType, encoding);
+        checkCollectionTypeForNull(collectionType);
         this.collectionType = collectionType;
     }
 
     public CollectionDataType(Class<C> collectionType, Class<T> type)
     {
         super(type);
+        checkCollectionTypeForNull(collectionType);
         this.collectionType = collectionType;
+    }
+
+    protected void checkCollectionTypeForNull(Class<C> collectionType)
+    {
+        if (collectionType == null)
+        {
+            throw new IllegalArgumentException("'collectionType' cannot be null.");
+        }
     }
 
     public Class<T> getItemType()

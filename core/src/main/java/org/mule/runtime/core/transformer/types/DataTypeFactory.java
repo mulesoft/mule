@@ -81,7 +81,7 @@ public class DataTypeFactory
         // Special case where proxies are used for testing
         if (isProxyClass(type))
         {
-            return new SimpleDataType<>((Class<T>) type.getInterfaces()[0], mimeType, encoding);
+            return new SimpleDataType<>(type.getInterfaces()[0], mimeType, encoding);
         }
 
         return new SimpleDataType<>(type, mimeType, encoding);
@@ -307,6 +307,7 @@ public class DataTypeFactory
         return isProxy;
     }
 
+    // TODO MULE-9895: Provide a builder api for creating DataType s
     public static <T> DataType<T> createFromDataType(DataType<T> typeFrom, String mimeType, String encoding)
     {
         if (typeFrom instanceof CollectionDataType)
@@ -328,6 +329,7 @@ public class DataTypeFactory
         }
     }
 
+    // TODO MULE-9895: Provide a builder api for creating DataType s
     public static <T> DataType<T> createFromDataTypeWithMimeType(DataType<T> typeFrom, String mimeType)
     {
         if (typeFrom instanceof CollectionDataType)

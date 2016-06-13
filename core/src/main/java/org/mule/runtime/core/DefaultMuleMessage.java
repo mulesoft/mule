@@ -127,6 +127,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         }
         else
         {
+            // TODO MULE-9855: Make MuleMessage immutable
             DataType<?> dataType = DataTypeFactory.create(payload.getClass(),
                     previous.getDataType().getMimeType(),
                     previous.getDataType().getEncoding());
@@ -137,6 +138,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
 
     private static DataType<?> getCloningMessageDataType(MuleMessage previous)
     {
+        // TODO MULE-9855: Make MuleMessage immutable
         DataType<?> dataType = DataTypeFactory.create(previous.getDataType().getType(),
                 previous.getDataType().getMimeType(),
                 previous.getDataType().getEncoding());
