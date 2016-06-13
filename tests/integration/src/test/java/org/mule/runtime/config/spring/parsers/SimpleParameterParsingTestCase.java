@@ -105,6 +105,15 @@ public class SimpleParameterParsingTestCase extends FunctionalTestCase
         assertSimpleTypeCollectionValues((List<String>) simpleParameters.get("other-simple-type-child-list-custom-key"));
     }
 
+    @Test
+    public void simpleTypeChildListWithConverter()
+    {
+        SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("simpleTypeObjectWithConverter");
+        List<String> simpleTypeListWithConverter = simpleCollectionObject.getSimpleTypeListWithConverter();
+        assertThat(simpleTypeListWithConverter.size(), is(2));
+        assertThat(simpleTypeListWithConverter, hasItems("value1-with-converter", "value2-with-converter"));
+    }
+
     private void assertSimpleTypeCollectionValues(Collection<String> simpleTypeCollectionValues)
     {
         assertThat(simpleTypeCollectionValues.size(), is(2));

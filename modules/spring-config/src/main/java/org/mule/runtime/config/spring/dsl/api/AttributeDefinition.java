@@ -116,6 +116,11 @@ public class AttributeDefinition
             return builder;
         }
 
+        /**
+         * @param configParameterName name of the configuration parameter from which this attribute value will be extracted.
+         * @param typeConverter converter from the configuration value to a custom type.
+         * @return the builder
+         */
         public static Builder fromSimpleParameter(String configParameterName, TypeConverter typeConverter)
         {
             Builder builder = new Builder();

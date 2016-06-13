@@ -15,6 +15,7 @@ public class SimpleCollectionObject
 {
 
     private List<String> simpleTypeList;
+    private List<String> simpleTypeListWithConverter;
     private Set<String> simpleTypeSet;
     private Map<Object, Object> simpleParameters = new HashMap<>();
 
@@ -46,5 +47,15 @@ public class SimpleCollectionObject
     public void setSimpleTypeSet(Set<String> simpleTypeSet)
     {
         this.simpleTypeSet = simpleTypeSet;
+    }
+
+    public List<String> getSimpleTypeListWithConverter()
+    {
+        return simpleTypeListWithConverter;
+    }
+
+    public void setSimpleTypeListWithConverter(List<String> simpleTypeListWithConverter)
+    {
+        this.simpleTypeListWithConverter = simpleTypeListWithConverter;
     }
 }

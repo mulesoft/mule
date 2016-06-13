@@ -42,6 +42,7 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                 .withIdentifier("parameter-collection-parser")
                                 .withTypeDefinition(fromType(SimpleCollectionObject.class))
                                 .withSetterParameterDefinition("simpleTypeList", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-list").build())
+                                .withSetterParameterDefinition("simpleTypeListWithConverter", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-list-with-converter").build())
                                 .withSetterParameterDefinition("simpleTypeSet", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-set").withCollectionType(HashSet.class).build())
                                 .withSetterParameterDefinition("simpleParameters", fromMultipleDefinitions(
                                         newBuilder()
@@ -83,6 +84,13 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                 .copy()
                                 .withIdentifier("simple-type-child")
                                 .withTypeDefinition(fromType(String.class))
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("simple-type-child-with-converter")
+                                .withTypeDefinition(fromType(String.class))
+                                .withTypeConverter( input -> input + "-with-converter")
                                 .build());
 
         return definitions;

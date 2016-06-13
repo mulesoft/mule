@@ -8,8 +8,11 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
+
+import java.util.Optional;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 
@@ -39,7 +42,10 @@ public class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator
         {
             ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
             componentModel.setType(type);
-            AbstractBeanDefinition beanDefinition = genericBeanDefinition(type).addConstructorArgValue(componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME)).getBeanDefinition();
+            final String value = componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME);
+            Optional<TypeConverter> typeConverterOptional = createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
+            Object convertedValue = typeConverterOptional.map(converter -> converter.convert(value)).orElse(value);
+            AbstractBeanDefinition beanDefinition = genericBeanDefinition(type).addConstructorArgValue(convertedValue).getBeanDefinition();
             componentModel.setBeanDefinition(beanDefinition);
             return true;
         }

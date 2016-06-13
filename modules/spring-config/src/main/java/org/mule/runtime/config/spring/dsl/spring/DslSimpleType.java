@@ -27,9 +27,13 @@ public class DslSimpleType
                                                         Double.class, double.class,
                                                         String.class);
 
+    /**
+     * @param type the value type.
+     * @return true if the type is a primitive type, a primitive type wrapper class, string or an enum.
+     */
     public static boolean isSimpleType(Class<?> type)
     {
-        return simpleTypes.contains(type);
+        return simpleTypes.contains(type) || type.isEnum();
     }
 
 }
