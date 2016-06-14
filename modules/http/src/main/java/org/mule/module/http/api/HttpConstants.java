@@ -6,10 +6,6 @@
  */
 package org.mule.module.http.api;
 
-import com.google.common.collect.Collections2;
-
-import java.util.Arrays;
-
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 
 /**
