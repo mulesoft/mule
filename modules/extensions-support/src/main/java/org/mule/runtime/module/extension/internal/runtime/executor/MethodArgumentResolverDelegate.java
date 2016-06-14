@@ -8,10 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.executor;
 
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.toMap;
-import org.mule.runtime.core.api.MuleEvent;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
+
+import org.mule.metadata.java.JavaTypeLoader;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
@@ -47,6 +48,7 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
 
 
     private final Method method;
+    private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
     private ArgumentResolver<? extends Object>[] argumentResolvers;
 
     /**
@@ -96,7 +98,7 @@ final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate
             {
                 argumentResolver = MESSAGE_ARGUMENT_RESOLVER;
             }
-            else if (annotations.containsKey(ParameterGroup.class) || annotations.containsKey(MetadataKeyId.class))
+            else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType)))
             {
                 argumentResolver = new ParameterGroupArgumentResolver(parameterType);
             }

@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
@@ -28,10 +29,12 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterContainers;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterFields;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterGroupFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isMultiLevelMetadataKeyId;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -112,6 +115,7 @@ import com.google.common.collect.Multimap;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -119,7 +123,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -345,7 +348,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
         source = declarer.withMessageSource(getSourceName(sourceType));
 
-        List<Class<?>> sourceGenerics = (List) getSuperClassGenerics(sourceType, Source.class);
+        List<Type> sourceGenerics = getSuperClassGenerics(sourceType, Source.class);
 
         if (sourceGenerics.size() != 2)
         {
@@ -364,7 +367,11 @@ public final class AnnotationsBasedDescriber implements Describer
 
         sourceDeclarers.put(sourceType, source);
         declareMetadataKeyId(sourceType, source);
-        declareSingleParameters(getParameterFields(sourceType), source, MuleExtensionAnnotationParser::parseMetadataAnnotations);
+        declareSingleParameters(getParameterFields(sourceType)
+                                        .stream()
+                                        .filter(field -> !isMultiLevelMetadataKeyId(field, field.getType(), typeLoader))
+                                        .collect(toCollection(LinkedHashSet::new)),
+                                source, MuleExtensionAnnotationParser::parseMetadataAnnotations);
 
         declareSourceConnection(sourceType, source);
         declareSourceConfig(sourceType, source);
@@ -383,10 +390,17 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareMetadataKeyId(Class<?> sourceType, SourceDeclarer source)
     {
-        getAnnotatedFields(sourceType, MetadataKeyId.class)
-                .stream()
-                .findFirst()
-                .ifPresent(f -> source.withModelProperty(new MetadataKeyIdModelProperty(typeLoader.load(f.getType()))));
+        final List<Field> annotatedFields = getAnnotatedFields(sourceType, MetadataKeyId.class);
+
+        if (!annotatedFields.isEmpty())
+        {
+            if (annotatedFields.size() > 1)
+            {
+                throw new IllegalModelDefinitionException(String.format("A Source cannot define more than one MetadataKeyId. Affecting Source: [%s]", sourceType.getSimpleName()));
+            }
+
+            source.withModelProperty(new MetadataKeyIdModelProperty(typeLoader.load(annotatedFields.get(0).getType())));
+        }
     }
 
     private void declareAnnotatedParameters(Class<?> annotatedType, ParameterizedDeclarer parameterDeclarer)
@@ -417,7 +431,7 @@ public final class AnnotationsBasedDescriber implements Describer
     private List<ParameterGroup> declareConfigurationParametersGroups(Class<?> annotatedType, ParameterizedDeclarer parameterDeclarer, ParameterGroup parent)
     {
         List<ParameterGroup> groups = new LinkedList<>();
-        for (Field field : getParameterGroupFields(annotatedType))
+        for (Field field : getParameterContainers(annotatedType, typeLoader))
         {
             //TODO: MULE-9220
             if (field.isAnnotationPresent(Optional.class))
@@ -495,10 +509,9 @@ public final class AnnotationsBasedDescriber implements Describer
                 .map(field -> {
                     final ParameterDeclarer describe = getFieldDescriber(field).describe(field, parameterDeclarer);
                     stream(contributors).forEach(contributor -> contributor.contribute(field, describe));
-                    parseMetadataAnnotations(field, describe);
                     return describe;
                 })
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+                .collect(toCollection(LinkedHashSet::new));
     }
 
     private FieldDescriber getFieldDescriber(Field field)
@@ -704,7 +717,6 @@ public final class AnnotationsBasedDescriber implements Describer
 
                 parseMetadataAnnotations(parsedParameter, parameter);
             }
-
 
             Connection connectionAnnotation = parsedParameter.getAnnotation(Connection.class);
             if (connectionAnnotation != null)

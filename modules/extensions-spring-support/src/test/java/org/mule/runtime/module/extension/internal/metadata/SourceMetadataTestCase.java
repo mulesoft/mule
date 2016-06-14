@@ -65,6 +65,12 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
     }
 
     @Test
+    public void injectSimpleMetadataKeyIdInstanceInSource() throws Exception
+    {
+        ((Flow) getFlowConstruct(SOURCE_METADATA)).start();
+    }
+
+    @Test
     public void getSourceDynamicOutputMetadata() throws Exception
     {
         final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(personKey);

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
@@ -34,6 +35,7 @@ import org.mule.runtime.module.extension.internal.runtime.connector.basic.TestCo
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.vegan.extension.VeganExtension;
@@ -71,7 +73,8 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
                 {StringListConnector.class, "string-list.xsd"},
                 {VeganExtension.class, "vegan.xsd"},
                 {SubTypesMappingConnector.class, "subtypes.xsd"},
-                {PetStoreConnector.class, "petstore.xsd"}
+                {PetStoreConnector.class, "petstore.xsd"},
+                {MetadataExtension.class, "metadata.xsd"}
         });
     }
 

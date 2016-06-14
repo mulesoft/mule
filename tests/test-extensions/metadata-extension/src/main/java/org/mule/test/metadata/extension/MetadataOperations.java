@@ -54,7 +54,7 @@ public class MetadataOperations extends MetadataOperationsParent
     @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class, contentResolver = TestContentAndOutputResolverWithKeyResolver.class, outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
     public Object outputOnlyWithoutContentParam(@Connection MetadataConnection connection, @MetadataKeyId String type)
     {
-        return null;
+        return type;
     }
 
     @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class, contentResolver = TestContentAndOutputResolverWithKeyResolver.class, outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
