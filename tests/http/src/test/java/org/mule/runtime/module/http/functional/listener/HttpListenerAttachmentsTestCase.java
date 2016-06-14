@@ -7,6 +7,7 @@
 package org.mule.runtime.module.http.functional.listener;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
@@ -38,7 +39,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -271,11 +271,6 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
         return partsAsMap;
     }
 
-    public static List<org.mule.extension.http.api.HttpPart> buildParts(org.mule.extension.http.api.HttpPart... parts)
-    {
-        return Arrays.asList(parts);
-    }
-
     public static class CreatePartMessageProcessor implements MessageProcessor
     {
         @Override
@@ -285,7 +280,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
                                                                                                  TEXT_BODY_FIELD_VALUE,
                                                                                                  TEXT_PLAIN.toString(),
                                                                                                  null);
-            event.setFlowVariable("parts", buildParts(part));
+            event.setFlowVariable("parts", asList(part));
             return event;
         }
     }
@@ -303,7 +298,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
                                                                                                   FILE_BODY_FIELD_VALUE.getBytes(),
                                                                                                   APPLICATION_OCTET_STREAM.toString(),
                                                                                                   FILE_BODY_FIELD_FILENAME);
-            event.setFlowVariable("parts", buildParts(part1, part2));
+            event.setFlowVariable("parts", asList(part1, part2));
             return event;
         }
     }
