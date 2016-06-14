@@ -6,10 +6,22 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.config.spring.dsl.api.TypeDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.lang.ClassUtils;
 
@@ -22,8 +34,13 @@ import org.apache.commons.lang.ClassUtils;
 public class ObjectTypeVisitor implements TypeDefinitionVisitor
 {
 
+    public static final Class<ArrayList> DEFAULT_COLLECTION_TYPE = ArrayList.class;
+    private static final Class<HashMap> DEFAULT_MAP_TYPE = HashMap.class;
+    private static final Class<HashSet> DEFAULT_SET_CLASS = HashSet.class;
+
     private final ComponentModel componentModel;
     private Class<?> type;
+    private Optional<TypeDefinition.MapEntryType> mapEntryType = empty();
 
     public ObjectTypeVisitor(ComponentModel componentModel)
     {
@@ -33,7 +50,27 @@ public class ObjectTypeVisitor implements TypeDefinitionVisitor
     @Override
     public void onType(Class<?> type)
     {
-        this.type = type;
+        this.type = resolveType(type);
+    }
+
+    private Class<?> resolveType(Class<?> type)
+    {
+        if (Collection.class.equals(type) || List.class.equals(type))
+        {
+            return DEFAULT_COLLECTION_TYPE;
+        }
+        else if (Set.class.equals(type))
+        {
+            return DEFAULT_SET_CLASS;
+        }
+        else if (Map.class.equals(type))
+        {
+            return DEFAULT_MAP_TYPE;
+        }
+        else
+        {
+            return type;
+        }
     }
 
     @Override
@@ -51,8 +88,20 @@ public class ObjectTypeVisitor implements TypeDefinitionVisitor
         }
     }
 
+    @Override
+    public void onMapType(TypeDefinition.MapEntryType mapEntryType)
+    {
+        this.type = mapEntryType.getClass();
+        this.mapEntryType = of(new TypeDefinition.MapEntryType(resolveType(mapEntryType.getKeyType()), resolveType(mapEntryType.getValueType())));
+    }
+
     public Class<?> getType()
     {
         return type;
+    }
+
+    public Optional<TypeDefinition.MapEntryType> getMapEntryType()
+    {
+        return mapEntryType;
     }
 }

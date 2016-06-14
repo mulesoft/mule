@@ -14,7 +14,10 @@ import java.util.Set;
 public class SimpleCollectionObject
 {
 
+    private Map<String, List<String>> simpleListTypeMap;
     private List<String> simpleTypeList;
+    private Map<String, Integer> simpleTypeMap;
+    private Map<Long, SimpleCollectionObject> complexTypeMap;
     private List<String> simpleTypeListWithConverter;
     private Set<String> simpleTypeSet;
     private Map<Object, Object> simpleParameters = new HashMap<>();
@@ -57,5 +60,35 @@ public class SimpleCollectionObject
     public void setSimpleTypeListWithConverter(List<String> simpleTypeListWithConverter)
     {
         this.simpleTypeListWithConverter = simpleTypeListWithConverter;
+    }
+
+    public Map<String, Integer> getSimpleTypeMap()
+    {
+        return simpleTypeMap;
+    }
+
+    public void setSimpleTypeMap(Map<String, Integer> simpleTypeMap)
+    {
+        this.simpleTypeMap = simpleTypeMap;
+    }
+
+    public Map<Long, SimpleCollectionObject> getComplexTypeMap()
+    {
+        return complexTypeMap;
+    }
+
+    public void setComplexTypeMap(Map<Long, SimpleCollectionObject> complexTypeMap)
+    {
+        this.complexTypeMap = complexTypeMap;
+    }
+
+    public Map<String, List<String>> getSimpleListTypeMap()
+    {
+        return simpleListTypeMap;
+    }
+
+    public void setSimpleListTypeMap(Map<String, List<String>> simpleListTypeMap)
+    {
+        this.simpleListTypeMap = simpleListTypeMap;
     }
 }

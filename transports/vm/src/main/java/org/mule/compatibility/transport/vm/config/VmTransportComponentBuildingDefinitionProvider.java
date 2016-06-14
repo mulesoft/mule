@@ -11,7 +11,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromType;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 
 import org.mule.compatibility.config.spring.TransportComponentBuildingDefinitionProvider;
 import org.mule.compatibility.transport.vm.VMConnector;

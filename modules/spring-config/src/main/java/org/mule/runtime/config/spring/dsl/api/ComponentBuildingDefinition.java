@@ -14,7 +14,6 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
-import org.mule.runtime.config.spring.dsl.processor.TypeDefinition;
 import org.mule.runtime.config.spring.dsl.processor.TypeDefinitionVisitor;
 
 import java.util.ArrayList;
@@ -37,6 +36,7 @@ public class ComponentBuildingDefinition
 
     public static final String TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE = "Type converter cannot be used with a type definition from a configuration attribute.";
     public static final String TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE = "Type converter can only be used with simple types. You can't use it with %s";
+    public static final String KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE = "key type converter can only be used with objects of type Map";
 
     private TypeDefinition typeDefinition;
     private boolean scope;
@@ -48,6 +48,7 @@ public class ComponentBuildingDefinition
     private boolean prototype;
     private ComponentIdentifier componentIdentifier;
     private Optional<TypeConverter> typeConverter = empty();
+    private Optional<TypeConverter> keyTypeConverter = empty();
 
     private ComponentBuildingDefinition()
     {
@@ -125,6 +126,14 @@ public class ComponentBuildingDefinition
     }
 
     /**
+     * @return a converter to be applied to the configuration key when the element is a map entry.
+     */
+    public Optional<TypeConverter> getKeyTypeConverter()
+    {
+        return keyTypeConverter;
+    }
+
+    /**
      * Builder for {@code ComponentBuildingDefinition}
      * <p/>
      * TODO MULE-9693 Improve builder so the copy is not required to reuse the namespace value.
@@ -188,9 +197,9 @@ public class ComponentBuildingDefinition
         }
 
         /**
-         * Sets the {@link org.mule.runtime.config.spring.dsl.processor.TypeDefinition} to discover the object type.
-         * It may be created from {@link org.mule.runtime.config.spring.dsl.processor.TypeDefinition#fromType(Class)} which
-         * means the type is predefined. Or it may be created from {@link org.mule.runtime.config.spring.dsl.processor.TypeDefinition#fromConfigurationAttribute(String)}
+         * Sets the {@link TypeDefinition} to discover the object type.
+         * It may be created from {@link TypeDefinition#fromType(Class)} which
+         * means the type is predefined. Or it may be created from {@link TypeDefinition#fromConfigurationAttribute(String)}
          * which means that the object type is declared within the configuration using a config attribute.
          *
          * @param typeDefinition the type definition to discover the objecvt type
@@ -215,6 +224,22 @@ public class ComponentBuildingDefinition
         public Builder withTypeConverter(TypeConverter typeConverter)
         {
             definition.typeConverter = of(typeConverter);
+            return this;
+        }
+
+        /**
+         * This method allows to convert a map entry key to another type using a converter.
+         *
+         * {@code TypeConverter} are only allowed when the produce type by the component is
+         * any of java primitive types, its wrapper or string.
+         *
+         * @param typeConverter converter from the configuration value to a custom type.
+         * @return the builder
+         * @return
+         */
+        public Builder withKeyTypeConverter(TypeConverter typeConverter)
+        {
+            definition.keyTypeConverter = of(typeConverter);
             return this;
         }
 
@@ -289,9 +314,15 @@ public class ComponentBuildingDefinition
             checkState(namespace != null, "You must specify the namespace");
             Optional<Class> componentType = getType();
             checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && componentType.isPresent()), TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE);
-            checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && isSimpleType(componentType.get())), format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE, componentType.orElse(Object.class).getName()));
+            checkState(!definition.typeConverter.isPresent() || (definition.typeConverter.isPresent() && (isSimpleType(componentType.get()) || isMapType(componentType.get()))), format(TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE, componentType.orElse(Object.class).getName()));
+            checkState(!definition.keyTypeConverter.isPresent() || (definition.keyTypeConverter.isPresent() && componentType.isPresent() && isMapType(componentType.get())), KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE);
             definition.componentIdentifier = new ComponentIdentifier.Builder().withName(identifier).withNamespace(namespace).build();
             return definition;
+        }
+
+        private boolean isMapType(Class componentType)
+        {
+            return Map.class.isAssignableFrom(componentType);
         }
 
         //TODO MULE-9681: remove for some other semantic. The API should not define something as "prototype" it should declare if it's a reusable component or an instance.
@@ -316,6 +347,12 @@ public class ComponentBuildingDefinition
                 @Override
                 public void onConfigurationAttribute(String attributeName)
                 {
+                }
+
+                @Override
+                public void onMapType(TypeDefinition.MapEntryType mapEntryType)
+                {
+                    typeReference.set(Map.class);
                 }
             });
             return ofNullable(typeReference.get());

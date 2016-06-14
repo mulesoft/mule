@@ -69,4 +69,32 @@
         </parsers-test:simple-type-child-list-with-converter>
     </parsers-test:parameter-collection-parser>
 
+    <parsers-test:parameter-collection-parser name="simpleTypeMapObject">
+        <parsers-test:simple-type-map>
+            <parsers-test:simple-type-entry key="key1" value="1"/>
+            <parsers-test:simple-type-entry key="key2" value="2"/>
+        </parsers-test:simple-type-map>
+    </parsers-test:parameter-collection-parser>
+
+    <parsers-test:parameter-collection-parser name="complexTypeMapObject">
+        <parsers-test:complex-type-map>
+            <parsers-test:complex-type-entry key="1">
+                <parsers-test:parameter-collection-parser firstname="Pablo" lastname="La Greca" age="32"/>
+            </parsers-test:complex-type-entry>
+            <parsers-test:complex-type-entry key="2">
+                <parsers-test:parameter-collection-parser firstname="Mariano" lastname="Gonzalez" age="31"/>
+            </parsers-test:complex-type-entry>
+        </parsers-test:complex-type-map>
+    </parsers-test:parameter-collection-parser>
+
+    <parsers-test:parameter-collection-parser name="simpleTypeCollectionMapObject">
+        <parsers-test:simple-list-type-map>
+            <parsers-test:simple-list-entry key="1">
+                <parsers-test:simple-type-child value="value1"/>
+                <parsers-test:simple-type-child value="value2"/>
+            </parsers-test:simple-list-entry>
+            <parsers-test:simple-list-entry key="2" value="#['some expression']"/>
+        </parsers-test:simple-list-type-map>
+    </parsers-test:parameter-collection-parser>
+
 </mule>

@@ -70,6 +70,47 @@
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
+                    <xsd:element name="simple-type-map" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="simple-type-entry" minOccurs="1" maxOccurs="unbounded">
+                                    <xsd:complexType>
+                                        <xsd:attribute name="key"/>
+                                        <xsd:attribute name="value"/>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="simple-list-type-map" minOccurs="0">
+                        <xsd:complexType>
+                            <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                                <xsd:element name="simple-list-entry">
+                                    <xsd:complexType>
+                                        <xsd:sequence>
+                                            <xsd:element name="simple-type-child" minOccurs="0" maxOccurs="unbounded" type="simpleTypeChildType"/>
+                                        </xsd:sequence>
+                                        <xsd:attribute name="key"/>
+                                        <xsd:attribute name="value"/>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="complex-type-map" minOccurs="0" maxOccurs="1">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="complex-type-entry" minOccurs="1" maxOccurs="unbounded">
+                                    <xsd:complexType>
+                                        <xsd:sequence>
+                                            <xsd:element ref="parameter-collection-parser" minOccurs="1" maxOccurs="1"/>
+                                        </xsd:sequence>
+                                        <xsd:attribute name="key"/>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="firstname"/>
                 <xsd:attribute name="lastname"/>

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.parsers;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -14,10 +15,10 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.config.spring.parsers.beans.SimpleCollectionObject;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.junit.Test;
 
@@ -98,7 +99,7 @@ public class SimpleParameterParsingTestCase extends FunctionalTestCase
     {
         SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("simpleTypeObject");
         assertSimpleTypeCollectionValues(simpleCollectionObject.getSimpleTypeList());
-        assertThat(simpleCollectionObject.getSimpleTypeSet(), instanceOf(HashSet.class));
+        assertThat(simpleCollectionObject.getSimpleTypeSet(), instanceOf(TreeSet.class));
         assertSimpleTypeCollectionValues(simpleCollectionObject.getSimpleTypeSet());
         Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
         assertThat(simpleParameters.size(), is(1));
@@ -112,6 +113,36 @@ public class SimpleParameterParsingTestCase extends FunctionalTestCase
         List<String> simpleTypeListWithConverter = simpleCollectionObject.getSimpleTypeListWithConverter();
         assertThat(simpleTypeListWithConverter.size(), is(2));
         assertThat(simpleTypeListWithConverter, hasItems("value1-with-converter", "value2-with-converter"));
+    }
+
+    @Test
+    public void simpleTypeMapObject()
+    {
+        SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("simpleTypeMapObject");
+        Map<String, Integer> simpleTypeMap = simpleCollectionObject.getSimpleTypeMap();
+        assertThat(simpleTypeMap.size(), is(2));
+    }
+
+    @Test
+    public void simpleListTypeMapObject()
+    {
+        SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("simpleTypeCollectionMapObject");
+        Map<String, List<String>> simpleListTypeMap = simpleCollectionObject.getSimpleListTypeMap();
+        assertThat(simpleListTypeMap.size(), is(2));
+        List<String> firstCollection = simpleListTypeMap.get("1");
+        assertThat(firstCollection, hasItems("value1", "value2"));
+        List<String> secondCollection = simpleListTypeMap.get("2");
+        assertThat(secondCollection, hasItem("#['some expression']"));
+    }
+
+    @Test
+    public void complexTypeMapObject()
+    {
+        SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("complexTypeMapObject");
+        Map<Long, SimpleCollectionObject> simpleTypeMap = simpleCollectionObject.getComplexTypeMap();
+        assertThat(simpleTypeMap.size(), is(2));
+        assertFirstChildParameters(simpleTypeMap.get(1l).getSimpleParameters());
+        assertSecondChildParameters(simpleTypeMap.get(2l).getSimpleParameters());
     }
 
     private void assertSimpleTypeCollectionValues(Collection<String> simpleTypeCollectionValues)

@@ -9,7 +9,6 @@ package org.mule.runtime.config.spring.dsl.processor;
 import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 
-import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -51,7 +50,12 @@ public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVi
     }
 
     @Override
-    public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionTypeOptional)
+    public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier)
+    {
+    }
+
+    @Override
+    public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier)
     {
     }
 

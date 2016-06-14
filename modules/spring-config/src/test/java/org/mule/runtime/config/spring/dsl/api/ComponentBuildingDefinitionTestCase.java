@@ -9,16 +9,19 @@ package org.mule.runtime.config.spring.dsl.api;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.rules.ExpectedException.none;
+import static org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE;
 import static org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.TYPE_CONVERTER_AND_NO_SIMPLE_TYPE_MESSAGE_TEMPLATE;
 import static org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.TYPE_CONVERTER_AND_UNKNOWN_TYPE_MESSAGE;
-import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromConfigurationAttribute;
-import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromType;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigurationAttribute;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@SmallTest
 public class ComponentBuildingDefinitionTestCase extends AbstractMuleTestCase
 {
 
@@ -57,6 +60,17 @@ public class ComponentBuildingDefinitionTestCase extends AbstractMuleTestCase
                 .copy()
                 .withTypeDefinition(fromType(Object.class))
                 .withTypeConverter(getFakeTypeConverter())
+                .build();
+    }
+
+    @Test
+    public void keyTypeConverterAndNoMapType()
+    {
+        expectException.expectMessage(is(KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE));
+        baseDefinition
+                .copy()
+                .withTypeDefinition(fromType(Object.class))
+                .withKeyTypeConverter(getFakeTypeConverter())
                 .build();
     }
 

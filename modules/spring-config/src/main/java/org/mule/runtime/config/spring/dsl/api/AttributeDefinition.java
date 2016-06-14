@@ -9,9 +9,6 @@ package org.mule.runtime.config.spring.dsl.api;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
-import org.mule.runtime.core.util.Preconditions;
-
-import java.util.Collection;
 
 /**
  * Defines how to build an attribute from an object.
@@ -35,11 +32,13 @@ public class AttributeDefinition
     private boolean undefinedComplexParametersHolder;
     private String referenceSimpleParameter;
     private boolean collection;
+    private boolean map;
+    private Class<?> mapKeyType;
     private boolean valueFromTextContent;
     private TypeConverter typeConverter;
     private KeyAttributeDefinitionPair[] definitions;
     private String wrapperIdentifier;
-    private Class<? extends Collection> collectionType;
+
 
     private AttributeDefinition()
     {
@@ -76,7 +75,11 @@ public class AttributeDefinition
         }
         else if (childObjectType != null && collection)
         {
-            visitor.onComplexChildCollection(childObjectType, ofNullable(wrapperIdentifier), ofNullable(collectionType));
+            visitor.onComplexChildCollection(childObjectType, ofNullable(wrapperIdentifier));
+        }
+        else if (childObjectType != null && map)
+        {
+            visitor.onComplexChildMap(mapKeyType, childObjectType, wrapperIdentifier);
         }
         else if (childObjectType != null)
         {
@@ -258,7 +261,7 @@ public class AttributeDefinition
         }
 
         /**
-         * Used when an attribute must be set with a collection of complex objects created from the
+         * Used when an attribute must be set with a collection of objects created from the
          * user configuration.
          *
          * @param type the collection object type.
@@ -273,17 +276,20 @@ public class AttributeDefinition
         }
 
         /**
-         * Used when the attribute type is collection and the collection implementation must
-         * be of a given type.
+         * Used when an attribute must be set with a map of objects created from the
+         * user configuration.
          *
-         * @param type collection type.
-         * @return the builder.
+         * @param keyType the map key type.
+         * @param valueType the map value type.
+         * @return the builder
          */
-        public Builder withCollectionType(Class<? extends Collection> type)
+        public static Builder fromChildMapConfiguration(Class<?> keyType, Class<?> valueType)
         {
-            checkState(this.attributeDefinition.collection, "Collection type can only be set when the attribute is a collection");
-            this.attributeDefinition.collectionType = type;
-            return this;
+            Builder builder = new Builder();
+            builder.attributeDefinition.childObjectType = valueType;
+            builder.attributeDefinition.mapKeyType = keyType;
+            builder.attributeDefinition.map = true;
+            return builder;
         }
 
         /**
