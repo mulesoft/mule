@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.SIMPLE_TYPE_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
@@ -29,8 +30,6 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
  */
 public class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator
 {
-
-    private static final String SIMPLE_TYPE_VALUE_PARAMETER_NAME = "value";
 
     @Override
     boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest)

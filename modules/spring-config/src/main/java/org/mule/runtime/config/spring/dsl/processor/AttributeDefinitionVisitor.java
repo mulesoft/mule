@@ -7,17 +7,15 @@
 
 package org.mule.runtime.config.spring.dsl.processor;
 
-import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 
-import java.util.Collection;
 import java.util.Optional;
 
 /**
  * An {code AttributeDefinitionVisitor} is in charge of handling an attribute configuration when
  * building an object from a {@link org.mule.runtime.config.spring.dsl.model.ComponentModel}.
- *
+ * <p>
  * Depending on the {@link org.mule.runtime.config.spring.dsl.api.AttributeDefinition} configuration
  * a method and only one method of this contract will be invoked.
  *
@@ -52,7 +50,7 @@ public interface AttributeDefinitionVisitor
      * Called when the attribute is configured from a simple configuration attribute.
      *
      * @param parameterName configuration parameter name.
-     * @param defaultValue default value for the configuration parameter if it has not value.
+     * @param defaultValue  default value for the configuration parameter if it has not value.
      * @param typeConverter a value converter to convert from the value provided by the config to the value required of the attribute.
      */
     void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter);
@@ -70,16 +68,24 @@ public interface AttributeDefinitionVisitor
     /**
      * Called when the attribute is configured from a list of object with a certain type.
      *
-     * @param type                   type of the list to be set in the attribute.
-     * @param wrapperIdentifier      the identifier of the wrapper element that holds the list of components
-     * @param collectionTypeOptional type of the collection to use for storing the elements
+     * @param type                      type of the list values to be set in the attribute.
+     * @param wrapperIdentifierOptional the identifier of the wrapper element that holds the list of components
      */
-    void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionTypeOptional);
+    void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifierOptional);
+
+    /**
+     * Called when the attribute is configured from a map of objects with a certain type.
+     *
+     * @param keyType           type of the map key to be set in the attribute.
+     * @param valueType         type of the map value to be set in the attribute.
+     * @param wrapperIdentifier the identifier of the wrapper element that holds the list of components
+     */
+    void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier);
 
     /**
      * Called when the attribute is configured from an object with a certain type.
      *
-     * @param type type of the attribute value.
+     * @param type              type of the attribute value.
      * @param wrapperIdentifier the identifier of the component
      */
     void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier);
@@ -98,4 +104,5 @@ public interface AttributeDefinitionVisitor
      * @param definitions the set of {@code AttributeDefinition} to be used to create
      */
     void onMultipleValues(KeyAttributeDefinitionPair[] definitions);
+
 }

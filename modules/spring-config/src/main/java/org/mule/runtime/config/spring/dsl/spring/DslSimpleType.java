@@ -18,6 +18,8 @@ import java.util.Set;
 public class DslSimpleType
 {
 
+    public static final String SIMPLE_TYPE_VALUE_PARAMETER_NAME = "value";
+
     private final static Set<Class<?>> simpleTypes = of(Byte.class, byte.class,
                                                         Short.class, short.class,
                                                         Integer.class, int.class,

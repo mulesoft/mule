@@ -13,8 +13,8 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleReferenceParameter;
-import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromConfigurationAttribute;
-import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromType;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigurationAttribute;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;

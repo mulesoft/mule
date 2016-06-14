@@ -12,8 +12,8 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromTextContent;
 import static org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider.getTransformerBaseBuilderForClass;
-import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromConfigurationAttribute;
-import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromType;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigurationAttribute;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 
 import org.mule.functional.client.QueueWriterMessageProcessor;
 import org.mule.functional.functional.AssertionMessageProcessor;

@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_ELEMENT;
@@ -18,11 +17,11 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceI
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
-import static org.mule.runtime.config.spring.dsl.spring.WrapperComponentConfig.WrapperType.COLLECTION;
-import static org.mule.runtime.config.spring.dsl.spring.WrapperComponentConfig.WrapperType.SINGLE;
+import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.COLLECTION;
+import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.MAP;
+import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
@@ -35,8 +34,6 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 
 import com.google.common.collect.ImmutableSet;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,14 +46,13 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.ManagedList;
 import org.w3c.dom.Element;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
  * {@link org.springframework.beans.factory.config.BeanDefinition} that can later be converted to a runtime object
  * that will be part of the artifact.
- *
+ * <p>
  * It will recursively process a {@code ComponentModel} to create a {@code BeanDefinition}. For the time being
  * it will collaborate with the old bean definitions parsers for configurations that are partially defined in the
  * new parsing method.
@@ -95,11 +91,11 @@ public class BeanDefinitionFactory
     /**
      * Creates a {@code BeanDefinition} by traversing the {@code ComponentModel} and its children.
      *
-     * @param parentComponentModel the parent component model since the bean definition to be created may depend on the context.
-     * @param componentModel the component model from which we want to create the bean definition.
-     * @param registry the bean registry since it may be required to get other bean definitions to create this one or to register the bean definition.
+     * @param parentComponentModel        the parent component model since the bean definition to be created may depend on the context.
+     * @param componentModel              the component model from which we want to create the bean definition.
+     * @param registry                    the bean registry since it may be required to get other bean definitions to create this one or to register the bean definition.
      * @param componentModelPostProcessor a function to post process the bean definition.
-     * @param oldParsingMechanism a function to execute the old parsing mechanism if required by children {@code ComponentModel}s
+     * @param oldParsingMechanism         a function to execute the old parsing mechanism if required by children {@code ComponentModel}s
      * @return the {@code BeanDefinition} of the component model.
      */
     public BeanDefinition resolveComponentRecursively(ComponentModel parentComponentModel,
@@ -163,48 +159,41 @@ public class BeanDefinitionFactory
 
     private void resolveComponentBeanDefinition(ComponentModel parentComponentModel, ComponentModel componentModel)
     {
-        if (isWrapperComponent(componentModel.getIdentifier(), of(parentComponentModel.getIdentifier())))
+        if (!customBuildersComponentIdentifiers.contains(componentModel.getIdentifier()))
         {
-            processComponentWrapper(componentModel);
-        }
-        else
-        {
-            ComponentBuildingDefinition componentBuildingDefinition = null;
-            if (!customBuildersComponentIdentifiers.contains(componentModel.getIdentifier()))
+            Optional<ComponentBuildingDefinition> buildingDefinitionOptional = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
+            if (buildingDefinitionOptional.isPresent())
             {
-                componentBuildingDefinition = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier()).orElseThrow(() -> {
-                    return new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency " +
-                                                                               "missing to the project that handle that extension.",
-                                                                               componentModel.getIdentifier())));
-                });
+                this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel, buildingDefinitionOptional.get()));
             }
-            this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel, componentBuildingDefinition));
+            else
+            {
+                boolean isWrapperComponent = isWrapperComponent(componentModel.getIdentifier(), of(parentComponentModel.getIdentifier()));
+                if (!isWrapperComponent)
+                {
+                    new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency " +
+                                                                        "missing to the project that handle that extension.",
+                                                                        componentModel.getIdentifier())));
+                }
+                processComponentWrapper(componentModel);
+            }
         }
     }
 
     private void processComponentWrapper(ComponentModel componentModel)
     {
-        componentModel.setType(componentModel.getInnerComponents().get(0).getType());
         ComponentBuildingDefinition parentBuildingDefinition = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getParent().getIdentifier()).get();
-        Map<String, WrapperComponentConfig> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(parentBuildingDefinition);
-        WrapperComponentConfig wrapperComponentConfig = wrapperIdentifierAndTypeMap.get(componentModel.getIdentifier().getName());
-        if (wrapperComponentConfig.getWrapperType().equals(COLLECTION))
+        Map<String, WrapperElementType> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(parentBuildingDefinition);
+        WrapperElementType wrapperElementType = wrapperIdentifierAndTypeMap.get(componentModel.getIdentifier().getName());
+        if (wrapperElementType.equals(SINGLE))
         {
-            Class<? extends Collection> type = wrapperComponentConfig.getCollectionTypeOptional().orElse(ArrayList.class);
-            ManagedList<Object> managedList = new ManagedList<>();
-            for (ComponentModel innerComponentModel : componentModel.getInnerComponents())
-            {
-                Object value = innerComponentModel.getBeanDefinition() != null ? innerComponentModel.getBeanDefinition() : innerComponentModel.getBeanReference();
-                managedList.add(value);
-            }
-            componentModel.setBeanDefinition(genericBeanDefinition(type)
-                                                     .addConstructorArgValue(managedList)
-                                                     .getBeanDefinition());
+            componentModel.setType(componentModel.getInnerComponents().get(0).getType());
+            componentModel.setBeanDefinition(componentModel.getInnerComponents().get(0).getBeanDefinition());
+            componentModel.setBeanReference(componentModel.getInnerComponents().get(0).getBeanReference());
         }
         else
         {
-            componentModel.setBeanDefinition(componentModel.getInnerComponents().get(0).getBeanDefinition());
-            componentModel.setBeanReference(componentModel.getInnerComponents().get(0).getBeanReference());
+            throw new IllegalStateException(format("Element %s does not have a building definition and it should since it's of type %s", componentModel.getIdentifier(), wrapperElementType));
         }
     }
 
@@ -226,12 +215,18 @@ public class BeanDefinitionFactory
         FilterReferenceBeanDefinitionCreator filterReferenceBeanDefinitionCreator = new FilterReferenceBeanDefinitionCreator();
         ReferenceBeanDefinitionCreator referenceBeanDefinitionCreator = new ReferenceBeanDefinitionCreator();
         SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
+        CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
+        MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
+        MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
         CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator();
         exceptionStrategyRefBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
         exceptionStrategyRefBeanDefinitionCreator.setNext(filterReferenceBeanDefinitionCreator);
         filterReferenceBeanDefinitionCreator.setNext(referenceBeanDefinitionCreator);
         referenceBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
-        simpleTypeBeanDefinitionCreator.setNext(commonComponentModelProcessor);
+        simpleTypeBeanDefinitionCreator.setNext(collectionBeanDefinitionCreator);
+        collectionBeanDefinitionCreator.setNext(mapEntryBeanDefinitionCreator);
+        mapEntryBeanDefinitionCreator.setNext(mapBeanDefinitionCreator);
+        mapBeanDefinitionCreator.setNext(commonComponentModelProcessor);
         return exceptionStrategyRefBeanDefinitionCreator;
     }
 
@@ -239,7 +234,7 @@ public class BeanDefinitionFactory
      * Used to collaborate with the bean definition parsers mechanism.
      * If {@code #hasDefinition} returns false, then the old mechanism must be used.
      *
-     * @param componentIdentifier a {@code ComponentModel} identifier.
+     * @param componentIdentifier          a {@code ComponentModel} identifier.
      * @param parentComponentModelOptional the {@code ComponentModel} parent identifier.
      * @return true if there's a {@code ComponentBuildingDefinition} for the specified configuration identifier, false if there's not.
      */
@@ -263,29 +258,35 @@ public class BeanDefinitionFactory
         {
             return false;
         }
-        final Map<String, WrapperComponentConfig> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(buildingDefinitionOptional.get());
+        final Map<String, WrapperElementType> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(buildingDefinitionOptional.get());
         return wrapperIdentifierAndTypeMap.containsKey(componentModel.getName());
     }
 
-    private Map<String, WrapperComponentConfig> getWrapperIdentifierAndTypeMap(ComponentBuildingDefinition buildingDefinition)
+    private Map<String, WrapperElementType> getWrapperIdentifierAndTypeMap(ComponentBuildingDefinition buildingDefinition)
     {
-        final Map<String, WrapperComponentConfig> wrapperIdentifierAndTypeMap = new HashMap<>();
+        final Map<String, WrapperElementType> wrapperIdentifierAndTypeMap = new HashMap<>();
         AbstractAttributeDefinitionVisitor wrapperIdentifiersCollector = new AbstractAttributeDefinitionVisitor()
         {
             @Override
-            public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionTypeOptional)
+            public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifierOptional)
             {
-                wrapperIdentifier.ifPresent( identifier -> {
-                    wrapperIdentifierAndTypeMap.put(identifier, new WrapperComponentConfig(COLLECTION, collectionTypeOptional));
+                wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> {
+                    wrapperIdentifierAndTypeMap.put(wrapperIdentifier, COLLECTION);
                 });
             }
 
             @Override
-            public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
+            public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifierOptional)
             {
-                wrapperIdentifier.ifPresent(identifier -> {
-                    wrapperIdentifierAndTypeMap.put(identifier, new WrapperComponentConfig(SINGLE, empty()));
+                wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> {
+                    wrapperIdentifierAndTypeMap.put(wrapperIdentifier, SINGLE);
                 });
+            }
+
+            @Override
+            public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier)
+            {
+                wrapperIdentifierAndTypeMap.put(wrapperIdentifier, MAP);
             }
 
             @Override

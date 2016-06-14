@@ -7,21 +7,25 @@
 package org.mule.runtime.config.dsl;
 
 import static org.mule.runtime.config.dsl.ParserXmlNamespaceInfoProvider.PARSERS_TEST_NAMESACE;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
-import static org.mule.runtime.config.spring.dsl.processor.TypeDefinition.fromType;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntryType;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.spring.parsers.beans.SimpleCollectionObject;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class ParserComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider
 {
@@ -41,9 +45,12 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                 .copy()
                                 .withIdentifier("parameter-collection-parser")
                                 .withTypeDefinition(fromType(SimpleCollectionObject.class))
-                                .withSetterParameterDefinition("simpleTypeList", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-list").build())
-                                .withSetterParameterDefinition("simpleTypeListWithConverter", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-list-with-converter").build())
-                                .withSetterParameterDefinition("simpleTypeSet", fromChildCollectionConfiguration(String.class).withWrapperIdentifier("simple-type-child-set").withCollectionType(HashSet.class).build())
+                                .withSetterParameterDefinition("simpleTypeList", fromChildConfiguration(List.class).withWrapperIdentifier("simple-type-child-list").build())
+                                .withSetterParameterDefinition("simpleTypeListWithConverter", fromChildConfiguration(List.class).withWrapperIdentifier("simple-type-child-list-with-converter").build())
+                                .withSetterParameterDefinition("simpleTypeSet", fromChildConfiguration(Set.class).withWrapperIdentifier("simple-type-child-set").build())
+                                .withSetterParameterDefinition("simpleTypeMap", fromChildMapConfiguration(String.class, Integer.class).withWrapperIdentifier("simple-type-map").build())
+                                .withSetterParameterDefinition("simpleListTypeMap", fromChildMapConfiguration(String.class, String.class).withWrapperIdentifier("simple-list-type-map").build())
+                                .withSetterParameterDefinition("complexTypeMap", fromChildMapConfiguration(Long.class, SimpleCollectionObject.class).withWrapperIdentifier("complex-type-map").build())
                                 .withSetterParameterDefinition("simpleParameters", fromMultipleDefinitions(
                                         newBuilder()
                                                 .withAttributeDefinition(fromSimpleParameter("firstname").build())
@@ -66,18 +73,54 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                                 .withKey("second-child")
                                                 .build(),
                                         newBuilder()
-                                                .withAttributeDefinition(fromChildCollectionConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("other-children").build())
+                                                .withAttributeDefinition(fromChildConfiguration(List.class).withWrapperIdentifier("other-children").build())
                                                 .withKey("other-children")
                                                 .build(),
                                         newBuilder()
-                                                .withAttributeDefinition(fromChildCollectionConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("other-children-custom-collection-type").withCollectionType(LinkedList.class).build())
+                                                .withAttributeDefinition(fromChildConfiguration(List.class).withWrapperIdentifier("other-children-custom-collection-type").build())
                                                 .withKey("other-children-custom-collection-type")
                                                 .build(),
                                         newBuilder()
-                                                .withAttributeDefinition(fromChildCollectionConfiguration(String.class).withWrapperIdentifier("other-simple-type-child-list").build())
+                                                .withAttributeDefinition(fromChildConfiguration(List.class).withWrapperIdentifier("other-simple-type-child-list").build())
                                                 .withKey("other-simple-type-child-list-custom-key")
                                                 .build())
                                         .build())
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("simple-type-child-list")
+                                .withTypeDefinition(fromType(List.class))
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("simple-type-child-list-with-converter")
+                                .withTypeDefinition(fromType(List.class))
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("other-children-custom-collection-type")
+                                .withTypeDefinition(fromType(LinkedList.class))
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("other-children")
+                                .withTypeDefinition(fromType(List.class))
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("simple-type-child-set")
+                                .withTypeDefinition(fromType(TreeSet.class))
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("other-simple-type-child-list")
+                                .withTypeDefinition(fromType(List.class))
                                 .build());
 
         definitions.add(baseBuilder
@@ -90,9 +133,48 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                 .copy()
                                 .withIdentifier("simple-type-child-with-converter")
                                 .withTypeDefinition(fromType(String.class))
-                                .withTypeConverter( input -> input + "-with-converter")
+                                .withTypeConverter(input -> input + "-with-converter")
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("simple-type-map")
+                                .withTypeDefinition(fromType(TreeMap.class))
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("simple-type-entry")
+                                .withTypeDefinition(fromMapEntryType(String.class, Integer.class))
+                                .withKeyTypeConverter(input -> input + "-with-converter")
+                                .withTypeConverter(input -> Integer.valueOf((String) input) + 1)
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("simple-list-type-map")
+                                .withTypeDefinition(fromType(Map.class))
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("simple-list-entry")
+                                .withTypeDefinition(fromMapEntryType(String.class, List.class))
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("complex-type-map")
+                                .withTypeDefinition(fromType(Map.class))
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("complex-type-entry")
+                                .withTypeDefinition(fromMapEntryType(Long.class, SimpleCollectionObject.class))
                                 .build());
 
         return definitions;
     }
+
 }

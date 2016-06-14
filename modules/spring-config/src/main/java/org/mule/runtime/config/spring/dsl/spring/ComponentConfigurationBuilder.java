@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
@@ -20,7 +20,6 @@ import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.util.ClassUtils;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +117,7 @@ class ComponentConfigurationBuilder
                 }
             }
             Object bean = cdm.getBeanDefinition() != null ? cdm.getBeanDefinition() : cdm.getBeanReference();
-            return new ComponentValue(cdm.getIdentifier(), beanDefinitionType, bean);
+            return new ComponentValue(cdm, beanDefinitionType, bean);
         }).filter(beanDefinitionTypePair -> {
             return beanDefinitionTypePair != null;
         }).collect(toList());
@@ -216,10 +216,18 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionType)
+        public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier)
         {
             ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
-            valueExtractor.onComplexChildCollection(type, wrapperIdentifier, collectionType);
+            valueExtractor.onComplexChildCollection(type, wrapperIdentifier);
+            valueConsumer.accept(valueExtractor.getValue());
+        }
+
+        @Override
+        public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier)
+        {
+            ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
+            valueExtractor.onComplexChildMap(keyType, valueType, wrapperIdentifier);
             valueConsumer.accept(valueExtractor.getValue());
         }
 
@@ -331,11 +339,11 @@ class ComponentConfigurationBuilder
         @Override
         public void onUndefinedComplexParameters()
         {
-            this.value = constructManagedList(fromBeanDefinitionTypePairToBeanDefinition(complexParameters), empty());
+            this.value = constructManagedList(fromBeanDefinitionTypePairToBeanDefinition(complexParameters));
         }
 
         @Override
-        public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier, Optional<Class<? extends Collection>> collectionTypeOptional)
+        public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifier)
         {
             Predicate<ComponentValue> matchesTypeAndIdentifierPredicate = getTypeAndIdentifierPredicate(type, wrapperIdentifier);
             List<ComponentValue> matchingComponentValues = complexParameters.stream()
@@ -351,9 +359,21 @@ class ComponentConfigurationBuilder
             {
                 if (!matchingComponentValues.isEmpty())
                 {
-                    this.value = constructManagedList(fromBeanDefinitionTypePairToBeanDefinition(matchingComponentValues), collectionTypeOptional);
+                    this.value = constructManagedList(fromBeanDefinitionTypePairToBeanDefinition(matchingComponentValues));
                 }
             }
+        }
+
+        @Override
+        public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier)
+        {
+            Optional<ComponentValue> componentValueOptional = complexParameters.stream()
+                    .filter(getTypeAndIdentifierPredicate(MapFactoryBean.class, of(wrapperIdentifier)))
+                    .findFirst();
+            componentValueOptional.ifPresent( componentValue -> {
+                complexParameters.remove(componentValue);
+                value = componentValue.getBean();
+            });
         }
 
         @Override
@@ -373,7 +393,7 @@ class ComponentConfigurationBuilder
             return componentValue -> {
                         AtomicReference<Boolean> matchesIdentifier = new AtomicReference<>(true);
                         wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> {
-                            matchesIdentifier.set(wrapperIdentifier.equals(componentValue.getIdentifier().getName()));
+                            matchesIdentifier.set(wrapperIdentifier.equals(componentValue.getComponentModel().getIdentifier().getName()));
                         });
                         return matchesIdentifier.get() && areMatchingTypes(type, componentValue.getType());
                     };
@@ -395,10 +415,9 @@ class ComponentConfigurationBuilder
         }
     }
 
-    private ManagedList constructManagedList(List<Object> beans, Optional<? extends Class<? extends Collection>> collectionTypeOptional)
+    private ManagedList constructManagedList(List<Object> beans)
     {
         ManagedList managedList = new ManagedList();
-        collectionTypeOptional.ifPresent( collectionType -> managedList.setElementTypeName(collectionType.getTypeName()));
         managedList.addAll(beans);
         return managedList;
     }
