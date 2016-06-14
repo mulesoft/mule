@@ -11,6 +11,7 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
 import static org.apache.http.entity.ContentType.TEXT_PLAIN;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
@@ -56,7 +57,6 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
@@ -168,7 +168,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
             try (CloseableHttpResponse response = httpClient.execute(httpGet))
             {
                 final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
-                assertThat(contentType, Matchers.containsString(MULTIPART_FORM_DATA));
+                assertThat(contentType, containsString(MULTIPART_FORM_DATA));
 
                 final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
                 assertThat(parts.size(), is(1));
@@ -201,7 +201,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
                 assertThat(new String(((HttpPartDataSource) receivedParts.get(FILE_BODY_FIELD_NAME).getDataSource()).getContent()), Is.<Object>is(FILE_BODY_FIELD_VALUE));
 
                 final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
-                assertThat(contentType, Matchers.containsString(expectedResponseContentType));
+                assertThat(contentType, containsString(expectedResponseContentType));
 
                 final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
                 assertThat(parts.size(), is(2));
@@ -273,9 +273,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
 
     public static List<org.mule.extension.http.api.HttpPart> buildParts(org.mule.extension.http.api.HttpPart... parts)
     {
-        List<org.mule.extension.http.api.HttpPart> partsList = new LinkedList<>();
-        Arrays.stream(parts).forEach(partsList::add);
-        return partsList;
+        return Arrays.asList(parts);
     }
 
     public static class CreatePartMessageProcessor implements MessageProcessor

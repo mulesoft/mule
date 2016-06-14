@@ -66,18 +66,21 @@ public class HttpResponseBuilder extends HttpMessageBuilder
     @Parameter
     @Optional
     private Function<MuleEvent, Integer> statusCode;
+
     /**
      * HTTP reason phrase the response should have.
      */
     @Parameter
     @Optional
     private Function<MuleEvent, String> reasonPhrase;
+
     /**
      * HTTP headers the response should have, as an expression. Will override the headers attribute.
      */
     @Parameter
     @Optional
     private Function<MuleEvent, Map> headersRef;
+
     /**
      * HTTP parts the message should include, as an expression. Will override the parts attribute.
      */
