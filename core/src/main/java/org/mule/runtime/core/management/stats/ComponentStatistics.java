@@ -12,8 +12,8 @@ import org.mule.runtime.core.util.StringUtils;
 
 import java.io.PrintWriter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ComponentStatistics is a basic metrics aggregation class that is accessible via the JMX api. This class is not
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 public class ComponentStatistics implements Statistics
 {
 
-    private static final Log logger = LogFactory.getLog(ComponentStatistics.class);
+    private static final Logger logger = LoggerFactory.getLogger(ComponentStatistics.class);
 
     /**
      * Serial version

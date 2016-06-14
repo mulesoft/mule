@@ -17,8 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>ExpiryMonitor</code> can monitor objects beased on an expiry time and can
@@ -30,7 +30,7 @@ public class ExpiryMonitor implements Runnable, Disposable
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(ExpiryMonitor.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ExpiryMonitor.class);
 
     protected ScheduledThreadPoolExecutor scheduler;
 

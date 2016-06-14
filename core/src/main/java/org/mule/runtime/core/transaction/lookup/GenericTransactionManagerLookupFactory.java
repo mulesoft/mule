@@ -20,8 +20,8 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A factory performing a JNDI lookup for TransactionManager. <p/> NOTE: Java EE 1.4
@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class GenericTransactionManagerLookupFactory implements TransactionManagerFactory, Initialisable
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected Context context;
 

@@ -19,8 +19,8 @@ import java.util.TreeMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a static class that provides access to the Mule core manifest file.
@@ -31,7 +31,7 @@ public class MuleManifest
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(MuleManifest.class);
+    protected static final Logger logger = LoggerFactory.getLogger(MuleManifest.class);
 
     private static Manifest manifest;
 

@@ -7,6 +7,8 @@
 package org.mule.runtime.core.registry;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -16,7 +18,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.TransformerChain;
@@ -24,7 +25,6 @@ import org.mule.runtime.core.transformer.TransformerWeighting;
 import org.mule.runtime.core.transformer.graph.GraphTransformerResolver;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.transformer.simple.ObjectToString;
-import org.mule.runtime.api.metadata.SimpleDataType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Will discover transformers based on type information only. It looks for transformers that support
@@ -47,7 +47,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(TypeBasedTransformerResolver.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(TypeBasedTransformerResolver.class);
 
     private ObjectToString objectToString;
     private ObjectToByteArray objectToByteArray;

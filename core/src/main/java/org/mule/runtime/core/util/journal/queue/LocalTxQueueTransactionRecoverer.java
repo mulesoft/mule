@@ -17,8 +17,8 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Process for recover pending transactions after a server crash.
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 public class LocalTxQueueTransactionRecoverer
 {
 
-    private Log logger = LogFactory.getLog(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private final LocalTxQueueTransactionJournal localTxQueueTransactionJournal;
     private final QueueProvider queueProvider;

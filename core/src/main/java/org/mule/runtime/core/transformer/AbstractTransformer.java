@@ -32,8 +32,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>AbstractTransformer</code> is a base class for all transformers.
@@ -46,7 +46,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
 
     protected MuleContext muleContext;
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * The return type that will be returned by the {@link #transform} method is

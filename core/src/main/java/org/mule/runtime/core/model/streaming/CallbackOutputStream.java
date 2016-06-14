@@ -9,12 +9,12 @@ package org.mule.runtime.core.model.streaming;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CallbackOutputStream extends OutputStream
 {
-    private static final Log logger = LogFactory.getLog(CallbackOutputStream.class);
+    private static final Logger logger = LoggerFactory.getLogger(CallbackOutputStream.class);
 
     public static interface Callback
     {

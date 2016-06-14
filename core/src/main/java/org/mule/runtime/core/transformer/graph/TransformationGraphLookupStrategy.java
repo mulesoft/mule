@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.transformer.graph;
 
-import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.transformer.CompositeConverter;
 
 import java.util.HashSet;
@@ -15,16 +15,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jgrapht.DirectedGraph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Looks for available conversion paths inside a transformation graph.
  */
 public class TransformationGraphLookupStrategy
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private DirectedGraph<DataType<?>, TransformationEdge> graph;
 

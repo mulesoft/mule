@@ -10,16 +10,15 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class NetworkUtils
 {
-    private static final Log logger = LogFactory.getLog(NetworkUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(NetworkUtils.class);
 
     private static final Map<String, String> ipPerHost = new ConcurrentHashMap<>();
     private static InetAddress localHost;
@@ -57,7 +56,7 @@ public final class NetworkUtils
             }
             catch (Exception socketNotClosed)
             {
-                logger.debug(socketNotClosed);
+                logger.debug("Error closing socket", socketNotClosed);
             }
         }
 

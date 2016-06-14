@@ -22,9 +22,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.PoolableObjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A LifecyleEnabledObjectPool implementation for pooling {@link LifecycleAdapter}
@@ -38,7 +38,7 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(DefaultLifecycleEnabledObjectPool.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultLifecycleEnabledObjectPool.class);
 
     protected AtomicBoolean started = new AtomicBoolean(false);
 

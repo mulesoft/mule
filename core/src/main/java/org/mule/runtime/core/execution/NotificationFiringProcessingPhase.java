@@ -17,8 +17,8 @@ import org.mule.runtime.core.context.notification.ServerNotificationManager;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a reusable way for concrete {@link MessageProcessPhase}s to fire notifications.
@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class NotificationFiringProcessingPhase<Template extends MessageProcessTemplate> implements MessageProcessPhase<Template>, Comparable<MessageProcessPhase>, MuleContextAware
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private ConcurrentHashMap<ServerNotificationManager, NotificationHelper> notificationHelpers = new ConcurrentHashMap<>();
 

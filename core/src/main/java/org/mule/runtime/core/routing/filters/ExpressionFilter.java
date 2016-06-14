@@ -21,8 +21,8 @@ import org.mule.runtime.core.expression.ExpressionConfig;
 
 import java.text.MessageFormat;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Allows boolean expressions to be executed on a message. Note that when using this filter you must be able
@@ -39,7 +39,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(ExpressionFilter.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(ExpressionFilter.class);
 
     private ExpressionConfig config;
     private String fullExpression;

@@ -19,8 +19,8 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The lifecycle manager responsible for managing lifecycle transitions for a Mule
@@ -32,7 +32,7 @@ public class ComponentLifecycleManager extends SimpleLifecycleManager<Component>
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(ComponentLifecycleManager.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(ComponentLifecycleManager.class);
     protected MuleContext muleContext;
 
     public ComponentLifecycleManager(String name, Component component)
@@ -86,7 +86,7 @@ public class ComponentLifecycleManager extends SimpleLifecycleManager<Component>
         }
         catch (LifecycleException e)
         {
-            logger.warn(CoreMessages.failedToDispose(lifecycleManagerId), e);
+            logger.warn(CoreMessages.failedToDispose(lifecycleManagerId).toString(), e);
         }
     }
 

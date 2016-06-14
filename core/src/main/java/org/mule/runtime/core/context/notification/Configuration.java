@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.context.notification;
 
+import static org.mule.runtime.core.context.notification.ServerNotificationManager.toClass;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -18,10 +19,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import static org.mule.runtime.core.context.notification.ServerNotificationManager.toClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This acts as a synchronized collection. No call blocks and all are synchronized.
@@ -29,7 +28,7 @@ import static org.mule.runtime.core.context.notification.ServerNotificationManag
 class Configuration
 {
 
-    protected static Log logger = LogFactory.getLog(Configuration.class);
+    protected static Logger logger = LoggerFactory.getLogger(Configuration.class);
     private Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes =
             new HashMap<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>>(); // map from interface to collection of events
     private Set<ListenerSubscriptionPair> listenerSubscriptionPairs = new HashSet<ListenerSubscriptionPair>();
@@ -80,7 +79,7 @@ class Configuration
         dirty = true;
         if (!listenerSubscriptionPairs.add(pair))
         {
-            logger.warn(CoreMessages.notificationListenerSubscriptionAlreadyRegistered(pair));
+            logger.warn(CoreMessages.notificationListenerSubscriptionAlreadyRegistered(pair).toString());
         }
     }
 

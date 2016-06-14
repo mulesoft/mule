@@ -22,8 +22,8 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A JCE based encryption strategy. It also provides base64 encoding of
@@ -34,7 +34,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected KeySpec keySpec;
     protected SecretKey secretKey;

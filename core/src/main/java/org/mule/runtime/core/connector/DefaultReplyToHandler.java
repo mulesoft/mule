@@ -23,8 +23,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>DefaultReplyToHandler</code> is responsible for processing a message
@@ -41,7 +41,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected transient MuleContext muleContext;
     protected transient Map<String, Object> serializedData = null;
@@ -89,7 +89,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
         }
         this.muleContext = context;
 
-        logger = LogFactory.getLog(getClass());
+        logger = LoggerFactory.getLogger(getClass());
         serializedData = null;
     }
 

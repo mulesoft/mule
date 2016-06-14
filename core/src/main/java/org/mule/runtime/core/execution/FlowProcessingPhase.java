@@ -8,7 +8,6 @@ package org.mule.runtime.core.execution;
 
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
@@ -22,8 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This phase routes the message through the flow.
@@ -33,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowProcessingPhaseTemplate>
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public boolean supportsTemplate(MessageProcessTemplate messageProcessTemplate)
@@ -114,7 +113,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
                         logger.warn("Failure during exception processing in flow template: " + e.getMessage());
                         if (logger.isDebugEnabled())
                         {
-                            logger.debug(e);
+                            logger.debug("Failure during exception processing in flow template: ", e);
                         }
                     }
                     phaseResultNotifier.phaseFailure(e);

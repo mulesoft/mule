@@ -20,10 +20,10 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wraps a {@link ClusterizableMessageSource} in order to manage the lifecycle
@@ -33,7 +33,7 @@ import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
 public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecycle,  MuleContextAware, FlowConstructAware
 {
 
-    protected static final Log logger = LogFactory.getLog(ClusterizableMessageSourceWrapper.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ClusterizableMessageSourceWrapper.class);
 
     private PrimaryNodeLifecycleNotificationListener primaryNodeLifecycleNotificationListener;
     private final ClusterizableMessageSource messageSource;

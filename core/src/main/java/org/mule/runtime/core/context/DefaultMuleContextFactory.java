@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation that uses {@link DefaultMuleContextBuilder} to build new
@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultMuleContextFactory implements MuleContextFactory
 {
 
-    protected static final Log logger = LogFactory.getLog(DefaultMuleContextBuilder.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleContextBuilder.class);
 
     private List<MuleContextListener> listeners = new LinkedList<MuleContextListener>();
 

@@ -9,15 +9,14 @@ package org.mule.runtime.core.transaction;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transaction.constraints.ConstraintFilter;
 import org.mule.runtime.core.util.ClassUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p/> <code>MuleTransactionConfig</code> defines transaction configuration for a
@@ -28,7 +27,7 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(MuleTransactionConfig.class);
+    protected static final Logger logger = LoggerFactory.getLogger(MuleTransactionConfig.class);
 
     public static final String ACTION_NONE_STRING = "NONE";
     public static final String ACTION_ALWAYS_BEGIN_STRING = "ALWAYS_BEGIN";
@@ -221,7 +220,7 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
         }
         catch (CloneNotSupportedException e)
         {
-            logger.fatal("Failed to clone ConstraintFilter: " + e.getMessage(), e);
+            logger.error("Failed to clone ConstraintFilter: " + e.getMessage(), e);
             return constraint;
         }
     }

@@ -15,8 +15,8 @@ import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>WildcardFilter</code> is used to match Strings against wildcards. It
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class WildcardFilter implements Filter, ObjectFilter
 {
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected volatile String pattern;
     protected volatile String[] patterns;

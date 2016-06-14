@@ -46,8 +46,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
@@ -56,7 +56,7 @@ import org.apache.commons.logging.LogFactory;
 public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
 {
 
-    protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
+    protected transient Logger logger = LoggerFactory.getLogger(MuleRegistryHelper.class);
 
     /**
      * A reference to Mule's internal registry

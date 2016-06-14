@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -20,13 +22,11 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.TransformerTemplate;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.TemplateParser;
 import org.mule.runtime.core.util.TemplateParser.PatternInfo;
@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>InvokerMessageProcessor</code> invokes a specified method of an object. An
@@ -55,7 +55,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class InvokerMessageProcessor extends AbstractAnnotatedObject implements MessageProcessor, Initialisable, MuleContextAware
 {
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected Object object;
     protected Class<?> objectType;

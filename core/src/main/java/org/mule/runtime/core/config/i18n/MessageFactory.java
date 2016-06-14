@@ -11,8 +11,8 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class MessageFactory
@@ -29,7 +29,7 @@ public abstract class MessageFactory
     private static final int STATIC_ERROR_CODE = -1;
     private static final transient Object[] EMPTY_ARGS = new Object[]{};
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * Do not use the default reload control to avoid loading the resource bundle upon each request.

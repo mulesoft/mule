@@ -9,8 +9,8 @@ package org.mule.runtime.core.api.security.tls;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Move a {@link TlsConfiguration} to and from Properties (typically System Properties).
@@ -29,7 +29,7 @@ public class TlsPropertiesMapper
     private static final String KEY_TYPE_SUFFIX = ".ssl.keyStoreType";
     private static final String KEY_PASSWORD_SUFFIX = ".ssl.keyStorePassword";
 
-    private Log logger = LogFactory.getLog(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
     private String namespace;
 
     public TlsPropertiesMapper(String namespace)

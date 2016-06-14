@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.session;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.TypedValue;
@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>DefaultMuleSession</code> manages the interaction and distribution of events for Mule Services.
@@ -43,7 +43,7 @@ public final class DefaultMuleSession implements MuleSession
     /**
      * logger used by this class
      */
-    private static Log logger = LogFactory.getLog(DefaultMuleSession.class);
+    private static Logger logger = LoggerFactory.getLogger(DefaultMuleSession.class);
 
     /**
      * Determines if the service is valid
@@ -138,7 +138,7 @@ public final class DefaultMuleSession implements MuleSession
     {
         if (!(value instanceof Serializable))
         {
-            logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key));
+            logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key).toString());
         }
 
         DataType dataType = DataTypeFactory.createFromObject(value);
@@ -151,7 +151,7 @@ public final class DefaultMuleSession implements MuleSession
     {
         if (!(value instanceof Serializable))
         {
-            logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key));
+            logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key).toString());
         }
         properties.put(key, new TypedValue(value, dataType));
     }
@@ -208,7 +208,7 @@ public final class DefaultMuleSession implements MuleSession
             final Entry<String, TypedValue> entry = propertyIterator.next();
             if (!(entry.getValue().getValue() instanceof Serializable))
             {
-                logger.warn(CoreMessages.propertyNotSerializableWasDropped(entry.getKey()));
+                logger.warn(CoreMessages.propertyNotSerializableWasDropped(entry.getKey()).toString());
                 propertyIterator.remove();
             }
         }

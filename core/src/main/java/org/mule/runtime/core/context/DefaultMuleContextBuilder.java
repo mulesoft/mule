@@ -64,8 +64,8 @@ import org.mule.runtime.core.work.MuleWorkManager;
 
 import javax.resource.spi.work.WorkListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link MuleContextBuilder} that uses {@link DefaultMuleContext}
@@ -76,7 +76,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultMuleContextBuilder implements MuleContextBuilder
 {
 
-    protected static final Log logger = LogFactory.getLog(DefaultMuleContextBuilder.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleContextBuilder.class);
     public static final String MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE = "mule.context.workmanager.maxthreadsactive";
 
     protected MuleConfiguration config;

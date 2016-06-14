@@ -22,8 +22,8 @@ import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import java.io.InterruptedIOException;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for RetryPolicyTemplate implementations.  Uses ConnectNotifier as RetryNotifier
@@ -38,7 +38,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
 
     private MuleContext muleContext;
 
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     public void setMuleContext(MuleContext context)
     {
@@ -72,7 +72,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
                     cause = e;
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug(cause);
+                        logger.debug("Error executing policy", cause);
                     }
                     if (notifier != null)
                     {
@@ -107,7 +107,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(status.getThrowable());
+                    logger.debug("Error executing policy", status.getThrowable());
                 }
             }
         }

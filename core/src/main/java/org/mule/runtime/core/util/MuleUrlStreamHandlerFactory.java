@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A factory for loading URL protocol handlers. This factory is necessary to make
@@ -32,7 +32,7 @@ public class MuleUrlStreamHandlerFactory extends Object implements URLStreamHand
 {
     
     private static final String HANDLER_PKGS_SYSTEM_PROPERTY = "java.protocol.handler.pkgs";
-    private static final Log log = LogFactory.getLog(MuleUrlStreamHandlerFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(MuleUrlStreamHandlerFactory.class);
     
     private static Map registry = Collections.synchronizedMap(new HashMap());
 

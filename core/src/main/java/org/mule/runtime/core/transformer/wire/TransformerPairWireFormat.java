@@ -21,8 +21,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A pairing of an outbound transformer and an inbound transformer that can be used to serialize and deserialize data.
@@ -34,7 +34,7 @@ public class TransformerPairWireFormat implements WireFormat
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected Transformer inboundTransformer;
     protected Transformer outboundTransformer;

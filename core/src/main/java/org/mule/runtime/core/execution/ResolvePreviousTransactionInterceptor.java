@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 class ResolvePreviousTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {
-    private static final Log logger = LogFactory.getLog(ResolvePreviousTransactionInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResolvePreviousTransactionInterceptor.class);
     final private ExecutionInterceptor<T> next;
     private TransactionConfig transactionConfig;
 

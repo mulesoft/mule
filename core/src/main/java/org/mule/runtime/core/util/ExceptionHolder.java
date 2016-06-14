@@ -10,13 +10,13 @@ import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** TODO */
 public class ExceptionHolder implements ExceptionListener
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     private List<Exception> exceptions = new ArrayList<Exception>(2);
 
     public void exceptionThrown(Exception e)
@@ -43,7 +43,7 @@ public class ExceptionHolder implements ExceptionListener
     {
         for (Exception exception : exceptions)
         {
-            logger.error(exception);
+            logger.error("Exception thrown", exception);
         }
     }
 }

@@ -12,8 +12,8 @@ import java.net.Socket;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A socket factory that is configured via Properties, using a {@link TlsConfiguration}
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public class TlsPropertiesSocketFactory extends SSLSocketFactory
 {
 
-    private Log logger = LogFactory.getLog(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
     private boolean anon;
     private String namespace;
     private SSLSocketFactory factory;

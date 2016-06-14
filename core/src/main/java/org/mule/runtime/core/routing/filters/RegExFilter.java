@@ -8,7 +8,6 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.hash;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -29,8 +28,8 @@ import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>RegExFilter</code> is used to match a String argument against a regular expression.
@@ -39,7 +38,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
 {
 
     private static final int NO_FLAGS = 0;
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private Pattern pattern;
     private MuleContext muleContext;
@@ -139,7 +138,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
             }
             catch (TransformerException e)
             {
-                logger.warn(CoreMessages.transformFailedBeforeFilter(), e);
+                logger.warn(CoreMessages.transformFailedBeforeFilter().toString(), e);
                 // revert transformation
                 object = tempObject;
             }

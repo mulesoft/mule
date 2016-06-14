@@ -8,14 +8,14 @@ package org.mule.runtime.core.util;
 
 import org.mule.runtime.core.api.NameableObject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
 {
 
     /** logger used by this class */
-    protected static final Log logger = LogFactory.getLog(ObjectUtils.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ObjectUtils.class);
 
     /**
      * Like {@link #identityToString(Object)} but without the object's full package

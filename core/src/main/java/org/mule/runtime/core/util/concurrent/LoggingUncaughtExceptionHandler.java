@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.util.concurrent;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoggingUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public void uncaughtException(Thread thread, Throwable throwable)
     {

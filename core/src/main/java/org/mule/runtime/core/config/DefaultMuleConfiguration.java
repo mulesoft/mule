@@ -37,8 +37,8 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes
@@ -154,7 +154,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private boolean disableTimeouts = false;
 
-    protected static transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
+    protected static transient Logger logger = LoggerFactory.getLogger(DefaultMuleConfiguration.class);
 
     private MuleContext muleContext;
     private boolean containerMode;
@@ -229,7 +229,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             }
             catch (UnknownHostException e)
             {
-                logger.warn(e);
+                logger.warn("Unable to obtain hostname", e);
                 domainId = "org.mule.runtime.core";
             }
         }

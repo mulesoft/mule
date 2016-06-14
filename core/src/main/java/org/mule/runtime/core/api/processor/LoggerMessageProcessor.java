@@ -16,9 +16,9 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.StringUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MessageProcessor implementation that logs the current element of a value evaluated from it using
@@ -28,7 +28,7 @@ import org.apache.log4j.Level;
  */
 public class LoggerMessageProcessor extends AbstractAnnotatedObject implements MessageProcessor, Initialisable, MuleContextAware
 {
-    protected transient Log logger;
+    protected transient Logger logger;
 
     protected String message;
     protected String category;
@@ -47,11 +47,11 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements M
     {
         if (category != null)
         {
-            logger = LogFactory.getLog(category);
+            logger = LoggerFactory.getLogger(category);
         }
         else
         {
-            logger = LogFactory.getLog(LoggerMessageProcessor.class);
+            logger = LoggerFactory.getLogger(LoggerMessageProcessor.class);
         }
     }
 
@@ -118,13 +118,13 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements M
         ERROR 
         {
             @Override
-            public void log(Log logger, Object object) 
+            public void log(Logger logger, Object object)
             {
-                logger.error(object);
+                logger.error(object == null ?  null : object.toString());
             }
 
             @Override
-            public boolean isEnabled(Log logger) 
+            public boolean isEnabled(Logger logger)
             {
                 return logger.isErrorEnabled();
             }
@@ -132,13 +132,13 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements M
         WARN 
         {
             @Override
-            public void log(Log logger, Object object) 
+            public void log(Logger logger, Object object)
             {
-                logger.warn(object);
+                logger.warn(object == null ? null : object.toString());
             }
             
             @Override
-            public boolean isEnabled(Log logger) 
+            public boolean isEnabled(Logger logger)
             {
                 return logger.isWarnEnabled();
             }
@@ -146,13 +146,13 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements M
         INFO
         {
             @Override
-            public void log(Log logger, Object object) 
+            public void log(Logger logger, Object object)
             {
-                logger.info(object);
+                logger.info(object == null ? null : object.toString());
             }
             
             @Override
-            public boolean isEnabled(Log logger) 
+            public boolean isEnabled(Logger logger)
             {
                 return logger.isInfoEnabled();
             }
@@ -160,13 +160,13 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements M
         DEBUG
         {
             @Override
-            public void log(Log logger, Object object) 
+            public void log(Logger logger, Object object)
             {
-                logger.debug(object);
+                logger.debug(object == null ? null : object.toString());
             }
             
             @Override
-            public boolean isEnabled(Log logger) 
+            public boolean isEnabled(Logger logger)
             {
                 return logger.isDebugEnabled();
             }
@@ -174,19 +174,19 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject implements M
         TRACE
         {
             @Override
-            public void log(Log logger, Object object) 
+            public void log(Logger logger, Object object)
             {
-                logger.trace(object);
+                logger.trace(object == null ? null : object.toString());
             }
             
             @Override
-            public boolean isEnabled(Log logger) 
+            public boolean isEnabled(Logger logger)
             {
                 return logger.isTraceEnabled();
             }
         };
         
-        public abstract void log(Log logger, Object object);
-        public abstract boolean isEnabled(Log logger);
+        public abstract void log(Logger logger, Object object);
+        public abstract boolean isEnabled(Logger logger);
     }
 }

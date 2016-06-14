@@ -12,8 +12,8 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.message.SessionHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A session handler used to store and retrieve session information on an
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SimpleSessionHandler implements SessionHandler
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {

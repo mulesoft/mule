@@ -14,8 +14,8 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -37,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class SchedulerFactory<T extends Runnable> implements MuleContextAware
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * <p>
@@ -112,7 +112,7 @@ public abstract class SchedulerFactory<T extends Runnable> implements MuleContex
         }
         catch (MuleException e)
         {
-            logger.error(couldNotRegisterNewScheduler(scheduler.getName()), e);
+            logger.error(couldNotRegisterNewScheduler(scheduler.getName()).toString(), e);
         }
     }
 

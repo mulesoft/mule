@@ -25,8 +25,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages a transaction journal file.
@@ -43,7 +43,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
      */
     private static final int MINIMUM_ENTRIES_TO_CLEAR_FILE = 10000;
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private final File journalFile;
     private final JournalEntrySerializer<T, K> journalEntrySerializer;
@@ -119,7 +119,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
             logger.warn(e.getMessage());
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug("Error closing transaction journal file", e);
             }
         }
     }
@@ -220,7 +220,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
                     logger.warn("Exception reading transaction content. This is normal if the mule server was shutdown due to a failure" + e.getMessage());
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug(e);
+                        logger.debug("Error reading transaction journal file", e);
                     }
                     logEntryCreationFailed = true;
                 }
@@ -241,7 +241,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
             }
             catch (IOException e)
             {
-                logger.error(e);
+                logger.error("Error loading transaction journal file entries", e);
             }
         }
     }

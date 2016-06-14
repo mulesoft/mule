@@ -19,8 +19,8 @@ import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
 import org.mule.runtime.core.service.Pausable;
 import org.mule.runtime.core.service.Resumable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The lifecycle manager responsible for managing lifecycle transitions for a Mule service.  The Mule service adds some additional
@@ -32,7 +32,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(FlowConstructLifecycleManager.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(FlowConstructLifecycleManager.class);
     protected MuleContext muleContext;
 
 

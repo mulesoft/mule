@@ -95,7 +95,7 @@ public class DefaultLifecycleManager<T extends Lifecycle> extends SimpleLifecycl
         }
         catch (LifecycleException e)
         {
-            logger.warn(CoreMessages.failedToDispose(lifecycleManagerId), e);
+            logger.warn(CoreMessages.failedToDispose(lifecycleManagerId).toString(), e);
         }
     }
 

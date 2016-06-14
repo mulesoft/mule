@@ -10,8 +10,8 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>LoggingInterceptor</code> is a simple interceptor that logs a message before
@@ -22,7 +22,7 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor
     /**
      * logger used by this class
      */
-    private static Log logger = LogFactory.getLog(LoggingInterceptor.class);
+    private static Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 
     @Override
     public MuleEvent before(MuleEvent event)

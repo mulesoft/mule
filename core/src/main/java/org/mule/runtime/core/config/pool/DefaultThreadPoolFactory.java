@@ -18,13 +18,13 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultThreadPoolFactory extends ThreadPoolFactory
 {
     // deliberately shadow the superclass' static logger as to avoid log congestion on it
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public ThreadPoolExecutor createPool(String name, ThreadingProfile tp)

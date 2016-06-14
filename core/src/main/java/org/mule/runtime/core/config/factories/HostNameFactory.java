@@ -11,15 +11,15 @@ import org.mule.runtime.core.util.NetworkUtils;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extracts the local hostname from the local system
  */
 public class HostNameFactory implements PropertyFactory
 {
-    protected static final Log logger = LogFactory.getLog(HostNameFactory.class);
+    protected static final Logger logger = LoggerFactory.getLogger(HostNameFactory.class);
 
     public Object create(Map<?, ?> props) throws Exception
     {

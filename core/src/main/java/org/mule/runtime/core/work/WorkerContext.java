@@ -20,8 +20,8 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkRejectedException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>WorkerContext</code> TODO
@@ -32,7 +32,7 @@ public class WorkerContext implements Work
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(WorkerContext.class);
+    protected static final Logger logger = LoggerFactory.getLogger(WorkerContext.class);
 
     /**
      * Null WorkListener used as the default WorkListener.

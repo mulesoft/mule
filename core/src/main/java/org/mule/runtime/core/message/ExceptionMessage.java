@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>ExceptionMessage</code> is used by the DefaultServiceExceptionStrategy
@@ -33,7 +33,7 @@ public class ExceptionMessage implements Serializable
      */
     private static final long serialVersionUID = -538516243574950621L;
 
-    private static final Log logger = LogFactory.getLog(ExceptionMessage.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionMessage.class);
 
     // This object uses custom serialization via the writeObject() method
     private transient Object payload;

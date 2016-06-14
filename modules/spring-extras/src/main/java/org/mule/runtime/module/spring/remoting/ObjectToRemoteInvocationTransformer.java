@@ -80,7 +80,7 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
                 buf.append(currentArgument == null ? "<null>" : currentArgument.toString());
                 buf.append(")");
                 
-                logger.debug(buf);
+                logger.debug(buf.toString());
             }
         }
         return ri;

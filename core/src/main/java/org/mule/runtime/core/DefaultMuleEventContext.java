@@ -23,8 +23,8 @@ import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import java.io.OutputStream;
 import java.net.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>DefaultMuleEventContext</code> is the context object for the current
@@ -36,7 +36,7 @@ public class DefaultMuleEventContext implements MuleEventContext
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(DefaultMuleEventContext.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleEventContext.class);
 
     private final MuleEvent event;
     private final MuleContext muleContext;

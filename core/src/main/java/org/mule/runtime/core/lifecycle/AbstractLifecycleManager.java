@@ -25,8 +25,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a base implementation of the {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} interface
@@ -42,7 +42,7 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(AbstractLifecycleManager.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(AbstractLifecycleManager.class);
 
     protected String lifecycleManagerId;
     protected String currentPhase = NotInLifecyclePhase.PHASE_NAME;

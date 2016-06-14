@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.retry.async;
 
-import javax.resource.spi.work.Work;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.util.concurrent.Latch;
+
+import javax.resource.spi.work.Work;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link javax.resource.spi.work.Work} implementation used when executing a {@link RetryPolicyTemplate} in a separate
@@ -21,7 +22,7 @@ import org.mule.runtime.core.util.concurrent.Latch;
  */
 public class RetryWorker implements Work
 {
-    protected transient final Log logger = LogFactory.getLog(RetryWorker.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(RetryWorker.class);
 
     private final RetryCallback callback;
     private final WorkManager workManager;
@@ -64,7 +65,7 @@ public class RetryWorker implements Work
         }
         catch (InterruptedException e)
         {
-            logger.warn("Retry thread interupted for callback: " + callback.getWorkDescription());
+            logger.warn("Retry thread interrupted for callback: " + callback.getWorkDescription());
             return;
         }
         try
@@ -74,7 +75,7 @@ public class RetryWorker implements Work
         catch (Exception e)
         {
             this.exception = e;
-            logger.fatal(e, e);
+            logger.error("Error retrying work", e);
 
         }
     }

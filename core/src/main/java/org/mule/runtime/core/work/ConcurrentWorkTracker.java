@@ -13,13 +13,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConcurrentWorkTracker implements WorkTracker
 {
 
-    protected static final Log logger = LogFactory.getLog(ConcurrentWorkTracker.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ConcurrentWorkTracker.class);
 
     private final ReadWriteLock registryLock = new ReentrantReadWriteLock();
     private final List<Runnable> works = new LinkedList<Runnable>();

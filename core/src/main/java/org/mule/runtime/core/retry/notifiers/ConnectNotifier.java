@@ -11,15 +11,15 @@ import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fires a {@link ConnectionNotification} each time a retry attempt is made.
  */
 public class ConnectNotifier implements RetryNotifier
 {
-    protected transient final Log logger = LogFactory.getLog(ConnectNotifier.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(ConnectNotifier.class);
 
     public void onSuccess(RetryContext context)
     {

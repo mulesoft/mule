@@ -20,8 +20,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link TransactionalQueueStoreDelegate} implementation using two files for storing the
@@ -42,7 +42,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
     private static final String QUEUE_STORE_2_SUFFIX = "-2";
     private static final Object QUEUE_DATA_CONTROL_SUFFIX = "-crl";
 
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final MuleContext muleContext;
     private final ObjectSerializer serializer;
     private final ReadWriteLock filesLock;
@@ -232,7 +232,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
                 logger.warn("Failure trying to deserialize value " + e.getMessage());
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(e);
+                    logger.debug("Failure trying to deserialize value", e);
                 }
             }
         }

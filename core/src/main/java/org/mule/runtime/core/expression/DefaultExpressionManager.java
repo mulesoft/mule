@@ -25,8 +25,8 @@ import org.mule.runtime.core.util.TemplateParser;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides universal access for evaluating expressions embedded in Mule configurations, such as Xml, Java,
@@ -38,7 +38,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     /**
      * logger used by this class
      */
-    protected static transient final Log logger = LogFactory.getLog(DefaultExpressionManager.class);
+    protected static transient final Logger logger = LoggerFactory.getLogger(DefaultExpressionManager.class);
 
     public static final String OBJECT_FOR_ENRICHMENT = "__object_for_enrichment";
 

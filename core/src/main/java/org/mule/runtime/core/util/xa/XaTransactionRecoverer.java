@@ -23,13 +23,13 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XaTransactionRecoverer
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private final XaTxQueueTransactionJournal xaTxQueueTransactionJournal;
     private final QueueProvider queueProvider;
@@ -91,7 +91,7 @@ public class XaTransactionRecoverer
     {
         try
         {
-            logger.info("Rollbacking danling tx with id " + xid);
+            logger.info("Rollbacking dangling tx with id " + xid);
             new PersistentXaTransactionContext(xaTxQueueTransactionJournal, queueProvider, xid).doRollback();
         }
         catch (ResourceManagerException e)
@@ -99,7 +99,7 @@ public class XaTransactionRecoverer
             logger.warn(e.getMessage());
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug("Error rollbacking dangling transaction", e);
             }
             throw new XAException(XAException.XAER_NOTA);
         }
@@ -109,7 +109,7 @@ public class XaTransactionRecoverer
     {
         try
         {
-            logger.info("Commiting danling tx with id " + xid);
+            logger.info("Commiting dangling tx with id " + xid);
             new PersistentXaTransactionContext(xaTxQueueTransactionJournal, queueProvider, xid).doCommit();
         }
         catch (ResourceManagerException e)
@@ -117,7 +117,7 @@ public class XaTransactionRecoverer
             logger.warn(e.getMessage());
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug("Error committing dangling transaction", e);
             }
             throw new XAException(XAException.XAER_NOTA);
         }

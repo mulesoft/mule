@@ -11,8 +11,8 @@ import org.mule.runtime.core.api.component.simple.LogService;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.util.StringMessageUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>LogComponent</code> simply logs the content (or content length if it is a
@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class LogComponent implements Callable, LogService
 {
-    private static Log logger = LogFactory.getLog(LogComponent.class);
+    private static Logger logger = LoggerFactory.getLogger(LogComponent.class);
 
     public Object onCall(MuleEventContext context) throws Exception
     {

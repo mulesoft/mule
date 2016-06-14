@@ -12,14 +12,14 @@ import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import java.io.Serializable;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPartitionedObjectStore<T extends Serializable>
     implements PartitionableObjectStore<T>
 {
     protected final static String DEFAULT_PARTITION = "DEFAULT_PARTITION";
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public void open() throws ObjectStoreException

@@ -41,8 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EventCorrelator implements Startable, Stoppable, Disposable
 {
@@ -50,7 +50,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(EventCorrelator.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(EventCorrelator.class);
 
     public static final String NO_CORRELATION_ID = "no-id";
 

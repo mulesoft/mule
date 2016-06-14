@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CON
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -90,8 +89,8 @@ import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultMuleContext implements MuleContext
 {
@@ -109,7 +108,7 @@ public class DefaultMuleContext implements MuleContext
     /**
      * logger used by this class
      */
-    private transient Log logger = LogFactory.getLog(DefaultMuleContext.class);
+    private transient Logger logger = LoggerFactory.getLogger(DefaultMuleContext.class);
 
     /**
      * Internal registry facade which delegates to other registries.

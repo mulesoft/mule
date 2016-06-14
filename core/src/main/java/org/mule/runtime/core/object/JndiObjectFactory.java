@@ -19,8 +19,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JndiObjectFactory implements ObjectFactory
 {
@@ -42,7 +42,7 @@ public class JndiObjectFactory implements ObjectFactory
     
     private Object _object;
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     
     public JndiObjectFactory()
     {

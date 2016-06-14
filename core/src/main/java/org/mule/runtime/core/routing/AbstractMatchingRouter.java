@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
-
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.api.MessagingException;
@@ -27,8 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>AbstractRouterCollection</code> provides common method implementations of router collections for in
@@ -40,7 +39,7 @@ public class AbstractMatchingRouter extends AbstractAnnotatedObject implements M
     /**
      * logger used by this class
      */
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected List<MatchableMessageProcessor> matchableRoutes = new CopyOnWriteArrayList<MatchableMessageProcessor>();
     protected boolean matchAll = false;

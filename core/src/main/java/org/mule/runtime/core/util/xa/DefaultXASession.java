@@ -11,8 +11,8 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for an XAResource implementation.
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class DefaultXASession<T extends AbstractXaTransactionContext> implements XAResource
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
     protected Xid localXid;
     protected AbstractXAResourceManager<T> resourceManager;
     protected T localContext;

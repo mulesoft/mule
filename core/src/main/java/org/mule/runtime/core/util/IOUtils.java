@@ -20,8 +20,8 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // @ThreadSafe
 /**
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 public class IOUtils extends org.apache.commons.io.IOUtils
 {
     /** Logger. */
-    private static final Log logger = LogFactory.getLog(IOUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(IOUtils.class);
 
     protected static int bufferSize = NumberUtils.toInt(
         System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);

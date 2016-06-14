@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -27,8 +26,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *  Abstract routing strategy with utility methods to be reused by routing strategies
@@ -47,7 +46,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(AbstractRoutingStrategy.class);
+    protected static transient Logger logger = LoggerFactory.getLogger(AbstractRoutingStrategy.class);
 
     private final MuleContext muleContext;
 

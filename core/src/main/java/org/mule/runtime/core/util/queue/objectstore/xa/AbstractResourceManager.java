@@ -16,8 +16,8 @@ import java.util.Collections;
 
 import javax.transaction.Status;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This code is based on code coming from the <a
@@ -57,7 +57,7 @@ public abstract class AbstractResourceManager
     protected int operationMode = OPERATION_MODE_STOPPED;
     protected long defaultTimeout = DEFAULT_TIMEOUT_MSECS;
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     protected boolean dirty = false;
 

@@ -38,8 +38,8 @@ import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>FileUtils</code> contains useful methods for dealing with files &
@@ -48,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
 // @ThreadSafe
 public class FileUtils extends org.apache.commons.io.FileUtils
 {
-    private static final Log logger = LogFactory.getLog(FileUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
     public static String DEFAULT_ENCODING = "UTF-8";
     
     public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException
@@ -639,7 +639,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                         }
                         catch (Exception e)
                         {
-                            logger.debug(e);
+                            logger.debug("Error renaming file", e);
                         }
                         finally
                         {
@@ -651,7 +651,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                                 }
                                 catch (Exception inNotClosed)
                                 {
-                                    logger.debug(inNotClosed);
+                                    logger.debug("Error closing input file", inNotClosed);
                                 }
                             }
                             if (out != null)
@@ -662,7 +662,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                                 }
                                 catch (Exception outNotClosed)
                                 {
-                                    logger.debug(outNotClosed);
+                                    logger.debug("Error closing output file", outNotClosed);
                                 }
                             }
                         }

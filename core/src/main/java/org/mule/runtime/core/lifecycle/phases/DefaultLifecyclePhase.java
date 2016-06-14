@@ -23,8 +23,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a configurable lifecycle phase. This is a default implementation of a
@@ -46,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
 {
-    protected transient final Log logger = LogFactory.getLog(DefaultLifecyclePhase.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(DefaultLifecyclePhase.class);
     private Class<?> lifecycleClass;
     private final Method lifecycleMethod;
     private Set<LifecycleObject> orderedLifecycleObjects = new LinkedHashSet<LifecycleObject>(6);

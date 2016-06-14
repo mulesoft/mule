@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>MuleSecurityManager</code> is a default implementation security manager
@@ -42,7 +42,7 @@ public class MuleSecurityManager implements SecurityManager
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(MuleSecurityManager.class);
+    protected static final Logger logger = LoggerFactory.getLogger(MuleSecurityManager.class);
 
     private Map<String, SecurityProvider> providers = new ConcurrentHashMap<String, SecurityProvider>();
     private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap<String, EncryptionStrategy>();

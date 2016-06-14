@@ -11,8 +11,8 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A support class for {@link org.mule.runtime.core.api.config.ConfigurationBuilder} implementations
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractConfigurationBuilder implements ConfigurationBuilder
 {
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected boolean configured = false;
 

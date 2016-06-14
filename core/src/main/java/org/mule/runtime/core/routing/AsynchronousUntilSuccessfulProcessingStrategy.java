@@ -38,8 +38,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Until successful asynchronous processing strategy.
@@ -57,7 +57,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
     private static final String UNTIL_SUCCESSFUL_MSG_PREFIX = "until-successful retries exhausted. Last exception message was: %s";
     private static final Random random = new Random();
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
     private MessagingExceptionHandler messagingExceptionHandler;
     private ExecutorService pool;
     private ScheduledExecutorService scheduledRetriesPool;
@@ -126,7 +126,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                 }
                 catch (final Exception e)
                 {
-                    logger.error(MessageFactory.createStaticMessage("Failed to schedule for processing event stored with key: " + eventStoreKey), e);
+                    logger.error(MessageFactory.createStaticMessage("Failed to schedule for processing event stored with key: " + eventStoreKey).toString(), e);
                 }
             }
         }
@@ -135,7 +135,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
             logger.warn("Failure during scheduling of until successful previous jobs " + e.getMessage());
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug("Failure during scheduling of until successful previous jobs ", e);
             }
         }
     }
