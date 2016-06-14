@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.util.Arrays.asList;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
 
-import org.mule.runtime.module.artifact.classloader.exception.FineGrainedClassNotFoundException;
+import org.mule.runtime.module.artifact.classloader.exception.CompositeClassNotFoundException;
 
 import java.net.URL;
 
@@ -44,6 +45,10 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader implem
 
         final ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
 
+        // Gather information about the exceptions in each of the searched classloaders to provide
+        // troubleshooting information in case of throwing a ClassNotFoundException.
+        ClassNotFoundException firstException = null;
+
         try
         {
             if (lookupStrategy == PARENT_ONLY)
@@ -58,6 +63,7 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader implem
                 }
                 catch (ClassNotFoundException e)
                 {
+                    firstException = e;
                     result = findClass(name);
                 }
             }
@@ -69,13 +75,14 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader implem
                 }
                 catch (ClassNotFoundException e)
                 {
+                    firstException = e;
                     result = findParentClass(name);
                 }
             }
         }
         catch (ClassNotFoundException e)
         {
-            throw new FineGrainedClassNotFoundException(e, lookupStrategy);
+            throw new CompositeClassNotFoundException(name, lookupStrategy, firstException != null ? asList(firstException, e) : asList(e));
         }
 
         if (resolve)

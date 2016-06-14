@@ -10,7 +10,7 @@ import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.System.lineSeparator;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_FILTERED_CLASSLOADING;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
@@ -26,7 +26,7 @@ public class NotExportedClassException extends ClassNotFoundException
 {
 
     private static final Logger logger = LoggerFactory.getLogger(NotExportedClassException.class);
-    private static boolean logFilteredClassloading = valueOf(getProperty(MULE_LOG_FILTERED_CLASSLOADING));
+    private static boolean logFilteredClassloading = valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
 
     private static final long serialVersionUID = 2510347069070514569L;
 

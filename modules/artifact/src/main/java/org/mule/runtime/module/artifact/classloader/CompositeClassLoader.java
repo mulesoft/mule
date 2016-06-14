@@ -78,10 +78,8 @@ public class CompositeClassLoader extends ClassLoader implements ClassLoaderLook
         final ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
         Class<?> result;
 
-        /*
-         * Gather information about the exceptions in each of the contained classloaders to provide
-         * troubleshooting information in case of throwing a ClassNotFoundException.
-         */
+        // Gather information about the exceptions in each of the contained classloaders to provide
+        // troubleshooting information in case of throwing a ClassNotFoundException.
         final List<ClassNotFoundException> exceptions = new ArrayList<>(classLoaders.size() + 1);
 
         if (lookupStrategy == PARENT_ONLY)
