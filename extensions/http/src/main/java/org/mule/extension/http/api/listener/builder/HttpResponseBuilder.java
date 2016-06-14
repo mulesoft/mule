@@ -94,7 +94,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder
     {
         final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
 
-        if (!headers.containsKey(CONTENT_TYPE_PROPERTY))
+        Map<String, String> resolvedHeaders = headersRef != null ? headersRef.apply(event) : headers;
+
+        if (!resolvedHeaders.containsKey(CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
             if (!MimeTypes.ANY.equals(dataType.getMimeType()))
@@ -102,8 +104,6 @@ public class HttpResponseBuilder extends HttpMessageBuilder
                 httpResponseHeaderBuilder.addHeader(CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
             }
         }
-
-        Map<String, String> resolvedHeaders = headersRef != null ? headersRef.apply(event) : headers;
 
         for (String name : resolvedHeaders.keySet())
         {
