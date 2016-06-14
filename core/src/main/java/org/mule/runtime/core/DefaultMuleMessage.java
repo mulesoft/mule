@@ -351,6 +351,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         }
 
         copyAttachments(previous);
+        attributes = previous.getAttributes();
 
         resetAccessControl();
     }

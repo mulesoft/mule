@@ -14,8 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.util.IOUtils;
@@ -39,6 +39,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 {
 
     public static final String FOO_PROPERTY = "foo";
+    private Serializable testAttributes = new Apple();
 
     @Test
     public void testConstructorWithNullPayload()
@@ -184,26 +185,27 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     @Test
     public void testCopyConstructor() throws Exception
     {
-        DefaultMuleMessage original = (DefaultMuleMessage) createMuleMessage();
+        DefaultMuleMessage original = createMuleMessage();
         Map<String, Serializable> properties = createMessageProperties();
         original.addInboundProperties(properties);
         assertInboundAndOutboundMessageProperties(original);
 
         DefaultMuleMessage copy = new DefaultMuleMessage(original);
         assertInboundAndOutboundMessageProperties(copy);
-        assertEquals(muleContext.getConfiguration().getDefaultEncoding(), copy.getEncoding());
+        assertThat(copy.getEncoding(), equalTo(muleContext.getConfiguration().getDefaultEncoding()));
+        assertThat(copy.getAttributes(), is(testAttributes));
         
         // Mutate original
         original.setOutboundProperty("FOO", "OTHER");
-        assertNull(copy.getOutboundProperty("FOO"));
+        assertThat(copy.getOutboundProperty("FOO"), is(nullValue()));
         original.setInboundProperty("FOO", "OTHER");
-        assertNull(copy.getInboundProperty("FOO"));
+        assertThat(copy.getInboundProperty("FOO"), is(nullValue()));
 
         // Mutate copy
         copy.setOutboundProperty("ABC", "OTHER");
-        assertNull(original.getOutboundProperty("ABC"));
+        assertThat(original.getOutboundProperty("ABC"), is(nullValue()));
         copy.setInboundProperty("ABC", "OTHER");
-        assertNull(original.getInboundProperty("ABC"));
+        assertThat(original.getInboundProperty("ABC"), is(nullValue()));
 
     }
 
@@ -310,7 +312,8 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 
     private DefaultMuleMessage createMuleMessage()
     {
-        DefaultMuleMessage previousMessage = new DefaultMuleMessage("MULE_MESSAGE", muleContext);
+        DefaultMuleMessage previousMessage = new DefaultMuleMessage("MULE_MESSAGE", DataType.STRING_DATA_TYPE,
+                                                                    testAttributes, muleContext);
         previousMessage.setOutboundProperty("MuleMessage", "MuleMessage");
         return previousMessage;
     }
