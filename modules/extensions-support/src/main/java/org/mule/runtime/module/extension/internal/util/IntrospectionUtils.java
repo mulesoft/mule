@@ -15,12 +15,14 @@ import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isObjectType;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withTypeAssignableTo;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -384,10 +386,7 @@ public final class IntrospectionUtils
 
     public static Collection<Field> getParameterGroupFields(Class<?> extensionType)
     {
-        ImmutableList.Builder<Field> listFieldsBuilder = ImmutableList.builder();
-        return listFieldsBuilder.addAll(getAnnotatedFields(extensionType, ParameterGroup.class))
-                .addAll(getAnnotatedFields(extensionType, MetadataKeyId.class))
-                .build();
+        return ImmutableList.copyOf(getAnnotatedFields(extensionType, ParameterGroup.class));
     }
 
     public static Collection<Method> getOperationMethods(Class<?> declaringClass)
@@ -528,5 +527,83 @@ public final class IntrospectionUtils
         }.walk(extensionModel);
 
         return parameterClasses.build();
+    }
+
+    /**
+     * Given a {@link Set} of Annotation classes and a {@link MetadataType} that describes a component parameter,
+     * indicates if the parameter is considered as a multilevel {@link MetadataKeyId}
+     *
+     * @param annotations   of the parameter
+     * @param parameterType of the parameter
+     * @return a boolean indicating if the Parameter is considered as a multilevel {@link MetadataKeyId}
+     */
+    public static boolean isMultiLevelMetadataKeyId(Set<Class<? extends Annotation>> annotations, MetadataType parameterType)
+    {
+        return annotations.contains(MetadataKeyId.class) && isObjectType(parameterType);
+    }
+
+    /**
+     * Given an {@link AnnotatedElement} (class {@link Field} or method {@link java.lang.reflect.Parameter}), the
+     * {@link Type} of it, and a {@link ClassTypeLoader}, indicates if the given {@link AnnotatedElement} is considered
+     * as a multilevel {@link MetadataKeyId}
+     *
+     * @param annotatedElement that represent a component parameter
+     * @param type             of the component parameter
+     * @param typeLoader       to load the {@link MetadataType} of the {@param type}
+     * @return a boolean indicating if the Parameter is considered as a multilevel {@link MetadataKeyId}
+     */
+    public static boolean isMultiLevelMetadataKeyId(AnnotatedElement annotatedElement, Type type, ClassTypeLoader typeLoader)
+    {
+        final Set<Class<? extends Annotation>> classSet = stream(annotatedElement.getAnnotations())
+                .map(Annotation::annotationType)
+                .collect(toSet());
+
+        return isMultiLevelMetadataKeyId(classSet, typeLoader.load(type));
+    }
+
+    /**
+     * Given a {@link Set} of annotation classes and a {@link MetadataType} of a component parameter, indicates
+     * if the parameter is a parameter container.
+     * <p>
+     * To be a parameter container means that the parameter is a {@link ParameterGroup} or a multilevel
+     * {@link MetadataKeyId}.
+     *
+     * @param annotations   of the component parameter
+     * @param parameterType of the component parameter
+     * @return a boolean indicating if the parameter is considered as a parameter container
+     */
+    public static boolean isParameterContainer(Set<Class<? extends Annotation>> annotations, MetadataType parameterType)
+    {
+        return (annotations.contains(ParameterGroup.class) || isMultiLevelMetadataKeyId(annotations, parameterType));
+    }
+
+    /**
+     * Retrieves all the considered parameter containers from a given class {@param annotatedType}
+     *
+     * @param annotatedType the class to be introspected
+     * @param typeLoader    {@link ClassTypeLoader} to be used to retrieve the type of each component parameter
+     * @return a immutable {@link Collection<Field>} with all the found parameters considered as parameter container
+     * @see IntrospectionUtils#isParameterContainer(Set, MetadataType)
+     */
+    public static Collection<Field> getParameterContainers(Class<?> annotatedType, ClassTypeLoader typeLoader)
+    {
+        return ImmutableList.<Field>builder()
+                .addAll(getParameterGroupFields(annotatedType))
+                .addAll(getMultilevelMetadataKeys(annotatedType, typeLoader)).build();
+    }
+
+    /**
+     * Retrieves all the considered as multilevel metadatakeys from a given class {@param annotatedType}
+     *
+     * @param annotatedType the class to be introspected
+     * @param typeLoader    {@link ClassTypeLoader} to be used to retrieve the type of each component parameter
+     * @return a immutable {@link Collection<Field>} with all the found parameters considered as multilevel metadata key
+     * @see IntrospectionUtils#isMultiLevelMetadataKeyId(Set, MetadataType)
+     */
+    public static Collection<Field> getMultilevelMetadataKeys(Class<?> annotatedType, ClassTypeLoader typeLoader)
+    {
+        return stream(annotatedType.getDeclaredFields())
+                .filter(field -> isMultiLevelMetadataKeyId(field, field.getType(), typeLoader))
+                .collect(new ImmutableListCollector<>());
     }
 }

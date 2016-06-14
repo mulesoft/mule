@@ -35,8 +35,6 @@ import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BR
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
 
 import org.mule.functional.listener.Callback;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.runtime.api.metadata.MetadataCache;
@@ -134,6 +132,13 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         MetadataKey key = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SAN_FRANCISCO, CITY))).build();
         final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, key);
         assertThat(metadataResult.isSuccess(), is(true));
+    }
+
+    @Test
+    public void injectSimpleMetadataKeyIdInOperation() throws Exception
+    {
+        final String metadataKey = (String) runFlow(OUTPUT_ONLY_WITHOUT_CONTENT_PARAM).getMessage().getPayload();
+        assertThat(metadataKey, is(PERSON));
     }
 
     @Test

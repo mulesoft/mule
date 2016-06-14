@@ -8,10 +8,12 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
@@ -35,6 +37,11 @@ public final class MetadataTypeUtils
     public static boolean isNullType(MetadataType type)
     {
         return type instanceof NullType;
+    }
+
+    public static boolean isObjectType(MetadataType type)
+    {
+        return type instanceof ObjectType;
     }
 
     public static boolean isVoid(MetadataType type)

@@ -78,7 +78,6 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected static final String RESOLVER_KEYS_WITH_CONTEXT_CLASSLOADER = "resolverTypeKeysWithContextClassLoader";
     protected static final String RESOLVER_CONTENT_WITH_CONTEXT_CLASSLOADER = "resolverContentWithContextClassLoader";
     protected static final String RESOLVER_OUTPUT_WITH_CONTEXT_CLASSLOADER = "resolverOutputWithContextClassLoader";
-    protected static final String METADATA_RESOLVING_WITH_INVALID_MULTILEVEL_KEY = "metadataResolvingWithInvalidMultilevelKey";
     protected static final String CONTINENT = "continent";
     protected static final String COUNTRY = "country";
     protected static final String CITY = "city";
