@@ -10,12 +10,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>TemplateParser</code> is a simple string parser that will substitute
@@ -50,7 +49,7 @@ public final class TemplateParser
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(TemplateParser.class);
+    protected static final Logger logger = LoggerFactory.getLogger(TemplateParser.class);
 
     public static final Pattern ANT_TEMPLATE_PATTERN = patterns.get(ANT_TEMPLATE_STYLE).getPattern();
     public static final Pattern SQUARE_TEMPLATE_PATTERN = patterns.get(SQUARE_TEMPLATE_STYLE).getPattern();

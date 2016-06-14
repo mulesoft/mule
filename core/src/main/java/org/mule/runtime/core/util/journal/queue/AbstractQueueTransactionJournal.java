@@ -17,8 +17,8 @@ import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base implementation for a queue transaction journal.
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<T>>
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private TransactionJournal<T, K> logFile;
 

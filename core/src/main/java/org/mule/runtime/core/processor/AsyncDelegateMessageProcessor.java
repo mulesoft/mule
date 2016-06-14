@@ -7,7 +7,6 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.OptimizedRequestContext;
@@ -38,8 +37,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous
@@ -51,7 +50,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         implements MessageProcessor, Initialisable, Startable, Stoppable, NonBlockingSupported
 {
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
     private AtomicBoolean consumablePayloadWarned = new AtomicBoolean(false);
 
     protected MessageProcessor delegate;

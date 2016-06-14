@@ -14,8 +14,8 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>GZipCompression</code> is a CompressionStrategy implementation using the
@@ -30,7 +30,7 @@ public class GZipCompression implements CompressionStrategy
     /**
      * The logger for this class
      */
-    private static final Log logger = LogFactory.getLog(GZipCompression.class);
+    private static final Logger logger = LoggerFactory.getLogger(GZipCompression.class);
 
     /**
      * Determines if a byte array is compressed. The java.util.zip GZip

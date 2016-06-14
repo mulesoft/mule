@@ -24,8 +24,8 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.TransformerTemplate;
 import org.mule.runtime.core.util.StringUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>AbstractSecurityFilter</code> provides basic initialisation for
@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractSecurityFilter implements MuleContextAware, SecurityFilter
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected SecurityManager securityManager;
     protected MuleContext muleContext;

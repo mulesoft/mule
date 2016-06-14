@@ -9,8 +9,8 @@ package org.mule.runtime.core.work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default exception Handler used when executing work in the work manager
@@ -21,7 +21,7 @@ public class DefaultWorkListener implements WorkListener
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public void workAccepted(WorkEvent event)
     {
@@ -62,7 +62,6 @@ public class DefaultWorkListener implements WorkListener
         }
 
         logger.error("Work caused exception on '" + type + "'. Work being executed was: "
-                     + event.getWork().toString());
-        logger.error(e);
+                     + event.getWork().toString(), e);
     }
 }

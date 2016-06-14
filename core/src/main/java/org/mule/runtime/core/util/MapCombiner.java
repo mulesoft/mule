@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This allows a collection (list) of maps to be defined in Spring, via the "list" property, and
@@ -29,7 +29,7 @@ public class MapCombiner implements Map<Object, Object>, Serializable
     public static final String LIST = "list"; // the setter/getter
     public static final int UNLIMITED_DEPTH = -1;
 
-    private transient Log logger = LogFactory.getLog(getClass());
+    private transient Logger logger = LoggerFactory.getLogger(getClass());
     private int maxDepth = UNLIMITED_DEPTH;
     private List list;
     private Map cachedMerge = new HashMap();

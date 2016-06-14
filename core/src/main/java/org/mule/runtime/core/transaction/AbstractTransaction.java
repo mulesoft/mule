@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.transaction;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
@@ -17,13 +15,16 @@ import org.mule.runtime.core.util.UUID;
 
 import java.text.MessageFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This base class provides low level features for transactions.
  */
 public abstract class AbstractTransaction implements Transaction
 {
 
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected String id = UUID.getUUID();
 

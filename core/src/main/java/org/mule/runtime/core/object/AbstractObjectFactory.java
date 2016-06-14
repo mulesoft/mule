@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates object instances based on the class and sets any properties.  This factory is also responsible for applying
@@ -40,7 +40,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
     protected FlowConstruct flowConstruct;
     protected boolean disposed = false;
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * For Spring only

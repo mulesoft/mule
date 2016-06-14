@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.core.transaction;
 
-import org.apache.commons.collections.ArrayStack;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.DelegateTransaction;
 
+import org.apache.commons.collections.ArrayStack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class TransactionCoordination
 {
-    protected static final Log logger = LogFactory.getLog(TransactionCoordination.class);
+    protected static final Logger logger = LoggerFactory.getLogger(TransactionCoordination.class);
 
     private static final TransactionCoordination instance = new TransactionCoordination();
 
@@ -177,7 +178,7 @@ public final class TransactionCoordination
             }
             catch (TransactionException e)
             {
-                logger.error(e);
+                logger.error("Cannot commit current transaction", e);
             }
         }
     }
@@ -193,7 +194,7 @@ public final class TransactionCoordination
             }
             catch (TransactionException e)
             {
-                logger.error(e);
+                logger.error("Cannot rollback current transaction", e);
             }
         }
     }

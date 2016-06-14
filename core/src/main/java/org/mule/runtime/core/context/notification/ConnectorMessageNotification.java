@@ -11,8 +11,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to notify that a message was received or sent through a Connector
@@ -28,7 +28,7 @@ public class ConnectorMessageNotification extends ServerNotification implements 
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(ConnectorMessageNotification.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ConnectorMessageNotification.class);
 
     public static final int MESSAGE_RECEIVED = MESSAGE_EVENT_ACTION_START_RANGE + 1;
     public static final int MESSAGE_RESPONSE = MESSAGE_EVENT_ACTION_START_RANGE + 5;

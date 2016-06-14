@@ -15,8 +15,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Keeps track of transactional operation made over a transactional resource.
@@ -33,7 +33,7 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
 
     private static final int MAXIMUM_LOG_FILE_ENTRIES = 50000;
 
-    private transient Log logger = LogFactory.getLog(getClass());
+    private transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private final TransactionCompletePredicate transactionCompletePredicate;
 

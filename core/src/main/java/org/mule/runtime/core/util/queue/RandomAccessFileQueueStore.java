@@ -16,8 +16,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Basic queueing functionality with file storage.
@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 class RandomAccessFileQueueStore
 {
 
-    private final Log logger = LogFactory.getLog(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     protected static final int CONTROL_DATA_SIZE = 5;
     private static final byte NOT_REMOVED = 0;
     private static final byte REMOVED = 1;
@@ -177,7 +177,7 @@ class RandomAccessFileQueueStore
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug("Error reading queue elements", e);
             }
         }
         return elements;
@@ -224,7 +224,7 @@ class RandomAccessFileQueueStore
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug("Error removing queue element", e);
             }
             return false;
         }
@@ -256,7 +256,7 @@ class RandomAccessFileQueueStore
         logger.warn(e.getMessage());
         if (logger.isDebugEnabled())
         {
-            logger.debug(e);
+            logger.debug("", e);
         }
     }
 
@@ -333,7 +333,7 @@ class RandomAccessFileQueueStore
             }
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug("Error initializing queue store", e);
             }
         }
         catch (Exception e)
@@ -407,7 +407,7 @@ class RandomAccessFileQueueStore
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug("Cannot determine if element is contained in the queue store", e);
             }
             return false;
         }

@@ -12,8 +12,8 @@ import org.mule.runtime.core.api.MuleEventKeyGenerator;
 import java.io.NotSerializableException;
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements {@link org.mule.runtime.core.api.MuleEventKeyGenerator} using the Mule expression language to
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator
 {
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     private String expression;
 

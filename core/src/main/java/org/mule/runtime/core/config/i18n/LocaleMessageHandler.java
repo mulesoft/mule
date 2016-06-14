@@ -10,8 +10,8 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The <code>LocaleMessageHandler</code> is essentially a merging of the Message
@@ -33,7 +33,7 @@ public class LocaleMessageHandler
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(LocaleMessageHandler.class);
+    protected static final Logger logger = LoggerFactory.getLogger(LocaleMessageHandler.class);
 
     /**
      * Get the resource string for the given bundle name and resource code

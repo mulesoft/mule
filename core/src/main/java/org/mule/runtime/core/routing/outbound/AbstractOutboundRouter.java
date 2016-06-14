@@ -48,8 +48,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>AbstractOutboundRouter</code> is a base router class that tracks statistics about message processing
@@ -60,7 +60,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected List<MessageProcessor> routes = new CopyOnWriteArrayList<MessageProcessor>();
 

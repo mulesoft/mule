@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.model.resolvers;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
@@ -19,8 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Base class for {@link org.mule.runtime.core.api.model.EntryPointResolver}. It provides parameters for
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractEntryPointResolver implements EntryPointResolver
 {
-    private static final Log logger = LogFactory.getLog(AbstractEntryPointResolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractEntryPointResolver.class);
 
     private boolean acceptVoidMethods = false;
 

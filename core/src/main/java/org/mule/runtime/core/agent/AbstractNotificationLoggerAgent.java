@@ -28,8 +28,8 @@ import org.mule.runtime.core.context.notification.SecurityNotification;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
@@ -43,7 +43,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     /**
      * The logger used for this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private boolean ignoreManagerNotifications = false;
     private boolean ignoreConnectionNotifications = false;

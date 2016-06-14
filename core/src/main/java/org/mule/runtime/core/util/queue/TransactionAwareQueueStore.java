@@ -13,8 +13,8 @@ import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Queue implementation that executes operations:
@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 public class TransactionAwareQueueStore implements Queue
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private final MuleContext muleContext;
     private final TransactionContextProvider transactionContextProvider;

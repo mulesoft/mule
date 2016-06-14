@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation for a QueueManager.
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractQueueManager implements QueueManager, QueueProvider, QueueStoreCacheListener, MuleContextAware, Initialisable, Disposable
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ReentrantLock queuesLock = new ReentrantLock();
     private final Map<String, CacheAwareQueueStore> queues = new HashMap<String, CacheAwareQueueStore>();

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.lifecycle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
@@ -17,6 +15,9 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.context.notification.NotificationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  * This class will start an Startable mule object that must only be started in the primary node.
@@ -24,7 +25,7 @@ import org.mule.runtime.core.context.notification.NotificationException;
  */
 public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNotificationListener {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
     private Startable startMeOnPrimaryNodeNotification;
     private MuleContext muleContext;
 

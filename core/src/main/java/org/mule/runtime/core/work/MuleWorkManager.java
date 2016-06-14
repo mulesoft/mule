@@ -28,8 +28,8 @@ import javax.resource.spi.work.WorkCompletedException;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>MuleWorkManager</code> is a JCA Work manager implementation used to manage
@@ -41,7 +41,7 @@ public class MuleWorkManager implements WorkManager, MuleContextAware
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(MuleWorkManager.class);
+    protected static final Logger logger = LoggerFactory.getLogger(MuleWorkManager.class);
 
     /**
      * Forced shutdown delay. The time the workManager will wait while threads are being

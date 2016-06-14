@@ -17,13 +17,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, MuleContextAware
 {
 
-    private static final Log logger = LogFactory.getLog(DefaultProcessingTimeWatcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultProcessingTimeWatcher.class);
 
     private final ReferenceQueue<ProcessingTime> queue = new ReferenceQueue<ProcessingTime>();
     private final Map<ProcessingTimeReference, Object> refs = new ConcurrentHashMap<ProcessingTimeReference, Object>();
@@ -90,7 +90,7 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
                 catch (Exception ex)
                 {
                     // Don't let exception escape -- it kills the thread
-                    logger.error(this, ex);
+                    logger.error(this.toString(), ex);
                 }
             }
         }

@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>BeanUtils</code> provides functions for altering the way commons BeanUtils
@@ -30,7 +30,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils
     /**
      * logger used by this class
      */
-    private static final Log logger = LogFactory.getLog(BeanUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(BeanUtils.class);
 
     /**
      * Exception safe version of BeanUtils.populate()

@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the base class for exception strategies which contains several helper methods.  However, you should
@@ -52,7 +52,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
     protected static final String NOT_SET = "<not set>";
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<MessageProcessor>();
 
@@ -310,7 +310,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
                 "id={0} correlationId={1}, correlationGroup={2}, correlationSeq={3}",
                 logUniqueId, correlationId, correlationGroupSize, correlationGroupSeq);
 
-        logger.fatal(
+        logger.error(
             "Failed to dispatch message to error queue after it failed to process.  This may cause message loss. "
                             + (event.getMessage() == null ? "" : printableLogMessage), t);
     }

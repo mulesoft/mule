@@ -16,8 +16,8 @@ import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Queue session that is used to manage the transaction context of a Queue
@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 @Deprecated
 class TransactionalQueueSession extends DefaultXASession implements QueueSession
 {
-    private Log logger = LogFactory.getLog(org.mule.runtime.core.util.queue.TransactionalQueueSession.class);
+    private Logger logger = LoggerFactory.getLogger(org.mule.runtime.core.util.queue.TransactionalQueueSession.class);
 
     protected TransactionalQueueManager queueManager;
 

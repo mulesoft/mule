@@ -14,12 +14,12 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {
-    private static final Log logger = LogFactory.getLog(BeginAndResolveTransactionInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(BeginAndResolveTransactionInterceptor.class);
     private final ExecutionInterceptor<T> next;
     private final TransactionConfig transactionConfig;
     private final MuleContext muleContext;

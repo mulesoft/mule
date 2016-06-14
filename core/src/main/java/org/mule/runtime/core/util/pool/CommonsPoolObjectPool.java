@@ -16,10 +16,10 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>CommonsPoolProxyPool</code> is an implementation of {@link ObjectPool}
@@ -31,7 +31,7 @@ public class CommonsPoolObjectPool implements ObjectPool
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(CommonsPoolObjectPool.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CommonsPoolObjectPool.class);
 
     /**
      * The pool

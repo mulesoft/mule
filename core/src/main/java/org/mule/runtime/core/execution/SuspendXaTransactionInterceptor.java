@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -15,9 +13,12 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SuspendXaTransactionInterceptor<T> implements ExecutionInterceptor<T>
 {
-    private static final Log logger = LogFactory.getLog(SuspendXaTransactionInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(SuspendXaTransactionInterceptor.class);
     private final ExecutionInterceptor<T> next;
     private final TransactionConfig transactionConfig;
     private final boolean processOnException;

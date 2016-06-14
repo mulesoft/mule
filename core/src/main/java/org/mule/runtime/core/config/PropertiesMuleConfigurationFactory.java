@@ -12,7 +12,6 @@ import org.mule.runtime.core.util.BeanUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FilenameUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -22,13 +21,13 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PropertiesMuleConfigurationFactory
 {
 
-    private static Log logger = LogFactory.getLog(PropertiesMuleConfigurationFactory.class);
+    private static Logger logger = LoggerFactory.getLogger(PropertiesMuleConfigurationFactory.class);
     
     private Properties properties;
 
@@ -51,13 +50,9 @@ public class PropertiesMuleConfigurationFactory
                 inputStream = muleAppURL.openStream();
                 this.properties.load(inputStream);
             }
-            catch (FileNotFoundException e)
-            {
-                logger.debug(e);
-            }
             catch (IOException e)
             {
-                logger.debug(e);
+                logger.debug("Unable to read properties", e);
             }
             finally
             {
@@ -101,13 +96,9 @@ public class PropertiesMuleConfigurationFactory
                 {
                     BeanUtils.setProperty(configuration, configProperty, value);
                 }
-                catch (IllegalAccessException e)
+                catch (IllegalAccessException | InvocationTargetException e)
                 {
-                    logger.error(e);
-                }
-                catch (InvocationTargetException e)
-                {
-                    logger.error(e);
+                    logger.error("Cannot set configuration property", e);
                 }
             }
         }

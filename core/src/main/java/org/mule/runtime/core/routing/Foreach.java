@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
-
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
@@ -36,8 +35,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
@@ -59,7 +58,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     public static final String COUNTER_PROPERTY = "counter";
     private static final String XPATH_PREFIX = "xpath";
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     private List<MessageProcessor> messageProcessors;
     private MessageProcessor ownedMessageProcessor;

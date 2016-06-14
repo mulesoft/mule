@@ -44,8 +44,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract {@link Component} to be used by all {@link Component} implementations.
@@ -56,7 +56,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
     /**
      * logger used by this class
      */
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected FlowConstruct flowConstruct;
     protected ComponentStatistics statistics = null;

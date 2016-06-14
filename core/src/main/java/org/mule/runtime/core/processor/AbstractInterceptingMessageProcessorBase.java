@@ -22,8 +22,8 @@ import org.mule.runtime.core.util.ObjectUtils;
 
 import java.util.Arrays;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation that provides the infrastructure for intercepting message processors.
@@ -35,7 +35,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
         implements MessageProcessor, MuleContextAware, MessageProcessorContainer
 {
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     protected MuleContext muleContext;
 

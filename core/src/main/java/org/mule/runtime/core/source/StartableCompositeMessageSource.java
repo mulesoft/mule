@@ -31,8 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link CompositeMessageSource} that propagates both injection of {@link FlowConstruct}
@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
 public class StartableCompositeMessageSource
     implements CompositeMessageSource, Lifecycle, FlowConstructAware, MuleContextAware
 {
-    protected static final Log log = LogFactory.getLog(StartableCompositeMessageSource.class);
+    protected static final Logger logger = LoggerFactory.getLogger(StartableCompositeMessageSource.class);
 
     protected MessageProcessor listener;
     protected AtomicBoolean initialised = new AtomicBoolean(false);

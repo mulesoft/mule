@@ -7,7 +7,6 @@
 package org.mule.runtime.core.component;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -36,8 +35,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>DefaultComponentLifecycleAdapter</code> is a default implementation of
@@ -60,7 +59,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(DefaultComponentLifecycleAdapter.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultComponentLifecycleAdapter.class);
 
     protected Object componentObject;
 

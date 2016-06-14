@@ -12,8 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Control information for queues.
@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 public class QueueControlDataFile
 {
 
-    private final Log logger = LogFactory.getLog(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     public static final int INTEGER_SIZE_IN_BYTES = Integer.SIZE / 8;
     private final QueueFileProvider queueFileProvider;
     private File currentReadFilePath;
@@ -146,7 +146,7 @@ public class QueueControlDataFile
             logger.warn("failure closing queue data control file: " + e.getMessage());
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug("Failure closing queue data control file", e);
             }
         }
     }

@@ -9,8 +9,8 @@ package org.mule.runtime.core;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * NOT FOR PUBLIC USE - please use the interface provided by RequestContext.
@@ -32,7 +32,7 @@ public final class OptimizedRequestContext
 {
 
     private static final boolean DOCUMENT_UNSAFE_CALLS = false;
-    private static final Log logger = LogFactory.getLog(OptimizedRequestContext.class);
+    private static final Logger logger = LoggerFactory.getLogger(OptimizedRequestContext.class);
 
     /**
      * Do not instantiate.

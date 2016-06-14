@@ -11,8 +11,8 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>TimerInterceptor</code> simply times and displays the time taken to process
@@ -23,7 +23,7 @@ public class TimerInterceptor extends AbstractInterceptingMessageProcessor imple
     /**
      * logger used by this class
      */
-    private static Log logger = LogFactory.getLog(TimerInterceptor.class);
+    private static Logger logger = LoggerFactory.getLogger(TimerInterceptor.class);
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {

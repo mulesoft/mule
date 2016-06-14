@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.core.transformer.types.DataTypeFactory.createFromDataType;
 import static org.mule.runtime.core.transformer.types.DataTypeFactory.createFromDataTypeWithMimeType;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -66,8 +65,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>DefaultMuleMessage</code> is a wrapper that contains a payload and properties
@@ -78,7 +77,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     private static final String NOT_SET = "<not set>";
 
     private static final long serialVersionUID = 1541720810851984845L;
-    private static final Log logger = LogFactory.getLog(DefaultMuleMessage.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultMuleMessage.class);
 
     /**
      * The default UUID for the message. If the underlying transport has the notion of a

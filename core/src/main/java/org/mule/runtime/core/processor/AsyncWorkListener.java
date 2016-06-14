@@ -13,12 +13,12 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AsyncWorkListener implements WorkListener
 {
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
     protected MessageProcessor target;
 
     public AsyncWorkListener(MessageProcessor target)

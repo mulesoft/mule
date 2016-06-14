@@ -11,8 +11,8 @@ import org.mule.runtime.core.util.ClassUtils;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>CompressionHelper</code> a static class that provides facilities for
@@ -24,7 +24,7 @@ public final class CompressionHelper
     /**
      * logger used by this class
      */
-    private static Log logger = LogFactory.getLog(CompressionHelper.class);
+    private static Logger logger = LoggerFactory.getLogger(CompressionHelper.class);
 
     private static CompressionStrategy defaultStrategy;
 

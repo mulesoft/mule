@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.core.retry.policies;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.runtime.core.api.retry.RetryPolicy;
 import org.mule.runtime.core.retry.PolicyStatus;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Allows to configure how many times a retry should be attempted and how long to wait between retries.
  */
 public class SimpleRetryPolicy implements RetryPolicy
 {
-    protected static final Log logger = LogFactory.getLog(SimpleRetryPolicy.class);
+    protected static final Logger logger = LoggerFactory.getLogger(SimpleRetryPolicy.class);
 
     protected RetryCounter retryCounter;
 

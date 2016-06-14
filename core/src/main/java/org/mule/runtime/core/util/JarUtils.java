@@ -22,8 +22,8 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class JarUtils
 {
@@ -33,7 +33,7 @@ public final class JarUtils
     
     public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
 
-    private static final Log logger = LogFactory.getLog(JarUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(JarUtils.class);
 
     private JarUtils()
     {
@@ -78,7 +78,7 @@ public final class JarUtils
                     }
                     catch (Exception ignore)
                     {
-                        logger.debug(ignore);
+                        logger.debug("Error closing jar file", ignore);
                     }
                 }
             }
@@ -154,7 +154,7 @@ public final class JarUtils
                     }
                     catch (Exception jarNotClosed)
                     {
-                        logger.debug(jarNotClosed);
+                        logger.debug("Error closing jar file", jarNotClosed);
                     }
                 }
                 if (fileStream != null)
@@ -165,7 +165,7 @@ public final class JarUtils
                     }
                     catch (Exception fileNotClosed)
                     {
-                        logger.debug(fileNotClosed);
+                        logger.debug("Error closing file", fileNotClosed);
                     }
                 }
             }
@@ -195,7 +195,7 @@ public final class JarUtils
                 }
                 catch (Exception fileContentNotClosed)
                 {
-                    logger.debug(fileContentNotClosed);
+                    logger.debug("Error closing file", fileContentNotClosed);
                 }
             }
         }

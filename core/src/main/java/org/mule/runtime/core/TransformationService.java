@@ -8,7 +8,6 @@ package org.mule.runtime.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -28,8 +27,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides the same operations previously exposed by {@link MuleMessage} but decoupled from MuleMessage.
@@ -39,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 public class TransformationService
 {
 
-    private static final Log logger = LogFactory.getLog(TransformationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TransformationService.class);
 
     private MuleContext muleContext;
 

@@ -13,8 +13,8 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @deprecated this class will be removed in Mule 4.0 in favor of the new queue implementation
@@ -26,7 +26,7 @@ public class DefaultXASession implements XAResource
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected AbstractTransactionContext localContext;
     protected Xid localXid;

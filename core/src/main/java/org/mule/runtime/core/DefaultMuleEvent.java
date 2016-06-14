@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CREDENTIALS_P
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -53,8 +52,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>DefaultMuleEvent</code> represents any data event occurring in the Mule environment. All data sent or
@@ -69,7 +68,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 {
     private static final long serialVersionUID = 1L;
 
-    private static Log logger = LogFactory.getLog(DefaultMuleEvent.class);
+    private static Logger logger = LoggerFactory.getLogger(DefaultMuleEvent.class);
 
     /** Immutable MuleEvent state **/
 

@@ -18,8 +18,8 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.NotSerializableException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Until successful synchronous processing strategy.
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy implements Initialisable
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     protected MuleEvent doRoute(MuleEvent event) throws MessagingException
@@ -48,7 +48,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
                     logger.info("Exception thrown inside until-successful " + e.getMessage());
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug(e);
+                        logger.debug("Exception thrown inside until-successful ", e);
                     }
                     lastExecutionException = e;
                     if (i < getUntilSuccessfulConfiguration().getMaxRetries())

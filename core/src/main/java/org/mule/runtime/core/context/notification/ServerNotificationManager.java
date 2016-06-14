@@ -30,8 +30,8 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A reworking of the event manager that allows efficient behaviour without global on/off
@@ -62,7 +62,7 @@ import org.apache.commons.logging.LogFactory;
 public class ServerNotificationManager implements Work, Disposable, ServerNotificationHandler, MuleContextAware
 {
     public static final String NULL_SUBSCRIPTION = "NULL";
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
     private boolean dynamic = false;
     private Configuration configuration = new Configuration();
     private AtomicBoolean disposed = new AtomicBoolean(false);

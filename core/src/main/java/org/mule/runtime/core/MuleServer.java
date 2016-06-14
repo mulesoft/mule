@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>MuleServer</code> is a simple application that represents a local Mule
@@ -79,7 +79,7 @@ public class MuleServer implements Runnable
     /**
      * logger used by this class
      */
-    private static final Log logger = LogFactory.getLog(MuleServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(MuleServer.class);
 
     public static final String DEFAULT_CONFIGURATION = "mule-config.xml";
 
@@ -228,9 +228,9 @@ public class MuleServer implements Runnable
             }
             catch (Exception e)
             {
-                logger.fatal(e);
+                logger.equals(e);
                 final Message message = CoreMessages.failedToLoad("Builder: " + cfgBuilderClassName);
-                System.err.println(StringMessageUtils.getBoilerPlate("FATAL: " + message.toString()));
+                System.err.println(StringMessageUtils.getBoilerPlate("ERROR: " + message.toString()));
                 System.exit(1);
             }
         }
@@ -425,12 +425,12 @@ public class MuleServer implements Runnable
         int exitCode = 1;
         if (muleException != null)
         {
-            logger.fatal(muleException.getDetailedMessage());
+            logger.error(muleException.getDetailedMessage());
             exitCode = muleException.getExceptionCode();
         }
         else
         {
-            logger.fatal(msg.toString() + " " + e.getMessage(), e);
+            logger.error(msg.toString() + " " + e.getMessage(), e);
         }
         List<String> msgs = new ArrayList<String>();
         msgs.add(msg.getMessage());
@@ -439,7 +439,7 @@ public class MuleServer implements Runnable
         msgs.add(" ");
         msgs.add(CoreMessages.fatalErrorInShutdown().getMessage());
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
-        logger.fatal(shutdownMessage);
+        logger.error(shutdownMessage);
 
         System.exit(exitCode);
     }
@@ -465,7 +465,7 @@ public class MuleServer implements Runnable
         }
     }
 
-    public Log getLogger()
+    public Logger getLogger()
     {
         return logger;
     }

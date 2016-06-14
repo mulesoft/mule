@@ -15,8 +15,8 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.util.StringUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>MessagePropertyFilter</code> can be used to filter against properties on
@@ -37,7 +37,7 @@ public class MessagePropertyFilter implements Filter
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(MessagePropertyFilter.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(MessagePropertyFilter.class);
     private boolean caseSensitive = true;
     private boolean not = false;
 

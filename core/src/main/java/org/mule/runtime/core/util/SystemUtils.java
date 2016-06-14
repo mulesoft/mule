@@ -22,15 +22,15 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // @ThreadSafe
 
 public class SystemUtils extends org.apache.commons.lang.SystemUtils
 {
     // class logger
-    protected static final Log logger = LogFactory.getLog(SystemUtils.class);
+    protected static final Logger logger = LoggerFactory.getLogger(SystemUtils.class);
 
     // bash prepends: declare -x
     // zsh prepends: typeset -x

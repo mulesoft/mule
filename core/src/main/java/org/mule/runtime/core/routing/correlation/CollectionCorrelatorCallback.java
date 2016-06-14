@@ -16,8 +16,8 @@ import org.mule.runtime.core.session.DefaultMuleSession;
 
 import java.text.MessageFormat;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Correlator that correlates messages based on Mule correlation settings
@@ -27,7 +27,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected MuleContext muleContext;
     private final String storePrefix;

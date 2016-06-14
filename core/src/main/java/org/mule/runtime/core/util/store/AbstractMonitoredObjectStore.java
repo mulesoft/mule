@@ -20,8 +20,8 @@ import java.io.Serializable;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractMonitoredObjectStore<T extends Serializable> 
     implements ObjectStore<T>, Runnable, MuleContextAware, Initialisable, Disposable
 {
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected MuleContext context;
     protected ScheduledThreadPoolExecutor scheduler;

@@ -14,8 +14,8 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wraps a {@link WorkManager} to track the work that in process.
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 public class TrackingWorkManager implements WorkManager
 {
 
-    protected static final Log logger = LogFactory.getLog(TrackingWorkManager.class);
+    protected static final Logger logger = LoggerFactory.getLogger(TrackingWorkManager.class);
 
     public static final int DEFAULT_SLEEP_MILLIS = 50;
     public static final String MULE_WAIT_MILLIS = "mule.transport.dispose.wait";

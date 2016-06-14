@@ -7,15 +7,14 @@
 package org.mule.runtime.core.util;
 
 import org.mule.runtime.core.config.MuleManifest;
-import org.mule.runtime.core.util.VersionRange;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JdkVersionUtils
 {
@@ -223,7 +222,7 @@ public class JdkVersionUtils
         }
     }
     
-    private static final Log logger = LogFactory.getLog(JdkVersionUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(JdkVersionUtils.class);
     
     /** 
      * pattern with groups for major, minor, micro, update and milestone (if exists).

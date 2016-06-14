@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class EventProcessingThread extends Thread
 {
-    protected final Log logger = LogFactory.getLog(EventProcessingThread.class);
+    protected final Logger logger = LoggerFactory.getLogger(EventProcessingThread.class);
 
     protected volatile boolean stopRequested;
     protected long delayTime;

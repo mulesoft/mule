@@ -14,8 +14,8 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Delegates every call to the real QueueManager.
@@ -29,7 +29,7 @@ public class DelegateQueueManager implements QueueManager, Lifecycle, MuleContex
 
     public static final String MULE_QUEUE_OLD_MODE_KEY = "mule.queue.objectstoremode";
 
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private QueueManager delegate;
 
     public DelegateQueueManager()

@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>ExceptionHelper</code> provides a number of helper functions that can be
@@ -57,7 +57,7 @@ public final class ExceptionHelper
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(ExceptionHelper.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ExceptionHelper.class);
 
     private static String J2SE_VERSION = "";
 

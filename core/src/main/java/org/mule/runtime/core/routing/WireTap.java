@@ -11,9 +11,9 @@ import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.util.ObjectUtils;
@@ -21,8 +21,8 @@ import org.mule.runtime.core.util.ObjectUtils;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The <code>WireTap</code> MessageProcessor allows inspection of messages in a flow.
@@ -40,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class WireTap extends AbstractMessageProcessorOwner implements MessageProcessor, NonBlockingSupported
 {
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
     protected volatile MessageProcessor tap;
     protected volatile Filter filter;
 

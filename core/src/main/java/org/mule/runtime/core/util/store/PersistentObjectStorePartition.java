@@ -40,8 +40,8 @@ import java.util.List;
 
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.TreeBidiMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PersistentObjectStorePartition<T extends Serializable>
     implements ListableObjectStore<T>, ExpirableObjectStore<T>
@@ -49,7 +49,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
 
     private static final String OBJECT_FILE_EXTENSION = ".obj";
     private static final String PARTITION_DESCRIPTOR_FILE = "partition-descriptor";
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final MuleContext muleContext;
     private final ObjectSerializer serializer;
 

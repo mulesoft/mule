@@ -37,8 +37,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Support for configuring TLS/SSL connections.
@@ -122,7 +122,7 @@ public final class TlsConfiguration
 
     public static final String DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY = SYSTEM_PROPERTY_PREFIX + "tls.disableSystemPropertiesMapping";
 
-    private Log logger = LogFactory.getLog(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private String sslType = DEFAULT_SSL_TYPE;
 
