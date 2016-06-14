@@ -34,7 +34,7 @@ import java.util.function.Function;
 import javax.inject.Inject;
 
 
-public class HttpRequesterOperations
+public class HttpRequestOperations
 {
 
     private static final int WAIT_FOR_EVER = MAX_VALUE;

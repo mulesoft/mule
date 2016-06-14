@@ -37,7 +37,7 @@ import javax.inject.Inject;
  */
 @Configuration(name = "request-config")
 @Providers(HttpRequesterProvider.class)
-@Operations({HttpRequesterOperations.class})
+@Operations({HttpRequestOperations.class})
 public class HttpRequesterConfig implements Initialisable, Stoppable
 {
     @ConfigName
