@@ -13,6 +13,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import org.mule.extension.http.api.HttpMessageBuilder;
+import org.mule.extension.http.api.HttpPart;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -42,6 +43,7 @@ import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -64,12 +66,27 @@ public class HttpResponseBuilder extends HttpMessageBuilder
     @Parameter
     @Optional
     private Function<MuleEvent, Integer> statusCode;
+
     /**
      * HTTP reason phrase the response should have.
      */
     @Parameter
     @Optional
     private Function<MuleEvent, String> reasonPhrase;
+
+    /**
+     * HTTP headers the response should have, as an expression. Will override the headers attribute.
+     */
+    @Parameter
+    @Optional
+    private Function<MuleEvent, Map> headersRef;
+
+    /**
+     * HTTP parts the message should include, as an expression. Will override the parts attribute.
+     */
+    @Parameter
+    @Optional
+    private Function<MuleEvent, List> partsRef;
 
     private HttpStreamingType responseStreaming = AUTO;
     private boolean multipartEntityWithNoMultipartContentyTypeWarned;
@@ -80,7 +97,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder
     {
         final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
 
-        if (!headers.containsKey(CONTENT_TYPE_PROPERTY))
+        Map<String, String> resolvedHeaders = headersRef != null ? headersRef.apply(event) : headers;
+
+        if (!resolvedHeaders.containsKey(CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
             if (!MimeTypes.ANY.equals(dataType.getMimeType()))
@@ -89,7 +108,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder
             }
         }
 
-        for (String name : headers.keySet())
+        for (String name : resolvedHeaders.keySet())
         {
             //For now, only support single headers
             if (TRANSFER_ENCODING.equals(name) && !supportsTransferEncoding)
@@ -98,7 +117,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder
             }
             else
             {
-                httpResponseHeaderBuilder.addHeader(name, headers.get(name));
+                httpResponseHeaderBuilder.addHeader(name, resolvedHeaders.get(name));
             }
         }
 
@@ -108,7 +127,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder
 
         HttpEntity httpEntity;
 
-        if (!parts.isEmpty())
+        List<HttpPart> resolvedParts = partsRef != null ? partsRef.apply(event) : parts;
+
+        if (!resolvedParts.isEmpty())
         {
             if (configuredContentType == null)
             {
@@ -118,7 +139,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder
             {
                 warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
             }
-            httpEntity = createMultipartEntity(event.getMessage(), httpResponseHeaderBuilder.getContentType());
+            httpEntity = createMultipartEntity(event.getMessage(), httpResponseHeaderBuilder.getContentType(), resolvedParts);
             resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding, (ByteArrayHttpEntity) httpEntity);
         }
         else
@@ -277,7 +298,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder
         }
     }
 
-    private HttpEntity createMultipartEntity(MuleMessage muleMessage, String contentType) throws MessagingException
+    private HttpEntity createMultipartEntity(MuleMessage muleMessage, String contentType, List<HttpPart> parts) throws MessagingException
     {
         if (logger.isDebugEnabled())
         {
@@ -287,7 +308,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder
         final MultipartHttpEntity multipartEntity;
         try
         {
-            multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(getParts()));
+            multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(getResolvedParts(parts)));
             return new ByteArrayHttpEntity(HttpMultipartEncoder.createMultipartContent(multipartEntity, contentType));
         }
         catch (Exception e)

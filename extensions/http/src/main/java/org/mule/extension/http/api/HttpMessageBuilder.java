@@ -54,6 +54,11 @@ public class HttpMessageBuilder
 
     public Map<String, DataHandler> getParts()
     {
+        return getResolvedParts(parts);
+    }
+
+    protected Map<String, DataHandler> getResolvedParts(List<HttpPart> parts)
+    {
         Map<String, DataHandler> resolvedAttachments = new HashMap<>();
 
         parts.forEach(attachment -> {

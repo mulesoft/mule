@@ -7,8 +7,14 @@
 package org.mule.runtime.module.http.functional.listener;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang.StringUtils.countMatches;
+import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
+import static org.apache.http.entity.ContentType.TEXT_PLAIN;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -17,12 +23,11 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
-import org.mule.runtime.api.message.NullPayload;
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
@@ -36,6 +41,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -44,20 +51,16 @@ import javax.servlet.http.Part;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore("MULE-9864: Support expression in HTTP response builder")
 public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
 {
 
@@ -66,10 +69,9 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
     private static final String FILE_BODY_FIELD_NAME = "file";
     //The value needs to be big enough to ensure several chunks if using transfer encoding chunked.
     private static final String FILE_BODY_FIELD_VALUE = randomAlphanumeric(1200000);
-    private static final String FIELD_BDOY_FILE_NAME = "file.ext";
+    private static final String FILE_BODY_FIELD_FILENAME = "file.ext";
     private static final boolean DO_NOT_USE_CHUNKED_MODE = false;
     private static final boolean USE_CHUNKED_MODE = true;
-    private static final String TEXT_PLAIN = "text/plain";
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
     @Rule
@@ -115,15 +117,15 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
     @Test
     public void respondWithAttachmentsContentLength() throws Exception
     {
-        MuleMessage response = getResponseWithExpectedAttachmentFrom(contentLength.getValue());
-        assertThat(response.getInboundProperty(CONTENT_LENGTH), is(notNullValue()));
+        String contentLengthValue = getResponseWithExpectedAttachmentFrom(contentLength.getValue(), CONTENT_LENGTH);
+        assertThat(contentLengthValue, is(notNullValue()));
     }
 
     @Test
     public void respondWithAttachmentsChunked() throws Exception
     {
-        MuleMessage response = getResponseWithExpectedAttachmentFrom(chunked.getValue());
-        assertThat((String) response.getInboundProperty(TRANSFER_ENCODING), is(CHUNKED));
+        String transferEncodingValue = getResponseWithExpectedAttachmentFrom(chunked.getValue(), TRANSFER_ENCODING);
+        assertThat(transferEncodingValue, is(CHUNKED));
     }
 
     @Test
@@ -135,13 +137,13 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
         DataHandler attachment1 = response.getInboundAttachment(FILE_BODY_FIELD_NAME);
         HttpPart part = ((HttpPartDataSource) attachment1.getDataSource()).getPart();
         assertThat(part.getName(), is(FILE_BODY_FIELD_NAME));
-        assertThat(part.getFileName(), is(FIELD_BDOY_FILE_NAME));
+        assertThat(part.getFileName(), is(FILE_BODY_FIELD_FILENAME));
         assertThat(part.getContentType(), is("application/octet-stream"));
         assertThat(IOUtils.toString(part.getInputStream()), is(FILE_BODY_FIELD_VALUE));
 
         DataHandler attachment2 = response.getInboundAttachment(TEXT_BODY_FIELD_NAME);
         assertThat((String) attachment2.getContent(), is(TEXT_BODY_FIELD_VALUE));
-        assertThat(attachment2.getContentType(), is(TEXT_PLAIN));
+        assertThat(attachment2.getContentType(), is(TEXT_PLAIN.toString()));
     }
 
     @Test
@@ -158,14 +160,24 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
         }
     }
 
-    private MuleMessage getResponseWithExpectedAttachmentFrom(String path) throws MuleException, IOException
+    private String getResponseWithExpectedAttachmentFrom(String path, String requiredHeader) throws MuleException, IOException
     {
-        MuleMessage response = muleContext.getClient().send(getUrl(path), getTestMuleMessage());
-        assertThat(response.getInboundAttachmentNames().size(), is(1));
-        DataHandler attachment = response.getInboundAttachment(TEXT_BODY_FIELD_NAME);
-        assertThat((String) attachment.getContent(), is(TEXT_BODY_FIELD_VALUE));
-        assertThat(attachment.getContentType(), is(TEXT_PLAIN));
-        return response;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault())
+        {
+            HttpGet httpGet = new HttpGet(getUrl(path));
+            try (CloseableHttpResponse response = httpClient.execute(httpGet))
+            {
+                final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
+                assertThat(contentType, containsString(MULTIPART_FORM_DATA));
+
+                final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
+                assertThat(parts.size(), is(1));
+                Map<String, Part> partsAsMap = convertPartsToMap(parts);
+                assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), notNullValue());
+                assertThat(IOUtils.toString(partsAsMap.get(TEXT_BODY_FIELD_NAME).getInputStream()), is(TEXT_BODY_FIELD_VALUE));
+                return response.getFirstHeader(requiredHeader).getValue();
+            }
+        }
     }
 
     private void processAttachmentRequestAndResponse(String pathToCall, String expectedResponseContentType, boolean useChunkedMode) throws IOException, MuleException, ServletException
@@ -180,21 +192,22 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
             try
             {
                 final MuleMessage receivedMessage = muleContext.getClient().request("test://out", 1000);
-                assertThat(receivedMessage.getPayload(), Is.<Object>is(NullPayload.getInstance()));
-                assertThat(receivedMessage.getInboundAttachmentNames().size(), is(2));
-                assertThat(receivedMessage.getInboundAttachmentNames().contains(TEXT_BODY_FIELD_NAME), is(true));
-                assertThat(new String(((HttpPartDataSource) receivedMessage.getInboundAttachment(TEXT_BODY_FIELD_NAME).getDataSource()).getContent()), Is.<Object>is(TEXT_BODY_FIELD_VALUE));
-                assertThat(receivedMessage.getInboundAttachmentNames().contains(FILE_BODY_FIELD_NAME), is(true));
-                assertThat(new String(((HttpPartDataSource) receivedMessage.getInboundAttachment(FILE_BODY_FIELD_NAME).getDataSource()).getContent()), Is.<Object>is(FILE_BODY_FIELD_VALUE));
+                assertThat(receivedMessage.getPayload(), instanceOf(HttpRequestAttributes.class));
+                Map<String, DataHandler> receivedParts = ((HttpRequestAttributes) receivedMessage.getPayload()).getParts();
+                assertThat(receivedParts.size(), is(2));
+                assertThat(receivedParts.keySet(), hasItem(TEXT_BODY_FIELD_NAME));
+                assertThat(new String(((HttpPartDataSource) receivedParts.get(TEXT_BODY_FIELD_NAME).getDataSource()).getContent()), is(TEXT_BODY_FIELD_VALUE));
+                assertThat(receivedParts.keySet(), hasItem(FILE_BODY_FIELD_NAME));
+                assertThat(new String(((HttpPartDataSource) receivedParts.get(FILE_BODY_FIELD_NAME).getDataSource()).getContent()), Is.<Object>is(FILE_BODY_FIELD_VALUE));
 
                 final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
-                assertThat(contentType, Matchers.containsString(expectedResponseContentType));
+                assertThat(contentType, containsString(expectedResponseContentType));
 
                 final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
-                assertThat(parts.size(), Is.is(2));
+                assertThat(parts.size(), is(2));
                 Map<String, Part> partsAsMap = convertPartsToMap(parts);
-                assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), IsNull.notNullValue());
-                assertThat(partsAsMap.get(FILE_BODY_FIELD_NAME), IsNull.notNullValue());
+                assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), notNullValue());
+                assertThat(partsAsMap.get(FILE_BODY_FIELD_NAME), notNullValue());
                 assertThat(IOUtils.toString(partsAsMap.get(TEXT_BODY_FIELD_NAME).getInputStream()), is(TEXT_BODY_FIELD_VALUE));
                 assertThat(IOUtils.toString(partsAsMap.get(FILE_BODY_FIELD_NAME).getInputStream()), is(FILE_BODY_FIELD_VALUE));
             }
@@ -235,10 +248,10 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
     private HttpEntity getMultipartEntity(boolean withFile)
     {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addTextBody(TEXT_BODY_FIELD_NAME, TEXT_BODY_FIELD_VALUE, ContentType.TEXT_PLAIN);
+        builder.addTextBody(TEXT_BODY_FIELD_NAME, TEXT_BODY_FIELD_VALUE, TEXT_PLAIN);
         if (withFile)
         {
-            builder.addBinaryBody(FILE_BODY_FIELD_NAME, FILE_BODY_FIELD_VALUE.getBytes(), ContentType.APPLICATION_OCTET_STREAM, FIELD_BDOY_FILE_NAME);
+            builder.addBinaryBody(FILE_BODY_FIELD_NAME, FILE_BODY_FIELD_VALUE.getBytes(), APPLICATION_OCTET_STREAM, FILE_BODY_FIELD_FILENAME);
         }
         return builder.build();
     }
@@ -258,20 +271,66 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
         return partsAsMap;
     }
 
-    public static class CustomAttachmentMessageProcessor implements MessageProcessor
+    public static class CreatePartMessageProcessor implements MessageProcessor
     {
-
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            try
-            {
-                event.getMessage().addOutboundAttachment(FILE_BODY_FIELD_NAME, new DataHandler(new ByteArrayDataSource(FILE_BODY_FIELD_VALUE.getBytes(), ContentType.APPLICATION_OCTET_STREAM.toString(), FIELD_BDOY_FILE_NAME)));
-            }
-            catch (Exception e)
-            {
-                //do nothing
-            }
+            org.mule.extension.http.api.HttpPart part = new org.mule.extension.http.api.HttpPart(TEXT_BODY_FIELD_NAME,
+                                                                                                 TEXT_BODY_FIELD_VALUE,
+                                                                                                 TEXT_PLAIN.toString(),
+                                                                                                 null);
+            event.setFlowVariable("parts", asList(part));
+            return event;
+        }
+    }
+
+    public static class CreatePartsMessageProcessor implements MessageProcessor
+    {
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            org.mule.extension.http.api.HttpPart part1 = new org.mule.extension.http.api.HttpPart(TEXT_BODY_FIELD_NAME,
+                                                                                                  TEXT_BODY_FIELD_VALUE,
+                                                                                                  TEXT_PLAIN.toString(),
+                                                                                                  null);
+            org.mule.extension.http.api.HttpPart part2 = new org.mule.extension.http.api.HttpPart(FILE_BODY_FIELD_NAME,
+                                                                                                  FILE_BODY_FIELD_VALUE.getBytes(),
+                                                                                                  APPLICATION_OCTET_STREAM.toString(),
+                                                                                                  FILE_BODY_FIELD_FILENAME);
+            event.setFlowVariable("parts", asList(part1, part2));
+            return event;
+        }
+    }
+
+    public static class ConvertPartsMessageProcessor implements MessageProcessor
+    {
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            List<org.mule.extension.http.api.HttpPart> parts = new LinkedList<>();
+            ((HttpRequestAttributes) event.getMessage().getAttributes())
+                    .getParts().forEach((id, dataHandler) ->
+                                        {
+                                            try
+                                            {
+                                                String filename = null;
+                                                if (!id.equals(dataHandler.getName()))
+                                                {
+                                                    filename = dataHandler.getName();
+                                                }
+                                                parts.add(new org.mule.extension.http.api.HttpPart(id,
+                                                                       dataHandler.getContent(),
+                                                                       dataHandler.getContentType(),
+                                                                       filename));
+                                            }
+                                            catch (IOException e)
+                                            {
+                                                //do nothing
+                                            }
+                                        }
+            );
+            event.setFlowVariable("parts", parts);
             return event;
         }
     }

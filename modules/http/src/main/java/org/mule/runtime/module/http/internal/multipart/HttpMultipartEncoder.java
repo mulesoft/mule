@@ -28,6 +28,7 @@ public class HttpMultipartEncoder
 {
 
     private static final String FORM_DATA = "form-data";
+    public static final String ATTACHMENT = "attachment";
 
     public static MimeMultipart createMultpartContent(MultipartHttpEntity body, String contentType)
     {
@@ -46,9 +47,10 @@ public class HttpMultipartEncoder
                     internetHeaders.addHeader(headerName, headerValue);
                 }
             }
-            if (internetHeaders.getHeader(CONTENT_DISPOSITION) == null && contentTypeSubType.equals(FORM_DATA))
+            if (internetHeaders.getHeader(CONTENT_DISPOSITION) == null)
             {
-                internetHeaders.addHeader(CONTENT_DISPOSITION, getContentDisposition(part));
+                String partType = contentTypeSubType.equals(FORM_DATA) ? FORM_DATA : ATTACHMENT;
+                internetHeaders.addHeader(CONTENT_DISPOSITION, getContentDisposition(part, partType));
             }
             if (internetHeaders.getHeader(CONTENT_TYPE) == null && part.getContentType() != null)
             {
@@ -67,10 +69,10 @@ public class HttpMultipartEncoder
         return mimeMultipartContent;
     }
 
-    private static String getContentDisposition(HttpPart part)
+    private static String getContentDisposition(HttpPart part, String partType)
     {
         StringBuilder builder = new StringBuilder();
-        builder.append(FORM_DATA);
+        builder.append(partType);
         builder.append("; name=\"");
         builder.append(part.getName());
         builder.append("\"");

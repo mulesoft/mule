@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -45,6 +44,8 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
     @Rule
     public SystemProperty headersResponseBuilderPath = new SystemProperty("headersResponseBuilderPath","headersResponseBuilderPath");
     @Rule
+    public SystemProperty headersOverrideResponseBuilderPath = new SystemProperty("headersOverrideResponseBuilderPath","headersOverrideResponseBuilderPath");
+    @Rule
     public SystemProperty errorEmptyResponseBuilderPath = new SystemProperty("errorEmptyResponseBuilderPath","errorEmptyResponseBuilderPath");
     @Rule
     public SystemProperty errorStatusResponseBuilderPath = new SystemProperty("errorStatusResponseBuilderPath","errorStatusResponseBuilderPath");
@@ -52,6 +53,8 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
     public SystemProperty errorHeaderResponseBuilderPath = new SystemProperty("errorHeaderResponseBuilderPath","errorHeaderResponseBuilderPath");
     @Rule
     public SystemProperty errorHeadersResponseBuilderPath = new SystemProperty("errorHeadersResponseBuilderPath","errorHeadersResponseBuilderPath");
+    @Rule
+    public SystemProperty errorHeadersOverrideResponseBuilderPath = new SystemProperty("errorHeadersOverrideResponseBuilderPath","errorHeadersOverrideResponseBuilderPath");
     @Rule
     public SystemProperty responseBuilderAndErrorResponseBuilderNotTheSamePath = new SystemProperty("responseBuilderAndErrorResponseBuilderNotTheSamePath","responseBuilderAndErrorResponseBuilderNotTheSamePath");
 
@@ -83,11 +86,17 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
         simpleHeaderTest(url);
     }
 
-    @Ignore("Not currently supported. MULE-9864: Support expressions in HTTP headers attribute.")
     @Test
     public void headersResponseBuilder() throws Exception
     {
         final String url = getUrl(headersResponseBuilderPath);
+        simpleHeaderTest(url);
+    }
+
+    @Test
+    public void headersOverrideResponseBuilder() throws Exception
+    {
+        final String url = getUrl(headersOverrideResponseBuilderPath);
         simpleHeaderTest(url);
     }
 
@@ -114,11 +123,17 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
         simpleHeaderTest(url);
     }
 
-    @Ignore("Not currently supported. MULE-9864: Support expressions in HTTP headers attribute.")
     @Test
     public void errorHeadersResponseBuilder() throws Exception
     {
         final String url = getUrl(errorHeadersResponseBuilderPath);
+        simpleHeaderTest(url);
+    }
+
+    @Test
+    public void errorHeadersOverrideResponseBuilder() throws Exception
+    {
+        final String url = getUrl(errorHeadersOverrideResponseBuilderPath);
         simpleHeaderTest(url);
     }
 
