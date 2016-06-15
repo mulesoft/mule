@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
-import static org.mule.runtime.core.util.SystemUtils.LINE_SEPARATOR;
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
 
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
@@ -49,7 +49,6 @@ import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -485,68 +484,64 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
             logger.info("Starting: " + this);
         }
 
-        lifecycleManager.fireStartPhase(new LifecycleCallback<Connector>()
+        lifecycleManager.fireStartPhase((phaseName, object) ->
         {
-            @Override
-            public void onTransition(String phaseName, Connector object) throws MuleException
-            {
-                initWorkManagers();
-                scheduler = createScheduler();
-                doStart();
+            initWorkManagers();
+            scheduler = createScheduler();
+            doStart();
 
-                if (receivers != null)
+            if (receivers != null)
+            {
+                for (MessageReceiver receiver : receivers.values())
                 {
-                    for (MessageReceiver receiver : receivers.values())
+                    final List<MuleException> errors = new ArrayList<MuleException>();
+                    try
                     {
-                        final List<MuleException> errors = new ArrayList<MuleException>();
-                        try
+                        if (logger.isDebugEnabled())
                         {
-                            if (logger.isDebugEnabled())
+                            logger.debug("Starting receiver on endpoint: "
+                                    + receiver.getEndpoint().getEndpointURI());
+                        }
+                        if (receiver.getFlowConstruct().getLifecycleState().isStarted())
+                        {
+                            receiver.start();
+                        }
+                        else if (retryPolicyTemplate instanceof AsynchronousRetryTemplate)
+                        {
+                            //we must be running on a different thread
+                            String timeout = System.getProperty(MULE_CONTEXT_START_TIMEOUT_SYSTEM_PROPERTY, DEFAULT_CONTEXT_START_TIMEOUT);
+                            if(!muleContext.waitUntilStarted(Integer.valueOf(timeout)))
                             {
-                                logger.debug("Starting receiver on endpoint: "
-                                        + receiver.getEndpoint().getEndpointURI());
+                                String errorMessage = "Timeout waiting for mule context to be completely started.";
+                                logger.error(errorMessage);
+                                errors.add(new DefaultMuleException(errorMessage));
                             }
-                            if (receiver.getFlowConstruct().getLifecycleState().isStarted())
+                            else
                             {
                                 receiver.start();
                             }
-                            else if (retryPolicyTemplate instanceof AsynchronousRetryTemplate)
-                            {
-                                //we must be running on a different thread
-                                String timeout = System.getProperty(MULE_CONTEXT_START_TIMEOUT_SYSTEM_PROPERTY, DEFAULT_CONTEXT_START_TIMEOUT);
-                                if(!muleContext.waitUntilStarted(Integer.valueOf(timeout)))
-                                {
-                                    String errorMessage = "Timeout waiting for mule context to be completely started.";
-                                    logger.error(errorMessage);
-                                    errors.add(new DefaultMuleException(errorMessage));
-                                }
-                                else
-                                {
-                                    receiver.start();
-                                }
-                            }
                         }
-                        catch (MuleException e)
-                        {
-                            logger.error(e);
-                            errors.add(e);
-                        }
-                        catch (InterruptedException e)
-                        {
-                            Thread.currentThread().interrupt();
-                            logger.error(e);
-                            errors.add(new DefaultMuleException(e));
-                        }
+                    }
+                    catch (MuleException e1)
+                    {
+                        logger.error(e1);
+                        errors.add(e1);
+                    }
+                    catch (InterruptedException e2)
+                    {
+                        Thread.currentThread().interrupt();
+                        logger.error(e2);
+                        errors.add(new DefaultMuleException(e2));
+                    }
 
-                        if (!errors.isEmpty())
-                        {
-                            // throw the first one in order not to break the reconnection
-                            // strategy logic,
-                            // every exception has been logged above already
-                            // api needs refactoring to support the multi-cause exception
-                            // here
-                            throw errors.get(0);
-                        }
+                    if (!errors.isEmpty())
+                    {
+                        // throw the first one in order not to break the reconnection
+                        // strategy logic,
+                        // every exception has been logged above already
+                        // api needs refactoring to support the multi-cause exception
+                        // here
+                        throw errors.get(0);
                     }
                 }
             }
@@ -562,40 +557,36 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         //    return;
         //}
 
-        lifecycleManager.fireStopPhase(new LifecycleCallback<Connector>()
+        lifecycleManager.fireStopPhase((phaseName, object) ->
         {
-            @Override
-            public void onTransition(String phaseName, Connector object) throws MuleException
+             // shutdown our scheduler service
+            shutdownScheduler();
+
+            doStop();
+
+            // Stop all the receivers on this connector
+            if (receivers != null)
             {
-                 // shutdown our scheduler service
-                shutdownScheduler();
-
-                doStop();
-
-                // Stop all the receivers on this connector
-                if (receivers != null)
+                for (MessageReceiver receiver : receivers.values())
                 {
-                    for (MessageReceiver receiver : receivers.values())
+                    if (logger.isDebugEnabled())
                     {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Stopping receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
-                        }
-                        receiver.stop();
+                        logger.debug("Stopping receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
                     }
+                    receiver.stop();
                 }
-
-                // Now that dispatchers are borrowed/returned in worker thread we need to
-                // dispose workManager before clearing object pools
-                disposeWorkManagers();
-
-                // Workaround for MULE-4553
-                clearDispatchers();
-                clearRequesters();
-
-                // make sure the scheduler is gone
-                scheduler = null;
             }
+
+            // Now that dispatchers are borrowed/returned in worker thread we need to
+            // dispose workManager before clearing object pools
+            disposeWorkManagers();
+
+            // Workaround for MULE-4553
+            clearDispatchers();
+            clearRequesters();
+
+            // make sure the scheduler is gone
+            scheduler = null;
         });
     }
 
@@ -620,14 +611,10 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
 
         try
         {
-            lifecycleManager.fireDisposePhase(new LifecycleCallback<Connector>()
+            lifecycleManager.fireDisposePhase((phaseName, object) ->
             {
-                @Override
-                public void onTransition(String phaseName, Connector object) throws MuleException
-                {
-                    doDispose();
-                    disposeReceivers();
-                }
+                doDispose();
+                disposeReceivers();
             });
         }
         catch (MuleException e)
@@ -2204,45 +2191,6 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         }
     }
 
-    /**
-     * This method will return the dispatcher to the pool or, if the payload is an
-     * inputstream, replace the payload with a new DelegatingInputStream which
-     * returns the dispatcher to the pool when the stream is closed.
-     *
-     * @param endpoint
-     * @param dispatcher
-     * @param result
-     */
-    protected void setupDispatchReturn(final OutboundEndpoint endpoint,
-                                       final MessageDispatcher dispatcher,
-                                       MuleMessage result)
-    {
-        if (result != null && result.getPayload() instanceof InputStream)
-        {
-            DelegatingInputStream is = new DelegatingInputStream((InputStream) result.getPayload())
-            {
-                @Override
-                public void close() throws IOException
-                {
-                    try
-                    {
-                        super.close();
-                    }
-                    finally
-                    {
-                        returnDispatcher(endpoint, dispatcher);
-                    }
-                }
-            };
-            result.setPayload(is);
-        }
-        else
-        {
-
-            this.returnDispatcher(endpoint, dispatcher);
-        }
-    }
-
     @Override
     public MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception
     {
@@ -2638,14 +2586,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
             SimpleMessageProcessorChainBuilder builder = new SimpleMessageProcessorChainBuilder();
             builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
             LaxAsyncInterceptingMessageProcessor async = new LaxAsyncInterceptingMessageProcessor(
-                new WorkManagerSource()
-            {
-                @Override
-                public WorkManager getWorkManager() throws MuleException
-                {
-                    return getDispatcherWorkManager();
-                }
-            });
+                () -> getDispatcherWorkManager());
             builder.chain(async);
             builder.chain(new DispatcherMessageProcessor(endpoint));
             return builder.build();
