@@ -8,18 +8,27 @@
 package org.mule.runtime.module.artifact.classloader;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
+import static org.mule.tck.junit4.matcher.FunctionExpressionMatcher.expressionMatches;
+
+import org.mule.runtime.module.artifact.classloader.TestClassLoader.TestClassNotFoundException;
+import org.mule.runtime.module.artifact.classloader.exception.CompositeClassNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class CompositeClassLoaderTestCase extends AbstractMuleTestCase
 {
@@ -34,6 +43,9 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase
     public static final String LIBRARY_FROM_PARENT = "parent.dummy.so";
     public static final String LIBRARY_FROM_CLASSLAODER1 = "classloader1.dummy.so";
     public static final String LIBRARY_FROM_CLASSLAODER2 = "classloader2.dummy.so";
+
+    @Rule
+    public ExpectedException expected = ExpectedException.none();
 
     private final TestClassLoader parentClassLoader = new TestClassLoader();
     private final TestClassLoader classLoader1 = new TestClassLoader();
@@ -55,11 +67,13 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase
         assertThat(aClass, equalTo(CLASS_FROM_PARENT));
     }
 
-    @Test(expected = ClassNotFoundException.class)
+    @Test
     public void usesParentOnlyLookupAndFails() throws ClassNotFoundException
     {
         classLoader1.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER1);
         classLoader2.addClass(CLASS_NAME, CLASS_FROM_CLASSLOADER2);
+
+        expected.expect(ClassNotFoundException.class);
 
         final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
         when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_ONLY);
@@ -96,9 +110,16 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase
         assertThat(aClass, equalTo(CLASS_FROM_CLASSLOADER1));
     }
 
-    @Test(expected = ClassNotFoundException.class)
+    @Test
     public void  usesParentFirstAndChildLookupAndFails() throws ClassNotFoundException
     {
+        expected.expect(CompositeClassNotFoundException.class);
+        expected.expectMessage(startsWith("Cannot load class '" + CLASS_NAME + "': ["));
+        expected.expect(expressionMatches((e) -> ((CompositeClassNotFoundException) e).getExceptions(), contains(
+                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) parentClassLoader)),
+                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) classLoader1)),
+                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) classLoader2)))));
+
         final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
         when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_FIRST);
         CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
@@ -146,9 +167,11 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase
         assertThat(aClass, equalTo(CLASS_FROM_CLASSLOADER1));
     }
 
-    @Test(expected = ClassNotFoundException.class)
+    @Test
     public void usesChildFirstThenParentLookupAndFails() throws ClassNotFoundException
     {
+        expected.expect(ClassNotFoundException.class);
+
         final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
         CompositeClassLoader compositeClassLoader = createCompositeClassLoader(lookupPolicy);
 

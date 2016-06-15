@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.core.util.ClassUtils.loadClass;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
-import org.mule.runtime.core.util.ClassUtils;
+import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
+
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
@@ -18,8 +22,6 @@ import org.mule.runtime.module.extension.internal.introspection.version.StaticVe
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class used to obtain the {@link Describer} instance which should be
@@ -53,7 +55,7 @@ final class DescriberResolver
         DescriberResolverDelegate delegate = delegates.get(manifest.getDescriberManifest().getId());
         if (delegate == null)
         {
-            throw new IllegalArgumentException(String.format("Manifest for extension '%s' references describer '%s' which is not supported", manifest.getName(), manifest.getDescriberManifest().getId()));
+            throw new IllegalArgumentException(format("Manifest for extension '%s' references describer '%s' which is not supported", manifest.getName(), manifest.getDescriberManifest().getId()));
         }
 
         return delegate.resolve(manifest, classLoader);
@@ -63,20 +65,20 @@ final class DescriberResolver
     {
         return (manifest, classLoader) -> {
 
-            String type = manifest.getDescriberManifest().getProperties().get(AnnotationsBasedDescriber.TYPE_PROPERTY_NAME);
-            if (StringUtils.isBlank(type))
+            String type = manifest.getDescriberManifest().getProperties().get(TYPE_PROPERTY_NAME);
+            if (isBlank(type))
             {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(format("Manifest for extension '%s' has no '%s' property", manifest.getName(), TYPE_PROPERTY_NAME));
             }
 
             Class<?> extensionType;
             try
             {
-                extensionType = ClassUtils.loadClass(type, classLoader);
+                extensionType = loadClass(type, classLoader);
             }
             catch (ClassNotFoundException e)
             {
-                throw new RuntimeException();
+                throw new RuntimeException(format("Class '%s' cannot be loaded for extension '%s'", type, manifest.getName()), e);
             }
 
             return new AnnotationsBasedDescriber(extensionType, new StaticVersionResolver(manifest.getVersion()));

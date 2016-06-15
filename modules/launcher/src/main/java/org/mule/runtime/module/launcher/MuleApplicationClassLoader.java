@@ -27,14 +27,6 @@ public class MuleApplicationClassLoader extends MuleArtifactClassLoader implemen
     }
 
     @Override
-    public String toString()
-    {
-        return String.format("%s[%s]@%s", getClass().getName(),
-                             getArtifactName(),
-                             Integer.toHexString(System.identityHashCode(this)));
-    }
-
-    @Override
     protected String findLibrary(String name)
     {
         String libraryPath = super.findLibrary(name);

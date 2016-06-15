@@ -7,15 +7,23 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.lang.Boolean.valueOf;
+import static java.lang.Integer.toHexString;
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.lang.System.identityHashCode;
 import static java.util.Collections.emptyList;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
+import org.mule.runtime.module.artifact.classloader.exception.NotExportedClassException;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Defines a {@link ClassLoader} that filter which classes and resources can
@@ -24,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 public class FilteringArtifactClassLoader extends ClassLoader implements ArtifactClassLoader
 {
 
-    protected static final Log logger = LogFactory.getLog(FilteringArtifactClassLoader.class);
+    protected static final Logger logger = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
 
     private final ArtifactClassLoader artifactClassLoader;
     private final ClassLoaderFilter filter;
@@ -53,7 +61,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
         }
         else
         {
-            throw new ClassNotFoundException(name);
+            throw new NotExportedClassException(name, getArtifactName(), filter);
         }
     }
 
@@ -66,6 +74,8 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
         }
         else
         {
+            logClassloadingTrace(format("Resource '%s' not found in classloader for '%s'.", name, getArtifactName()));
+            logClassloadingTrace(format("Filter applied for resource '%s': %s", name, getArtifactName()));
             return null;
         }
     }
@@ -84,7 +94,21 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
         }
         else
         {
+            logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactName()));
+            logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactName()));
             return new EnumerationAdapter<>(emptyList());
+        }
+    }
+
+    private void logClassloadingTrace(String message)
+    {
+        if (valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING)))
+        {
+            logger.info(message);
+        }
+        else if (logger.isTraceEnabled())
+        {
+            logger.trace(message);
         }
     }
 
@@ -108,9 +132,9 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     @Override
     public String toString()
     {
-        return String.format("%s[%s]@%s", getClass().getName(),
-                             artifactClassLoader.getArtifactName(),
-                             Integer.toHexString(System.identityHashCode(this)));
+        return format("%s[%s]@%s", getClass().getName(),
+                artifactClassLoader.getArtifactName(),
+                toHexString(identityHashCode(this)));
     }
 
     @Override
