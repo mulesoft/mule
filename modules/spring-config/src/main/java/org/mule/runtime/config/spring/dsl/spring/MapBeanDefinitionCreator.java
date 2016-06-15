@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 
@@ -39,9 +40,10 @@ public class MapBeanDefinitionCreator extends BeanDefinitionCreator
     {
         ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
         ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-        createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeDefinition().visit(objectTypeVisitor);
+        ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
+        componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
         Class<?> type = objectTypeVisitor.getType();
-        if (Map.class.isAssignableFrom(type))
+        if (Map.class.isAssignableFrom(type) && componentBuildingDefinition.getObjectFactoryType() == null)
         {
             ManagedList managedList = new ManagedList<>();
             for (ComponentModel innerComponent : componentModel.getInnerComponents())
