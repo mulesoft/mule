@@ -530,7 +530,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                     catch (InterruptedException e2)
                     {
                         Thread.currentThread().interrupt();
-                        logger.error(e2);
+                        logger.error(e2.toString());
                         errors.add(new DefaultMuleException(e2));
                     }
 
