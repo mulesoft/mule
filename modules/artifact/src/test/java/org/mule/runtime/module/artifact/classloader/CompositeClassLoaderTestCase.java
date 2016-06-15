@@ -8,13 +8,17 @@
 package org.mule.runtime.module.artifact.classloader;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
+import static org.mule.tck.junit4.matcher.FunctionExpressionMatcher.expressionMatches;
 
+import org.mule.runtime.module.artifact.classloader.TestClassLoader.TestClassNotFoundException;
 import org.mule.runtime.module.artifact.classloader.exception.CompositeClassNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -111,6 +115,10 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase
     {
         expected.expect(CompositeClassNotFoundException.class);
         expected.expectMessage(startsWith("Cannot load class '" + CLASS_NAME + "': ["));
+        expected.expect(expressionMatches((e) -> ((CompositeClassNotFoundException) e).getExceptions(), contains(
+                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) parentClassLoader)),
+                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) classLoader1)),
+                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) classLoader2)))));
 
         final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
         when(lookupPolicy.getLookupStrategy(CLASS_NAME)).thenReturn(PARENT_FIRST);

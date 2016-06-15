@@ -7,15 +7,21 @@
 package org.mule.runtime.module.artifact.classloader;
 
 import static java.lang.System.lineSeparator;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
+import static org.mule.tck.junit4.matcher.FunctionExpressionMatcher.expressionMatches;
 
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.module.artifact.classloader.TestClassLoader.TestClassNotFoundException;
 import org.mule.runtime.module.artifact.classloader.exception.CompositeClassNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -56,13 +62,15 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
     public void usesParentOnlyLookupAndFails() throws Exception
     {
         ClassLoader parent = mock(ClassLoader.class);
-        when(parent.loadClass(TEST_CLASS_NAME)).thenThrow(new ClassNotFoundException("ERROR"));
+        final ClassNotFoundException thrownException = new ClassNotFoundException("ERROR");
+        when(parent.loadClass(TEST_CLASS_NAME)).thenThrow(thrownException);
 
         final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
         when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_ONLY);
 
         expected.expect(CompositeClassNotFoundException.class);
         expected.expectMessage(startsWith("Cannot load class '" + TEST_CLASS_NAME + "': [ERROR" + lineSeparator() + "]"));
+        expected.expect(expressionMatches((e) -> ((CompositeClassNotFoundException) e).getExceptions(), contains(sameInstance(thrownException))));
 
         FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
 
@@ -98,7 +106,21 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
     @Test
     public void usesParentFirstAndChildLookupAndFails() throws Exception
     {
-        doClassNotFoundTest(PARENT_FIRST);
+        ClassLoader parent = Thread.currentThread().getContextClassLoader();
+        
+        final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+        when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_FIRST);
+        
+        expected.expect(CompositeClassNotFoundException.class);
+        expected.expectMessage(startsWith("Cannot load class '" + TEST_CLASS_NAME + "': ["));
+        
+        FineGrainedControlClassLoader ext = buildFineGrainedControlClassLoader(parent, lookupPolicy);
+        
+        expected.expect(expressionMatches((e) -> ((CompositeClassNotFoundException) e).getExceptions(), contains(
+                hasMessage(is(TEST_CLASS_NAME)),
+                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) ext)))));
+        
+        invokeTestClassMethod(ext);
     }
 
     @Test
@@ -130,22 +152,40 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
     @Test
     public void usesChildFirstThenParentLookupAndFails() throws Exception
     {
-        doClassNotFoundTest(CHILD_FIRST);
-    }
-
-    private void doClassNotFoundTest(ClassLoaderLookupStrategy lookupStrategy) throws Exception
-    {
         ClassLoader parent = Thread.currentThread().getContextClassLoader();
 
         final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-        when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(lookupStrategy);
+        when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(CHILD_FIRST);
 
         expected.expect(CompositeClassNotFoundException.class);
         expected.expectMessage(startsWith("Cannot load class '" + TEST_CLASS_NAME + "': ["));
 
-        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy);
+        FineGrainedControlClassLoader ext = buildFineGrainedControlClassLoader(parent, lookupPolicy);
+
+        expected.expect(expressionMatches((e) -> ((CompositeClassNotFoundException) e).getExceptions(), contains(
+                expressionMatches((e) -> ((TestClassNotFoundException) e).getClassLoader(), is((ClassLoader) ext)),
+                hasMessage(is(TEST_CLASS_NAME)))));
 
         invokeTestClassMethod(ext);
+    }
+
+    protected FineGrainedControlClassLoader buildFineGrainedControlClassLoader(ClassLoader parent, final ClassLoaderLookupPolicy lookupPolicy)
+    {
+        return new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy)
+        {
+            @Override
+            protected Class<?> findClass(String name) throws ClassNotFoundException
+            {
+                try
+                {
+                    return super.findClass(name);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    throw new TestClassLoader.TestClassNotFoundException(name, this);
+                }
+            }
+        };
     }
 
     private URL getParentResource()

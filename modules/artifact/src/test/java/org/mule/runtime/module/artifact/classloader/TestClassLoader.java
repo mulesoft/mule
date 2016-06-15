@@ -31,7 +31,7 @@ public class TestClassLoader extends ClassLoader
         Class aClass = classes.get(s);
         if (aClass == null)
         {
-            throw new ClassNotFoundException(s);
+            throw new TestClassNotFoundException(s, this);
         }
 
         return aClass;
@@ -91,5 +91,22 @@ public class TestClassLoader extends ClassLoader
     protected synchronized Class<?> loadClass(String s, boolean b) throws ClassNotFoundException
     {
         return loadClass(s);
+    }
+
+    public static class TestClassNotFoundException extends ClassNotFoundException
+    {
+
+        private ClassLoader classLoader;
+
+        public TestClassNotFoundException(String s, ClassLoader classLoader)
+        {
+            super(s);
+            this.classLoader = classLoader;
+        }
+
+        public ClassLoader getClassLoader()
+        {
+            return classLoader;
+        }
     }
 }
