@@ -27,13 +27,6 @@ import javax.net.ssl.SSLContext;
  * <p>
  * Performs the creation of a persistent set of properties that are used
  * to configure the {@link Session} instance.
- * <p>
- * The full list of properties available to configure can be found at:
- * <ul>
- * <li>for POP3 <a>https://javamail.java.net/nonav/docs/api/com/sun/mail/pop3/package-summary.html#properties</a></li>
- * <li>for SMTP <a>https://javamail.java.net/nonav/docs/api/com/sun/mail/smtp/package-summary.html#properties</a></li>
- * <li>for IMAP <a>https://javamail.java.net/nonav/docs/api/com/sun/mail/imap/package-summary.html#properties</a></li>
- * <ul/>
  *
  * @since 4/0
  */
@@ -130,20 +123,14 @@ public abstract class AbstractEmailConnection
      */
     private Properties buildBasicSessionProperties(String host, String port, long connectionTimeout, long readTimeout, long writeTimeout) throws EmailConnectionException
     {
-        Properties properties = new Properties();
-        properties.setProperty(protocol.getPortProperty(), port);
-        properties.setProperty(protocol.getHostProperty(), host);
-        properties.setProperty(protocol.getReadTimeoutProperty(), Long.toString(readTimeout));
-        properties.setProperty(protocol.getConnectionTimeoutProperty(), Long.toString(connectionTimeout));
-
-        // Note: "mail." + protocol + ".writetimeout" breaks TLS/SSL Dummy Socket and makes tests run 6x slower!!!
-        if (writeTimeout > 0L)
-        {
-            properties.setProperty(protocol.getWriteTimeoutProperty(), Long.toString(writeTimeout));
-        }
-
-        properties.setProperty(protocol.getTransportProtocolProperty(), protocol.getName());
-        return properties;
+        Properties props = new Properties();
+        props.setProperty(protocol.getPortProperty(), port);
+        props.setProperty(protocol.getHostProperty(), host);
+        props.setProperty(protocol.getReadTimeoutProperty(), Long.toString(readTimeout));
+        props.setProperty(protocol.getConnectionTimeoutProperty(), Long.toString(connectionTimeout));
+        props.setProperty(protocol.getWriteTimeoutProperty(), Long.toString(writeTimeout));
+        props.setProperty(protocol.getTransportProtocolProperty(), protocol.getName());
+        return props;
     }
 
     /**

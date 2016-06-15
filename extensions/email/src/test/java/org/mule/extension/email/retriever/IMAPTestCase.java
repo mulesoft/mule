@@ -18,6 +18,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
+import static org.mule.extension.email.internal.EmailProtocol.IMAP;
+import static org.mule.extension.email.internal.EmailProtocol.IMAPS;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 
@@ -46,9 +48,10 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
     public String protocol;
 
     @Parameters
-    public static Collection<Object[]> data() {
+    public static Collection<Object[]> data()
+    {
         return Arrays.asList(new Object[][] {
-                {"imap"}, {"imaps"}
+                {IMAP.getName()}, {IMAPS.getName()}
         });
     }
 
@@ -113,6 +116,14 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
         testMatcherFlag(RETRIEVE_MATCH_RECENT, RECENT, false);
     }
 
+    @Test
+    public void retrieveAndExpungeDelete() throws Exception
+    {
+        stream(server.getReceivedMessages()).forEach(m -> assertFlag(m, DELETED, false));
+        runFlow(RETRIEVE_AND_THEN_EXPUNGE_DELETE);
+        assertThat(server.getReceivedMessages().length, is(0));
+    }
+
     private void testMatcherFlag(String flowName, Flag flag, boolean flagState) throws Exception
     {
         for (int i = 0; i < 3; i++)
@@ -121,9 +132,8 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
             message.setFlag(flag, flagState);
         }
 
-        List<MuleMessage> messages= runFlowAndGetMessages(flowName);
+        List<MuleMessage> messages = runFlowAndGetMessages(flowName);
         assertThat(server.getReceivedMessages(), arrayWithSize(10));
         assertThat(messages, hasSize(7));
     }
-
 }

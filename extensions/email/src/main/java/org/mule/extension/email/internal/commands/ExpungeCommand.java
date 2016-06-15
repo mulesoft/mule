@@ -11,6 +11,8 @@ import org.mule.extension.email.api.retriever.RetrieverConnection;
 
 /**
  * Represents the expunge (eliminate completely) emails from folder operation.
+ * <p>
+ * Removes all the emails from a folder that contains the {@code DELETED} flag.
  *
  * @since 4.0
  */

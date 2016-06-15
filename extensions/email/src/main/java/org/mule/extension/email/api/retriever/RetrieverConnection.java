@@ -7,7 +7,7 @@
 package org.mule.extension.email.api.retriever;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.CREDENTIALS_EXPIRED;
+import static org.mule.runtime.api.connection.ConnectionExceptionCode.DISCONNECTED;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.email.api.AbstractEmailConnection;
@@ -68,7 +68,15 @@ public class RetrieverConnection extends AbstractEmailConnection
         try
         {
             this.store = session.getStore(protocol.getName());
-            this.store.connect(username, password);
+
+            if (username != null && password != null)
+            {
+                this.store.connect(username, password);
+            }
+            else
+            {
+                this.store.connect();
+            }
         }
         catch (MessagingException e)
         {
@@ -106,29 +114,31 @@ public class RetrieverConnection extends AbstractEmailConnection
     /**
      * Opens and return the email {@link Folder} of name {@code mailBoxFolder}.
      * The folder can contain Messages, other Folders or both.
+     * <p>
+     * If there was an already opened folder and a different one is requested
+     * the opened folder will be closed and the new one will be opened.
      *
      * @param mailBoxFolder the name of the folder to be opened.
-     * @param openMode   open the folder in READ_ONLY or READ_WRITE mode
+     * @param openMode      open the folder in READ_ONLY or READ_WRITE mode
      * @return the opened {@link Folder}
      */
     public Folder getFolder(String mailBoxFolder, int openMode)
     {
         try
         {
+            if (folder != null)
+            {
+                if (isCurrentFolder(mailBoxFolder)
+                    && folder.isOpen()
+                    && folder.getMode() == openMode)
+                {
+                    return folder;
+                }
+                closeFolder(false);
+            }
+
             folder = store.getFolder(mailBoxFolder);
-
-            if (!folder.isOpen())
-            {
-                folder.open(openMode);
-                return folder;
-            }
-
-            if (folder.getMode() != openMode)
-            {
-                folder.close(false);
-                folder.open(openMode);
-            }
-
+            folder.open(openMode);
             return folder;
         }
         catch (MessagingException e)
@@ -138,14 +148,15 @@ public class RetrieverConnection extends AbstractEmailConnection
     }
 
     /**
-     * Closes the specified {@code folder}
+     * Closes the current connection folder.
      *
+     * @param expunge whether to remove all the emails marked as DELETED.
      */
     public void closeFolder(boolean expunge)
     {
         try
         {
-            if (folder != null)
+            if (folder != null && folder.isOpen())
             {
                 folder.close(expunge);
             }
@@ -168,7 +179,7 @@ public class RetrieverConnection extends AbstractEmailConnection
         }
         catch (Exception e)
         {
-            LOGGER.error(format("Error while closing mailbox folder [%s] when disconnecting: %s", folder.getName(), e.getMessage()));
+            LOGGER.error(format("Error closing mailbox folder [%s] when disconnecting: %s", folder.getName(), e.getMessage()));
         }
         finally
         {
@@ -176,9 +187,9 @@ public class RetrieverConnection extends AbstractEmailConnection
             {
                 store.close();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                LOGGER.error(format("Error while closing store while disconnecting: %s", e.getMessage()));
+                LOGGER.error(format("Error closing store when disconnecting: %s", e.getMessage()));
             }
         }
     }
@@ -191,6 +202,17 @@ public class RetrieverConnection extends AbstractEmailConnection
     {
         String errorMessage = "Store is not connected";
         return store.isConnected() ? success()
-                                   : failure(errorMessage, CREDENTIALS_EXPIRED, new EmailConnectionException(errorMessage));
+                                   : failure(errorMessage, DISCONNECTED, new EmailConnectionException(errorMessage));
+    }
+
+    /**
+     * Checks if a mailBoxFolder name is the same name as the current folder.
+     *
+     * @param mailBoxFolder the name of the folder
+     * @return true if is the same folder, false otherwise.
+     */
+    private boolean isCurrentFolder(String mailBoxFolder)
+    {
+        return folder.getName().equalsIgnoreCase(mailBoxFolder);
     }
 }

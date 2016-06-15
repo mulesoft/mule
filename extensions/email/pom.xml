@@ -17,6 +17,7 @@
         <javaMailVersion>1.4.7</javaMailVersion>
         <icegreenVersion>1.5.0</icegreenVersion>
         <guavaVersion>18.0</guavaVersion>
+        <powermockVersion>1.5.5</powermockVersion>
     </properties>
 
     <dependencies>
@@ -30,6 +31,8 @@
             <artifactId>guava</artifactId>
             <version>${guavaVersion}</version>
         </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>com.icegreen</groupId>
             <artifactId>greenmail</artifactId>
@@ -41,6 +44,24 @@
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-all</artifactId>
+                </exclusion>
+            </exclusions>
+            <version>${powermockVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>${powermockVersion}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

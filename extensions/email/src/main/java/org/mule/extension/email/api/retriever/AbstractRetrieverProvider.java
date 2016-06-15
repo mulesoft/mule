@@ -13,6 +13,7 @@ import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
@@ -21,8 +22,10 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
  *
  * @since 4.0
  */
+// TODO: Change generic signature for a more specific one. MULE-9874
 public abstract class AbstractRetrieverProvider<Config extends AbstractEmailConfiguration, Connection extends AbstractEmailConnection> implements ConnectionProvider<Config, Connection>
 {
+
     /**
      * A basic set of parameters for email connections.
      */
@@ -53,6 +56,22 @@ public abstract class AbstractRetrieverProvider<Config extends AbstractEmailConf
     @Override
     public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, Connection> connectionHandlingStrategyFactory)
     {
-        return connectionHandlingStrategyFactory.supportsPooling();
+        return connectionHandlingStrategyFactory.supportsPooling(new PoolingListener<Config, Connection>()
+        {
+            @Override
+            public void onBorrow(Config config, Connection connection)
+            {
+                if (connection instanceof RetrieverConnection)
+                {
+                    ((RetrieverConnection) connection).closeFolder(false);
+                }
+            }
+
+            @Override
+            public void onReturn(Config config, Connection connection)
+            {
+                // do nothing
+            }
+        });
     }
 }

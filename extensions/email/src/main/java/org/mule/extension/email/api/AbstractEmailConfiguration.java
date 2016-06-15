@@ -10,6 +10,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Generic contract for all email configurations.
@@ -20,32 +21,53 @@ public abstract class AbstractEmailConfiguration
 {
 
     /**
-     * Additional custom properties to configure the session.
+     * An additional custom set of properties to configure the connection
+     * session.
      */
     @Parameter
     @Optional
     protected Map<String, String> properties;
 
     /**
-     * the client socket connection timeout in milliseconds.
+     * The socket connection timeout. This attribute
+     * works in tandem with {@link #timeoutUnit}.
+     * <p>
+     * Defaults to {@code 5}
      */
     @Parameter
-    @Optional(defaultValue = "5000")
-    protected long connectionTimeout;
+    @Optional(defaultValue = "5")
+    private int connectionTimeout;
 
     /**
-     * the client socket read timeout in milliseconds.
+     * The socket read timeout value. This attribute
+     * works in tandem with {@link #timeoutUnit}.
+     * <p>
+     * Defaults to {@code 5}
      */
     @Parameter
-    @Optional(defaultValue = "5000")
-    protected long readTimeout;
+    @Optional(defaultValue = "5")
+    protected int readTimeout;
 
     /**
-     * the client socket write timeout in milliseconds.
+     * The socket write timeout value. This attribute
+     * works in tandem with {@link #timeoutUnit}.
+     * <p>
+     * Defaults to {@code 5}
      */
     @Parameter
-    @Optional(defaultValue = "0")
-    protected long writeTimeout;
+    @Optional(defaultValue = "5")
+    protected int writeTimeout;
+
+    /**
+     * A {@link TimeUnit} which qualifies the {@link #connectionTimeout},
+     * {@link #writeTimeout} and {@link #readTimeout} attributes.
+     * <p>
+     * Defaults to {@code SECONDS}
+     */
+    @Parameter
+    @Optional(defaultValue = "SECONDS")
+    private TimeUnit timeoutUnit;
+
 
     /**
      * @return the additional custom properties to configure the session.
@@ -56,27 +78,27 @@ public abstract class AbstractEmailConfiguration
     }
 
     /**
-     * @return the configured client socket connection timeout.
+     * @return the configured client socket connection timeout in milliseconds.
      */
     public long getConnectionTimeout()
     {
-        return connectionTimeout;
+        return timeoutUnit.toMillis(connectionTimeout);
     }
 
     /**
-     * @return he configured client socket read timeout.
+     * @return he configured client socket read timeout in milliseconds.
      */
     public long getReadTimeout()
     {
-        return readTimeout;
+        return timeoutUnit.toMillis(readTimeout);
     }
 
     /**
-     * @return he configured client socket write timeout.
+     * @return he configured client socket write timeout in milliseconds.
      */
     public long getWriteTimeout()
     {
-        return writeTimeout;
+        return timeoutUnit.toMillis(writeTimeout);
     }
 
 }

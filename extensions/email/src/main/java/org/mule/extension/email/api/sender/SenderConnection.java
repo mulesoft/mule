@@ -10,14 +10,10 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.success
 import org.mule.extension.email.api.AbstractEmailConnection;
 import org.mule.extension.email.internal.EmailProtocol;
 import org.mule.extension.email.internal.exception.EmailConnectionException;
-import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
 import java.util.Map;
-
-import javax.mail.NoSuchProviderException;
-import javax.mail.Transport;
 
 /**
  * A connection with a mail server for sending emails.
@@ -99,17 +95,5 @@ public final class SenderConnection extends AbstractEmailConnection
     public ConnectionValidationResult validate()
     {
         return success();
-    }
-
-    public Transport getTransport()
-    {
-        try
-        {
-            return session.getTransport(protocol.getName());
-        }
-        catch (NoSuchProviderException e)
-        {
-            throw new EmailException("Error while obtaining transport: " + e.getMessage(), e);
-        }
     }
 }

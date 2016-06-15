@@ -11,6 +11,8 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
+import static org.mule.extension.email.internal.EmailProtocol.POP3;
+import static org.mule.extension.email.internal.EmailProtocol.POP3S;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.Arrays;
@@ -31,7 +33,7 @@ public class POP3TestCase extends AbstractEmailRetrieverTestCase
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] {
-                {"pop3"}, {"pop3s"}
+                {POP3.getName()}, {POP3S.getName()}
         });
     }
 

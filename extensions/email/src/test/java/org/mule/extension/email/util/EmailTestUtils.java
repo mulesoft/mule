@@ -14,6 +14,9 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.transformer.types.MimeTypes.TEXT;
 import org.mule.runtime.core.util.IOUtils;
 
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -90,5 +93,12 @@ public class EmailTestUtils
         DataHandler attachment = attachments.get(attachmentKey);
         String attachmentAsString = IOUtils.toString((InputStream) attachment.getContent());
         assertThat(attachmentAsString, is(expectedResult));
+    }
+
+    public static void setUpServer(GreenMail server, int port, String protocol)
+    {
+        ServerSetup serverSetup = new ServerSetup(port, null, protocol);
+        server = new GreenMail(serverSetup);
+        server.start();
     }
 }

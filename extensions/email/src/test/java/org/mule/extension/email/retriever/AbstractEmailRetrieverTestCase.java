@@ -8,9 +8,7 @@
 package org.mule.extension.email.retriever;
 
 import static java.lang.String.format;
-import static java.util.Arrays.stream;
 import static java.util.Collections.singletonList;
-import static javax.mail.Flags.Flag.DELETED;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -150,15 +148,6 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
         {
             assertStoredEmail(storedEmail);
         }
-    }
-
-    // TODO: CHECK IF THIS IS POSSIBLE IN POP3.
-    @Test
-    public void retrieveAndExpungeDelete() throws Exception
-    {
-        stream(server.getReceivedMessages()).forEach(m -> assertFlag(m, DELETED, false));
-        runFlow(RETRIEVE_AND_THEN_EXPUNGE_DELETE);
-        assertThat(server.getReceivedMessages().length, is(0));
     }
 
     @Test
