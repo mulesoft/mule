@@ -159,24 +159,21 @@ public class BeanDefinitionFactory
 
     private void resolveComponentBeanDefinition(ComponentModel parentComponentModel, ComponentModel componentModel)
     {
-        if (!customBuildersComponentIdentifiers.contains(componentModel.getIdentifier()))
+        Optional<ComponentBuildingDefinition> buildingDefinitionOptional = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
+        if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(componentModel.getIdentifier()))
         {
-            Optional<ComponentBuildingDefinition> buildingDefinitionOptional = componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
-            if (buildingDefinitionOptional.isPresent())
+            this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel, buildingDefinitionOptional.orElse(null)));
+        }
+        else
+        {
+            boolean isWrapperComponent = isWrapperComponent(componentModel.getIdentifier(), of(parentComponentModel.getIdentifier()));
+            if (!isWrapperComponent)
             {
-                this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel, buildingDefinitionOptional.get()));
+                throw new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency " +
+                                                                    "missing to the project that handle that extension.",
+                                                                    componentModel.getIdentifier())));
             }
-            else
-            {
-                boolean isWrapperComponent = isWrapperComponent(componentModel.getIdentifier(), of(parentComponentModel.getIdentifier()));
-                if (!isWrapperComponent)
-                {
-                    new MuleRuntimeException(createStaticMessage(format("No component building definition for element %s. It may be that there's a dependency " +
-                                                                        "missing to the project that handle that extension.",
-                                                                        componentModel.getIdentifier())));
-                }
-                processComponentWrapper(componentModel);
-            }
+            processComponentWrapper(componentModel);
         }
     }
 
