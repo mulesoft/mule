@@ -10,7 +10,7 @@ package org.mule.runtime.container.internal;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.container.internal.FilteringContainerClassLoader;
+
 import org.mule.runtime.module.artifact.classloader.EnumerationMatcher;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoaderTestCase;
@@ -30,6 +30,11 @@ public class FilteringContainerClassLoaderTestCase extends FilteringArtifactClas
     protected FilteringArtifactClassLoader doCreateClassLoader()
     {
         return new FilteringContainerClassLoader(artifactClassLoader, filter);
+    }
+
+    public FilteringContainerClassLoaderTestCase(boolean verboseClassloadingLog)
+    {
+        super(verboseClassloadingLog);
     }
 
     @Test
