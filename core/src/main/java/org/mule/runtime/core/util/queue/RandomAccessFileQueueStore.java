@@ -256,7 +256,7 @@ class RandomAccessFileQueueStore
         logger.warn(e.getMessage());
         if (logger.isDebugEnabled())
         {
-            logger.debug("", e);
+            logger.debug("Error closing queue store", e);
         }
     }
 

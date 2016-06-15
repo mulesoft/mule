@@ -63,7 +63,7 @@ public abstract class AbstractExternalTransactionTestCase extends FunctionalTest
         }
         catch (Exception ex)
         {
-            logger.debug(ex.toString());
+            logger.debug("Error rollbacking transaction", ex);
         }
         try
         {
@@ -75,7 +75,7 @@ public abstract class AbstractExternalTransactionTestCase extends FunctionalTest
         }
         catch (TransactionException ex)
         {
-            logger.debug(ex.toString());
+            logger.debug("Error unbinding transaction", ex);
         }
     }
 

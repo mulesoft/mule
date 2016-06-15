@@ -218,7 +218,7 @@ public class Jms11Support implements JmsSupport
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(e.toString());
+                logger.debug("Cannot retrieve JNDI resource '{}'", name, e);
             }
             String message = MessageFormat.format("Failed to look up destination {0}. Reason: {1}",
                                                   name, e.getMessage());

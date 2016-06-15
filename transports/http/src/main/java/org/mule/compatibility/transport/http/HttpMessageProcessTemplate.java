@@ -224,10 +224,11 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             }
             catch (Exception e)
             {
-                logger.warn("Exception sending http response after error: " + e.getMessage());
+                final String errorMessage = "Exception sending http response after error: ";
+                logger.warn(errorMessage + e.getMessage());
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(e.toString());
+                    logger.debug(errorMessage, e);
                 }
             }
         }

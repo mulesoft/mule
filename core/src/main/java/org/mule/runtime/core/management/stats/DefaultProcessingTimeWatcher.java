@@ -90,7 +90,7 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
                 catch (Exception ex)
                 {
                     // Don't let exception escape -- it kills the thread
-                    logger.error(this.toString(), ex);
+                    logger.error("Error running {}. Thread will be stopped", this, ex);
                 }
             }
         }
