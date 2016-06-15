@@ -26,7 +26,6 @@ public class NotExportedClassException extends ClassNotFoundException
 {
 
     private static final Logger logger = LoggerFactory.getLogger(NotExportedClassException.class);
-    private static boolean logFilteredClassloading = valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
 
     private static final long serialVersionUID = 2510347069070514569L;
 
@@ -76,7 +75,7 @@ public class NotExportedClassException extends ClassNotFoundException
     @Override
     public String getMessage()
     {
-        if (logFilteredClassloading || logger.isDebugEnabled())
+        if (valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING)) || logger.isTraceEnabled())
         {
             return super.getMessage() + lineSeparator() + filter.toString();
         }

@@ -33,7 +33,6 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 {
 
     protected static final Logger logger = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
-    private static boolean logFilteredClassloading = valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
 
     private final ArtifactClassLoader artifactClassLoader;
     private final ClassLoaderFilter filter;
@@ -103,7 +102,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
     private void logClassloadingTrace(String message)
     {
-        if (logFilteredClassloading)
+        if (valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING)))
         {
             logger.info(message);
         }

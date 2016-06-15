@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.classloader.exception;
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 
@@ -37,7 +38,7 @@ public class CompositeClassNotFoundException extends ClassNotFoundException
      */
     public CompositeClassNotFoundException(String className, ClassLoaderLookupStrategy lookupStrategy, List<ClassNotFoundException> exceptions)
     {
-        super(format("Cannot load class '%s': %s", className, exceptions.stream().map((e) -> e.getMessage() + lineSeparator())));
+        super(format("Cannot load class '%s': %s", className, exceptions.stream().map((e) -> e.getMessage() + lineSeparator()).collect(toList())));
         this.className = className;
         this.lookupStrategy = lookupStrategy;
         this.exceptions = copyOf(exceptions);
