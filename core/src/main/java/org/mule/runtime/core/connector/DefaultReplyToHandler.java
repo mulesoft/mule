@@ -73,6 +73,12 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
             return msg;
         }));
 
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.removeOutboundProperty(MULE_REPLY_TO_PROPERTY);
+            msg.removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+            return msg;
+        }));
+
         //TODO See MULE-9307 - re-add behaviour to process reply to destination dispatching with new connectors
     }
 
