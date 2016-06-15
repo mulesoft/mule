@@ -16,16 +16,16 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 {
     private static final List<Xid> committedTx = new CopyOnWriteArrayList<Xid>();
     private static final List<Xid> rolledbackTx = new CopyOnWriteArrayList<Xid>();
-    protected static final Log logger = LogFactory.getLog(JmsXAAlwaysBeginTestCase.class);
+    protected static final Logger logger = LoggerFactory.getLogger(JmsXAAlwaysBeginTestCase.class);
 
     @Override
     protected String getConfigFile()

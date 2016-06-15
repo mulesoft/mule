@@ -10,13 +10,13 @@ import org.mule.runtime.core.api.store.ObjectStore;
 
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public AbstractQueueStoreFactoryBean(String name)
     {

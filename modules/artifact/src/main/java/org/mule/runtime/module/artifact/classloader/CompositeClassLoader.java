@@ -26,8 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Defines a classloader that delegates classes and resources resolution to
@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 public class CompositeClassLoader extends ClassLoader implements ClassLoaderLookupPolicyProvider
 {
 
-    protected static final Log logger = LogFactory.getLog(CompositeClassLoader.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CompositeClassLoader.class);
 
     protected final List<ClassLoader> classLoaders;
     private final ClassLoaderLookupPolicy lookupPolicy;

@@ -17,13 +17,13 @@ import org.mule.runtime.module.cxf.i18n.CxfMessages;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.invoker.Invoker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds a CXF web service MessageProcessor using either the JAX-WS or
@@ -36,7 +36,7 @@ import org.apache.cxf.service.invoker.Invoker;
 public class WebServiceMessageProcessorBuilder
     extends AbstractInboundMessageProcessorBuilder implements FlowConstructAware
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private DataBinding databinding;
     private String frontend = CxfConstants.JAX_WS_FRONTEND;

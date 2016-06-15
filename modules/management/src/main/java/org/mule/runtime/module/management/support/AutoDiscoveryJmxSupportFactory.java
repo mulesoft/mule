@@ -13,8 +13,8 @@ import java.lang.reflect.Method;
 
 import javax.management.ObjectName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Will discover if newer JMX version is available, otherwise fallback to JMX 1.1
@@ -31,7 +31,7 @@ public class AutoDiscoveryJmxSupportFactory implements JmxSupportFactory
     /**
      * logger used by this class
      */
-    private transient Log logger = LogFactory.getLog(getClass());
+    private transient Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * A cached JMX support class instance.

@@ -39,8 +39,8 @@ import javax.jms.TextMessage;
 import javax.jms.Topic;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>JmsMessageUtils</code> contains helper method for dealing with JMS
@@ -50,7 +50,7 @@ public class JmsMessageUtils
 {
     public static final char REPLACEMENT_CHAR = '_';
 
-    private static final Log logger = LogFactory.getLog(JmsMessageUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(JmsMessageUtils.class);
 
     /**
      * Encode a String so that is is a valid JMS header name

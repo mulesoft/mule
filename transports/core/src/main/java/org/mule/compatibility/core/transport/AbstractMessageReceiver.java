@@ -375,7 +375,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         }
         catch (MuleException e)
         {
-            logger.error(e);
+            logger.error(e.toString());
             return null;
         }
     }

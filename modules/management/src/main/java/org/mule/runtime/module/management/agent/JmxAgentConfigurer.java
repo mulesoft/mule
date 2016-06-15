@@ -17,8 +17,8 @@ import java.util.Map;
 import javax.management.MBeanServer;
 import javax.management.remote.rmi.RMIConnectorServer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Mule now binds to a platform mbeanserver by default and jmx agent is always registered via a
@@ -33,7 +33,7 @@ public class JmxAgentConfigurer implements MuleContextAware
     /**
      * Logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(JmxAgentConfigurer.class);
+    protected static final Logger logger = LoggerFactory.getLogger(JmxAgentConfigurer.class);
 
     protected MuleContext muleContext;
 

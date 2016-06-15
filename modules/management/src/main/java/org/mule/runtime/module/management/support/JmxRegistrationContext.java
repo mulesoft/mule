@@ -11,8 +11,8 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Stores JMX info pertinent to the currently intialising Mule manager with
@@ -30,7 +30,7 @@ public class JmxRegistrationContext
     /**
      * The logger used for this class
      */
-    private final transient Log logger = LogFactory.getLog(getClass());
+    private final transient Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * Normally ThreadLocal is fine, as Mule is being initialised and destroyed

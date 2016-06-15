@@ -28,8 +28,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -63,7 +63,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
 
     protected MuleContext muleContext;
 
-    protected transient final Log logger = LogFactory.getLog(MuleXmlBuilderContextListener.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(MuleXmlBuilderContextListener.class);
 
     public void contextInitialized(ServletContextEvent event)
     {

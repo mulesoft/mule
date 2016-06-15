@@ -10,12 +10,12 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.component.AbstractComponent;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractWebServiceWrapperComponent extends AbstractComponent
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String WS_SERVICE_URL = "ws.service.url";
 

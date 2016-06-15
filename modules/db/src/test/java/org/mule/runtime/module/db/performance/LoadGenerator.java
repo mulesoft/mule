@@ -16,8 +16,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoadGenerator
 {
@@ -26,7 +26,7 @@ public class LoadGenerator
     public static final int DEFAULT_MESSAGE_PER_THREAD = 200;
     public static final int DEFAULT_MESSAGE_DELAY = 50;
 
-    protected static final Log logger = LogFactory.getLog(LoadGenerator.class);
+    protected static final Logger logger = LoggerFactory.getLogger(LoadGenerator.class);
     private final int threadCount;
     private final int messagesPerThread;
     private final int messageDelay;

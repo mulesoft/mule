@@ -8,7 +8,6 @@ package org.mule.compatibility.transport.jms.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
-
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.util.ClassUtils;
@@ -18,8 +17,8 @@ import java.util.regex.Pattern;
 
 import javax.jms.Message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JmsPropertyFilter implements Filter
 {
@@ -27,7 +26,7 @@ public class JmsPropertyFilter implements Filter
     /**
      * Logger used by this class
      */
-    private static Log logger = LogFactory.getLog(JmsPropertyFilter.class);
+    private static Logger logger = LoggerFactory.getLogger(JmsPropertyFilter.class);
 
     /**
      * Name of the JMS property to filter on

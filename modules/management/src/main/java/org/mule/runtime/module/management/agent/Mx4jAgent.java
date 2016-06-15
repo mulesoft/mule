@@ -12,15 +12,14 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.BeanUtils;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.management.mbean.MBeanServerFactory;
 import org.mule.runtime.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.runtime.module.management.support.JmxSupport;
 import org.mule.runtime.module.management.support.JmxSupportFactory;
 import org.mule.runtime.module.xml.util.XMLUtils;
-import org.mule.runtime.core.util.BeanUtils;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.SystemUtils;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -41,7 +40,8 @@ import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,
@@ -54,7 +54,7 @@ public class Mx4jAgent extends AbstractAgent
     protected static final String DEFAULT_PATH_IN_JAR = 
         StringUtils.replaceChars(ClassUtils.getPackageName(Mx4jAgent.class), '.', '/') + "/http/xsl";
 
-    private static final org.apache.commons.logging.Log logger = LogFactory.getLog(Mx4jAgent.class);
+    private static final Logger logger = LoggerFactory.getLogger(Mx4jAgent.class);
 
     private static final String PROTOCOL_PREFIX = "http://";
     public static final String DEFAULT_HOSTNAME = "localhost";

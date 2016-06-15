@@ -34,8 +34,8 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -108,7 +108,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private BeanAssemblerFactory beanAssemblerFactory = new DefaultBeanAssemblerFactory();
     protected ReusablePropertyConfiguration beanPropertyConfiguration = new ReusablePropertyConfiguration();

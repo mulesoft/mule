@@ -9,15 +9,15 @@ package org.mule.runtime.module.management.mbean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The MBean for application-wide statistics
  */
 public class ApplicationService extends FlowConstructService implements FlowConstructServiceMBean
 {
-    private static Log LOGGER = LogFactory.getLog(ApplicationService.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(ApplicationService.class);
 
     public ApplicationService(String type, String name, MuleContext muleContext, FlowConstructStatistics statistics)
     {

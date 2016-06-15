@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
-import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.config.StartupContext;
-import org.mule.runtime.module.launcher.application.Application;
+import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.Artifact;
+import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.artifact.DeployableArtifact;
 import org.mule.runtime.module.launcher.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.launcher.domain.Domain;
@@ -19,9 +22,6 @@ import org.mule.runtime.module.launcher.util.DebuggableReentrantLock;
 import org.mule.runtime.module.launcher.util.ElementAddedEvent;
 import org.mule.runtime.module.launcher.util.ElementRemovedEvent;
 import org.mule.runtime.module.launcher.util.ObservableList;
-import org.mule.runtime.core.util.ArrayUtils;
-import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -44,8 +44,8 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * It's in charge of the whole deployment process.
@@ -63,7 +63,7 @@ public class DeploymentDirectoryWatcher implements Runnable
     public static final IOFileFilter ZIP_ARTIFACT_FILTER = new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX), FileFileFilter.FILE);
     protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ReentrantLock deploymentLock;
     private final ArchiveDeployer<Domain> domainArchiveDeployer;
@@ -232,7 +232,7 @@ public class DeploymentDirectoryWatcher implements Runnable
             }
             catch (Throwable t)
             {
-                logger.error(t);
+                logger.error("Error stopping artifact {}", artifact.getArtifactName(), t);
             }
         }
     }
@@ -551,7 +551,7 @@ public class DeploymentDirectoryWatcher implements Runnable
                 {
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug(e);
+                        logger.debug("Error redeploying artifact {}", artifact.getArtifactName(), e);
                     }
                 }
             }

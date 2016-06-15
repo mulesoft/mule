@@ -13,9 +13,9 @@ import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A filter that will determine if the current message payload is a JSON encoded message.
@@ -26,7 +26,7 @@ public class IsJsonFilter implements Filter
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(IsJsonFilter.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(IsJsonFilter.class);
 
     private boolean validateParsing = false;
 

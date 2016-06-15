@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.config.builders;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.runtime.config.spring.OptionalObjectsController;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.config.ConfigResource;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,8 +19,8 @@ import java.io.InputStream;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.context.ApplicationContext;
@@ -50,7 +50,7 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     /**
      * Logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ServletContext context;
 

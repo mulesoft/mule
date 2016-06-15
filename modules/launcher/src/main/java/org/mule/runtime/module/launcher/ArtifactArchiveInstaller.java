@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Installer for mule artifacts inside the mule container directories.
@@ -27,7 +27,7 @@ public class ArtifactArchiveInstaller
 
     protected static final String ANCHOR_FILE_BLURB = "Delete this file while Mule is running to remove the artifact in a clean way.";
 
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final File artifactParentDir;
 

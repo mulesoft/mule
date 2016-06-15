@@ -25,8 +25,8 @@ import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tanukisoftware.wrapper.WrapperSystemPropertyUtil;
 import org.tanukisoftware.wrapper.jmx.WrapperManager;
 import org.tanukisoftware.wrapper.jmx.WrapperManagerMBean;
@@ -50,7 +50,7 @@ public class WrapperManagerAgent extends AbstractAgent
      */
     public static final String DEFAULT_WRAPPER_MBEAN_NAME = "org.tanukisoftware.wrapper:type=WrapperManager";
 
-    private static final Log logger = LogFactory.getLog(WrapperManagerAgent.class);
+    private static final Logger logger = LoggerFactory.getLogger(WrapperManagerAgent.class);
 
     /**
      * This property is set by the native launcher, used for extra checks.

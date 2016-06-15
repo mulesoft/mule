@@ -11,13 +11,13 @@ import org.mule.runtime.core.api.MuleContext;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CompositeDeploymentListener implements DeploymentListener, DeploymentListenerManager
 {
 
-    private transient final Log logger = LogFactory.getLog(getClass());
+    private transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     private List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<DeploymentListener>();
 

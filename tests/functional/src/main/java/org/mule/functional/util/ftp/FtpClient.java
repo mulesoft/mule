@@ -12,17 +12,17 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Ftp client wrapper for working with an FTP server.
  */
 public class FtpClient
 {
-    protected final transient Log logger = LogFactory.getLog(this.getClass());
+    protected final transient Logger logger = LoggerFactory.getLogger(this.getClass());
     FTPClient ftpClient = null;   
     String server = null;
     int port;

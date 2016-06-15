@@ -18,8 +18,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Iterates a {@link ResultSet} to provide rows streaming
@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 public class ResultSetIterator implements Iterator<Map<String, Object>>, Closeable
 {
 
-    protected static final Log logger = LogFactory.getLog(ResultSetIterator.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ResultSetIterator.class);
 
     private final ResultSet resultSet;
     private final RowHandler rowHandler;

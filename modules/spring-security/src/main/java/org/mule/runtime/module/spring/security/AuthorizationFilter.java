@@ -17,16 +17,16 @@ import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.spring.security.i18n.SpringSecurityMessages;
 import org.mule.runtime.core.security.AbstractSecurityFilter;
+import org.mule.runtime.module.spring.security.i18n.SpringSecurityMessages;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
@@ -34,7 +34,7 @@ import org.springframework.security.core.GrantedAuthority;
  */
 public class AuthorizationFilter extends AbstractSecurityFilter
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     private Collection<String> requiredAuthorities = new HashSet<String>();
 
     public void doFilter(MuleEvent event)

@@ -8,19 +8,17 @@ package org.mule.tck.junit4;
 
 import static org.junit.Assume.assumeThat;
 import org.mule.runtime.core.RequestContext;
-import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.SystemUtils;
+import org.mule.tck.junit4.rule.WarningTimeout;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.After;
@@ -31,6 +29,8 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule test cases. This
@@ -70,7 +70,7 @@ public abstract class AbstractMuleTestCase
         MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
     }
 
-    protected final transient Log logger = LogFactory.getLog(this.getClass());
+    protected final transient Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Should be set to a string message describing any prerequisites not met.
@@ -311,7 +311,7 @@ public abstract class AbstractMuleTestCase
     }
 
     private static final transient String THREAD_RESULT_LINE = StringUtils.repeat('-', 80);
-    private static final transient Log LOGGER = LogFactory.getLog(AbstractMuleTestCase.class);
+    private static final transient Logger LOGGER = LoggerFactory.getLogger(AbstractMuleTestCase.class);
 
     private static void logThreadsResult(String result)
     {

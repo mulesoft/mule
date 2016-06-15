@@ -12,15 +12,15 @@ import com.yourkit.api.Controller;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class YourKitProfilerService implements YourKitProfilerServiceMBean
 {
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Controller controller;
     private final AtomicBoolean capturing = new AtomicBoolean(false);

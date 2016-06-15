@@ -14,8 +14,8 @@ import javax.jms.Destination;
 import javax.jms.Queue;
 import javax.jms.Topic;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A default implementation of the resolver uses endpoint's
@@ -27,7 +27,7 @@ public class DefaultJmsTopicResolver implements JmsTopicResolver
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(DefaultJmsTopicResolver.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultJmsTopicResolver.class);
 
     /**
      * Connector back-reference.

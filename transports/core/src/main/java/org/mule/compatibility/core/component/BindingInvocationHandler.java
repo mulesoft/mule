@@ -23,8 +23,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO MULE-9449 Remove Java Component Bindings
@@ -34,7 +34,7 @@ public class BindingInvocationHandler implements InvocationHandler
 
     public static final String DEFAULT_METHOD_NAME_TOKEN = "default";
 
-    protected static Log logger = LogFactory.getLog(BindingInvocationHandler.class);
+    protected static Logger logger = LoggerFactory.getLogger(BindingInvocationHandler.class);
 
     protected Map<String, InterfaceBinding> routers = null;
 

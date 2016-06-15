@@ -70,7 +70,7 @@ public abstract class AbstractNotificationTestCase extends FunctionalTestCase
         for (Iterator<?> iterator = notificationLogger.getNotifications().iterator(); iterator.hasNext();)
         {
             ServerNotification notification = (ServerNotification) iterator.next();
-            logger.info(notification);
+            logger.info(notification.toString());
         }
     }
 

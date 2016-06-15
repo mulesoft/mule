@@ -21,8 +21,6 @@ import org.mule.runtime.module.cxf.transport.MuleUniversalTransport;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
@@ -31,6 +29,8 @@ import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -43,7 +43,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
     public static final String BUS_PROPERTY = CXF;
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     // The CXF Bus object
     private Bus bus;

@@ -13,8 +13,8 @@ import org.mule.runtime.core.security.AbstractSecurityProvider;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A security provider which only authenticates a single user at a time
@@ -27,7 +27,7 @@ public class TestSingleUserSecurityProvider extends AbstractSecurityProvider
 
     private Authentication authentication;
 
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     public TestSingleUserSecurityProvider()
     {

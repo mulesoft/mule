@@ -16,12 +16,12 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TcpServerSocketFactory implements SimpleServerSocketFactory
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public ServerSocket createServerSocket(URI uri, int backlog, Boolean reuse) throws IOException
@@ -31,7 +31,7 @@ public class TcpServerSocketFactory implements SimpleServerSocketFactory
 
         if ((inetAddress.equals(NetworkUtils.getLocalHost()) || host.trim().equals("localhost")) && TcpPropertyHelper.isBindingLocalhostToAllLocalInterfaces())
         {
-            logger.warn(TcpMessages.localhostBoundToAllLocalInterfaces());
+            logger.warn(TcpMessages.localhostBoundToAllLocalInterfaces().toString());
             return createServerSocket(uri.getPort(), backlog, reuse);
         }
         else

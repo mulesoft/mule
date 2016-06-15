@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Finds available port numbers in a specified range.
@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 public class FreePortFinder
 {
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final int minPortNumber;
     private final int portRange;

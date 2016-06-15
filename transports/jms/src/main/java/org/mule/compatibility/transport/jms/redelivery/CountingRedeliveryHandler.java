@@ -19,8 +19,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 
 import org.apache.commons.collections.map.LRUMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This redelivery handler will keep counting the redelivery attempts for each message redelivered. Used for
@@ -31,7 +31,7 @@ public class CountingRedeliveryHandler extends AbstractRedeliveryHandler
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(CountingRedeliveryHandler.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CountingRedeliveryHandler.class);
 
     private Map<String, Integer> messages = null;
 

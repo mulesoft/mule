@@ -13,8 +13,8 @@ import org.mule.runtime.core.util.monitor.Expirable;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dispatches HttpRequest to the appropriate MessageReceiver
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public class HttpRequestDispatcherWork implements Runnable, Expirable
 {
 
-    private static Log logger = LogFactory.getLog(HttpRequestDispatcherWork.class);
+    private static Logger logger = LoggerFactory.getLogger(HttpRequestDispatcherWork.class);
 
     private HttpServerConnection httpServerConnection;
     private Socket socket;

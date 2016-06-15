@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolves parameter types for stored procedure queries
@@ -35,7 +35,7 @@ public class StoredProcedureParamTypeResolver implements ParamTypeResolver
     public static final int TYPE_ID_COLUMN_INDEX = 6;
     public static final int TYPE_NAME_COLUMN_INDEX = 7;
 
-    private static final Log logger = LogFactory.getLog(StoredProcedureParamTypeResolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(StoredProcedureParamTypeResolver.class);
 
     private final Pattern storedProcedureMatcher = Pattern.compile("(?msi)(\\{\\s+)?call\\s* \\s*(\\w+)\\(.*");
     private final DbTypeManager dbTypeManager;

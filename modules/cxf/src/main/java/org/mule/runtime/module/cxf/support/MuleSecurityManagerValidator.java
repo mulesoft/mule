@@ -14,19 +14,19 @@ import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.MuleCredentials;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *  Integrates mule spring security with CXF ws-security
  */
 public class MuleSecurityManagerValidator implements Validator
 {
-    private static Log logger = LogFactory.getLog(MuleSecurityManagerValidator.class);
+    private static Logger logger = LoggerFactory.getLogger(MuleSecurityManagerValidator.class);
     
     private org.mule.runtime.core.api.security.SecurityManager securityManager;
 

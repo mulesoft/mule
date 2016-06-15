@@ -40,8 +40,8 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * In Mule an endpoint corresponds to a single receiver. It's up to the receiver to do multithreaded consumption and
@@ -244,7 +244,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
     protected class SubReceiver implements MessageListener
     {
-        private final Log subLogger = LogFactory.getLog(getClass());
+        private final Logger subLogger = LoggerFactory.getLogger(getClass());
 
         private volatile Session session;
         private volatile MessageConsumer consumer;
@@ -299,7 +299,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
             catch (Exception jmsEx)
             {
-                logger.error(jmsEx);
+                logger.error(jmsEx.toString());
             }
         }
 

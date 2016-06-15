@@ -29,12 +29,12 @@ import javax.jms.XASession;
 import javax.jms.XATopicSession;
 import javax.transaction.xa.XAResource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SessionInvocationHandler implements TargetInvocationHandler
 {
-    protected static final transient Log logger = LogFactory.getLog(SessionInvocationHandler.class);
+    protected static final transient Logger logger = LoggerFactory.getLogger(SessionInvocationHandler.class);
 
     private XASession xaSession;
     private XAResource xaResource;

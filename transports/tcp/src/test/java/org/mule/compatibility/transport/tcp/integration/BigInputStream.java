@@ -8,12 +8,12 @@ package org.mule.compatibility.transport.tcp.integration;
 
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BigInputStream extends InputStream
 {
@@ -21,7 +21,7 @@ public class BigInputStream extends InputStream
     private static final int SUMMARY_SIZE = 4;
     private static final MessageFormat FORMAT  =
             new MessageFormat("Sent {0,number,#} bytes, {1,number,###.##}% (free {2,number,#}/{3,number,#})");
-    private final Log logger = LogFactory.getLog(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private long size;
     private int messages;
 

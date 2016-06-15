@@ -19,8 +19,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.ExportException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Binds to an existing RMI registry or creates a new one on a defined URI. The
@@ -31,7 +31,7 @@ public class RmiRegistryAgent extends AbstractAgent
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String DEFAULT_HOSTNAME = "localhost";
     public static final int DEFAULT_PORT = 1099;

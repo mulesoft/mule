@@ -13,8 +13,8 @@ import org.mule.runtime.module.db.internal.result.resultset.StreamingResultSetCl
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for implementing {@link StreamingResultSetCloser}
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public class AbstractStreamingResultSetCloser implements StreamingResultSetCloser
 {
 
-    protected static final Log logger = LogFactory.getLog(AbstractStreamingResultSetCloser.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractStreamingResultSetCloser.class);
 
     @Override
     public void close(DbConnection connection, ResultSet resultSet)

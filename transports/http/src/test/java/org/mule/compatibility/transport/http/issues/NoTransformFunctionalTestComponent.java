@@ -15,8 +15,8 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>FunctionalTestComponent</code> is a service that can be used by
@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class NoTransformFunctionalTestComponent implements Callable
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final int STREAM_SAMPLE_SIZE = 4;
     public static final int STREAM_BUFFER_SIZE = 4096;

@@ -38,8 +38,8 @@ import java.util.concurrent.Executor;
 import javax.sql.XAConnection;
 import javax.transaction.xa.XAResource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Using for unification XAConnection and Connection
@@ -59,7 +59,7 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
      */
     private XAResource enlistedXAResource;
 
-    protected static final transient Log logger = LogFactory.getLog(ConnectionWrapper.class);
+    protected static final transient Logger logger = LoggerFactory.getLogger(ConnectionWrapper.class);
     private volatile boolean reuseObject = false;
 
     public ConnectionWrapper(XAConnection xaCon) throws SQLException

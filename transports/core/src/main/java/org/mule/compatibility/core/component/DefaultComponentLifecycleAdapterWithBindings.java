@@ -13,8 +13,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.component.DefaultComponentLifecycleAdapter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @deprecated Transport infrastructure is deprecated.
@@ -25,7 +25,7 @@ public class DefaultComponentLifecycleAdapterWithBindings extends DefaultCompone
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(DefaultComponentLifecycleAdapterWithBindings.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultComponentLifecycleAdapterWithBindings.class);
 
     public DefaultComponentLifecycleAdapterWithBindings(Object componentObject,
             JavaWithBindingsComponent component,

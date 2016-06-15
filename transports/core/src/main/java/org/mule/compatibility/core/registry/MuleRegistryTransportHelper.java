@@ -23,8 +23,8 @@ import org.mule.runtime.core.registry.MuleRegistryHelper;
 
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @deprecated Transport infrastructure is deprecated.
@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 @Deprecated
 public class MuleRegistryTransportHelper
 {
-    protected static Log logger = LogFactory.getLog(MuleRegistryTransportHelper.class);
+    protected static Logger logger = LoggerFactory.getLogger(MuleRegistryTransportHelper.class);
 
     public static Connector lookupConnector(MuleRegistry registry, String name)
     {

@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.launcher;
 
+import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
 import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.runtime.core.util.Preconditions;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -21,8 +21,8 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Archive deployer for domains.
@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
 {
 
-    private transient final Log logger = LogFactory.getLog(getClass());
+    private transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String DOMAIN_BUNDLE_APPS_FOLDER = "apps";
     private final ArchiveDeployer<Domain> domainDeployer;
@@ -140,7 +140,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(e);
+                    logger.debug("Error redeploying application {}", domainApplication.getArtifactName(), e);
                 }
             }
         }
@@ -203,7 +203,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
                     logger.warn(e.getMessage());
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug(e);
+                        logger.debug("Cannot move file {} to apps folder", file, e);
                     }
                 }
             }

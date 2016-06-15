@@ -36,12 +36,12 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.MalformedCookieException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 {
-    private static Log log = LogFactory.getLog(HttpMuleMessageFactory.class);
+    private static Logger log = LoggerFactory.getLogger(HttpMuleMessageFactory.class);
     private static final String DEFAULT_ENCODING = "UTF-8";
 
     private boolean enableCookies = false;

@@ -9,8 +9,8 @@ package org.mule.runtime.module.json.transformers;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.module.json.filters.IsJsonFilter;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.module.json.filters.IsJsonFilter;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Converts a java object to a JSON encoded object that can be consumed by other languages such as
@@ -34,7 +34,7 @@ public class ObjectToJson extends AbstractJsonTransformer
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(ObjectToJson.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(ObjectToJson.class);
 
     private Map<Class<?>, Class<?>> serializationMixins = new HashMap<Class<?>, Class<?>>();
 

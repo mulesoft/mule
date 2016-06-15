@@ -12,17 +12,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMuleContextTestCase
 {
@@ -31,7 +30,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected QueueTestComponent disposeTest = new QueueTestComponent();
 
@@ -650,7 +649,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                     catch (Exception e)
                     {
                         //unlikely to happen. But if it does lets show it in the test logs.
-                        logger.warn(e);
+                        logger.warn(e.toString());
                     }
                 }
             });
@@ -738,7 +737,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                     catch (Exception e)
                     {
                         //unlikely to happen. But if it does lets show it in the test logs.
-                        logger.warn(e);
+                        logger.warn(e.toString());
                     }
                 }
             });

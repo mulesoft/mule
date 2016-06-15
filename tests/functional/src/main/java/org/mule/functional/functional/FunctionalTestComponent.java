@@ -6,6 +6,7 @@
  */
 package org.mule.functional.functional;
 
+import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -18,7 +19,6 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.NumberUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>FunctionalTestComponent</code> is a service that can be used by
@@ -48,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
 // TODO This should really extend StaticComponent from mule-core as it is quite similar.
 public class FunctionalTestComponent implements Callable, Initialisable, Disposable, MuleContextAware, Receiveable, Startable, Stoppable
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final int STREAM_SAMPLE_SIZE = 4;
     public static final int STREAM_BUFFER_SIZE = 4096;

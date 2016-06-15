@@ -48,8 +48,8 @@ import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MuleDeploymentService implements DeploymentService
 {
@@ -57,7 +57,7 @@ public class MuleDeploymentService implements DeploymentService
     public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
     public static final IOFileFilter ZIP_ARTIFACT_FILTER = new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX), FileFileFilter.FILE);
 
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
     // fair lock
     private final ReentrantLock deploymentLock = new DebuggableReentrantLock(true);
 
@@ -127,7 +127,7 @@ public class MuleDeploymentService implements DeploymentService
             }
             catch (Throwable t)
             {
-                logger.error(t);
+                logger.error("Error executing startup listener {}", listener, t);
             }
         }
     }

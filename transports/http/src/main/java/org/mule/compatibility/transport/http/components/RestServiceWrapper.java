@@ -33,8 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This service can used to proxy REST style services as local Mule Components. It
@@ -51,7 +51,7 @@ public class RestServiceWrapper extends AbstractComponent
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private String serviceUrl;
     private Map requiredParams = new HashMap();

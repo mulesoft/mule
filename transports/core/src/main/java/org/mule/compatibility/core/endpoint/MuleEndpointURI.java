@@ -9,7 +9,6 @@ package org.mule.compatibility.core.endpoint;
 import static java.net.URLDecoder.decode;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
-
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.EndpointURIBuilder;
@@ -29,8 +28,8 @@ import java.net.URISyntaxException;
 import java.util.Hashtable;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>MuleEndpointURI</code> is used to determine how a message is sent or received. The url
@@ -53,7 +52,7 @@ public class MuleEndpointURI implements EndpointURI
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(MuleEndpointURI.class);
+    protected static final Logger logger = LoggerFactory.getLogger(MuleEndpointURI.class);
 
     public static boolean isMuleUri(String url)
     {

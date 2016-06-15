@@ -15,14 +15,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommandServer
 {
 
     public static final String MULE_CONTEXT_STARTED_COMMAND = "MuleContext:started";
-    private final Log logger = LogFactory.getLog(CommandServer.class);
+    private final Logger logger = LoggerFactory.getLogger(CommandServer.class);
     private final int serverPort;
 
     private ServerSocket commandSocket;

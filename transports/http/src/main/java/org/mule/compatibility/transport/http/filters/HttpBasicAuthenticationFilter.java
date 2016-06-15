@@ -15,8 +15,8 @@ import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -27,7 +27,7 @@ public class HttpBasicAuthenticationFilter extends org.mule.runtime.module.http.
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(HttpBasicAuthenticationFilter.class);
+    protected static final Logger logger = LoggerFactory.getLogger(HttpBasicAuthenticationFilter.class);
 
     public HttpBasicAuthenticationFilter(String realm)
     {

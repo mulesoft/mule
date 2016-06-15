@@ -9,7 +9,6 @@ package org.mule.compatibility.core.transport.service;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupConnector;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
-
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
@@ -28,8 +27,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>TransportFactory</code> can be used for generically creating endpoints
@@ -42,7 +41,7 @@ public class TransportFactory
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(TransportFactory.class);
+    protected static final Logger logger = LoggerFactory.getLogger(TransportFactory.class);
 
     protected MuleContext muleContext;
 

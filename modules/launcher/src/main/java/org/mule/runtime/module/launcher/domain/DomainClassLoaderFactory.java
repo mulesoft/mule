@@ -14,6 +14,8 @@ import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStra
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainLibFolder;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -26,8 +28,6 @@ import org.mule.runtime.module.launcher.application.FilePackageDiscoverer;
 import org.mule.runtime.module.launcher.application.PackageDiscoverer;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.runtime.core.util.Preconditions;
-import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,15 +41,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates {@link ArtifactClassLoader} for domain artifacts.
  */
 public class DomainClassLoaderFactory implements ArtifactClassLoaderFactory<DomainDescriptor>
 {
-    protected static final Log logger = LogFactory.getLog(DomainClassLoaderFactory.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DomainClassLoaderFactory.class);
     private final ClassLoader parentClassLoader;
 
     private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();

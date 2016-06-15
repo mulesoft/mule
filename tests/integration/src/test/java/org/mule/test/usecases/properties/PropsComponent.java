@@ -15,12 +15,12 @@ import org.mule.tck.testmodels.fruit.Apple;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PropsComponent implements Callable
 {
-    private static final Log logger = LogFactory.getLog(PropsComponent.class);
+    private static final Logger logger = LoggerFactory.getLogger(PropsComponent.class);
 
     protected static Apple testObjectProperty = new Apple();
 

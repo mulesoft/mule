@@ -19,8 +19,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation of the ArtifactClassLoader interface, that manages shutdown listeners.
@@ -31,7 +31,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/runtime/module/artifact/classloader/DefaultResourceReleaser.class";
     private final String name;
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
@@ -80,7 +80,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
             }
             catch (Exception e)
             {
-                logger.error(e);
+                logger.error("Error executing shutdown listener", e);
             }
         }
 
@@ -90,7 +90,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
         }
         catch (Exception e)
         {
-            logger.error(e);
+            logger.error("Cannot create resource releaser instance", e);
         }
 
         super.dispose();

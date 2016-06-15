@@ -6,19 +6,19 @@
  */
 package org.mule.compatibility.core.endpoint;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 import java.lang.reflect.Method;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Required to resolve the overload of URIBuilder.setPort() during bean assembly
  */
 public class URIBuilderBeanInfo extends SimpleBeanInfo
 {
-    protected transient final Log logger = LogFactory.getLog(URIBuilderBeanInfo.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(URIBuilderBeanInfo.class);
 
     @Override
     public PropertyDescriptor[] getPropertyDescriptors()
@@ -42,7 +42,7 @@ public class URIBuilderBeanInfo extends SimpleBeanInfo
         }
         catch (Exception e)
         {
-            logger.fatal("Error in bean introspection for URIBuilder, e");
+            logger.error("Error in bean introspection for URIBuilder", e);
         }
         return null;
     }

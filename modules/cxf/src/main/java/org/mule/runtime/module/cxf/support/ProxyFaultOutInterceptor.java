@@ -8,8 +8,6 @@ package org.mule.runtime.module.cxf.support;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.interceptor.Fault;
@@ -21,6 +19,8 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fault out interceptor for Proxy configuration considering that FaultInfo might not have an associated class
@@ -28,7 +28,7 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
  */
 public class ProxyFaultOutInterceptor extends FaultOutInterceptor
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public void handleMessage(Message message) throws Fault {

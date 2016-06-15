@@ -23,8 +23,8 @@ import javax.jms.XAQueueConnectionFactory;
 import javax.jms.XATopicConnection;
 import javax.jms.XATopicConnectionFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultXAConnectionFactoryWrapper
         implements XAConnectionFactoryWrapper, QueueConnectionFactory, TopicConnectionFactory
@@ -32,7 +32,7 @@ public class DefaultXAConnectionFactoryWrapper
     /**
      * logger used by this class
      */
-    protected static final transient Log logger = LogFactory.getLog(DefaultXAConnectionFactoryWrapper.class);
+    protected static final transient Logger logger = LoggerFactory.getLogger(DefaultXAConnectionFactoryWrapper.class);
 
     protected final Object factory;
     private Boolean sameRMOverrideValue;

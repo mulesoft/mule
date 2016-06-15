@@ -9,7 +9,7 @@ package org.mule.runtime.module.db.internal.domain.logger;
 
 import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * Logs a prepared bulk query in debug level
@@ -23,7 +23,7 @@ public class DebugPreparedBulkQueryLogger extends DebugSingleQueryLogger impleme
     private final int bulkSize;
     private int currentBulkSize = 0;
 
-    public DebugPreparedBulkQueryLogger(Log logger, QueryTemplate queryTemplate, int bulkSize)
+    public DebugPreparedBulkQueryLogger(Logger logger, QueryTemplate queryTemplate, int bulkSize)
     {
         super(logger, queryTemplate);
         this.bulkSize = bulkSize;

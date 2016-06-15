@@ -115,7 +115,7 @@ public class MuleMQJmsConnector extends JmsConnector
     {
         if (!isSupportJms102bSpec() && specification.equals(JmsConstants.JMS_SPECIFICATION_102B))
         {
-            logger.warn(JmsMessages.errorMuleMqJmsSpecification());
+            logger.warn(JmsMessages.errorMuleMqJmsSpecification().toString());
             specification = JmsConstants.JMS_SPECIFICATION_11;
         }
         super.setSpecification(specification);

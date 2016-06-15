@@ -9,13 +9,13 @@ package org.mule.runtime.module.launcher;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.module.launcher.artifact.DeployableArtifact;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultArtifactDeployer<T extends DeployableArtifact> implements ArtifactDeployer<T>
 {
 
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     public void deploy(T artifact)
     {

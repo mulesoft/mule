@@ -10,8 +10,8 @@ import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.XMLUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.w3c.dom.Element;
 
@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
 public class SpringXMLUtils extends XMLUtils
 {
 
-    private static final Log logger = LogFactory.getLog(SpringXMLUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpringXMLUtils.class);
 
     public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesoft.org/schema/mule/core";
     public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesoft.org/schema/mule/";

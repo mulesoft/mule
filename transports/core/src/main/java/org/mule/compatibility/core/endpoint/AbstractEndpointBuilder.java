@@ -68,8 +68,8 @@ import java.util.Properties;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract endpoint builder used for externalizing the complex creation logic of
@@ -112,7 +112,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     protected MuleContext muleContext;
     protected ObjectNameHelper objectNameHelper;
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException

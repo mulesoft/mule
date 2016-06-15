@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.jms.ConnectionMetaData;
 import javax.jms.JMSException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This factory will consult JMS connection metadata for supported optional properties and use
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AutoDiscoveryRedeliveryHandlerFactory implements RedeliveryHandlerFactory
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected AtomicReference<RedeliveryHandler> delegateHandler = new AtomicReference<RedeliveryHandler>(null);
 

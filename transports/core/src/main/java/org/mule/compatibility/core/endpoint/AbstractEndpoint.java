@@ -40,8 +40,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server. A
@@ -57,7 +57,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(AbstractEndpoint.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractEndpoint.class);
 
     /**
      * The endpoint used to communicate with the external system

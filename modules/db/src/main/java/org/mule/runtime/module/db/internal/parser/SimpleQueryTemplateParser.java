@@ -7,20 +7,20 @@
 
 package org.mule.runtime.module.db.internal.parser;
 
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.db.internal.domain.param.DefaultInputQueryParam;
 import org.mule.runtime.module.db.internal.domain.param.QueryParam;
 import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
 import org.mule.runtime.module.db.internal.domain.query.QueryType;
 import org.mule.runtime.module.db.internal.domain.type.UnknownDbType;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple SQL parser
@@ -43,7 +43,7 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser
     private static final String[] END_SKIP =
             new String[] {"'", "\"", "\n", "*/"};
 
-    private static final Log logger = LogFactory.getLog(SimpleQueryTemplateParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(SimpleQueryTemplateParser.class);
 
     private static final String STORED_PROCEDURE_REGEX = "(?ms)(\\{\\s*)?(:\\S+\\s*=)?\\s*CALL\\s* \\s*.*";
     private static final String OPERATION_REGEX_TEMPLATE = "(?ms)%s\\s++.+";

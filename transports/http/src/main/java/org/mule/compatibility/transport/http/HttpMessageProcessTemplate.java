@@ -175,8 +175,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Exception while sending http response");
-                logger.debug(e);
+                logger.debug("Exception while sending http response", e);
             }
             throw new MessagingException(responseMuleEvent,e);
         }
@@ -228,7 +227,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                 logger.warn("Exception sending http response after error: " + e.getMessage());
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(e);
+                    logger.debug(e.toString());
                 }
             }
         }

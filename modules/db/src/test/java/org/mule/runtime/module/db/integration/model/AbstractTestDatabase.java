@@ -16,8 +16,8 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTestDatabase
 {
@@ -25,7 +25,7 @@ public abstract class AbstractTestDatabase
     public static final Planet[] PLANET_TEST_VALUES = {Planet.VENUS, Planet.EARTH, Planet.MARS};
     public static final Alien[] ALIEN_TEST_VALUES = {Alien.MONGUITO, Alien.ET};
 
-    private static final Log logger = LogFactory.getLog(AbstractTestDatabase.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractTestDatabase.class);
     public static final String NO_SQLXML_SUPPORT_ERROR = "Database does not support SQLXML type";
     public static final String NO_RESULSET_FROM_FUNCTION_SUPPORT_ERROR = "Database does not support returning a resultset from a function";
 

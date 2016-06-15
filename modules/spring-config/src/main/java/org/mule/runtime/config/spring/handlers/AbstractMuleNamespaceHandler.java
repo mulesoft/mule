@@ -29,8 +29,8 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -50,7 +50,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
     public static final String INBOUND_ENDPOINT = "inbound-endpoint";
     public static final String OUTBOUND_ENDPOINT = "outbound-endpoint";
 
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected AbstractMuleNamespaceHandler()
     {

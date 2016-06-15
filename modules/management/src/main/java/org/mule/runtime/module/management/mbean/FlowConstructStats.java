@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.management.mbean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
 import javax.management.MBeanRegistration;
@@ -25,11 +23,6 @@ public class FlowConstructStats implements FlowConstructStatsMBean, MBeanRegistr
     protected MBeanServer server;
 
     protected ObjectName name;
-
-    /**
-     * logger used by this class
-     */
-    private static Log LOGGER = LogFactory.getLog(FlowConstructStats.class);
 
     public FlowConstructStats(FlowConstructStatistics statistics)
     {

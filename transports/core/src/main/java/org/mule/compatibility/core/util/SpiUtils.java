@@ -7,7 +7,6 @@
 package org.mule.compatibility.core.util;
 
 import static org.mule.runtime.core.config.ExceptionHelper.SERVICE_ROOT;
-
 import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.transport.service.TransportFactory;
 import org.mule.runtime.core.api.registry.ServiceType;
@@ -20,15 +19,15 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO This will eventually use the OSGi Service Registry for locating services
 
 //@ThreadSafe
 public class SpiUtils
 {
-    private static final Log logger = LogFactory.getLog(SpiUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpiUtils.class);
 
     public static Properties findServiceDescriptor(ServiceType type, String name)
     {

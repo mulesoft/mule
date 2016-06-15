@@ -8,7 +8,6 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.runtime.core.RequestContext;
@@ -21,14 +20,14 @@ import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations. */
 public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunctionalTestCase
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Session session = null;
 

@@ -16,9 +16,9 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.resource.spi.work.Work;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests the following behavior:
@@ -32,7 +32,7 @@ import org.junit.Test;
  */
 public class MuleWorkManagerTestCase extends AbstractMuleContextTestCase
 {
-    private final transient Log logger = LogFactory.getLog(getClass());
+    private final transient Logger logger = LoggerFactory.getLogger(getClass());
 
     @Test
     public void testDoWorkExecutesSynchronously() throws Exception

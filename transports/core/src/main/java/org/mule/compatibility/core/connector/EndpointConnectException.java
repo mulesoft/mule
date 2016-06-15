@@ -14,15 +14,15 @@ import org.mule.runtime.core.connector.ConnectException;
 
 import javax.resource.spi.work.Work;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** 
  * When this exception is thrown it will trigger a retry (reconnection) policy to go into effect if one is configured.
  */
 public class EndpointConnectException extends ConnectException
 {
-    protected static Log logger = LogFactory.getLog(EndpointConnectException.class);
+    protected static Logger logger = LoggerFactory.getLogger(EndpointConnectException.class);
 
     /** Serial version */
     private static final long serialVersionUID = -7802483584780922653L;

@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleMessage;
@@ -49,8 +48,8 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the base class for all integration tests that are part of the JMS integration test suite.  This is
@@ -108,7 +107,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     public static final String MIDDLE3_ENDPOINT_KEY = "middle3.destination";
     public static final String BROADCAST_TOPIC_ENDPOINT_KEY = "broadcast.topic.destination";
 
-    protected static final Log log = LogFactory.getLog("MULE_TESTS");
+    protected static final Logger log = LoggerFactory.getLogger("MULE_TESTS");
 
     protected JmsVendorConfiguration jmsConfig = null;
     protected Scenario scenarioNoTx;
@@ -230,7 +229,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     }
 
     /**
-     * This creates a {@link org.mule.config.spring.SpringXmlConfigurationBuilder} as expected but also figures out
+     * This creates a {@link org.mule.runtime.config.spring.SpringXmlConfigurationBuilder} as expected but also figures out
      * which 'connector' configuration file to load with the event flow configuration (obtained from the overriding
      * class which implements {@link #getConfigFile()}).
      *

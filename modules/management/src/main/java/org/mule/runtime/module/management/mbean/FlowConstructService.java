@@ -17,8 +17,8 @@ import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>FlowConstructService</code> exposes service information about a Mule Managed
@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FlowConstructService implements FlowConstructServiceMBean, MBeanRegistration, FlowConstructStatsMBean
 {
-    private static Log LOGGER = LogFactory.getLog(FlowConstructService.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(FlowConstructService.class);
 
     protected FlowConstructStatistics statistics;
 

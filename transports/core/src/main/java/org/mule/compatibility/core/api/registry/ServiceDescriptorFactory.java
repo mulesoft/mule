@@ -7,7 +7,6 @@
 package org.mule.compatibility.core.api.registry;
 
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
-
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.transport.service.DefaultTransportServiceDescriptor;
 import org.mule.compatibility.core.transport.service.MetaTransportServiceDescriptor;
@@ -23,8 +22,8 @@ import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory used to create a new service descriptor.
@@ -34,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 @Deprecated
 public class ServiceDescriptorFactory
 {
-    protected static Log logger = LogFactory.getLog(ServiceDescriptorFactory.class);
+    protected static Logger logger = LoggerFactory.getLogger(ServiceDescriptorFactory.class);
 
     /**
      * Factory method to create a new service descriptor.

@@ -9,7 +9,7 @@ package org.mule.runtime.module.db.internal.domain.logger;
 
 import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * Creates {@link QueryLogger} instances
@@ -24,7 +24,7 @@ public interface QueryLoggerFactory
      * @param queryTemplate query tepmlate to log
      * @return a non null {@link SingleQueryLogger}
      */
-    SingleQueryLogger createQueryLogger(Log logger, QueryTemplate queryTemplate);
+    SingleQueryLogger createQueryLogger(Logger logger, QueryTemplate queryTemplate);
 
     /**
      * Creates a logger for a single query running in bulk mode
@@ -34,7 +34,7 @@ public interface QueryLoggerFactory
      * @param bulkSize total size of the bulk operation. Must be positive
      * @return a non null {@link PreparedBulkQueryLogger}
      */
-    PreparedBulkQueryLogger createBulkQueryLogger(Log logger, QueryTemplate queryTemplate, int bulkSize);
+    PreparedBulkQueryLogger createBulkQueryLogger(Logger logger, QueryTemplate queryTemplate, int bulkSize);
 
     /**
      * Creates a logger for a bulk query
@@ -42,5 +42,5 @@ public interface QueryLoggerFactory
      * @param logger logger where the query will be logged
      * @return a non null {@link BulkQueryLogger}
      */
-    BulkQueryLogger createBulkQueryLogger(Log logger);
+    BulkQueryLogger createBulkQueryLogger(Logger logger);
 }

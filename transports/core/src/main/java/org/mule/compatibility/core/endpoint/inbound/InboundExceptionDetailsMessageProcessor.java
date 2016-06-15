@@ -17,8 +17,8 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.util.ObjectUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sets error message properties as specified by the transport based on the exception
@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 public class InboundExceptionDetailsMessageProcessor implements MessageProcessor, MuleContextAware
 {
 
-    private static final Log logger = LogFactory.getLog(InboundExceptionDetailsMessageProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(InboundExceptionDetailsMessageProcessor.class);
 
     protected Connector connector;
     private MuleContext muleContext;

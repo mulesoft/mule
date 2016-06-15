@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct
@@ -29,7 +29,7 @@ public class TestExceptionStrategy extends AbstractExceptionListener implements 
     /**
      * logger used by this class
      */
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * This is the lock that protect both the storage of {@link #callback} and

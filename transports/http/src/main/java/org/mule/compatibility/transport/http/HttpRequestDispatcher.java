@@ -25,8 +25,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manage a ServerSocket.
@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 class HttpRequestDispatcher implements Work
 {
 
-    private static Log logger = LogFactory.getLog(HttpRequestDispatcher.class);
+    private static Logger logger = LoggerFactory.getLogger(HttpRequestDispatcher.class);
 
     private ServerSocket serverSocket;
     private HttpConnector httpConnector;

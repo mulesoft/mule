@@ -6,15 +6,15 @@
  */
 package org.mule.compatibility.config.spring.parsers.specific.endpoint.support;
 
-import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
 import org.mule.runtime.config.spring.parsers.PostProcessor;
+import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.core.util.StringUtils;
 
-import org.w3c.dom.Element;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
 
 /**
  * Routines and constants common to the two endpoint definition parsers.
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 public class EndpointUtils
 {
 
-    private static Log logger = LogFactory.getLog(EndpointUtils.class);
+    private static Logger logger = LoggerFactory.getLogger(EndpointUtils.class);
     public static final String CONNECTOR_ATTRIBUTE = "connector-ref";
     public static final String TRANSFORMERS_ATTRIBUTE = "transformer-refs";
     public static final String URI_BUILDER_ATTRIBUTE = "URIBuilder";

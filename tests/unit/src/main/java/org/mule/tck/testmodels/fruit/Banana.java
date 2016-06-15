@@ -8,8 +8,8 @@ package org.mule.tck.testmodels.fruit;
 
 import java.util.EventObject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Banana implements Fruit
 {
@@ -21,7 +21,7 @@ public class Banana implements Fruit
     /**
      * logger used by this class
      */
-    private static final Log logger = LogFactory.getLog(Banana.class);
+    private static final Logger logger = LoggerFactory.getLogger(Banana.class);
 
     private boolean peeled = false;
     private boolean bitten = false;

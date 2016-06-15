@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.module.launcher;
 
-import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.core.util.SimpleLoggingTable;
+import org.mule.runtime.module.launcher.application.Application;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Prints application status summary table on Mule startup.
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 public class StartupSummaryDeploymentListener implements StartupListener
 {
 
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final String APPLICATION_LABEL = "APPLICATION";
     private static final String DOMAIN_OWNER_LABEL = "DOMAIN";
