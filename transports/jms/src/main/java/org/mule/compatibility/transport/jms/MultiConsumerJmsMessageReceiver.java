@@ -299,7 +299,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
             catch (Exception jmsEx)
             {
-                logger.error("CAnnot recover session", jmsEx);
+                logger.error("Cannot recover session", jmsEx);
             }
         }
 
