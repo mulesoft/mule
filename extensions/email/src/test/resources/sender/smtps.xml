@@ -14,7 +14,7 @@
                       the factory loads the resource <code>greenmail.jks</code> from classpath. GreenMail provides the keystore resource.
                       For customization, place your greenmail.jks before greenmail JAR in the classpath.
                       Now is working in insecure mode -->
-                <tls:trust-store insecure="true"/>
+                <tls:trust-store path="greenmail.jks" password="changeit"/>
             </tls:context>
         </email:smtps-connection>
     </email:smtp>

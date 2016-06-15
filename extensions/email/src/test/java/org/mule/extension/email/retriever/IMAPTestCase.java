@@ -18,8 +18,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
-import static org.mule.extension.email.internal.EmailProtocol.IMAP;
-import static org.mule.extension.email.internal.EmailProtocol.IMAPS;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 
@@ -51,7 +49,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
     public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][] {
-                {IMAP.getName()}, {IMAPS.getName()}
+                {"imap"}, {"imaps"}
         });
     }
 

@@ -102,7 +102,7 @@ public final class EmailConnectorUtils
      * @param attachments a {@link Map} of {@link String} {@link DataHandler} that carries the attachments.
      * @return a {@link List} of {@link EmailAttachment}.
      */
-    public static List<EmailAttachment> mapToEmailAttributes(Map<String, DataHandler> attachments)
+    public static List<EmailAttachment> mapToEmailAttachments(Map<String, DataHandler> attachments)
     {
         return attachments.entrySet().stream()
                 .map(e -> new EmailAttachment(e.getKey(), e.getValue(), e.getValue().getContentType()))

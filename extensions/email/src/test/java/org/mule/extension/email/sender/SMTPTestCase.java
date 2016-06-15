@@ -17,8 +17,6 @@ import static org.junit.runners.Parameterized.Parameter;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.extension.email.internal.EmailContentProcessor.process;
-import static org.mule.extension.email.internal.EmailProtocol.SMTP;
-import static org.mule.extension.email.internal.EmailProtocol.SMTPS;
 import static org.mule.extension.email.internal.commands.ReplyCommand.IN_REPLY_TO_HEADER;
 import static org.mule.extension.email.internal.commands.ReplyCommand.NO_EMAIL_FOUND;
 import static org.mule.extension.email.util.EmailTestUtils.ALE_EMAIL;
@@ -65,7 +63,7 @@ public class SMTPTestCase extends EmailConnectorTestCase
     public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][] {
-                {SMTP.getName()}, {SMTPS.getName()}
+                {"smtp"}, {"smtps"}
         });
     }
 
