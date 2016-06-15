@@ -23,7 +23,6 @@ import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.capability.StudioProvidedEditor;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -50,7 +49,6 @@ import java.util.Locale;
 @Extension(name = "Validation Module", description = "Allows performing validations and throw an Exception if the validation fails")
 @Operations({CommonValidationOperations.class, CustomValidatorOperation.class, ValidationStrategies.class, NumberValidationOperation.class})
 @Extensible(alias = "validator-message-processor")
-@StudioProvidedEditor
 @Export(resources = {"/META-INF/services/org/mule/runtime/core/i18n"})
 public class ValidationExtension extends AbstractAnnotatedObject implements Config, NamedObject, Initialisable, MuleContextAware
 {
