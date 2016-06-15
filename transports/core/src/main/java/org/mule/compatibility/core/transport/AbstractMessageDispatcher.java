@@ -218,7 +218,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         }
         catch (MuleException e)
         {
-            logger.error(e.toString());
+            logger.error("Cannot access dispatcher work manager", e);
             return null;
         }
     }

@@ -524,13 +524,13 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                     }
                     catch (MuleException e1)
                     {
-                        logger.error(e1.toString());
+                        logger.error("Error starting connector", e1);
                         errors.add(e1);
                     }
                     catch (InterruptedException e2)
                     {
                         Thread.currentThread().interrupt();
-                        logger.error(e2.toString());
+                        logger.error("Connector start process interrupted", e2);
                         errors.add(new DefaultMuleException(e2));
                     }
 

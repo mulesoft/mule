@@ -649,7 +649,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                     catch (Exception e)
                     {
                         //unlikely to happen. But if it does lets show it in the test logs.
-                        logger.warn(e.toString());
+                        logger.warn("Error using queue session", e);
                     }
                 }
             });
@@ -737,7 +737,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                     catch (Exception e)
                     {
                         //unlikely to happen. But if it does lets show it in the test logs.
-                        logger.warn(e.toString());
+                        logger.warn("Error using queue session", e);
                     }
                 }
             });

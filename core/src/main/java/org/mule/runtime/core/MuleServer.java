@@ -228,8 +228,8 @@ public class MuleServer implements Runnable
             }
             catch (Exception e)
             {
-                logger.equals(e);
                 final Message message = CoreMessages.failedToLoad("Builder: " + cfgBuilderClassName);
+                logger.error(message.toString(), e);
                 System.err.println(StringMessageUtils.getBoilerPlate("ERROR: " + message.toString()));
                 System.exit(1);
             }

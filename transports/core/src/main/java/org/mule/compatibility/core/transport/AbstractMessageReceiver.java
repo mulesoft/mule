@@ -375,7 +375,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         }
         catch (MuleException e)
         {
-            logger.error(e.toString());
+            logger.error("Cannot access receiver work manager", e);
             return null;
         }
     }

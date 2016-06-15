@@ -631,7 +631,7 @@ public class MuleClient implements Disposable
         }
         catch (RegistrationException e)
         {
-            logger.error(e.toString());
+            logger.error("Cannot set property '{}'", key, e);
         }
     }
 

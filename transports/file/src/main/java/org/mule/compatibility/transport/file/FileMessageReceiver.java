@@ -517,7 +517,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 }
                 catch (Exception ex)
                 {
-                    logger.warn(ex.toString());
+                    logger.warn("Cannot close receiver file input stream", ex);
                 }
             }
         }
@@ -550,7 +550,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             }
             catch (IOException iox)
             {
-                logger.warn(iox.toString());
+                logger.warn("Error rollbacking file to original location", iox);
             }
         }
     }
