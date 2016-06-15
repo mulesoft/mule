@@ -22,8 +22,8 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import java.lang.reflect.Proxy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @deprecated Transport infrastructure is deprecated.
@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 @Deprecated
 public class DefaultInterfaceBinding implements InterfaceBinding, MessagingExceptionHandlerAware, Initialisable
 {
-    protected static final Log logger = LogFactory.getLog(DefaultInterfaceBinding.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultInterfaceBinding.class);
 
     private Class<?> interfaceClass;
 

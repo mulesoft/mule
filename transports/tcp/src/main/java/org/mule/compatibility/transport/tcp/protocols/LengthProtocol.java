@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The LengthProtocol is an application level tcp protocol that can be used to
@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 public class LengthProtocol extends DirectProtocol
 {
     
-    private static final Log logger = LogFactory.getLog(LengthProtocol.class);
+    private static final Logger logger = LoggerFactory.getLogger(LengthProtocol.class);
     // TODO - can we not get this from the API somewhere?
     private static final int SIZE_INT = 4;
     public static final int NO_MAX_LENGTH = -1;

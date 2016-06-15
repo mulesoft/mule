@@ -35,8 +35,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.collections.map.LRUMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An Outbound endpoint who's URI is a template used to created new non dynamic
@@ -50,7 +50,7 @@ import org.apache.commons.logging.LogFactory;
 public class DynamicOutboundEndpoint implements OutboundEndpoint
 {
 
-    protected transient final Log logger = LogFactory.getLog(DynamicOutboundEndpoint.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(DynamicOutboundEndpoint.class);
 
     private static final long serialVersionUID = 8861985949279708638L;
 

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.management.support;
 
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.management.agent.ConfigurableJMXAuthenticator;
 import org.mule.runtime.module.management.agent.JmxApplicationAgent;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -21,8 +21,8 @@ import javax.management.remote.JMXAuthenticator;
 import javax.management.remote.JMXPrincipal;
 import javax.security.auth.Subject;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A JMX authenticator for a simple username/password scheme.
@@ -33,7 +33,7 @@ public class SimplePasswordJmxAuthenticator implements JMXAuthenticator, Configu
     /**
      * Logger used by this class.
      */
-    protected static final Log logger = LogFactory.getLog(JmxApplicationAgent.class);
+    protected static final Logger logger = LoggerFactory.getLogger(JmxApplicationAgent.class);
 
     /**
      * An in-memory credentials storage.

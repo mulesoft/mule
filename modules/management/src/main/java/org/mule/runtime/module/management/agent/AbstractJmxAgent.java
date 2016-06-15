@@ -56,8 +56,8 @@ import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnectorServer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>AbstractJmxAgent</code> registers Mule Jmx management beans with an MBean server.
@@ -79,7 +79,7 @@ public abstract class AbstractJmxAgent extends AbstractAgent
     /**
      * Logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(AbstractJmxAgent.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractJmxAgent.class);
 
     /**
      * Should MBeanServer be discovered.

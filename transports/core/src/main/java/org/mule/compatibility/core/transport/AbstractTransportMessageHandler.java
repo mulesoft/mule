@@ -34,15 +34,15 @@ import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provide a default dispatch (client) support for handling threads lifecycle and validation.
  */
 public abstract class AbstractTransportMessageHandler<O> implements Connectable, LifecycleStateEnabled
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     protected ImmutableEndpoint endpoint;
     protected final AbstractConnector connector;

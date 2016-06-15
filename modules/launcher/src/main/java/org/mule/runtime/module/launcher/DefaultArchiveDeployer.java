@@ -9,13 +9,13 @@ package org.mule.runtime.module.launcher;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.module.launcher.application.NullDeploymentListener;
+import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.Artifact;
+import org.mule.runtime.module.launcher.application.NullDeploymentListener;
 import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
 import org.mule.runtime.module.launcher.artifact.DeployableArtifact;
 import org.mule.runtime.module.launcher.util.ObservableList;
-import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,8 +29,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Deployer of an artifact within mule container.
@@ -45,7 +45,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     public static final String ZIP_FILE_SUFFIX = ".zip";
     public static final String ANOTHER_DEPLOYMENT_OPERATION_IS_IN_PROGRESS = "Another deployment operation is in progress";
     public static final String INSTALL_OPERATION_HAS_BEEN_INTERRUPTED = "Install operation has been interrupted";
-    private static final Log logger = LogFactory.getLog(DefaultArchiveDeployer.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
 
     private final ArtifactDeployer<T> deployer;
     private final ArtifactArchiveInstaller artifactArchiveInstaller;

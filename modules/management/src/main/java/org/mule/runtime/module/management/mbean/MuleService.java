@@ -19,8 +19,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>MuleService</code> exposes certain Mule server functions for management
@@ -30,7 +30,7 @@ public class MuleService implements MuleServiceMBean
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private String version;
     private String vendor;

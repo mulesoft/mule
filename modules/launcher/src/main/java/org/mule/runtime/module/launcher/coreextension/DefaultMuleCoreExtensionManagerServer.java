@@ -18,13 +18,13 @@ import org.mule.runtime.module.launcher.DeploymentServiceAware;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionManagerServer
 {
 
-    protected static final Log logger = LogFactory.getLog(DefaultMuleCoreExtensionManagerServer.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleCoreExtensionManagerServer.class);
 
     private final MuleCoreExtensionDiscoverer coreExtensionDiscoverer;
     private final MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver;
@@ -49,7 +49,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
             }
             catch (Exception ex)
             {
-                logger.fatal("Error disposing core extension " + extension.getName(), ex);
+                logger.error("Error disposing core extension " + extension.getName(), ex);
             }
         }
     }

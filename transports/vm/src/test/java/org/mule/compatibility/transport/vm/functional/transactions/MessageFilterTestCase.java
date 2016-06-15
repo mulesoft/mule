@@ -8,7 +8,6 @@ package org.mule.compatibility.transport.vm.functional.transactions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -17,9 +16,9 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test transaction behavior when "joinExternal" is set to disallow joining external
@@ -29,7 +28,7 @@ import org.junit.Test;
 public class MessageFilterTestCase extends FunctionalTestCase
 {
 
-    protected static final Log logger = LogFactory.getLog(MessageFilterTestCase.class);
+    protected static final Logger logger = LoggerFactory.getLogger(MessageFilterTestCase.class);
 
     private static String rejectMesage;
 

@@ -18,8 +18,8 @@ import com.thoughtworks.xstream.mapper.Mapper;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Initializes the XStream utility for converting Objects to XML and XML to Objects.
@@ -33,7 +33,7 @@ public class XStreamFactory
     public static final String XSTREAM_STAX_DRIVER = "com.thoughtworks.xstream.io.xml.StaxDriver";
     public static final String XSTREAM_XPP_DRIVER = "com.thoughtworks.xstream.io.xml.XppDriver";
 
-    private static final Log logger = LogFactory.getLog(XStreamFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(XStreamFactory.class);
 
     private final XStream xstream;
 

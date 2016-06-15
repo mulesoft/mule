@@ -11,8 +11,8 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The DirectProtocol class is an application level tcp protocol that does nothing.
@@ -29,7 +29,7 @@ public class DirectProtocol extends AbstractByteProtocol
 
     protected static final int UNLIMITED = -1;
 
-    private static final Log logger = LogFactory.getLog(DirectProtocol.class);
+    private static final Logger logger = LoggerFactory.getLogger(DirectProtocol.class);
     private static final int DEFAULT_BUFFER_SIZE = 8192;
     
     protected int bufferSize;

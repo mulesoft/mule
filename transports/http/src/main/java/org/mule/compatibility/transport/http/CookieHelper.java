@@ -31,11 +31,11 @@ import org.apache.commons.httpclient.cookie.CookieSpec;
 import org.apache.commons.httpclient.cookie.MalformedCookieException;
 import org.apache.commons.httpclient.cookie.NetscapeDraftSpec;
 import org.apache.commons.httpclient.cookie.RFC2109Spec;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ServerCookie;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -109,7 +109,7 @@ public class CookieHelper
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(CookieHelper.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CookieHelper.class);
 
 	public static final String EXPIRE_PATTERN = "EEE, d-MMM-yyyy HH:mm:ss z";
     private static final SimpleDateFormat EXPIRE_FORMATTER;

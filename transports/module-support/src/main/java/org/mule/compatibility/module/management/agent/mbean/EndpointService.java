@@ -14,8 +14,8 @@ import org.mule.compatibility.core.util.TransportObjectNameHelper;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The EndpointServiceMBean allows you to check the confiugration of an endpoint and
@@ -26,7 +26,7 @@ public class EndpointService implements EndpointServiceMBean
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private ImmutableEndpoint endpoint;
     private MessageReceiver receiver;

@@ -9,15 +9,14 @@ package org.mule.runtime.modules.schedulers.cron;
 import static java.lang.String.format;
 import static java.util.TimeZone.getDefault;
 import static java.util.TimeZone.getTimeZone;
-
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.SchedulerFactory;
 import org.mule.runtime.core.source.polling.PollingWorker;
 
 import java.util.TimeZone;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -29,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CronSchedulerFactory extends SchedulerFactory<PollingWorker>
 {
-    private static final Log logger = LogFactory.getLog(CronSchedulerFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(CronSchedulerFactory.class);
 
     private static final String TZ_GMT_ID = "GMT";
 

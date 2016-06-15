@@ -13,7 +13,6 @@ import static org.mule.runtime.modules.schedulers.i18n.SchedulerMessages.couldNo
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
-
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -25,8 +24,6 @@ import org.mule.runtime.core.source.polling.schedule.PollScheduler;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -36,6 +33,8 @@ import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -47,7 +46,7 @@ import org.quartz.impl.StdSchedulerFactory;
 public class CronScheduler extends PollScheduler<PollingWorker> implements MuleContextAware
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String THREAD_POLL_CLASS_PROPERTY = "org.quartz.threadPool.class";
     public static final String THREAD_POLL_CLASS = "org.quartz.simpl.SimpleThreadPool";
@@ -122,7 +121,7 @@ public class CronScheduler extends PollScheduler<PollingWorker> implements MuleC
         }
         catch (SchedulerException e)
         {
-            logger.error(couldNotShutdownScheduler(), e);
+            logger.error(couldNotShutdownScheduler().toString(), e);
         }
     }
 

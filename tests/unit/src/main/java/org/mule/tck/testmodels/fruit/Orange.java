@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Orange implements Callable, OrangeInterface
 {
@@ -27,7 +27,7 @@ public class Orange implements Callable, OrangeInterface
     /**
      * logger used by this class
      */
-    private static final Log logger = LogFactory.getLog(Orange.class);
+    private static final Logger logger = LoggerFactory.getLogger(Orange.class);
 
     private boolean bitten = false;
     private Integer segments = new Integer(10);

@@ -19,8 +19,8 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages database types that are discovered using database metadata
@@ -31,7 +31,7 @@ public class MetadataDbTypeManager implements DbTypeManager
     static final String METADATA_TYPE_ID_COLUMN = "DATA_TYPE";
     static final String METADATA_TYPE_NAME_COLUMN = "TYPE_NAME";
 
-    private final Log logger = LogFactory.getLog(MetadataDbTypeManager.class);
+    private final Logger logger = LoggerFactory.getLogger(MetadataDbTypeManager.class);
 
     private final Map<String, DbType> typesById = new HashMap<String, DbType>();
     private final Object lock = new Object();

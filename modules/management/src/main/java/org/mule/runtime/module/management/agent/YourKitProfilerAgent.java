@@ -12,12 +12,12 @@ import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.management.i18n.ManagementMessages;
 import org.mule.runtime.module.management.mbean.YourKitProfilerService;
 import org.mule.runtime.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.runtime.module.management.support.JmxSupport;
 import org.mule.runtime.module.management.support.JmxSupportFactory;
-import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +29,8 @@ import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class YourKitProfilerAgent implements Agent, MuleContextAware
 {
@@ -49,7 +49,7 @@ public class YourKitProfilerAgent implements Agent, MuleContextAware
     /**
      * Logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(YourKitProfilerAgent.class);
+    protected static final Logger logger = LoggerFactory.getLogger(YourKitProfilerAgent.class);
 
     protected MuleContext muleContext;
 

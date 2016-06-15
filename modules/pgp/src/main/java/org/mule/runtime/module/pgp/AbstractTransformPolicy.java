@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstract implementation of {@link TransformPolicy}.
@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractTransformPolicy implements TransformPolicy
 {
-    protected static final Log logger = LogFactory.getLog(AbstractTransformPolicy.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractTransformPolicy.class);
 
     private AtomicBoolean startedCopying;
     private Thread copyingThread;

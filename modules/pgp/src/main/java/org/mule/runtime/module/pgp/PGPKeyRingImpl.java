@@ -10,16 +10,14 @@ import static org.mule.runtime.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.pgp.i18n.PGPMessages;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.SecurityUtils;
+import org.mule.runtime.module.pgp.i18n.PGPMessages;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
@@ -27,11 +25,13 @@ import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 {
-    protected static final Log logger = LogFactory.getLog(PGPKeyRingImpl.class);
+    protected static final Logger logger = LoggerFactory.getLogger(PGPKeyRingImpl.class);
 
     private String publicKeyRingFileName;
 

@@ -8,7 +8,6 @@ package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -27,8 +26,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.eclipse.jetty.server.AbstractNetworkConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -37,12 +34,14 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpMultipleCookiesTestCase extends FunctionalTestCase
 {
     
     protected static String TEST_MESSAGE = "Test Http Request ";
-    protected static final Log logger = LogFactory.getLog(HttpMultipleCookiesTestCase.class);
+    protected static final Logger logger = LoggerFactory.getLogger(HttpMultipleCookiesTestCase.class);
 
     private CountDownLatch simpleServerLatch = new CountDownLatch(1);
     private CountDownLatch simpleServerShutdownLatch = new CountDownLatch(1);

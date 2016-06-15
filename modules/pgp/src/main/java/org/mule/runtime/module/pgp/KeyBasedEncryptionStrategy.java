@@ -11,25 +11,25 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 import org.mule.runtime.core.api.security.CryptoFailureException;
-import org.mule.runtime.module.pgp.i18n.PGPMessages;
 import org.mule.runtime.core.security.AbstractNamedEncryptionStrategy;
 import org.mule.runtime.core.util.SecurityUtils;
+import org.mule.runtime.module.pgp.i18n.PGPMessages;
 
 import java.io.InputStream;
 import java.security.Provider;
 import java.util.Calendar;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 {
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(KeyBasedEncryptionStrategy.class);
+    protected static final Logger logger = LoggerFactory.getLogger(KeyBasedEncryptionStrategy.class);
 
     private PGPKeyRing keyManager;
     private CredentialsAccessor credentialsAccessor;

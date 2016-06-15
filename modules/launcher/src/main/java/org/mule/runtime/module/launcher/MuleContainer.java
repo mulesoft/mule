@@ -15,24 +15,24 @@ import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
+import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtensionDiscoverer;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
-import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
-import org.mule.runtime.core.util.StringMessageUtils;
-import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MuleContainer
 {
@@ -52,7 +52,7 @@ public class MuleContainer
     /**
      * logger used by this class
      */
-    private static final Log logger;
+    private static final Logger logger;
 
     /**
      * A properties file to be read at startup. This can be useful for setting
@@ -75,7 +75,7 @@ public class MuleContainer
             LogManager.setFactory(new MuleLog4jContextFactory());
         }
 
-        logger = LogFactory.getLog(MuleContainer.class);
+        logger = LoggerFactory.getLogger(MuleContainer.class);
     }
 
     /**
@@ -198,11 +198,11 @@ public class MuleContainer
         MuleException muleException = ExceptionHelper.getRootMuleException(e);
         if (muleException != null)
         {
-            logger.fatal(muleException.getDetailedMessage());
+            logger.error(muleException.getDetailedMessage());
         }
         else
         {
-            logger.fatal(msg.toString() + " " + e.getMessage(), e);
+            logger.error(msg.toString() + " " + e.getMessage(), e);
         }
         List<String> msgs = new ArrayList<String>();
         msgs.add(msg.getMessage());
@@ -211,7 +211,7 @@ public class MuleContainer
         msgs.add(" ");
         msgs.add(CoreMessages.fatalErrorInShutdown().getMessage());
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
-        logger.fatal(shutdownMessage);
+        logger.error(shutdownMessage);
 
         unregisterShutdownHook();
         doShutdown();
@@ -251,7 +251,7 @@ public class MuleContainer
         }
     }
 
-    public Log getLogger()
+    public Logger getLogger()
     {
         return logger;
     }

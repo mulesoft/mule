@@ -37,8 +37,8 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
 import org.apache.commons.httpclient.StatusLine;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A connection to the SimpleHttpServer.
@@ -46,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
 public class HttpServerConnection implements HandshakeCompletedListener
 {
 
-    private static final Log logger = LogFactory.getLog(HttpServerConnection.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpServerConnection.class);
 
     private Socket socket;
     private final InputStream in;

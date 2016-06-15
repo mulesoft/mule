@@ -18,8 +18,8 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A redelivery handler which relies on JMS provider's redelivery count facilities.
@@ -30,7 +30,7 @@ public class JmsXRedeliveryHandler extends AbstractRedeliveryHandler
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(JmsXRedeliveryHandler.class);
+    protected static final Logger logger = LoggerFactory.getLogger(JmsXRedeliveryHandler.class);
 
     /**
      * process the redelivered message. If the Jms receiver should process the

@@ -40,14 +40,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultMuleDomain implements Domain
 {
 
-    protected transient final Log logger = LogFactory.getLog(getClass());
-    protected transient final Log deployLogger = LogFactory.getLog(MuleDeploymentService.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+    protected transient final Logger deployLogger = LoggerFactory.getLogger(MuleDeploymentService.class);
 
     private final DomainDescriptor descriptor;
     private MuleContext muleContext;

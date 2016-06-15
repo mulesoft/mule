@@ -22,8 +22,8 @@ import javax.jms.Session;
 import javax.jms.Topic;
 import javax.naming.NamingException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>Jms11Support</code> is a template class to provide an abstraction to to
@@ -36,7 +36,7 @@ public class Jms11Support implements JmsSupport
     /**
      * logger used by this class
      */
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected JmsConnector connector;
 
@@ -218,7 +218,7 @@ public class Jms11Support implements JmsSupport
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug(e.toString());
             }
             String message = MessageFormat.format("Failed to look up destination {0}. Reason: {1}",
                                                   name, e.getMessage());

@@ -50,7 +50,7 @@ public class ResponseTransformerTestCase extends FunctionalTestCase
         for (int count = 1; iterator.hasNext(); count++)
         {
             NameableObject transformer = (NameableObject) iterator.next();
-            logger.debug(transformer);
+            logger.debug(transformer.toString());
             assertEquals(prefix + count, transformer.getName());
         }
     }

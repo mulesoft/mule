@@ -12,8 +12,8 @@ import org.mule.runtime.core.util.StringUtils;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @deprecated Transport infrastructure is deprecated.
@@ -25,7 +25,7 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
     /**
      * logger used by this class
      */
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected String service;
 

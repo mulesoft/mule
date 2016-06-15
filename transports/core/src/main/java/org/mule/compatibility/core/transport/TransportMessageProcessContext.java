@@ -13,8 +13,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.MessageProcessContext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Generic {@link org.mule.execution.MessageProcessContext} implementations for transports.
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public class TransportMessageProcessContext implements MessageProcessContext
 {
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private final MessageReceiver messageReceiver;
     private WorkManager flowExecutionWorkManager;

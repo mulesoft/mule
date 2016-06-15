@@ -17,8 +17,8 @@ import org.mule.runtime.core.util.ArrayUtils;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -37,7 +37,7 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
     implements MuleDefinitionParser
 {
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
     
     private MuleDefinitionParser[] delegates;
 

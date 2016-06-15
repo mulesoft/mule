@@ -12,9 +12,9 @@ import org.mule.runtime.core.util.MapUtils;
 import java.io.IOException;
 import java.net.Socket;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates a client socket using the socket address extracted from the endpoint.  Addtional
@@ -26,7 +26,7 @@ public abstract class AbstractTcpSocketFactory implements KeyedPoolableObjectFac
     /**
      * logger used by this class
      */
-    private static final Log logger = LogFactory.getLog(TcpSocketFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(TcpSocketFactory.class);
 
     private int connectionTimeout = Connector.INT_VALUE_NOT_SET;
 

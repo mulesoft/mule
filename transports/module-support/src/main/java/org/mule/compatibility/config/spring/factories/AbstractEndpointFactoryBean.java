@@ -13,8 +13,8 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
@@ -24,7 +24,7 @@ public abstract class AbstractEndpointFactoryBean extends EndpointURIEndpointBui
     implements FactoryBean, Initialisable
 {
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public AbstractEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException
     {

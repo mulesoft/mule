@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Discovers {@link MuleCoreExtension} classes that are defined in the
@@ -31,7 +31,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
 
     public static final String CORE_EXTENSION_RESOURCE_NAME = "META-INF/services/org/mule/runtime/core/config/core-extensions.properties";
 
-    private static Log logger = LogFactory.getLog(ClasspathMuleCoreExtensionDiscoverer.class);
+    private static Logger logger = LoggerFactory.getLogger(ClasspathMuleCoreExtensionDiscoverer.class);
     private final ArtifactClassLoader containerClassLoader;
 
     /**

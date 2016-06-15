@@ -36,8 +36,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -80,7 +80,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
     private BeanDefinitionFactory beanDefinitionFactory;
 
-    protected static final Log logger = LogFactory.getLog(MuleHierarchicalBeanDefinitionParserDelegate.class);
+    protected static final Logger logger = LoggerFactory.getLogger(MuleHierarchicalBeanDefinitionParserDelegate.class);
 
     public MuleHierarchicalBeanDefinitionParserDelegate(XmlReaderContext readerContext,
                                                         DefaultBeanDefinitionDocumentReader beanDefinitionDocumentReader, Supplier<ApplicationModel> applicationModelSupplier, BeanDefinitionFactory beanDefinitionFactory, ElementValidator... elementValidators)

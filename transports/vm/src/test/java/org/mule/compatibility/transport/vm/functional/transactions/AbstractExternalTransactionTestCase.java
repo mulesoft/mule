@@ -28,14 +28,14 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class AbstractExternalTransactionTestCase extends FunctionalTestCase
 {
 
-    protected static final Log logger = LogFactory.getLog(AbstractExternalTransactionTestCase.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractExternalTransactionTestCase.class);
 
     protected MuleContext context;
     protected TransactionManager tm;
@@ -63,7 +63,7 @@ public abstract class AbstractExternalTransactionTestCase extends FunctionalTest
         }
         catch (Exception ex)
         {
-            logger.debug(ex);
+            logger.debug(ex.toString());
         }
         try
         {
@@ -75,7 +75,7 @@ public abstract class AbstractExternalTransactionTestCase extends FunctionalTest
         }
         catch (TransactionException ex)
         {
-            logger.debug(ex);
+            logger.debug(ex.toString());
         }
     }
 

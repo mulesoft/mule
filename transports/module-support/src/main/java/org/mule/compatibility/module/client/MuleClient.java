@@ -52,8 +52,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and
@@ -88,7 +88,7 @@ public class MuleClient implements Disposable
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(MuleClient.class);
+    protected static final Logger logger = LoggerFactory.getLogger(MuleClient.class);
 
     /**
      * The local MuleContext instance.
@@ -631,7 +631,7 @@ public class MuleClient implements Disposable
         }
         catch (RegistrationException e)
         {
-            logger.error(e);
+            logger.error(e.toString());
         }
     }
 

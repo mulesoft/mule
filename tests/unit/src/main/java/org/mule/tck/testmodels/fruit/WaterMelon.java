@@ -14,8 +14,8 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 
 import java.util.HashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
 {
@@ -27,7 +27,7 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
     /**
      * logger used by this class
      */
-    private static final Log logger = LogFactory.getLog(WaterMelon.class);
+    private static final Logger logger = LoggerFactory.getLogger(WaterMelon.class);
 
     private boolean bitten = false;
     private Integer seeds = new Integer(100);

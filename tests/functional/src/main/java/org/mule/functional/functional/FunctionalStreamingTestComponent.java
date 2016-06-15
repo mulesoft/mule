@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A service that can be used by streaming functional tests. This service accepts an
@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class FunctionalStreamingTestComponent implements Callable
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private static AtomicInteger count = new AtomicInteger(0);
     private int number = count.incrementAndGet();
@@ -124,7 +124,7 @@ public class FunctionalStreamingTestComponent implements Callable
             e.printStackTrace();
             if (logger.isDebugEnabled())
             {
-                logger.debug(e);
+                logger.debug("Error on test component", e);
             }
             throw e;
         }

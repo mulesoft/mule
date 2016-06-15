@@ -31,8 +31,8 @@ import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
@@ -48,7 +48,7 @@ import org.w3c.dom.Attr;
 public class DefaultBeanAssembler implements BeanAssembler
 {
 
-    private static Log logger = LogFactory.getLog(DefaultBeanAssembler.class);
+    private static Logger logger = LoggerFactory.getLogger(DefaultBeanAssembler.class);
     private PropertyConfiguration beanConfig;
     protected BeanDefinitionBuilder bean;
     protected PropertyConfiguration targetConfig;

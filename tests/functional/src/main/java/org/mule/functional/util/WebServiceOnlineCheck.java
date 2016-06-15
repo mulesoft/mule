@@ -6,9 +6,9 @@
  */
 package org.mule.functional.util;
 
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -16,13 +16,13 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WebServiceOnlineCheck
 {
     public static final String TEST_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote?symbol=CSCO";
-    private static final Log logger = LogFactory.getLog(WebServiceOnlineCheck.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebServiceOnlineCheck.class);
 
     public static boolean isWebServiceOnline()
     {

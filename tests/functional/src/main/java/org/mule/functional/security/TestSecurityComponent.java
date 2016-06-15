@@ -12,12 +12,12 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestSecurityComponent implements Callable
 {
-    protected static final Log logger = LogFactory.getLog(TestSecurityComponent.class);
+    protected static final Logger logger = LoggerFactory.getLogger(TestSecurityComponent.class);
     
     public Object onCall(MuleEventContext eventContext) throws Exception
     {

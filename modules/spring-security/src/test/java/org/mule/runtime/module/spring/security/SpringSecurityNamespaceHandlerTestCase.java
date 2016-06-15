@@ -44,7 +44,6 @@ public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase
         while (providers.hasNext())
         {
             SecurityProvider provider = providers.next();
-            logger.debug(provider);
             logger.debug(provider.getName());
         }
         knownProperties(getProvider("customProvider"));

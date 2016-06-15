@@ -10,12 +10,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.compatibility.core.transport.AbstractConnector;
-import org.mule.compatibility.core.transport.AbstractTransportMessageHandler;
-import org.mule.compatibility.core.transport.ConnectableLifecycleManager;
 import org.mule.compatibility.core.transport.MuleAbstractTransportMessageHandlerTestCase.MethodInvocation.MethodPart;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -27,19 +23,18 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import edu.umd.cs.mtc.MultithreadedTestCase;
+import edu.umd.cs.mtc.TestFramework;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import edu.umd.cs.mtc.MultithreadedTestCase;
-import edu.umd.cs.mtc.TestFramework;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This test tests class {@link AbstractTransportMessageHandler} but its name starts with "Mule"
@@ -51,7 +46,7 @@ public class MuleAbstractTransportMessageHandlerTestCase
     /**
      * The logger used for this class
      */
-    static Log log = LogFactory.getLog(MuleAbstractTransportMessageHandlerTestCase.class);
+    static Logger log = LoggerFactory.getLogger(MuleAbstractTransportMessageHandlerTestCase.class);
 
     @Test
     public void testStartRethrowsMuleExceptionCorrectly() throws Exception
@@ -172,7 +167,7 @@ public class MuleAbstractTransportMessageHandlerTestCase
         {
             for (MethodInvocation methodInvocation : connectable.methodInvocations)
             {
-                log.debug(methodInvocation);
+                log.debug(methodInvocation.toString());
             }
 
             int i = 0;

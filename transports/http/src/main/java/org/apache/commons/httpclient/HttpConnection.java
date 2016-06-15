@@ -47,8 +47,8 @@ import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.httpclient.util.ExceptionUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a modified version of the HttpConnection class from commons-httpclient that doesn't limit the size
@@ -1322,7 +1322,7 @@ public class HttpConnection {
     private static final byte[] CRLF = new byte[] {(byte) 13, (byte) 10};
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HttpConnection.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpConnection.class);
 
     // ----------------------------------------------------- Instance Variables
 

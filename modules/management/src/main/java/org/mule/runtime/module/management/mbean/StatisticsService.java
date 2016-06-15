@@ -16,8 +16,8 @@ import org.mule.runtime.core.management.stats.printers.XMLPrinter;
 import java.io.StringWriter;
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>StatisicsService</code> exposes Mule processing statistics
@@ -32,7 +32,7 @@ public class StatisticsService implements StatisticsServiceMBean
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(StatisticsService.class);
+    protected static final Logger logger = LoggerFactory.getLogger(StatisticsService.class);
 
     private AllStatistics stats = new AllStatistics();
     private MuleContext muleContext;

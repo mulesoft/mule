@@ -8,7 +8,6 @@
 package org.mule.compatibility.core.endpoint;
 
 import static org.mule.compatibility.core.endpoint.URIBuilder.URL_ENCODER;
-
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,8 +18,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 
 import org.apache.commons.collections.Transformer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds dynamic string URI from a template {@link URIBuilder}
@@ -28,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 public class DynamicURIBuilder
 {
 
-    protected transient final Log logger = LogFactory.getLog(DynamicURIBuilder.class);
+    protected transient final Logger logger = LoggerFactory.getLogger(DynamicURIBuilder.class);
 
     private final URIBuilder templateUriBuilder;
 

@@ -9,9 +9,9 @@ package org.mule.runtime.module.http.internal.filter;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -29,8 +29,8 @@ import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.MuleCredentials;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Filter for basic authentication over an HTTP request
@@ -40,7 +40,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(HttpBasicAuthenticationFilter.class);
+    protected static final Logger logger = LoggerFactory.getLogger(HttpBasicAuthenticationFilter.class);
 
     private String realm;
 

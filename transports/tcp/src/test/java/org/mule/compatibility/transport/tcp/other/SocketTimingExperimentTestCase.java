@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.transport.tcp.other;
 
+import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
@@ -14,8 +16,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * This was an attempt to understand the issue we saw with HTTP closing early.
@@ -34,20 +34,20 @@ public class SocketTimingExperimentTestCase extends AbstractMuleTestCase
         try
         {
             boolean expectBadClient = expectBadClient();
-            logger.info("Expected bad client: " + expectBadClient);
+            fail("Expected bad client: " + expectBadClient);
         }
         catch (Exception e)
         {
-            logger.info(e);
+            // Expected
         }
         try
         {
             boolean expectBadServer = expectBadServer();
-            logger.info("Expected bad server: " + expectBadServer);
+            fail("Expected bad server: " + expectBadServer);
         }
         catch (Exception e)
         {
-            logger.info(e);
+            // Expected
         }
     }
 

@@ -10,8 +10,8 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Apple implements Fruit, Callable
 {
@@ -23,7 +23,7 @@ public class Apple implements Fruit, Callable
     /**
      * logger used by this class
      */
-    private static final Log logger = LogFactory.getLog(Apple.class);
+    private static final Logger logger = LoggerFactory.getLogger(Apple.class);
 
     private boolean bitten = false;
     private boolean washed = false;

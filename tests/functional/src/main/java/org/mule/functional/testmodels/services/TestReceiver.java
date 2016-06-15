@@ -11,12 +11,12 @@ import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestReceiver
 {
-    protected static final Log logger = LogFactory.getLog(TestComponent.class);
+    protected static final Logger logger = LoggerFactory.getLogger(TestComponent.class);
 
     protected AtomicInteger count = new AtomicInteger(0);
 

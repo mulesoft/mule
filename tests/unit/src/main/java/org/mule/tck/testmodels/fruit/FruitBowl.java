@@ -12,15 +12,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FruitBowl
 {
     /**
      * logger used by this class
      */
-    private static final Log logger = LogFactory.getLog(FruitBowl.class);
+    private static final Logger logger = LoggerFactory.getLogger(FruitBowl.class);
 
     private final Map<Class<?>, Fruit> bowl = Collections.synchronizedMap(new HashMap<Class<?>, Fruit>());
 

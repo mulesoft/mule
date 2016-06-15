@@ -6,9 +6,9 @@
  */
 package org.mule.tck.junit4.rule;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Defines a {@link Statement} to execute a test with a given timeout.
@@ -19,7 +19,7 @@ import org.junit.runners.model.Statement;
 public class WarnOnTimeout extends Statement
 {
 
-    private final Log logger = LogFactory.getLog(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private Statement next;
     private final long timeout;

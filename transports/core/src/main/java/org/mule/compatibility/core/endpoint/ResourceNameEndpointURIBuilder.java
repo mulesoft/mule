@@ -12,8 +12,8 @@ import org.mule.runtime.core.util.StringUtils;
 import java.net.URI;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>ResourceNameEndpointBuilder</code> extracts a resource name from a uri
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
 
-    protected static final Log logger = LogFactory.getLog(ResourceNameEndpointURIBuilder.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ResourceNameEndpointURIBuilder.class);
     
     public static final String RESOURCE_INFO_PROPERTY = "resourceInfo";
 

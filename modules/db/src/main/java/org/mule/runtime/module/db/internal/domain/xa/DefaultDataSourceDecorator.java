@@ -7,14 +7,14 @@
 package org.mule.runtime.module.db.internal.domain.xa;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.db.internal.domain.connection.DbPoolingProfile;
 import org.mule.runtime.core.util.Preconditions;
+import org.mule.runtime.module.db.internal.domain.connection.DbPoolingProfile;
 
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Decorates a {@link DataSource} using a {@link DataSourceWrapper} if required
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultDataSourceDecorator implements DataSourceDecorator
 {
 
-    private static final Log logger = LogFactory.getLog(DefaultDataSourceDecorator.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultDataSourceDecorator.class);
 
     @Override
     public DataSource decorate(DataSource dataSource, String dataSourceName, DbPoolingProfile dbPoolingProfile, MuleContext muleContext)

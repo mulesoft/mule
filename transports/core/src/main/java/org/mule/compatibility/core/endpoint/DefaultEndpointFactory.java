@@ -7,7 +7,6 @@
 package org.mule.compatibility.core.endpoint;
 
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
-
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
@@ -22,15 +21,16 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultEndpointFactory implements EndpointFactory
 {
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(DefaultEndpointFactory.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DefaultEndpointFactory.class);
 
     public static final String ENDPOINT_REGISTRY_PREFIX = "endpoint:";
 

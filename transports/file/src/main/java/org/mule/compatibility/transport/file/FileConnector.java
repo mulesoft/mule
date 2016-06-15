@@ -36,8 +36,8 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>FileConnector</code> is used for setting up listeners on a directory and
@@ -48,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
 public class FileConnector extends AbstractConnector
 {
 
-    private static Log logger = LogFactory.getLog(FileConnector.class);
+    private static Logger logger = LoggerFactory.getLogger(FileConnector.class);
 
     public static final String FILE = "file";
     private static final String DEFAULT_WORK_FILENAME_PATTERN = "#[org.mule.runtime.core.util.UUID.getUUID()].#[server.dateTime.toDate()].#[message.inboundProperties.originalFilename]";

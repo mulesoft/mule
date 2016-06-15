@@ -9,8 +9,8 @@ package org.mule.test.firewall;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import org.mule.runtime.core.config.factories.HostNameFactory;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.NetworkUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -21,9 +21,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.SecureRandom;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FirewallTestCase extends AbstractMuleTestCase
 {
@@ -31,7 +31,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
     public static final String LOCALADDR = "127.0.0.1";
     public static final int TEST_COUNT = 1;
 
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private SecureRandom random = new SecureRandom();
 

@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Defines a {@link Map} that will close any contained {@link Closeable} value
@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 public class CloseableMap<K, V> implements Map<K,V>, Closeable
 {
 
-    protected static final Log logger = LogFactory.getLog(CloseableMap.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CloseableMap.class);
 
     private Map<K,V> delegate = new HashMap<K, V>();
 

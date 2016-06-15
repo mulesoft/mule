@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
 
-import java.util.Set;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * We test notifications by defining a "tree" of expected responses (this is needed because the system is
@@ -45,7 +45,7 @@ public class Node implements RestrictedNode
     private boolean isIdDefined = false; // allow null IDs to be specified
     private boolean nodeOk = false;
 
-    protected final transient Log logger = LogFactory.getLog(this.getClass());
+    protected final transient Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // any of these can run after this
     private Set parallel = new HashSet();

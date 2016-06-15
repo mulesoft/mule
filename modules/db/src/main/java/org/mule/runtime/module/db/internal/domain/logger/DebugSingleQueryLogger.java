@@ -10,7 +10,7 @@ package org.mule.runtime.module.db.internal.domain.logger;
 import org.mule.runtime.module.db.internal.domain.param.InputQueryParam;
 import org.mule.runtime.module.db.internal.domain.query.QueryTemplate;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 /**
  * Logs a single query in debug level
@@ -20,7 +20,7 @@ public class DebugSingleQueryLogger extends AbstractDebugQueryLogger implements 
 
     private final QueryTemplate queryTemplate;
 
-    public DebugSingleQueryLogger(Log logger, QueryTemplate queryTemplate)
+    public DebugSingleQueryLogger(Logger logger, QueryTemplate queryTemplate)
     {
         super(logger);
 

@@ -11,11 +11,11 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.xml.transformer.DelayedResult;
 import org.mule.runtime.module.xml.util.MuleResourceResolver;
 import org.mule.runtime.module.xml.util.XMLUtils;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,8 +30,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -44,7 +44,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
 {
     public static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected transient Logger logger = LoggerFactory.getLogger(getClass());
     private String schemaLocations;
     private String schemaLanguage = DEFAULT_SCHEMA_LANGUAGE;
     private Schema schemaObject;

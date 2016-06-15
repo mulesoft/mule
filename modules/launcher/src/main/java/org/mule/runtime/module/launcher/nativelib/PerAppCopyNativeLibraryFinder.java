@@ -12,8 +12,8 @@ import org.mule.runtime.core.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * * Finds native libraries in an application's lib folder and creates a copy of
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public class PerAppCopyNativeLibraryFinder extends PerAppNativeLibraryFinder
 {
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     private final File perAppNativeLibs;
 

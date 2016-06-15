@@ -27,8 +27,8 @@ import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
@@ -47,7 +47,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     // any properties not set by the user.
     private DefaultMuleConfiguration config = new DefaultMuleConfiguration();
 
-    protected transient Log logger = LogFactory.getLog(MuleConfigurationConfigurator.class);
+    protected transient Logger logger = LoggerFactory.getLogger(MuleConfigurationConfigurator.class);
 
     public void setMuleContext(MuleContext context)
     {

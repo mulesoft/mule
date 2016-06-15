@@ -14,8 +14,8 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.StandardMBean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Ensures any external jmx invocation (like e.g. remote) is executed with a correct application
@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ClassloaderSwitchingMBeanWrapper extends StandardMBean implements MBeanRegistration
 {
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     private ClassLoader executionClassLoader;
 

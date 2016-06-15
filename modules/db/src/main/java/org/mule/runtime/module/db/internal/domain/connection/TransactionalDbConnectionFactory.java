@@ -19,8 +19,8 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates connections using a {@link org.mule.runtime.module.db.internal.domain.transaction.DbTransactionManager} to track active transactions.
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 public class TransactionalDbConnectionFactory implements DbConnectionFactory
 {
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected final DbTransactionManager dbTransactionManager;
     protected final DbTypeManager dbTypeManager;

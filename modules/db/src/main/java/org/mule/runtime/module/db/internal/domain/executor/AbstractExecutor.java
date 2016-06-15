@@ -23,8 +23,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for query executors
@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractExecutor
 {
 
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     protected final StatementFactory statementFactory;
     protected QueryLoggerFactory queryLoggerFactory = new DefaultQueryLoggerFactory();
 
