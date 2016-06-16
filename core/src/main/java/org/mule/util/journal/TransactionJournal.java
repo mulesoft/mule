@@ -173,10 +173,7 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
         {
             if (currentLogFile.size() > MAXIMUM_LOG_FILE_ENTRIES && notCurrentLogFile.size() == 0)
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Changing ");
-                }
+                debugLogFilesSwap();
                 changeCurrentLogFile();
             }
         }
@@ -184,14 +181,19 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
         {
             if (currentLogFile.fileLength() > maximumFileSizeInBytes && notCurrentLogFile.size() == 0)
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Changing files, current file size: " + currentLogFile.fileLength() + " other file size: " + notCurrentLogFile.fileLength());
-                }
+                debugLogFilesSwap();
                 changeCurrentLogFile();
             }
         }
         return currentLogFile;
+    }
+
+    private void debugLogFilesSwap()
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Changing files, current file size: " + currentLogFile.fileLength() + " other file size: " + notCurrentLogFile.fileLength());
+        }
     }
 
     private void changeCurrentLogFile()

@@ -26,6 +26,8 @@ import org.junit.rules.TemporaryFolder;
 public class TransactionJournalFileTestCase extends AbstractMuleContextTestCase
 {
 
+    private static final long KB_500 = 500 * 1024l;
+
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -56,7 +58,7 @@ public class TransactionJournalFileTestCase extends AbstractMuleContextTestCase
         File journalFile = new File(temporaryFolder.getRoot(), "journal");
         JournalEntrySerializer serializer = LocalTxQueueTransactionJournal.createLocalTxQueueJournalEntrySerializer(muleContext);
 
-        return new TransactionJournalFile(journalFile, serializer, 500 * 1024l);
+        return new TransactionJournalFile(journalFile, serializer, KB_500);
     }
 
 }
