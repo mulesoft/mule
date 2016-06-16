@@ -86,8 +86,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     private String id;
     private String rootId;
 
-    private transient Object originalPayload;
-
     /**
      * If an exception occurs while processing this message an exception payload
      * will be attached here
@@ -233,14 +231,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         {
             copyMessageProperties((MuleMessage) value);
         }
-        else
-        {
-            if (muleContext != null && muleContext.getConfiguration().isCacheMessageOriginalPayload())
-            {
-                originalPayload = value;
-            }
-        }
-
         resetAccessControl();
     }
 
@@ -279,13 +269,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         if (message instanceof MuleMessage)
         {
             copyMessageProperties((MuleMessage) message);
-        }
-        else
-        {
-            if (muleContext.getConfiguration().isCacheMessageOriginalPayload())
-            {
-                originalPayload = message;
-            }
         }
         addInboundProperties(inboundProperties);
         addOutboundProperties(outboundProperties);
@@ -332,11 +315,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         else
         {
             copyMessageProperties(previous);
-        }
-
-        if (muleContext.getConfiguration().isCacheMessageOriginalPayload())
-        {
-            originalPayload = previous.getPayload();
         }
 
         if (getDataType().getEncoding() == null)
@@ -422,15 +400,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     boolean isPayloadConsumed(Class<?> inputCls)
     {
         return InputStream.class.isAssignableFrom(inputCls) || ClassUtils.isConsumable(inputCls);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object getOriginalPayload()
-    {
-        return originalPayload;
     }
 
     /**
