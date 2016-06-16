@@ -204,6 +204,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private ProcessingStrategy defaultProcessingStrategy;
 
+    /**
+     * {@inheritDoc}
+     */
+    private Integer queueTransactionFilesSizeInMegabytes;
+
     public DefaultMuleConfiguration()
     {
         this(false);
@@ -682,6 +687,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return shutdownTimeout;
     }
 
+    @Override
+    public Integer getQueueTransactionFilesSizeInMegabytes()
+    {
+        return queueTransactionFilesSizeInMegabytes;
+    }
+
     public void setShutdownTimeout(int shutdownTimeout)
     {
         if (verifyContextNotStarted())
@@ -781,6 +792,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.enricherPropagatesSessionVariableChanges = enricherPropagatesSessionVariableChanges;
     }
 
+    public void setQueueTransactionFilesSize(Integer queueTransactionFilesSizeInMegabytes)
+    {
+        this.queueTransactionFilesSizeInMegabytes = queueTransactionFilesSizeInMegabytes;
+    }
+
     @Override
     public boolean isDisableTimeouts()
     {
@@ -853,6 +869,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         result = prime * result + (clientMode ? 1231 : 1237);
         result = prime * result + defaultQueueTimeout;
         result = prime * result + defaultTransactionTimeout;
+        result = prime * result + (queueTransactionFilesSizeInMegabytes == null ? 0 : queueTransactionFilesSizeInMegabytes);
         result = prime * result + ((domainId == null) ? 0 : domainId.hashCode());
         result = prime * result + (enableStreaming ? 1231 : 1237);
         result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
@@ -989,6 +1006,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
 
         if (containerMode != other.containerMode)
+        {
+            return false;
+        }
+        if (queueTransactionFilesSizeInMegabytes != other.queueTransactionFilesSizeInMegabytes)
         {
             return false;
         }

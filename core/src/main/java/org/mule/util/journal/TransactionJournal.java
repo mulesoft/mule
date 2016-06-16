@@ -31,6 +31,10 @@ import org.apache.commons.logging.LogFactory;
 public class TransactionJournal<T, K extends JournalEntry<T>>
 {
 
+    public static final String TX1_LOG_FILE_NAME = "tx1.log";
+    public static final String TX2_LOG_FILE_NAME = "tx2.log";
+
+    //TODO poner minimo de tama�o de archivo.
     private static final int MAXIMUM_LOG_FILE_ENTRIES = 50000;
 
     private transient Log logger = LogFactory.getLog(getClass());
@@ -47,22 +51,43 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
     private TransactionJournalFile<T, K> notCurrentLogFile;
 
     /**
+     * Maximum transaction log file size in bytes.
+     */
+    private Long maximumFileSizeInBytes;
+
+    /**
+     * Minimum transaction log file size in bytes to consider it ready for clear content.
+     */
+    private Long clearFileMinimumSizeInBytes;
+
+    /**
      * @param logFilesDirectory directory used to store the journal files.
      */
-    public TransactionJournal(String logFilesDirectory, TransactionCompletePredicate transactionCompletePredicate, JournalEntrySerializer journalEntrySerializer)
+    public TransactionJournal(String logFilesDirectory, TransactionCompletePredicate transactionCompletePredicate, JournalEntrySerializer journalEntrySerializer, Integer maximumFileSizeInMegabytes)
     {
         File logFileDirectory = new File(logFilesDirectory);
         if (!logFileDirectory.exists())
         {
             Preconditions.checkState(logFileDirectory.mkdirs(), "Could not create directory for queue transaction logger " + logFileDirectory);
         }
-        File logFile1 = new File(logFileDirectory, "tx1.log");
-        File logFile2 = new File(logFileDirectory, "tx2.log");
+        calculateJournalFileSize(maximumFileSizeInMegabytes);
+        File logFile1 = new File(logFileDirectory, TX1_LOG_FILE_NAME);
+        File logFile2 = new File(logFileDirectory, TX2_LOG_FILE_NAME);
         logger.info(String.format("Using files for tx logs %s and %s", logFile1.getAbsolutePath(), logFile2.getAbsolutePath()));
 
-        this.currentLogFile = new TransactionJournalFile(logFile1, journalEntrySerializer);
-        this.notCurrentLogFile = new TransactionJournalFile(logFile2, journalEntrySerializer);
+        this.currentLogFile = new TransactionJournalFile(logFile1, journalEntrySerializer, clearFileMinimumSizeInBytes);
+        this.notCurrentLogFile = new TransactionJournalFile(logFile2, journalEntrySerializer, clearFileMinimumSizeInBytes);
         this.transactionCompletePredicate = transactionCompletePredicate;
+
+    }
+
+    private void calculateJournalFileSize(Integer maximumFileSizeInMegabytes)
+    {
+        if (maximumFileSizeInMegabytes != null)
+        {
+            this.maximumFileSizeInBytes = ((long)maximumFileSizeInMegabytes*1024*1024)/2;
+            this.clearFileMinimumSizeInBytes = this.maximumFileSizeInBytes/2;
+        }
     }
 
     /**
@@ -143,13 +168,30 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
         {
             return logFile;
         }
-        if (currentLogFile.size() > MAXIMUM_LOG_FILE_ENTRIES && notCurrentLogFile.size() == 0)
+        //we keep this condition for backward compatibility.
+        if (maximumFileSizeInBytes == null)
         {
-            TransactionJournalFile aux = currentLogFile;
-            currentLogFile = notCurrentLogFile;
-            notCurrentLogFile = aux;
+            if (currentLogFile.size() > MAXIMUM_LOG_FILE_ENTRIES && notCurrentLogFile.size() == 0)
+            {
+                changeCurrentLogFile();
+            }
+        }
+        else
+        {
+            if (currentLogFile.fileLength() > maximumFileSizeInBytes && notCurrentLogFile.size() == 0)
+            {
+                System.out.println("Changing files, current file size: " + currentLogFile.fileLength() + " other file size: " + notCurrentLogFile.fileLength());
+                changeCurrentLogFile();
+            }
         }
         return currentLogFile;
+    }
+
+    private void changeCurrentLogFile()
+    {
+        TransactionJournalFile aux = currentLogFile;
+        currentLogFile = notCurrentLogFile;
+        notCurrentLogFile = aux;
     }
 
     private TransactionJournalFile determineLogFileWithoutModifyingCurrent(T txId)

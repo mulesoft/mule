@@ -56,7 +56,7 @@ public class TransactionJournalFileTestCase extends AbstractMuleContextTestCase
         File journalFile = new File(temporaryFolder.getRoot(), "journal");
         JournalEntrySerializer serializer = LocalTxQueueTransactionJournal.createLocalTxQueueJournalEntrySerializer(muleContext);
 
-        return new TransactionJournalFile(journalFile, serializer);
+        return new TransactionJournalFile(journalFile, serializer, 500*1024l);
     }
 
 }
