@@ -28,7 +28,7 @@ import javax.net.ssl.SSLContext;
  * Performs the creation of a persistent set of properties that are used
  * to configure the {@link Session} instance.
  *
- * @since 4/0
+ * @since 4.0
  */
 public abstract class AbstractEmailConnection
 {

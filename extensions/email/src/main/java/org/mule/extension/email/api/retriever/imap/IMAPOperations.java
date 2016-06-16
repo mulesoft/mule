@@ -34,7 +34,7 @@ public class IMAPOperations
     private final ExpungeCommand expungeCommand = new ExpungeCommand();
 
     /**
-     * Marks an incoming email as READ
+     * Marks an incoming email as READ.
      * <p>
      * This operation can target a single email, but also if the incoming {@link MuleMessage} is carrying a list of emails
      * this operation will mark all the emails that the {@link MuleMessage} is carrying.
@@ -53,7 +53,7 @@ public class IMAPOperations
     }
 
     /**
-     * Marks an incoming email as DELETED. If {@code expunge} is true, the email is going to be isDeleted from the mailbox folder when it's closed.
+     * Marks an incoming email as DELETED, this way the marked email(s) are scheduled for deletion when the folder closes.
      * <p>
      * This operation can target a single email, but also if the incoming {@link MuleMessage} is carrying a list of emails
      * this operation will mark all the emails that the {@link MuleMessage} is carrying.
@@ -72,7 +72,7 @@ public class IMAPOperations
     }
 
     /**
-     * Removes from the mailbox all deleted marked messages.
+     * Eliminates from the mailbox all the messages scheduled for deletion with the DELETED flag setted.
      *
      * @param connection the associated {@link RetrieverConnection}.
      * @param folder     the folder where the emails are going to be fetched
