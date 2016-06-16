@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -168,13 +169,15 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         final AtomicReference<Latch> contextStartedLatch = new AtomicReference<Latch>();
 
         contextStartedLatch.set(new Latch());
-        muleContext.registerListener(notification ->
+        // Do not inline it, otherwise the type of the listener is lost
+        final MuleContextNotificationListener<MuleContextNotification> listener = notification ->
         {
             if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
             {
                 contextStartedLatch.get().countDown();
             }
-        });
+        };
+        muleContext.registerListener(listener);
 
         muleContext.start();
 
