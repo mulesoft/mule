@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -99,5 +100,23 @@ public class RestrictedSSLSocketFactory extends SSLSocketFactory
         socket.setEnabledCipherSuites(enabledCipherSuites);
         socket.setEnabledProtocols(enabledProtocols);
         return socket;
+    }
+
+    public static synchronized SocketFactory getDefault()
+    {
+        SocketFactory factory = null;
+        try
+        {
+            TlsPropertiesMapper propertiesMapper = new TlsPropertiesMapper(TlsConfiguration.JSSE_NAMESPACE);
+            TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
+            propertiesMapper.readFromProperties(configuration, System.getProperties());
+            configuration.initialise(null == configuration.getKeyStore(), TlsConfiguration.JSSE_NAMESPACE);
+            return new RestrictedSSLSocketFactory(configuration.getSslContext(), configuration.getEnabledCipherSuites(), configuration.getEnabledProtocols());
+        }
+        catch (Exception e)
+        {
+            factory = SSLSocketFactory.getDefault();
+        }
+        return factory;
     }
 }
