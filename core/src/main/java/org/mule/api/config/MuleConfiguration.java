@@ -52,6 +52,16 @@ public interface MuleConfiguration
     int getShutdownTimeout();
 
     /**
+     * The approximated maximum space in megabytes used by the transaction log files for transactional persistent queues.
+     *
+     * Take into account that this number applies both to the set of transaction log files for XA and for local transactions.
+     * If both type of transactions are used then the approximated maximum space used will be twice the configured value.
+     *
+     * @return the approximated maximum space in disk that the transactions logs can use in megabytes.
+     */
+    int getMaxQueueTransactionFilesSizeInMegabytes();
+
+    /**
      * A container mode implies multiple Mule apps running. When true, Mule changes behavior in some areas, e.g.:
      * <ul>
      *     <li>Splash screens</li>

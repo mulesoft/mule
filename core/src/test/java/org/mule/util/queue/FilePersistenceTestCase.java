@@ -6,6 +6,7 @@
  */
 package org.mule.util.queue;
 
+import static org.mockito.Mockito.when;
 import org.mule.DefaultMuleContext;
 import org.mule.api.config.MuleConfiguration;
 
@@ -24,8 +25,10 @@ public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTest
     {
         TransactionalQueueManager mgr = new TransactionalQueueManager();
         MuleConfiguration mockConfiguration = Mockito.mock(MuleConfiguration.class);
-        Mockito.when(mockConfiguration.getWorkingDirectory()).thenReturn(temporaryFolder.getRoot().getAbsolutePath());
+        when(mockConfiguration.getWorkingDirectory()).thenReturn(temporaryFolder.getRoot().getAbsolutePath());
+        when(mockConfiguration.getMaxQueueTransactionFilesSizeInMegabytes()).thenReturn(100);
         ((DefaultMuleContext)muleContext).setMuleConfiguration(mockConfiguration);
+
         mgr.setMuleContext(muleContext);
         mgr.initialise();
         mgr.setDefaultQueueConfiguration(new DefaultQueueConfiguration(0, true));

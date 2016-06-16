@@ -4,6 +4,10 @@ MIGRATION GUIDE
 The following is a list of changes you have to execute to migrate from Mule Runtime Community edition version 3.4.x to version 3.7.x
 Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for more details.
 
+Migration changes from 3.8.x to 3.9.x
+MULE-9931: Transaction log files size are now restricted by size, using a default size of 500 mb. The configured size is just an approximated value which may be exceeded based on the size of the record store by the transaction. This is configurable using the attribute queueTransactionFilesSize of the <configuration> element.
+    The size restriction applies to the set of transaction log files for local transactions and XA transactions independently meaning that if both types of transactions are used for queue the set of tx files will use up to 1 gb.
+
 Migration changes from 3.7.x to 3.8.x
 MULE-9368: System property mule.sftp.knownHostsFile is now removed. Instead, the file with the known hosts must now be provided through the mule xml config file, in the knownHostsFile attribute of the connector or the endpoints.
 MULE-9149: mule-module-jbpm was removed from standalone and embedded CE distributions. Following libraries were also removed as they are not required anymore: hibernate-commons-annotations-3.2.0.Final.jar, hibernate-core-3.6.0.Final.jar, hibernate-jpa-2.0-api-1.0.0.Final.jar, jbpm-api-4.4.jar, jbpm-jpdl-4.4.jar, jbpm-log-4.4.jar, jbpm-pvm-4.4.jar, juel-engine-2.1.0.jar, juel-impl-2.2.1.jar, livetribe-jsr223-2.0.5.jar

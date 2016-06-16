@@ -204,6 +204,14 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private ProcessingStrategy defaultProcessingStrategy;
 
+    /**
+     * Maximum size (approximately) of the transaction log files. This applies
+     * to each set of files for local transactions and xa transactions when using queues.
+     *
+     * @since 3.9.0
+     */
+    private int maxQueueTransactionFilesSizeInMegabytes = 500;
+
     public DefaultMuleConfiguration()
     {
         this(false);
@@ -682,6 +690,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return shutdownTimeout;
     }
 
+
+    @Override
+    public int getMaxQueueTransactionFilesSizeInMegabytes()
+    {
+        return maxQueueTransactionFilesSizeInMegabytes;
+    }
+
     public void setShutdownTimeout(int shutdownTimeout)
     {
         if (verifyContextNotStarted())
@@ -781,6 +796,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.enricherPropagatesSessionVariableChanges = enricherPropagatesSessionVariableChanges;
     }
 
+    public void setMaxQueueTransactionFilesSize(int maxQueueTransactionFilesSizeInMegabytes)
+    {
+        this.maxQueueTransactionFilesSizeInMegabytes = maxQueueTransactionFilesSizeInMegabytes;
+    }
+
     @Override
     public boolean isDisableTimeouts()
     {
@@ -853,6 +873,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         result = prime * result + (clientMode ? 1231 : 1237);
         result = prime * result + defaultQueueTimeout;
         result = prime * result + defaultTransactionTimeout;
+        result = prime * result + maxQueueTransactionFilesSizeInMegabytes;
         result = prime * result + ((domainId == null) ? 0 : domainId.hashCode());
         result = prime * result + (enableStreaming ? 1231 : 1237);
         result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
@@ -989,6 +1010,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
 
         if (containerMode != other.containerMode)
+        {
+            return false;
+        }
+        if (maxQueueTransactionFilesSizeInMegabytes != other.maxQueueTransactionFilesSizeInMegabytes)
         {
             return false;
         }
