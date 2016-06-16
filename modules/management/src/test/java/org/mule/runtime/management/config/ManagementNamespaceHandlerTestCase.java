@@ -10,9 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.agent.Log4jNotificationLoggerAgent;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.module.management.agent.JmxApplicationAgent;
@@ -69,17 +67,6 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(agent);
         assertEquals(JmxServerNotificationAgent.class, agent.getClass());
 
-        agent = muleContext.getRegistry().lookupAgent("log4j-notifications");
-        assertNotNull(agent);
-        assertEquals(Log4jNotificationLoggerAgent.class, agent.getClass());
-
-        agent = muleContext.getRegistry().lookupAgent("chainsaw-notifications");
-        assertNotNull(agent);
-        assertEquals(Log4jNotificationLoggerAgent.class, agent.getClass());
-        Log4jNotificationLoggerAgent lnlAgent = (Log4jNotificationLoggerAgent) agent;
-        assertEquals(lnlAgent.getChainsawPort(), CHAINSAW_PORT);
-        assertEquals(lnlAgent.getChainsawHost(), "127.0.0.1");
-
         agent = muleContext.getRegistry().lookupAgent("test-custom-agent");
         assertNotNull(agent);
         assertEquals(TestAgent.class, agent.getClass());
@@ -97,19 +84,13 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         Registry registry = muleContext.getRegistry();
         assertNotNull(registry);
         Collection<Agent> agents = registry.lookupObjects(Agent.class);
-        assertEquals(agents.size(), 7);
+        assertEquals(agents.size(), 5);
         
         Iterator<Agent> iter = agents.iterator();
         assertTrue(iter.next() instanceof Log4jAgent);
         assertTrue(iter.next() instanceof Mx4jAgent);
         assertTrue(iter.next() instanceof TestAgent);
         assertTrue(iter.next() instanceof JmxServerNotificationAgent);
-
-        Log4jNotificationLoggerAgent log4jAgent = (Log4jNotificationLoggerAgent) iter.next();
-        assertEquals(log4jAgent.getName(), "log4j-notifications");
-
-        log4jAgent = (Log4jNotificationLoggerAgent) iter.next();
-        assertEquals(log4jAgent.getName(), "chainsaw-notifications");
         assertTrue(iter.next() instanceof JmxApplicationAgent);
     }
 
