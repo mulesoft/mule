@@ -61,15 +61,10 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
         endpoints.add(mockendpoint2);
         router.setRoutes(endpoints);
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-
-        assertTrue(router.isMatch(message));
+        assertTrue(router.isMatch(getTestEvent(TEST_MESSAGE)));
 
         when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
         when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
-
-        MuleSession session = mock(MuleSession.class);
-        router.route(new OutboundRoutingTestEvent(message, session, muleContext));
     }
 
     @Test
@@ -98,7 +93,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
-        assertTrue(router.isMatch(message));
+        assertTrue(router.isMatch(getTestEvent(message)));
 
         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
@@ -135,7 +130,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
-        assertTrue(router.isMatch(message));
+        assertTrue(router.isMatch(getTestEvent(message)));
         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
@@ -172,7 +167,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
         MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setOutboundProperty(MULE_CORRELATION_ID_PROPERTY, "MyCustomCorrelationId");
 
-        assertTrue(router.isMatch(message));
+        assertTrue(router.isMatch(getTestEvent(message)));
 
         Answer<MuleEvent> answer = new Answer<MuleEvent>()
         {
