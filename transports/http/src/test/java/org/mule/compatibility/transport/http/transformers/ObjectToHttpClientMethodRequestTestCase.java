@@ -9,18 +9,17 @@ package org.mule.compatibility.transport.http.transformers;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpRequest;
 import org.mule.compatibility.transport.http.RequestLine;
-import org.mule.compatibility.transport.http.transformers.ObjectToHttpClientMethodRequest;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -42,14 +41,14 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     
     private InboundEndpoint endpoint;
     
-    private MuleMessage setupRequestContext(final String url, final String method) throws Exception
+    private MutableMuleMessage setupRequestContext(final String url, final String method) throws Exception
     {
         HttpRequest request = new HttpRequest(new RequestLine(method, url, HttpVersion.HTTP_1_1), null, "UTF-8");
         
         endpoint = getEndpointFactory().getInboundEndpoint(url);
         
         MuleEvent event = getTestEvent(request, endpoint);
-        MuleMessage message = event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         message.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
         message.setOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, url);
         RequestContext.setEvent(event);
@@ -57,7 +56,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
         return message;
     }
 
-    private MuleMessage setupRequestContextForCollection(final String url, final String method,
+    private MutableMuleMessage setupRequestContextForCollection(final String url, final String method,
                                                                    List<MuleMessage> messages) throws Exception
     {
         HttpRequest request = new HttpRequest(new RequestLine(method, url, HttpVersion.HTTP_1_1), null, "UTF-8");
@@ -65,7 +64,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
         endpoint = getEndpointFactory().getInboundEndpoint(url);
         
         MuleEvent event = getTestEvent(request, endpoint);
-        MuleMessage message = new DefaultMuleMessage(messages, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(messages, muleContext);
         message.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
         message.setOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, url);
         RequestContext.setEvent(event);
@@ -91,7 +90,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     @Test
     public void testUrlWithoutQuery() throws Exception
     {
-        MuleMessage message = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_GET);
+        MutableMuleMessage message = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_GET);
         // transforming NullPayload will make sure that no body=xxx query is added
         message.setPayload(NullPayload.getInstance());
 
@@ -107,7 +106,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     @Test
     public void testUrlWithQuery() throws Exception
     {
-        MuleMessage message = setupRequestContext("http://localhost:8080/services?method=echo", HttpConstants.METHOD_GET);
+        MutableMuleMessage message = setupRequestContext("http://localhost:8080/services?method=echo", HttpConstants.METHOD_GET);
         // transforming NullPayload will make sure that no body=xxx query is added
         message.setPayload(NullPayload.getInstance());
 
@@ -123,7 +122,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     @Test
     public void testUrlWithUnescapedQuery() throws Exception
     {
-        MuleMessage message = setupRequestContext("http://mycompany.com/test?fruits=apple%20orange", HttpConstants.METHOD_GET);
+        MutableMuleMessage message = setupRequestContext("http://mycompany.com/test?fruits=apple%20orange", HttpConstants.METHOD_GET);
         // transforming NullPayload will make sure that no body=xxx query is added
         message.setPayload(NullPayload.getInstance());
 
@@ -139,7 +138,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     @Test
     public void testAppendedUrl() throws Exception
     {
-        MuleMessage message = setupRequestContext("http://mycompany.com/test?fruits=apple%20orange", HttpConstants.METHOD_GET);
+        MutableMuleMessage message = setupRequestContext("http://mycompany.com/test?fruits=apple%20orange", HttpConstants.METHOD_GET);
         // transforming a payload here will add it as body=xxx query parameter
         message.setPayload("test");
         message.setOutboundProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, "body");
@@ -158,7 +157,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     {
         // the payload is already encoded, switch off encoding it in the transformer
         String encodedPayload = "encoded%20payload";
-        MuleMessage message = setupRequestContext("http://mycompany.com/", "GET");
+        MutableMuleMessage message = setupRequestContext("http://mycompany.com/", "GET");
         message.setOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, false);
         message.setOutboundProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, "body");
         message.setPayload(encodedPayload);
@@ -175,7 +174,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
 
     public void testPostMethod() throws Exception
     {
-    	final MuleMessage message = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_POST);
+    	final MutableMuleMessage message = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_POST);
     	final String contentType = "text/plain";
 
         message.setPayload("I'm a payload");
@@ -193,7 +192,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
 
     public void testPutMethod() throws Exception
     {
-    	final MuleMessage message = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_PUT);
+    	final MutableMuleMessage message = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_PUT);
     	final String contentType = "text/plain";
 
         message.setPayload("I'm a payload");
@@ -212,7 +211,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     @Test
     public void testPostMethodWithHttp10ForMuleMessage() throws Exception
     {
-        final MuleMessage message = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_POST);
+        final MutableMuleMessage message = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_POST);
         final String contentType = "text/plain";
 
         String payload = "I'm a payload";
@@ -233,8 +232,8 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     @Test
     public void testPostMethodWithHttp10ForMuleMessageCollection() throws Exception
     {
-        MuleMessage messageOne = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_POST);
-        final MuleMessage message = setupRequestContextForCollection("http://localhost:8080/services", HttpConstants.METHOD_POST, Collections.singletonList(messageOne));
+        MutableMuleMessage messageOne = setupRequestContext("http://localhost:8080/services", HttpConstants.METHOD_POST);
+        final MutableMuleMessage message = setupRequestContextForCollection("http://localhost:8080/services", HttpConstants.METHOD_POST, Collections.singletonList(messageOne));
         final String contentType = "text/plain";
         
         String payload = "I'm a payload";

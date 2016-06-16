@@ -209,7 +209,11 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
                 if (response.getMessage().getExceptionPayload() == null)
                 {
-                    response.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
+                    Exception finalException = exception;
+                    event.setMessage(event.getMessage().transform(msg -> {
+                        msg.setExceptionPayload(new DefaultExceptionPayload(finalException));
+                        return msg;
+                    }));
                 }
             }
             else

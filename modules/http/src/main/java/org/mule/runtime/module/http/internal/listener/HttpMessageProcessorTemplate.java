@@ -9,7 +9,6 @@ package org.mule.runtime.module.http.internal.listener;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -161,7 +160,10 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
                 .setReasonPhrase(messagingException.getMessage());
         addThrottlingHeaders(failureResponseBuilder);
         MuleEvent event = messagingException.getEvent();
-        event.getMessage().setPayload(messagingException.getMessage());
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setPayload(messagingException.getMessage());
+            return msg;
+        }));
         final HttpResponse response = errorResponseBuilder.build(failureResponseBuilder, event);
         responseReadyCallback.responseReady(response, getResponseFailureCallback(responseCompletationCallback, messagingException.getEvent()));
     }

@@ -42,6 +42,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.connector.Connectable;
@@ -2192,10 +2193,10 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     }
 
     @Override
-    public MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception
+    public MutableMuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception
     {
         MessageRequester requester = null;
-        MuleMessage result = null;
+        MutableMuleMessage result = null;
 
         try
         {
@@ -2220,7 +2221,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
      */
     protected void setupRequestReturn(final InboundEndpoint endpoint,
                                       final MessageRequester requester,
-                                      MuleMessage result)
+                                      MutableMuleMessage result)
     {
         if (result != null && result.getPayload() instanceof InputStream)
         {

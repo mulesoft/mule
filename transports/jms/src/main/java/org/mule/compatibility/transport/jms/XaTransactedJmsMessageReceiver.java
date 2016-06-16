@@ -14,6 +14,7 @@ import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -306,7 +307,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             redeliveryHandler.get().handleRedelivery(message, (InboundEndpoint) endpoint, flowConstruct);
         }
 
-        MuleMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
+        MutableMuleMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
         routeMessage(messageToRoute);
         closeConsumerIfRequired(consumer);
         return null;

@@ -44,6 +44,7 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.execution.EndPhaseTemplate;
 import org.mule.runtime.core.execution.RequestResponseFlowProcessingPhaseTemplate;
@@ -311,9 +312,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     }
 
     @Override
-    protected MuleMessage createMessageFromSource(Object message) throws MuleException
+    protected MutableMuleMessage createMessageFromSource(Object message) throws MuleException
     {
-        MuleMessage muleMessage = super.createMessageFromSource(message);
+        MutableMuleMessage muleMessage = super.createMessageFromSource(message);
         String path = muleMessage.getInboundProperty(HTTP_REQUEST_PROPERTY);
         int i = path.indexOf('?');
         if (i > -1)
@@ -353,7 +354,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
      * @param muleMessage MuleMessage to be enriched
      * @see <a href="https://en.wikipedia.org/wiki/X-Forwarded-For">https://en.wikipedia.org/wiki/X-Forwarded-For</a>
      */
-    protected void processRemoteAddresses(MuleMessage muleMessage)
+    protected void processRemoteAddresses(MutableMuleMessage muleMessage)
     {
         String xForwardedFor = muleMessage.getInboundProperty(HEADER_X_FORWARDED_FOR);
 
@@ -503,9 +504,10 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     private void sendFailureResponseToClient(MessagingException exception, int httpStatus) throws IOException, MuleException
     {
         MuleEvent response = exception.getEvent();
-        response.getMessage().setPayload(exception.getMessage());
-        httpStatus = response.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(response.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY).toString()) : httpStatus;
-        response.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, httpStatus);
+        MutableMuleMessage message = (MutableMuleMessage) response.getMessage();
+        message.setPayload(exception.getMessage());
+        httpStatus = message.getOutboundProperty(HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(response.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY).toString()) : httpStatus;
+        message.setOutboundProperty(HTTP_STATUS_PROPERTY, httpStatus);
         HttpResponse httpResponse = transformResponse(response.getMessage());
         httpServerConnection.writeResponse(httpResponse, getThrottlingHeaders());
     }

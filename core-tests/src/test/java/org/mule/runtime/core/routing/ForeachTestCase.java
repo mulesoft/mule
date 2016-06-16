@@ -54,7 +54,10 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
             @Override
             public MuleEvent process(MuleEvent event) {
                 String payload = event.getMessage().getPayload().toString();
-                event.getMessage().setPayload(payload + ":foo");
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setPayload(payload + ":foo");
+                    return msg;
+                }));
                 processedEvents.add(event);
                 return event;
             }

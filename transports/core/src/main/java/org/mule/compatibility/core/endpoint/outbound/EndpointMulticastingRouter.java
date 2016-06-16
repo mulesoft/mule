@@ -56,7 +56,7 @@ public final class EndpointMulticastingRouter extends MulticastingRouter
             logger.debug("Uri before parsing is: " + uri);
         }
 
-        AbstractRoutingStrategy.propagateMagicProperties(message, message);
+        message = AbstractRoutingStrategy.propagateMagicProperties(message);
 
         if (!parser.isContainsTemplate(uri))
         {

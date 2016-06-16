@@ -188,7 +188,10 @@ public class RestServiceWrapper extends AbstractComponent
         {
             if (event.getMessage().getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE) == null)
             {
-                event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE);
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE);
+                    return msg;
+                }));
             }
 
             StringBuilder requestBodyBuffer = new StringBuilder();
@@ -200,7 +203,10 @@ public class RestServiceWrapper extends AbstractComponent
         tempUrl = urlBuffer.toString();
         logger.info("Invoking REST service: " + tempUrl);
 
-        event.getMessage().setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, httpMethod);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, httpMethod);
+            return msg;
+        }));
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
         endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);

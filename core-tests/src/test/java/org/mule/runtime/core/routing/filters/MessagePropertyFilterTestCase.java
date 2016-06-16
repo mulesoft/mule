@@ -25,7 +25,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilter() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
         assertTrue(!filter.accept(message));
         message.setOutboundProperty("foo", "bar");
         assertTrue("Filter didn't accept the message", filter.accept(message));
@@ -71,7 +71,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilterWithNot() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=bar");
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue("Filter didn't accept the message", filter.accept(message));
         message.setOutboundProperty("foo", "bar");
@@ -84,7 +84,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilterWithNotNull() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertFalse(filter.accept(message));
         removeProperty(message, "foo");
@@ -97,7 +97,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilterWithCaseSensitivity() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=Bar");
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
         message.setOutboundProperty("foo", "bar");
         assertFalse(filter.accept(message));
         filter.setCaseSensitive(false);
@@ -108,7 +108,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilterWithWildcard() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=B*");
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
         message.setOutboundProperty("foo", "bar");
         assertFalse(filter.accept(message));
         filter.setCaseSensitive(false);
@@ -124,7 +124,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
         assertFalse(filter.accept((MuleMessage) null));
 
         filter = new MessagePropertyFilter("foo = bar");
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
         message.setOutboundProperty("foo", "bar");
         assertTrue("Filter didn't accept the message", filter.accept(message));
         filter.setCaseSensitive(false);
@@ -141,7 +141,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
         assertFalse(filter.accept(message));
     }
 
-    private void removeProperty(MuleMessage message, String property)
+    private void removeProperty(DefaultMuleMessage message, String property)
     {
         message.removeOutboundProperty(property);
     }
@@ -150,7 +150,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyFilterPropertyExists() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertFalse(filter.accept(message));
         message.setOutboundProperty("foo", "car");
@@ -161,7 +161,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
     public void testMessagePropertyWithEnum() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=ONE_WAY");
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("", muleContext);
         assertFalse(filter.accept(message));
         message.setOutboundProperty("foo", MessageExchangePattern.ONE_WAY);
         assertTrue(filter.accept(message));

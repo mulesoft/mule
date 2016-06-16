@@ -13,6 +13,7 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.util.Base64;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class TransformerEncodingTestCase extends FunctionalTestCase
     @Test
     public void encodingFromMessage() throws Exception
     {
-        MuleMessage message = getMuleMessage();
+        MutableMuleMessage message = getMuleMessage();
         message.setOutboundProperty(MULE_ENCODING_PROPERTY, UTF_16_LE);
         testEncoding("base64decode", message);
     }
@@ -61,7 +62,7 @@ public class TransformerEncodingTestCase extends FunctionalTestCase
         assertThat(getPayloadAsString(response), is(PAYLOAD));
     }
 
-    private MuleMessage getMuleMessage() throws IOException
+    private MutableMuleMessage getMuleMessage() throws IOException
     {
         return new DefaultMuleMessage(Base64.encodeBytes(PAYLOAD.getBytes(UTF_16_LE)), muleContext);
     }

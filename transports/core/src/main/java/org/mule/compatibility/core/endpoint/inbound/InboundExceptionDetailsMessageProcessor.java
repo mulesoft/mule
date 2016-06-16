@@ -52,7 +52,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
             {
                 if (resultMessage.getExceptionPayload() != null)
                 {
-                    setExceptionDetails(resultMessage, connector, resultMessage.getExceptionPayload()
+                    setExceptionDetails(event, connector, resultMessage.getExceptionPayload()
                         .getException());
                 }
             }
@@ -64,10 +64,10 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
      * This method is used to set any additional and possibly transport specific
      * information on the return message where it has an exception payload.
      * 
-     * @param message
+     * @param event
      * @param exception
      */
-    protected void setExceptionDetails(MuleMessage message, Connector connector, Throwable exception)
+    protected void setExceptionDetails(MuleEvent event, Connector connector, Throwable exception)
     {
         String propName = ExceptionHelper.getErrorCodePropertyName(connector.getProtocol(), muleContext);
         // If we dont find a error code property we can assume there are not
@@ -80,7 +80,10 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
                 logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "="
                              + code);
             }
-            message.setOutboundProperty(propName, code);
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setOutboundProperty(propName, code);
+                return msg;
+            }));
         }
     }
 

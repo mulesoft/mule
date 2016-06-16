@@ -10,11 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,6 +20,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -80,14 +79,14 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     public void routeMessageRequestResponseReturnsEvent() throws MuleException
     {
         MessageReceiver receiver = createMessageReciever(MessageExchangePattern.REQUEST_RESPONSE);
-        MuleMessage request = createRequestMessage();
+        MutableMuleMessage request = createRequestMessage();
 
         assertEquals(request, receiver.routeMessage(request).getMessage());
     }
 
-    protected MuleMessage createRequestMessage()
+    protected MutableMuleMessage createRequestMessage()
     {
-        MuleMessage request = Mockito.mock(MuleMessage.class);
+        MutableMuleMessage request = Mockito.mock(MutableMuleMessage.class);
         when(request.getMuleContext()).thenReturn(muleContext);
         when(request.getInboundProperty(Mockito.anyString(), Mockito.eq(false))).thenReturn(Boolean.FALSE);
         when(request.getOutboundProperty(Mockito.anyString(), Mockito.eq(false))).thenReturn(Boolean.FALSE);

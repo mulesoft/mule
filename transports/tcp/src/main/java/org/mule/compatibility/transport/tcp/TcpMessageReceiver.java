@@ -13,7 +13,7 @@ import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.core.transport.AbstractReceiverResourceWorker;
 import org.mule.compatibility.transport.tcp.i18n.TcpMessages;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
@@ -424,7 +424,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         }
 
         @Override
-        protected void preRouteMuleMessage(final MuleMessage message) throws Exception
+        protected void preRouteMuleMessage(final MutableMuleMessage message) throws Exception
         {
             super.preRouteMuleMessage(message);
 

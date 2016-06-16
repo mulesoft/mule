@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.anyString;
+import static org.hamcrest.Matchers.any;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.size.SmallTest;
 
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatcher;
 
 @SmallTest
 public class AddPropertyTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase
@@ -30,19 +30,32 @@ public class AddPropertyTransformerTestCase extends AbstractAddVariablePropertyT
     @Override
     protected void verifyAdded(MuleEvent event, String key, String value, ArgumentCaptor<DataType> dataTypeCaptor)
     {
-        verify(event.getMessage()).setOutboundProperty(argThat(equalTo(key)), argThat(equalTo(value)), dataTypeCaptor.capture());
+        verify(event, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>()
+        {
+            @Override
+            public boolean matches(Object argument)
+            {
+                return ((MuleMessage) argument).getOutboundProperty(key).equals(value);
+            }
+        }));
     }
 
     @Override
     protected void verifyNotAdded(MuleEvent event)
     {
-        verify(event.getMessage(), times(0)).setOutboundProperty((String) isNull(), anyString()
-        );
+        verify(event, times(0)).setMessage(argThat(any(MuleMessage.class)));
     }
 
     @Override
     protected void verifyRemoved(MuleEvent event, String key)
     {
-        verify(event.getMessage()).removeOutboundProperty(key);
+        verify(event, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>()
+        {
+            @Override
+            public boolean matches(Object argument)
+            {
+                return ((MuleMessage) argument).getOutboundProperty(key) ==  null;
+            }
+        }));
     }
 }

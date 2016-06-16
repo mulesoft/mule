@@ -7,13 +7,13 @@
 package org.mule.compatibility.core.transport;
 
 import static java.lang.Thread.currentThread;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.message.SessionHandler;
-import org.mule.runtime.core.session.MuleSessionHandler;
+import org.mule.runtime.core.session.SerializeAndEncodeSessionHandler;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import java.io.OutputStream;
@@ -120,7 +120,7 @@ public abstract class AbstractReceiverWorker implements Work
                                 Object preProcessedPayload = preProcessMessage(payload);
                                 if (preProcessedPayload != null)
                                 {
-                                    final MuleMessage muleMessage = receiver.createMuleMessage(preProcessedPayload, endpoint.getEncoding());
+                                    final MutableMuleMessage muleMessage = receiver.createMuleMessage(preProcessedPayload, endpoint.getEncoding());
                                     preRouteMuleMessage(muleMessage);
                                     // TODO Move getSessionHandler() to the Connector interface
                                     SessionHandler handler;
@@ -129,7 +129,7 @@ public abstract class AbstractReceiverWorker implements Work
                                         handler = ((AbstractConnector) endpoint.getConnector()).getSessionHandler();
                                     } else
                                     {
-                                        handler = new MuleSessionHandler();
+                                        handler = new SerializeAndEncodeSessionHandler();
                                     }
                                     MuleSession session = handler.retrieveSessionInfoFromMessage(muleMessage);
 
@@ -209,7 +209,7 @@ public abstract class AbstractReceiverWorker implements Work
      * @param message the next message to be processed
      * @throws Exception
      */
-    protected void preRouteMuleMessage(MuleMessage message) throws Exception
+    protected void preRouteMuleMessage(MutableMuleMessage message) throws Exception
     {
         //no op
     }

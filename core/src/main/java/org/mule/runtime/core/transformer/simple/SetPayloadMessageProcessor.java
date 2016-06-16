@@ -38,19 +38,20 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (StringUtils.isEmpty(mimeType) && StringUtils.isEmpty(encoding))
-        {
-            final TypedValue typedValue = resolveTypedValue(event);
-            event.getMessage().setPayload(typedValue.getValue(), typedValue.getDataType());
-        }
-        else
-        {
-            Object value = resolveValue(event);
-            DataType dataType = resolveDataType(value);
-
-            event.getMessage().setPayload(value, dataType);
-        }
-
+        event.setMessage(event.getMessage().transform(msg -> {
+            if (StringUtils.isEmpty(mimeType) && StringUtils.isEmpty(encoding))
+            {
+                final TypedValue typedValue = resolveTypedValue(event);
+                msg.setPayload(typedValue.getValue(), typedValue.getDataType());
+            }
+            else
+            {
+                Object value = resolveValue(event);
+                DataType dataType = resolveDataType(value);
+                msg.setPayload(value, dataType);
+            }
+            return msg;
+        }));
         return event;
     }
 

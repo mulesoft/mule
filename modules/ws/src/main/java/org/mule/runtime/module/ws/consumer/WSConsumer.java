@@ -170,7 +170,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                  * of the payload of the message. This will happen when an operation required no input parameters. */
                 if (requestBody != null)
                 {
-                    event.getMessage().setPayload(requestBody);
+                    event.setMessage(event.getMessage().transform(msg -> {
+                        msg.setPayload(requestBody);
+                        return msg;
+                    }));
                 }
 
                 copyAttachmentsRequest(event);
@@ -194,7 +197,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                     {
                         SoapFault soapFault = (SoapFault) e.getCause();
 
-                        event.getMessage().setPayload(soapFault.getDetail());
+                        event.setMessage(event.getMessage().transform(msg -> {
+                            msg.setPayload(soapFault.getDetail());
+                            return msg;
+                        }));
 
                         throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(),
                                                      soapFault.getMessage(), soapFault.getDetail(), this);
@@ -254,13 +260,17 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
                 List<String> outboundProperties = new ArrayList<>(event.getMessage().getOutboundPropertyNames());
 
-                for (String outboundProperty : outboundProperties)
-                {
-                    if (outboundProperty.startsWith(SOAP_HEADERS_PROPERTY_PREFIX))
+                event.setMessage(event.getMessage().transform(msg -> {
+                    for (String outboundProperty : outboundProperties)
                     {
-                        event.getMessage().removeOutboundProperty(outboundProperty);
+                        if (outboundProperty.startsWith(SOAP_HEADERS_PROPERTY_PREFIX))
+                        {
+                            msg.removeOutboundProperty(outboundProperty);
+                        }
                     }
-                }
+                    return msg;
+                }));
+
                 return super.processRequest(event);
             }
 
@@ -271,7 +281,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 Object statusCode = response.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY, null);
                 if (statusCode != null && !(statusCode instanceof String))
                 {
-                    response.getMessage().setInboundProperty(HTTP_STATUS_PROPERTY, statusCode.toString());
+                    response.setMessage(response.getMessage().transform(msg -> {
+                        msg.setInboundProperty(HTTP_STATUS_PROPERTY, statusCode.toString());
+                        return msg;
+                    }));
                 }
                 return super.processResponse(response, request);
             }
@@ -442,7 +455,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
             event.setFlowVariable(CxfConstants.ATTACHMENTS, attachments);
 
-            message.clearAttachments();
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.clearAttachments();
+                return msg;
+            }));
         }
     }
 

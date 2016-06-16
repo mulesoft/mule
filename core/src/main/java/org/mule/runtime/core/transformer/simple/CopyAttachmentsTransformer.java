@@ -51,13 +51,17 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
                         @Override
                         public void processMatch(String matchedValue)
                         {
-                            try
-                            {
-                                message.addOutboundAttachment(matchedValue,message.getInboundAttachment(matchedValue));
-                            } catch (Exception e)
-                            {
-                                throw new MuleRuntimeException(e);
-                            }
+                            event.setMessage(message.transform(msg -> {
+                                try
+                                {
+                                    msg.addOutboundAttachment(matchedValue,msg.getInboundAttachment(matchedValue));
+                                }
+                                catch (Exception e)
+                                {
+                                    throw new MuleRuntimeException(e);
+                                }
+                                return msg;
+                            }));
                         }
                     });
                 }
@@ -70,7 +74,17 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
             {
                 String attachmentName = attachmentNameEvaluator.resolveValue(event).toString();
                 DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
-                message.addOutboundAttachment(attachmentName, inboundAttachment);
+                event.setMessage(message.transform(msg -> {
+                    try
+                    {
+                        msg.addOutboundAttachment(attachmentName, inboundAttachment);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new MuleRuntimeException(e);
+                    }
+                    return msg;
+                }));
             }
         }
         catch (Exception e)

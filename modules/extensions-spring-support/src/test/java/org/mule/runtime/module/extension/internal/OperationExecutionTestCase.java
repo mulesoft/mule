@@ -91,7 +91,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 
         assertThat(responseEvent.getMessage().getPayload(), is(""));
         verify(event, never()).setMessage(any(MuleMessage.class));
-        verify(event.getMessage(), never()).setPayload(any(Object.class));
+        //verify(event.getMessage(), never()).setPayload(any(Object.class));
 
         MuleMessage responseMessage = event.getFlowVariable("myFace");
         assertThat(responseMessage.getPayload(), is(HEISENBERG));

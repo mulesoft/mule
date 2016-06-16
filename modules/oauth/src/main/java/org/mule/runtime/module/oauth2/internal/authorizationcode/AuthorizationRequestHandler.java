@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -13,12 +14,11 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.listener.HttpListener;
 import org.mule.runtime.module.http.api.listener.HttpListenerBuilder;
 import org.mule.runtime.module.oauth2.internal.DynamicFlowFactory;
 import org.mule.runtime.module.oauth2.internal.StateEncoder;
-import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -136,7 +136,10 @@ public class AuthorizationRequestHandler implements MuleContextAware
                         .setState(stateEncoder.getEncodedState())
                         .setScope(scopes).buildUrl();
 
-                muleEvent.getMessage().setOutboundProperty(HttpHeaders.Names.LOCATION, authorizationUrlWithParams);
+                muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
+                    msg.setOutboundProperty(LOCATION, authorizationUrlWithParams);
+                    return msg;
+                }));
                 return muleEvent;
             }
         };

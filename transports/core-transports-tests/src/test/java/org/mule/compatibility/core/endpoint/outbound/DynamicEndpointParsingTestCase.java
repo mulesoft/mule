@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -39,7 +38,10 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointT
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
         MuleEvent event = getTestEvent("test", getTestInboundEndpoint("test1"));
-        event.getMessage().setOutboundProperty("port", 12345);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setOutboundProperty("port", 12345);
+            return msg;
+        }));
 
         MuleEvent response = endpoint.process(event);
 
@@ -73,8 +75,11 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointT
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
         MuleEvent event = getTestEvent("test", getTestInboundEndpoint("test1"));
-        event.getMessage().setOutboundProperty("port", 12345);
-        event.getMessage().setOutboundProperty("host", "localhost");
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setOutboundProperty("port", 12345);
+            msg.setOutboundProperty("host", "localhost");
+            return msg;
+        }));
 
         MuleEvent response = endpoint.process(event);
         assertSame(VoidMuleEvent.getInstance(), response);
@@ -85,8 +90,11 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointT
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
         event = getTestEvent("test", getTestInboundEndpoint("test1"));
-        event.getMessage().setOutboundProperty("port", 12345);
-        event.getMessage().setOutboundProperty("host", "localhost");
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setOutboundProperty("port", 12345);
+            msg.setOutboundProperty("host", "localhost");
+            return msg;
+        }));
 
         response = endpoint.process(event);
         assertNotNull(response);

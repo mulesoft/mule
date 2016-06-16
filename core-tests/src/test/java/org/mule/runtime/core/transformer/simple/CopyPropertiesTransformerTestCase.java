@@ -14,7 +14,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -49,7 +49,7 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
     @Mock
     private MuleContext mockMuleContext;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MuleMessage mockMuleMessage;
+    private MutableMuleMessage mockMuleMessage;
     @Mock
     private ExpressionManager mockExpressionManager;
 

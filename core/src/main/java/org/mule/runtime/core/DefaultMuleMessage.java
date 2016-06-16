@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -72,7 +73,7 @@ import org.slf4j.LoggerFactory;
  * <code>DefaultMuleMessage</code> is a wrapper that contains a payload and properties
  * associated with the payload.
  */
-public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
+public class DefaultMuleMessage extends TypedValue<Object> implements MutableMuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
 {
     private static final String NOT_SET = "<not set>";
 

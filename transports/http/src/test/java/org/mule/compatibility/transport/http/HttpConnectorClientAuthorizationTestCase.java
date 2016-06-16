@@ -13,14 +13,11 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.core.util.StringUtils;
@@ -66,7 +63,7 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
 
     private URI uri;
 
-    private MuleMessage message;
+    private MutableMuleMessage message;
 
     private String encoding;
 

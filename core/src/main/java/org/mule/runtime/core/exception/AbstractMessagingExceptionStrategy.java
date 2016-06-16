@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.exception;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
@@ -18,7 +19,6 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.runtime.api.message.NullPayload;
 
 /**
  * Fire a notification, log exception, increment statistics, route the problematic message to a destination 
@@ -60,8 +60,11 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
             {
                 RequestContext.setExceptionPayload(exceptionPayload);
             }
-            event.getMessage().setPayload(NullPayload.getInstance());
-            event.getMessage().setExceptionPayload(exceptionPayload);
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setPayload(NullPayload.getInstance());
+                msg.setExceptionPayload(exceptionPayload);
+                return msg;
+            }));
             return event;
         }
         finally

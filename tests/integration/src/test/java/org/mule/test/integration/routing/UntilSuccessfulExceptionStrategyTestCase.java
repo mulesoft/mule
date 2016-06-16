@@ -9,11 +9,11 @@ package org.mule.test.integration.routing;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -81,7 +81,10 @@ public class UntilSuccessfulExceptionStrategyTestCase extends FunctionalTestCase
             {
                 if (!latch.await(TIMEOUT, TimeUnit.SECONDS))
                 {
-                    event.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
+                    event.setMessage(event.getMessage().transform(msg -> {
+                        msg.setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
+                        return msg;
+                    }));
                 }
             }
             catch (InterruptedException e)

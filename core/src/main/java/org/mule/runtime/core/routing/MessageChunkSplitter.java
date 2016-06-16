@@ -10,6 +10,7 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
@@ -77,7 +78,7 @@ public class MessageChunkSplitter extends AbstractSplitter
             buffer = new byte[len];
             System.arraycopy(data, pos, buffer, 0, buffer.length);
             pos += len;
-            MuleMessage part = new DefaultMuleMessage(buffer, message, muleContext);
+            MutableMuleMessage part = new DefaultMuleMessage(buffer, message, muleContext);
             part.setCorrelationId(message.getUniqueId());
             part.setCorrelationGroupSize(parts);
             part.setCorrelationSequence(count);

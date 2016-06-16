@@ -10,12 +10,12 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -25,26 +25,27 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
-import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -57,7 +58,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private MuleEvent mockMuleEvent;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MuleMessage mockMuleMessage;
+    private MutableMuleMessage mockMuleMessage;
     @Mock
     private StreamCloserService mockStreamCloserService;
     @Spy
@@ -90,11 +91,11 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
         MuleEvent resultEvent = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
         assertThat(resultEvent, is(resultEvent));
 
-        verify(mockMuleMessage, VerificationModeFactory.times(2)).setExceptionPayload(Matchers.<ExceptionPayload>any(ExceptionPayload.class));
-        verify(mockTransaction, VerificationModeFactory.times(0)).setRollbackOnly();
-        verify(mockTransaction, VerificationModeFactory.times(0)).commit();
-        verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
-        verify(mockStreamCloserService).closeStream(Matchers.<Object>any(Object.class));
+        verify(mockMuleMessage, times(2)).setExceptionPayload(Matchers.any(ExceptionPayload.class));
+        verify(mockTransaction, times(0)).setRollbackOnly();
+        verify(mockTransaction, times(0)).commit();
+        verify(mockTransaction, times(0)).rollback();
+        verify(mockStreamCloserService).closeStream(Matchers.any(Object.class));
     }
 
     @Mock(answer = RETURNS_DEEP_STUBS)
@@ -109,8 +110,22 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
         catchMessagingExceptionStrategy.setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
         catchMessagingExceptionStrategy.initialise();
         catchMessagingExceptionStrategy.handleException(mockException,mockMuleEvent);
-        verify(mockMuleEvent.getMessage(), times(1)).setPayload("A");
-        verify(mockMuleEvent.getMessage(), times(1)).setPayload("B");
+        verify(mockMuleEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>()
+        {
+            @Override
+            public boolean matches(Object argument)
+            {
+                return ((MuleMessage) argument).getPayload().equals("A");
+            }
+        }));
+        verify(mockMuleEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>()
+        {
+            @Override
+            public boolean matches(Object argument)
+            {
+                return ((MuleMessage) argument).getPayload().equals("B");
+            }
+        }));
     }
 
     @Test
@@ -180,7 +195,10 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
             @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
-                event.getMessage().setPayload(appendText);
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setPayload(appendText);
+                    return msg;
+                }));
                 return event;
             }
         };

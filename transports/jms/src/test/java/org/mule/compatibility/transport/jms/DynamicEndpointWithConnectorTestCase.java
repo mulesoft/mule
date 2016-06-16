@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -28,7 +29,7 @@ public class DynamicEndpointWithConnectorTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage message = getTestMuleMessage();
+        MutableMuleMessage message = getTestMuleMessage();
         message.setOutboundProperty("queueName", "test.out");
 
         MuleMessage test = client.send("vm://input", message);

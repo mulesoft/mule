@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
@@ -30,7 +31,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     @Test
     public void testSerializablePayload() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setOutboundProperty("foo", "bar");
 
         MuleMessage deserializedMessage = serializationRoundtrip(message);
@@ -46,7 +47,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         // will be used during Serialization
         muleContext.getRegistry().registerTransformer(new NonSerializableToByteArray());
 
-        MuleMessage message = new DefaultMuleMessage(new NonSerializable(), muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(new NonSerializable(), muleContext);
         message.setOutboundProperty("foo", "bar");
 
         MuleMessage deserializedMessage = serializationRoundtrip(message);
@@ -59,7 +60,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     public void testStreamPayloadSerialization() throws Exception
     {
         InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
-        MuleMessage message = new DefaultMuleMessage(stream, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(stream, muleContext);
         message.setOutboundProperty("foo", "bar");
 
         MuleMessage deserializedMessage = serializationRoundtrip(message);

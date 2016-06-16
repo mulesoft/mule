@@ -12,7 +12,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -137,7 +137,7 @@ public interface Connector extends LegacyConnector
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception;
+    MutableMuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception;
 
     /**
      * Will get the output stream for this type of transport. Typically this will be

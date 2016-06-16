@@ -13,6 +13,7 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.util.CollectionUtils;
 
@@ -141,7 +142,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         {
             list.add(event.getMessage());
         }
-        MuleMessage coll = new DefaultMuleMessage(list, muleContext);
+        MutableMuleMessage coll = new DefaultMuleMessage(list, muleContext);
         coll.propagateRootId(previous.getMessage());
         MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
         for (String name : previous.getFlowVariableNames())

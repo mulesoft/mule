@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.servlet;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,13 +36,13 @@ public class MuleHttpServletResponse implements HttpServletResponse
     { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"};
 
     private MuleEvent event;
-    private MuleMessage message;
+    private MutableMuleMessage message;
 
     public MuleHttpServletResponse(MuleEvent event)
     {
         super();
         this.event = event;
-        this.message = event.getMessage();
+        this.message = (MutableMuleMessage) event.getMessage();
     }
     
     @Override

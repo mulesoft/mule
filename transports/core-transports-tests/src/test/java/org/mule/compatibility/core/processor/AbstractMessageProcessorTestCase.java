@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
@@ -59,7 +60,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
 {
     protected static final String TEST_URI = "test://myTestUri";
     protected static String RESPONSE_MESSAGE = "response-message";
-    protected static MuleMessage responseMessage;
+    protected static MutableMuleMessage responseMessage;
     protected Answer<MuleEvent> echoEventAnswer = new Answer<MuleEvent>()
     {
         @Override
@@ -238,7 +239,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         return event;
     }
 
-    protected MuleMessage createTestResponseMuleMessage()
+    protected MutableMuleMessage createTestResponseMuleMessage()
     {
         return new DefaultMuleMessage(RESPONSE_MESSAGE, muleContext);
     }
@@ -334,8 +335,11 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         public MuleEvent handleException(Exception exception, MuleEvent event)
         {
             sensedException = exception;
-            event.getMessage().setPayload(NullPayload.getInstance());
-            event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setPayload(NullPayload.getInstance());
+                msg.setExceptionPayload(new DefaultExceptionPayload(exception));
+                return msg;
+            }));
             return event;
         }
     }

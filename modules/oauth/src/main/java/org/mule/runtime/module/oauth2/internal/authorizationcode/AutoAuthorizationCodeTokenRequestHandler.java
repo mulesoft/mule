@@ -146,14 +146,21 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
                     statusCodeToReturn = INTERNAL_SERVER_ERROR.getStatusCode();
                     responseMessage = "Failed processing redirect URL request done from OAuth provider. See logs for details.";
                 }
-                event.getMessage().setPayload(responseMessage);
-                event.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, statusCodeToReturn);
-                String onCompleteRedirectToValue = stateDecoder.decodeOnCompleteRedirectTo();
-                if (!isEmpty(onCompleteRedirectToValue))
-                {
-                    event.getMessage().setOutboundProperty(HTTP_STATUS_PROPERTY, MOVED_TEMPORARILY.getStatusCode());
-                    event.getMessage().setOutboundProperty(LOCATION, HttpParser.appendQueryParam(onCompleteRedirectToValue, AUTHORIZATION_STATUS_QUERY_PARAM_KEY, String.valueOf(authorizationStatus)));
-                }
+                final String finalResponseMessage = responseMessage;
+                final int finalStatusCodeToReturn = statusCodeToReturn;
+                final int finalAuthorizationStatus = authorizationStatus;
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setPayload(finalResponseMessage);
+                    msg.setOutboundProperty(HTTP_STATUS_PROPERTY, finalStatusCodeToReturn);
+                    String onCompleteRedirectToValue = stateDecoder.decodeOnCompleteRedirectTo();
+                    if (!isEmpty(onCompleteRedirectToValue))
+                    {
+                        msg.setOutboundProperty(HTTP_STATUS_PROPERTY, MOVED_TEMPORARILY.getStatusCode());
+                        msg.setOutboundProperty(LOCATION, HttpParser.appendQueryParam(onCompleteRedirectToValue, AUTHORIZATION_STATUS_QUERY_PARAM_KEY, String.valueOf(finalAuthorizationStatus)));
+                    }
+                    return msg;
+                }));
+
                 return event;
             }
         };
@@ -190,7 +197,10 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
         formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_AUTHENTICATION_CODE);
         formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getRedirectionUrl());
-        event.getMessage().setPayload(formData);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setPayload(formData);
+            return msg;
+        }));
     }
 
     private void setMapPayloadWithRefreshTokenRequestParameters(final MuleEvent event, final String refreshToken)
@@ -201,7 +211,10 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
         formData.put(GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_REFRESH_TOKEN);
         formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getRedirectionUrl());
-        event.getMessage().setPayload(formData);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setPayload(formData);
+            return msg;
+        }));
     }
 
     private void logResourceOwnerOAuthContextBeforeUpdate(ResourceOwnerOAuthContext resourceOwnerOAuthContext)
@@ -272,7 +285,10 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         try
         {
             final MuleEvent muleEvent = DefaultMuleEvent.copy(currentEvent);
-            muleEvent.getMessage().clearOutboundProperties();
+            muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
+                msg.clearOutboundProperties();
+                return msg;
+            }));
             final String userRefreshToken = resourceOwnerOAuthContext.getRefreshToken();
             if (userRefreshToken == null)
             {

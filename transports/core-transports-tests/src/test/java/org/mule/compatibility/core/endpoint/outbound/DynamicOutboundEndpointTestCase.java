@@ -41,6 +41,7 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -285,7 +286,10 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
 
         testOutboundEvent = createTestOutboundEvent();
-        testOutboundEvent.getMessage().setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
+        testOutboundEvent.setMessage(testOutboundEvent.getMessage().transform(msg -> {
+            msg.setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
+            return msg;
+        }));
 
         MuleEvent response = endpoint.process(testOutboundEvent);
 
@@ -416,7 +420,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         }
 
         @Override
-        protected MuleMessage doSend(MuleEvent event) throws Exception
+        protected MutableMuleMessage doSend(MuleEvent event) throws Exception
         {
             sensedSendEvent = event;
             sentEvent = true;

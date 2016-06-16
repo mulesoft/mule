@@ -21,7 +21,7 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -113,7 +113,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
                     endpointBuilder);
         }
 
-        MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, outboundEndpoint.getProperties(), muleContext);
+        MutableMuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, outboundEndpoint.getProperties(), muleContext);
         if (etag != null && checkEtag)
         {
             request.setOutboundProperty(HttpConstants.HEADER_IF_NONE_MATCH, etag);
@@ -123,10 +123,10 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint.getExchangePattern(), flowConstruct);
 
         MuleEvent result = outboundEndpoint.process(event);
-        MuleMessage message = null;
+        MutableMuleMessage message = null;
         if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
-            message = result.getMessage();
+            message = (MutableMuleMessage) result.getMessage();
         }
 
         final int contentLength = message.getOutboundProperty(HttpConstants.HEADER_CONTENT_LENGTH, -1);

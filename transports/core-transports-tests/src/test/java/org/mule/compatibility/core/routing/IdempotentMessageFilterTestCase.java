@@ -9,14 +9,13 @@ package org.mule.compatibility.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
@@ -42,7 +41,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextEndpoint
         ir.setStorePrefix("foo");
         ir.setStore(new InMemoryObjectStore<String>());
 
-        MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
+        MutableMuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
         okMessage.setOutboundProperty("id", "1");
         DefaultMuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);

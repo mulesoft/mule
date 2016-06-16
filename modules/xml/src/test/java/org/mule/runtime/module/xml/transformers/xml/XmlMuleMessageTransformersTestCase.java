@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
 import org.mule.runtime.module.xml.transformer.XmlToObject;
@@ -32,7 +32,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
         ObjectToXml t1 = createObject(ObjectToXml.class);
         t1.setAcceptMuleMessage(true);
 
-        MuleMessage msg = new DefaultMuleMessage("test", muleContext);
+        MutableMuleMessage msg = new DefaultMuleMessage("test", muleContext);
         msg.setEncoding("UTF-8");
         msg.setCorrelationId("1234");
         msg.setOutboundProperty("object", new Apple());
@@ -45,9 +45,9 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
 
         Object result = t2.transform(xml);
         assertNotNull(result);
-        assertTrue(result instanceof MuleMessage);
+        assertTrue(result instanceof MutableMuleMessage);
 
-        msg = (MuleMessage) result;
+        msg = (MutableMuleMessage) result;
 
         assertEquals("test", getPayloadAsString(msg));
         assertEquals(new Apple(), msg.getOutboundProperty("object"));

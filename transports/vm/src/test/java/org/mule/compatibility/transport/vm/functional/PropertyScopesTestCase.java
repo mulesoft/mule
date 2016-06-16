@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNull;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.Collections;
@@ -46,7 +47,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     public void noPropagationOfOutboundScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setOutboundProperty("foo", "bar");
         MuleMessage response = client.send("vm://in-synch", message);
         assertNotNull(response);
@@ -57,7 +58,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     public void noPropagationOfInboundScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setOutboundProperty("foo", "bar");
         client.dispatch("vm://in-asynch", message);
         MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
@@ -69,7 +70,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     public void noPropagationOfOutboundScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setOutboundProperty("foo", "bar");
         client.dispatch("vm://in-asynch", message);
         MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);

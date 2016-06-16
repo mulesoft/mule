@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.transport;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 
 public final class UnsupportedMessageRequester extends AbstractMessageRequester
 {
@@ -18,7 +18,7 @@ public final class UnsupportedMessageRequester extends AbstractMessageRequester
     }
 
     @Override
-    protected MuleMessage doRequest(long timeout) throws Exception
+    protected MutableMuleMessage doRequest(long timeout) throws Exception
     {
         throw new UnsupportedOperationException("Request not supported for this transport");
     }

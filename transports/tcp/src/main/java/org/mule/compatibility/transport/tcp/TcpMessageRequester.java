@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.tcp;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 
 import java.net.Socket;
@@ -40,7 +40,7 @@ public class TcpMessageRequester extends AbstractMessageRequester
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
     @Override
-    protected MuleMessage doRequest(long timeout) throws Exception
+    protected MutableMuleMessage doRequest(long timeout) throws Exception
     {
         if (timeout > Integer.MAX_VALUE || timeout < 0)
         {

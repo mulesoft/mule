@@ -10,7 +10,7 @@ import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedExceptio
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
@@ -308,7 +308,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         return encoding;
     }
     
-    private void initEncoding(MuleMessage message, String encoding)
+    private void initEncoding(MutableMuleMessage message, String encoding)
     {
         message.setEncoding(encoding);
     }

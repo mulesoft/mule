@@ -17,6 +17,7 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -81,7 +82,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
      * @throws Exception if the call to the underlying protocol causes an exception
      */
     @Override
-    public final MuleMessage request(long timeout) throws Exception
+    public final MutableMuleMessage request(long timeout) throws Exception
     {
         try
         {
@@ -93,8 +94,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
             }
             // Make sure we are connected
             connect();
-            MuleMessage result = null;
-            result = doRequest(timeout);
+            MutableMuleMessage result = doRequest(timeout);
             if (result != null)
             {
                 String rootId = result.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
@@ -132,9 +132,17 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
         }
     }
 
-    protected MuleMessage applyInboundTransformers(MuleMessage message) throws MuleException
+    protected MutableMuleMessage applyInboundTransformers(MuleMessage message) throws MuleException
     {
-        return getTransformationService().applyTransformers(message, null, defaultInboundTransformers);
+        MuleMessage transformed = getTransformationService().applyTransformers(message, null, defaultInboundTransformers);
+        if (message instanceof MutableMuleMessage)
+        {
+            return (MutableMuleMessage) message;
+        }
+        else
+        {
+            return new DefaultMuleMessage(transformed);
+        }
     }
 
     @Override
@@ -160,6 +168,6 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected abstract MuleMessage doRequest(long timeout) throws Exception;
+    protected abstract MutableMuleMessage doRequest(long timeout) throws Exception;
 
 }

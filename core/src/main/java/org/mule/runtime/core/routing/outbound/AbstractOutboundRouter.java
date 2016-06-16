@@ -187,8 +187,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         {
             // if replyTo is set we'll probably want the correlationId set as
             // well
-            message.setReplyTo(replyTo);
-            message.setOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName());
+            event.setMessage(message.transform(msg -> {
+                msg.setReplyTo(replyTo);
+                msg.setOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName());
+                return msg;
+            }));
         }
         if (enableCorrelation != CorrelationMode.NEVER)
         {
@@ -234,9 +237,12 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                 // buf.append(", ").append("Group Size=").append(group);
                 logger.debug(buf.toString());
             }
-            message.setCorrelationId(correlation);
-            // message.setCorrelationGroupSize(group);
-            // message.setCorrelationSequence(seq);
+            event.setMessage(message.transform(msg -> {
+                msg.setCorrelationId(correlation);
+                // msg.setCorrelationGroupSize(group);
+                // msg.setCorrelationSequence(seq);
+                return msg;
+            }));
         }
     }
 
@@ -448,9 +454,9 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
      * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and
      * out params can be the same message object when not dealing with replies.
      */
-    protected void propagateMagicProperties(MuleMessage in, MuleMessage out)
+    protected MuleMessage propagateMagicProperties(MuleMessage in)
     {
-        AbstractRoutingStrategy.propagateMagicProperties(in, out);
+        return AbstractRoutingStrategy.propagateMagicProperties(in);
     }
 
     @Override

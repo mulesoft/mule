@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.http.transformers;
 
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_PARAMS_PROPERTY;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
 import org.mule.compatibility.transport.http.HttpConnector;
@@ -127,8 +128,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
             }
 
             // Allow the user to set HttpMethodParams as an object on the message
-            final HttpMethodParams params = (HttpMethodParams) msg.removeOutboundProperty(
-                HttpConnector.HTTP_PARAMS_PROPERTY);
+            final HttpMethodParams params = msg.getOutboundProperty(HTTP_PARAMS_PROPERTY);
+            event.setMessage(event.getMessage().transform(message -> {
+                message.removeOutboundProperty(HTTP_PARAMS_PROPERTY);
+                return message;
+            }));
+
             if (params != null)
             {
                 httpMethod.setParams(params);

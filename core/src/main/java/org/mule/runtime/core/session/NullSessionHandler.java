@@ -16,25 +16,17 @@ import org.mule.runtime.core.message.SessionHandler;
  */
 public class NullSessionHandler implements SessionHandler
 {
+
+    @Override
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
         return null;
     }
 
-    public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
+    @Override
+    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {
-        // noop
+        return message;
     }
 
-    /**
-     * The property name of the session id to use when creating the Mule session. by
-     * default the property name "ID" will be used. If no property was set on the
-     * session called "ID" a session id will be automatically generated
-     * 
-     * @return the property name of the session id that is set on the session
-     */
-    public String getSessionIDKey()
-    {
-        return "ID";
-    }
 }

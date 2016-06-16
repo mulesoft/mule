@@ -118,22 +118,28 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             {
                 originalEvent.setFlowVariable(counterVariableName, correlationSequence);
             }
-            if (enableCorrelation != CorrelationMode.NEVER)
-            {
-                boolean correlationSet = event.getMessage().getCorrelationId() != null;
-                if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
-                    || (enableCorrelation == CorrelationMode.ALWAYS))
-                {
-                    event.getMessage().setCorrelationId(correlationId);
-                }
 
-                // take correlation group size from the message properties, set by
-                // concrete
-                // message splitter implementations
-                event.getMessage().setCorrelationGroupSize(count);
-                event.getMessage().setCorrelationSequence(correlationSequence);
-            }
-            event.getMessage().propagateRootId(originalEvent.getMessage());
+            int finalCorrelationSequence = correlationSequence;
+            event.setMessage(event.getMessage().transform(msg -> {
+                if (enableCorrelation != CorrelationMode.NEVER)
+                {
+                    boolean correlationSet = event.getMessage().getCorrelationId() != null;
+                    if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
+                        || (enableCorrelation == CorrelationMode.ALWAYS))
+                    {
+                        msg.setCorrelationId(correlationId);
+                    }
+
+                    // take correlation group size from the message properties, set by
+                    // concrete
+                    // message splitter implementations
+                    msg.setCorrelationGroupSize(count);
+                    msg.setCorrelationSequence(finalCorrelationSequence);
+                }
+                msg.propagateRootId(originalEvent.getMessage());
+                return msg;
+            }));
+
             MuleEvent resultEvent = processNext(RequestContext.setEvent(event));
             if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
             {

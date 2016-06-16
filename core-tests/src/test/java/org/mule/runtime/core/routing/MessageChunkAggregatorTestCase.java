@@ -41,9 +41,9 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
         router.setFlowConstruct(flow);
         router.initialise();
 
-        MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
+        DefaultMuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
+        DefaultMuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
+        DefaultMuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
         message1.setCorrelationId(message1.getUniqueId());
         message2.setCorrelationId(message1.getUniqueId());
         message3.setCorrelationId(message1.getUniqueId());

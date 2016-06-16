@@ -51,7 +51,10 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
             else
             {
                 // the correlationId will be set by the AbstractOutboundRouter
-                message.setCorrelationGroupSize(routes.size());
+                event.setMessage(message.transform(msg -> {
+                    msg.setCorrelationGroupSize(routes.size());
+                    return msg;
+                }));
             }
         }
 

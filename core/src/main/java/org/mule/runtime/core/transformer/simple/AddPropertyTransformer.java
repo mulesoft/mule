@@ -18,13 +18,19 @@ public class AddPropertyTransformer extends AbstractAddVariablePropertyTransform
     @Override
     protected void addProperty(MuleEvent event, String propertyName, Serializable value, DataType dataType)
     {
-        event.getMessage().setOutboundProperty(propertyName, value, dataType);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setOutboundProperty(propertyName, value, dataType);
+            return msg;
+        }));
     }
 
     @Override
     protected void removeProperty(MuleEvent event, String propertyName)
     {
-        event.getMessage().removeOutboundProperty(propertyName);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.removeOutboundProperty(propertyName);
+            return msg;
+        }));
     }
 
 }

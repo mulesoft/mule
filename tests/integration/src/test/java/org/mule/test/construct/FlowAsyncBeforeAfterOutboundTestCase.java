@@ -76,8 +76,10 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             String propName = event.getFlowVariable("property-name");
-
-            event.getMessage().setOutboundProperty(propName, Thread.currentThread().getName());
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setOutboundProperty(propName, Thread.currentThread().getName());
+                return msg;
+            }));
             return event;
         }
     }

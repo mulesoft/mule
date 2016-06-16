@@ -154,7 +154,10 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
             {
                 MuleEvent argEvent = (MuleEvent) invocation.getArguments()[0];
                 assertThat(argEvent.getMessageAsString(), is(TEST_DATA));
-                argEvent.getMessage().setPayload(PROCESSED_DATA);
+                argEvent.setMessage(argEvent.getMessage().transform(msg -> {
+                    msg.setPayload(PROCESSED_DATA);
+                    return msg;
+                }));
                 return argEvent;
             }
         });

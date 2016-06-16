@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.core.work;
 
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.OptimizedRequestContext;
-import org.mule.runtime.core.RequestContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.ThreadSafeAccess;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.util.concurrent.Latch;
-
-import java.util.concurrent.TimeUnit;
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.OptimizedRequestContext;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.ThreadSafeAccess;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
 
 /**
  * Test case to reproduce issue described in MULE-4407 and validate fix.
@@ -38,8 +38,11 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase
         super.doSetUp();
         // Create a dummy event and give it some properties
         originalEvent = getTestEvent("test");
-        originalEvent.getMessage().setOutboundProperty("test", "val");
-        originalEvent.getMessage().setOutboundProperty("test2", "val2");
+        originalEvent.setMessage(originalEvent.getMessage().transform(msg -> {
+            msg.setOutboundProperty("test", "val");
+            msg.setOutboundProperty("test2", "val2");
+            return msg;
+        }));
         OptimizedRequestContext.unsafeSetEvent(originalEvent);
     }
 

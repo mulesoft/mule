@@ -254,7 +254,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
         try
         {
-            mutableEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(buildRetryPolicyExhaustedException(lastException)));
+            mutableEvent.setMessage(mutableEvent.getMessage().transform(msg -> {
+                msg.setExceptionPayload(new DefaultExceptionPayload(buildRetryPolicyExhaustedException(lastException)));
+                return msg;
+            }));
+
             getUntilSuccessfulConfiguration().getDlqMP().process(mutableEvent);
         }
         catch (MessagingException e)

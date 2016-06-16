@@ -12,6 +12,7 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 
 public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
 {
@@ -25,18 +26,18 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
     }
 
     @Override
-    public MuleMessage create(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext) throws Exception
+    public MutableMuleMessage create(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext) throws Exception
     {
         return doCreate(transportMessage, previousMessage, encoding, muleContext);
     }
 
     @Override
-    public MuleMessage create(Object transportMessage, String encoding, MuleContext muleContext) throws Exception
+    public MutableMuleMessage create(Object transportMessage, String encoding, MuleContext muleContext) throws Exception
     {
         return doCreate(transportMessage, null, encoding, muleContext);
     }
 
-    private MuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext)
+    private MutableMuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext)
             throws Exception
     {
         if (transportMessage == null)

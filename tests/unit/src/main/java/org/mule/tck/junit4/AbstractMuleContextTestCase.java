@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -352,7 +353,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     /**
      * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with a test payload
      */
-    protected MuleMessage getTestMuleMessage()
+    protected MutableMuleMessage getTestMuleMessage()
     {
         return getTestMuleMessage(TEST_PAYLOAD);
     }
@@ -361,7 +362,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      * @param message
      * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with message as payload
      */
-    protected MuleMessage getTestMuleMessage(Object message)
+    protected MutableMuleMessage getTestMuleMessage(Object message)
     {
         return new DefaultMuleMessage(message, muleContext);
     }

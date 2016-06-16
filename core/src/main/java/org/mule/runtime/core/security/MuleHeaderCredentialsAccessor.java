@@ -25,6 +25,9 @@ public class MuleHeaderCredentialsAccessor implements CredentialsAccessor
 
     public void setCredentials(MuleEvent event, Serializable credentials)
     {
-        event.getMessage().setOutboundProperty(MULE_USER_PROPERTY, credentials);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setOutboundProperty(MULE_USER_PROPERTY, credentials);
+            return msg;
+        }));
     }
 }

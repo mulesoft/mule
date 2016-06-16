@@ -465,16 +465,17 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             payload = response;
         }
 
-        MuleMessage message = transportResponse.getMessage();
+        transportResponse.setMessage(transportResponse.getMessage().transform(msg -> {
+            Serializable httpStatusCode = msg.getInboundProperty(HTTP_STATUS_PROPERTY);
+            if (isProxy() && httpStatusCode != null)
+            {
+                msg.setOutboundProperty(HTTP_STATUS_PROPERTY, httpStatusCode);
+            }
 
-        Serializable httpStatusCode = message.getInboundProperty(HTTP_STATUS_PROPERTY);
-        if (isProxy() && httpStatusCode != null)
-        {
-            message.setOutboundProperty(HTTP_STATUS_PROPERTY, httpStatusCode);
-        }
-
-        Class payloadClass = payload != null ? payload.getClass() : Object.class;
-        message.setPayload(payload, DataTypeFactory.create(payloadClass, getMimeType()));
+            Class payloadClass = payload != null ? payload.getClass() : Object.class;
+            msg.setPayload(payload, DataTypeFactory.create(payloadClass, getMimeType()));
+            return msg;
+        }));
 
         return transportResponse;
     }

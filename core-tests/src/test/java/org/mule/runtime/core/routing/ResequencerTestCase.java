@@ -49,9 +49,9 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         router.setFlowConstruct(flow);
         router.initialise();
 
-        MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
+        DefaultMuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
+        DefaultMuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
+        DefaultMuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
         final String correlationId = message1.getUniqueId();
         message1.setCorrelationId(correlationId);
         message2.setCorrelationId(correlationId);
@@ -87,9 +87,9 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         router.setFlowConstruct(flow);
         router.initialise();
 
-        MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
+        DefaultMuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
+        DefaultMuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
+        DefaultMuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
         final String correlationId = message1.getUniqueId();
         message1.setCorrelationId(correlationId);
         message2.setCorrelationId(correlationId);

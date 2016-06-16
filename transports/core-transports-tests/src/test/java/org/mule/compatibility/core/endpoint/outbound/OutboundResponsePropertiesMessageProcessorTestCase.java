@@ -8,11 +8,9 @@ package org.mule.compatibility.core.endpoint.outbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.AbstractEndpointBuilder;
-import org.mule.compatibility.core.endpoint.outbound.OutboundResponsePropertiesMessageProcessor;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -56,8 +54,12 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
         });
 
         MuleEvent event = createTestOutboundEvent();
-        event.getMessage().setOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL);
-        event.getMessage().setOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, MULE_CORRELATION_ID_VAL);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL);
+            msg.setOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, MULE_CORRELATION_ID_VAL);
+            return msg;
+        }));
+
         MuleEvent result = mp.process(event);
 
         assertNotNull(result);

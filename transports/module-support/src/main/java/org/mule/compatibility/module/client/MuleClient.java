@@ -12,6 +12,7 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.MuleEvent.TIMEOUT_NOT_SET_VALUE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
+import static org.mule.runtime.core.security.MuleCredentials.createHeader;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
@@ -511,11 +512,12 @@ public class MuleClient implements Disposable
     {
         if (user != null)
         {
-            message.setOutboundProperty(MULE_USER_PROPERTY,
-                                        MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
+            message = message.transform(msg -> {
+                msg.setOutboundProperty(MULE_USER_PROPERTY, createHeader(user.getUsername(), user.getPassword()));
+                return msg;
+            });
         }
-        return new DefaultMuleEvent(message, exchangePattern,
-                new MuleClientFlowConstruct(muleContext));
+        return new DefaultMuleEvent(message, exchangePattern, new MuleClientFlowConstruct(muleContext));
     }
 
     protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException

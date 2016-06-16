@@ -168,7 +168,10 @@ public class MuleUniversalConduit extends AbstractConduit
         }
         else 
         {
-            event.getMessage().setPayload(handler, DataTypeFactory.XML_STRING);
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setPayload(handler, DataTypeFactory.XML_STRING);
+                return msg;
+            }));
         }
 
         if (!decoupled)

@@ -9,6 +9,7 @@ package org.mule.runtime.module.json.validation;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -269,7 +270,7 @@ public class JsonSchemaValidator
 
             if ((input instanceof Reader) || (input instanceof InputStream))
             {
-                event.getMessage().setPayload(jsonNode.toString());
+                event.setMessage(new DefaultMuleMessage(jsonNode.toString(), event.getMessage()));
             }
 
             report = schema.validate(jsonNode);

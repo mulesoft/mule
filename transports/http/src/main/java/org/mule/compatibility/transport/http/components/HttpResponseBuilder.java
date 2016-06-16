@@ -79,21 +79,24 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleMessage msg = event.getMessage();
+        MuleMessage message = event.getMessage();
 
-        HttpResponse httpResponse = getHttpResponse(msg);
+        HttpResponse httpResponse = getHttpResponse(message);
 
-        propagateMessageProperties(httpResponse, msg);
-        checkVersion(msg);
+        propagateMessageProperties(httpResponse, message);
+        checkVersion(message);
         setStatus(httpResponse, event);
         setContentType(httpResponse, event);
         setHeaders(httpResponse, event);
         setCookies(httpResponse, event);
         setCacheControl(httpResponse, event);
         setDateHeader(httpResponse, new Date());
-        setBody(httpResponse, msg, event);
+        setBody(httpResponse, message, event);
 
-        msg.setPayload(httpResponse);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setPayload(httpResponse);
+            return msg;
+        }));
         return event;
     }
 

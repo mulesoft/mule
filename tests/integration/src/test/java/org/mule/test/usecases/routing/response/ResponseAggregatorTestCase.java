@@ -17,6 +17,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -61,7 +62,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
         try
         {
             MuleEvent event = getTestEvent("message1");
-            final MuleMessage message = event.getMessage();
+            final MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
             final String id = message.getUniqueId();
             message.setCorrelationId(id);
             message.setCorrelationGroupSize(1);

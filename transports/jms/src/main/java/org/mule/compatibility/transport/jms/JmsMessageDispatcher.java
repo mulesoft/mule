@@ -19,6 +19,7 @@ import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -99,7 +100,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         return disableTemporaryDestinations;
     }
 
-    private MuleMessage dispatchMessage(MuleEvent event, boolean doSend, final CompletionHandler<MuleMessage, Exception, Void> completionHandler) throws Exception
+    private MutableMuleMessage dispatchMessage(MuleEvent event, boolean doSend, final CompletionHandler<MutableMuleMessage, Exception, Void> completionHandler) throws Exception
     {
         if (logger.isDebugEnabled())
         {
@@ -185,19 +186,21 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 {
                     try
                     {
-                                                if (topic)
-                                                    {
-                                                        return internalBlockingSendAndAwait(consumer, producer, replyTo, jmsMessage, topic, ttl, priority, persistent, timeout);
-                                                 }
+                        if (topic)
+                        {
+                            return internalBlockingSendAndAwait(consumer, producer, replyTo, jmsMessage, topic, ttl,
+                                                                priority, persistent, timeout);
+                        }
 
-                                            else
-                                            {
-                                                return internalBlockingSendAndReceive(producer, consumer, replyTo, jmsMessage, topic, ttl, priority, persistent, timeout);
-                                            }
-                                            }
-                finally
+                        else
+                        {
+                            return internalBlockingSendAndReceive(producer, consumer, replyTo, jmsMessage, topic,
+                                                                  ttl, priority, persistent, timeout);
+                        }
+                    }
+                    finally
                     {
-                    closeConsumer(session, consumer, replyTo);
+                        closeConsumer(session, consumer, replyTo);
                     }
                 }
             }
@@ -216,13 +219,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    private MuleMessage internalSend(MessageProducer producer, Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent) throws Exception
+    private MutableMuleMessage internalSend(MessageProducer producer, Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent) throws Exception
     {
         connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
         return returnOriginalMessageAsReply ? createMuleMessage(jmsMessage) : null;
     }
 
-    private MuleMessage internalBlockingSendAndAwait(MessageConsumer consumer, MessageProducer producer, Destination replyTo,
+    private MutableMuleMessage internalBlockingSendAndAwait(MessageConsumer consumer, MessageProducer producer, Destination replyTo,
                                                      Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent, int timeout)
             throws Exception
     {
@@ -244,7 +247,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         return createResponseMuleMessage(listener.getMessage(), replyTo);
     }
 
-    private MuleMessage internalBlockingSendAndReceive(MessageProducer producer, MessageConsumer consumer, Destination replyTo, Message jmsMessage, boolean topic, long ttl, int priority,
+    private MutableMuleMessage internalBlockingSendAndReceive(MessageProducer producer, MessageConsumer consumer, Destination replyTo, Message jmsMessage, boolean topic, long ttl, int priority,
                                                        boolean persistent, int timeout)
             throws Exception
     {
@@ -261,7 +264,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
     private void internalNonBlockingSendAndReceive(final Session session, final MessageProducer producer, final MessageConsumer consumer, final Destination replyTo, Message jmsMessage, boolean topic,
                                                    long ttl, int priority, boolean persistent, final boolean transacted, int timeout,
-                                                   final CompletionHandler<MuleMessage, Exception, Void> completionHandler)
+                                                   final CompletionHandler<MutableMuleMessage, Exception, Void> completionHandler)
             throws JMSException
     {
         final TimerTask closeConsumerTask = new TimerTask()
@@ -271,7 +274,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             {
                 try
                 {
-                    completionHandler.onCompletion(createMuleMessage(null), (ExceptionCallback<Void, Exception>) (exception ->
+                    completionHandler.onCompletion(createMuleMessage(null), (exception ->
                     {
                         // TODO MULE-9629
                         return null;
@@ -393,7 +396,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             }
     }
 
-    private MuleMessage createResponseMuleMessage(Message result, Destination replyTo) throws Exception
+    private MutableMuleMessage createResponseMuleMessage(Message result, Destination replyTo) throws Exception
     {
         if (result == null)
         {
@@ -435,9 +438,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected MuleMessage createMessageWithJmsMessagePayload(Message jmsMessage) throws Exception
+    protected MutableMuleMessage createMessageWithJmsMessagePayload(Message jmsMessage) throws Exception
     {
-        MuleMessage muleMessage = createMuleMessage(jmsMessage);
+        MutableMuleMessage muleMessage = createMuleMessage(jmsMessage);
         Object payload = JmsMessageUtils.toObject(jmsMessage, connector.getSpecification(),
             endpoint.getEncoding());
         muleMessage.setPayload(payload);
@@ -463,13 +466,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
-    protected MuleMessage doSend(MuleEvent event) throws Exception
+    protected MutableMuleMessage doSend(MuleEvent event) throws Exception
     {
         return dispatchMessage(event, true, null);
     }
 
     @Override
-    protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MuleMessage, Exception, Void> completionHandler)
+    protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MutableMuleMessage, Exception, Void> completionHandler)
     {
         try
         {

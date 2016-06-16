@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -115,7 +116,11 @@ public final class RequestContext
     public static void setExceptionPayload(ExceptionPayload exceptionPayload)
     {
         MuleEvent newEvent = newEvent(getEvent(), SAFE);
-        newEvent.getMessage().setExceptionPayload(exceptionPayload);
+        newEvent.setMessage(newEvent.getMessage().transform(msg -> {
+            msg.setExceptionPayload(exceptionPayload);
+            return msg;
+        }));
+
         internalSetEvent(newEvent);
     }
 

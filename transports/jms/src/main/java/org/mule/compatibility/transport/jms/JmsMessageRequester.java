@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.jms;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -63,7 +63,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
     @Override
-    protected MuleMessage doRequest(long timeout) throws Exception
+    protected MutableMuleMessage doRequest(long timeout) throws Exception
     {
         Session session = null;
         MessageConsumer consumer = null;

@@ -12,7 +12,7 @@ import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -65,7 +65,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
-    protected synchronized MuleMessage doSend(MuleEvent event) throws Exception
+    protected synchronized MutableMuleMessage doSend(MuleEvent event) throws Exception
     {
         Socket socket = connector.getSocket(endpoint);
         doDispatchToSocket(socket, event);
@@ -81,9 +81,9 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                         return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
                     }
                     
-                    if (result instanceof MuleMessage)
+                    if (result instanceof MutableMuleMessage)
                     {
-                        return (MuleMessage) result;
+                        return (MutableMuleMessage) result;
                     }
                     
                     return createMuleMessage(result, endpoint.getEncoding());

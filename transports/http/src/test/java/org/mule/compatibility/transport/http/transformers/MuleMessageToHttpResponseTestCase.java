@@ -21,6 +21,7 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -128,7 +129,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         Map<String, Serializable> outboundProperties =  new HashMap<>();
         outboundProperties.put(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);
         MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-        MuleMessage msg = new DefaultMuleMessage(null,outboundProperties, muleContext);
+        MutableMuleMessage msg = new DefaultMuleMessage(null, outboundProperties, muleContext);
         //Making sure that the outbound property overrides both invocation and inbound
         msg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);
         msg.setInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, wrongContentType);

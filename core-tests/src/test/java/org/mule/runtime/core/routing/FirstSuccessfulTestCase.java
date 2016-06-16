@@ -59,14 +59,12 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
     @Test
     public void testFailureExpression() throws Exception
     {
-        MessageProcessor intSetter = new MessageProcessor()
-        {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                event.getMessage().setPayload(Integer.valueOf(1));
-                return event;
-            }
+        MessageProcessor intSetter = event -> {
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setPayload(Integer.valueOf(1));
+                return msg;
+            }));
+            return event;
         };
 
         FirstSuccessful fs = createFirstSuccessfulRouter(intSetter, new StringAppendTransformer("abc"));

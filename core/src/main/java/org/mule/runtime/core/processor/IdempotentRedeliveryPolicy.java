@@ -7,7 +7,6 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
@@ -288,7 +287,10 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             if (payload instanceof InputStream)
             {
                 // We've consumed the stream.
-                event.getMessage().setPayload(bytes);
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setPayload(bytes);
+                    return msg;
+                }));
             }
             MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
             byte[] digestedBytes = md.digest(bytes);

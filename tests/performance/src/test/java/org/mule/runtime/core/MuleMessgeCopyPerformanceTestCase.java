@@ -8,6 +8,7 @@ package org.mule.runtime.core;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -32,7 +33,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
     private MuleContext muleContext;
 
     private String payload;
-    private MuleMessage message;
+    private MutableMuleMessage message;
 
     @Override
     public int getTestTimeoutSecs()
@@ -133,14 +134,14 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         }
     }
 
-    protected MuleMessage createMuleMessage()
+    protected MutableMuleMessage createMuleMessage()
     {
         return new DefaultMuleMessage(payload, muleContext);
     }
 
     protected MuleMessage createMuleMessageWithProperties(int numProperties)
     {
-        MuleMessage message = createMuleMessage();
+        MutableMuleMessage message = createMuleMessage();
         for (int i = 1; i <= numProperties; i++)
         {
             message.setOutboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");

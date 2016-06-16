@@ -19,6 +19,7 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.routing.CorrelationMode;
 import org.mule.runtime.core.routing.filters.RegExFilter;
@@ -168,7 +169,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
         router.setRoutes(endpoints);
         router.setEnableCorrelation(CorrelationMode.NEVER);
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setOutboundProperty(MULE_CORRELATION_ID_PROPERTY, "MyCustomCorrelationId");
 
         assertTrue(router.isMatch(message));

@@ -416,7 +416,10 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
                                                                   lastEvent, getMergedSession());
                 if (getCommonRootId() != null)
                 {
-                    muleEvent.getMessage().setMessageRootId(commonRootId);
+                    muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
+                        msg.setMessageRootId(commonRootId);
+                        return msg;
+                    }));
                 }
                 return muleEvent;
             }

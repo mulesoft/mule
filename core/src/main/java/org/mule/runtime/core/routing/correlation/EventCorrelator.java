@@ -241,12 +241,16 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 {
                     // create the response event
                     MuleEvent returnEvent = callback.aggregateEvents(group);
-                    returnEvent.getMessage().setCorrelationId(groupId);
-                    String rootId = group.getCommonRootId();
-                    if (rootId != null)
-                    {
-                        returnEvent.getMessage().setMessageRootId(rootId);
-                    }
+                    EventGroup finalGroup = group;
+                    returnEvent.setMessage(returnEvent.getMessage().transform(msg -> {
+                        msg.setCorrelationId(groupId);
+                        String rootId = finalGroup.getCommonRootId();
+                        if (rootId != null)
+                        {
+                            msg.setMessageRootId(rootId);
+                        }
+                        return msg;
+                    }));
 
                     // remove the eventGroup as no further message will be received
                     // for this group once we aggregate
@@ -400,7 +404,10 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 {
                     MuleEvent newEvent = callback.aggregateEvents(group);
                     group.clear();
-                    newEvent.getMessage().setCorrelationId(group.getGroupId().toString());
+                    newEvent.setMessage(newEvent.getMessage().transform(msg -> {
+                        msg.setCorrelationId(group.getGroupId().toString());
+                        return msg;
+                    }));
 
                     if (!correlatorStore.contains((Serializable) group.getGroupId(), getExpiredAndDispatchedPartitionKey()))
                     {

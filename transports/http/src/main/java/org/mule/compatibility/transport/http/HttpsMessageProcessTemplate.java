@@ -39,14 +39,17 @@ public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate
             throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(),
                                          muleEvent, e);
         }
-        if (getHttpServerConnection().getPeerCertificateChain() != null)
-        {
-            muleEvent.getMessage().setOutboundProperty(HttpsConnector.PEER_CERTIFICATES, getHttpServerConnection().getPeerCertificateChain());
-        }
-        if (getHttpServerConnection().getLocalCertificateChain() != null)
-        {
-            muleEvent.getMessage().setOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES, getHttpServerConnection().getLocalCertificateChain());
-        }
+        muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
+            if (getHttpServerConnection().getPeerCertificateChain() != null)
+            {
+                msg.setOutboundProperty(HttpsConnector.PEER_CERTIFICATES, getHttpServerConnection().getPeerCertificateChain());
+            }
+            if (getHttpServerConnection().getLocalCertificateChain() != null)
+            {
+                msg.setOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES, getHttpServerConnection().getLocalCertificateChain());
+            }
+            return msg;
+        }));
 
         super.beforeRouteEvent(muleEvent);
         return muleEvent;

@@ -12,6 +12,7 @@ import static org.mule.extension.validation.ValidationTestCase.INVALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.INVALID_URL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.extension.validation.internal.validator.NumberType;
@@ -61,13 +62,13 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
 
         assertValid(expression, event);
 
-        event.getMessage().setPayload("TRUE");
+        event.setMessage(new DefaultMuleMessage("TRUE", event.getMessage()));
         assertValid(expression, event);
 
         event.setFlowVariable("caseSensitive", true);
         assertInvalid(expression, event);
 
-        event.getMessage().setPayload("tTrue");
+        event.setMessage(new DefaultMuleMessage("tTrue", event.getMessage()));
         assertInvalid(expression, event);
     }
 

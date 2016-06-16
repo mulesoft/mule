@@ -64,7 +64,10 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase
         @Override
         public MuleEvent handleException(Exception ex, MuleEvent event)
         {
-            event.getMessage().setOutboundProperty("http.status","403");
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setOutboundProperty("http.status", "403");
+                return msg;
+            }));
             return event;
         }
     }

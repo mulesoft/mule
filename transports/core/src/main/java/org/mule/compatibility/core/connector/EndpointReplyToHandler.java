@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.connector;
 
+import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
@@ -72,7 +73,10 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler
             Serializable propertyValue = event.getMessage().getInboundProperty(propertyName);
             if (propertyValue != null)
             {
-                replyToEvent.getMessage().setOutboundProperty(propertyName, propertyValue);
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setOutboundProperty(propertyName, propertyValue);
+                    return msg;
+                }));
             }
         }
 

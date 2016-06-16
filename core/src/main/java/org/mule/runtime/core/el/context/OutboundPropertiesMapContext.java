@@ -31,13 +31,19 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable>
     @Override
     public void doPut(String key, Serializable value)
     {
-        event.getMessage().setOutboundProperty(key, value);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setOutboundProperty(key, value);
+            return msg;
+        }));
     }
 
     @Override
     public void doRemove(String key)
     {
-        event.getMessage().removeOutboundProperty(key);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.removeOutboundProperty(key);
+            return msg;
+        }));
     }
 
     @Override
@@ -49,7 +55,10 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable>
     @Override
     public void clear()
     {
-        event.getMessage().clearOutboundProperties();
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.clearOutboundProperties();
+            return msg;
+        }));
     }
 
     @Override

@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -29,7 +30,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
     {
         ExpressionFilter filter = new ExpressionFilter("message.outboundProperties['foo']=='bar'");
         filter.setMuleContext(muleContext);
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage("blah", muleContext);
         assertTrue(!filter.accept(message));
         message.setOutboundProperty("foo", "bar");
         assertTrue(filter.accept(message));
@@ -51,7 +52,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("message.outboundProperties['foo']!='bar'");
         filter.setMuleContext(muleContext);
 
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(filter.accept(message));
         message.setOutboundProperty("foo", "bar");
@@ -75,9 +76,12 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         assertTrue(filter.accept(event));
     }
 
-    private void removeProperty(MuleMessage message)
+    private MutableMuleMessage removeProperty(MuleMessage message)
     {
-        message.removeOutboundProperty("foo");
+        return (MutableMuleMessage) message.transform(msg -> {
+            msg.removeOutboundProperty("foo");
+            return msg;
+        });
     }
 
     @Test
@@ -86,10 +90,10 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("message.outboundProperties['foo']!=null");
         filter.setMuleContext(muleContext);
 
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(!filter.accept(message));
-        removeProperty(message);
+        message = removeProperty(message);
         assertTrue(!filter.accept(message));
         message.setOutboundProperty("foo", "car");
         assertTrue(filter.accept(message));
@@ -104,7 +108,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         MuleEvent event = getTestEvent("blah");
 
         assertTrue(!filter.accept(event));
-        removeProperty(event.getMessage());
+        event.setMessage(removeProperty(event.getMessage()));
         assertTrue(!filter.accept(event));
         event.setFlowVariable("foo", "car");
         assertTrue(filter.accept(event));
@@ -148,7 +152,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("exception is java.lang.Exception");
         filter.setMuleContext(muleContext);
 
-        MuleMessage m = new DefaultMuleMessage("test", muleContext);
+        MutableMuleMessage m = new DefaultMuleMessage("test", muleContext);
         assertTrue(!filter.accept(m));
         m.setExceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test")));
         assertTrue(filter.accept(m));
@@ -166,7 +170,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("exception is java.lang.Exception");
         filter.setMuleContext(muleContext);
 
-        MuleMessage m = new DefaultMuleMessage("test", muleContext);
+        MutableMuleMessage m = new DefaultMuleMessage("test", muleContext);
         assertTrue(!filter.accept(m));
         m.setExceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test")));
         assertTrue(filter.accept(m));

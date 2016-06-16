@@ -71,7 +71,11 @@ public class TransformerChain extends AbstractMessageTransformer
             }
             else
             {
-                result.setPayload(temp);
+                Object finalTemp = temp;
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setPayload(finalTemp);
+                    return msg;
+                }));
             }
         }
         if (lastTransformer != null && lastTransformer.getReturnDataType().getType().equals(MuleMessage.class))

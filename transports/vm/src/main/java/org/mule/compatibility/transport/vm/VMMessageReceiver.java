@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -91,14 +92,14 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         // template method
     }
 
-    public void onMessage(MuleMessage message) throws MuleException
+    public void onMessage(MutableMuleMessage message) throws MuleException
     {
         // Rewrite the message to treat it as a new message
-        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, endpoint.getMuleContext());
+        MutableMuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, endpoint.getMuleContext());
         routeMessage(newMessage);
     }
 
-    public MuleMessage onCall(final MuleMessage message) throws MuleException
+    public MuleMessage onCall(final MutableMuleMessage message) throws MuleException
     {
 
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
@@ -120,7 +121,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                         MuleMessage returnedMessage = event.getMessage();
                         if (returnedMessage != null)
                         {
-                            returnedMessage.release();
+                            ((DefaultMuleMessage) returnedMessage).release();
                         }
                         return event;
                     }
@@ -267,11 +268,11 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     @Override
     protected MuleEvent processMessage(Object msg) throws Exception
     {
-        MuleMessage message = (MuleMessage) msg;
+        MutableMuleMessage message = (MutableMuleMessage) msg;
 
         if (message instanceof ThreadSafeAccess)
         {
-            message = (MuleMessage)((ThreadSafeAccess) message).newThreadCopy();
+            message = (MutableMuleMessage)((ThreadSafeAccess) message).newThreadCopy();
         }
         return routeMessage(message);
     }
