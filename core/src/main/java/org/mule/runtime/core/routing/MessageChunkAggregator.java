@@ -74,6 +74,7 @@ public class MessageChunkAggregator extends AbstractAggregator
                         baos.write(event.getMessageAsBytes());
                     }
 
+                    // TODO MULE-9856 Replace with the builder
                     MutableMuleMessage message;
 
                     // try to deserialize message, since ChunkingRouter might have

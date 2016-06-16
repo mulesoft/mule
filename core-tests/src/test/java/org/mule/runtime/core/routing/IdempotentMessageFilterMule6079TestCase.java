@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
@@ -74,6 +75,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         @Override
         public void run()
         {
+            // TODO MULE-9856 Replace with the builder
             MutableMuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
             okMessage.setOutboundProperty("id", "1");
             MuleEvent event = new DefaultMuleEvent(okMessage, flow, session);

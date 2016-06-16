@@ -8,6 +8,7 @@ package org.mule.runtime.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
@@ -31,6 +32,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     @Test
     public void testSerializablePayload() throws Exception
     {
+        // TODO MULE-9856 Replace with the builder
         MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         message.setOutboundProperty("foo", "bar");
 
@@ -47,6 +49,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         // will be used during Serialization
         muleContext.getRegistry().registerTransformer(new NonSerializableToByteArray());
 
+        // TODO MULE-9856 Replace with the builder
         MutableMuleMessage message = new DefaultMuleMessage(new NonSerializable(), muleContext);
         message.setOutboundProperty("foo", "bar");
 
@@ -60,6 +63,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     public void testStreamPayloadSerialization() throws Exception
     {
         InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
+        // TODO MULE-9856 Replace with the builder
         MutableMuleMessage message = new DefaultMuleMessage(stream, muleContext);
         message.setOutboundProperty("foo", "bar");
 

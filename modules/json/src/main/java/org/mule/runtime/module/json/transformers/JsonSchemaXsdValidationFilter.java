@@ -11,9 +11,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
 import org.mule.runtime.module.xml.filters.SchemaValidationFilter;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -73,6 +73,7 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
                 event.setMessage(msg);
             }
             String xmlString = (String) jToX.transform(msg.getPayload(), msg.getEncoding());
+            // TODO MULE-9856 Replace with the builder
             MuleMessage xmlMessage = new DefaultMuleMessage(xmlString, msg, msg.getMuleContext());
             boolean accepted = super.accept(xmlMessage);
             if (jsonString != null)

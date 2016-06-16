@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleMessage;
@@ -222,6 +223,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     @Test
     public void testLegacyAddingAttachment() throws Exception
     {
+        // TODO MULE-9856 Replace with the builder
         MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
         DataHandler handler = new DataHandler("this is the attachment", "text/plain");
@@ -234,6 +236,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     @Test
     public void testAddingOutboundAttachment() throws Exception
     {
+        // TODO MULE-9856 Replace with the builder
         MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
         DataHandler handler = new DataHandler("this is the attachment", "text/plain");
@@ -313,6 +316,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 
     private DefaultMuleMessage createMuleMessage()
     {
+        // TODO MULE-9856 Replace with the builder
         DefaultMuleMessage previousMessage = new DefaultMuleMessage("MULE_MESSAGE", DataType.STRING_DATA_TYPE,
                                                                     testAttributes, muleContext);
         previousMessage.setOutboundProperty("MuleMessage", "MuleMessage");

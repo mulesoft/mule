@@ -9,8 +9,8 @@ package org.mule.runtime.core;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 
@@ -33,6 +33,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
     private MuleContext muleContext;
 
     private String payload;
+    // TODO MULE-9856 Replace with the builder
     private MutableMuleMessage message;
 
     @Override

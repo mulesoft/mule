@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -40,6 +41,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -173,16 +175,15 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 
     private Serializable removeProperty(MuleEvent event)
     {
-        final Serializable outbound = event.getMessage().getOutboundProperty(MULE_SESSION_PROPERTY);
-
+        final AtomicReference<Serializable> outbound = new AtomicReference<>();
         event.setMessage(event.getMessage().transform(msg -> {
-            msg.removeOutboundProperty(MULE_SESSION_PROPERTY);
+            outbound.set(msg.removeOutboundProperty(MULE_SESSION_PROPERTY));
             return msg;
         }));
 
         final Object invocation = event.getFlowVariable(MULE_SESSION_PROPERTY);
         event.removeFlowVariable(MULE_SESSION_PROPERTY);
-        return outbound != null ? outbound : (Serializable) invocation;
+        return outbound.get() != null ? outbound.get() : (Serializable) invocation;
     }
 
     /**

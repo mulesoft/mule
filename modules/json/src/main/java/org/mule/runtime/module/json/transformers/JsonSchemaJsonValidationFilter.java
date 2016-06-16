@@ -13,15 +13,9 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.json.JsonData;
 import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
-import org.mule.runtime.core.util.IOUtils;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jackson.JsonLoader;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
-import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -39,6 +33,12 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jackson.JsonLoader;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchema;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 /**
  * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link ValidateJsonSchemaMessageProcessor} instead
@@ -100,6 +100,7 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter
                 return false;
             }
 
+            // TODO MULE-9856 Replace with the builder
             event.setMessage(new DefaultMuleMessage(output, event.getMessage()));
             ProcessingReport report = jsonSchema.validate(data);
 

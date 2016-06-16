@@ -139,9 +139,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     private static DataType<?> getCloningMessageDataType(MuleMessage previous)
     {
         // TODO MULE-9855: Make MuleMessage immutable
-        DataType<?> dataType = DataTypeFactory.create(previous.getDataType().getType(),
-                previous.getDataType().getMimeType(),
-                previous.getDataType().getEncoding());
+        DataType<?> dataType = previous.getDataType();
 
         return dataType;
     }

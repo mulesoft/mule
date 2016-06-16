@@ -11,7 +11,10 @@ import org.mule.runtime.api.metadata.DataType;
 import java.io.Serializable;
 
 /**
- * @deprecated use org.mule.runtime.core.api.temp.MuleMessage whenever possible. This class should have dissapeared by the time the mule-api is frozen.
+ * TODO MULE-9856 Move to transport specific code
+ * 
+ * @deprecated use {@link org.mule.runtime.core.api.MuleMessage} whenever possible. This class
+ *             should have dissapeared by the time the mule-api is frozen.
  */
 @Deprecated
 public interface MutableMuleMessage extends MuleMessage, MutableMessageProperties, MutableMessageAttachments
@@ -110,9 +113,11 @@ public interface MutableMuleMessage extends MuleMessage, MutableMessagePropertie
     MuleMessage createInboundMessage() throws Exception;
 
     /**
-     * Temporary method used to get {@code this} same instance as the new {@link org.mule.runtime.api.message.MuleMessage} API,
-     * supporting generics. This is a temporal, transitional method which will not
-     * survive the immutability refactor
+     * TODO MULE-9856 Replace with the builder
+     * 
+     * Temporary method used to get {@code this} same instance as the new
+     * {@link org.mule.runtime.api.message.MuleMessage} API, supporting generics. This is a
+     * temporal, transitional method which will not survive the immutability refactor
      */
     @Deprecated
     <Payload, Attributes extends Serializable> org.mule.runtime.api.message.MuleMessage<Payload, Attributes> asNewMessage();

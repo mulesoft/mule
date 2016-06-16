@@ -108,8 +108,9 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage<Ob
     MuleContext getMuleContext();
 
     /**
-     * TODO MULE-9856 Replaced with use of builder
+     * TODO MULE-9856 Replace with the builder
      */
+    @Deprecated
     default MuleMessage transform(Function<MutableMuleMessage, MuleMessage> transform)
     {
         MutableMuleMessage copy = new DefaultMuleMessage(this);

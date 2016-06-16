@@ -163,6 +163,7 @@ public final class MuleTestUtils
                                          MuleContext context) throws Exception
     {
         final MuleSession session = getTestSession(flowConstruct, context);
+        // TODO MULE-9856 Replace with the builder
         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data, context), mep, flowConstruct, session);
         return event;
     }
@@ -175,6 +176,7 @@ public final class MuleTestUtils
             throws Exception
     {
         final MuleSession session = getTestSession(flowConstruct, context);
+        // TODO MULE-9856 Replace with the builder
         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data, context), flowConstruct, session);
         return event;
     }

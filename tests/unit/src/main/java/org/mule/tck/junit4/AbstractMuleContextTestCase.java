@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
-import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -169,15 +168,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         final AtomicReference<Latch> contextStartedLatch = new AtomicReference<Latch>();
 
         contextStartedLatch.set(new Latch());
-        muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
+        muleContext.registerListener(notification ->
         {
-            @Override
-            public void onNotification(MuleContextNotification notification)
+            if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
             {
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
-                {
-                    contextStartedLatch.get().countDown();
-                }
+                contextStartedLatch.get().countDown();
             }
         });
 
@@ -351,17 +346,23 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
+     * TODO MULE-9856 Replace with the builder
+     * 
      * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with a test payload
      */
+    @Deprecated
     protected MutableMuleMessage getTestMuleMessage()
     {
         return getTestMuleMessage(TEST_PAYLOAD);
     }
 
     /**
+     * TODO MULE-9856 Replace with the builder
+     * 
      * @param message
      * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with message as payload
      */
+    @Deprecated
     protected MutableMuleMessage getTestMuleMessage(Object message)
     {
         return new DefaultMuleMessage(message, muleContext);

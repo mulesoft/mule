@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonList;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
@@ -18,10 +20,7 @@ import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
-import org.apache.commons.collections.Predicate;
 
 /**
  * The default results handler for all outbound endpoint. Depending on the number of messages passed it the
@@ -99,17 +98,9 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         else
         {
             List<MuleEvent> nonNullResults = (List<MuleEvent>) CollectionUtils.select(results,
-                new Predicate()
-                {
-                    @Override
-                    public boolean evaluate(Object object)
-                    {
-                        return
-                                !VoidMuleEvent.getInstance().equals(object) &&
-                                object != null &&
-                                ((MuleEvent) object).getMessage() != null;
-                    }
-                });
+                object -> !VoidMuleEvent.getInstance().equals(object) &&
+                object != null &&
+                ((MuleEvent) object).getMessage() != null);
 
             if (nonNullResults.size() == 0)
             {
@@ -128,7 +119,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
 
     private MuleEvent createMessageCollectionWithSingleMessage(MuleEvent event, MuleContext muleContext)
     {
-        MuleMessage coll = new DefaultMuleMessage(Collections.singletonList(event.getMessage()), muleContext);
+        MuleMessage coll = new DefaultMuleMessage(singletonList(event.getMessage()), muleContext);
         event.setMessage(coll);
         return OptimizedRequestContext.unsafeSetEvent(event);
     }

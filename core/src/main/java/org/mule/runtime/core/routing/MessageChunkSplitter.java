@@ -46,6 +46,7 @@ public class MessageChunkSplitter extends AbstractSplitter
         return messageSize != 0;
     }
 
+    @Override
     protected List<MuleEvent> splitMessage(MuleEvent event) throws RoutingException
     {
         List<MuleEvent> messageParts = new ArrayList<>();
@@ -78,6 +79,7 @@ public class MessageChunkSplitter extends AbstractSplitter
             buffer = new byte[len];
             System.arraycopy(data, pos, buffer, 0, buffer.length);
             pos += len;
+            // TODO MULE-9856 Replace with the builder
             MutableMuleMessage part = new DefaultMuleMessage(buffer, message, muleContext);
             part.setCorrelationId(message.getUniqueId());
             part.setCorrelationGroupSize(parts);

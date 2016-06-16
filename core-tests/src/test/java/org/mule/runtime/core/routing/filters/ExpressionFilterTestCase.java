@@ -10,6 +10,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -30,6 +31,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
     {
         ExpressionFilter filter = new ExpressionFilter("message.outboundProperties['foo']=='bar'");
         filter.setMuleContext(muleContext);
+        // TODO MULE-9856 Replace with the builder
         MutableMuleMessage message = new DefaultMuleMessage("blah", muleContext);
         assertTrue(!filter.accept(message));
         message.setOutboundProperty("foo", "bar");
@@ -52,6 +54,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("message.outboundProperties['foo']!='bar'");
         filter.setMuleContext(muleContext);
 
+        // TODO MULE-9856 Replace with the builder
         MutableMuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(filter.accept(message));
@@ -90,6 +93,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("message.outboundProperties['foo']!=null");
         filter.setMuleContext(muleContext);
 
+        // TODO MULE-9856 Replace with the builder
         MutableMuleMessage message = new DefaultMuleMessage("blah", muleContext);
 
         assertTrue(!filter.accept(message));
@@ -152,6 +156,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("exception is java.lang.Exception");
         filter.setMuleContext(muleContext);
 
+        // TODO MULE-9856 Replace with the builder
         MutableMuleMessage m = new DefaultMuleMessage("test", muleContext);
         assertTrue(!filter.accept(m));
         m.setExceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test")));
@@ -170,6 +175,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("exception is java.lang.Exception");
         filter.setMuleContext(muleContext);
 
+        // TODO MULE-9856 Replace with the builder
         MutableMuleMessage m = new DefaultMuleMessage("test", muleContext);
         assertTrue(!filter.accept(m));
         m.setExceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test")));

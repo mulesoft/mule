@@ -22,6 +22,7 @@ import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionE
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -91,7 +92,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 
         assertThat(responseEvent.getMessage().getPayload(), is(""));
         verify(event, never()).setMessage(any(MuleMessage.class));
-        //verify(event.getMessage(), never()).setPayload(any(Object.class));
 
         MuleMessage responseMessage = event.getFlowVariable("myFace");
         assertThat(responseMessage.getPayload(), is(HEISENBERG));

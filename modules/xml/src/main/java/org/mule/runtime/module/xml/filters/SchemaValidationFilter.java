@@ -140,6 +140,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         {
             if (result != null && result.getNode() != null)
             {
+                // TODO MULE-9856 Replace with the builder
                 event.setMessage(new DefaultMuleMessage(result.getNode(), event.getMessage()));
             }
         }
@@ -164,16 +165,19 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         {
             private String systemId;
 
+            @Override
             public void write(Result result) throws Exception
             {
                 createValidator().validate(source, result);
             }
 
+            @Override
             public String getSystemId()
             {
                 return systemId;
             }
 
+            @Override
             public void setSystemId(String systemId)
             {
                 this.systemId = systemId;
@@ -198,6 +202,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         return XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), payload);
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
