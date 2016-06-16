@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.BackwardsCompatibilityProperty;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Rule;
@@ -26,22 +25,12 @@ public class DefaultNativeLibraryFinderFactoryTestCase extends AbstractMuleTestC
     @Rule
     public TemporaryFolder muleHomeFolder = new TemporaryFolder();
 
-    @Rule
-    public BackwardsCompatibilityProperty property = new BackwardsCompatibilityProperty(DefaultNativeLibraryFinderFactory.COPY_APPLICATION_NATIVE_LIBRARIES);
-
     private final DefaultNativeLibraryFinderFactory nativeLibraryFinderFactory = new DefaultNativeLibraryFinderFactory();
 
     @Test
     public void createsPerAppNativeLibraryFinderWhenPropertyIsFalse() throws Exception
     {
         doCreateNativeLibraryFinderTest(PerAppNativeLibraryFinder.class);
-    }
-
-    @Test
-    public void createsPerAppCopyNativeLibraryFinderWhenPropertyIsTrue() throws Exception
-    {
-        property.switchOn();
-        doCreateNativeLibraryFinderTest(PerAppCopyNativeLibraryFinder.class);
     }
 
     private void doCreateNativeLibraryFinderTest(final Class<? extends NativeLibraryFinder> expectedNativeLibraryFinderClass) throws Exception

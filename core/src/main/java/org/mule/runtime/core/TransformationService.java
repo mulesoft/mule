@@ -166,37 +166,26 @@ public class TransformationService
                         logger.debug("Transformer " + transformer + " doesn't support the source payload: " + srcCls);
                     }
 
-                    if (useExtendedTransformations())
+                    if (canSkipTransformer(result, transformers, index))
                     {
-                        if (canSkipTransformer(result, transformers, index))
-                        {
-                            continue;
-                        }
-
-                        // Resolves implicit conversion if possible
-                        Transformer implicitTransformer = muleContext.getDataTypeConverterResolver().resolve(originalSourceType, transformer.getSourceDataTypes());
-
-                        if (implicitTransformer != null)
-                        {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug("Performing implicit transformation with: " + transformer);
-                            }
-                            result = transformMessage(result, event, implicitTransformer);
-                            result = transformMessage(result, event, transformer);
-                        }
-                        else
-                        {
-                            throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
-                        }
+                        continue;
                     }
-                    else if (!transformer.isIgnoreBadInput())
+
+                    // Resolves implicit conversion if possible
+                    Transformer implicitTransformer = muleContext.getDataTypeConverterResolver().resolve(originalSourceType, transformer.getSourceDataTypes());
+
+                    if (implicitTransformer != null)
                     {
                         if (logger.isDebugEnabled())
                         {
-                            logger.debug("Exiting from transformer chain (ignoreBadInput = false)");
+                            logger.debug("Performing implicit transformation with: " + transformer);
                         }
-                        break;
+                        result = transformMessage(result, event, implicitTransformer);
+                        result = transformMessage(result, event, transformer);
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
                     }
                 }
             }
@@ -236,17 +225,6 @@ public class TransformationService
         }
 
         return skipConverter;
-    }
-
-    private boolean useExtendedTransformations()
-    {
-        boolean result = true;
-        if (muleContext != null && muleContext.getConfiguration() != null)
-        {
-            result = muleContext.getConfiguration().useExtendedTransformations();
-        }
-
-        return result;
     }
 
     private MuleMessage transformMessage(final MuleMessage message, final MuleEvent event, final Transformer transformer) throws TransformerMessagingException, TransformerException

@@ -7,43 +7,18 @@
 
 package org.mule.runtime.module.launcher.nativelib;
 
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.launcher.MuleFoldersUtil;
-import org.mule.runtime.core.util.BackwardsCompatibilityPropertyChecker;
-
-import java.io.File;
 
 /**
- * Creates different {@link NativeLibraryFinder} instances depending on the
- * value of system property {@value #COPY_APPLICATION_NATIVE_LIBRARIES_PROPERTY},
- * which value is true by default.
+ * Creates {@link NativeLibraryFinder}
  */
 public class DefaultNativeLibraryFinderFactory implements NativeLibraryFinderFactory
 {
 
-    public static final String COPY_APPLICATION_NATIVE_LIBRARIES_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "copyApplicationNativeLibraries";
-
-    public static final BackwardsCompatibilityPropertyChecker COPY_APPLICATION_NATIVE_LIBRARIES = new BackwardsCompatibilityPropertyChecker(COPY_APPLICATION_NATIVE_LIBRARIES_PROPERTY);
-
     @Override
     public NativeLibraryFinder create(String appName)
     {
-        File libDir = MuleFoldersUtil.getAppLibFolder(appName);
-
-        NativeLibraryFinder nativeLibraryFinder;
-
-        if (COPY_APPLICATION_NATIVE_LIBRARIES.isEnabled())
-        {
-            File perAppNativeLibs = new File(MuleFoldersUtil.getAppTempFolder(appName), MuleFoldersUtil.LIB_FOLDER);
-
-            nativeLibraryFinder = new PerAppCopyNativeLibraryFinder(libDir, perAppNativeLibs);
-        }
-        else
-        {
-            nativeLibraryFinder = new PerAppNativeLibraryFinder(libDir);
-        }
-
-        return nativeLibraryFinder;
+        return new PerAppNativeLibraryFinder(MuleFoldersUtil.getAppLibFolder(appName));
     }
 
 }

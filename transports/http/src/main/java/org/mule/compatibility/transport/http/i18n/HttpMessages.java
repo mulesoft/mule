@@ -6,12 +6,10 @@
  */
 package org.mule.compatibility.transport.http.i18n;
 
-import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
 import java.net.URI;
-import java.util.TimeZone;
 
 public class HttpMessages extends MessageFactory
 {
@@ -119,8 +117,4 @@ public class HttpMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 26, url);
     }
 
-    public static Message dateInServerTimeZone()
-    {
-        return factory.createMessage(BUNDLE_PATH, 27, TimeZone.getDefault().getDisplayName(), HttpConstants.SERVER_TIME_ZONE_PROPERTY.getPropertyName());
-    }
 }

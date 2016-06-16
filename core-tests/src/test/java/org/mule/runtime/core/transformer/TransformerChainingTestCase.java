@@ -40,7 +40,6 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
     @Before
     public void setUp() throws Exception
     {
-        when(muleConfiguration.useExtendedTransformations()).thenReturn(Boolean.FALSE);
         when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
         transformationService = new TransformationService(muleContext);
     }
@@ -91,26 +90,6 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertEquals(new Integer(3), transformedMessage);
     }
 
-    @Test
-    public void testIgnoreBadInputDoesNotBreakChainWithTransformationOrderInvalidValid() throws Exception
-    {
-        AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
-        assertNotNull(invalidTransformer);
-        invalidTransformer.setIgnoreBadInput(true);
-        
-        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
-        assertNotNull(validTransformer);
-
-        MuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
-        Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
-        messageTransformer.setMuleContext(muleContext);
-        message = transformationService.applyTransformers(message, null, messageTransformer);
-
-        Object transformedMessage = message.getPayload();
-        assertNotNull(transformedMessage);
-        assertEquals(new Integer(1), transformedMessage);
-    }
-
     @Test(expected = TransformerMessagingException.class)
     public void testIgnoreBadInputBreaksWithTransformationOrderInvalidValidWhenEnforcedOn() throws Exception
     {
@@ -151,38 +130,18 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testIgnoreBadInputDoesNotBreakChainWithTransformationOrderValidInvalid() throws Exception
-    {
-        AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
-        assertNotNull(invalidTransformer);
-        invalidTransformer.setIgnoreBadInput(true);
-        
-        AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
-        assertNotNull(validTransformer);
-
-        MuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
-        Transformer messageTransformer = new TransformerChain(validTransformer, invalidTransformer);
-        messageTransformer.setMuleContext(muleContext);
-        message = transformationService.applyTransformers(message, null, messageTransformer);
-
-        Object transformedMessage = message.getPayload();
-        assertNotNull(transformedMessage);
-        assertEquals(new Integer(1), transformedMessage);
-    }
-
-    @Test
     public void testIgnoreBadInputBreaksChainWithTransformationOrderValidInvalid() throws Exception
     {
         AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
         assertNotNull(invalidTransformer);
         invalidTransformer.setIgnoreBadInput(false);
-        
+
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
-        
+
         DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerChain(validTransformer, invalidTransformer);
-        
+
         try
         {
             transformationService.applyTransformers(message, null, messageTransformer);

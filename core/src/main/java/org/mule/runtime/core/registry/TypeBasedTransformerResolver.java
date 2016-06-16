@@ -91,15 +91,12 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
 
         List<Transformer> trans = muleContext.getRegistry().lookupTransformers(source, result);
 
-        if (muleContext != null && muleContext.getConfiguration().useExtendedTransformations())
+        Transformer compositeTransformer = graphTransformerResolver.resolve(source, result);
+        if (compositeTransformer != null)
         {
-            Transformer compositeTransformer = graphTransformerResolver.resolve(source, result);
-            if (compositeTransformer != null)
-            {
-                // Needs to create a new list because the lookup returns a cached instance
-                trans = new LinkedList<Transformer>(trans);
-                trans.add(compositeTransformer);
-            }
+            // Needs to create a new list because the lookup returns a cached instance
+            trans = new LinkedList<Transformer>(trans);
+            trans.add(compositeTransformer);
         }
 
         transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());

@@ -7,7 +7,6 @@
 package org.mule.compatibility.transport.http;
 
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.util.BackwardsCompatibilityPropertyChecker;
 import org.mule.runtime.core.util.MapUtils;
 
 import com.google.common.net.HttpHeaders;
@@ -45,8 +44,6 @@ public class HttpConstants
 
     // Date header format
     public static final String DATE_FORMAT_RFC822 = "EEE, dd MMM yyyy HH:mm:ss Z";
-    //Date header backwards compatibility property checker
-    public static final BackwardsCompatibilityPropertyChecker SERVER_TIME_ZONE_PROPERTY = new BackwardsCompatibilityPropertyChecker("mule.http.dateheaderservertimezone");
 
     // Newline
     public static final String CRLF = "\r\n";

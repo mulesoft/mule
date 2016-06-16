@@ -52,7 +52,6 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase
     @Before
     public void setUp() throws Exception
     {
-        when(muleConfiguration.useExtendedTransformations()).thenReturn(false);
         when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     }
 
