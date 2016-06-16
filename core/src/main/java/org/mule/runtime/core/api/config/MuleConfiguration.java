@@ -81,12 +81,6 @@ public interface MuleConfiguration
      */
     String getDefaultExceptionStrategyName();
 
-    boolean useExtendedTransformations();
-
-    boolean isFlowEndingWithOneWayEndpointReturnsNull();
-    
-    boolean isEnricherPropagatesSessionVariableChanges();
-
     boolean isDisableTimeouts();
 
     /**

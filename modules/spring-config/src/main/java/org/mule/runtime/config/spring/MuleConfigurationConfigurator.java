@@ -73,10 +73,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
             defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
             defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
-            defaultConfig.setUseExtendedTransformations(config.useExtendedTransformations());
-            defaultConfig.setFlowEndingWithOneWayEndpointReturnsNull(config.isFlowEndingWithOneWayEndpointReturnsNull());
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
-            defaultConfig.setEnricherPropagatesSessionVariableChanges(config.isEnricherPropagatesSessionVariableChanges());
             defaultConfig.setExtensions(config.getExtensions());
 
             determineDefaultProcessingStrategy(defaultConfig);
@@ -181,21 +178,6 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName)
     {
         config.setDefaultExceptionStrategyName(defaultExceptionStrategyName);
-    }
-
-    public void setUseExtendedTransformations(boolean resolveNonDirectTransformations)
-    {
-        config.setUseExtendedTransformations(resolveNonDirectTransformations);
-    }
-
-    public void setFlowEndingWithOneWayEndpointReturnsNull(boolean flowEndingWithOneWayEndpointReturnsNull)
-    {
-        config.setFlowEndingWithOneWayEndpointReturnsNull(flowEndingWithOneWayEndpointReturnsNull);
-    }
-
-    public void setEnricherPropagatesSessionVariableChanges(boolean enricherPropagatesSessionVariableChanges)
-    {
-        config.setEnricherPropagatesSessionVariableChanges(enricherPropagatesSessionVariableChanges);
     }
 
     public void setDefaultObjectSerializer(ObjectSerializer objectSerializer)

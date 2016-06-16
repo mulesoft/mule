@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -75,15 +74,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             server = MuleManifest.getProductName() + "/" + MuleManifest.getProductVersion();
         }
 
-        if(HttpConstants.SERVER_TIME_ZONE_PROPERTY.isEnabled())
-        {
-            logger.warn(HttpMessages.dateInServerTimeZone().toString());
-            dateFormatter = dateFormatter.withZone(DateTimeZone.forID(TimeZone.getDefault().getID()));
-        }
-        else
-        {
-            dateFormatter = dateFormatter.withZone(DateTimeZone.forID("GMT"));
-        }
+        dateFormatter = dateFormatter.withZone(DateTimeZone.forID("GMT"));
     }
 
     @Override

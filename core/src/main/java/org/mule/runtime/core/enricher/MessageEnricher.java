@@ -247,13 +247,6 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
                     enrich(eventToEnrich, response, pair.getSource(), pair.getTarget(), expressionManager);
                 }
             }
-
-            if (muleContext != null
-                && muleContext.getConfiguration().isEnricherPropagatesSessionVariableChanges())
-            {
-                eventToEnrich = new DefaultMuleEvent(eventToEnrich.getMessage(), eventToEnrich, response.getSession());
-            }
-
             return OptimizedRequestContext.unsafeSetEvent(eventToEnrich);
         }
 
