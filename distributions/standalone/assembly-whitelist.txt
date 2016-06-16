@@ -134,7 +134,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-file-extension-common-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-http-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-http-ext-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-json-${productVersion}.jar
@@ -167,6 +166,7 @@
 /mule-standalone-${productVersion}/app-plugins/mule-module-ftp-${productVersion}.zip
 /mule-standalone-${productVersion}/app-plugins/mule-module-sockets-${productVersion}.zip
 /mule-standalone-${productVersion}/app-plugins/mule-module-validation-${productVersion}.zip
+/mule-standalone-${productVersion}/app-plugins/mule-module-http-ext-4.0-SNAPSHOT.zip
 
 #
 # /lib/opt
