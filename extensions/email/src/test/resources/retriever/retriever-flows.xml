@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:email="http://www.mulesoft.org/schema/mule/email"
+      xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+
+    <flow name="retrieveAndRead">
+        <email:list config-ref="config"/>
+    </flow>
+
+    <flow name="retrieveMatchingSubjectAndFromAddress">
+        <email:list config-ref="config">
+            <email:match-with>
+                <email:matcher subjectRegex="Email Subject" fromRegex="@mulesoft"/>
+            </email:match-with>
+        </email:list>
+    </flow>
+
+    <flow name="retrieveWithAttachments">
+        <email:list config-ref="config"/>
+    </flow>
+
+    <flow name="storeMessages">
+        <email:list config-ref="config"/>
+        <email:store config-ref="config" localDirectory="${storePath}"/>
+    </flow>
+
+    <flow name="storeSingleMessage">
+        <email:store config-ref="config" localDirectory="${storePath}" emailId="1"/>
+    </flow>
+
+</mule>

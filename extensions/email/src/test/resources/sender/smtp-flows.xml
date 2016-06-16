@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:email="http://www.mulesoft.org/schema/mule/email"
+      xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+
+
+    <flow name="sendEmail">
+        <email:send config-ref="config" subject="Email Subject" content="emailContent">
+            <email:to-addresses>
+                <email:to-address value="juan.desimoni@mulesoft.com"/>
+            </email:to-addresses>
+        </email:send>
+    </flow>
+
+    <flow name="sendEmailWithAttachment">
+        <email:send config-ref="config" subject="Email Subject" content="emailContent" >
+            <email:to-addresses>
+                <email:to-address value="pablo.musumeci@mulesoft.com"/>
+            </email:to-addresses>
+            <email:cc-addresses>
+                <email:cc-address value="pablo.musumeci@mulesoft.com"/>
+            </email:cc-addresses>
+            <email:bcc-addresses>
+                <email:bcc-address value="esteban.wasinger@mulesoft.com"/>
+                <email:bcc-address value="alejandro.g.marra@mulesoft.com"/>
+            </email:bcc-addresses>
+            <email:attachments>
+                <email:email-attachment content="#[Thread.currentThread().getContextClassLoader().getResource('attachment.json')]" id="json-attachment"/>
+                <email:email-attachment content="#['This is the email text attachment']" id="text-attachment" contentType="text/plain"/>
+            </email:attachments>
+        </email:send>
+    </flow>
+
+    <flow name="replyEmail">
+        <email:reply config-ref="config" content="emailContent"/>
+    </flow>
+
+    <flow name="forwardEmail">
+        <email:forward config-ref="config" subject="Email Subject">
+            <email:to-addresses>
+                <email:to-address value="pablo.musumeci@mulesoft.com"/>
+            </email:to-addresses>
+        </email:forward>
+    </flow>
+
+    <email:email-content name="emailContent" body="Email Content" contentType="text/plain"/>
+
+</mule>

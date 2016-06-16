@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:email="http://www.mulesoft.org/schema/mule/email"
+      xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+
+
+    <email:pop3 name="config">
+        <email:pop3-connection host="127.0.0.1" port="${port}" password="password" user="juan.desimoni@mulesoft.com"/>
+    </email:pop3>
+
+    <spring:beans>
+        <spring:import resource="pop3-flows.xml"/>
+    </spring:beans>
+
+</mule>
