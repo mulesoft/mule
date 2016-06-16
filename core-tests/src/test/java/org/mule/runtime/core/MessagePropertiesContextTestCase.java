@@ -45,16 +45,20 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
         event.getSession().setProperty("Prop", "session");
         MuleMessage message = event.getMessage();
 
-        event.setMessage(message.transform(msg -> {
+        message = message.transform(msg ->
+        {
             msg.setOutboundProperty("Prop", "outbound");
             return msg;
-        }));
+        });
+        event.setMessage(message);
 
         assertEquals("outbound", message.getOutboundProperty("Prop"));
-        event.setMessage(message.transform(msg -> {
+        message = message.transform(msg ->
+        {
             msg.removeOutboundProperty("Prop");
             return msg;
-        }));
+        });
+        event.setMessage(message);
 
         assertNull(message.getInboundProperty("Prop"));
         assertNull(message.getOutboundProperty("Prop"));

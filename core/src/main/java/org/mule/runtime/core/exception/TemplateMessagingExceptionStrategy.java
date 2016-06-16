@@ -35,6 +35,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     private String when;
     private boolean handleException;
 
+    @Override
     final public MuleEvent handleException(Exception exception, MuleEvent event)
     {
         try
@@ -69,7 +70,8 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             fireNotification(exception);
             logException(exception, request);
             processStatistics(request);
-            request.setMessage(request.getMessage().transform(msg -> {
+            request.setMessage(request.getMessage().transform(msg ->
+            {
                 msg.setExceptionPayload(new DefaultExceptionPayload(exception));
                 return msg;
             }));
@@ -223,6 +225,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         this.when = when;
     }
 
+    @Override
     public boolean accept(MuleEvent event)
     {
         return acceptsAll() || acceptsEvent(event) || muleContext.getExpressionManager().evaluateBoolean(when, event);

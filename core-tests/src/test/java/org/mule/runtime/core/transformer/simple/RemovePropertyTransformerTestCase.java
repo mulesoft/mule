@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.verify;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashSet;
-
-import org.mockito.ArgumentMatcher;
 
 @SmallTest
 public class RemovePropertyTransformerTestCase extends AbstractRemoveVariablePropertyTransformerTestCase
@@ -36,26 +36,12 @@ public class RemovePropertyTransformerTestCase extends AbstractRemoveVariablePro
     @Override
     protected void verifyRemoved(MuleEvent mockEvent, String key)
     {
-        verify(mockEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>()
-        {
-            @Override
-            public boolean matches(Object argument)
-            {
-                return ((MuleMessage) argument).getOutboundProperty(key) == null;
-            }
-        }));
+        assertThat(mockEvent.getMessage().getOutboundProperty(key), is(nullValue()));
     }
 
     @Override
     protected void verifyNotRemoved(MuleEvent mockEvent, String key)
     {
-        verify(mockEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>()
-        {
-            @Override
-            public boolean matches(Object argument)
-            {
-                return ((MuleMessage) argument).getOutboundProperty(key) != null;
-            }
-        }));
+        assertThat(mockEvent.getMessage().getOutboundProperty(key), not(nullValue()));
     }
 }

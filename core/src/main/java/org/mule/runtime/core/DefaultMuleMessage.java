@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.core.transformer.types.DataTypeFactory.createFromDataType;
 import static org.mule.runtime.core.transformer.types.DataTypeFactory.createFromDataTypeWithMimeType;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -62,6 +63,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -1461,5 +1463,16 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
                 }
             }
         }
+    }
+
+    /**
+     * TODO MULE-9856 Replace with the builder This is needed for calls from mocks.
+     */
+    @Override
+    @Deprecated
+    public MuleMessage transform(Function<MutableMuleMessage, MuleMessage> transform)
+    {
+        MutableMuleMessage copy = new DefaultMuleMessage(this);
+        return transform.apply(copy);
     }
 }

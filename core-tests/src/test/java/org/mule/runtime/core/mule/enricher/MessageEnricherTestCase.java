@@ -7,6 +7,7 @@
 package org.mule.runtime.core.mule.enricher;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
+import static junit.framework.Assert.assertSame;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -19,6 +20,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -46,8 +48,9 @@ import org.mule.tck.junit4.matcher.DataTypeMatcher;
 
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 {
@@ -156,7 +159,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void propogateMessage() throws Exception
+    public void propagateMessage() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
         enricher.setMuleContext(muleContext);
@@ -169,13 +172,14 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
             return event;
         });
         MuleEvent in = getTestEvent("");
-        in.getMessage().transform(msg -> {
+        in.setMessage(in.getMessage().transform(msg ->
+        {
             msg.setOutboundProperty("foo", "bar");
             return msg;
-        });
+        }));
         MuleEvent out = enricher.process(in);
-        Assert.assertSame(in, out);
-        Assert.assertSame(in.getMessage(), out.getMessage());
+        assertSame(in, out);
+        assertSame(in.getMessage(), out.getMessage());
         assertEquals(in.getMessage().getUniqueId(), out.getMessage().getUniqueId());
         assertEquals(in.getMessage().getOutboundPropertyNames(), out.getMessage().getOutboundPropertyNames());
         assertEquals("bar", out.getMessage().getOutboundProperty("foo"));
@@ -183,7 +187,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void propogateMessagePropagateSession() throws Exception
+    public void propagateMessagePropagateSession() throws Exception
     {
         ((DefaultMuleConfiguration) muleContext.getConfiguration()).setEnricherPropagatesSessionVariableChanges(true);
         MessageEnricher enricher = new MessageEnricher();
@@ -197,10 +201,11 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
             return event;
         });
         MuleEvent in = getTestEvent("");
-        in.getMessage().transform(msg -> {
+        in.setMessage(in.getMessage().transform(msg ->
+        {
             msg.setOutboundProperty("foo", "bar");
             return msg;
-        });
+        }));
         MuleEvent out = enricher.process(in);
         Assert.assertNotSame(in, out);
         Assert.assertSame(in.getMessage(), out.getMessage());

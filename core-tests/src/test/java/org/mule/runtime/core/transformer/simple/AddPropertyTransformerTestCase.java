@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.hamcrest.Matchers.any;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.size.SmallTest;
 
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatcher;
+import java.io.Serializable;
+
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 @SmallTest
 public class AddPropertyTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase
@@ -28,34 +28,27 @@ public class AddPropertyTransformerTestCase extends AbstractAddVariablePropertyT
     }
 
     @Override
-    protected void verifyAdded(MuleEvent event, String key, String value, ArgumentCaptor<DataType> dataTypeCaptor)
+    protected void verifyAdded(MuleEvent event, String key, String value)
     {
-        verify(event, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>()
-        {
-            @Override
-            public boolean matches(Object argument)
-            {
-                return ((MuleMessage) argument).getOutboundProperty(key).equals(value);
-            }
-        }));
+        assertThat(event.getMessage().getOutboundProperty(key), is(value));
     }
 
     @Override
     protected void verifyNotAdded(MuleEvent event)
     {
-        verify(event, times(0)).setMessage(argThat(any(MuleMessage.class)));
+        assertThat(event.getMessage().getOutboundPropertyNames(), empty());
     }
 
     @Override
     protected void verifyRemoved(MuleEvent event, String key)
     {
-        verify(event, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>()
-        {
-            @Override
-            public boolean matches(Object argument)
-            {
-                return ((MuleMessage) argument).getOutboundProperty(key) ==  null;
-            }
-        }));
+        assertThat(event.getMessage().getOutboundProperty(key), is(nullValue()));
     }
+
+    @Override
+    protected DataType<Serializable> getVariableDataType(MuleEvent event, String key)
+    {
+        return event.getMessage().getOutboundPropertyDataType(key);
+    }
+
 }

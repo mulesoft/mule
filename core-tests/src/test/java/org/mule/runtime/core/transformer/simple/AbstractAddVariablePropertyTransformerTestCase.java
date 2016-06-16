@@ -9,16 +9,22 @@ package org.mule.runtime.core.transformer.simple;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_XML;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.SimpleDataType;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -26,14 +32,12 @@ import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.transformer.types.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
 
 import javax.activation.MimeTypeParseException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 @SmallTest
@@ -47,13 +51,12 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
     public static final String NULL_EXPRESSION = "#[string:someValueNull]";
     public static final String CUSTOM_ENCODING = UTF_8.name();
 
-    private MuleEvent mockEvent = mock(MuleEvent.class);
-    private MuleMessage mockMessage = mock(MuleMessage.class);
+    private MuleEvent mockEvent;
+    private MuleMessage mockMessage;
     private MuleSession mockSession = mock(MuleSession.class);
     private MuleContext mockMuleContext = mock(MuleContext.class);
     private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
     private AbstractAddVariablePropertyTransformer addVariableTransformer;
-    private final ArgumentCaptor<DataType> dataTypeCaptor = ArgumentCaptor.forClass(DataType.class);
 
     public AbstractAddVariablePropertyTransformerTestCase(AbstractAddVariablePropertyTransformer abstractAddVariableTransformer)
     {
@@ -65,14 +68,16 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
     {
         addVariableTransformer.setReturnDataType(new SimpleDataType(Object.class));
 
-        when(mockEvent.getMessage()).thenReturn(mockMessage);
-        when(mockEvent.getSession()).thenReturn(mockSession);
         when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+        when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
         when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
-        when(mockExpressionManager.evaluate(EXPRESSION, mockEvent)).thenReturn(EXPRESSION_VALUE);
+        when(mockExpressionManager.evaluate(eq(EXPRESSION), Mockito.any(MuleEvent.class))).thenReturn(EXPRESSION_VALUE);
         TypedValue typedValue = new TypedValue(EXPRESSION_VALUE, DataTypeFactory.STRING);
-        when(mockExpressionManager.evaluateTyped(EXPRESSION, mockEvent)).thenReturn(typedValue);
+        when(mockExpressionManager.evaluateTyped(eq(EXPRESSION), Mockito.any(MuleEvent.class))).thenReturn(typedValue);
         addVariableTransformer.setMuleContext(mockMuleContext);
+
+        mockMessage = new DefaultMuleMessage("", mockMuleContext);
+        mockEvent = new DefaultMuleEvent(mockMessage, (FlowConstruct) null, mockSession);
     }
 
     @Test
@@ -83,8 +88,8 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockEvent, ENCODING);
 
-        verifyAdded(mockEvent, PLAIN_STRING_KEY, PLAIN_STRING_VALUE, dataTypeCaptor);
-        assertThat(dataTypeCaptor.getValue(), DataTypeMatcher.like(String.class, MimeTypes.ANY, null));
+        verifyAdded(mockEvent, PLAIN_STRING_KEY, PLAIN_STRING_VALUE);
+        assertThat(getVariableDataType(mockEvent, PLAIN_STRING_KEY), like(String.class, MimeTypes.ANY, null));
     }
 
     @Test
@@ -95,8 +100,8 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockEvent, ENCODING);
 
-        verifyAdded(mockEvent, PLAIN_STRING_KEY, EXPRESSION_VALUE, dataTypeCaptor);
-        assertThat(dataTypeCaptor.getValue(), DataTypeMatcher.like(String.class, MimeTypes.ANY, null));
+        verifyAdded(mockEvent, PLAIN_STRING_KEY, EXPRESSION_VALUE);
+        assertThat(getVariableDataType(mockEvent, PLAIN_STRING_KEY), like(String.class, MimeTypes.ANY, null));
     }
 
     @Test
@@ -107,8 +112,8 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         addVariableTransformer.initialise();
         addVariableTransformer.transform(mockEvent, ENCODING);
 
-        verifyAdded(mockEvent, EXPRESSION_VALUE, PLAIN_STRING_VALUE, dataTypeCaptor);
-        assertThat(dataTypeCaptor.getValue(), DataTypeMatcher.like(String.class, MimeTypes.ANY, null));
+        verifyAdded(mockEvent, EXPRESSION_VALUE, PLAIN_STRING_VALUE);
+        assertThat(getVariableDataType(mockEvent, EXPRESSION_VALUE), like(String.class, MimeTypes.ANY, null));
     }
 
     @Test
@@ -120,8 +125,8 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         addVariableTransformer.setReturnDataType(new SimpleDataType<>(Object.class, null, CUSTOM_ENCODING));
         addVariableTransformer.transform(mockEvent, ENCODING);
 
-        verifyAdded(mockEvent, PLAIN_STRING_KEY, PLAIN_STRING_VALUE, dataTypeCaptor);
-        assertThat(dataTypeCaptor.getValue(), DataTypeMatcher.like(String.class, MimeTypes.ANY, CUSTOM_ENCODING));
+        verifyAdded(mockEvent, PLAIN_STRING_KEY, PLAIN_STRING_VALUE);
+        assertThat(getVariableDataType(mockEvent, PLAIN_STRING_KEY), like(String.class, MimeTypes.ANY, CUSTOM_ENCODING));
     }
 
     @Test
@@ -133,9 +138,11 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         addVariableTransformer.setReturnDataType(new SimpleDataType<>(Object.class, APPLICATION_XML));
         addVariableTransformer.transform(mockEvent, ENCODING);
 
-        verifyAdded(mockEvent, PLAIN_STRING_KEY, PLAIN_STRING_VALUE, dataTypeCaptor);
-        assertThat(dataTypeCaptor.getValue(), DataTypeMatcher.like(String.class, APPLICATION_XML, null));
+        verifyAdded(mockEvent, PLAIN_STRING_KEY, PLAIN_STRING_VALUE);
+        assertThat(getVariableDataType(mockEvent, PLAIN_STRING_KEY), like(String.class, APPLICATION_XML, null));
     }
+
+    protected abstract DataType getVariableDataType(MuleEvent event, String key);
 
     @Test(expected = IllegalArgumentException.class)
     public void testAddVariableWithNullKey() throws InitialisationException, TransformerException
@@ -194,7 +201,7 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         verifyRemoved(mockEvent, PLAIN_STRING_KEY);
     }
 
-    protected abstract void verifyAdded(MuleEvent event, String key, String value, ArgumentCaptor<DataType> dataTypeCaptor);
+    protected abstract void verifyAdded(MuleEvent event, String key, String value);
 
     protected abstract void verifyNotAdded(MuleEvent mockEvent);
 

@@ -6,7 +6,6 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NameableObject;
@@ -31,11 +30,16 @@ public class TestMessageProcessor implements MessageProcessor, NameableObject
         this.label = label;
     }
     
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (event != null && event.getMessage() != null)
         {
-            event.setMessage(new DefaultMuleMessage(event.getMessage().getPayload() + ":" + label, event.getMessage()));
+            event.setMessage(event.getMessage().transform(msg ->
+            {
+                msg.setPayload(msg.getPayload() + ":" + label);
+                return msg;
+            }));
         }
         return event;
     }
@@ -50,11 +54,13 @@ public class TestMessageProcessor implements MessageProcessor, NameableObject
         this.label = label;
     }
 
+    @Override
     public void setName(String name)
     {
         this.name = name;
     }
 
+    @Override
     public String getName()
     {
         return name;

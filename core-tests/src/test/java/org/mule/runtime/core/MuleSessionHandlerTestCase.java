@@ -106,10 +106,12 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         List<String> list = createList();
         event.getSession().setProperty("fooList", list);
 
-        handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        event.setMessage(message);
         // store save session to outbound, move it to the inbound
         // for retrieve to deserialize
         Serializable s = removeProperty(event);
+        message = (DefaultMuleMessage) event.getMessage();
         message.setInboundProperty(MULE_SESSION_PROPERTY, s);
         MuleSession session = handler.retrieveSessionInfoFromMessage(event.getMessage());
 
@@ -138,10 +140,12 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 
         NotSerializableClass clazz = new NotSerializableClass();
         event.getSession().setProperty("foo", clazz);
-        handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        event.setMessage(message);
         // store save session to outbound, move it to the inbound
         // for retrieve to deserialize
         Serializable s = removeProperty(event);
+        message = (DefaultMuleMessage) event.getMessage();
         message.setInboundProperty(MULE_SESSION_PROPERTY, s);
         MuleSession session = handler.retrieveSessionInfoFromMessage(event.getMessage());
         // Property was removed because it could not be serialized
@@ -162,10 +166,12 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         SecurityContext sc = new DefaultSecurityContextFactory().create(new DefaultMuleAuthentication(credentials));
         event.getSession().setSecurityContext(sc);
 
-        handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        event.setMessage(message);
         // store save session to outbound, move it to the inbound
         // for retrieve to deserialize
         Serializable s = removeProperty(event);
+        message = (DefaultMuleMessage) event.getMessage();
         message.setInboundProperty(MULE_SESSION_PROPERTY, s);
         MuleSession session = handler.retrieveSessionInfoFromMessage(event.getMessage());
 

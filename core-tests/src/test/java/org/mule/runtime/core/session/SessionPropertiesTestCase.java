@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.core.session;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -122,7 +126,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
         event.getSession().setProperty("key", "value");
 
         // Serialize and deserialize session using default session handler
-        new SerializeAndEncodeSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
+        message = (DefaultMuleMessage) new SerializeAndEncodeSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
         message.setInboundProperty(MULE_SESSION_PROPERTY, message.getOutboundProperty(MULE_SESSION_PROPERTY));
         MuleSession newSession = new SerializeAndEncodeSessionHandler().retrieveSessionInfoFromMessage(message);
 
@@ -186,14 +190,14 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
         event.getSession().setProperty("key2", "value2");
 
         // Serialize and deserialize session using default session handler
-        new SerializeAndEncodeSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
+        message = (DefaultMuleMessage) new SerializeAndEncodeSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
         message.setInboundProperty(MULE_SESSION_PROPERTY, message.getOutboundProperty(MULE_SESSION_PROPERTY));
         MuleSession newSession = new SerializeAndEncodeSessionHandler().retrieveSessionInfoFromMessage(message);
 
         // Session after deserialization is a new instance that does not equal old
         // instance
-        assertNotSame(newSession, event.getSession());
-        assertFalse(newSession.equals(event.getSession()));
+        assertThat(newSession, not(sameInstance(event.getSession())));
+        assertThat(newSession, not(event.getSession()));
         assertEquals(nonSerializable, event.getSession().getProperty("key"));
         assertEquals("value2", event.getSession().getProperty("key2"));
 

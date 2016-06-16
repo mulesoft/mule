@@ -16,14 +16,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -89,9 +88,8 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
         configureXaTransactionAndSingleResourceTransaction();
 
         MuleEvent resultEvent = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
-        assertThat(resultEvent, is(resultEvent));
+        assertThat(resultEvent, is(mockMuleEvent));
 
-        verify(mockMuleMessage, times(2)).setExceptionPayload(Matchers.any(ExceptionPayload.class));
         verify(mockTransaction, times(0)).setRollbackOnly();
         verify(mockTransaction, times(0)).commit();
         verify(mockTransaction, times(0)).rollback();
@@ -166,41 +164,26 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
 
     private MessageProcessor createChagingEventMessageProcessor(final MuleEvent lastEventCreated)
     {
-        return new MessageProcessor()
-        {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return lastEventCreated;
-            }
-        };
+        return event -> lastEventCreated;
     }
 
     private MessageProcessor createFailingEventMessageProcessor(final MuleEvent lastEventCreated)
     {
-        return new MessageProcessor()
+        return event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                throw new DefaultMuleException(mockException);
-            }
+            throw new DefaultMuleException(mockException);
         };
     }
 
     private MessageProcessor createSetStringMessageProcessor(final String appendText)
     {
-        return new MessageProcessor()
+        return event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setPayload(appendText);
-                    return msg;
-                }));
-                return event;
-            }
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setPayload(appendText);
+                return msg;
+            }));
+            return event;
         };
     }
 
