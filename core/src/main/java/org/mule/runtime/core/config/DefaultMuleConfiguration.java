@@ -142,8 +142,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
     private boolean cacheMessageAsBytes = true;
 
-    private boolean cacheMessageOriginalPayload = true;
-
     private boolean enableStreaming = true;
 
     private boolean autoWrapMessageAwareTransform = true;
@@ -329,11 +327,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         if (p != null)
         {
             cacheMessageAsBytes = BooleanUtils.toBoolean(p);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal");
-        if (p != null)
-        {
-            cacheMessageOriginalPayload = BooleanUtils.toBoolean(p);
         }
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
         if (p != null)
@@ -609,20 +602,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     }
 
     @Override
-    public boolean isCacheMessageOriginalPayload()
-    {
-        return cacheMessageOriginalPayload;
-    }
-
-    public void setCacheMessageOriginalPayload(boolean cacheMessageOriginalPayload)
-    {
-        if (verifyContextNotStarted())
-        {
-            this.cacheMessageOriginalPayload = cacheMessageOriginalPayload;
-        }
-    }
-
-    @Override
     public boolean isEnableStreaming()
     {
         return enableStreaming;
@@ -849,7 +828,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         int result = 1;
         result = prime * result + (autoWrapMessageAwareTransform ? 1231 : 1237);
         result = prime * result + (cacheMessageAsBytes ? 1231 : 1237);
-        result = prime * result + (cacheMessageOriginalPayload ? 1231 : 1237);
         result = prime * result + (clientMode ? 1231 : 1237);
         result = prime * result + defaultQueueTimeout;
         result = prime * result + defaultTransactionTimeout;
@@ -889,10 +867,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             return false;
         }
         if (cacheMessageAsBytes != other.cacheMessageAsBytes)
-        {
-            return false;
-        }
-        if (cacheMessageOriginalPayload != other.cacheMessageOriginalPayload)
         {
             return false;
         }

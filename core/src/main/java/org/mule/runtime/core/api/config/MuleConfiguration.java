@@ -41,8 +41,6 @@ public interface MuleConfiguration
 
     boolean isCacheMessageAsBytes();
 
-    boolean isCacheMessageOriginalPayload();
-
     boolean isEnableStreaming();
 
     boolean isValidateExpressions();
