@@ -12,7 +12,6 @@ import org.mule.runtime.config.spring.parsers.collection.ChildMapDefinitionParse
 import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ObjectFactoryWrapper;
-import org.mule.runtime.core.agent.Log4jNotificationLoggerAgent;
 import org.mule.runtime.module.management.agent.DefaultJmxSupportAgent;
 import org.mule.runtime.module.management.agent.JmxServerNotificationAgent;
 import org.mule.runtime.module.management.agent.Log4jAgent;
@@ -41,10 +40,6 @@ public class ManagementNamespaceHandler extends AbstractMuleNamespaceHandler
         defaultJmxParser.addAlias("registerLog4j", "loadLog4jAgent");
         
         registerBeanDefinitionParser("level-mapping", new ChildMapEntryDefinitionParser("levelMappings", "severity", "eventId"));
-
-        // these two are identical?
-        registerBeanDefinitionParser("log4j-notifications", new DefaultNameMuleOrphanDefinitionParser(Log4jNotificationLoggerAgent.class));
-        registerBeanDefinitionParser("chainsaw-notifications", new DefaultNameMuleOrphanDefinitionParser(Log4jNotificationLoggerAgent.class));
 
         registerBeanDefinitionParser("rmi-server", new DefaultNameMuleOrphanDefinitionParser(RmiRegistryAgent.class));
         registerBeanDefinitionParser("yourkit-profiler", new DefaultNameMuleOrphanDefinitionParser(YourKitProfilerAgent.class));

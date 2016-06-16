@@ -26,10 +26,6 @@
 
     <management:jmx-notifications/>
 
-    <management:log4j-notifications/>
-
-    <management:chainsaw-notifications chainsawPort="8080" chainsawHost="127.0.0.1"/>
-
     <!-- needs profiler installed -->
     <!-- management:yourkit-profiler/ -->
 
