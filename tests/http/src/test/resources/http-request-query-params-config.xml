@@ -13,12 +13,12 @@
     <flow name="queryParamList">
         <httpn:request config-ref="config" path="testPath" method="POST" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:query-params>
                         <httpn:query-param key="testName1" value="testValue1" />
                         <httpn:query-param key="#[paramName]" value="#[paramValue]" />
                     </httpn:query-params>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -26,7 +26,7 @@
     <flow name="queryParamMap">
         <httpn:request config-ref="config" path="testPath"  key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder queryParams="#[params]"/>
+                <httpn:simple-request-builder queryParams="#[params]"/>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -34,11 +34,11 @@
     <flow name="multipleQueryParam">
         <httpn:request config-ref="config" path="testPath" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder queryParams="#[params]">
+                <httpn:simple-request-builder queryParams="#[params]">
                     <httpn:query-params>
                         <httpn:query-param key="testName1" value="testValue1" />
                     </httpn:query-params>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -47,8 +47,8 @@
         <httpn:request config-ref="config" path="testPath"  key="ANY">
             <httpn:request-builder>
                 <!-- Not currently supported. -->
-                <!--<httpn:requester-request-builder queryParams="#[{'testName1':null, 'testName2': [null]}]"/>-->
-                <httpn:requester-request-builder queryParams="#[{'testName1':null, 'testName2': null}]"/>
+                <!--<httpn:simple-request-builder queryParams="#[{'testName1':null, 'testName2': [null]}]"/>-->
+                <httpn:simple-request-builder queryParams="#[{'testName1':null, 'testName2': null}]"/>
             </httpn:request-builder>
         </httpn:request>
     </flow>

@@ -16,6 +16,7 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.HttpRequesterConfig;
+import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -33,6 +34,7 @@ import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
+import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
 import com.google.common.collect.Lists;
@@ -50,6 +52,11 @@ import javax.activation.DataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Component that transforms a {@link MuleEvent} to a {@link HttpRequest}.
+ *
+ * @since 4.0
+ */
 public class MuleEventToHttpRequest
 {
     private static final Logger logger = LoggerFactory.getLogger(MuleEventToHttpRequest.class);
@@ -73,8 +80,16 @@ public class MuleEventToHttpRequest
         this.source = source;
     }
 
-
-    public HttpRequestBuilder create(MuleEvent event, HttpRequesterRequestBuilder requestBuilder) throws MuleException
+    /**
+     * Creates an {@HttpRequest}.
+     *
+     * @param event The {@link MuleEvent} that should be used to set the {@link HttpRequest} content.
+     * @param requestBuilder The generic {@link HttpRequesterRequestBuilder} from the request component that should be used to create the {@link HttpRequest}.
+     * @param authentication The {@link HttpAuthentication} that should be used to create the {@link HttpRequest}.
+     * @return an {@HttpRequest} configured based on the parameters.
+     * @throws MuleException if the request creation fails.
+     */
+    public HttpRequest create(MuleEvent event, HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication) throws MuleException
     {
         HttpRequestBuilder builder = new HttpRequestBuilder();
 
@@ -116,7 +131,12 @@ public class MuleEventToHttpRequest
 
         builder.setEntity(createRequestEntity(builder, event, this.method, requestBuilder.getParts()));
 
-        return builder;
+        if (authentication != null)
+        {
+            authentication.authenticate(event, builder);
+        }
+
+        return builder.build();
     }
 
     private ParameterMap toParameterMap(Map<String, String> map)

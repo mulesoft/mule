@@ -49,37 +49,27 @@ public class HttpRequester
     private static final Logger logger = LoggerFactory.getLogger(HttpRequester.class);
     private static final String REMOTELY_CLOSED = "Remotely closed";
 
-    private final String uri;
-    private final String method;
     private final boolean followRedirects;
-    private final HttpStreamingType requestStreamingMode;
-    private final HttpSendBodyMode sendBodyMode;
-    private final String source;
     private final HttpAuthentication authentication;
-
     private final boolean parseResponse;
     private final int responseTimeout;
     private final ResponseValidator responseValidator;
 
     private final HttpRequesterConfig config;
     private final NotificationHelper notificationHelper;
+    private final MuleEventToHttpRequest eventToHttpRequest;
 
-    public HttpRequester(String uri, String method, boolean followRedirects, HttpStreamingType requestStreamingMode,
-                         HttpSendBodyMode sendBodyMode, String source, HttpAuthentication authentication,
-                         boolean parseResponse, int responseTimeout, ResponseValidator responseValidator,
-                         HttpRequesterConfig config)
+    public HttpRequester(MuleEventToHttpRequest eventToHttpRequest, boolean followRedirects,
+                         HttpAuthentication authentication, boolean parseResponse, int responseTimeout,
+                         ResponseValidator responseValidator, HttpRequesterConfig config)
     {
-        this.uri = uri;
-        this.method = method;
         this.followRedirects = followRedirects;
-        this.requestStreamingMode = requestStreamingMode;
-        this.sendBodyMode = sendBodyMode;
-        this.source = source;
         this.authentication = authentication;
         this.parseResponse = parseResponse;
         this.responseTimeout = responseTimeout;
         this.responseValidator = responseValidator;
         this.config = config;
+        this.eventToHttpRequest = eventToHttpRequest;
         this.notificationHelper = new NotificationHelper(config.getMuleContext().getNotificationManager(), ConnectorMessageNotification.class, false);
     }
 
@@ -87,8 +77,7 @@ public class HttpRequester
                                                                  HttpRequesterRequestBuilder requestBuilder,
                                                                  boolean checkRetry) throws MuleException
     {
-        MuleEventToHttpRequest eventToHttpRequest = new MuleEventToHttpRequest(config, uri, method, requestStreamingMode, sendBodyMode, source);
-        HttpRequest httpRequest = createHttpRequest(muleEvent, eventToHttpRequest, requestBuilder, authentication);
+        HttpRequest httpRequest = eventToHttpRequest.create(muleEvent, requestBuilder, authentication);
 
         HttpResponse response;
         try
@@ -150,17 +139,6 @@ public class HttpRequester
             requestAuthentication = ((UsernamePasswordAuthentication) authentication).buildRequestAuthentication();
         }
         return requestAuthentication;
-    }
-
-    private HttpRequest createHttpRequest(MuleEvent muleEvent, MuleEventToHttpRequest muleEventToHttpRequest, HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication) throws MuleException
-    {
-        HttpRequestBuilder builder = muleEventToHttpRequest.create(muleEvent, requestBuilder);
-
-        if (authentication != null)
-        {
-            authentication.authenticate(muleEvent, builder);
-        }
-        return builder.build();
     }
 
     private void checkIfRemotelyClosed(Exception exception, UriParameters uriParameters)
@@ -255,8 +233,11 @@ public class HttpRequester
 
         public HttpRequester build()
         {
-            return new HttpRequester(uri, method, followRedirects, requestStreamingMode, sendBodyMode, source,
-                                     authentication, parseResponse, responseTimeout, responseValidator, config);
+            MuleEventToHttpRequest eventToHttpRequest = new MuleEventToHttpRequest(config, uri, method,
+                                                                                   requestStreamingMode, sendBodyMode,
+                                                                                   source);
+            return new HttpRequester(eventToHttpRequest, followRedirects, authentication, parseResponse,
+                                     responseTimeout, responseValidator, config);
         }
     }
 }

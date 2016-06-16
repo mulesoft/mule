@@ -15,7 +15,7 @@
     <flow name="testFlow1">
         <httpn:listener config-ref="listenerConfig" path="${formDataPath}">
             <httpn:response-builder>
-                <httpn:http-response-builder partsRef="#[parts]"/>
+                <httpn:simple-response-builder partsRef="#[parts]"/>
             </httpn:response-builder>
         </httpn:listener>
         <custom-processor
@@ -27,11 +27,11 @@
     <flow name="testFlow2">
         <httpn:listener config-ref="listenerConfig" path="${mixedPath}">
             <httpn:response-builder>
-                <httpn:http-response-builder partsRef="#[parts]">
+                <httpn:simple-response-builder partsRef="#[parts]">
                     <httpn:headers>
                         <httpn:header key="Content-Type" value="multipart/mixed"/>
                     </httpn:headers>
-                </httpn:http-response-builder>
+                </httpn:simple-response-builder>
             </httpn:response-builder>
         </httpn:listener>
         <custom-processor
@@ -43,7 +43,7 @@
     <flow name="testFlow3">
         <httpn:listener config-ref="listenerConfig" path="${contentLength}">
             <httpn:response-builder>
-                <httpn:http-response-builder partsRef="#[parts]"/>
+                <httpn:simple-response-builder partsRef="#[parts]"/>
             </httpn:response-builder>
         </httpn:listener>
         <custom-processor
@@ -54,7 +54,7 @@
     <flow name="testFlow4">
         <httpn:listener config-ref="listenerConfig" path="${chunked}" responseStreamingMode="ALWAYS">
             <httpn:response-builder>
-                <httpn:http-response-builder partsRef="#[parts]"/>
+                <httpn:simple-response-builder partsRef="#[parts]"/>
             </httpn:response-builder>
         </httpn:listener>
         <custom-processor
@@ -65,7 +65,7 @@
     <flow name="testFlow5">
         <httpn:listener config-ref="listenerConfig" path="${filePath}">
             <httpn:response-builder>
-                <httpn:http-response-builder partsRef="#[parts]"/>
+                <httpn:simple-response-builder partsRef="#[parts]"/>
             </httpn:response-builder>        
         </httpn:listener>
         <custom-processor

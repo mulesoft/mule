@@ -21,11 +21,11 @@
 
         <httpn:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET"  key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:headers>
                         <httpn:header key="Content-Type" value="invalidMimeType"/>
                     </httpn:headers>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>

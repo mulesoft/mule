@@ -13,12 +13,12 @@
     <flow name="headerList">
         <httpn:request config-ref="config" path="testPath" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:headers>
                         <httpn:header key="testName1" value="testValue1" />
                         <httpn:header key="#[headerName]" value="#[headerValue]" />
                     </httpn:headers>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -26,7 +26,7 @@
     <flow name="headerMap">
         <httpn:request config-ref="config" path="testPath" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder headers="#[headers]"/>
+                <httpn:simple-request-builder headers="#[headers]"/>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -34,11 +34,11 @@
     <flow name="headerOverride">
         <httpn:request config-ref="config" path="testPath" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder headers="#[headers]">
+                <httpn:simple-request-builder headers="#[headers]">
                     <httpn:headers>
                         <httpn:header key="testName1" value="testValue1" />
                     </httpn:headers>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -46,11 +46,11 @@
     <flow name="httpHeaders">
         <httpn:request config-ref="config" path="testPath" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:headers>
                         <httpn:header key="http.scheme" value="testValue1" />
                     </httpn:headers>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -58,11 +58,11 @@
     <flow name="connectionHeader">
         <httpn:request config-ref="config" path="testPath" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:headers>
                         <httpn:header key="Connection" value="close" />
                     </httpn:headers>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -74,11 +74,11 @@
     <flow name="hostHeader">
         <httpn:request config-ref="config" path="testPath" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:headers>
                         <httpn:header key="Host" value="${host}" />
                     </httpn:headers>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -86,11 +86,11 @@
     <flow name="transferEncodingHeader">
         <httpn:request config-ref="config" path="testPath" method="POST" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:headers>
                         <httpn:header key="Transfer-Encoding" value="${encoding}" />
                     </httpn:headers>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
