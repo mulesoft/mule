@@ -139,7 +139,6 @@
                 <include>org.mule.modules:mule-module-extensions-spring-support</include>
                 <include>org.mule.modules:mule-module-file-extension-common</include>
                 <include>org.mule.modules:mule-module-http</include>
-                <include>org.mule.modules:mule-module-http-ext</include>
                 <include>org.mule.modules:mule-module-jaas</include>
                 <include>org.mule.modules:mule-module-jbossts</include>
                 <include>org.mule.modules:mule-module-json</include>
