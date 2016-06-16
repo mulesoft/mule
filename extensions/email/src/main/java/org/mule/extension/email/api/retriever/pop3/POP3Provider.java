@@ -7,6 +7,7 @@
 package org.mule.extension.email.api.retriever.pop3;
 
 import static org.mule.extension.email.internal.EmailProtocol.POP3;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.POP3_PORT;
 import org.mule.extension.email.api.retriever.AbstractRetrieverProvider;
 import org.mule.extension.email.api.retriever.RetrieverConnection;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -27,7 +28,7 @@ public class POP3Provider extends AbstractRetrieverProvider<POP3Configuration, R
      * The port number of the mail server.
      */
     @Parameter
-    @Optional(defaultValue = "110")
+    @Optional(defaultValue = POP3_PORT)
     private String port;
 
     /**

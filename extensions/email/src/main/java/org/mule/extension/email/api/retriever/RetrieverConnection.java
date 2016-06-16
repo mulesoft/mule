@@ -122,7 +122,7 @@ public class RetrieverConnection extends AbstractEmailConnection
      * @param openMode      open the folder in READ_ONLY or READ_WRITE mode
      * @return the opened {@link Folder}
      */
-    public Folder getFolder(String mailBoxFolder, int openMode)
+    public synchronized Folder getFolder(String mailBoxFolder, int openMode)
     {
         try
         {
@@ -152,7 +152,7 @@ public class RetrieverConnection extends AbstractEmailConnection
      *
      * @param expunge whether to remove all the emails marked as DELETED.
      */
-    public void closeFolder(boolean expunge)
+    public synchronized void closeFolder(boolean expunge)
     {
         try
         {

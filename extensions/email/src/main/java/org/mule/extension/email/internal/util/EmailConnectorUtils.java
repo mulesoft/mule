@@ -46,6 +46,36 @@ public final class EmailConnectorUtils
     public static final String TEXT = "text/*";
 
     /**
+     * Default port value for SMTP servers.
+     */
+    public static final String SMTP_PORT = "25";
+
+    /**
+     * Default port value for SMTPS servers.
+     */
+    public static final String SMTPS_PORT = "465";
+
+    /**
+     * Default port value for POP3 servers.
+     */
+    public static final String POP3_PORT = "110";
+
+    /**
+     * Default port value for POP3S servers.
+     */
+    public static final String POP3S_PORT = "995";
+
+    /**
+     * Default port value for IMAP servers.
+     */
+    public static final String IMAP_PORT = "143";
+
+    /**
+     * Default port value for IMAPS servers.
+     */
+    public static final String IMAPS_PORT = "993";
+
+    /**
      * Hide constructor
      */
     private EmailConnectorUtils()

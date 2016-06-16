@@ -7,6 +7,7 @@
 package org.mule.extension.email.api.retriever.imap;
 
 import static org.mule.extension.email.internal.EmailProtocol.IMAP;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.IMAP_PORT;
 import org.mule.extension.email.api.retriever.AbstractRetrieverProvider;
 import org.mule.extension.email.api.retriever.RetrieverConnection;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -28,7 +29,7 @@ public class IMAPProvider extends AbstractRetrieverProvider<IMAPConfiguration, R
      * The port number of the mail server.
      */
     @Parameter
-    @Optional(defaultValue = "143")
+    @Optional(defaultValue = IMAP_PORT)
     private String port;
 
     /**

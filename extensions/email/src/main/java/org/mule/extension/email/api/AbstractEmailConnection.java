@@ -10,6 +10,7 @@ import static org.apache.commons.lang.StringUtils.join;
 import org.mule.extension.email.internal.EmailProtocol;
 import org.mule.extension.email.internal.PasswordAuthenticator;
 import org.mule.extension.email.internal.exception.EmailConnectionException;
+import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
@@ -32,6 +33,9 @@ import javax.net.ssl.SSLContext;
  */
 public abstract class AbstractEmailConnection
 {
+
+    public static final String PASSWORD_NO_USERNAME_ERROR = "Password provided but not username was specified.";
+    public static final String USERNAME_NO_PASSWORD_ERROR = "Username provided but not password was specified.";
 
     /**
      * A separator used to separate some tokens from a property that accepts multiple values, e.g.: mail.{name}.ciphersuites
@@ -108,7 +112,7 @@ public abstract class AbstractEmailConnection
         }
 
         PasswordAuthenticator authenticator = null;
-        if (username != null && password != null)
+        if (shouldAuthenticate(username, password))
         {
             sessionProperties.setProperty(protocol.getMailAuthProperty(), "true");
             authenticator = new PasswordAuthenticator(username, password);
@@ -194,4 +198,23 @@ public abstract class AbstractEmailConnection
      */
     public abstract ConnectionValidationResult validate();
 
+    /**
+     * Checks the consistency of the username and password parameters and
+     * returns whether we should authenticate with the server or not.
+     *
+     * @param username the specified username.
+     * @param password the specified password.
+     */
+    private boolean shouldAuthenticate(String username, String password)
+    {
+        if (username == null && password != null)
+        {
+            throw new EmailException(PASSWORD_NO_USERNAME_ERROR);
+        }
+        if (username != null && password == null)
+        {
+            throw new EmailException(USERNAME_NO_PASSWORD_ERROR);
+        }
+        return username != null;
+    }
 }

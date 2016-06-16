@@ -14,6 +14,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
+import static org.mule.extension.email.api.AbstractEmailConnection.PASSWORD_NO_USERNAME_ERROR;
+import static org.mule.extension.email.api.AbstractEmailConnection.USERNAME_NO_PASSWORD_ERROR;
 import static org.mule.extension.email.internal.EmailProtocol.IMAP;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.INBOX_FOLDER;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
@@ -21,6 +23,8 @@ import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 import org.mule.extension.email.api.retriever.RetrieverConnection;
+import org.mule.extension.email.internal.exception.EmailConnectionException;
+import org.mule.extension.email.internal.exception.EmailException;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -30,7 +34,9 @@ import javax.mail.Session;
 import javax.mail.Store;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -43,6 +49,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class RetrieverConnectionTestCase
 {
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     private static final String RECENT_FOLDER = "Recent";
 
     private Store store;
@@ -51,7 +60,6 @@ public class RetrieverConnectionTestCase
     @Before
     public void setUpTestConnection() throws Exception
     {
-
         store = mock(Store.class);
         doNothing().when(store).connect(anyString(), anyString());
 
@@ -98,6 +106,22 @@ public class RetrieverConnectionTestCase
         getFolder();
         Folder inbox = connection.getFolder(INBOX_FOLDER, READ_ONLY);
         assertFolder(inbox, INBOX_FOLDER, READ_ONLY);
+    }
+
+    @Test
+    public void usernameMissingPassword() throws MessagingException, EmailConnectionException
+    {
+        expectedException.expect(EmailException.class);
+        expectedException.expectMessage(is(PASSWORD_NO_USERNAME_ERROR));
+        new RetrieverConnection(IMAP, null, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
+    }
+
+    @Test
+    public void passwordMissingUsername() throws MessagingException, EmailConnectionException
+    {
+        expectedException.expect(EmailException.class);
+        expectedException.expectMessage(is(USERNAME_NO_PASSWORD_ERROR));
+        new RetrieverConnection(IMAP, JUANI_EMAIL, null, "127.0.0.1", "123", 1000, 1000, 1000, null);
     }
 
     private void assertFolder(Folder folder, String name, int mode)
