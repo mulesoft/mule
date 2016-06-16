@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import org.mule.runtime.core.DefaultMuleMessage;
+import static org.mule.tck.MuleTestUtils.getTestEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -43,8 +43,8 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
         filter.setSchemaLocations(SIMPLE_SCHEMA);
         filter.initialise();
 
-        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
-        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
+        assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
+        assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
         filter.setSchemaLocations(INCLUDE_SCHEMA);
         filter.initialise();
 
-        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
-        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
+        assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(VALID_XML_FILE), muleContext)), is(true));
+        assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
     }
 }
