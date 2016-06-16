@@ -15,8 +15,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Keeps track of transactional operation made over a transactional resource.
@@ -34,10 +34,10 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
     public static final String TX1_LOG_FILE_NAME = "tx1.log";
     public static final String TX2_LOG_FILE_NAME = "tx2.log";
 
-    //TODO poner minimo de tama�o de archivo.
     private static final int MAXIMUM_LOG_FILE_ENTRIES = 50000;
+    private static final int ONE_MEGABYTE_IN_BYTES = 1024 * 1024;
 
-    private transient Log logger = LogFactory.getLog(getClass());
+    private transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private final TransactionCompletePredicate transactionCompletePredicate;
 
@@ -85,8 +85,8 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
     {
         if (maximumFileSizeInMegabytes != null)
         {
-            this.maximumFileSizeInBytes = ((long)maximumFileSizeInMegabytes*1024*1024)/2;
-            this.clearFileMinimumSizeInBytes = this.maximumFileSizeInBytes/2;
+            this.maximumFileSizeInBytes = ((long) maximumFileSizeInMegabytes * ONE_MEGABYTE_IN_BYTES) / 2;
+            this.clearFileMinimumSizeInBytes = this.maximumFileSizeInBytes / 2;
         }
     }
 
@@ -173,6 +173,10 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
         {
             if (currentLogFile.size() > MAXIMUM_LOG_FILE_ENTRIES && notCurrentLogFile.size() == 0)
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Changing ");
+                }
                 changeCurrentLogFile();
             }
         }
@@ -180,7 +184,10 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
         {
             if (currentLogFile.fileLength() > maximumFileSizeInBytes && notCurrentLogFile.size() == 0)
             {
-                System.out.println("Changing files, current file size: " + currentLogFile.fileLength() + " other file size: " + notCurrentLogFile.fileLength());
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Changing files, current file size: " + currentLogFile.fileLength() + " other file size: " + notCurrentLogFile.fileLength());
+                }
                 changeCurrentLogFile();
             }
         }

@@ -205,9 +205,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     private ProcessingStrategy defaultProcessingStrategy;
 
     /**
-     * {@inheritDoc}
+     * Maximum size (approximately) of the transaction log files. This applies
+     * to each set of files for local transactions and xa transactions when using queues.
+     *
+     * @since 3.9.0
      */
-    private Integer queueTransactionFilesSizeInMegabytes;
+    private int maxQueueTransactionFilesSizeInMegabytes = 500;
 
     public DefaultMuleConfiguration()
     {
@@ -687,10 +690,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return shutdownTimeout;
     }
 
+
     @Override
-    public Integer getQueueTransactionFilesSizeInMegabytes()
+    public int getMaxQueueTransactionFilesSizeInMegabytes()
     {
-        return queueTransactionFilesSizeInMegabytes;
+        return maxQueueTransactionFilesSizeInMegabytes;
     }
 
     public void setShutdownTimeout(int shutdownTimeout)
@@ -792,9 +796,9 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.enricherPropagatesSessionVariableChanges = enricherPropagatesSessionVariableChanges;
     }
 
-    public void setQueueTransactionFilesSize(Integer queueTransactionFilesSizeInMegabytes)
+    public void setMaxQueueTransactionFilesSize(int maxQueueTransactionFilesSizeInMegabytes)
     {
-        this.queueTransactionFilesSizeInMegabytes = queueTransactionFilesSizeInMegabytes;
+        this.maxQueueTransactionFilesSizeInMegabytes = maxQueueTransactionFilesSizeInMegabytes;
     }
 
     @Override
@@ -869,7 +873,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         result = prime * result + (clientMode ? 1231 : 1237);
         result = prime * result + defaultQueueTimeout;
         result = prime * result + defaultTransactionTimeout;
-        result = prime * result + (queueTransactionFilesSizeInMegabytes == null ? 0 : queueTransactionFilesSizeInMegabytes);
+        result = prime * result + maxQueueTransactionFilesSizeInMegabytes;
         result = prime * result + ((domainId == null) ? 0 : domainId.hashCode());
         result = prime * result + (enableStreaming ? 1231 : 1237);
         result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
@@ -1009,7 +1013,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             return false;
         }
-        if (queueTransactionFilesSizeInMegabytes != other.queueTransactionFilesSizeInMegabytes)
+        if (maxQueueTransactionFilesSizeInMegabytes != other.maxQueueTransactionFilesSizeInMegabytes)
         {
             return false;
         }

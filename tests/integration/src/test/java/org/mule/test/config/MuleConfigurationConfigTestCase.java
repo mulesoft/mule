@@ -21,14 +21,14 @@ public class MuleConfigurationConfigTestCase extends AbstractMuleTestCase
     public void configurationQueueTxLogSizeExplicitValue() throws Exception
     {
         MuleContext muleContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"org/mule/test/config/configuration-queue-tx-log-size-explict-config.xml"}).build();
-        assertThat(muleContext.getConfiguration().getQueueTransactionFilesSizeInMegabytes(), is(100));
+        assertThat(muleContext.getConfiguration().getMaxQueueTransactionFilesSizeInMegabytes(), is(100));
     }
 
     @Test
     public void configurationQueueTxLogSizeDefaultValue() throws Exception
     {
         MuleContext muleContext = new ApplicationContextBuilder().setApplicationResources(new String[] {}).build();
-        assertThat(muleContext.getConfiguration().getQueueTransactionFilesSizeInMegabytes(), is(500));
+        assertThat(muleContext.getConfiguration().getMaxQueueTransactionFilesSizeInMegabytes(), is(500));
     }
 
 }

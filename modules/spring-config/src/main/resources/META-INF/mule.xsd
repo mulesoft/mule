@@ -1359,7 +1359,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="queueTransactionFilesSize" type="substitutableInt" default="500">
+                <xsd:attribute name="maxQueueTransactionFilesSize" type="substitutableInt" default="500">
                     <xsd:annotation>
                         <xsd:documentation>
                             The approximated maximum space in megabytes used by the transaction log files for transactional persistent queues. Take into account that this number applies both to the set of transaction log files for XA and for local transactions. If both type of transactions are used then the approximated maximum space used will be twice the configured value.

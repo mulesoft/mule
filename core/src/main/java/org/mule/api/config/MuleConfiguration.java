@@ -59,7 +59,7 @@ public interface MuleConfiguration
      *
      * @return the approximated maximum space in disk that the transactions logs can use in megabytes.
      */
-    Integer getQueueTransactionFilesSizeInMegabytes();
+    int getMaxQueueTransactionFilesSizeInMegabytes();
 
     /**
      * A container mode implies multiple Mule apps running. When true, Mule changes behavior in some areas, e.g.:

@@ -66,7 +66,7 @@ public class TransactionalQueueManager extends AbstractQueueManager
     public void initialise() throws InitialisationException
     {
         String workingDirectory = getMuleContext().getConfiguration().getWorkingDirectory();
-        Integer queueTransactionFilesSizeInMegabytes = getMuleContext().getConfiguration().getQueueTransactionFilesSizeInMegabytes();
+        int queueTransactionFilesSizeInMegabytes = getMuleContext().getConfiguration().getMaxQueueTransactionFilesSizeInMegabytes();
         localTxTransactionJournal = new LocalTxQueueTransactionJournal(workingDirectory + File.separator + "queue-tx-log", getMuleContext(), queueTransactionFilesSizeInMegabytes);
         localTxQueueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(localTxTransactionJournal, this);
         xaTransactionJournal = new XaTxQueueTransactionJournal(workingDirectory + File.separator + "queue-xa-tx-log", getMuleContext(), queueTransactionFilesSizeInMegabytes);

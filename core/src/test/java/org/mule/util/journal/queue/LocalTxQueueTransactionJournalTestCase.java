@@ -227,7 +227,6 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
 
     private void assertLogFileIsWithinBoundaries(File file)
     {
-        System.out.println("File: " + file.getName() + " space: " + file.length());
         assertThat(file.length(), lessThan(MAXIMUM_FILE_SIZE_EXPECTED));
     }
 
@@ -236,7 +235,6 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
         for (int i = 0; i < 5; i++)
         {
             int txId = abs(new Random().nextInt());
-            System.out.println("Tx ID: " + txId);
             logAddWith100kbEntry(transactionJournal, txId);
             transactionJournal.logCommit(txId);
         }

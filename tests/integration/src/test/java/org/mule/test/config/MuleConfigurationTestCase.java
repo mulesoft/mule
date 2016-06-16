@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.config.DefaultMuleConfiguration.QUEUE_LOG_MAXIMUM_SIZE_SYSTEM_PROPERTY;
 import org.mule.api.MuleContext;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleConfiguration;
@@ -67,7 +66,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         config.setCacheMessageAsBytes(false);
         config.setCacheMessageOriginalPayload(false);
         config.setEnableStreaming(false);
-        config.setQueueTransactionFilesSize(10);
+        config.setMaxQueueTransactionFilesSize(500);
         ThreadSafeAccess.AccessControl.setAssertMessageAccess(false);
         config.setAutoWrapMessageAwareTransform(false);
         
@@ -107,8 +106,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable", "false");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.assertAccess", "false");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap", "false");
-        System.setProperty(QUEUE_LOG_MAXIMUM_SIZE_SYSTEM_PROPERTY, "10");
-        
+
         muleContext = new DefaultMuleContextFactory().createMuleContext();
         muleContext.start();
 
@@ -130,7 +128,6 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
         System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.assertAccess");
         System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
-        System.clearProperty(QUEUE_LOG_MAXIMUM_SIZE_SYSTEM_PROPERTY);
     }
 
     /** Test for MULE-3110 */
@@ -208,7 +205,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         assertFalse(config.isEnableStreaming());
         assertFalse(ThreadSafeAccess.AccessControl.isAssertMessageAccess());
         assertFalse(config.isAutoWrapMessageAwareTransform());
-        assertThat(config.getQueueTransactionFilesSizeInMegabytes(), is(10));
+        assertThat(config.getMaxQueueTransactionFilesSizeInMegabytes(), is(500));
     }
 }
 

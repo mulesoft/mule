@@ -26,7 +26,7 @@ public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTest
         TransactionalQueueManager mgr = new TransactionalQueueManager();
         MuleConfiguration mockConfiguration = Mockito.mock(MuleConfiguration.class);
         when(mockConfiguration.getWorkingDirectory()).thenReturn(temporaryFolder.getRoot().getAbsolutePath());
-        when(mockConfiguration.getQueueTransactionFilesSizeInMegabytes()).thenReturn(100);
+        when(mockConfiguration.getMaxQueueTransactionFilesSizeInMegabytes()).thenReturn(100);
         ((DefaultMuleContext)muleContext).setMuleConfiguration(mockConfiguration);
 
         mgr.setMuleContext(muleContext);

@@ -4,6 +4,6 @@
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <configuration queueTransactionFilesSize="100"/>
+    <configuration maxQueueTransactionFilesSize="100"/>
 
 </mule>
