@@ -27,7 +27,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,7 +65,7 @@ public class HttpListenerAuthenticationTestCase extends AbstractHttpTestCase
         CredentialsProvider credsProvider = getCredentialsProvider(VALID_USER, INVALID_PASSWORD);
         getHttpResponse(credsProvider);
 
-        assertThat(httpResponse.getStatusLine().getStatusCode(), Is.is(SC_UNAUTHORIZED));
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_UNAUTHORIZED));
         Header authHeader = httpResponse.getFirstHeader(WWW_AUTHENTICATE);
         assertThat(authHeader, is(notNullValue()));
         assertThat(authHeader.getValue(), is(BASIC_REALM_MULE_REALM));

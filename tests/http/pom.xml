@@ -62,7 +62,6 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-security</artifactId>
             <version>${project.version}</version>
-            <!--<type>test-jar</type>-->
             <scope>test</scope>
         </dependency>
         <dependency>

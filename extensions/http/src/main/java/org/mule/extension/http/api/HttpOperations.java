@@ -11,10 +11,16 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import javax.inject.Inject;
 
+/**
+ * General HTTP operations that do not required any specific configuration or connection.
+ *
+ * @since 4.0
+ */
 public class HttpOperations
 {
     @Inject
@@ -37,13 +43,19 @@ public class HttpOperations
                                            @Optional(defaultValue = "statusCode") String statusCodeFlowVar,
                                            @Optional(defaultValue = "headers") String headersFlowVar) throws MuleException
     {
+        HttpBasicAuthenticationFilter filter = createFilter(realm, securityProviders, statusCodeFlowVar, headersFlowVar);
+
+        filter.doFilter(event);
+        return event.getMessage();
+    }
+
+    private HttpBasicAuthenticationFilter createFilter(String realm, String securityProviders, String statusCodeFlowVar, String headersFlowVar) throws InitialisationException
+    {
         HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter(statusCodeFlowVar, headersFlowVar);
         filter.setRealm(realm);
         filter.setSecurityProviders(securityProviders);
         filter.setMuleContext(muleContext);
         filter.initialise();
-
-        filter.doFilter(event);
-        return event.getMessage();
+        return filter;
     }
 }

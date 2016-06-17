@@ -45,9 +45,15 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
     private String realm;
 
     private boolean realmRequired = true;
-    private String headersFlowVar;
-    private String statusCodeFlowVar;
+    private final String headersFlowVar;
+    private final String statusCodeFlowVar;
 
+    /**
+     * Creates a filter based on the HTTP listener error response builder status code and headers configuration.
+     *
+     * @param statusCodeFlowVar The flow variable name used to set the HTTP response status code.
+     * @param headersFlowVar The flow variable name used to set the HTTP response headers.
+     */
     public HttpBasicAuthenticationFilter(String statusCodeFlowVar, String headersFlowVar)
     {
         super();
@@ -62,7 +68,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
         {
             if (isRealmRequired())
             {
-                throw new InitialisationException(createStaticMessage("The \"realm\" must be set on this security filter"), this);
+                throw new InitialisationException(createStaticMessage("The realm must be set on this security filter"), this);
             }
             else
             {
@@ -116,9 +122,9 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
 
     /**
      * Authenticates the current message if authenticate is set to true. This method
-     * will always populate the secure context in the session
+     * will always populate the secure context in the {@link MuleEvent} session
      *
-     * @param event the current message recieved
+     * @param event the current message received
      * @throws SecurityException if authentication fails
      */
     @Override
@@ -156,7 +162,6 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
             }
             catch (UnauthorisedException e)
             {
-                // Authentication failed
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
@@ -165,7 +170,6 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
                 throw new UnauthorisedException(CoreMessages.authFailedForUser(username), event, e);
             }
 
-            // Authentication success
             if (logger.isDebugEnabled())
             {
                 logger.debug("Authentication success: " + authResult.toString());
