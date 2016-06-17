@@ -8,6 +8,7 @@ package org.mule.runtime.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -271,7 +272,7 @@ public class TransformationService
                 MuleMessage transformResult = (MuleMessage) result;
                 return new DefaultMuleMessage(result, transformResult, muleContext, transformResult.getDataType());
             }
-            return  message;
+            return (MuleMessage) result;
         }
         else
         {
