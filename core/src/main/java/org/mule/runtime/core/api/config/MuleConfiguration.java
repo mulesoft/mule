@@ -41,8 +41,6 @@ public interface MuleConfiguration
 
     boolean isCacheMessageAsBytes();
 
-    boolean isCacheMessageOriginalPayload();
-
     boolean isEnableStreaming();
 
     boolean isValidateExpressions();
@@ -82,12 +80,6 @@ public interface MuleConfiguration
      * configured explicitly.
      */
     String getDefaultExceptionStrategyName();
-
-    boolean useExtendedTransformations();
-
-    boolean isFlowEndingWithOneWayEndpointReturnsNull();
-    
-    boolean isEnricherPropagatesSessionVariableChanges();
 
     boolean isDisableTimeouts();
 

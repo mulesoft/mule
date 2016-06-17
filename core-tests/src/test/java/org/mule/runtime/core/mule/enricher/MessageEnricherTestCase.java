@@ -20,7 +20,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -33,7 +32,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.enricher.MessageEnricher;
@@ -49,8 +47,6 @@ import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 {
@@ -187,35 +183,6 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void propagateMessagePropagateSession() throws Exception
-    {
-        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setEnricherPropagatesSessionVariableChanges(true);
-        MessageEnricher enricher = new MessageEnricher();
-        enricher.setMuleContext(muleContext);
-        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
-        enricher.setEnrichmentMessageProcessor(event -> {
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setPayload("enriched");
-                return msg;
-            }));
-            return event;
-        });
-        MuleEvent in = getTestEvent("");
-        in.setMessage(in.getMessage().transform(msg ->
-        {
-            msg.setOutboundProperty("foo", "bar");
-            return msg;
-        }));
-        MuleEvent out = enricher.process(in);
-        Assert.assertNotSame(in, out);
-        Assert.assertSame(in.getMessage(), out.getMessage());
-        assertEquals(in.getMessage().getUniqueId(), out.getMessage().getUniqueId());
-        assertEquals(in.getMessage().getOutboundPropertyNames(), out.getMessage().getOutboundPropertyNames());
-        assertEquals("bar", out.getMessage().getOutboundProperty("foo"));
-        assertEquals("", out.getMessage().getPayload());
-    }
-
-    @Test
     public void propagatesVariables() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
@@ -310,24 +277,6 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         MuleEvent out = enricher.process(in);
 
         assertNull(out.getSession().getProperty("sessionFoo"));
-    }
-
-    @Test
-    public void propagatesSession() throws Exception
-    {
-        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setEnricherPropagatesSessionVariableChanges(true);
-        MessageEnricher enricher = new MessageEnricher();
-        enricher.setMuleContext(muleContext);
-        enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
-        enricher.setEnrichmentMessageProcessor(event -> {
-            event.getSession().setProperty("sessionFoo", "bar");
-            return event;
-        });
-        MuleEvent in = getTestEvent("");
-
-        MuleEvent out = enricher.process(in);
-
-        assertEquals("bar", out.getSession().getProperty("sessionFoo"));
     }
 
     @Test

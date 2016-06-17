@@ -12,7 +12,6 @@ import org.mule.compatibility.transport.http.CookieWrapper;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
-import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -65,15 +64,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         super.initialise();
         expiresHeaderFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
         expiresHeaderFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-        if (HttpConstants.SERVER_TIME_ZONE_PROPERTY.isEnabled())
-        {
-            logger.warn(HttpMessages.dateInServerTimeZone().getMessage());
-            dateFormatter = new SimpleDateFormat(HttpConstants.DATE_FORMAT_RFC822, Locale.US);
-        }
-        else
-        {
-            dateFormatter = expiresHeaderFormatter;
-        }
+        dateFormatter = expiresHeaderFormatter;
     }
 
     @Override

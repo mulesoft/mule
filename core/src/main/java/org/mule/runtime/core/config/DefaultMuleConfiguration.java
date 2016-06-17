@@ -47,8 +47,6 @@ import org.slf4j.LoggerFactory;
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware
 {
 
-    public static final boolean DEFAULT_TRANSFORMATION_RESOLVE_NON_DIRECT = true;
-
     public static final String[] DEFAULT_STACKTRACE_FILTER = (
             "org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor," +
             "org.mule.runtime.core.processor.chain")
@@ -142,8 +140,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
     private boolean cacheMessageAsBytes = true;
 
-    private boolean cacheMessageOriginalPayload = true;
-
     private boolean enableStreaming = true;
 
     private boolean autoWrapMessageAwareTransform = true;
@@ -166,12 +162,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      * being closed; this would cause the validation to fail.  Users can turn off validation using this flag.
      */
     private boolean validateExpressions = true;
-
-    private boolean useExtendedTransformations = DEFAULT_TRANSFORMATION_RESOLVE_NON_DIRECT;
-
-    private boolean flowEndingWithOneWayEndpointReturnsNull;
-    
-    private boolean enricherPropagatesSessionVariableChanges;
 
     /**
      * Generic string/string map of properties in addition to standard Mule props.
@@ -329,11 +319,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         if (p != null)
         {
             cacheMessageAsBytes = BooleanUtils.toBoolean(p);
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal");
-        if (p != null)
-        {
-            cacheMessageOriginalPayload = BooleanUtils.toBoolean(p);
         }
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
         if (p != null)
@@ -609,20 +594,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     }
 
     @Override
-    public boolean isCacheMessageOriginalPayload()
-    {
-        return cacheMessageOriginalPayload;
-    }
-
-    public void setCacheMessageOriginalPayload(boolean cacheMessageOriginalPayload)
-    {
-        if (verifyContextNotStarted())
-        {
-            this.cacheMessageOriginalPayload = cacheMessageOriginalPayload;
-        }
-    }
-
-    @Override
     public boolean isEnableStreaming()
     {
         return enableStreaming;
@@ -740,47 +711,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return defaultExceptionStrategyName;
     }
 
-    public void setUseExtendedTransformations(boolean useExtendedTransformations)
-    {
-        if (verifyContextNotStarted())
-        {
-            this.useExtendedTransformations = useExtendedTransformations;
-        }
-    }
-
-    @Override
-    public boolean useExtendedTransformations()
-    {
-        return useExtendedTransformations;
-    }
-
-    public void setFlowEndingWithOneWayEndpointReturnsNull(boolean flowEndingWithOneWayEndpointReturnsNull)
-    {
-        this.flowEndingWithOneWayEndpointReturnsNull = flowEndingWithOneWayEndpointReturnsNull;
-    }
-
-    @Override
-    public boolean isFlowEndingWithOneWayEndpointReturnsNull()
-    {
-        return flowEndingWithOneWayEndpointReturnsNull;
-    }
-
     public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName)
     {
         this.defaultExceptionStrategyName = defaultExceptionStrategyName;
     }
     
-    @Override
-    public boolean isEnricherPropagatesSessionVariableChanges()
-    {
-        return enricherPropagatesSessionVariableChanges;
-    }
-
-    public void setEnricherPropagatesSessionVariableChanges(boolean enricherPropagatesSessionVariableChanges)
-    {
-        this.enricherPropagatesSessionVariableChanges = enricherPropagatesSessionVariableChanges;
-    }
-
     @Override
     public boolean isDisableTimeouts()
     {
@@ -849,7 +784,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         int result = 1;
         result = prime * result + (autoWrapMessageAwareTransform ? 1231 : 1237);
         result = prime * result + (cacheMessageAsBytes ? 1231 : 1237);
-        result = prime * result + (cacheMessageOriginalPayload ? 1231 : 1237);
         result = prime * result + (clientMode ? 1231 : 1237);
         result = prime * result + defaultQueueTimeout;
         result = prime * result + defaultTransactionTimeout;
@@ -859,8 +793,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + responseTimeout;
         result = prime * result + shutdownTimeout;
-        result = prime * result + (useExtendedTransformations ? 1231 : 1237);
-        result = prime * result + (flowEndingWithOneWayEndpointReturnsNull ? 1231 : 1237);
         result = prime * result + (synchronous ? 1231 : 1237);
         result = prime * result + ((systemModelType == null) ? 0 : systemModelType.hashCode());
         result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
@@ -889,10 +821,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             return false;
         }
         if (cacheMessageAsBytes != other.cacheMessageAsBytes)
-        {
-            return false;
-        }
-        if (cacheMessageOriginalPayload != other.cacheMessageOriginalPayload)
         {
             return false;
         }
@@ -950,14 +878,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             return false;
         }
         if (shutdownTimeout != other.shutdownTimeout)
-        {
-            return false;
-        }
-        if (useExtendedTransformations != other.useExtendedTransformations)
-        {
-            return false;
-        }
-        if (flowEndingWithOneWayEndpointReturnsNull != other.flowEndingWithOneWayEndpointReturnsNull)
         {
             return false;
         }

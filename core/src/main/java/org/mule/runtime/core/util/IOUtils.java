@@ -8,8 +8,12 @@ package org.mule.runtime.core.util;
 
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.message.ds.ByteArrayDataSource;
+import org.mule.runtime.core.message.ds.InputStreamDataSource;
+import org.mule.runtime.core.message.ds.StringDataSource;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,32 +24,36 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 // @ThreadSafe
+
 /**
  * Mule input/output utilities.
  */
 public class IOUtils extends org.apache.commons.io.IOUtils
 {
-    /** Logger. */
-    private static final Logger logger = LoggerFactory.getLogger(IOUtils.class);
+
+    private static final Log logger = LogFactory.getLog(IOUtils.class);
 
     protected static int bufferSize = NumberUtils.toInt(
-        System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
+            System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
 
     /**
      * Attempts to load a resource from the file system, from a URL, or from the
      * classpath, in that order.
-     * 
+     *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @return the requested resource as a string
      * @throws java.io.IOException IO error
      */
     public static String getResourceAsString(final String resourceName, final Class callingClass)
-        throws IOException
+            throws IOException
     {
         try (InputStream is = getResourceAsStream(resourceName, callingClass))
         {
@@ -63,7 +71,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
     /**
      * Attempts to load a resource from the file system, from a URL, or from the
      * classpath, in that order.
-     * 
+     *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @return an InputStream to the resource or null if resource not found
@@ -78,11 +86,11 @@ public class IOUtils extends org.apache.commons.io.IOUtils
     /**
      * Attempts to load a resource from the file system, from a URL, or from the
      * classpath, in that order.
-     * 
+     *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
-     * @param tryAsFile - try to load the resource from the local file system
-     * @param tryAsUrl - try to load the resource as a URL
+     * @param tryAsFile    - try to load the resource from the local file system
+     * @param tryAsUrl     - try to load the resource as a URL
      * @return an InputStream to the resource or null if resource not found
      * @throws java.io.IOException IO error
      */
@@ -107,7 +115,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
     /**
      * Attempts to load a resource from the file system or from the classpath, in
      * that order.
-     * 
+     *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @return an URL to the resource or null if resource not found
@@ -120,11 +128,11 @@ public class IOUtils extends org.apache.commons.io.IOUtils
     /**
      * Attempts to load a resource from the file system or from the classpath, in
      * that order.
-     * 
+     *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
-     * @param tryAsFile - try to load the resource from the local file system
-     * @param tryAsUrl - try to load the resource as a Url string
+     * @param tryAsFile    - try to load the resource from the local file system
+     * @param tryAsUrl     - try to load the resource as a Url string
      * @return an URL to the resource or null if resource not found
      */
     public static URL getResourceAsUrl(final String resourceName,
@@ -134,7 +142,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         if (resourceName == null)
         {
             throw new IllegalArgumentException(
-                CoreMessages.objectIsNull("Resource name").getMessage());
+                    CoreMessages.objectIsNull("Resource name").getMessage());
         }
         URL url = null;
 
@@ -165,7 +173,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         {
             try
             {
-                url = (URL)AccessController.doPrivileged(new PrivilegedAction()
+                url = (URL) AccessController.doPrivileged(new PrivilegedAction()
                 {
                     public Object run()
                     {
@@ -183,7 +191,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
             }
         }
 
-        if(url==null)
+        if (url == null)
         {
             try
             {
@@ -196,7 +204,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         }
         return url;
     }
-    
+
     /**
      * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toString(InputStream)</code>
      * method but catches any {@link IOException} and wraps it into a {@link RuntimeException}.
@@ -212,7 +220,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
             throw new RuntimeException(iox);
         }
     }
-    
+
     /**
      * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toByteArray(InputStream)</code>
      * method but catches any {@link IOException} and wraps it into a {@link RuntimeException}.
@@ -228,7 +236,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
             throw new RuntimeException(iox);
         }
     }
-    
+
     /**
      * Re-implement copy method to allow buffer size to be configured. This won't impact all methods because
      * there is no polymorphism for static methods, but rather just direct use of these two methods.
@@ -261,5 +269,65 @@ public class IOUtils extends org.apache.commons.io.IOUtils
             count += n;
         }
         return count;
+    }
+
+    /**
+     * Transforms an Object into a DataHandler of its corresponding type.
+     *
+     * @param name        the name of the attachment being handled
+     * @param object      the attachment to be handled
+     * @param contentType the Content-Type of the attachment that is being handled
+     * @return a {@link DataHandler} of the corresponding attachment
+     * @throws Exception if the transformation fails.
+     */
+    public static DataHandler toDataHandler(String name, Object object, String contentType) throws Exception
+    {
+        DataHandler dh;
+        if (object instanceof File)
+        {
+            if (contentType != null)
+            {
+                dh = new DataHandler(new FileInputStream((File) object), contentType);
+            }
+            else
+            {
+                dh = new DataHandler(new FileDataSource((File) object));
+            }
+        }
+        else if (object instanceof URL)
+        {
+            if (contentType != null)
+            {
+                dh = new DataHandler(((URL) object).openStream(), contentType);
+            }
+            else
+            {
+                dh = new DataHandler((URL) object);
+            }
+        }
+        else if (object instanceof String)
+        {
+            if (contentType != null)
+            {
+                dh = new DataHandler(new StringDataSource((String) object, name, contentType));
+            }
+            else
+            {
+                dh = new DataHandler(new StringDataSource((String) object, name));
+            }
+        }
+        else if (object instanceof byte[] && contentType != null)
+        {
+            dh = new DataHandler(new ByteArrayDataSource((byte[]) object, contentType, name));
+        }
+        else if (object instanceof InputStream && contentType != null)
+        {
+            dh = new DataHandler(new InputStreamDataSource((InputStream) object, contentType, name));
+        }
+        else
+        {
+            dh = new DataHandler(object, contentType);
+        }
+        return dh;
     }
 }

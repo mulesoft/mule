@@ -1474,6 +1474,7 @@
                                     <!-- Logging related artifacts are exposed by the BOOTSTRAP ClassLoader -->
                                     <ignoredUsedUndeclaredDependency>org.slf4j:slf4j-api</ignoredUsedUndeclaredDependency>
                                     <ignoredUsedUndeclaredDependency>javax.inject:javax.inject</ignoredUsedUndeclaredDependency>
+                                    <ignoredUsedUndeclaredDependency>javax.mail:mail</ignoredUsedUndeclaredDependency>
                                 </ignoredUsedUndeclaredDependencies>
                                 <ignoredUnusedDeclaredDependencies>
                                     <!-- Don't need to worry about this -->

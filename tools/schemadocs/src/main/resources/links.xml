@@ -103,9 +103,7 @@
     <link><item>management:jmx-default-config</item><page>Management+Module</page></link>
     <link><item>management:credentials</item><page>Management+Module</page></link>
     <link><item>management:jmx-notifications</item><page>Management+Module</page></link>
-    <link><item>management:log4j-notifications</item><page>Management+Module</page></link>
     <link><item>management:level-mapping</item><page>Management+Module</page></link>
-    <link><item>management:chainsaw-notifications</item><page>Management+Module</page></link>
     <link><item>management:level-mapping</item><page>Management+Module</page></link>
     <link><item>management:publish-notifications</item><page>Management+Module</page></link>
     <link><item>management:yourkit-profiler</item><page>Management+Module</page></link>

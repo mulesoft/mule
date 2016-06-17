@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:email="http://www.mulesoft.org/schema/mule/email"
+      xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+
+    <spring:beans>
+        <spring:import resource="retriever-flows.xml"/>
+    </spring:beans>
+
+    <flow name="retrieveAndDontRead">
+        <email:list config-ref="config-dont-read"/>
+    </flow>
+
+    <flow name="retrieveAndMarkRead">
+        <email:list config-ref="config"/>
+        <email:mark-as-read config-ref="config"/>
+    </flow>
+
+    <flow name="retrieveAndThenExpungeDelete">
+        <email:list config-ref="config"/>
+        <email:delete config-ref="config"/>
+        <email:expunge config-ref="config"/>
+    </flow>
+
+    <flow name="retrieveAndMarkDelete">
+        <email:list config-ref="config"/>
+        <email:delete config-ref="config"/>
+    </flow>
+
+    <flow name="retrieveOnlyNotReadEmails">
+        <email:list config-ref="config">
+            <email:match-with>
+                <email:matcher seen="false"/>
+            </email:match-with>
+        </email:list>
+    </flow>
+
+    <flow name="retrieveOnlyRecentEmails">
+        <email:list config-ref="config">
+            <email:match-with>
+                <email:matcher recent="true"/>
+            </email:match-with>
+        </email:list>
+    </flow>
+
+</mule>

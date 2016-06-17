@@ -33,7 +33,6 @@ public class TransformationServiceNullTransformationTestCase extends AbstractMul
     {
         MuleContext muleContext = mock(MuleContext.class);
         MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
-        when(muleConfiguration.isCacheMessageOriginalPayload()).thenReturn(false);
         when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
         TransformationService transformationService = new TransformationService(muleContext);
 

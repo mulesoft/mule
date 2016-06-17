@@ -62,7 +62,6 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         config.setId("MY_SERVER");
         config.setDomainId("MY_DOMAIN");
         config.setCacheMessageAsBytes(false);
-        config.setCacheMessageOriginalPayload(false);
         config.setEnableStreaming(false);
         ThreadSafeAccess.AccessControl.setAssertMessageAccess(false);
         config.setAutoWrapMessageAwareTransform(false);
@@ -198,7 +197,6 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         assertEquals("MY_SERVER", config.getId());
         assertEquals("MY_DOMAIN", config.getDomainId());
         assertFalse(config.isCacheMessageAsBytes());
-        assertFalse(config.isCacheMessageOriginalPayload());
         assertFalse(config.isEnableStreaming());
         assertFalse(ThreadSafeAccess.AccessControl.isAssertMessageAccess());
         assertFalse(config.isAutoWrapMessageAwareTransform());

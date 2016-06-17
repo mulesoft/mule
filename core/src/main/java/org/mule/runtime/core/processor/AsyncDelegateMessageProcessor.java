@@ -146,14 +146,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             OptimizedRequestContext.unsafeSetEvent(newEvent);
             target.process(newEvent);
         }
-        if (muleContext.getConfiguration().isFlowEndingWithOneWayEndpointReturnsNull())
-        {
-            return event;
-        }
-        else
-        {
-            return VoidMuleEvent.getInstance();
-        }
+        return VoidMuleEvent.getInstance();
     }
 
     public void setDelegate(MessageProcessor delegate)

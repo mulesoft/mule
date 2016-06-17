@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
+import org.mule.runtime.core.api.util.TimeSinceFunction;
+import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.extension.file.api.matcher.PathMatcherPredicate;
-import org.mule.runtime.module.extension.file.api.matcher.TimeSinceFunction;
-import org.mule.runtime.module.extension.file.api.matcher.TimeUntilFunction;
 
 import java.util.function.Predicate;
 

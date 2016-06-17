@@ -62,7 +62,6 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase
     public void setUp() throws Exception
     {
         when(muleContext.getDataTypeConverterResolver()).thenReturn(conversionResolver);
-        when(muleContext.getConfiguration().useExtendedTransformations()).thenReturn(true);
         this.transformationService = new TransformationService(muleContext);
     }
 

@@ -259,28 +259,12 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         }
 
         DataType<?> sourceType = DataTypeFactory.create(payload.getClass());
-        //Once we support mime types, it should be possible to do this since we'll be able to discern the difference
-        //between objects with the same type
-//        if(getReturnDataType().isCompatibleWith(sourceType))
-//        {
-//            logger.debug("Object is already of type: " + getReturnDataType() + " No transform to perform");
-//            return payload;
-//        }
-
         if (!isSourceDataTypeSupported(sourceType))
         {
-            if (ignoreBadInput && !useExtendedTransformations())
-            {
-                logger.debug("Source type is incompatible with this transformer and property 'ignoreBadInput' is set to true, so the transformer chain will continue.");
-                return payload;
-            }
-            else
-            {
-                Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),
-                        payload.getClass());
-                /// FIXME
-                throw new TransformerException(msg, this);
-            }
+            Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),
+                    payload.getClass());
+            /// FIXME
+            throw new TransformerException(msg, this);
         }
 
         if (logger.isDebugEnabled())
@@ -305,18 +289,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
 
         return result;
     }
-
-    private boolean useExtendedTransformations()
-    {
-        boolean result = true;
-        if (muleContext != null && muleContext.getConfiguration() != null)
-        {
-            result = muleContext.getConfiguration().useExtendedTransformations();
-        }
-
-        return result;
-    }
-
 
     protected String getEncoding(Object src)
     {
