@@ -7,7 +7,6 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -39,19 +38,18 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
     {
-        MuleMessage message = event.getMessage();
         try
         {
             if (wildcardAttachmentNameEvaluator.hasWildcards())
             {
                 try
                 {
-                    wildcardAttachmentNameEvaluator.processValues(message.getInboundAttachmentNames(),new WildcardAttributeEvaluator.MatchCallback()
+                    wildcardAttachmentNameEvaluator.processValues(event.getMessage().getInboundAttachmentNames(),new WildcardAttributeEvaluator.MatchCallback()
                     {
                         @Override
                         public void processMatch(String matchedValue)
                         {
-                            event.setMessage(message.transform(msg -> {
+                            event.setMessage(event.getMessage().transform(msg -> {
                                 try
                                 {
                                     msg.addOutboundAttachment(matchedValue,msg.getInboundAttachment(matchedValue));
@@ -73,8 +71,8 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
             else
             {
                 String attachmentName = attachmentNameEvaluator.resolveValue(event).toString();
-                DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
-                event.setMessage(message.transform(msg -> {
+                DataHandler inboundAttachment = event.getMessage().getInboundAttachment(attachmentName);
+                event.setMessage(event.getMessage().transform(msg -> {
                     try
                     {
                         msg.addOutboundAttachment(attachmentName, inboundAttachment);
@@ -91,7 +89,7 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
         {
             throw new TransformerException(this,e);
         }
-        return message;
+        return event.getMessage();
     }
 
     @Override
