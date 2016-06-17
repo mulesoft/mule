@@ -141,7 +141,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
             if (result != null && result.getNode() != null)
             {
                 // TODO MULE-9856 Replace with the builder
-                event.setMessage(new DefaultMuleMessage(result.getNode(), event.getMessage()));
+                event.setMessage(new DefaultMuleMessage(result.getNode(), event.getMessage(), event.getMuleContext()));
             }
         }
         

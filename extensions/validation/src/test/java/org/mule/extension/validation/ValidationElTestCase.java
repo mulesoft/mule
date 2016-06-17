@@ -62,13 +62,13 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
 
         assertValid(expression, event);
 
-        event.setMessage(new DefaultMuleMessage("TRUE", event.getMessage()));
+        event.setMessage(new DefaultMuleMessage("TRUE", event.getMessage(), event.getMuleContext()));
         assertValid(expression, event);
 
         event.setFlowVariable("caseSensitive", true);
         assertInvalid(expression, event);
 
-        event.setMessage(new DefaultMuleMessage("tTrue", event.getMessage()));
+        event.setMessage(new DefaultMuleMessage("tTrue", event.getMessage(), event.getMuleContext()));
         assertInvalid(expression, event);
     }
 

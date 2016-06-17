@@ -62,7 +62,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
                 {
                     e.printStackTrace();
                 }
-                event.setMessage(new DefaultMuleMessage(msg, event.getMessage()));
+                event.setMessage(new DefaultMuleMessage(msg, event.getMessage(), event.getMuleContext()));
                 gotEvent = true;
                 return event;
             }

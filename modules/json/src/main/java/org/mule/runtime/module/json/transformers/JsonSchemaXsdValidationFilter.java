@@ -79,7 +79,7 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
             boolean accepted = super.accept(new DefaultMuleEvent(xmlMessage, event.getFlowConstruct()));
             if (jsonString != null)
             {
-                msg = new DefaultMuleMessage(jsonString, msg);
+                msg = new DefaultMuleMessage(jsonString, msg, event.getMuleContext());
                 event.setMessage(msg);
             }
             return accepted;

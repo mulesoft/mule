@@ -131,7 +131,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
             // so that a protocol class can use the thread local and pick the
             // transformed
             // message.
-            event.setMessage(new DefaultMuleMessage(payload, event.getMessage()));
+            event.setMessage(new DefaultMuleMessage(payload, event.getMessage(), event.getMuleContext()));
             // OptimizedRequestContext.unsafeRewriteEvent(new DefaultMuleMessage(
             // payload));
             write(payload);

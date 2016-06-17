@@ -664,7 +664,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.setMessage(new DefaultMuleMessage(Thread.currentThread(), event.getMessage()));
+            event.setMessage(new DefaultMuleMessage(Thread.currentThread(), event.getMessage(), event.getMuleContext()));
             return event;
         }
     }

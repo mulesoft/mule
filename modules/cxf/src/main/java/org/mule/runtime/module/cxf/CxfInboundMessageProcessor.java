@@ -478,7 +478,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                 if (ex != null)
                 {
                     ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
-                    msg.setExceptionPayload(exceptionPayload);
+                    event.setMessage(event.getMessage().transform(message -> {
+                        msg.setExceptionPayload(exceptionPayload);
+                        return msg;
+                    }));
                     msg.setOutboundProperty(HTTP_STATUS_PROPERTY, 500);
                 }
             }
