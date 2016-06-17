@@ -133,7 +133,7 @@ public class MessageContext
 
     public void setPayload(Object payload)
     {
-        event.setMessage(new DefaultMuleMessage(payload, event.getMessage(), event.getMuleContext()));
+        event.setMessage(new DefaultMuleMessage(payload, event.getMessage(), muleContext));
     }
 
     public Map<String, Serializable> getInboundProperties()
