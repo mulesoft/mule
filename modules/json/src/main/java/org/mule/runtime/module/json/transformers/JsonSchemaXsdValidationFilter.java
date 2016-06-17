@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.json.transformers;
 
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -69,13 +70,13 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
                     IOUtils.copy(transformerInputs.getReader(), jsonWriter);
                 }
                 jsonString = jsonWriter.toString();
-                msg = new DefaultMuleMessage(jsonString, msg);
+                msg = new DefaultMuleMessage(jsonString, msg, msg.getMuleContext());
                 event.setMessage(msg);
             }
             String xmlString = (String) jToX.transform(msg.getPayload(), msg.getEncoding());
             // TODO MULE-9856 Replace with the builder
             MuleMessage xmlMessage = new DefaultMuleMessage(xmlString, msg, msg.getMuleContext());
-            boolean accepted = super.accept(xmlMessage);
+            boolean accepted = super.accept(new DefaultMuleEvent(xmlMessage, event.getFlowConstruct()));
             if (jsonString != null)
             {
                 msg = new DefaultMuleMessage(jsonString, msg);
@@ -85,6 +86,7 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
         }
         catch (Exception ex)
         {
+            logger.warn("Exception validating json.", ex);
             return false;
         }
     }
