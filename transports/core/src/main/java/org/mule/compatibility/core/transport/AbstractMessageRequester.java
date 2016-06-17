@@ -135,9 +135,9 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
     protected MutableMuleMessage applyInboundTransformers(MuleMessage message) throws MuleException
     {
         MuleMessage transformed = getTransformationService().applyTransformers(message, null, defaultInboundTransformers);
-        if (message instanceof MutableMuleMessage)
+        if (transformed instanceof MutableMuleMessage)
         {
-            return (MutableMuleMessage) message;
+            return (MutableMuleMessage) transformed;
         }
         else
         {
