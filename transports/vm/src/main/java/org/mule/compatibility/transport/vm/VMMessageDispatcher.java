@@ -105,14 +105,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
         ExecutionTemplate<MuleMessage> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(
                 event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
-        ExecutionCallback<MuleMessage> processingCallback = new ExecutionCallback<MuleMessage>()
-        {
-            @Override
-            public MuleMessage process() throws Exception
-            {
-                return receiver.onCall((MutableMuleMessage) message);
-            }
-        };
+        ExecutionCallback<MuleMessage> processingCallback = () -> receiver.onCall((MutableMuleMessage) message);
         retMessage = executionTemplate.execute(processingCallback);
 
         if (logger.isDebugEnabled())
@@ -121,7 +114,8 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
         if (retMessage != null)
         {
-            retMessage = eventToSend.getMessage().transform(msg -> {
+            retMessage = retMessage.transform(msg ->
+            {
                 try
                 {
                     return msg.createInboundMessage();
