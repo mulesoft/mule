@@ -10,18 +10,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.compatibility.transport.http.CacheControlHeader;
 import org.mule.compatibility.transport.http.CookieHelper;
 import org.mule.compatibility.transport.http.CookieWrapper;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
-import org.mule.compatibility.transport.http.components.HttpResponseBuilder;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -85,6 +85,11 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
         mockEvent = mock(MuleEvent.class);
         mockMuleMessage = mock(MuleMessage.class);
+        doAnswer(invocation -> {
+            mockMuleMessage = (MuleMessage) invocation.getArguments()[0];
+            return null;
+        }).when(mockEvent).setMessage(any(MuleMessage.class));
+        when(mockEvent.getMessage()).thenAnswer(invocation -> mockMuleMessage);
         mockExpressionManager = mock(ExpressionManager.class);
         when(muleContext.getExpressionManager()).thenReturn(mockExpressionManager);
     }
@@ -93,9 +98,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testEmptyHttpResponseBuilder() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
-
-        when(mockEvent.getMessage()).thenReturn(muleMessage);
+        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
 
         mockParse();
         HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
@@ -109,8 +112,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseBuilderAttributes() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
-        when(mockEvent.getMessage()).thenReturn(muleMessage);
+        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
 
         httpResponseBuilder.setContentType("text/html");
         httpResponseBuilder.setStatus(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR));
@@ -127,8 +129,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseBuilderAttributesWithExpressions() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
-        when(mockEvent.getMessage()).thenReturn(muleMessage);
+        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
 
         httpResponseBuilder.setStatus(HEADER_STATUS);
         httpResponseBuilder.setContentType(HEADER_CONTENT_TYPE);
@@ -418,9 +419,8 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         outboundProperties.put(HttpConstants.HEADER_LOCATION, "http://localhost:9090");
 
         mockParse();
-        DefaultMuleMessage message = new DefaultMuleMessage(HTTP_BODY, outboundProperties, muleContext);
+        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY, outboundProperties, muleContext);
 
-        when(mockEvent.getMessage()).thenReturn(message);
         HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
         Header[] resultHeaders = httpResponse.getHeaders();
         validateHeader(resultHeaders, HttpConstants.HEADER_CACHE_CONTROL, "max-age=3600,public");
