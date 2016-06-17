@@ -1016,8 +1016,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
         out.defaultWriteObject();
         out.writeObject(serializeAttachments(inboundAttachments));
         out.writeObject(serializeAttachments(outboundAttachments));
-
-        // TODO: we don't serialize the originalPayload for now
     }
 
     private Map<String, SerializedDataHandler> serializeAttachments(Map<String, DataHandler> attachments) throws IOException

@@ -30,7 +30,6 @@
                 |muleContext|a reference to the MuleContext object.|
                 |eventContext| A reference to the eventcontext. This allows you to dispatch events progammatically from your script|
                 |message|the current message.|
-                |originalPayload|the payload of the current message before any transforms.|
                 |payload|the transformed payload of the current message if a transformer is configured on the service. Otherwise this is the same value as _originalPayload_.|
                 |src|same as _payload_, kept for backward compatability.|
                 |service|a reference to the current service object.|
@@ -113,10 +112,6 @@
                     <tr>
                         <td>message</td>
                         <td>the current message.</td>
-                    </tr>
-                    <tr>
-                        <td>originalPayload</td>
-                        <td>the payload of the current message before any transforms.</td>
                     </tr>
                     <tr>
                         <td>payload</td>
