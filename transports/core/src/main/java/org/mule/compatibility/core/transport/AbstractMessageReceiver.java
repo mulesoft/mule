@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_P
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -32,7 +33,6 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -47,7 +47,6 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.work.TrackingWorkManager;
-import org.mule.runtime.core.work.WorkManagerHolder;
 
 import java.io.OutputStream;
 import java.util.List;
@@ -151,23 +150,19 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
         if (!shouldConsumeInEveryNode() && !flowConstruct.getMuleContext().isPrimaryPollingInstance())
         {
-            primaryNodeLifecycleNotificationListener = new PrimaryNodeLifecycleNotificationListener(new Startable()
+            primaryNodeLifecycleNotificationListener = new PrimaryNodeLifecycleNotificationListener(() ->
             {
-                @Override
-                public void start() throws MuleException
+                if (AbstractMessageReceiver.this.isStarted())
                 {
-                    if (AbstractMessageReceiver.this.isStarted())
+                    try
                     {
-                        try
-                        {
-                            AbstractMessageReceiver.this.doConnect();
-                        }
-                        catch (Exception e)
-                        {
-                            throw new DefaultMuleException(e);
-                        }
-                        AbstractMessageReceiver.this.doStart();
+                        AbstractMessageReceiver.this.doConnect();
                     }
+                    catch (Exception e)
+                    {
+                        throw new DefaultMuleException(e);
+                    }
+                    AbstractMessageReceiver.this.doStart();
                 }
             },flowConstruct.getMuleContext());
             primaryNodeLifecycleNotificationListener.register();
@@ -296,15 +291,17 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         {
             session = new DefaultMuleSession();
         }
-        if (message.getReplyTo() != null)
+        final Object replyToFromMessage = message.getReplyTo();
+        if (replyToFromMessage != null)
         {
-            DefaultMuleEvent newEvent = new DefaultMuleEvent(message, flowConstruct, session, replyToHandler, message.getReplyTo(), ros);
-            DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
-            event = newEvent;
-            message =  message.transform(msg -> {
+            message = message.transform(msg ->
+            {
                 msg.setReplyTo(null);
                 return msg;
             });
+            DefaultMuleEvent newEvent = new DefaultMuleEvent(message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
+            DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
+            event = newEvent;
         }
         else
         {
@@ -495,14 +492,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     {
         int shutdownTimeout = endpoint.getMuleContext().getConfiguration().getShutdownTimeout();
 
-        return new TrackingWorkManager(new WorkManagerHolder()
-        {
-            @Override
-            public WorkManager getWorkManager()
-            {
-                return getConnectorWorkManager();
-            }
-        }, shutdownTimeout);
+        return new TrackingWorkManager(() -> getConnectorWorkManager(), shutdownTimeout);
     }
 
     public MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException
