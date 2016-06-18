@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
@@ -20,16 +21,20 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -58,6 +63,7 @@ public final class ParameterModelValidator implements ModelValidator
     private static final String CONFIGURATION = "configuration";
     private static final String OPERATION = "operation";
     private static final String CONNECTION_PROVIDER = "connection provider";
+    private static final String SOURCE = "source";
 
     private SubTypesMappingContainer subTypesMapping;
     private Map<MetadataType, MetadataType> importedTypes;
@@ -117,36 +123,20 @@ public final class ParameterModelValidator implements ModelValidator
                 .map(ImportedTypesModelProperty::getImportedTypes);
         importedTypes = typeImports.isPresent() ? typeImports.get() : ImmutableMap.of();
 
-        extensionModel.getConfigurationModels().stream()
-                .forEach(config -> validateParameters(config.getParameterModels(), visitor, config.getName(),
-                                                      CONFIGURATION, extensionModel.getName()));
-
-        validateOperations(extensionModel, extensionModel.getOperationModels(), visitor);
-        extensionModel.getConfigurationModels().forEach(config -> validateOperations(extensionModel, config.getOperationModels(), visitor));
-
-        validateConnectionProviders(extensionModel, extensionModel.getConnectionProviders(), visitor);
-        extensionModel.getConfigurationModels().forEach(config -> validateConnectionProviders(extensionModel, config.getConnectionProviders(), visitor));
-    }
-
-    private void validateConnectionProviders(ExtensionModel extensionModel, List<ConnectionProviderModel> providers, MetadataTypeVisitor visitor)
-    {
-        providers.forEach(provider -> validateParameters(provider.getParameterModels(), visitor, provider.getName(),
-                                                         CONNECTION_PROVIDER, extensionModel.getName()));
-    }
-
-    private void validateOperations(ExtensionModel extensionModel, List<OperationModel> operations, MetadataTypeVisitor visitor)
-    {
-        operations.forEach(operation -> validateParameters(operation.getParameterModels(), visitor, operation.getName(),
-                                                           OPERATION, extensionModel.getName()));
-    }
-
-    private void validateParameters(List<ParameterModel> parameters, MetadataTypeVisitor visitor, String ownerName, String ownerModelType, String extensionName)
-    {
-        parameters.stream().forEach(parameterModel -> {
-            validateParameter(parameterModel, visitor, ownerName, ownerModelType, extensionName);
-            validateNameCollisionWithTypes(parameterModel, ownerName, ownerModelType, extensionName,
-                                           parameters.stream().map(p -> hyphenize(p.getName())).collect(toList()));
-        });
+        String extensionModelName = extensionModel.getName();
+        new ExtensionWalker()
+        {
+            @Override
+            public void onParameter(ParameterizedModel owner, ParameterModel model)
+            {
+                String ownerName = owner.getName();
+                String ownerModelType = getComponentModelTypeName(owner);
+                validateParameter(model, visitor, ownerName, ownerModelType, extensionModelName);
+                validateParameterGroup(model, ownerName, ownerModelType, extensionModelName);
+                validateNameCollisionWithTypes(model, ownerName, ownerModelType, extensionModelName,
+                                               owner.getParameterModels().stream().map(p -> hyphenize(p.getName())).collect(toList()));
+            }
+        }.walk(extensionModel);
     }
 
     private void validateParameter(ParameterModel parameterModel, MetadataTypeVisitor visitor, String ownerName, String ownerModelType, String extensionName)
@@ -191,4 +181,43 @@ public final class ParameterModelValidator implements ModelValidator
 
     }
 
+    private void validateParameterGroup(ParameterModel parameterModel, String ownerName, String ownerModelType, String extensionName)
+    {
+        parameterModel.getModelProperty(ParameterGroupModelProperty.class)
+                .ifPresent(parameterGroupModelProperty -> parameterGroupModelProperty
+                        .getGroups().stream()
+                        .filter(p -> !isInstantiable(p.getType()))
+                        .findFirst()
+                        .ifPresent(p ->
+                                   {
+                                       throw new IllegalParameterModelDefinitionException(
+                                               format("The parameter group of type '%s' in %s [%s] from the extension [%s] should be non abstract with a default constructor.",
+                                                      p.getType(), ownerModelType, ownerName, extensionName));
+                                   }
+                        ));
+    }
+
+    private String getComponentModelTypeName(Object component)
+    {
+        if (component instanceof OperationModel)
+        {
+            return OPERATION;
+        }
+        else if (component instanceof ConfigurationModel)
+        {
+            return CONFIGURATION;
+        }
+        else if (component instanceof ConnectionProviderModel)
+        {
+            return CONNECTION_PROVIDER;
+        }
+        else if (component instanceof SourceModel)
+        {
+            return SOURCE;
+        }
+
+        throw new IllegalArgumentException(format("Component '%s' is not an instance of any known model type [%s, %s, %s, %s]",
+                                                  component.toString(),
+                                                  CONFIGURATION, CONNECTION_PROVIDER, OPERATION, SOURCE));
+    }
 }
