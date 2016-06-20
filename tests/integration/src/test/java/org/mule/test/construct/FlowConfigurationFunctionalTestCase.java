@@ -6,6 +6,7 @@
  */
 package org.mule.test.construct;
 
+import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsString;
@@ -664,7 +665,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.setMessage(new DefaultMuleMessage(Thread.currentThread(), event.getMessage(), event.getMuleContext()));
+            event.setMessage(new DefaultMuleMessage(currentThread(), event.getMessage(), event.getMuleContext()));
             return event;
         }
     }

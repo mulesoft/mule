@@ -8,6 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -38,7 +39,6 @@ import javax.activation.MimeTypeParseException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public abstract class AbstractAddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
@@ -70,10 +70,10 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
 
         when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
         when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-        when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
-        when(mockExpressionManager.evaluate(eq(EXPRESSION), Mockito.any(MuleEvent.class))).thenReturn(EXPRESSION_VALUE);
+        when(mockExpressionManager.parse(anyString(), any(MuleEvent.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
+        when(mockExpressionManager.evaluate(eq(EXPRESSION), any(MuleEvent.class))).thenReturn(EXPRESSION_VALUE);
         TypedValue typedValue = new TypedValue(EXPRESSION_VALUE, DataTypeFactory.STRING);
-        when(mockExpressionManager.evaluateTyped(eq(EXPRESSION), Mockito.any(MuleEvent.class))).thenReturn(typedValue);
+        when(mockExpressionManager.evaluateTyped(eq(EXPRESSION), any(MuleEvent.class))).thenReturn(typedValue);
         addVariableTransformer.setMuleContext(mockMuleContext);
 
         mockMessage = new DefaultMuleMessage("", mockMuleContext);

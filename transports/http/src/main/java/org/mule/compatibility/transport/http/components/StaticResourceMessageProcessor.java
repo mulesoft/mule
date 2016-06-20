@@ -6,12 +6,16 @@
  */
 package org.mule.compatibility.transport.http.components;
 
+import static java.lang.String.valueOf;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PATH_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_LENGTH;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_LOCATION;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_MOVED_TEMPORARILY;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_OK;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -104,9 +108,9 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
             // Return a 302 with the new location
             // Return a 302 with the new location
             MutableMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance() , event.getMuleContext());
-            message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(HttpConstants.SC_MOVED_TEMPORARILY));
+            message.setOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_MOVED_TEMPORARILY));
             message.setOutboundProperty(HEADER_CONTENT_LENGTH, 0);
-            message.setOutboundProperty(HEADER_LOCATION, event.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY) + "/");
+            message.setOutboundProperty(HEADER_LOCATION, event.getMessage().getInboundProperty(HTTP_REQUEST_PATH_PROPERTY) + "/");
             resultEvent = new DefaultMuleEvent(message, event);
             return resultEvent;
         }
@@ -128,7 +132,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
             }
 
             MutableMuleMessage message = new DefaultMuleMessage(buffer , event.getMuleContext());
-            message.setOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(HttpConstants.SC_OK));
+            message.setOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_OK));
             message.setOutboundProperty(HEADER_CONTENT_TYPE, mimetype);
             message.setOutboundProperty(HEADER_CONTENT_LENGTH, buffer.length);
             resultEvent = new DefaultMuleEvent(message, event);

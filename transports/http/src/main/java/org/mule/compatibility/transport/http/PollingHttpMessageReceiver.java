@@ -6,7 +6,16 @@
  */
 package org.mule.compatibility.transport.http;
 
-import org.mule.compatibility.core.api.config.MuleEndpointProperties;
+import static java.util.Collections.emptyList;
+import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_METHOD_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_LENGTH;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_ETAG;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_IF_NONE_MATCH;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_NOT_MODIFIED;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -17,18 +26,14 @@ import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.StringUtils;
-
-import java.util.Collections;
 
 /**
  * Will poll an http URL and use the response as the input for a service request.
@@ -103,11 +108,11 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             // send() as thats the only way we can customize headers and use eTags
             EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoint);
             // Must not use inbound endpoint processors
-            endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>emptyList());
-            endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>emptyList());
-            endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>emptyList());
-            endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>emptyList());
-            endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
+            endpointBuilder.setMessageProcessors(emptyList());
+            endpointBuilder.setResponseMessageProcessors(emptyList());
+            endpointBuilder.setMessageProcessors(emptyList());
+            endpointBuilder.setResponseMessageProcessors(emptyList());
+            endpointBuilder.setExchangePattern(REQUEST_RESPONSE);
 
             outboundEndpoint = getEndpointFactory(muleContext).getOutboundEndpoint(
                     endpointBuilder);
@@ -116,9 +121,9 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         MutableMuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, outboundEndpoint.getProperties(), muleContext);
         if (etag != null && checkEtag)
         {
-            request.setOutboundProperty(HttpConstants.HEADER_IF_NONE_MATCH, etag);
+            request.setOutboundProperty(HEADER_IF_NONE_MATCH, etag);
         }
-        request.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+        request.setOutboundProperty(HTTP_METHOD_PROPERTY, "GET");
 
         MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint.getExchangePattern(), flowConstruct);
 
@@ -129,7 +134,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             message = (MutableMuleMessage) result.getMessage();
         }
 
-        final int contentLength = message.getOutboundProperty(HttpConstants.HEADER_CONTENT_LENGTH, -1);
+        final int contentLength = message.getOutboundProperty(HEADER_CONTENT_LENGTH, -1);
         if (contentLength == 0 && discardEmptyContent)
         {
             if (logger.isDebugEnabled())
@@ -138,10 +143,10 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             }
             return;
         }
-        int status = message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
-        etag = message.getOutboundProperty(HttpConstants.HEADER_ETAG);
+        int status = message.getOutboundProperty(HTTP_STATUS_PROPERTY, 0);
+        etag = message.getOutboundProperty(HEADER_ETAG);
 
-        if ((status != HttpConstants.SC_NOT_MODIFIED || !checkEtag))
+        if ((status != SC_NOT_MODIFIED || !checkEtag))
         {
             routeMessage(message);
         }
@@ -149,6 +154,6 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 
     public EndpointFactory getEndpointFactory(MuleContext muleContext)
     {
-        return (EndpointFactory) muleContext.getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+        return (EndpointFactory) muleContext.getRegistry().lookupObject(OBJECT_MULE_ENDPOINT_FACTORY);
     }
 }

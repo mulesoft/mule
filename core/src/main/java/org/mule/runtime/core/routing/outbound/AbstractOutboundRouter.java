@@ -86,23 +86,19 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
         ExecutionTemplate<MuleEvent> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, getTransactionConfig());
-        ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
+        ExecutionCallback<MuleEvent> processingCallback = () ->
         {
-            @Override
-            public MuleEvent process() throws Exception
+            try
             {
-                try
-                {
-                    return route(event);
-                }
-                catch (RoutingException e)
-                {
-                    throw e;
-                }
-                catch (Exception e)
-                {
-                    throw new RoutingException(event, AbstractOutboundRouter.this, e);
-                }
+                return route(event);
+            }
+            catch (RoutingException e1)
+            {
+                throw e1;
+            }
+            catch (Exception e2)
+            {
+                throw new RoutingException(event, AbstractOutboundRouter.this, e2);
             }
         };
         try
@@ -233,14 +229,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                 StringBuilder buf = new StringBuilder();
                 buf.append("Setting Correlation info on Outbound router");
                 buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
-                // buf.append(", ").append("Seq=").append(seq);
-                // buf.append(", ").append("Group Size=").append(group);
                 logger.debug(buf.toString());
             }
             event.setMessage(message.transform(msg -> {
                 msg.setCorrelationId(correlation);
-                // msg.setCorrelationGroupSize(group);
-                // msg.setCorrelationSequence(seq);
                 return msg;
             }));
         }

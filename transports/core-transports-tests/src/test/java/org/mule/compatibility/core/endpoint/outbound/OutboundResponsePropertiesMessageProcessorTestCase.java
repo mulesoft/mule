@@ -8,18 +8,18 @@ package org.mule.compatibility.core.endpoint.outbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.AbstractEndpointBuilder;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import org.junit.Test;
 
@@ -35,28 +35,26 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
     {
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
         InterceptingMessageProcessor mp = new OutboundResponsePropertiesMessageProcessor(endpoint);
-        mp.setListener(new MessageProcessor()
+        mp.setListener(event ->
         {
-            public MuleEvent process(MuleEvent event) throws MuleException
+            // return event with same payload but no properties
+            try
             {
-                // return event with same payload but no properties
-                try
-                {
-                    return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload(),
-                        muleContext), MessageExchangePattern.REQUEST_RESPONSE, getTestFlow(),
-                        getTestSession(null, muleContext));
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
-                }
+                return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload(),
+                    muleContext), REQUEST_RESPONSE, getTestFlow(),
+                    getTestSession(null, muleContext));
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
             }
         });
 
         MuleEvent event = createTestOutboundEvent();
-        event.setMessage(event.getMessage().transform(msg -> {
+        event.setMessage(event.getMessage().transform(msg ->
+        {
             msg.setOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL);
-            msg.setOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, MULE_CORRELATION_ID_VAL);
+            msg.setOutboundProperty(MULE_CORRELATION_ID_PROPERTY, MULE_CORRELATION_ID_VAL);
             return msg;
         }));
 

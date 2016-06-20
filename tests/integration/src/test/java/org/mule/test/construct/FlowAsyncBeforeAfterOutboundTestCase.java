@@ -6,16 +6,17 @@
  */
 package org.mule.test.construct;
 
+import static java.lang.Thread.currentThread;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
@@ -60,7 +61,7 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
         assertNotNull(msgAsync);
         assertNotNull(msgOut);
 
-        assertEquals((Object) msgSync.getInboundProperty("request-response-thread"),
+        assertEquals(msgSync.getInboundProperty("request-response-thread"),
             msgOut.getInboundProperty("request-response-thread"));
 
         assertTrue(!msgAsync.getOutboundProperty("async-thread").
@@ -77,7 +78,7 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
         {
             String propName = event.getFlowVariable("property-name");
             event.setMessage(event.getMessage().transform(msg -> {
-                msg.setOutboundProperty(propName, Thread.currentThread().getName());
+                msg.setOutboundProperty(propName, currentThread().getName());
                 return msg;
             }));
             return event;

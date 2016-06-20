@@ -1433,7 +1433,10 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     }
 
     /**
-     * TODO MULE-9856 Replace with the builder This is needed for calls from mocks.
+     * TODO MULE-9856 Replace with the builder
+     * <p>
+     * This method here is needed for calls from mocks. Mockito doesn't support default methods in
+     * interfaces.
      */
     @Override
     @Deprecated

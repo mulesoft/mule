@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing;
 
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -17,7 +18,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
-import org.mule.runtime.core.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,10 +97,12 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
         }
         else
         {
-            List<MuleEvent> nonNullResults = (List<MuleEvent>) CollectionUtils.select(results,
-                object -> !VoidMuleEvent.getInstance().equals(object) &&
-                object != null &&
-                ((MuleEvent) object).getMessage() != null);
+            List<MuleEvent> nonNullResults = results.stream().filter(object ->
+            {
+                return !VoidMuleEvent.getInstance().equals(object) &&
+                       object != null &&
+                       object.getMessage() != null;
+            }).collect(toList());
 
             if (nonNullResults.size() == 0)
             {

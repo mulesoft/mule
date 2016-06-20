@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.jms;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.util.NumberUtils.toInt;
+
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -276,7 +277,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 {
                     completionHandler.onCompletion(createMuleMessage(null), (exception ->
                     {
-                        // TODO MULE-9629
                         return null;
                     }));
                 }

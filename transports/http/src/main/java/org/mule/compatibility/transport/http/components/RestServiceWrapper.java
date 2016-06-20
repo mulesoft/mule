@@ -6,16 +6,18 @@
  */
 package org.mule.compatibility.transport.http.components;
 
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_METHOD_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -186,10 +188,11 @@ public class RestServiceWrapper extends AbstractComponent
         // if post
         else
         {
-            if (event.getMessage().getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE) == null)
+            if (event.getMessage().getOutboundProperty(HEADER_CONTENT_TYPE) == null)
             {
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE);
+                event.setMessage(event.getMessage().transform(msg ->
+                {
+                    msg.setOutboundProperty(HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE);
                     return msg;
                 }));
             }
@@ -203,13 +206,14 @@ public class RestServiceWrapper extends AbstractComponent
         tempUrl = urlBuffer.toString();
         logger.info("Invoking REST service: " + tempUrl);
 
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, httpMethod);
+        event.setMessage(event.getMessage().transform(msg ->
+        {
+            msg.setOutboundProperty(HTTP_METHOD_PROPERTY, httpMethod);
             return msg;
         }));
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
-        endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
+        endpointBuilder.setExchangePattern(REQUEST_RESPONSE);
         OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
 
         MuleEventContext eventContext = new DefaultMuleEventContext(event);
