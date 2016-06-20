@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.model.property;
 
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
 
@@ -19,14 +20,14 @@ import org.mule.runtime.extension.api.introspection.ModelProperty;
 public final class ConnectionTypeModelProperty implements ModelProperty
 {
 
-    private final Class<?> connectionType;
+    private final MetadataType connectionType;
 
     /**
      * Creates a new instance for the given {@code connectionType}
      *
      * @param connectionType
      */
-    public ConnectionTypeModelProperty(Class<?> connectionType)
+    public ConnectionTypeModelProperty(MetadataType connectionType)
     {
         this.connectionType = connectionType;
     }
@@ -34,7 +35,7 @@ public final class ConnectionTypeModelProperty implements ModelProperty
     /**
      * @return the {@link {@link #connectionType}}
      */
-    public Class<?> getConnectionType()
+    public MetadataType getConnectionType()
     {
         return connectionType;
     }

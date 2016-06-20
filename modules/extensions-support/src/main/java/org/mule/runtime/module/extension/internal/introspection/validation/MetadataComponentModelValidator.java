@@ -49,7 +49,7 @@ public class MetadataComponentModelValidator implements ModelValidator
     private void validateMetadataReturnType(ExtensionModel extensionModel, ComponentModel componentModel)
     {
         RuntimeComponentModel component = (RuntimeComponentModel) componentModel;
-        MetadataType returnMetadataType = component.getReturnType();
+        MetadataType returnMetadataType = component.getOutputPayload().getType();
 
         if (returnMetadataType instanceof ObjectType || returnMetadataType instanceof DictionaryType)
         {

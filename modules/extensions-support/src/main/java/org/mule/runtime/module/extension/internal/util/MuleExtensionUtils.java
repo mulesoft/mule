@@ -12,6 +12,7 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
+import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -22,10 +23,10 @@ import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.Described;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.InterceptableModel;
+import org.mule.runtime.extension.api.introspection.Named;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
@@ -199,6 +200,7 @@ public class MuleExtensionUtils
         Set<Class<?>> connectionTypes = extensionModel.getOperationModels().stream()
                 .map(operation -> operation.getModelProperty(ConnectionTypeModelProperty.class).map(ConnectionTypeModelProperty::getConnectionType).orElse(null))
                 .filter(type -> type != null)
+                .map(JavaTypeUtils::getType)
                 .collect(toSet());
 
         if (isEmpty(connectionTypes))
@@ -218,21 +220,21 @@ public class MuleExtensionUtils
     }
 
     /**
-     * Sorts the given {@code list} in ascending alphabetic order, using {@link Described#getName()}
+     * Sorts the given {@code list} in ascending alphabetic order, using {@link Named#getName()}
      * as the sorting criteria
      *
-     * @param list a {@link List} with instances of {@link Described}
+     * @param list a {@link List} with instances of {@link Named}
      * @param <T>  the generic type of the items in the {@code list}
      * @return the sorted {@code list}
      */
-    public static <T extends Described> List<T> alphaSortDescribedList(List<T> list)
+    public static <T extends Named> List<T> alphaSortDescribedList(List<T> list)
     {
         if (isEmpty(list))
         {
             return list;
         }
 
-        Collections.sort(list, new DescribedComparator());
+        Collections.sort(list, new NamedComparator());
         return list;
     }
 
@@ -370,11 +372,11 @@ public class MuleExtensionUtils
         return new IllegalModelDefinitionException("No ClassLoader was specified for extension " + extensionName);
     }
 
-    private static class DescribedComparator implements Comparator<Described>
+    private static class NamedComparator implements Comparator<Named>
     {
 
         @Override
-        public int compare(Described o1, Described o2)
+        public int compare(Named o1, Named o2)
         {
             return o1.getName().compareTo(o2.getName());
         }

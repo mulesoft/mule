@@ -17,6 +17,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
@@ -65,7 +66,7 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase
         when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
         when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
         when(extensionDeclaration.getOperations()).thenReturn(asList(connectedOperation, notConnectedOperation));
-        when(connectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(Object.class)));
+        when(connectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(toMetadataType(Object.class))));
         when(notConnectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.empty());
     }
 

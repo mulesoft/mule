@@ -12,11 +12,12 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataOutputResolverWithAttributes;
 
 import java.util.Set;
 
-public class TestOutputAttributesResolverWithKeyResolver implements MetadataKeysResolver, MetadataOutputResolver<String>
+public class TestOutputAttributesResolverWithKeyResolver
+        implements MetadataKeysResolver, MetadataOutputResolverWithAttributes<String>
 {
 
     @Override

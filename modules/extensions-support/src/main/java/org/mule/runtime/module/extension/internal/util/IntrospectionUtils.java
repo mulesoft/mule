@@ -307,6 +307,7 @@ public final class IntrospectionUtils
     }
 
 
+    //public static <T> List<T> getSuperClassGenerics(Class<?> type, Class<?> superClass)
     public static List<Type> getSuperClassGenerics(Class<?> type, Class<?> superClass)
     {
         Class<?> searchClass = type;
@@ -371,7 +372,7 @@ public final class IntrospectionUtils
 
     public static boolean isVoid(ComponentModel componentModel)
     {
-        return componentModel.getReturnType() instanceof NullType;
+        return componentModel.getOutputPayload().getType() instanceof NullType;
     }
 
     private static boolean isVoid(Class<?> type)

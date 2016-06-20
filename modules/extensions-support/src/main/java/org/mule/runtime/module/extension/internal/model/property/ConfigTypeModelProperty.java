@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.model.property;
 
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
 
@@ -19,14 +20,14 @@ import org.mule.runtime.extension.api.introspection.ModelProperty;
 public final class ConfigTypeModelProperty implements ModelProperty
 {
 
-    private final Class<?> configType;
+    private final MetadataType configType;
 
     /**
      * Creates a new instance for the given {@code configType}
      *
      * @param configType
      */
-    public ConfigTypeModelProperty(Class<?> configType)
+    public ConfigTypeModelProperty(MetadataType configType)
     {
         this.configType = configType;
     }
@@ -34,7 +35,7 @@ public final class ConfigTypeModelProperty implements ModelProperty
     /**
      * @return the {@link {@link #configType }}
      */
-    public Class<?> getConfigType()
+    public MetadataType getConfigType()
     {
         return configType;
     }

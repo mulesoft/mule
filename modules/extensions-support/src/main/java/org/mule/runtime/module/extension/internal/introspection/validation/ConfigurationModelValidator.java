@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
@@ -57,15 +58,16 @@ public final class ConfigurationModelValidator implements ModelValidator
 
     private ListMultimap<Class, String> getParameterConfigsFromOperations(ExtensionModel model)
     {
-        ListMultimap<Class, String> listMultimap = ArrayListMultimap.create();
+        ListMultimap<Class, String> operationsByConfig = ArrayListMultimap.create();
 
         for (OperationModel operationModel : model.getOperationModels())
         {
             operationModel.getModelProperty(ConfigTypeModelProperty.class)
-                    .ifPresent(modelProperty -> listMultimap.put(modelProperty.getConfigType(), operationModel.getName()));
+                    .ifPresent(modelProperty -> operationsByConfig.put(getType(modelProperty.getConfigType()),
+                                                                       operationModel.getName()));
         }
 
-        return listMultimap;
+        return operationsByConfig;
     }
 
 }
