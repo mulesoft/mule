@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
+
 import org.mule.runtime.config.spring.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.util.SystemUtils;
@@ -16,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.LinkedHashMap;
 import java.util.Stack;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -44,6 +46,8 @@ import org.xml.sax.helpers.DefaultHandler;
 final class MuleDocumentLoader implements DocumentLoader
 {
 
+    private static final String DEFER_NODE_EXPANSION_FEATURE_KEY = "http://apache.org/xml/features/dom/defer-node-expansion";
+
     private static final UserDataHandler COPY_METADATA_ANNOTATIONS_DATA_HANDLER = new UserDataHandler()
     {
         @Override
@@ -56,7 +60,26 @@ final class MuleDocumentLoader implements DocumentLoader
         }
     };
 
-    private final DocumentLoader defaultLoader = new DefaultDocumentLoader();
+    private final DocumentLoader defaultLoader = new DefaultDocumentLoader()
+    {
+        @Override
+        protected DocumentBuilderFactory createDocumentBuilderFactory(int validationMode, boolean namespaceAware)
+                throws ParserConfigurationException
+        {
+            DocumentBuilderFactory factory = super.createDocumentBuilderFactory(validationMode, namespaceAware);
+            try
+            {
+                factory.setFeature(DEFER_NODE_EXPANSION_FEATURE_KEY, false);
+            }
+            catch (Throwable e)
+            {
+                // we can get all kinds of exceptions from this
+                // due to old copies of Xerces and whatnot.
+            }
+
+            return factory;
+        }
+    };
     private final XmlMetadataAnnotationsFactory metadataFactory;
 
     public MuleDocumentLoader(XmlMetadataAnnotationsFactory metadataFactory)

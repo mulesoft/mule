@@ -82,6 +82,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         ctx.setExecutionClassLoader(getClass().getClassLoader());
         value = ExceptionHelper.getErrorMapping(TEST_PROTOCOL, IllegalArgumentException.class, ctx);
         assertThat(value, is(VALUE_AFTER_REDEPLOY));
+        ctx.dispose();
     }
 
     private void createExceptionMappingFile(File exceptionMappingFile, String value) throws IOException
@@ -108,6 +109,8 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         context.setExceptionListener(mockSystemExceptionHandler);
         context.handleException(mockMessagingException);
         verify(mockSystemExceptionHandler, VerificationModeFactory.times(1)).handleException(mockMessagingException,null);
+
+        context.dispose();
     }
     
     @Test
@@ -116,6 +119,8 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         MuleContext context = muleContextFactory.createMuleContext();
         Object osManager = context.getObjectStoreManager();
         Assert.assertTrue(osManager instanceof MuleObjectStoreManager);
+
+        context.dispose();
     }
 
     @Test
@@ -125,6 +130,9 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         context.start();
         org.junit.Assert.assertThat(context.getClusterId(), Is.is(""));
         org.junit.Assert.assertThat(context.getClusterNodeId(), Is.is(0));
+
+        context.stop();
+        context.dispose();
     }
 
     @Test
@@ -151,6 +159,9 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         context.start();
         assertThat(context.getClusterId(), is(clusterId));
         assertThat(context.getClusterNodeId(), is(clusterNodeId));
+
+        context.stop();
+        context.dispose();
     }
 
     @Test
@@ -159,6 +170,9 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         MuleContext context = muleContextFactory.createMuleContext();
         context.start();
         assertThat(context.isPrimaryPollingInstance(), is(true));
+
+        context.stop();
+        context.dispose();
     }
 
     @Test
@@ -175,6 +189,9 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         });
         context.start();
         assertThat(context.isPrimaryPollingInstance(), is(false));
+
+        context.stop();
+        context.dispose();
     }
 
     @Test
@@ -195,6 +212,8 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
 
         // verify we're not fetching from registry many times
         verify(registry, times(1)).lookupObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE);
+
+        context.dispose();
     }
 
     @Test
@@ -210,5 +229,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
         assertThat(dataTypeConverterResolver1, instanceOf(DynamicDataTypeConversionResolver.class));
         assertThat(dataTypeConverterResolver2, sameInstance(dataTypeConverterResolver1));
         verify(muleRegistry).lookupObject(OBJECT_CONVERTER_RESOLVER);
+
+        context.dispose();
     }
 }

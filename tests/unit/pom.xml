@@ -31,7 +31,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>${springVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>

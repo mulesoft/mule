@@ -18,7 +18,7 @@
         <javaMailVersion>1.4.7</javaMailVersion>
         <icegreenVersion>1.5.0</icegreenVersion>
         <guavaVersion>18.0</guavaVersion>
-        <powermockVersion>1.5.5</powermockVersion>
+        <powermockVersion>1.6.5</powermockVersion>
     </properties>
 
     <dependencies>

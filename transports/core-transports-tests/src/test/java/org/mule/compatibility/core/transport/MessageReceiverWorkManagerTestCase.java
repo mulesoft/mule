@@ -10,7 +10,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -52,6 +51,9 @@ public class MessageReceiverWorkManagerTestCase extends AbstractMuleContextEndpo
         {
             fail("Work should be executed and it was not");
         }
+
+        receiverConnector.stop();
+        receiverConnector.dispose();
     }
 
     private AbstractMessageReceiver createMessageReceiver() throws Exception

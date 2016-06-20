@@ -6,6 +6,8 @@
  */
 package org.mule.tck.junit4;
 
+import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -116,6 +118,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      * false, which means that a context will be instantiated per test method.
      */
     private boolean disposeContextPerClass;
+    private static boolean logConfigured;
 
     protected boolean isDisposeContextPerClass()
     {
@@ -130,7 +133,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     @Before
     public final void setUpMuleContext() throws Exception
     {
-        TestsLogConfigurationHelper.configureLoggingForTest(getClass());
+        if (!logConfigured)
+        {
+            configureLoggingForTest(getClass());
+            logConfigured = true;
+        }
         workingDirectory.create();
         String workingDirectoryOldValue = System.setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectory.getRoot().getAbsolutePath());
         try
@@ -297,7 +304,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             doTearDownAfterMuleContextDispose();
         }
 
-        //When an Assumption fails then junit doesn't call @Before methods so we need to avoid executing delete if there's no root folder.
+        // When an Assumption fails then junit doesn't call @Before methods so we need to avoid
+        // executing delete if there's no root folder.
         workingDirectory.delete();
     }
 

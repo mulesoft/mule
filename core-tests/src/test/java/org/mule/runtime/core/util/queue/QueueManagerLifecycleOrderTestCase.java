@@ -8,6 +8,7 @@ package org.mule.runtime.core.util.queue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -44,6 +45,8 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase
         assertSame(fc, startStopOrder.get(1));
         assertSame(fc, startStopOrder.get(2));
         assertSame(rtqm, startStopOrder.get(3));
+
+        muleContext.dispose();
     }
 
     private class RecordingTQM implements QueueManager
@@ -86,11 +89,13 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase
             super(name, muleContext);
         }
 
+        @Override
         public void doStart() throws MuleException
         {
             startStopOrder.add(this);
         }
 
+        @Override
         public void doStop() throws MuleException
         {
             startStopOrder.add(this);

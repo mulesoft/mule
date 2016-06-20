@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.util.annotation;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -52,20 +56,10 @@ public class AnnotationUtils
 
     public static List<AnnotationMetaData> getMethodAnnotations(Class<?> c, Class<? extends Annotation> ann)
     {
-        List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
-
-        for (int i = 0; i < c.getMethods().length; i++)
-        {
-            Method method = c.getMethods()[i];
-            for (int j = 0; j < method.getDeclaredAnnotations().length; j++)
-            {
-                if (ann.isInstance(method.getDeclaredAnnotations()[j]))
-                {
-                    annotations.add(new AnnotationMetaData(c, method, ElementType.METHOD, method.getDeclaredAnnotations()[j]));
-                }
-            }
-        }
-        return annotations;
+        return asList(c.getMethods()).stream()
+                                     .filter(method -> method.isAnnotationPresent(ann))
+                                     .map(method -> new AnnotationMetaData(c, method, METHOD, method.getAnnotation(ann)))
+                                     .collect(toList());
     }
 
     public static boolean hasAnnotationWithPackage(String packageName, Class<?> clazz) throws IOException
