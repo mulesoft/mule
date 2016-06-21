@@ -8,8 +8,11 @@ package org.mule.runtime.module.xml.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
+
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -19,10 +22,10 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.xml.util.NamespaceManager;
 import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.runtime.module.xml.xpath.XPathEvaluator;
-import org.mule.runtime.core.util.ClassUtils;
 
 import java.text.MessageFormat;
 import java.util.Map;
@@ -105,7 +108,13 @@ public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initiali
     @Override
     public boolean accept(MuleMessage message)
     {
-        Object payload = message.getPayload();
+        throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
+    }
+
+    @Override
+    public boolean accept(MuleEvent event)
+    {
+        Object payload = event.getMessage().getPayload();
         if (payload == null)
         {
             if (logger.isWarnEnabled())
@@ -155,7 +164,8 @@ public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initiali
             return false;
         }
 
-        message.setPayload(node);
+        // TODO MULE-9856 Replace with the builder
+        event.setMessage(new DefaultMuleMessage(node, event.getMessage(), event.getMuleContext()));
 
         return accept(node);
     }

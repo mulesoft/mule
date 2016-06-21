@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -330,7 +331,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             destinationFile = FileUtils.newFile(moveDir, destinationFileName);
         }
 
-        MuleMessage message = null;
+        MutableMuleMessage message = null;
         String encoding = endpoint.getEncoding();
         try
         {
@@ -379,7 +380,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         final Object originalPayload = message.getPayload();
 
         ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
-        final MuleMessage finalMessage = message;
+        final MutableMuleMessage finalMessage = message;
 
         if (fileConnector.isStreaming())
         {
@@ -434,7 +435,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final String originalSourceDirectory, final File sourceFile,final File destinationFile, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage) throws DefaultMuleException
+    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final String originalSourceDirectory, final File sourceFile,final File destinationFile, ExecutionTemplate<MuleEvent> executionTemplate, final MutableMuleMessage finalMessage) throws DefaultMuleException
     {
         try
         {
@@ -471,7 +472,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    private void processWithStreaming(final File sourceFile, final ReceiverFileInputStream originalPayload, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage)
+    private void processWithStreaming(final File sourceFile, final ReceiverFileInputStream originalPayload, ExecutionTemplate<MuleEvent> executionTemplate, final MutableMuleMessage finalMessage)
     {
         try
         {
@@ -556,7 +557,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     private void moveAndDelete(final File sourceFile, File destinationFile,
-                               String originalSourceFileName, String originalSourceDirectory, MuleMessage message) throws MuleException
+                               String originalSourceFileName, String originalSourceDirectory, MutableMuleMessage message) throws MuleException
     {
         // If we are moving the file to a read directory, move it there now and
         // hand over a reference to the

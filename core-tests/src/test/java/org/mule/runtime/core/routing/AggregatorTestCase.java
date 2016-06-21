@@ -9,14 +9,13 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
@@ -45,9 +44,9 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
         router.setMuleContext(muleContext);
         router.setFlowConstruct(flow);
         router.initialise();
-        MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
+        MutableMuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
+        MutableMuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
+        MutableMuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
         message1.setCorrelationId(message1.getUniqueId());
         message2.setCorrelationId(message1.getUniqueId());
         message3.setCorrelationId(message1.getUniqueId());

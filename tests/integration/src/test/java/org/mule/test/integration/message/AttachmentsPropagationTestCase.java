@@ -10,12 +10,12 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.message.ds.StringDataSource;
 
 import java.util.Set;
@@ -49,23 +49,31 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
     @Override
     public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
-        MuleMessage message = context.getMessage();
-
         // copy all inbound attachments to outbound
-        for (String attachmentName : message.getInboundAttachmentNames())
-        {
-            DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
-            message.addOutboundAttachment(attachmentName, inboundAttachment);
-        }
+        context.getEvent().setMessage(context.getEvent().getMessage().transform(msg -> {
+            try
+            {
+                for (String attachmentName : msg.getInboundAttachmentNames())
+                {
+                    DataHandler inboundAttachment = msg.getInboundAttachment(attachmentName);
+                    msg.addOutboundAttachment(attachmentName, inboundAttachment);
+                }
+                // add an attachment, named after the componentname...
+                String attachmentName = context.getFlowConstruct().getName();
+                DataHandler dataHandler = new DataHandler(new StringDataSource(ATTACHMENT_CONTENT, "doesNotMatter",
+                                                                               "text/plain"));
+                msg.addOutboundAttachment(attachmentName, dataHandler);
 
-        // add an attachment, named after the componentname...
-        String attachmentName = context.getFlowConstruct().getName();
-        DataHandler dataHandler = new DataHandler(new StringDataSource(ATTACHMENT_CONTENT, "doesNotMatter", "text/plain"));
-        message.addOutboundAttachment(attachmentName, dataHandler);
-
-        // return the list of attachment names
-        FunctionalTestComponent fc = (FunctionalTestComponent) component;
-        fc.setReturnData(message.getOutboundAttachmentNames());
+                // return the list of attachment names
+                FunctionalTestComponent fc = (FunctionalTestComponent) component;
+                fc.setReturnData(msg.getOutboundAttachmentNames());
+                return msg;
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+        }));
     }
 
     @Test

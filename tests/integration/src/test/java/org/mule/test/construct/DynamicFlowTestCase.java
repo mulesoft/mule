@@ -9,6 +9,7 @@ package org.mule.test.construct;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -227,7 +228,7 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             steps.append("P");
-            event.getMessage().setPayload(event.getMessage().getPayload() + "(pre)");
+            event.setMessage(new DefaultMuleMessage(event.getMessage().getPayload() + "(pre)", event.getMessage(), event.getMuleContext()));
             return event;
         }
 
@@ -259,7 +260,7 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.getMessage().setPayload(event.getMessage().getPayload() + "(pre)");
+            event.setMessage(new DefaultMuleMessage(event.getMessage().getPayload() + "(pre)", event.getMessage(), event.getMuleContext()));
             return event;
         }
 

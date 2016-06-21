@@ -6,16 +6,18 @@
  */
 package org.mule.test.construct;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static java.lang.Thread.currentThread;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
@@ -56,18 +58,13 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
 
     private void assertCorrectThreads(MuleMessage msgSync, MuleMessage msgAsync, MuleMessage msgOut) throws Exception
     {
-        assertNotNull(msgSync);
-        assertNotNull(msgAsync);
-        assertNotNull(msgOut);
+        assertThat(msgSync, not(nullValue()));
+        assertThat(msgAsync, not(nullValue()));
+        assertThat(msgOut, not(nullValue()));
 
-        assertEquals((Object) msgSync.getInboundProperty("request-response-thread"),
-            msgOut.getInboundProperty("request-response-thread"));
-
-        assertTrue(!msgAsync.getOutboundProperty("async-thread").
-            equals(msgSync.getOutboundProperty("request-response-thread")));
-
-        assertTrue(!msgAsync.getOutboundProperty("async-thread").
-            equals(msgOut.getOutboundProperty("request-response-thread")));
+        assertThat(msgOut.getInboundProperty("request-response-thread"), equalTo(msgSync.getInboundProperty("request-response-thread")));
+        assertThat(msgSync.getOutboundProperty("request-response-thread"), not(equalTo(msgAsync.getOutboundProperty("async-thread"))));
+        assertThat(msgOut.getOutboundProperty("request-response-thread"), not(equalTo(msgAsync.getOutboundProperty("async-thread"))));
     }
 
     public static class ThreadSensingMessageProcessor implements MessageProcessor
@@ -76,8 +73,11 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             String propName = event.getFlowVariable("property-name");
-
-            event.getMessage().setOutboundProperty(propName, Thread.currentThread().getName());
+            event.setMessage(event.getMessage().transform(msg ->
+            {
+                msg.setOutboundProperty(propName, currentThread().getName());
+                return msg;
+            }));
             return event;
         }
     }

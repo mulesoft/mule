@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- *
+ *  Use to obtain and mutate message proprties defined in two scopes, inbound and outbound.
  */
 public interface MutableMessageProperties extends MessageProperties
 {

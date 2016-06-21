@@ -13,6 +13,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
@@ -150,7 +151,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
 
     private MuleMessage executeSoap11Call(String msgString, String soapAction) throws MuleException
     {
-        MuleMessage msg = getTestMuleMessage(msgString);
+        MutableMuleMessage msg = getTestMuleMessage(msgString);
         msg.setOutboundProperty("soapAction", soapAction);
 
         return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", msg, HTTP_REQUEST_OPTIONS);
@@ -158,7 +159,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
 
     private MuleMessage executeSoap12Call(String msgString, String soapAction) throws MuleException
     {
-        MuleMessage msg = getTestMuleMessage(msgString);
+        MutableMuleMessage msg = getTestMuleMessage(msgString);
         String contentType = "application/soap+xml;charset=UTF-8;action=\"" + soapAction + "\"";
         msg.setOutboundProperty("Content-Type", contentType);
 

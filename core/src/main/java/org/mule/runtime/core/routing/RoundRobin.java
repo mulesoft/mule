@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -71,7 +70,7 @@ public class RoundRobin extends AbstractOutboundRouter
     }
 
     @Override
-    public boolean isMatch(MuleMessage message) throws MuleException
+    public boolean isMatch(MuleEvent message) throws MuleException
     {
         return true;
     }

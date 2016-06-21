@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -203,7 +204,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         // here is ok even though it is not ideal.
         client.getHttpConnectionManager().getParams().setSoTimeout(endpoint.getResponseTimeout());
 
-        MuleMessage msg = event.getMessage();
+        MutableMuleMessage msg = (MutableMuleMessage) event.getMessage();
         setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
 
         HttpMethod httpMethod;
@@ -229,7 +230,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return httpMethod;
     }
 
-    protected void setPropertyFromEndpoint(MuleEvent event, MuleMessage msg, String prop)
+    protected void setPropertyFromEndpoint(MuleEvent event, MutableMuleMessage msg, String prop)
     {
         Serializable o = msg.getOutboundProperty(prop);
         if (o == null)
@@ -272,7 +273,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
-    protected MuleMessage doSend(MuleEvent event) throws Exception
+    protected MutableMuleMessage doSend(MuleEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
         httpConnector.setupClientAuthorization(event, httpMethod, client, endpoint);
@@ -323,7 +324,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected MuleMessage handleRedirect(HttpMethod method, MuleEvent event) throws HttpResponseException, MuleException, IOException
+    protected MutableMuleMessage handleRedirect(HttpMethod method, MuleEvent event) throws HttpResponseException, MuleException, IOException
     {
         String followRedirects = (String)endpoint.getProperty("followRedirects");
         if (followRedirects==null || "false".equalsIgnoreCase(followRedirects))
@@ -344,7 +345,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         MuleEvent result = out.process(event);
         if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
-            return result.getMessage();
+            return (MutableMuleMessage) result.getMessage();
         }
         else
         {
@@ -352,10 +353,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected MuleMessage getResponseFromMethod(HttpMethod httpMethod, ExceptionPayload ep)
+    protected MutableMuleMessage getResponseFromMethod(HttpMethod httpMethod, ExceptionPayload ep)
         throws IOException, MuleException
     {
-        MuleMessage message = createMuleMessage(httpMethod);
+        MutableMuleMessage message = createMuleMessage(httpMethod);
 
         if (logger.isDebugEnabled())
         {

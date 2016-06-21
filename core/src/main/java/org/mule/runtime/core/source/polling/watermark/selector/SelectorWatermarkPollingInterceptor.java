@@ -79,8 +79,10 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         }
         else if (payload instanceof Iterator)
         {
-            event.getMessage().setPayload(
-                new SelectorIteratorProxy<Object>((Iterator<Object>) payload, selector));
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setPayload(new SelectorIteratorProxy<>((Iterator<Object>) payload, selector));
+                return msg;
+            }));
         }
         else
         {

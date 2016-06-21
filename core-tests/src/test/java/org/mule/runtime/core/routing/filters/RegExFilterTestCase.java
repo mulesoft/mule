@@ -180,7 +180,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase
     {
         regExWithValue.setValue("#[payload]");
         regExWithValue.initialise();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage("run with the mules", muleContext);
+        MuleMessage muleMessage = new DefaultMuleMessage("run with the mules", muleContext);
         assertThat(regExWithValue.accept(muleMessage), is(true));
     }
 
@@ -189,7 +189,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase
     {
         regExWithValue.setValue("#[payload]");
         regExWithValue.initialise();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage("run with the zebras", muleContext);
+        MuleMessage muleMessage = new DefaultMuleMessage("run with the zebras", muleContext);
         assertThat(regExWithValue.accept(muleMessage), is(false));
     }
 
@@ -208,7 +208,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase
     {
         regExWithValue.setValue("run with the mules");
         regExWithValue.initialise();
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(null, muleContext);
+        MuleMessage muleMessage = new DefaultMuleMessage(null, muleContext);
         assertThat(regExWithValue.accept(muleMessage), is(true));
     }
 

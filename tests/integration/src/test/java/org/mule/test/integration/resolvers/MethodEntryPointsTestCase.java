@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.model.resolvers.EntryPointNotFoundException;
 
 import java.io.Serializable;
@@ -74,7 +75,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
     @Test
     public void testValidCallToUpperCase() throws Exception
     {
-        MuleMessage msg = new DefaultMuleMessage("hello", singletonMap("method", "upperCaseString"), null, null, muleContext);
+        MutableMuleMessage msg = new DefaultMuleMessage("hello", singletonMap("method", "upperCaseString"), null, null, muleContext);
         msg.setOutboundProperty("method", "upperCaseString");
         MuleMessage message = flowRunner("Service").withPayload(msg).run().getMessage();
         assertNotNull(message);

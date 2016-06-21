@@ -7,6 +7,7 @@
 package org.mule.runtime.core.el.mvel;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -689,7 +690,10 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         MuleEvent event = getTestEvent(new String[]{"1", "2"});
         assertEquals("1", mvel.evaluate("payload[0]", event));
-        event.getMessage().setPayload(Collections.singletonList("1"));
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setPayload(singletonList("1"));
+            return msg;
+        }));
         assertEquals("1", mvel.evaluate("payload[0]", event));
     }
 

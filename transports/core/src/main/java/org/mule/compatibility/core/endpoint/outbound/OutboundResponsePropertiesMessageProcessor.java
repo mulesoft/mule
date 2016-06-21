@@ -44,7 +44,11 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractRequestR
                 Serializable propertyValue = request.getMessage().getOutboundProperty(propertyName);
                 if (propertyValue != null)
                 {
-                    response.getMessage().setOutboundProperty(propertyName, propertyValue);
+                    response.setMessage(response.getMessage().transform(msg -> {
+                        msg.setOutboundProperty(propertyName, propertyValue);
+                        return msg;
+                    }));
+
                 }
             }
         }

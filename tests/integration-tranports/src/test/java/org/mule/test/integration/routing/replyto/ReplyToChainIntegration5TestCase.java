@@ -6,17 +6,20 @@
  */
 package org.mule.test.integration.routing.replyto;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.util.concurrent.Latch;
 
-import java.util.concurrent.TimeUnit;
-
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
 public class ReplyToChainIntegration5TestCase extends FunctionalTestCase
@@ -36,22 +39,15 @@ public class ReplyToChainIntegration5TestCase extends FunctionalTestCase
     public void testReplyToIsHonoredInFlowUsingAsyncBlock() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        final org.mule.runtime.core.util.concurrent.Latch flowExecutedLatch = new org.mule.runtime.core.util.concurrent.Latch();
+        final Latch flowExecutedLatch = new Latch();
         FunctionalTestComponent ftc = getFunctionalTestComponent("replierService");
-        ftc.setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(org.mule.runtime.core.api.MuleEventContext context, Object component) throws Exception
-            {
-                flowExecutedLatch.release();
-            }
-        });
-        org.mule.runtime.core.api.MuleMessage muleMessage = new org.mule.runtime.core.DefaultMuleMessage(TEST_PAYLOAD, muleContext);
-        muleMessage.setOutboundProperty(org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY, "jms://response");
+        ftc.setEventCallback((context, component) -> flowExecutedLatch.release());
+        MutableMuleMessage muleMessage = new DefaultMuleMessage(TEST_PAYLOAD, muleContext);
+        muleMessage.setOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response");
         client.dispatch("jms://jmsIn1", muleMessage);
-        flowExecutedLatch.await(TIMEOUT, TimeUnit.MILLISECONDS);
-        org.mule.runtime.core.api.MuleMessage response = client.request("jms://response", TIMEOUT);
-        assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(getPayloadAsString(response), Is.is(EXPECTED_PAYLOAD));
+        flowExecutedLatch.await(TIMEOUT, MILLISECONDS);
+        MuleMessage response = client.request("jms://response", TIMEOUT);
+        assertThat(response, notNullValue());
+        assertThat(getPayloadAsString(response), is(EXPECTED_PAYLOAD));
     }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.session;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -25,6 +26,7 @@ public class SerializeOnlySessionHandler extends AbstractSessionHandler
 {
     protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Override
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
         MuleSession session = null;
@@ -37,15 +39,8 @@ public class SerializeOnlySessionHandler extends AbstractSessionHandler
         return session;
     }
 
-    /**
-     * @deprecated Use retrieveSessionInfoFromMessage(MuleMessage message) instead
-     */
-    public void retrieveSessionInfoFromMessage(MuleMessage message, MuleSession session) throws MuleException
-    {
-        session = retrieveSessionInfoFromMessage(message);
-    }
-
-    public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
+    @Override
+    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {
         MuleContext muleContext = message.getMuleContext();
         byte[] serializedSession = muleContext.getObjectSerializer().serialize(
@@ -55,7 +50,10 @@ public class SerializeOnlySessionHandler extends AbstractSessionHandler
         {
             logger.debug("Adding serialized Session header to message: " + serializedSession);
         }
-        message.setOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedSession);
+        return message.transform(msg -> {
+            msg.setOutboundProperty(MULE_SESSION_PROPERTY, serializedSession);
+            return msg;
+        });
     }
     
     protected MuleSession removeNonSerializableProperties(final MuleSession session,
@@ -65,12 +63,5 @@ public class SerializeOnlySessionHandler extends AbstractSessionHandler
         copy.removeNonSerializableProperties();
         return copy;
     }
-    
-    /**
-     * @deprecated This method is no longer needed and will be removed in the next major release
-     */
-    public String getSessionIDKey()
-    {
-        return "ID";
-    }
+
 }

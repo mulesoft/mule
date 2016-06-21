@@ -6,6 +6,7 @@
  */
 package org.mule.test.routing;
 
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -50,7 +51,7 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
         {
             try
             {
-                event.getMessage().setPayload(letter);
+                event.setMessage(new DefaultMuleMessage(letter, event.getMessage(), event.getMuleContext()));
                 return event;
             }
             catch (Exception e)

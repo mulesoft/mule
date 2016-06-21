@@ -87,7 +87,7 @@ public class AbstractMatchingRouter extends AbstractAnnotatedObject implements M
                 eventToRoute = event;
             }
 
-            if (outboundRouter.isMatch(eventToRoute.getMessage()))
+            if (outboundRouter.isMatch(eventToRoute))
             {
                 matchfound = true;
                 result = outboundRouter.process(event);

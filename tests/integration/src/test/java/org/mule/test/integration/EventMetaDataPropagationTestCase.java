@@ -14,6 +14,7 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -61,7 +62,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
                 props.put("integerParam", 12345);
                 props.put("longParam", (long) 123456789);
                 props.put("booleanParam", Boolean.TRUE);
-                MuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props, muleContext);
+                MutableMuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props, muleContext);
                 msg.addOutboundAttachment("test1", new DataHandler(new DataSource()
                 {
                     @Override

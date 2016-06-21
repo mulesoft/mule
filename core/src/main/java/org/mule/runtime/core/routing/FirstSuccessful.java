@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
@@ -51,7 +50,7 @@ public class FirstSuccessful extends AbstractOutboundRouter
     }
 
     @Override
-    public boolean isMatch(MuleMessage message) throws MuleException
+    public boolean isMatch(MuleEvent event) throws MuleException
     {
         return true;
     }

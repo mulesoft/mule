@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.json.transformers;
 
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
 import org.mule.runtime.module.xml.filters.SchemaValidationFilter;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -41,9 +43,16 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
     protected JsonToXml jToX;
 
     @Override
-    public boolean accept(MuleMessage msg)
+    public boolean accept(MuleMessage message)
+    {
+        throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
+    }
+
+    @Override
+    public boolean accept(MuleEvent event)
     {
         String jsonString = null;
+        MuleMessage msg = event.getMessage();
 
         try
         {
@@ -61,19 +70,23 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
                     IOUtils.copy(transformerInputs.getReader(), jsonWriter);
                 }
                 jsonString = jsonWriter.toString();
-                msg.setPayload(jsonString);
+                msg = new DefaultMuleMessage(jsonString, msg, msg.getMuleContext());
+                event.setMessage(msg);
             }
             String xmlString = (String) jToX.transform(msg.getPayload(), msg.getEncoding());
+            // TODO MULE-9856 Replace with the builder
             MuleMessage xmlMessage = new DefaultMuleMessage(xmlString, msg, msg.getMuleContext());
-            boolean accepted = super.accept(xmlMessage);
+            boolean accepted = super.accept(new DefaultMuleEvent(xmlMessage, event.getFlowConstruct()));
             if (jsonString != null)
             {
-                msg.setPayload(jsonString);
+                msg = new DefaultMuleMessage(jsonString, msg, event.getMuleContext());
+                event.setMessage(msg);
             }
             return accepted;
         }
         catch (Exception ex)
         {
+            logger.warn("Exception validating json.", ex);
             return false;
         }
     }

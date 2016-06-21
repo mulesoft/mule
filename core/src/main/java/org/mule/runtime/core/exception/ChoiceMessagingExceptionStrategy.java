@@ -49,12 +49,19 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event)
     {
-        event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setExceptionPayload(new DefaultExceptionPayload(exception));
+            return msg;
+        }));
+
         for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners)
         {
             if (exceptionListener.accept(event))
             {
-                event.getMessage().setExceptionPayload(null);
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setExceptionPayload(null);
+                    return msg;
+                }));
                 return exceptionListener.handleException(exception, event);
             }
         }

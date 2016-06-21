@@ -8,6 +8,7 @@ package org.mule.test.integration.interceptor;
 
 import static org.junit.Assert.assertEquals;
 
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -47,7 +48,7 @@ public class SharedInterceptorStackTestCase extends FunctionalTestCase
         {
             MuleMessage message = event.getMessage();
             String payload = message.getPayload().toString();
-            message.setPayload(payload + " CustomInterceptor");
+            event.setMessage(new DefaultMuleMessage(payload + " CustomInterceptor", event.getMessage(), event.getMuleContext()));
             return processNext(event);
         }
     }

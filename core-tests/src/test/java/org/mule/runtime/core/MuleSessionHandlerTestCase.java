@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -40,6 +41,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -104,10 +106,12 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         List<String> list = createList();
         event.getSession().setProperty("fooList", list);
 
-        handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        event.setMessage(message);
         // store save session to outbound, move it to the inbound
         // for retrieve to deserialize
         Serializable s = removeProperty(event);
+        message = (DefaultMuleMessage) event.getMessage();
         message.setInboundProperty(MULE_SESSION_PROPERTY, s);
         MuleSession session = handler.retrieveSessionInfoFromMessage(event.getMessage());
 
@@ -136,10 +140,12 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 
         NotSerializableClass clazz = new NotSerializableClass();
         event.getSession().setProperty("foo", clazz);
-        handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        event.setMessage(message);
         // store save session to outbound, move it to the inbound
         // for retrieve to deserialize
         Serializable s = removeProperty(event);
+        message = (DefaultMuleMessage) event.getMessage();
         message.setInboundProperty(MULE_SESSION_PROPERTY, s);
         MuleSession session = handler.retrieveSessionInfoFromMessage(event.getMessage());
         // Property was removed because it could not be serialized
@@ -160,10 +166,12 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         SecurityContext sc = new DefaultSecurityContextFactory().create(new DefaultMuleAuthentication(credentials));
         event.getSession().setSecurityContext(sc);
 
-        handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        event.setMessage(message);
         // store save session to outbound, move it to the inbound
         // for retrieve to deserialize
         Serializable s = removeProperty(event);
+        message = (DefaultMuleMessage) event.getMessage();
         message.setInboundProperty(MULE_SESSION_PROPERTY, s);
         MuleSession session = handler.retrieveSessionInfoFromMessage(event.getMessage());
 
@@ -173,10 +181,15 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 
     private Serializable removeProperty(MuleEvent event)
     {
-        final Serializable outbound = event.getMessage().removeOutboundProperty(MULE_SESSION_PROPERTY);
+        final AtomicReference<Serializable> outbound = new AtomicReference<>();
+        event.setMessage(event.getMessage().transform(msg -> {
+            outbound.set(msg.removeOutboundProperty(MULE_SESSION_PROPERTY));
+            return msg;
+        }));
+
         final Object invocation = event.getFlowVariable(MULE_SESSION_PROPERTY);
         event.removeFlowVariable(MULE_SESSION_PROPERTY);
-        return outbound != null ? outbound : (Serializable) invocation;
+        return outbound.get() != null ? outbound.get() : (Serializable) invocation;
     }
 
     /**

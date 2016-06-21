@@ -21,6 +21,7 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -198,7 +199,7 @@ public class ForeachTestCase extends FunctionalTestCase
         List<MuleMessage> list = new ArrayList<>();
         for (int i = 0; i < 10; i++)
         {
-            MuleMessage msg = new DefaultMuleMessage("message-" + i, muleContext);
+            MutableMuleMessage msg = new DefaultMuleMessage("message-" + i, muleContext);
             msg.setOutboundProperty("out", "out" + (i + 1));
             list.add(msg);
         }

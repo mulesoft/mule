@@ -20,8 +20,8 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -101,8 +101,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                 }
                 else
                 {
-                    MuleMessage resultMessage = doSend(event);
-                    return createResponseEvent(resultMessage, event);
+                    return createResponseEvent(doSend(event), event);
                 }
             }
             else
@@ -121,7 +120,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         }
     }
 
-    private MuleEvent createResponseEvent(MuleMessage resultMessage, MuleEvent requestEvent) throws MuleException
+    private MuleEvent createResponseEvent(MutableMuleMessage resultMessage, MuleEvent requestEvent) throws MuleException
     {
         if (resultMessage != null)
         {
@@ -203,7 +202,10 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         }
         if (!remoteSync)
         {
-            event.getMessage().removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+                return msg;
+            }));
             event.removeFlowVariable(MULE_REMOTE_SYNC_PROPERTY);
         }
         return remoteSync;
@@ -236,14 +238,14 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
     protected abstract void doDispatch(MuleEvent event) throws Exception;
 
-    protected abstract MuleMessage doSend(MuleEvent event) throws Exception;
+    protected abstract MutableMuleMessage doSend(MuleEvent event) throws Exception;
 
-    protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MuleMessage, Exception, Void> completionHandler)
+    protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MutableMuleMessage, Exception, Void> completionHandler)
     {
         throw new IllegalStateException("This MessageDispatcher does not support non-blocking");
     }
 
-    private class NonBlockingSendCompletionHandler implements CompletionHandler<MuleMessage, Exception, Void>
+    private class NonBlockingSendCompletionHandler implements CompletionHandler<MutableMuleMessage, Exception, Void>
     {
         private final MuleEvent event;
         private final WorkManager workManager;
@@ -258,7 +260,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         }
 
         @Override
-        public void onCompletion(final MuleMessage result, ExceptionCallback<Void, Exception> exceptionCallback)
+        public void onCompletion(final MutableMuleMessage result, ExceptionCallback<Void, Exception> exceptionCallback)
         {
             try
             {

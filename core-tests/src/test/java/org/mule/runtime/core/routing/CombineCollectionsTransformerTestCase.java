@@ -61,7 +61,10 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
         payload.add(Arrays.asList("1", "2", "3"));
         payload.add("4");
         payload.add(Arrays.asList("5", "6", "7"));
-        event.getMessage().setPayload(payload);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setPayload(payload);
+            return msg;
+        }));
         
         MuleEvent response = merger.process(event);
         

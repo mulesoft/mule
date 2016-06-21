@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- *
+ *  Use to obtain message proprties defined in two scopes, inbound and outbound.
  */
 public interface MessageProperties
 {

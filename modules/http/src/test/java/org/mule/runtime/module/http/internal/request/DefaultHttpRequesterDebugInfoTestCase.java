@@ -36,6 +36,7 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.construct.Flow;
@@ -118,7 +119,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         doDebugInfoTest(message, event, null);
     }
 
-    private void doDebugInfoTest(DefaultMuleMessage message, DefaultMuleEvent event, List<Matcher<FieldDebugInfo<?>>> securityFieldMatchers) throws InitialisationException
+    private void doDebugInfoTest(MuleMessage message, DefaultMuleEvent event, List<Matcher<FieldDebugInfo<?>>> securityFieldMatchers) throws InitialisationException
     {
         configureRequesterExpressions();
         addRequesterProperties(message);
@@ -169,7 +170,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         event.setFlowVariable(WORKSTATION_PROPERTY, WORKSTATION);
     }
 
-    private void addRequesterProperties(DefaultMuleMessage message)
+    private void addRequesterProperties(MuleMessage message)
     {
         event.setFlowVariable(HOST_PROPERTY, HOST);
         event.setFlowVariable(PORT_PROPERTY, PORT);

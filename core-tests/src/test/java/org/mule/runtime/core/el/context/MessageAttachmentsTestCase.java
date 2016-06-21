@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 
 import java.util.Collection;
 import java.util.Map;
@@ -108,7 +109,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     {
         MuleEvent event = getTestEvent("");
         DataHandler dataHandler = mock(DataHandler.class);
-        event.getMessage().addOutboundAttachment("foo", dataHandler);
+        ((MutableMuleMessage) event.getMessage()).addOutboundAttachment("foo", dataHandler);
         assertEquals(dataHandler, evaluate("message.outboundAttachments['foo']", event));
     }
 
@@ -116,7 +117,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void assignValueToOutboundAttachment() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        event.getMessage().addOutboundAttachment("foo", mock(DataHandler.class));
+        ((MutableMuleMessage) event.getMessage()).addOutboundAttachment("foo", mock(DataHandler.class));
         evaluate("message.outboundAttachments['foo']=new DataHandler('bar','text/plain')", event);
         assertEquals("bar", event.getMessage().getOutboundAttachment("foo").getContent());
     }
@@ -242,7 +243,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundClear() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        MuleMessage message = event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         message.addOutboundAttachment("foo", mock(DataHandler.class));
         message.addOutboundAttachment("bar", mock(DataHandler.class));
         evaluate("message.outboundAttachments.clear()", event);
@@ -253,7 +254,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundSize() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        MuleMessage message = event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         message.addOutboundAttachment("foo", mock(DataHandler.class));
         message.addOutboundAttachment("bar", mock(DataHandler.class));
         assertEquals(2, evaluate("message.outboundAttachments.size()", event));
@@ -263,7 +264,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundKeySet() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        MuleMessage message = event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         message.addOutboundAttachment("foo", mock(DataHandler.class));
         message.addOutboundAttachment("bar", mock(DataHandler.class));
         assertEquals(2, evaluate("message.outboundAttachments.keySet().size()", event));
@@ -275,7 +276,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundContainsKey() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        MuleMessage message = event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         message.addOutboundAttachment("foo", mock(DataHandler.class));
         Assert.assertTrue((Boolean)evaluate("message.outboundAttachments.containsKey('foo')", event));
         Assert.assertFalse((Boolean)evaluate("message.outboundAttachments.containsKey('bar')", event));
@@ -285,7 +286,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundContainsValue() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        MuleMessage message = event.getMessage();
+        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
         DataHandler valA = mock(DataHandler.class);
         message.addOutboundAttachment("foo", valA);
         message.setPayload(valA);
@@ -298,7 +299,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundEntrySet() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         DataHandler valA = mock(DataHandler.class);
         DataHandler valB = mock(DataHandler.class);
         message.addOutboundAttachment("foo", valA);
@@ -315,7 +316,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundValues() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         DataHandler valA = mock(DataHandler.class);
         DataHandler valB = mock(DataHandler.class);
         message.addOutboundAttachment("foo", valA);
@@ -331,7 +332,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundIsEmpty() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         Assert.assertTrue((Boolean)evaluate("message.outboundAttachments.isEmpty()", event));
         message.addOutboundAttachment("foo", mock(DataHandler.class));
         message.addOutboundAttachment("bar", mock(DataHandler.class));
@@ -342,7 +343,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundPutAll() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MuleMessage message = (MuleMessage) event.getMessage();
         evaluate(
             "message.outboundAttachments.putAll(['foo': new DataHandler(new URL('http://val1')),'bar': new DataHandler(new URL('http://val2'))])",
             event);
@@ -355,7 +356,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void outboundInboundRemove() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        event.getMessage().addOutboundAttachment("foo", mock(DataHandler.class));
+        ((MutableMuleMessage) event.getMessage()).addOutboundAttachment("foo", mock(DataHandler.class));
         Assert.assertFalse((Boolean)evaluate("message.outboundAttachments.isEmpty()", event));
         evaluate("message.outboundAttachments.remove('foo')", event);
         Assert.assertTrue((Boolean)evaluate("message.outboundAttachments.isEmpty()", event));

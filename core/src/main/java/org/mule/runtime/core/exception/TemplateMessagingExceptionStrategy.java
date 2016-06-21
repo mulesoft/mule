@@ -35,6 +35,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     private String when;
     private boolean handleException;
 
+    @Override
     final public MuleEvent handleException(Exception exception, MuleEvent event)
     {
         try
@@ -69,7 +70,12 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             fireNotification(exception);
             logException(exception, request);
             processStatistics(request);
-            request.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
+            request.setMessage(request.getMessage().transform(msg ->
+            {
+                msg.setExceptionPayload(new DefaultExceptionPayload(exception));
+                return msg;
+            }));
+
             markExceptionAsHandledIfRequired(exception);
             return beforeRouting(exception, request);
         }
@@ -112,7 +118,12 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             {
                 //Do nothing
             }
-            event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
+
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setExceptionPayload(new DefaultExceptionPayload(exception));
+                return msg;
+            }));
+
             return event;
         }
 
@@ -155,7 +166,10 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     {
         if (this.handleException)
         {
-            event.getMessage().setExceptionPayload(null);
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setExceptionPayload(null);
+                return msg;
+            }));
         }
     }
 
@@ -174,7 +188,10 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         {
             try
             {
-                event.getMessage().setExceptionPayload(new DefaultExceptionPayload(t));
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setExceptionPayload(new DefaultExceptionPayload(t));
+                    return msg;
+                }));
                 MuleEvent result = configuredMessageProcessors.process(event);
                 return result;
             }
@@ -208,6 +225,7 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         this.when = when;
     }
 
+    @Override
     public boolean accept(MuleEvent event)
     {
         return acceptsAll() || acceptsEvent(event) || muleContext.getExpressionManager().evaluateBoolean(when, event);

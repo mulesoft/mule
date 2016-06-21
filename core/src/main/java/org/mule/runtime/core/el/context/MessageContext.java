@@ -79,7 +79,10 @@ public class MessageContext
 
     public void setReplyTo(String replyTo)
     {
-        event.getMessage().setReplyTo(replyTo);
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setReplyTo(replyTo);
+            return msg;
+        }));
     }
 
     public DataType<?> getDataType()
@@ -130,7 +133,7 @@ public class MessageContext
 
     public void setPayload(Object payload)
     {
-        event.setMessage(new DefaultMuleMessage(payload, event.getMessage()));
+        event.setMessage(new DefaultMuleMessage(payload, event.getMessage(), muleContext));
     }
 
     public Map<String, Serializable> getInboundProperties()

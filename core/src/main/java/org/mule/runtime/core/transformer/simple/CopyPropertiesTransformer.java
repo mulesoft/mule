@@ -36,13 +36,17 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(final MuleEvent event, String outputEncoding) throws TransformerException
     {
         MuleMessage message = event.getMessage();
         if (wildcardPropertyNameEvaluator.hasWildcards())
         {
-            wildcardPropertyNameEvaluator.processValues(message.getInboundPropertyNames(), matchedValue -> message
-                    .copyProperty(matchedValue));
+            wildcardPropertyNameEvaluator.processValues(message.getInboundPropertyNames(), matchedValue -> event.setMessage(
+                    event.getMessage().transform(msg ->
+                    {
+                        msg.copyProperty(matchedValue);
+                        return msg;
+                    })));
         }
         else
         {
@@ -53,7 +57,11 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
                 Serializable propertyValue = message.getInboundProperty(propertyName);
                 if (propertyValue != null)
                 {
-                    message.copyProperty(propertyName);
+                    event.setMessage(event.getMessage().transform(msg ->
+                    {
+                        msg.copyProperty(propertyName);
+                        return msg;
+                    }));
                 }
                 else
                 {
@@ -65,7 +73,7 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
                 logger.info("Key expression return null, no property will be copied");
             }
         }
-        return message;
+        return event.getMessage();
     }
 
     @Override

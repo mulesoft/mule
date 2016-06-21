@@ -9,17 +9,15 @@ package org.mule.runtime.config.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.runtime.core.util.store.TextFileObjectStore;
 
@@ -104,7 +102,7 @@ public class CoreNamespaceRoutersFlowTestCase extends FunctionalTestCase
     
     public static class CustomRouter extends AbstractOutboundRouter
     {
-        public boolean isMatch(MuleMessage message) throws MuleException
+        public boolean isMatch(MuleEvent message) throws MuleException
         {
             return true;
         }

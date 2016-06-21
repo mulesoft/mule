@@ -17,7 +17,6 @@ import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -61,9 +60,9 @@ public class TransformerChain extends AbstractMessageTransformer
         MuleMessage result = event.getMessage();
         Object temp = event.getMessage();
         Transformer lastTransformer = null;
-        for (Iterator iterator = transformers.iterator(); iterator.hasNext();)
+        for (Object element : transformers)
         {
-            lastTransformer = (Transformer) iterator.next();
+            lastTransformer = (Transformer) element;
             temp = lastTransformer.transform(temp);
             if (temp instanceof MuleMessage)
             {
@@ -71,7 +70,12 @@ public class TransformerChain extends AbstractMessageTransformer
             }
             else
             {
-                result.setPayload(temp);
+                Object finalTemp = temp;
+                result = event.getMessage().transform(msg -> {
+                    msg.setPayload(finalTemp);
+                    return msg;
+                });
+                event.setMessage(result);
             }
         }
         if (lastTransformer != null && lastTransformer.getReturnDataType().getType().equals(MuleMessage.class))

@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.session;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.message.SessionHandler;
 
 import org.slf4j.Logger;
@@ -25,29 +25,19 @@ public class SimpleSessionHandler implements SessionHandler
 {
     protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Override
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
-        return message.getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
+        return message.getInboundProperty(MULE_SESSION_PROPERTY);
     }
 
-    /**
-     * @deprecated Use retrieveSessionInfoFromMessage(MuleMessage message) instead
-     */
-    public void retrieveSessionInfoFromMessage(MuleMessage message, MuleSession session) throws MuleException
+    @Override
+    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {
-        session = retrieveSessionInfoFromMessage(message);
-    }
-
-    public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
-    {
-        message.setOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY, session);
+        return message.transform(msg -> {
+            msg.setOutboundProperty(MULE_SESSION_PROPERTY, session);
+            return msg;
+        });
     }
     
-    /**
-     * @deprecated This method is no longer needed and will be removed in the next major release
-     */
-    public String getSessionIDKey()
-    {
-        return "ID";
-    }
 }

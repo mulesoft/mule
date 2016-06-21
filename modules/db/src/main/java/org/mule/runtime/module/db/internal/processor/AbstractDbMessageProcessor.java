@@ -94,7 +94,10 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
 
             if (target == null || "".equals(target) || "#[payload]".equals(target))
             {
-                muleEvent.getMessage().setPayload(result);
+                muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
+                    msg.setPayload(result);
+                    return msg;
+                }));
             }
             else
             {

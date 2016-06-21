@@ -12,6 +12,7 @@ import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.core.transport.TransportMessageProcessContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -105,7 +106,7 @@ public class HttpMessageReceiver extends AbstractMessageReceiver
     }
 
     @Override
-    protected MuleMessage handleUnacceptedFilter(MuleMessage message)
+    protected MuleMessage handleUnacceptedFilter(MutableMuleMessage message)
     {
         if (logger.isDebugEnabled())
         {

@@ -10,7 +10,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -50,7 +50,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
     }
 
     @Override
-    protected synchronized MuleMessage doSend(MuleEvent event) throws Exception
+    protected synchronized MutableMuleMessage doSend(MuleEvent event) throws Exception
     {
         try
         {
@@ -65,13 +65,12 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
                         return new DefaultMuleMessage(NullPayload.getInstance(), this.getEndpoint().getMuleContext());
                     }
 
-                    if (result instanceof MuleMessage)
+                    if (result instanceof MutableMuleMessage)
                     {
-                        return (MuleMessage) result;
+                        return (MutableMuleMessage) result;
                     }
 
-                    return new DefaultMuleMessage(result, this.getEndpoint()
-                            .getMuleContext());
+                    return new DefaultMuleMessage(result, this.getEndpoint().getMuleContext());
                 }
                 catch (Exception ex)
                 {
@@ -82,11 +81,10 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
                     closeSocket();
                     throw ex;
                 }
-
             }
             else
             {
-                return event.getMessage();
+                return (MutableMuleMessage) event.getMessage();
             }
         }
         finally
@@ -133,7 +131,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
             // so that a protocol class can use the thread local and pick the
             // transformed
             // message.
-            event.getMessage().setPayload(payload);
+            event.setMessage(new DefaultMuleMessage(payload, event.getMessage(), event.getMuleContext()));
             // OptimizedRequestContext.unsafeRewriteEvent(new DefaultMuleMessage(
             // payload));
             write(payload);

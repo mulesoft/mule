@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILENAME;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
@@ -15,11 +17,11 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -55,11 +57,12 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         FileOutputStream fos = (FileOutputStream) connector.getOutputStream(getEndpoint(), event);
         try
         {
-            if (event.getMessage().getOutboundProperty(FileConnector.PROPERTY_FILENAME) == null)
+            if (event.getMessage().getOutboundProperty(PROPERTY_FILENAME) == null)
             {
-                event.getMessage().setOutboundProperty(FileConnector.PROPERTY_FILENAME,
-                                                       message.getOutboundProperty(FileConnector.PROPERTY_FILENAME,
-                                                                                   StringUtils.EMPTY));
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setOutboundProperty(PROPERTY_FILENAME, message.getOutboundProperty(PROPERTY_FILENAME, EMPTY));
+                    return msg;
+                }));
             }
 
             if (data instanceof byte[])
@@ -160,7 +163,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
-    protected MuleMessage doSend(MuleEvent event) throws Exception
+    protected MutableMuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
         return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());

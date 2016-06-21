@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -59,7 +60,17 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
                 else
                 {
                     String contentType = contentTypeEvaluator.resolveValue(event).toString();
-                    event.getMessage().addOutboundAttachment(key,value,contentType);
+                    event.setMessage(event.getMessage().transform(msg -> {
+                        try
+                        {
+                            msg.addOutboundAttachment(key,value,contentType);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new MuleRuntimeException(e);
+                        }
+                        return msg;
+                    }));
                 }
             }
             

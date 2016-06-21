@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.xml.filters;
 
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -56,18 +58,25 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
     private boolean returnResult = true;
     private XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
+    @Override
+    public boolean accept(MuleMessage message)
+    {
+        throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
+    }
+
     /**
      * Accepts the message if schema validation passes.
      * 
-     * @param message The message.
+     * @param event The event.
      * @return Whether the message passes schema validation.
      */
-    public boolean accept(MuleMessage message)
+    @Override
+    public boolean accept(MuleEvent event)
     {
         Source source;
         try
         {
-            source = loadSource(message);
+            source = loadSource(event.getMessage());
         }
         catch (Exception e)
         {
@@ -131,7 +140,8 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         {
             if (result != null && result.getNode() != null)
             {
-                message.setPayload(result.getNode());
+                // TODO MULE-9856 Replace with the builder
+                event.setMessage(new DefaultMuleMessage(result.getNode(), event.getMessage(), event.getMuleContext()));
             }
         }
         
@@ -155,16 +165,19 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         {
             private String systemId;
 
+            @Override
             public void write(Result result) throws Exception
             {
                 createValidator().validate(source, result);
             }
 
+            @Override
             public String getSystemId()
             {
                 return systemId;
             }
 
+            @Override
             public void setSystemId(String systemId)
             {
                 this.systemId = systemId;
@@ -189,6 +202,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         return XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), payload);
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();

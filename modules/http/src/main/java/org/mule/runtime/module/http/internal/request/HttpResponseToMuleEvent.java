@@ -211,7 +211,10 @@ public class HttpResponseToMuleEvent
     {
         if (StringUtils.isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget()) )
         {
-            muleEvent.getMessage().setPayload(payload, muleEvent.getMessage().getDataType());
+            muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
+                msg.setPayload(payload, muleEvent.getMessage().getDataType());
+                return msg;
+            }));
         }
         else
         {

@@ -86,23 +86,19 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
         ExecutionTemplate<MuleEvent> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, getTransactionConfig());
-        ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
+        ExecutionCallback<MuleEvent> processingCallback = () ->
         {
-            @Override
-            public MuleEvent process() throws Exception
+            try
             {
-                try
-                {
-                    return route(event);
-                }
-                catch (RoutingException e)
-                {
-                    throw e;
-                }
-                catch (Exception e)
-                {
-                    throw new RoutingException(event, AbstractOutboundRouter.this, e);
-                }
+                return route(event);
+            }
+            catch (RoutingException e1)
+            {
+                throw e1;
+            }
+            catch (Exception e2)
+            {
+                throw new RoutingException(event, AbstractOutboundRouter.this, e2);
             }
         };
         try
@@ -187,8 +183,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         {
             // if replyTo is set we'll probably want the correlationId set as
             // well
-            message.setReplyTo(replyTo);
-            message.setOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName());
+            event.setMessage(message.transform(msg -> {
+                msg.setReplyTo(replyTo);
+                msg.setOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName());
+                return msg;
+            }));
         }
         if (enableCorrelation != CorrelationMode.NEVER)
         {
@@ -230,13 +229,12 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                 StringBuilder buf = new StringBuilder();
                 buf.append("Setting Correlation info on Outbound router");
                 buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
-                // buf.append(", ").append("Seq=").append(seq);
-                // buf.append(", ").append("Group Size=").append(group);
                 logger.debug(buf.toString());
             }
-            message.setCorrelationId(correlation);
-            // message.setCorrelationGroupSize(group);
-            // message.setCorrelationSequence(seq);
+            event.setMessage(message.transform(msg -> {
+                msg.setCorrelationId(correlation);
+                return msg;
+            }));
         }
     }
 
@@ -448,9 +446,9 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
      * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and
      * out params can be the same message object when not dealing with replies.
      */
-    protected void propagateMagicProperties(MuleMessage in, MuleMessage out)
+    protected MuleMessage propagateMagicProperties(MuleMessage in)
     {
-        AbstractRoutingStrategy.propagateMagicProperties(in, out);
+        return AbstractRoutingStrategy.propagateMagicProperties(in);
     }
 
     @Override

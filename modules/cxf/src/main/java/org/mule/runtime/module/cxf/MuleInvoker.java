@@ -65,10 +65,12 @@ public class MuleInvoker implements Invoker
         {
             try
             {
-                MuleMessage reqMsg = event.getMessage();
                 Object payload = extractPayload(exchange.getInMessage());
                 Class payloadClass = payload != null ? payload.getClass() : Object.class;
-                reqMsg.setPayload(payload, DataTypeFactory.create(payloadClass, cxfMmessageProcessor.getMimeType()));
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setPayload(payload, DataTypeFactory.create(payloadClass, cxfMmessageProcessor.getMimeType()));
+                    return msg;
+                }));
 
                 BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
                 Service svc = exchange.get(Service.class);

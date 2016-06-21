@@ -8,6 +8,7 @@ package org.mule.runtime.core.interceptor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.interceptor.Interceptor;
@@ -154,30 +155,36 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         @Override
         public MuleEvent after(MuleEvent event)
         {
-            try
+            event.setMessage(event.getMessage().transform(msg ->
             {
-                event.getMessage().setPayload(getPayloadAsString(event.getMessage()) + name + AFTER);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                fail(e.getMessage());
-            }
+                try
+                {
+                    msg.setPayload(getPayloadAsString(msg) + name + AFTER);
+                }
+                catch (Exception e)
+                {
+                    fail(e.getMessage());
+                }
+                return msg;
+            }));
             return event;
         }
 
         @Override
         public MuleEvent before(MuleEvent event)
         {
-            try
+            event.setMessage(event.getMessage().transform(msg ->
             {
-                event.getMessage().setPayload(getPayloadAsString(event.getMessage()) + name + BEFORE);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                fail(e.getMessage());
-            }
+                try
+                {
+                    msg.setPayload(getPayloadAsString(msg) + name + BEFORE);
+                }
+                catch (Exception e)
+                {
+                    fail(e.getMessage());
+                }
+                return msg;
+            }));
             return event;
         }
 

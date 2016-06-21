@@ -6,17 +6,15 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
-import org.mule.runtime.core.api.MuleEvent;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.size.SmallTest;
 
-import org.mockito.ArgumentCaptor;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 @SmallTest
 public class AddFlowVariableTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase
@@ -28,21 +26,27 @@ public class AddFlowVariableTransformerTestCase extends AbstractAddVariablePrope
     }
 
     @Override
-    protected void verifyAdded(MuleEvent event, String key, String value, ArgumentCaptor<DataType> dataTypeCaptor)
+    protected void verifyAdded(MuleEvent event, String key, String value)
     {
-        verify(event).setFlowVariable(argThat(equalTo(key)), argThat(equalTo(value)), dataTypeCaptor.capture());
+        assertThat(event.getFlowVariable(key), is(value));
     }
 
     @Override
     protected void verifyNotAdded(MuleEvent event)
     {
-        verify(event, times(0)).setFlowVariable((String) isNull(), anyString());
+        assertThat(event.getFlowVariableNames(), empty());
     }
 
     @Override
     protected void verifyRemoved(MuleEvent event, String key)
     {
-        verify(event).removeFlowVariable(key);
+        assertThat(event.getFlowVariable(key), is(nullValue()));
+    }
+
+    @Override
+    protected DataType getVariableDataType(MuleEvent event, String key)
+    {
+        return event.getFlowVariableDataType(key);
     }
 
 }

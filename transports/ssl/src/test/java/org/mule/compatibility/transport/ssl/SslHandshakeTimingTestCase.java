@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -85,7 +86,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
 
     private void callPreRoute(SslMessageReceiver receiver, MuleMessage message) throws Exception
     {
-        Method preRouteMessage = receiver.getClass().getDeclaredMethod("preRoute", MuleMessage.class);
+        Method preRouteMessage = receiver.getClass().getDeclaredMethod("preRoute", MutableMuleMessage.class);
         assertNotNull(preRouteMessage);
         preRouteMessage.setAccessible(true);
 

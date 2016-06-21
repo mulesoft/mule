@@ -10,7 +10,7 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
@@ -74,7 +74,8 @@ public class MessageChunkAggregator extends AbstractAggregator
                         baos.write(event.getMessageAsBytes());
                     }
 
-                    MuleMessage message;
+                    // TODO MULE-9856 Replace with the builder
+                    MutableMuleMessage message;
 
                     // try to deserialize message, since ChunkingRouter might have
                     // serialized

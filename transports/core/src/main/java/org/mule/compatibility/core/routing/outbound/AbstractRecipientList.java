@@ -60,7 +60,10 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             else
             {
                 // the correlationId will be set by the AbstractOutboundRouter
-                message.setCorrelationGroupSize(recipients.size());
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setCorrelationGroupSize(recipients.size());
+                    return msg;
+                }));
             }
         }
 

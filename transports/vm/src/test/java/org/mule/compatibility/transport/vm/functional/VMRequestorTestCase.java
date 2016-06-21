@@ -9,10 +9,9 @@ package org.mule.compatibility.transport.vm.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.ArrayList;
@@ -39,10 +38,10 @@ public class VMRequestorTestCase extends FunctionalTestCase
 
         MuleClient client = muleContext.getClient();
         List<String> results = new ArrayList<String>();
-        MuleMessage result = null;
+        MutableMuleMessage result = null;
         for (int i = 0; i < 10; i++)
         {
-            result = client.request("vm://out", 3000L);
+            result = (MutableMuleMessage) client.request("vm://out", 3000L);
             assertNotNull(result);
             results.add(getPayloadAsString(result));
         }

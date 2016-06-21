@@ -271,7 +271,7 @@ public class TestEventBuilder
 
         for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet())
         {
-            outboundAttachmentEntry.getValue().addOutboundTo(muleMessage, outboundAttachmentEntry.getKey());
+            outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());
         }
         for (Entry<String, Object> sessionPropertyEntry : sessionProperties.entrySet())
         {
@@ -289,7 +289,7 @@ public class TestEventBuilder
     private interface Attachment
     {
 
-        void addOutboundTo(MuleMessage msg, String key);
+        void addOutboundTo(MuleEvent event, String key);
     }
 
     private class DataHandlerAttachment implements Attachment
@@ -303,16 +303,19 @@ public class TestEventBuilder
         }
 
         @Override
-        public void addOutboundTo(MuleMessage msg, String key)
+        public void addOutboundTo(MuleEvent event, String key)
         {
-            try
-            {
-                msg.addOutboundAttachment(key, dataHandler);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
+            event.setMessage(event.getMessage().transform(msg -> {
+                try
+                {
+                    msg.addOutboundAttachment(key, dataHandler);
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(e);
+                }
+                return msg;
+            }));
         }
     }
 
@@ -329,16 +332,19 @@ public class TestEventBuilder
         }
 
         @Override
-        public void addOutboundTo(MuleMessage msg, String key)
+        public void addOutboundTo(MuleEvent event, String key)
         {
-            try
-            {
-                msg.addOutboundAttachment(key, object, contentType);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
+            event.setMessage(event.getMessage().transform(msg -> {
+                try
+                {
+                    msg.addOutboundAttachment(key, object, contentType);
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(e);
+                }
+                return msg;
+            }));
         }
     }
 }

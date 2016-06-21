@@ -13,6 +13,7 @@ import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
@@ -97,7 +98,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
         @Override
         public Object transformMessage(MuleEvent event, String outputEncoding)
         {
-            MuleMessage message = event.getMessage();
+            MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
 
             String recipients = "vm://recipient1, vm://recipient1, vm://recipient3";
             logger.debug("Setting recipients to '" + recipients + "'");

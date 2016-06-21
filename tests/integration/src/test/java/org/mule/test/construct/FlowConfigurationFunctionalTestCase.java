@@ -6,6 +6,7 @@
  */
 package org.mule.test.construct;
 
+import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsString;
@@ -25,6 +26,7 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
@@ -531,7 +533,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testLoggerHeader() throws Exception
     {
-        MuleMessage message = getTestMuleMessage("0");
+        MutableMuleMessage message = getTestMuleMessage("0");
         message.setOutboundProperty("toLog", "valueToLog");
         flowRunner("loggerheader").withPayload(message).run();
     }
@@ -663,7 +665,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.getMessage().setPayload(Thread.currentThread());
+            event.setMessage(new DefaultMuleMessage(currentThread(), event.getMessage(), event.getMuleContext()));
             return event;
         }
     }

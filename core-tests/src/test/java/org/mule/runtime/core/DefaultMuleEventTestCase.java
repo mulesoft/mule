@@ -19,6 +19,7 @@ import static org.mule.runtime.core.transformer.types.MimeTypes.APPLICATION_XML;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
@@ -43,7 +44,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
     public static final String PROPERTY_VALUE = "foo";
 
     private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    private final DefaultMuleMessage muleMessage = new DefaultMuleMessage("test-data", (Map<String, Serializable>) null, muleContext);
+    private final MutableMuleMessage muleMessage = new DefaultMuleMessage("test-data", (Map<String, Serializable>) null, muleContext);
     private final DefaultMuleEvent muleEvent = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, (FlowConstruct) null);
 
     @Test

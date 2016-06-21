@@ -14,6 +14,7 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -81,7 +82,7 @@ public class FileMessageRequester extends AbstractMessageRequester
      * @throws Exception
      */
     @Override
-    protected MuleMessage doRequest(long timeout) throws Exception
+    protected MutableMuleMessage doRequest(long timeout) throws Exception
     {
         File file = FileUtils.newFile(endpoint.getEndpointURI().getAddress());
         File result = null;
@@ -159,7 +160,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                     destinationFile = FileUtils.newFile(movDir, destinationFileName);
                 }
 
-                MuleMessage returnMessage = null;
+                MutableMuleMessage returnMessage = null;
                 String encoding = endpoint.getEncoding();
                 try
                 {

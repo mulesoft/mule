@@ -41,15 +41,24 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
     @Test
     public void testPropertyScopeOrder() throws Exception
     {
-        MuleEvent e = getTestEvent("testing");
-        e.getSession().setProperty("Prop", "session");
+        MuleEvent event = getTestEvent("testing");
+        event.getSession().setProperty("Prop", "session");
+        MuleMessage message = event.getMessage();
 
-        MuleMessage message = e.getMessage();
-        //Note that we cannot write to the Inbound scope, its read only
-        message.setOutboundProperty("Prop", "outbound");
+        message = message.transform(msg ->
+        {
+            msg.setOutboundProperty("Prop", "outbound");
+            return msg;
+        });
+        event.setMessage(message);
 
         assertEquals("outbound", message.getOutboundProperty("Prop"));
-        message.removeOutboundProperty("Prop");
+        message = message.transform(msg ->
+        {
+            msg.removeOutboundProperty("Prop");
+            return msg;
+        });
+        event.setMessage(message);
 
         assertNull(message.getInboundProperty("Prop"));
         assertNull(message.getOutboundProperty("Prop"));

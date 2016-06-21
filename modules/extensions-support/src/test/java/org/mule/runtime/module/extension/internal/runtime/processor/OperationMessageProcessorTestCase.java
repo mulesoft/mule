@@ -290,7 +290,6 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         messageProcessor.process(event);
 
         verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
-        verify(event.getMessage(), never()).setPayload(any(Object.class));
 
         ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
         verify(event).setFlowVariable(same(TARGET_VAR), captor.capture());
@@ -393,7 +392,6 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         messageProcessor.process(event);
 
         verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
-        verify(event.getMessage(), never()).setPayload(any(Object.class));
 
         ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
         verify(event).setFlowVariable(same(TARGET_VAR), captor.capture());

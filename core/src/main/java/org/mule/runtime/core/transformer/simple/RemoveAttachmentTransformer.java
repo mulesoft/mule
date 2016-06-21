@@ -49,13 +49,17 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
                         @Override
                         public void processMatch(String matchedValue)
                         {
-                            try
-                            {
-                                message.removeOutboundAttachment(matchedValue);
-                            } catch (Exception e)
-                            {
-                                throw new MuleRuntimeException(e);
-                            }
+                            event.setMessage(event.getMessage().transform(msg -> {
+                                try
+                                {
+                                    msg.removeOutboundAttachment(matchedValue);
+                                }
+                                catch (Exception e)
+                                {
+                                    throw new MuleRuntimeException(e);
+                                }
+                                return msg;
+                            }));
                         }
                     });
                 }
@@ -69,8 +73,17 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
                 Object keyValue = nameEvaluator.resolveValue(event);
                 if (keyValue != null)
                 {
-                    String name = keyValue.toString();
-                    message.removeOutboundAttachment(name);
+                    event.setMessage(event.getMessage().transform(msg -> {
+                        try
+                        {
+                            msg.removeOutboundAttachment(keyValue.toString());
+                        }
+                        catch (Exception e)
+                        {
+                            throw new MuleRuntimeException(e);
+                        }
+                        return msg;
+                    }));
                 }
                 else
                 {

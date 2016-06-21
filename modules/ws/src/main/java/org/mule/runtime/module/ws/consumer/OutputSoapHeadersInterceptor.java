@@ -63,7 +63,10 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor
                     String key = WSConsumer.SOAP_HEADERS_PROPERTY_PREFIX + header.getName().getLocalPart();
                     String value = (String) transformer.transform(header.getObject());
 
-                    event.getMessage().setInboundProperty(key, value);
+                    event.setMessage(event.getMessage().transform(msg -> {
+                        msg.setInboundProperty(key, value);
+                        return msg;
+                    }));
                 }
                 catch (TransformerException e)
                 {

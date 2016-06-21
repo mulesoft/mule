@@ -6,10 +6,14 @@
  */
 package org.mule.compatibility.transport.http.functional;
 
+import static java.lang.String.valueOf;
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_FORBIDDEN;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.NullPayload;
@@ -19,7 +23,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import org.hamcrest.core.Is;
 import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.IsNot;
 import org.junit.Rule;
@@ -56,7 +59,7 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase
         String url = String.format("http://localhost:%d/flowWithtCESAndStatusCode", port1.getNumber());
         MuleMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT);
         assertThat(response, notNullValue());
-        assertThat(response.<String>getInboundProperty("http.status"), Is.is("403"));
+        assertThat(response.<String> getInboundProperty("http.status"), is(valueOf(SC_FORBIDDEN)));
     }
 
     public static class CustomExceptionStrategy extends AbstractMessagingExceptionStrategy
@@ -64,7 +67,11 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase
         @Override
         public MuleEvent handleException(Exception ex, MuleEvent event)
         {
-            event.getMessage().setOutboundProperty("http.status","403");
+            event.setMessage(event.getMessage().transform(msg ->
+            {
+                msg.setOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_FORBIDDEN));
+                return msg;
+            }));
             return event;
         }
     }

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.routing;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 
 /**
  * Enables an artifact to be matched for routing before actually routing to it
@@ -17,9 +17,9 @@ public interface Matchable
     /**
      * Determines if the event should be processed
      *
-     * @param message the current message to evaluate
+     * @param event the current event to evaluate
      * @return true if the event should be processed by this router
      * @throws MuleException if the event cannot be evaluated
      */
-    boolean isMatch(MuleMessage message) throws MuleException;
+    boolean isMatch(MuleEvent event) throws MuleException;
 }

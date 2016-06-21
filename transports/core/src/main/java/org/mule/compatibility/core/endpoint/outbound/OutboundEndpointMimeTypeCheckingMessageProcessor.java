@@ -41,7 +41,10 @@ public class OutboundEndpointMimeTypeCheckingMessageProcessor implements Message
             String contentType = message.getOutboundProperty(CONTENT_TYPE_PROPERTY);
             if (contentType == null)
             {
-                message.setOutboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType);
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setOutboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType);
+                    return msg;
+                }));
             }
             else
             {

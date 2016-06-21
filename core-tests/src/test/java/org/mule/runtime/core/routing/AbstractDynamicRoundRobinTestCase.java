@@ -113,7 +113,10 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
         {
             try
             {
-                event.getMessage().setPayload(letter);
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setPayload(letter);
+                    return msg;
+                }));
                 return event;
             }
             catch (Exception e)

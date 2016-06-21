@@ -159,7 +159,10 @@ public class MuleEventToHttpRequest
         {
             Object newPayload = muleContext.getExpressionManager().evaluate(requester.getSource(), muleEvent);
             oldPayload = muleEvent.getMessage().getPayload();
-            muleEvent.getMessage().setPayload(newPayload);
+            muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
+                msg.setPayload(newPayload);
+                return msg;
+            }));
             customSource = true;
         }
 
@@ -174,7 +177,11 @@ public class MuleEventToHttpRequest
 
         if (customSource)
         {
-            muleEvent.getMessage().setPayload(oldPayload);
+            Object finalOldPayload = oldPayload;
+            muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
+                msg.setPayload(finalOldPayload);
+                return msg;
+            }));
         }
 
         return entity;

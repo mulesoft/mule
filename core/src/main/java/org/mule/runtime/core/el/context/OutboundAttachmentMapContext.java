@@ -31,27 +31,33 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
     @Override
     public void doPut(String key, DataHandler value)
     {
-        try
-        {
-            event.getMessage().addOutboundAttachment(key, value);
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+        event.setMessage(event.getMessage().transform(msg -> {
+            try
+            {
+                msg.addOutboundAttachment(key, value);
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+            return msg;
+        }));
     }
 
     @Override
     public void doRemove(String key)
     {
-        try
-        {
-            event.getMessage().removeOutboundAttachment((String) key);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
+        event.setMessage(event.getMessage().transform(msg -> {
+            try
+            {
+                msg.removeOutboundAttachment(key);
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+            return msg;
+        }));
     }
 
     @Override
@@ -59,11 +65,14 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
     {
         return event.getMessage().getOutboundAttachmentNames();
     }
-    
+
     @Override
     public void clear()
     {
-        event.getMessage().clearAttachments();
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.clearAttachments();
+            return msg;
+        }));
     }
 
 }

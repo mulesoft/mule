@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.mockito.Mockito.verify;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.size.SmallTest;
 
@@ -32,12 +35,12 @@ public class RemoveFlowVariableTransformerTestCase extends AbstractRemoveVariabl
     @Override
     protected void verifyRemoved(MuleEvent mockEvent, String key)
     {
-        verify(mockEvent).removeFlowVariable(key);
+        assertThat(mockEvent.getFlowVariable(key), is(nullValue()));
     }
 
     @Override
     protected void verifyNotRemoved(MuleEvent mockEvent, String key)
     {
-        verify(mockEvent, times(0)).removeFlowVariable(key);
+        assertThat(mockEvent.getFlowVariable(key), not(nullValue()));
     }
 }

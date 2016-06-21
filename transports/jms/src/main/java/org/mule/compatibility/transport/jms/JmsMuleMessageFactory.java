@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.jms;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.io.Serializable;
@@ -126,7 +127,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
-    protected void addJMSReplyTo(MuleMessage muleMessage, Message jmsMessage)
+    protected void addJMSReplyTo(MutableMuleMessage muleMessage, Message jmsMessage)
     {
         try
         {

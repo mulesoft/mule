@@ -8,14 +8,13 @@ package org.mule.compatibility.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -80,7 +79,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         @Override
         public void run()
         {
-            MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
+            MutableMuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
             okMessage.setOutboundProperty("id", "1");
             DefaultMuleEvent newEvent = new DefaultMuleEvent(okMessage, flow, session);
             DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, inboundEndpoint);

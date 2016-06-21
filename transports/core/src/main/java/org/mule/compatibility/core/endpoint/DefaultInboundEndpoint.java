@@ -15,7 +15,7 @@ import org.mule.compatibility.core.connector.EndpointConnectException;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -72,7 +72,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     }
 
     @Override
-    public MuleMessage request(long timeout) throws Exception
+    public MutableMuleMessage request(long timeout) throws Exception
     {
         if (getConnector() != null)
         {

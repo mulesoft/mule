@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.core.context.notification;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.NameableObject;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.ObjectUtils;
 
 public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent
@@ -98,7 +99,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
         }
         else if (rootId != null && flowConstruct != null)
         {
-            DefaultMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance(), flowConstruct.getMuleContext());
+            MutableMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance(), flowConstruct.getMuleContext());
             msg.setMessageRootId(rootId);
             return new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
         }

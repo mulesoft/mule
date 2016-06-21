@@ -36,7 +36,10 @@ public class WatermarkSelectorWrapper extends WatermarkSelector
     @Override
     public void acceptValue(Object value)
     {
-        this.muleEvent.getMessage().setPayload(value);
+        muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
+            msg.setPayload(value);
+            return msg;
+        }));
         try
         {
             Serializable evaluated = WatermarkUtils.evaluate(this.selectorExpression, muleEvent);

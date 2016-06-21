@@ -22,6 +22,7 @@ import org.mule.functional.listener.SystemExceptionListener;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -111,7 +112,7 @@ public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCas
     @Test
     public void transactionCommitFailureTriggersExceptionStrategyUsingFilter() throws Exception
     {
-        MuleMessage muleMessage = getTestMuleMessage();
+        MutableMuleMessage muleMessage = getTestMuleMessage();
         muleMessage.setOutboundProperty("filterMessage", true);
         transactionCommitFailureExecutesExceptionStrategy(muleMessage);
     }

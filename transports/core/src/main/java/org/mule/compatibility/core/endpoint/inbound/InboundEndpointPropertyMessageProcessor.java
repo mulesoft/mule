@@ -42,7 +42,11 @@ public class InboundEndpointPropertyMessageProcessor implements MessageProcessor
             // URI
             inboundEndpoint = endpoint.getEndpointURI().getUri().toString();
         }
-        event.getMessage().setInboundProperty(MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
+        String finalInboundEndpoint = inboundEndpoint;
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setInboundProperty(MULE_ORIGINATING_ENDPOINT_PROPERTY, finalInboundEndpoint);
+            return msg;
+        }));
         return event;
     }
 

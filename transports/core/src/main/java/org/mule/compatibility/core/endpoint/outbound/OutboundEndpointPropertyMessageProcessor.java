@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENDPOINT_PROPERTY;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -37,23 +38,25 @@ public class OutboundEndpointPropertyMessageProcessor implements MessageProcesso
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        event.getMessage().setOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
-            endpoint.getEndpointURI().toString());
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setOutboundProperty(MULE_ENDPOINT_PROPERTY, endpoint.getEndpointURI().toString());
 
-        if (endpoint.getProperties() != null)
-        {
-            for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
+            if (endpoint.getProperties() != null)
             {
-                String prop = (String) iterator.next();
-                Serializable value = endpoint.getProperties().get(prop);
-                // don't overwrite property on the message
-                if (!ignoreProperty(event.getMessage(), prop))
+                for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
                 {
-                    // inbound endpoint properties are in the invocation scope
-                    event.getMessage().setOutboundProperty(prop, value);
+                    String prop = (String) iterator.next();
+                    Serializable value = endpoint.getProperties().get(prop);
+                    // don't overwrite property on the message
+                    if (!ignoreProperty(msg, prop))
+                    {
+                        // inbound endpoint properties are in the invocation scope
+                        msg.setOutboundProperty(prop, value);
+                    }
                 }
             }
-        }
+            return msg;
+        }));
         event = OptimizedRequestContext.unsafeSetEvent(event);
         return event;
     }

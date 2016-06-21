@@ -339,7 +339,7 @@ public class StandardFileSystemOperations
             return path;
         }
 
-        MuleMessage<?, ?> message = event.getMessage().asNewMessage();
+        MuleMessage<?, ?> message = event.getMessage();
         if (message.getAttributes() instanceof FileAttributes)
         {
             return ((FileAttributes) message.getAttributes()).getPath();

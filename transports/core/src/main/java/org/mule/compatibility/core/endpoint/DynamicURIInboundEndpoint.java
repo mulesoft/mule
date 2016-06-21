@@ -16,7 +16,7 @@ import org.mule.compatibility.core.connector.EndpointConnectException;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -217,7 +217,7 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     }
 
     @Override
-    public MuleMessage request(long timeout) throws Exception
+    public MutableMuleMessage request(long timeout) throws Exception
     {
         return getConnector().request(this, timeout);
     }

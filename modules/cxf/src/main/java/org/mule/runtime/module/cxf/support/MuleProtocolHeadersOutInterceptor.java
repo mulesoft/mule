@@ -7,12 +7,13 @@
 package org.mule.runtime.module.cxf.support;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static org.apache.cxf.message.Message.PROTOCOL_HEADERS;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.io.Serializable;
@@ -50,42 +51,38 @@ public class MuleProtocolHeadersOutInterceptor
             return;
         }
 
-        MuleMessage muleMsg = event.getMessage();
-        
-        if (muleMsg == null)
+        if (event.getMessage() == null)
         {
             return;
         }
-        extractAndSetContentType(message, muleMsg);
-        extractAndSet(message, muleMsg, Message.RESPONSE_CODE, HTTP_STATUS_PROPERTY);
 
-        String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
-        if (method == null)
-        {
-            method = POST.name();
-        }
+        event.setMessage(event.getMessage().transform(msg -> {
+            extractAndSetContentType(message, msg);
+            extractAndSet(message, msg, Message.RESPONSE_CODE, HTTP_STATUS_PROPERTY);
+            String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
+            final String finalMethod = method != null ? method : POST.name();
+            msg.setOutboundProperty(HTTP_METHOD_PROPERTY, finalMethod);
 
-        muleMsg.setOutboundProperty(HTTP_METHOD_PROPERTY, method);
-        
-        Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?, ?>) message.get(Message.PROTOCOL_HEADERS));
-        if (reqHeaders != null)
-        {
-            for (Map.Entry<String, List<String>> e : reqHeaders.entrySet())
+            Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?, ?>) message.get(PROTOCOL_HEADERS));
+            if (reqHeaders != null)
             {
-                String key = e.getKey();
-                String val = format(e.getValue());
-
-                muleMsg.setOutboundProperty(key, val);
+                for (Map.Entry<String, List<String>> e : reqHeaders.entrySet())
+                {
+                    String key = e.getKey();
+                    String val = format(e.getValue());
+                    msg.setOutboundProperty(key, val);
+                }
             }
-        }   
-        
+            return msg;
+        }));
+
         if (!Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE)))
         {
             message.getInterceptorChain().pause();
         }
     }
 
-    private void extractAndSet(Message message, MuleMessage muleMsg, String cxfHeader, String muleHeader)
+    private void extractAndSet(Message message, MutableMuleMessage muleMsg, String cxfHeader, String muleHeader)
     {
         if(message.get(cxfHeader) instanceof Serializable)
         {
@@ -101,7 +98,7 @@ public class MuleProtocolHeadersOutInterceptor
         }
     }
 
-    private void extractAndSetContentType(Message message, MuleMessage muleMsg)
+    private void extractAndSetContentType(Message message, MutableMuleMessage muleMsg)
     {
         String ct = (String) message.get(Message.CONTENT_TYPE);
         if (ct != null)

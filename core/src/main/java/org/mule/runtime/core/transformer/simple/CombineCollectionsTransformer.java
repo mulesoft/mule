@@ -29,6 +29,7 @@ import java.util.List;
 public class CombineCollectionsTransformer implements MessageProcessor
 {
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleMessage msg = event.getMessage();
@@ -59,7 +60,7 @@ public class CombineCollectionsTransformer implements MessageProcessor
             payload.add(msg.getPayload());
         }
 
-        DefaultMuleMessage listMessage = new DefaultMuleMessage(payload, msg, msg.getMuleContext());
+        MuleMessage listMessage = new DefaultMuleMessage(payload, msg, msg.getMuleContext());
         return new DefaultMuleEvent(listMessage, event);
     }
 

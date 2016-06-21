@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -168,17 +169,15 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         final AtomicReference<Latch> contextStartedLatch = new AtomicReference<Latch>();
 
         contextStartedLatch.set(new Latch());
-        muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
+        // Do not inline it, otherwise the type of the listener is lost
+        final MuleContextNotificationListener<MuleContextNotification> listener = notification ->
         {
-            @Override
-            public void onNotification(MuleContextNotification notification)
+            if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
             {
-                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
-                {
-                    contextStartedLatch.get().countDown();
-                }
+                contextStartedLatch.get().countDown();
             }
-        });
+        };
+        muleContext.registerListener(listener);
 
         muleContext.start();
 
@@ -350,18 +349,24 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
+     * TODO MULE-9856 Replace with the builder
+     * 
      * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with a test payload
      */
-    protected MuleMessage getTestMuleMessage()
+    @Deprecated
+    protected MutableMuleMessage getTestMuleMessage()
     {
         return getTestMuleMessage(TEST_PAYLOAD);
     }
 
     /**
+     * TODO MULE-9856 Replace with the builder
+     * 
      * @param message
      * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with message as payload
      */
-    protected MuleMessage getTestMuleMessage(Object message)
+    @Deprecated
+    protected MutableMuleMessage getTestMuleMessage(Object message)
     {
         return new DefaultMuleMessage(message, muleContext);
     }

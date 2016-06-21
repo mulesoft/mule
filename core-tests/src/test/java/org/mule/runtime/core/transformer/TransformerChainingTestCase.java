@@ -6,26 +6,25 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
-
-import java.util.Collections;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -67,8 +66,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         
         DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
         Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer);
-        message = (DefaultMuleMessage) transformationService.applyTransformers(message, null, Collections
-                .singletonList(messageTransformer));
+        message = (DefaultMuleMessage) transformationService.applyTransformers(message, null, singletonList(messageTransformer));
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);

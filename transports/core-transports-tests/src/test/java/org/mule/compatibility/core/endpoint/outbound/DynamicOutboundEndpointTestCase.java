@@ -24,6 +24,8 @@ import static org.mule.compatibility.core.context.notification.EndpointMessageNo
 import static org.mule.compatibility.core.context.notification.EndpointMessageNotification.MESSAGE_SEND_BEGIN;
 import static org.mule.compatibility.core.context.notification.EndpointMessageNotification.MESSAGE_SEND_END;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -41,6 +43,7 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -173,25 +176,21 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
 
-        MyMessageDispatcherFactory.afterSend = new Closure()
+        MyMessageDispatcherFactory.afterSend = input ->
         {
-            @Override
-            public void execute(Object input)
+            try
             {
-                try
-                {
-                    assertTrue(listener.latchFirst.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-                }
-                catch (InterruptedException e)
-                {
-                    fail(e.getMessage());
-                }
-                assertThat(listener.messageNotificationList, hasSize(1));
-                assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_SEND_BEGIN));
-                assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
-                assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-                        is(outboundEvent.getMessage().getPayload()));
+                assertTrue(listener.latchFirst.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
             }
+            catch (InterruptedException e)
+            {
+                fail(e.getMessage());
+            }
+            assertThat(listener.messageNotificationList, hasSize(1));
+            assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_SEND_BEGIN));
+            assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
+            assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
+                    is(outboundEvent.getMessage().getPayload()));
         };
 
         endpoint.process(outboundEvent);
@@ -218,25 +217,21 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.ONE_WAY, null);
         final MuleEvent outboundEvent = createTestOutboundEvent();
 
-        MyMessageDispatcherFactory.afterDispatch = new Closure()
+        MyMessageDispatcherFactory.afterDispatch = input ->
         {
-            @Override
-            public void execute(Object input)
+            try
             {
-                try
-                {
-                    assertTrue(listener.latchFirst.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-                }
-                catch (InterruptedException e)
-                {
-                    fail(e.getMessage());
-                }
-                assertThat(listener.messageNotificationList, hasSize(1));
-                assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_DISPATCH_BEGIN));
-                assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
-                assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-                        is(outboundEvent.getMessage().getPayload()));
+                assertTrue(listener.latchFirst.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
             }
+            catch (InterruptedException e)
+            {
+                fail(e.getMessage());
+            }
+            assertThat(listener.messageNotificationList, hasSize(1));
+            assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_DISPATCH_BEGIN));
+            assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
+            assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
+                    is(outboundEvent.getMessage().getPayload()));
         };
 
         endpoint.process(outboundEvent);
@@ -282,10 +277,14 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     {
         int testTimeout = 999;
 
-        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
+        OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
 
         testOutboundEvent = createTestOutboundEvent();
-        testOutboundEvent.getMessage().setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
+        testOutboundEvent.setMessage(testOutboundEvent.getMessage().transform(msg ->
+        {
+            msg.setOutboundProperty(MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
+            return msg;
+        }));
 
         MuleEvent response = endpoint.process(testOutboundEvent);
 
@@ -416,7 +415,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         }
 
         @Override
-        protected MuleMessage doSend(MuleEvent event) throws Exception
+        protected MutableMuleMessage doSend(MuleEvent event) throws Exception
         {
             sensedSendEvent = event;
             sentEvent = true;

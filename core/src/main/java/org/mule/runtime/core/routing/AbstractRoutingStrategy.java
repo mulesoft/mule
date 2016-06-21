@@ -163,16 +163,19 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
      *
      * This method is mostly used by routers that dispatch the same message to several routes
      */
-    public static void propagateMagicProperties(MuleMessage in, MuleMessage out)
+    public static MuleMessage propagateMagicProperties(MuleMessage in)
     {
-        for (String name : magicProperties)
-        {
-            Serializable value = in.getInboundProperty(name);
-            if (value != null)
+        return in.transform(msg -> {
+            for (String name : magicProperties)
             {
-                out.setOutboundProperty(name, value);
+                Serializable value = in.getInboundProperty(name);
+                if (value != null)
+                {
+                    msg.setOutboundProperty(name, value);
+                }
             }
-        }
+            return msg;
+        });
     }
 
     /**

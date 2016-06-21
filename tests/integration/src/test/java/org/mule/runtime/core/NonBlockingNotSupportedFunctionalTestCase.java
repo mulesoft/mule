@@ -11,12 +11,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.functional.FlowAssert.verify;
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -88,14 +88,14 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
         int correlationGroupSize = 3;
 
         FlowRunner runner = flowRunner("aggregator").withPayload(TEST_MESSAGE).nonBlocking();
-        MuleMessage message1 = runner.buildEvent().getMessage();
+        MutableMuleMessage message1 = (MutableMuleMessage) runner.buildEvent().getMessage();
         message1.setCorrelationId(correlationId);
         message1.setCorrelationGroupSize(correlationGroupSize);
         message1.setCorrelationSequence(1);
         runner.runNoVerify();
 
         runner.reset();
-        MuleMessage message2 = runner.buildEvent().getMessage();
+        MutableMuleMessage message2 = (MutableMuleMessage) runner.buildEvent().getMessage();
         message2.setCorrelationId(correlationId);
         message2.setCorrelationGroupSize(correlationGroupSize);
         message2.setCorrelationSequence(2);
@@ -103,7 +103,7 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
         runner.runNoVerify();
 
         runner.reset();
-        MuleMessage message3 = runner.buildEvent().getMessage();
+        MutableMuleMessage message3 = (MutableMuleMessage) runner.buildEvent().getMessage();
         message3.setCorrelationId(correlationId);
         message3.setCorrelationGroupSize(correlationGroupSize);
         message3.setCorrelationSequence(3);

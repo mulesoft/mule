@@ -6,15 +6,20 @@
  */
 package org.mule.compatibility.core.transport;
 
+import static java.lang.Boolean.FALSE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,6 +27,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -35,10 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 /**
  * <li>Correct return value for ONE_WAY/REQUEST_RESPONSE endpoints. <li>//TODO: Test default
@@ -61,10 +64,10 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     public void setup() throws MuleException
     {
         when(muleSession.getId()).thenReturn("1");
-        MuleConfiguration muleConfiguration = Mockito.mock(MuleConfiguration.class);
+        MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
         when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
         when(muleContext.getTransformationService()).thenReturn(transformationService);
-        when(transformationService.applyTransformers(any(MuleMessage.class), any(MuleEvent.class), Mockito.anyList())
+        when(transformationService.applyTransformers(any(MuleMessage.class), any(MuleEvent.class), anyList())
         ).thenAnswer(answer -> answer.getArguments()[0]);
     }
 
@@ -79,30 +82,30 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     @Test
     public void routeMessageRequestResponseReturnsEvent() throws MuleException
     {
-        MessageReceiver receiver = createMessageReciever(MessageExchangePattern.REQUEST_RESPONSE);
-        MuleMessage request = createRequestMessage();
+        MessageReceiver receiver = createMessageReciever(REQUEST_RESPONSE);
+        MutableMuleMessage request = createRequestMessage();
 
         assertEquals(request, receiver.routeMessage(request).getMessage());
     }
 
-    protected MuleMessage createRequestMessage()
+    protected MutableMuleMessage createRequestMessage()
     {
-        MuleMessage request = Mockito.mock(MuleMessage.class);
+        MutableMuleMessage request = mock(MutableMuleMessage.class);
         when(request.getMuleContext()).thenReturn(muleContext);
-        when(request.getInboundProperty(Mockito.anyString(), Mockito.eq(false))).thenReturn(Boolean.FALSE);
-        when(request.getOutboundProperty(Mockito.anyString(), Mockito.eq(false))).thenReturn(Boolean.FALSE);
+        when(request.getInboundProperty(anyString(), eq(false))).thenReturn(FALSE);
+        when(request.getOutboundProperty(anyString(), eq(false))).thenReturn(FALSE);
         return request;
     }
 
     protected MessageReceiver createMessageReciever(MessageExchangePattern mep) throws MuleException
     {
-        AbstractConnector connector = Mockito.mock(AbstractConnector.class);
+        AbstractConnector connector = mock(AbstractConnector.class);
         when(connector.getSessionHandler()).thenReturn(new NullSessionHandler());
         when(connector.getMuleContext()).thenReturn(muleContext);
 
-        FlowConstruct flowConstruct = Mockito.mock(FlowConstruct.class);
+        FlowConstruct flowConstruct = mock(FlowConstruct.class);
 
-        InboundEndpoint endpoint = Mockito.mock(InboundEndpoint.class);
+        InboundEndpoint endpoint = mock(InboundEndpoint.class);
         when(endpoint.getExchangePattern()).thenReturn(mep);
         when(endpoint.getConnector()).thenReturn(connector);
         when(endpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
@@ -110,18 +113,11 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
         when(endpoint.getExchangePattern()).thenReturn(mep);
         when(endpoint.getMuleContext()).thenReturn(muleContext);
 
-        MuleEvent responseEvent = Mockito.mock(MuleEvent.class);
+        MuleEvent responseEvent = mock(MuleEvent.class);
         when(responseEvent.getSession()).thenReturn(muleSession);
 
-        MessageProcessor listener = Mockito.mock(MessageProcessor.class);
-        when(listener.process(any(MuleEvent.class))).thenAnswer(new Answer<MuleEvent>()
-        {
-            @Override
-            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
-            {
-                return (MuleEvent) invocation.getArguments()[0];
-            }
-        });
+        MessageProcessor listener = mock(MessageProcessor.class);
+        when(listener.process(any(MuleEvent.class))).thenAnswer(invocation -> (MuleEvent) invocation.getArguments()[0]);
 
         MessageReceiver messageReceiver = new TestMessageReceiver(connector, flowConstruct, endpoint);
         messageReceiver.setListener(listener);

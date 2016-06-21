@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.module.json.transformers;
 
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.json.JsonData;
 import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
-import org.mule.runtime.core.util.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonLoader;
@@ -53,8 +55,14 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter
     @Override
     public boolean accept(MuleMessage message)
     {
+        throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
+    }
+
+    @Override
+    public boolean accept(MuleEvent event)
+    {
         JsonNode data;
-        Object input = message.getPayload();
+        Object input = event.getMessage().getPayload();
         Object output = input;
 
         try
@@ -92,7 +100,8 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter
                 return false;
             }
 
-            message.setPayload(output);
+            // TODO MULE-9856 Replace with the builder
+            event.setMessage(new DefaultMuleMessage(output, event.getMessage(), event.getMuleContext()));
             ProcessingReport report = jsonSchema.validate(data);
 
             if (LOGGER.isDebugEnabled())

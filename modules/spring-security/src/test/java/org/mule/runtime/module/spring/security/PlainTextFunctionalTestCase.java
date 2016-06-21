@@ -13,6 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHOR
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.security.MuleCredentials;
@@ -74,7 +75,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
 
     private MuleMessage createRequestMessage(String user, String password)
     {
-        MuleMessage message = getTestMuleMessage();
+        MutableMuleMessage message = getTestMuleMessage();
         String header = MuleCredentials.createHeader(user, password.toCharArray());
         message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, header);
         return message;

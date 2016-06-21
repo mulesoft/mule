@@ -15,6 +15,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.message.ds.StringDataSource;
@@ -57,7 +58,7 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase
         });
 
         MuleClient client = muleContext.getClient();
-        MuleMessage msg = new DefaultMuleMessage("test",  muleContext);
+        MutableMuleMessage msg = new DefaultMuleMessage("test", muleContext);
         msg.addOutboundAttachment("attach1", new DataHandler(new StringDataSource("foo", "attach1")));
 
         MuleMessage result = client.send("endpoint1", msg);

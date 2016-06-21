@@ -15,9 +15,9 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.RETURNS_DEFAULTS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import org.mule.runtime.core.DefaultMuleMessage;
+import static org.mule.tck.MuleTestUtils.getTestEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -69,7 +69,7 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
     public void testAcceptMessage() throws Exception
     {
         final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        DefaultMuleMessage message = new DefaultMuleMessage(null, muleContext);
+        MuleEvent event = getTestEvent(null, muleContext);
         XPathFilter filter = new XPathFilter()
         {
             @Override
@@ -85,19 +85,21 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
             }
         };
 
-        assertFalse("shouldn't accept a message if no payload is set.", filter.accept(message));
-        message.setPayload(new Object());
+        assertFalse("shouldn't accept a message if no payload is set.", filter.accept(event));
+
+        event = getTestEvent(new Object(), muleContext);
         filter.setPattern("/some/pattern = null");
-        assertTrue(filter.accept(message));
+        assertTrue(filter.accept(event));
         assertEquals("null", filter.getExpectedValue());
         assertEquals("/some/pattern", filter.getPattern().trim());
-        assertSame(document, message.getPayload());
-        message.setPayload(new Object());
+        assertSame(document, event.getMessage().getPayload());
+
+        event = getTestEvent(new Object(), muleContext);
         filter.setExpectedValue(null);
-        assertTrue(filter.accept(message));
+        assertTrue(filter.accept(event));
         assertEquals("true", filter.getExpectedValue());
         assertEquals("/some/pattern", filter.getPattern().trim());
-        assertSame(document, message.getPayload());
+        assertSame(document, event.getMessage().getPayload());
     }
 
     /**

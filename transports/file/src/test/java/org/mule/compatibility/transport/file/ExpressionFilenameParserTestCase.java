@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.Serializable;
@@ -28,7 +28,7 @@ import org.junit.Test;
 public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpointTestCase
 {
     private ExpressionFilenameParser parser;
-    private MuleMessage message;
+    private MutableMuleMessage message;
     private MuleEvent event;
 
     @Override

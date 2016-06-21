@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -33,7 +34,6 @@ import org.mule.runtime.core.util.store.QueuePersistenceObjectStore;
 
 import java.io.Serializable;
 import java.util.Random;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -148,33 +148,25 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         }
         else
         {
-            this.scheduledRetriesPool.schedule(new Callable<Object>()
+            this.scheduledRetriesPool.schedule(() ->
             {
-                @Override
-                public Object call() throws Exception
-                {
-                    submitForProcessing(eventStoreKey);
-                    return null;
-                }
+                submitForProcessing(eventStoreKey);
+                return null;
             }, getUntilSuccessfulConfiguration().getMillisBetweenRetries(), TimeUnit.MILLISECONDS);
         }
     }
 
     protected void submitForProcessing(final Serializable eventStoreKey)
     {
-        this.pool.execute(new Runnable()
+        this.pool.execute(() ->
         {
-            @Override
-            public void run()
+            try
             {
-                try
-                {
-                    retrieveAndProcessEvent(eventStoreKey);
-                }
-                catch (Exception e)
-                {
-                    incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(eventStoreKey, e);
-                }
+                retrieveAndProcessEvent(eventStoreKey);
+            }
+            catch (Exception e)
+            {
+                incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(eventStoreKey, e);
             }
         });
     }
@@ -254,7 +246,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
         try
         {
-            mutableEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(buildRetryPolicyExhaustedException(lastException)));
+            mutableEvent.setMessage(mutableEvent.getMessage().transform(msg -> {
+                msg.setExceptionPayload(new DefaultExceptionPayload(buildRetryPolicyExhaustedException(lastException)));
+                return msg;
+            }));
+
             getUntilSuccessfulConfiguration().getDlqMP().process(mutableEvent);
         }
         catch (MessagingException e)
@@ -318,7 +314,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
     protected MuleEvent threadSafeCopy(final MuleEvent event)
     {
-        final DefaultMuleMessage message = new DefaultMuleMessage(event.getMessage().getPayload(),
+        final MuleMessage message = new DefaultMuleMessage(event.getMessage().getPayload(),
                                                                   event.getMessage(), getUntilSuccessfulConfiguration().getMuleContext());
 
         return new DefaultMuleEvent(message, event);

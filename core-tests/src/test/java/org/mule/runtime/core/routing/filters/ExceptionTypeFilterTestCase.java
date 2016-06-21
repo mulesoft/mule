@@ -12,7 +12,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -30,7 +30,7 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase
     {
         ExceptionTypeFilter filter = new ExceptionTypeFilter();
         assertNull(filter.getExpectedType());
-        MuleMessage m = new DefaultMuleMessage("test", muleContext);
+        MutableMuleMessage m = new DefaultMuleMessage("test", muleContext);
         assertTrue(!filter.accept(m));
         m.setExceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test")));
         assertTrue(filter.accept(m));

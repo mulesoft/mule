@@ -7,7 +7,6 @@
 package org.mule.runtime.module.cxf.support;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.cxf.CxfConstants;
 
@@ -83,32 +82,35 @@ public class MuleHeadersInInterceptor extends AbstractMuleHeaderInterceptor
         }
         
 
-        MuleMessage reqMsg = ((MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT)).getMessage();
-        
-        // Copy correlation headers nto message
-        String replyTo = (String) message.get(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        if (replyTo != null)
-        {
-            reqMsg.setReplyTo(replyTo);
-        }
-        
-        String corId = (String) message.get(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-        if (corId != null)
-        {
-            reqMsg.setCorrelationId(corId);
-        }
+        MuleEvent reqEvent = ((MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT));
 
-        String corGroupSize = (String) message.get(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-        if (corGroupSize != null)
-        {
-            reqMsg.setCorrelationGroupSize(Integer.valueOf(corGroupSize));
-        }
+        reqEvent.setMessage(reqEvent.getMessage().transform(msg -> {
+            // Copy correlation headers nto message
+            String replyTo = (String) message.get(MuleProperties.MULE_REPLY_TO_PROPERTY);
+            if (replyTo != null)
+            {
+                msg.setReplyTo(replyTo);
+            }
 
-        String corSeq = (String) message.get(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
-        if (corSeq != null)
-        {
-            reqMsg.setCorrelationSequence(Integer.valueOf(corSeq));
-        }
+            String corId = (String) message.get(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+            if (corId != null)
+            {
+                msg.setCorrelationId(corId);
+            }
+
+            String corGroupSize = (String) message.get(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
+            if (corGroupSize != null)
+            {
+                msg.setCorrelationGroupSize(Integer.valueOf(corGroupSize));
+            }
+
+            String corSeq = (String) message.get(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
+            if (corSeq != null)
+            {
+                msg.setCorrelationSequence(Integer.valueOf(corSeq));
+            }
+            return msg;
+        }));
     }
 
     public Set<QName> getUnderstoodHeaders()

@@ -92,8 +92,12 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
         {
             return event;
         }
-        event.getMessage().setPayload(getUntilSuccessfulConfiguration().getMuleContext().getExpressionManager()
-                                              .evaluate(getUntilSuccessfulConfiguration().getAckExpression(), event));
+
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setPayload(getUntilSuccessfulConfiguration().getMuleContext().getExpressionManager()
+                                   .evaluate(getUntilSuccessfulConfiguration().getAckExpression(), event));
+            return msg;
+        }));
         return event;
     }
 

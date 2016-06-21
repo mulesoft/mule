@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.transformer.simple;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.SimpleDataType;
@@ -21,7 +23,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.transformer.types.TypedValue;
 import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.core.util.StringUtils;
 
 /**
  * Modifies the payload of a {@link MuleMessage} according to the provided value.
@@ -38,19 +39,20 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (StringUtils.isEmpty(mimeType) && StringUtils.isEmpty(encoding))
-        {
-            final TypedValue typedValue = resolveTypedValue(event);
-            event.getMessage().setPayload(typedValue.getValue(), typedValue.getDataType());
-        }
-        else
-        {
-            Object value = resolveValue(event);
-            DataType dataType = resolveDataType(value);
-
-            event.getMessage().setPayload(value, dataType);
-        }
-
+        event.setMessage(event.getMessage().transform(msg -> {
+            if (isEmpty(mimeType) && isEmpty(encoding))
+            {
+                final TypedValue typedValue = resolveTypedValue(event);
+                msg.setPayload(typedValue.getValue(), typedValue.getDataType());
+            }
+            else
+            {
+                Object value = resolveValue(event);
+                DataType dataType = resolveDataType(value);
+                msg.setPayload(value, dataType);
+            }
+            return msg;
+        }));
         return event;
     }
 

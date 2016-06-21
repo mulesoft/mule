@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.module.cxf.transport;
 
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -32,7 +33,6 @@ import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
 import org.mule.runtime.module.cxf.transport.MuleUniversalConduit;
 import org.mule.runtime.module.cxf.transport.MuleUniversalTransport;
-import org.mule.runtime.module.http.api.HttpConstants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -130,7 +130,10 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit
         }
         else
         {
-            event.getMessage().setPayload(handler, DataTypeFactory.XML_STRING);
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setPayload(handler, DataTypeFactory.XML_STRING);
+                return msg;
+            }));
         }
 
         if (!decoupled)
@@ -163,8 +166,10 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit
     {
         try
         {
-            MuleMessage req = reqEvent.getMessage();
-            req.setOutboundProperty(HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
+            reqEvent.setMessage(reqEvent.getMessage().transform(msg -> {
+                msg.setOutboundProperty(HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
+                return msg;
+            }));
 
             if (reqEvent.isAllowNonBlocking())
             {

@@ -15,6 +15,7 @@ import static org.mule.runtime.core.transformer.types.MimeTypes.JSON;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.extension.file.api.LocalFileAttributes;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
 import org.mule.runtime.core.util.IOUtils;
@@ -138,7 +139,7 @@ public class FileReadTestCase extends FileConnectorTestCase
 
     private MuleMessage<AbstractFileInputStream, LocalFileAttributes> readWithLock() throws Exception
     {
-        MuleMessage<AbstractFileInputStream, LocalFileAttributes> message = flowRunner("readWithLock").run().getMessage().asNewMessage();
+        MuleMessage<AbstractFileInputStream, LocalFileAttributes> message = ((MutableMuleMessage) flowRunner("readWithLock").run().getMessage()).asNewMessage();
         assertThat(message.getPayload().isLocked(), is(true));
 
         return message;

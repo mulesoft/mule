@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.vm.functional;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 import java.io.File;
@@ -46,7 +47,7 @@ public class AttachmentsComponent implements Callable
             throw new IllegalArgumentException("payload is incorrect");
         }
         // Lets return an image
-        MuleMessage result = new DefaultMuleMessage("here is one for you!", eventContext.getMuleContext());
+        MutableMuleMessage result = new DefaultMuleMessage("here is one for you!", eventContext.getMuleContext());
         FileDataSource ds = new FileDataSource(
             new File("transports/vm/src/test/resources/test.gif").getAbsoluteFile());
         result.addOutboundAttachment("mule", new DataHandler(ds));

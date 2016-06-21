@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.session;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.model.SessionException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.util.Base64;
@@ -29,7 +29,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {
         MuleSession session = null;
-        String serializedEncodedSession = message.getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
+        String serializedEncodedSession = message.getInboundProperty(MULE_SESSION_PROPERTY);
         
         if (serializedEncodedSession != null)
         {
@@ -43,7 +43,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
     }
 
     @Override
-    public void storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
+    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
     {        
         session = removeNonSerializableProperties(session, message.getMuleContext());
         byte[] serializedSession = serialize(message, session);
@@ -62,6 +62,9 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
         {
             logger.debug("Adding serialized and base64-encoded Session header to message: " + serializedEncodedSession);
         }
-        message.setOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY, serializedEncodedSession);
+        return message.transform(msg -> {
+            msg.setOutboundProperty(MULE_SESSION_PROPERTY, serializedEncodedSession);
+            return msg;
+        });
     }
 }

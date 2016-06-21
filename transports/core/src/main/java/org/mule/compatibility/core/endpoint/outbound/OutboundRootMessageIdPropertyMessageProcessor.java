@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -21,8 +22,10 @@ public class OutboundRootMessageIdPropertyMessageProcessor implements MessagePro
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        event.getMessage().setOutboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY,
-            event.getMessage().getMessageRootId());
+        event.setMessage(event.getMessage().transform(msg -> {
+            msg.setOutboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY, msg.getMessageRootId());
+            return msg;
+        }));
         return event;
     }
 

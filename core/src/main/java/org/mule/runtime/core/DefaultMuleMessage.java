@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.core.transformer.types.DataTypeFactory.createFromDataType;
 import static org.mule.runtime.core.transformer.types.DataTypeFactory.createFromDataTypeWithMimeType;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -61,6 +63,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -72,7 +75,7 @@ import org.slf4j.LoggerFactory;
  * <code>DefaultMuleMessage</code> is a wrapper that contains a payload and properties
  * associated with the payload.
  */
-public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
+public class DefaultMuleMessage extends TypedValue<Object> implements MutableMuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
 {
     private static final String NOT_SET = "<not set>";
 
@@ -136,9 +139,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
     private static DataType<?> getCloningMessageDataType(MuleMessage previous)
     {
         // TODO MULE-9855: Make MuleMessage immutable
-        DataType<?> dataType = DataTypeFactory.create(previous.getDataType().getType(),
-                previous.getDataType().getMimeType(),
-                previous.getDataType().getEncoding());
+        DataType<?> dataType = previous.getDataType();
 
         return dataType;
     }
@@ -1162,7 +1163,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
             {
                 if (item instanceof DefaultMuleMessage)
                 {
-                    newListPayload.add(copyToInbound((DefaultMuleMessage) item, ((DefaultMuleMessage) item)
+                    newListPayload.add(copyToInbound((DefaultMuleMessage) item, ((MuleMessage) item)
                             .getPayload()));
                 }
                 else
@@ -1429,5 +1430,19 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MuleMessag
                 }
             }
         }
+    }
+
+    /**
+     * TODO MULE-9856 Replace with the builder
+     * <p>
+     * This method here is needed for calls from mocks. Mockito doesn't support default methods in
+     * interfaces.
+     */
+    @Override
+    @Deprecated
+    public MuleMessage transform(Function<MutableMuleMessage, MuleMessage> transform)
+    {
+        MutableMuleMessage copy = new DefaultMuleMessage(this);
+        return transform.apply(copy);
     }
 }

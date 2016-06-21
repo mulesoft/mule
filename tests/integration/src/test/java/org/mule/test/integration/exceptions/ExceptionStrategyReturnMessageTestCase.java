@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -61,7 +62,7 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
         public MuleEvent handleException(Exception exception, MuleEvent event)
         {
             MuleEvent result = super.handleException(exception, event);
-            result.getMessage().setPayload("Ka-boom!");
+            event.setMessage(new DefaultMuleMessage("Ka-boom!", event.getMessage(), event.getMuleContext()));
             if (exception instanceof MessagingException)
             {
                 ((MessagingException)exception).setHandled(true);

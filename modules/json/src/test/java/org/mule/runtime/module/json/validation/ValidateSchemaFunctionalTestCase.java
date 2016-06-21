@@ -7,7 +7,6 @@
 package org.mule.runtime.module.json.validation;
 
 import static com.github.fge.jackson.JsonLoader.fromString;
-import static org.junit.runners.Parameterized.Parameter;
 import static org.mule.runtime.module.json.validation.JsonSchemaDereferencing.CANONICAL;
 import static org.mule.runtime.module.json.validation.JsonSchemaDereferencing.INLINE;
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_DRAFTV3;
@@ -29,6 +28,7 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 @RunWith(Parameterized.class)
 public class ValidateSchemaFunctionalTestCase extends AbstractValidateSchemaFunctionalTestCase

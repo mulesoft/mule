@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.oauth2.internal.clientcredentials;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -24,7 +25,6 @@ import org.mule.runtime.module.oauth2.internal.TokenResponseProcessor;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.module.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,21 +71,25 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
         formData.put(OAuthConstants.GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
         String clientId = applicationCredentials.getClientId();
         String clientSecret = applicationCredentials.getClientSecret();
-        if (encodeClientCredentialsInBody)
-        {
-            formData.put(OAuthConstants.CLIENT_ID_PARAMETER, clientId);
-            formData.put(OAuthConstants.CLIENT_SECRET_PARAMETER, clientSecret);
-        }
-        else
-        {
-            String encodedCredentials = Base64.encodeBase64String(String.format("%s:%s", clientId, clientSecret).getBytes());
-            event.getMessage().setOutboundProperty(HttpHeaders.Names.AUTHORIZATION, "Basic " + encodedCredentials);
-        }
-        if (scopes != null)
-        {
-            formData.put(OAuthConstants.SCOPE_PARAMETER, scopes);
-        }
-        event.getMessage().setPayload(formData);
+
+        event.setMessage(event.getMessage().transform(msg -> {
+            if (encodeClientCredentialsInBody)
+            {
+                formData.put(OAuthConstants.CLIENT_ID_PARAMETER, clientId);
+                formData.put(OAuthConstants.CLIENT_SECRET_PARAMETER, clientSecret);
+            }
+            else
+            {
+                String encodedCredentials = Base64.encodeBase64String(String.format("%s:%s", clientId, clientSecret).getBytes());
+                msg.setOutboundProperty(HttpHeaders.Names.AUTHORIZATION, "Basic " + encodedCredentials);
+            }
+            if (scopes != null)
+            {
+                formData.put(OAuthConstants.SCOPE_PARAMETER, scopes);
+            }
+            msg.setPayload(formData);
+            return msg;
+        }));
     }
 
     public void refreshAccessToken() throws MuleException

@@ -29,7 +29,10 @@ public class PayloadEnricherDataTypePropagator extends AbstractEnricherDataTypeP
 
             if (PAYLOAD.equals(assignmentVar) || MESSAGE_PAYLOAD.equals(assignmentVar))
             {
-                event.getMessage().setPayload(typedValue.getValue(), typedValue.getDataType());
+                event.setMessage(event.getMessage().transform(msg -> {
+                    msg.setPayload(typedValue.getValue(), typedValue.getDataType());
+                    return msg;
+                }));
 
                 return true;
             }

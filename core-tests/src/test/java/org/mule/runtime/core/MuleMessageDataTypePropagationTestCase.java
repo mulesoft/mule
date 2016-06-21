@@ -33,6 +33,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -327,7 +328,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     @Test
     public void setsDefaultOutboundPropertyDataType() throws Exception
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        MutableMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.setOutboundProperty(TEST_PROPERTY, TEST);
 
         assertDefaultOutboundPropertyDataType(muleMessage);
@@ -347,7 +348,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     @Test
     public void setsDefaultOutboundScopePropertyDataType() throws Exception
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        MutableMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.setOutboundProperty(TEST_PROPERTY, TEST);
 
         assertDefaultOutboundPropertyDataType(muleMessage);
@@ -356,7 +357,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     @Test
     public void setsDefaultInboundPropertyDataType() throws Exception
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        MutableMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.setInboundProperty(TEST_PROPERTY, TEST);
 
         assertDefaultInboundPropertyDataType(muleMessage);
@@ -376,7 +377,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     @Test
     public void setsDefaultInboundScopePropertyDataType() throws Exception
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        MutableMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.setInboundProperty(TEST_PROPERTY, TEST);
 
         assertDefaultInboundPropertyDataType(muleMessage);
@@ -430,7 +431,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
         muleMessage.setOutboundProperty(TEST_PROPERTY, TEST, dataType);
 
-        DefaultMuleMessage inboundMessage = (DefaultMuleMessage) muleMessage.createInboundMessage();
+        MuleMessage inboundMessage = (MuleMessage) muleMessage.createInboundMessage();
 
         assertInboundPropertyDataType(inboundMessage, dataType);
     }
@@ -449,7 +450,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     @Test
     public void updatesDataTypeWithContentTypePropertyAndScope() throws Exception
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        MutableMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.setOutboundProperty(CONTENT_TYPE_PROPERTY, CUSTOM_CONTENT_TYPE);
 
         assertDataType(muleMessage, String.class, CUSTOM_MIME_TYPE, CUSTOM_ENCODING);
@@ -458,7 +459,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     @Test
     public void updatesDataTypeWithContentTypeInInboundProperties() throws Exception
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
+        MutableMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.addInboundProperties(Collections.singletonMap(CONTENT_TYPE_PROPERTY, CUSTOM_CONTENT_TYPE));
 
         assertDataType(muleMessage, String.class, CUSTOM_MIME_TYPE, CUSTOM_ENCODING);
@@ -479,23 +480,23 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         assertThat(muleMessage.getDataType(), like(dataType));
     }
 
-    private void assertDefaultInboundPropertyDataType(DefaultMuleMessage muleMessage)
+    private void assertDefaultInboundPropertyDataType(MuleMessage muleMessage)
     {
         assertInboundPropertyDataType(muleMessage, STRING_DATA_TYPE);
     }
 
-    private void assertDefaultOutboundPropertyDataType(DefaultMuleMessage muleMessage)
+    private void assertDefaultOutboundPropertyDataType(MuleMessage muleMessage)
     {
         assertOutboundPropertyDataType(muleMessage, STRING_DATA_TYPE);
     }
 
-    private void assertInboundPropertyDataType(DefaultMuleMessage muleMessage, DataType dataType)
+    private void assertInboundPropertyDataType(MuleMessage muleMessage, DataType dataType)
     {
         DataType<?> actualDataType = muleMessage.getInboundPropertyDataType(TEST_PROPERTY);
         assertThat(actualDataType, like(dataType));
     }
 
-    private void assertOutboundPropertyDataType(DefaultMuleMessage muleMessage, DataType dataType)
+    private void assertOutboundPropertyDataType(MuleMessage muleMessage, DataType dataType)
     {
         DataType<?> actualDataType = muleMessage.getOutboundPropertyDataType(TEST_PROPERTY);
         assertThat(actualDataType, like(dataType));

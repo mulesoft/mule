@@ -245,7 +245,10 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
-        responseEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
+        responseEvent.setMessage(responseEvent.getMessage().transform(msg -> {
+            msg.setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
+            return msg;
+        }));
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
@@ -264,7 +267,10 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
-        responseEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
+        responseEvent.setMessage(responseEvent.getMessage().transform(msg -> {
+            msg.setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
+            return msg;
+        }));
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
 

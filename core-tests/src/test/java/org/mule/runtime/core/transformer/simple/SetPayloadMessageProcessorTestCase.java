@@ -7,33 +7,32 @@
 
 package org.mule.runtime.core.transformer.simple;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.transformer.types.TypedValue;
-import org.mule.runtime.api.message.NullPayload;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
 {
@@ -47,8 +46,6 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
     private MuleMessage muleMessage;
     private MuleEvent muleEvent;
     private ExpressionManager expressionManager;
-    private final ArgumentCaptor<DataType> actualDataType = ArgumentCaptor.forClass(DataType.class);
-    private final ArgumentCaptor<Object> actualValue = ArgumentCaptor.forClass(Object.class);
 
     @Before
     public void setUp()
@@ -57,22 +54,14 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
         muleContext = mock(MuleContext.class);
         setPayloadMessageProcessor.setMuleContext(muleContext);
         expressionManager = mock(ExpressionManager.class);
-        muleMessage = mock(MuleMessage.class);
 
         when(muleContext.getExpressionManager()).thenReturn(expressionManager);
+        when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
         when(expressionManager.parse(anyString(), any(MuleEvent.class))).thenAnswer(
-                new Answer<String>()
-                {
-                    @Override
-                    public String answer(InvocationOnMock invocation) throws Throwable
-                    {
+                invocation -> (String) invocation.getArguments()[0]);
 
-                        return (String) invocation.getArguments()[0];
-                    }
-                });
-
-        muleEvent = mock(MuleEvent.class);
-        when(muleEvent.getMessage()).thenReturn(muleMessage);
+        muleMessage = new DefaultMuleMessage("", muleContext);
+        muleEvent = new DefaultMuleEvent(muleMessage, (FlowConstruct) null);
     }
 
     @Test
@@ -94,9 +83,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        verify(muleMessage).setPayload(actualValue.capture(), Matchers.<DataType<?>>any());
-
-        assertTrue(actualValue.getValue() instanceof NullPayload);
+        assertThat(muleEvent.getMessage().getPayload(), is(instanceOf(NullPayload.class)));
     }
 
     @Test
@@ -109,9 +96,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        verify(muleMessage).setPayload(actualValue.capture(), Matchers.<DataType<?>>any());
-
-        assertThat((String) actualValue.getValue(), equalTo(PLAIN_TEXT));
+        assertThat(muleEvent.getMessage().getPayload(), is(PLAIN_TEXT));
     }
 
     @Test
@@ -126,9 +111,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        verify(muleMessage).setPayload(actualValue.capture(), Matchers.<DataType<?>>any());
-
-        assertThat((String) actualValue.getValue(), equalTo(PLAIN_TEXT));
+        assertThat(muleEvent.getMessage().getPayload(), is(PLAIN_TEXT));
     }
 
     @Test
@@ -139,9 +122,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        verify(muleMessage).setPayload(any(), actualDataType.capture());
-
-        assertThat(actualDataType.getValue(), DataTypeMatcher.like(Object.class, MimeTypes.ANY, null));
+        assertThat(muleEvent.getMessage().getDataType(), like(Object.class, MimeTypes.ANY, null));
     }
 
     @Test
@@ -152,9 +133,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        verify(muleMessage).setPayload(any(), actualDataType.capture());
-
-        assertThat(actualDataType.getValue(), DataTypeMatcher.like(String.class, MimeTypes.ANY, null));
+        assertThat(muleEvent.getMessage().getDataType(), like(String.class, MimeTypes.ANY, null));
     }
 
     @Test
@@ -166,9 +145,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        verify(muleMessage).setPayload(any(), actualDataType.capture());
-
-        assertThat(actualDataType.getValue(), DataTypeMatcher.like(String.class, MimeTypes.ANY, CUSTOM_ENCODING));
+        assertThat(muleEvent.getMessage().getDataType(), like(String.class, MimeTypes.ANY, CUSTOM_ENCODING));
     }
 
     @Test
@@ -180,8 +157,6 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        verify(muleMessage).setPayload(any(), actualDataType.capture());
-
-        assertThat(actualDataType.getValue(), DataTypeMatcher.like(String.class, MimeTypes.APPLICATION_XML, null));
+        assertThat(muleEvent.getMessage().getDataType(), like(String.class, MimeTypes.APPLICATION_XML, null));
     }
 }

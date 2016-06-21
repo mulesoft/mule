@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.vm;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.util.queue.Queue;
 import org.mule.runtime.core.util.queue.QueueSession;
@@ -43,7 +43,7 @@ public class VMMessageRequester extends AbstractMessageRequester
      * @throws Exception if the call to the underlying protocol causes an exception
      */
     @Override
-    protected MuleMessage doRequest(long timeout) throws Exception
+    protected MutableMuleMessage doRequest(long timeout) throws Exception
     {
         try
         {
@@ -60,7 +60,7 @@ public class VMMessageRequester extends AbstractMessageRequester
             }
             else
             {
-                MuleMessage message = null;
+                MutableMuleMessage message = null;
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Waiting for a message on " + endpoint.getEndpointURI().getAddress());
@@ -71,11 +71,11 @@ public class VMMessageRequester extends AbstractMessageRequester
 
                     if (polledItem instanceof MuleEvent)
                     {
-                        message = ((MuleEvent) polledItem).getMessage();
+                        message = (MutableMuleMessage) ((MuleEvent) polledItem).getMessage();
                     }
                     else
                     {
-                        message = (MuleMessage) polledItem;
+                        message = (MutableMuleMessage) polledItem;
                     }
                 }
                 catch (InterruptedException e)

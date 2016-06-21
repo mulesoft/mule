@@ -6,13 +6,15 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.compatibility.transport.http.HttpsConnector.LOCAL_CERTIFICATES;
+import static org.mule.compatibility.transport.http.HttpsConnector.PEER_CERTIFICATES;
+
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
-
-import java.util.concurrent.TimeUnit;
 
 public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate
 {
@@ -28,7 +30,7 @@ public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate
         try
         {
             long timeout = ((HttpsConnector) getConnector()).getSslHandshakeTimeout();
-            boolean handshakeComplete = getHttpServerConnection().getSslSocketHandshakeCompleteLatch().await(timeout, TimeUnit.MILLISECONDS);
+            boolean handshakeComplete = getHttpServerConnection().getSslSocketHandshakeCompleteLatch().await(timeout, MILLISECONDS);
             if (!handshakeComplete)
             {
                 throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(), muleEvent);
@@ -39,14 +41,17 @@ public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate
             throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(),
                                          muleEvent, e);
         }
-        if (getHttpServerConnection().getPeerCertificateChain() != null)
-        {
-            muleEvent.getMessage().setOutboundProperty(HttpsConnector.PEER_CERTIFICATES, getHttpServerConnection().getPeerCertificateChain());
-        }
-        if (getHttpServerConnection().getLocalCertificateChain() != null)
-        {
-            muleEvent.getMessage().setOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES, getHttpServerConnection().getLocalCertificateChain());
-        }
+        muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
+            if (getHttpServerConnection().getPeerCertificateChain() != null)
+            {
+                msg.setOutboundProperty(PEER_CERTIFICATES, getHttpServerConnection().getPeerCertificateChain());
+            }
+            if (getHttpServerConnection().getLocalCertificateChain() != null)
+            {
+                msg.setOutboundProperty(LOCAL_CERTIFICATES, getHttpServerConnection().getLocalCertificateChain());
+            }
+            return msg;
+        }));
 
         super.beforeRouteEvent(muleEvent);
         return muleEvent;

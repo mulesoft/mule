@@ -12,8 +12,8 @@ import static org.junit.Assert.assertFalse;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -75,7 +75,8 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         @Override
         public void run()
         {
-            MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
+            // TODO MULE-9856 Replace with the builder
+            MutableMuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
             okMessage.setOutboundProperty("id", "1");
             MuleEvent event = new DefaultMuleEvent(okMessage, flow, session);
 
