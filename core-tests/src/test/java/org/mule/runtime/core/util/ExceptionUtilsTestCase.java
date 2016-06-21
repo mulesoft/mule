@@ -9,6 +9,7 @@ package org.mule.runtime.core.util;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -16,10 +17,11 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.util.ExceptionUtils.containsType;
-import static org.mule.runtime.core.util.ExceptionUtils.extractRootConnectionException;
+import static org.mule.runtime.core.util.ExceptionUtils.extractCauseOfType;
+import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.util.ExceptionUtils.getDeepestOccurenceOfType;
 import static org.mule.runtime.core.util.ExceptionUtils.getFullStackTraceWithoutMessages;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -32,6 +34,8 @@ import org.junit.Test;
 @SmallTest
 public class ExceptionUtilsTestCase extends AbstractMuleTestCase
 {
+    private static final String ERROR_MESSAGE = "Excepted Error Message";
+
     @Test
     public void testContainsType()
     {
@@ -108,18 +112,48 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
+    public void extractExceptionOfType()
+    {
+        Exception exception = new Exception(new Throwable(new ConnectionException(new IOException(new NullPointerException()))));
+        Optional<IOException> ioException = extractOfType(exception, IOException.class);
+        assertThat(ioException.isPresent(), is(true));
+        assertThat(ioException.get().getCause(), instanceOf(NullPointerException.class));
+    }
 
     @Test
-    public void testExtractRootConnectionException()
+    public void extractExceptionOfSubtype()
     {
-        final String errorMessage = "Error Message";
-        Exception withConnectionExceptionCause = new Exception(new ConnectionException(errorMessage, new ConnectionException(new NullPointerException())));
-        Optional<ConnectionException> connectionException = extractRootConnectionException(withConnectionExceptionCause);
-        assertThat(connectionException.isPresent(), is(true));
-        assertThat(connectionException.get().getMessage(), is(errorMessage));
+        Exception exception = new Exception(new IllegalStateException(new Error(new RuntimeException(new IOException()))));
+        Optional<RuntimeException> runtimeException = extractOfType(exception, RuntimeException.class);
+        assertThat(runtimeException.isPresent(), is(true));
+        assertThat(runtimeException.get(), instanceOf(IllegalStateException.class));
+    }
 
+    @Test
+    public void extractExceptionCauseOf()
+    {
+        Exception exception = new Exception(new IOException(new ConnectionException(ERROR_MESSAGE, new NullPointerException())));
+        Optional<? extends Throwable> throwable = extractCauseOfType(exception, IOException.class);
+        assertThat(throwable.isPresent(), is(true));
+        assertThat(throwable.get(), instanceOf(ConnectionException.class));
+        assertThat(throwable.get().getMessage(), is(ERROR_MESSAGE));
+    }
+
+    @Test
+    public void extractRootConnectionException()
+    {
+        Exception withConnectionExceptionCause = new Exception(new ConnectionException(ERROR_MESSAGE, new ConnectionException(new NullPointerException())));
+        Optional<ConnectionException> connectionException = extractConnectionException(withConnectionExceptionCause);
+        assertThat(connectionException.isPresent(), is(true));
+        assertThat(connectionException.get().getMessage(), is(ERROR_MESSAGE));
+    }
+
+    @Test
+    public void extractMissingConnectionException()
+    {
         Exception withoutConnectionException = new Exception(new NullPointerException());
-        Optional<ConnectionException> exception = extractRootConnectionException(withoutConnectionException);
+        Optional<ConnectionException> exception = extractConnectionException(withoutConnectionException);
         assertThat(exception.isPresent(), is(false));
     }
 }

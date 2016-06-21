@@ -58,7 +58,12 @@ public final class ValidationStrategies
             }
             catch (Exception e)
             {
-                results.add(error(ExceptionUtils.getRootCause(e).getMessage()));
+                Throwable rootCause = ExceptionUtils.getRootCause(e);
+                if (rootCause == null)
+                {
+                    rootCause = e;
+                }
+                results.add(error(rootCause.getMessage()));
             }
         }
 

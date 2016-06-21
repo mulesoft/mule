@@ -8,14 +8,11 @@ package org.mule.runtime.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
-
+import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.util.concurrent.Latch;
-
-import com.ning.http.client.filter.FilterException;
 
 import java.io.IOException;
 
@@ -54,7 +51,7 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
         MessagingException e = runner.runExpectingException();
         // Max connections should be reached
         assertThat(e, instanceOf(MessagingException.class));
-        assertThat(e.getCause(), instanceOf(FilterException.class));
+        assertThat(e.getCause(), instanceOf(IOException.class));
 
         messageHold.release();
         t1.join();

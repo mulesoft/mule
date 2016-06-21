@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.util.Arrays.stream;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import org.mule.runtime.api.connection.ConnectionException;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
@@ -19,13 +21,14 @@ import java.util.Optional;
  */
 public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionUtils
 {
+
     /**
      * This method returns true if the throwable contains a {@link Throwable} that
      * matches the specified class or subclass in the exception chain. Subclasses of
      * the specified class do match.
      *
      * @param throwable the throwable to inspect, may be null
-     * @param type the type to search for, subclasses match, null returns false
+     * @param type      the type to search for, subclasses match, null returns false
      * @return the index into the throwable chain, false if no match or null input
      */
     public static boolean containsType(Throwable throwable, Class<?> type)
@@ -39,9 +42,9 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
      * null.
      *
      * @param throwable the throwable to inspect, may be null
-     * @param type the type to search for, subclasses match, null returns null
+     * @param type      the type to search for, subclasses match, null returns null
      * @return the throwable that is closest to the root in the throwable chain that
-     *         matches the type or subclass of that type.
+     * matches the type or subclass of that type.
      */
     @SuppressWarnings("unchecked")
     public static <ET> ET getDeepestOccurenceOfType(Throwable throwable, Class<ET> type)
@@ -57,7 +60,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
             Throwable candidate = listIterator.previous();
             if (type.isAssignableFrom(candidate.getClass()))
             {
-                return (ET)candidate;
+                return (ET) candidate;
             }
         }
         return null;
@@ -83,39 +86,54 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
         return builder.toString();
     }
 
-
+    /**
+     * Introspects the {@link Throwable} parameter to obtain the first {@link Throwable} of
+     * type {@link ConnectionException} in the exception chain.
+     *
+     * @param throwable the last throwable in the exception chain.
+     * @return an {@link Optional} value with the first {@link ConnectionException} in the exception chain if any.
+     */
+    public static Optional<ConnectionException> extractConnectionException(Throwable throwable)
+    {
+        return extractOfType(throwable, ConnectionException.class);
+    }
 
     /**
-     * Introspects the {@link Throwable} to obtain the first
-     * Connection Exception cause if exists.
+     * Introspects the {@link Throwable} parameter to obtain the first {@link Throwable} of
+     * type {@code throwableType} in the exception chain and return the cause of it.
      *
+     * @param throwable the last throwable on the exception chain.
+     * @param throwableType the type of the throwable that the cause is wanted.
+     * @return the cause of the first {@link Throwable} of type {@code throwableType}.
+     */
+    public static Optional<? extends Throwable> extractCauseOfType(Throwable throwable, Class<? extends Throwable> throwableType)
+    {
+        Optional<? extends Throwable> typeThrowable = extractOfType(throwable, throwableType);
+        return typeThrowable.isPresent() ? ofNullable(typeThrowable.get().getCause()) : empty();
+    }
+
+    /**
+     * Introspects the {@link Throwable} parameter to obtain the first {@link Throwable} of
+     * type {@code throwableType} in the exception chain.
+     * <p>
      * This method handles recursive cause structures
      * that might otherwise cause infinite loops. If the throwable parameter
      * is a {@link ConnectionException} the same value will be returned.
      * If the throwable parameter has a cause of itself,
      * then an empty value will be returned.
      *
-     * @param throwable the throwable to get the root cause for
-     * @return an Optional {@link ConnectionException} cause of the <code>Throwable</code>
+     * @param throwable the last throwable on the exception chain.
+     * @param throwableType the type of the throwable is wanted to find.
+     * @return the cause of the first {@link Throwable} of type {@code throwableType}.
      */
     @SuppressWarnings("unchecked")
-    public static Optional<ConnectionException> extractRootConnectionException(Throwable throwable)
+    public static <T extends Throwable> Optional<T> extractOfType(Throwable throwable, Class<T> throwableType)
     {
-        if(throwable != null)
+        if (throwable == null || !containsType(throwable, throwableType))
         {
-            if (isConnectionException(throwable))
-            {
-                return Optional.of((ConnectionException) throwable);
-            }
-            Optional<? extends Throwable> connectionException = Arrays.stream(getThrowables(throwable)).filter(ExceptionUtils::isConnectionException).findFirst();
-            return (Optional<ConnectionException>) connectionException;
+            return empty();
         }
-        return Optional.empty();
-    }
 
-    private static boolean isConnectionException(Throwable throwable)
-    {
-        return throwable instanceof ConnectionException;
+        return (Optional<T>) stream(getThrowables(throwable)).filter(throwableType::isInstance).findFirst();
     }
-
 }
