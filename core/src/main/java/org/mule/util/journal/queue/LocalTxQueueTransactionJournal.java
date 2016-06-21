@@ -20,9 +20,14 @@ import java.io.Serializable;
 public class LocalTxQueueTransactionJournal extends AbstractQueueTransactionJournal<Integer, LocalQueueTxJournalEntry>
 {
 
+    public LocalTxQueueTransactionJournal(String logFilesDirectory, final MuleContext muleContext, Integer maximumFileSizeInMegabytes)
+    {
+        super(logFilesDirectory, createLocalTxQueueJournalEntrySerializer(muleContext), maximumFileSizeInMegabytes);
+    }
+
     public LocalTxQueueTransactionJournal(String logFilesDirectory, final MuleContext muleContext)
     {
-        super(logFilesDirectory, createLocalTxQueueJournalEntrySerializer(muleContext));
+        super(logFilesDirectory, createLocalTxQueueJournalEntrySerializer(muleContext), null);
     }
 
     public static JournalEntrySerializer<Integer, LocalQueueTxJournalEntry> createLocalTxQueueJournalEntrySerializer(final MuleContext muleContext)

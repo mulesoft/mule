@@ -9,6 +9,7 @@ package org.mule.util.queue;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
@@ -29,6 +30,7 @@ import java.util.Map;
 public class TransactionalQueueManager extends AbstractQueueManager
 {
 
+    public static final String MAX_TRANSACTION_LOG_FILE_SIZE = MuleProperties.PROPERTY_PREFIX + "queue.tx.max.file.size";
     private LocalTxQueueTransactionJournal localTxTransactionJournal;
     private LocalTxQueueTransactionRecoverer localTxQueueTransactionRecoverer;
     private XaTxQueueTransactionJournal xaTransactionJournal;
@@ -66,10 +68,17 @@ public class TransactionalQueueManager extends AbstractQueueManager
     public void initialise() throws InitialisationException
     {
         String workingDirectory = getMuleContext().getConfiguration().getWorkingDirectory();
-        localTxTransactionJournal = new LocalTxQueueTransactionJournal(workingDirectory + File.separator + "queue-tx-log", getMuleContext());
+        Integer queueTransactionFilesSizeInMegabytes = getMaxSizeForTransactionalFiles();
+        localTxTransactionJournal = new LocalTxQueueTransactionJournal(workingDirectory + File.separator + "queue-tx-log", getMuleContext(), queueTransactionFilesSizeInMegabytes);
         localTxQueueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(localTxTransactionJournal, this);
-        xaTransactionJournal = new XaTxQueueTransactionJournal(workingDirectory + File.separator + "queue-xa-tx-log", getMuleContext());
+        xaTransactionJournal = new XaTxQueueTransactionJournal(workingDirectory + File.separator + "queue-xa-tx-log", getMuleContext(), queueTransactionFilesSizeInMegabytes);
         xaTransactionRecoverer = new XaTransactionRecoverer(xaTransactionJournal, this);
+    }
+
+    private Integer getMaxSizeForTransactionalFiles()
+    {
+        String value = System.getProperty(MAX_TRANSACTION_LOG_FILE_SIZE);
+        return value != null ? Integer.parseInt(value) : null;
     }
 
     @Override
