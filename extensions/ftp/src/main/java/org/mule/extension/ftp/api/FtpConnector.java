@@ -33,7 +33,7 @@ import javax.inject.Inject;
 @Operations({StandardFileSystemOperations.class})
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = FtpFilePredicateBuilder.class)
 @Providers({ClassicFtpConnectionProvider.class, SftpConnectionProvider.class})
-public class FtpConnector implements FileConnectorConfig
+public class FtpConnector extends FileConnectorConfig
 {
 
     public static final String FTP_PROTOCOL = "ftp";

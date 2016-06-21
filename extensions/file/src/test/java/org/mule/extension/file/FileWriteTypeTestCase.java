@@ -10,8 +10,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.extension.file.api.FileWriteMode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,9 +37,6 @@ public class FileWriteTypeTestCase extends FileConnectorTestCase
                 {"byte[]", HELLO_WORLD.getBytes(), HELLO_WORLD},
                 {"OutputHandler", new TestOutputHandler(), HELLO_WORLD},
                 {"InputStream", new ByteArrayInputStream(HELLO_WORLD.getBytes()), HELLO_WORLD},
-                {"Iterable", Arrays.asList(HELLO_WORLD, new HelloWorld()), HELLO_WORLD + HELLO_WORLD},
-                {"Iterator", Arrays.asList(HELLO_WORLD, new HelloWorld()).iterator(), HELLO_WORLD + HELLO_WORLD},
-                {"Fallback", new HelloWorld(), HELLO_WORLD}
         });
     }
 
@@ -89,7 +86,8 @@ public class FileWriteTypeTestCase extends FileConnectorTestCase
         }
     }
 
-    private static class HelloWorld {
+    private static class HelloWorld
+    {
 
         @Override
         public String toString()

@@ -18,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.module.extension.file.api.matcher.NullFilePayloadPredicate;
 
 import java.io.InputStream;
@@ -36,6 +37,7 @@ import javax.inject.Inject;
 //TODO: MULE-9215
 public class StandardFileSystemOperations
 {
+
     @Inject
     private MuleContext muleContext;
 
@@ -133,21 +135,27 @@ public class StandardFileSystemOperations
      * {@code lock} argument, but following the same rules and considerations
      * as described in the read operation.
      *
+     * @param config                  the {@link FileConnectorConfig} on which the operation is being executed
      * @param fileSystem              a reference to the host {@link FileSystem}
      * @param path                    the path of the file to be written
      * @param content                 the content to be written into the file. Defaults to the current {@link MuleMessage} payload
      * @param mode                    a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
      * @param lock                    whether or not to lock the file. Defaults to {@code false}
      * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+     * @param encoding                when {@@code content} is a {@link String}, this attribute specifies the encoding
+     *                                to be used when writing. If not set, then it defaults to
+     *                                {@link FileConnectorConfig#getDefaultWriteEncoding()}
      * @param event                   The current {@link MuleEvent}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    public void write(@Connection FileSystem fileSystem,
+    public void write(@UseConfig FileConnectorConfig config,
+                      @Connection FileSystem fileSystem,
                       @Optional String path,
                       @Optional(defaultValue = "#[payload]") @Expression(LITERAL) Object content,
                       @Optional(defaultValue = "OVERWRITE") FileWriteMode mode,
                       @Optional(defaultValue = "false") boolean lock,
                       @Optional(defaultValue = "true") boolean createParentDirectories,
+                      @Optional String encoding,
                       MuleEvent event)
     {
         if (content == null || content instanceof NullPayload)
@@ -167,7 +175,13 @@ public class StandardFileSystemOperations
         }
 
         path = resolvePath(path, event, "path");
-        fileSystem.write(path, content, mode, event, lock, createParentDirectories);
+
+        if (encoding == null)
+        {
+            encoding = config.getDefaultWriteEncoding();
+        }
+
+        fileSystem.write(path, content, mode, event, lock, createParentDirectories, encoding);
     }
 
     /**

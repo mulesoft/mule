@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.extension.file.internal.DirectoryListener;
 import org.mule.extension.file.internal.LocalFilePredicateBuilder;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -18,7 +17,6 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
-import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
@@ -45,12 +43,9 @@ import org.slf4j.LoggerFactory;
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = LocalFilePredicateBuilder.class)
 @Providers(LocalFileConnectionProvider.class)
 @Sources(DirectoryListener.class)
-public class FileConnector implements Initialisable, FileConnectorConfig
+public class FileConnector extends FileConnectorConfig
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileConnector.class);
-
-    @ConfigName
-    private String configName;
 
     /**
      * The directory to be considered as the root of every
@@ -64,7 +59,7 @@ public class FileConnector implements Initialisable, FileConnectorConfig
     private String baseDir;
 
     @Override
-    public void initialise() throws InitialisationException
+    protected void doInitialise() throws InitialisationException
     {
         validateBaseDir();
     }
@@ -79,7 +74,7 @@ public class FileConnector implements Initialisable, FileConnectorConfig
                 throw new InitialisationException(createStaticMessage("Could not obtain user's home directory. Please provide a explicit value for the baseDir parameter"), this);
             }
 
-            LOGGER.warn("File connector '{}' does not specify the baseDir property. Defaulting to '{}'", configName, baseDir);
+            LOGGER.warn("File connector '{}' does not specify the baseDir property. Defaulting to '{}'", getConfigName(), baseDir);
         }
         Path baseDirPath = Paths.get(baseDir);
         if (Files.notExists(baseDirPath))

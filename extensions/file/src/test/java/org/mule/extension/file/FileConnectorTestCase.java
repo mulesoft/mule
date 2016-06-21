@@ -103,12 +103,17 @@ public abstract class FileConnectorTestCase extends ExtensionFunctionalTestCase
         doWrite("write", path, content, mode, createParent);
     }
 
-    protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
+    protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
+        doWrite(flow, path, content, mode, createParent, null);
+    }
+
+    protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent, String encoding) throws Exception
     {
         flowRunner(flow)
                 .withFlowVariable("path", path)
                 .withFlowVariable("createParent", createParent)
                 .withFlowVariable("mode", mode)
+                .withFlowVariable("encoding", encoding)
                 .withPayload(content)
                 .run();
     }

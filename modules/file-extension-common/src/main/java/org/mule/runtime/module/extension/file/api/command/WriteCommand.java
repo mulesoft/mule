@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.file.api.command;
 
 import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 
@@ -27,7 +28,16 @@ public interface WriteCommand
      * @param event                 the {@link MuleEvent} which processing triggers this operation
      * @param lock                  whether or not to lock the file
      * @param createParentDirectory whether or not to attempt creating the parent directory if it doesn't exists.
+     * @param encoding              when {@@code content} is a {@link String}, this attribute specifies the encoding
+     *                              to be used when writing. If not set, then it defaults to
+     *                              {@link FileConnectorConfig#getDefaultWriteEncoding()}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    void write(String filePath, Object content, FileWriteMode mode, MuleEvent event, boolean lock, boolean createParentDirectory);
+    void write(String filePath,
+               Object content,
+               FileWriteMode mode,
+               MuleEvent event,
+               boolean lock,
+               boolean createParentDirectory,
+               String encoding);
 }

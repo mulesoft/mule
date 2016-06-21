@@ -52,7 +52,13 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
      * {@inheritDoc}
      */
     @Override
-    public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event, boolean lock, boolean createParentDirectory)
+    public void write(String filePath,
+                      Object content,
+                      FileWriteMode mode,
+                      MuleEvent event,
+                      boolean lock,
+                      boolean createParentDirectory,
+                      String encoding)
     {
         Path path = resolvePath(filePath);
         assureParentFolderExists(path, createParentDirectory);
@@ -62,7 +68,7 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
 
         try (OutputStream out = getOutputStream(path, openOptions, mode))
         {
-            new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(out, event, muleContext));
+            new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(out, event, encoding));
         }
         catch (Exception e)
         {

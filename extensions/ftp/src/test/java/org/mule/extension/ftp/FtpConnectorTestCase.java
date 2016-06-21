@@ -70,10 +70,16 @@ public abstract class FtpConnectorTestCase extends ExtensionFunctionalTestCase
 
     protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent) throws Exception
     {
+        doWrite(flow, path, content, mode, createParent, null);
+    }
+
+    protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent, String encoding) throws Exception
+    {
         flowRunner(flow)
                 .withFlowVariable("path", path)
                 .withFlowVariable("createParent", createParent)
                 .withFlowVariable("mode", mode)
+                .withFlowVariable("encoding", encoding)
                 .withPayload(content)
                 .run();
     }

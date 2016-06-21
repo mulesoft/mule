@@ -112,6 +112,9 @@ public interface FileSystem
      * @param event                   the {@link MuleEvent} which processing triggers this operation
      * @param lock                    whether or not to lock the file
      * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+     * @param encoding                when {@@code content} is a {@link String}, this attribute specifies the encoding
+     *                                to be used when writing. If not set, then it defaults to
+     *                                {@link FileConnectorConfig#getDefaultWriteEncoding()}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
     void write(String filePath,
@@ -119,7 +122,8 @@ public interface FileSystem
                FileWriteMode mode,
                MuleEvent event,
                boolean lock,
-               boolean createParentDirectories);
+               boolean createParentDirectories,
+               String encoding);
 
     /**
      * Copies the file at the {@code sourcePath} into the {@code targetPath}.

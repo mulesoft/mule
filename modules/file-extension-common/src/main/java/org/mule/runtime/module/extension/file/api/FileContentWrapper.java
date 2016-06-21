@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
@@ -16,8 +18,9 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
+import com.google.common.base.Joiner;
+
 import java.io.InputStream;
-import java.util.Iterator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,18 +77,6 @@ public final class FileContentWrapper
         {
             visitor.visit((OutputHandler) content);
         }
-        else if (content instanceof String[])
-        {
-            visitor.visit((String[]) content);
-        }
-        else if (content instanceof Iterable)
-        {
-            visitor.visit((Iterable) content);
-        }
-        else if (content instanceof Iterator)
-        {
-            visitor.visit((Iterator) content);
-        }
         else if (content instanceof byte[])
         {
             visitor.visit((byte[]) content);
@@ -116,16 +107,10 @@ public final class FileContentWrapper
         }
         else
         {
-            targetDataType = DataTypeFactory.create(String.class);
-            transformedValue = tryTransform(sourceDataType, targetDataType);
-            if (transformedValue != null)
-            {
-                visitor.visit((String) transformedValue);
-            }
-            else
-            {
-                throw new IllegalArgumentException(String.format("Contents of type '%s' are not visitable and no suitable transformer could be found", content.getClass().getName()));
-            }
+            throw new IllegalArgumentException(format("Content of type '%s' is not supported and no suitable transformer could be found. Supported types are [%s]",
+                                                      content.getClass().getName(), Joiner.on(", ").join(asList(
+                            String.class, InputStream.class, OutputHandler.class, byte[].class, byte.class, Byte.class)
+                    )));
         }
     }
 
@@ -140,7 +125,7 @@ public final class FileContentWrapper
         {
             if (LOGGER.isDebugEnabled())
             {
-                LOGGER.debug(String.format("Could not find transformer for content of type '%s' to '%s'", content.getClass().getName(), targetDataType.getType().getName()), e);
+                LOGGER.debug(format("Could not find transformer for content of type '%s' to '%s'", content.getClass().getName(), targetDataType.getType().getName()), e);
             }
             return null;
         }
@@ -160,7 +145,7 @@ public final class FileContentWrapper
         {
             if (LOGGER.isDebugEnabled())
             {
-                LOGGER.debug(String.format("Found exception trying to transform content of type '%s' to '%s'", content.getClass().getName(), targetDataType.getType().getName()), e);
+                LOGGER.debug(format("Found exception trying to transform content of type '%s' to '%s'", content.getClass().getName(), targetDataType.getType().getName()), e);
             }
             return null;
         }

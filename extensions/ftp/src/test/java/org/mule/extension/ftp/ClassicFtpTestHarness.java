@@ -205,7 +205,6 @@ public class ClassicFtpTestHarness extends AbstractFtpTestHarness
     @Override
     public void assertDeleted(String path) throws Exception
     {
-        changeWorkingDirectory("/");
-        assertThat(getFileList(".").length, is(0));
+        assertThat(fileExists(path), is(false));
     }
 }

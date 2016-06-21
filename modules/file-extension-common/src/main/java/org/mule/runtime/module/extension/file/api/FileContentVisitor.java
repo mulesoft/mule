@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.file.api;
 import org.mule.runtime.core.message.OutputHandler;
 
 import java.io.InputStream;
-import java.util.Iterator;
 
 /**
  * Implementation of the visitor pattern meant to operate over the
@@ -65,16 +64,6 @@ public interface FileContentVisitor
     }
 
     /**
-     * Invoked when the file has an {@code String[]} as content
-     *
-     * @param content the file's content
-     * @throws Exception
-     */
-    default void visit(String[] content) throws Exception
-    {
-    }
-
-    /**
      * Invoked when the file has an {@link InputStream} as content
      *
      * @param content the file's content
@@ -83,25 +72,4 @@ public interface FileContentVisitor
     default void visit(InputStream content) throws Exception
     {
     }
-
-    /**
-     * Invoked when the file has an {@link Iterable} as content
-     *
-     * @param content the file's content
-     * @throws Exception
-     */
-    default void visit(Iterable<?> content) throws Exception
-    {
-    }
-
-    /**
-     * Invoked when the file has an {@link Iterator} as content
-     *
-     * @param content the file's content
-     * @throws Exception
-     */
-    default void visit(Iterator<?> content) throws Exception
-    {
-    }
-
 }
