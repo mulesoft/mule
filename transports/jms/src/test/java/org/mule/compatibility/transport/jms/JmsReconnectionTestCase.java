@@ -20,6 +20,7 @@ import java.util.Collection;
 import javax.jms.Connection;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JmsReconnectionTestCase extends AbstractBrokerFunctionalTestCase
@@ -56,6 +57,7 @@ public class JmsReconnectionTestCase extends AbstractBrokerFunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-9628")
     public void reconnectAllConsumers() throws Exception
     {
         this.assertMessageRouted();
