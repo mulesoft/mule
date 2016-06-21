@@ -161,7 +161,6 @@
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.7.3</aspectjVersion>
         <asyncHttpClientVersion>1.9.32</asyncHttpClientVersion>
-        <bitronixTMVersion>2.1.4</bitronixTMVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.54</bouncycastleVersion>
         <cglibVersion>2.2</cglibVersion>
@@ -1154,7 +1153,7 @@
                 <artifactId>bcmail-jdk15on</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
-			
+
             <dependency>
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>jasper-el</artifactId>
