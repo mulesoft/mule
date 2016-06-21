@@ -55,11 +55,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-security</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
