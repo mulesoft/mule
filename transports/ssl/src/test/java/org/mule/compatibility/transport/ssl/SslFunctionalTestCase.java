@@ -74,6 +74,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase
     }
 
     @Test
+    @Ignore("MULE-9628")
     public void testAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
