@@ -6,22 +6,22 @@
  */
 package org.mule.extension.ftp;
 
+import static java.nio.charset.Charset.availableCharsets;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+import static org.mule.runtime.core.util.IOUtils.toByteArray;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.APPEND;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.CREATE_NEW;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.OVERWRITE;
 import org.mule.extension.FtpTestHarness;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
@@ -153,7 +153,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
         final String defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
         assertThat(defaultEncoding, is(notNullValue()));
 
-        final String customEncoding = Charset.availableCharsets().keySet().stream()
+        final String customEncoding = availableCharsets().keySet().stream()
                 .filter(encoding -> !encoding.equals(defaultEncoding))
                 .findFirst()
                 .orElse(null);
@@ -164,7 +164,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase
         doWrite("write", filename, HELLO_WORLD, CREATE_NEW, false, customEncoding);
         InputStream content = (InputStream) readPath(Paths.get(testHarness.getWorkingDirectory()).resolve(filename).toString()).getPayload();
 
-        assertThat(Arrays.equals(IOUtils.toByteArray(content), HELLO_WORLD.getBytes(customEncoding)), is(true));
+        assertThat(Arrays.equals(toByteArray(content), HELLO_WORLD.getBytes(customEncoding)), is(true));
     }
 
     private void doWriteNotExistingFileWithCreatedParent(FileWriteMode mode) throws Exception

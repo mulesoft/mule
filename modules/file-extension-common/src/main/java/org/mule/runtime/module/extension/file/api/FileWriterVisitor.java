@@ -13,6 +13,7 @@ import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 /**
  * A {@link FileContentVisitor} which writes the received
@@ -44,15 +45,11 @@ public class FileWriterVisitor implements FileContentVisitor
     @Override
     public void visit(String content) throws Exception
     {
-        char[] payload = new char[content.length()];
-        content.getChars(0, content.length(), payload, 0);
-
-        IOUtils.write(payload, outputStream);
-        //try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, encoding))
-        //{
-        //    write(content, writer);
-        //    writer.flush();
-        //}
+        try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, encoding))
+        {
+            write(content, writer);
+            writer.flush();
+        }
     }
 
     @Override
