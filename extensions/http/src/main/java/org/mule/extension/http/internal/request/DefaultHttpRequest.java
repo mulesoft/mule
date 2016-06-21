@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
-import org.mule.module.http.internal.domain.BaseHttpMessage;
+import org.mule.runtime.module.http.internal.domain.BaseHttpMessage;
 import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpProtocol;
