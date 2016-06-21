@@ -21,7 +21,7 @@
     <flow name="proxyTemplate">
         <httpn:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO" parseRequest="false">
             <httpn:response-builder>
-                <httpn:http-response-builder statusCode="#[message.getAttributes().getStatusCode()]"
+                <httpn:simple-response-builder statusCode="#[message.getAttributes().getStatusCode()]"
                                              reasonPhrase="#[message.getAttributes().getReasonPhrase()]"
                                              />
             </httpn:response-builder>
@@ -31,12 +31,12 @@
 
         <httpn:request config-ref="requestConfig" method="#[message.getAttributes().getMethod()]" path="#[message.getAttributes().getRequestPath()]" parseResponse="false"  key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder queryParams="#[message.getAttributes().getQueryParams()]"
+                <httpn:simple-request-builder queryParams="#[message.getAttributes().getQueryParams()]"
                                                  headers="#[message.getAttributes().getHeaders()]">
                     <httpn:headers>
                         <httpn:header key="X-Forwarded-For" value="#[message.getAttributes().getRemoteHostAddress()]"/>
                     </httpn:headers>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
 

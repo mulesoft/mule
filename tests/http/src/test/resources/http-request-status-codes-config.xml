@@ -13,11 +13,11 @@
     <flow name="default">
         <httpn:request config-ref="requestConfig" path="status" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:query-params>
                         <httpn:query-param key="code" value="#[code]" />
                     </httpn:query-params>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -28,11 +28,11 @@
                 <httpn:success-status-code-validator values="409" />
             </httpn:response-validator>
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:query-params>
                         <httpn:query-param key="code" value="#[code]" />
                     </httpn:query-params>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -43,11 +43,11 @@
                 <httpn:failure-status-code-validator values="201" />
             </httpn:response-validator>
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:query-params>
                         <httpn:query-param key="code" value="#[code]" />
                     </httpn:query-params>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>

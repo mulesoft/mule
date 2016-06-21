@@ -12,8 +12,9 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
-import org.mule.extension.http.api.listener.builder.HttpResponseBuilder;
+import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.HttpRequestToMuleMessage;
+import org.mule.extension.http.internal.listener.MuleEventToHttpResponse;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.MuleMessage;
@@ -41,6 +42,7 @@ import org.mule.runtime.module.http.internal.domain.HttpProtocol;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.runtime.module.http.internal.domain.response.DefaultHttpResponse;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
+import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
 import org.mule.runtime.module.http.internal.domain.response.ResponseStatus;
 import org.mule.runtime.module.http.internal.listener.HttpRequestParsingException;
 import org.mule.runtime.module.http.internal.listener.HttpThrottlingHeadersMapBuilder;
@@ -112,17 +114,18 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
 
     @Parameter
     @Optional
-    private HttpResponseBuilder responseBuilder;
+    private HttpListenerResponseBuilder responseBuilder;
 
     @Parameter
     @Optional
-    private HttpResponseBuilder errorResponseBuilder;
+    private HttpListenerResponseBuilder errorResponseBuilder;
 
     private MethodRequestMatcher methodRequestMatcher = AcceptsAllMethodsRequestMatcher.instance();
     private HttpThrottlingHeadersMapBuilder httpThrottlingHeadersMapBuilder = new HttpThrottlingHeadersMapBuilder();
     private String[] parsedAllowedMethods;
     private ListenerPath listenerPath;
     private RequestHandlerManager requestHandlerManager;
+    private MuleEventToHttpResponse muleEventToHttpResponse;
     @Inject
     private MuleContext muleContext;
 
@@ -137,14 +140,14 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
 
         if (responseBuilder == null)
         {
-            responseBuilder = HttpResponseBuilder.emptyInstance();
+            responseBuilder = new HttpListenerResponseBuilder();
         }
 
         initialiseIfNeeded(responseBuilder);
 
         if (errorResponseBuilder == null)
         {
-            errorResponseBuilder = HttpResponseBuilder.emptyInstance();
+            errorResponseBuilder = new HttpListenerResponseBuilder();
         }
 
         initialiseIfNeeded(errorResponseBuilder);
@@ -152,8 +155,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
         path = HttpParser.sanitizePathWithStartSlash(path);
         listenerPath = config.getFullListenerPath(path);
         path = listenerPath.getResolvedPath();
-        responseBuilder.setResponseStreaming(responseStreamingMode);
-        errorResponseBuilder.setResponseStreaming(responseStreamingMode);
+        muleEventToHttpResponse = new MuleEventToHttpResponse(responseStreamingMode);
         validatePath();
         parseRequest = config.resolveParseRequest(parseRequest);
         try
@@ -205,7 +207,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                         public void onCompletion(org.mule.runtime.api.message.MuleEvent result, ExceptionCallback<org.mule.runtime.api.message.MuleEvent, Exception> exceptionCallback)
                         {
                             //TODO: MULE-9699 Analyse adding static resource handler here
-                            final org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder responseBuilder = new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder();
+                            final HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
                             final HttpResponse httpResponse = buildResponse((MuleEvent) result, responseBuilder, supportStreaming, exceptionCallback);
                             responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback));
                         }
@@ -217,7 +219,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                             MessagingException messagingException = (MessagingException) exception;
                             String exceptionStatusCode = ExceptionHelper.getTransportErrorMapping(HTTP.getScheme(), messagingException.getClass(), muleContext);
                             Integer statusCodeFromException = exceptionStatusCode != null ? Integer.valueOf(exceptionStatusCode) : 500;
-                            final org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder failureResponseBuilder = new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
+                            final HttpResponseBuilder failureResponseBuilder = new HttpResponseBuilder()
                                     .setStatusCode(statusCodeFromException)
                                     .setReasonPhrase(messagingException.getMessage());
                             addThrottlingHeaders(failureResponseBuilder);
@@ -226,7 +228,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                             HttpResponse response;
                             try
                             {
-                                response = errorResponseBuilder.build(failureResponseBuilder, messagingException.getEvent(), supportStreaming);
+                                response = muleEventToHttpResponse.create(messagingException.getEvent(), failureResponseBuilder, errorResponseBuilder, supportStreaming);
                             }
                             catch (MessagingException e)
                             {
@@ -255,7 +257,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
 
             private void sendErrorResponse(final HttpConstants.HttpStatus status, String message, HttpResponseReadyCallback responseCallback)
             {
-                responseCallback.responseReady(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
+                responseCallback.responseReady(new HttpResponseBuilder()
                                                        .setStatusCode(status.getStatusCode())
                                                        .setReasonPhrase(status.getReasonPhrase())
                                                        .setEntity(new ByteArrayHttpEntity(message.getBytes()))
@@ -289,7 +291,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
         //return muleEvent;
     }
 
-    protected HttpResponse buildResponse(MuleEvent event, final org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder responseBuilder, boolean supportStreaming, ExceptionCallback exceptionCallback)
+    protected HttpResponse buildResponse(MuleEvent event, final HttpResponseBuilder responseBuilder, boolean supportStreaming, ExceptionCallback exceptionCallback)
     {
         addThrottlingHeaders(responseBuilder);
         final HttpResponse httpResponse;
@@ -306,11 +308,11 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
         return httpResponse;
     }
 
-    protected HttpResponse doBuildResponse(MuleEvent event, final org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder responseBuilder, boolean supportsStreaming, ExceptionCallback exceptionCallback)
+    protected HttpResponse doBuildResponse(MuleEvent event, final HttpResponseBuilder responseBuilder, boolean supportsStreaming, ExceptionCallback exceptionCallback)
     {
         try
         {
-            return this.responseBuilder.build(responseBuilder, event, supportsStreaming);
+            return muleEventToHttpResponse.create(event, responseBuilder, this.responseBuilder, supportsStreaming);
         }
         catch (Exception e)
         {
@@ -319,7 +321,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                 // Handle errors that occur while building the response. We need to send ES result back.
                 MuleEvent exceptionStrategyResult = (MuleEvent) exceptionCallback.onException(e);
                 // Send the result from the event that was built from the Exception Strategy.
-                return this.responseBuilder.build(responseBuilder, exceptionStrategyResult, supportsStreaming);
+                return muleEventToHttpResponse.create(exceptionStrategyResult, responseBuilder, this.responseBuilder, supportsStreaming);
             }
             catch (Exception innerException)
             {
@@ -331,7 +333,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
 
     protected HttpResponse buildErrorResponse()
     {
-        final org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder errorResponseBuilder = new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder();
+        final HttpResponseBuilder errorResponseBuilder = new HttpResponseBuilder();
         final HttpResponse errorResponse = errorResponseBuilder.setStatusCode(INTERNAL_SERVER_ERROR.getStatusCode())
                 .setReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .build();
@@ -362,7 +364,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
         return !(HttpProtocol.HTTP_0_9.asString().equals(httpVersion) || HttpProtocol.HTTP_1_0.asString().equals(httpVersion));
     }
 
-    private void addThrottlingHeaders(org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder throttledResponseBuilder)
+    private void addThrottlingHeaders(HttpResponseBuilder throttledResponseBuilder)
     {
         final Map<String, String> throttlingHeaders = getThrottlingHeaders();
         for (String throttlingHeaderName : throttlingHeaders.keySet())

@@ -16,12 +16,12 @@
     <flow name="server">
         <httpn:listener path="test" config-ref="listenerConfig">
             <httpn:response-builder>
-                <httpn:http-response-builder statusCode="200">
+                <httpn:simple-response-builder statusCode="200">
                     <httpn:headers>
                         <httpn:header key="Content-Type" value="application/x-www-form-urlencoded"/>
                         <httpn:header key="customname1" value="customValue"/>
                     </httpn:headers>
-                </httpn:http-response-builder>
+                </httpn:simple-response-builder>
             </httpn:response-builder>
         </httpn:listener>
         <set-payload value="#[message.getAttributes().getHeaders().get('CusTomName2')]=value" />
@@ -30,11 +30,11 @@
     <flow name="client">
         <httpn:request path="test" config-ref="requestConfig" key="ANY">
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:headers>
                         <httpn:header key="CusTomName2" value="CustomValue"/>
                     </httpn:headers>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>

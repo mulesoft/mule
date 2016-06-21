@@ -16,11 +16,11 @@
                 <httpn:success-status-code-validator values="0..599" />
             </httpn:response-validator>
             <httpn:request-builder>
-                <httpn:requester-request-builder>
+                <httpn:simple-request-builder>
                     <httpn:headers>
                         <httpn:header key="Expect" value="Continue"/>
                     </httpn:headers>
-                </httpn:requester-request-builder>
+                </httpn:simple-request-builder>
             </httpn:request-builder>
         </httpn:request>
     </flow>
