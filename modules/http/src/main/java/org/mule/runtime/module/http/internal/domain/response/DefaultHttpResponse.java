@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.domain.response;
 
-import org.mule.module.http.internal.domain.BaseHttpMessage;
+import org.mule.runtime.module.http.internal.domain.BaseHttpMessage;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 
 import java.util.Collection;
