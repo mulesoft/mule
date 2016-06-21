@@ -73,6 +73,7 @@ public class ApplicationModel
     public static final String PROCESSING_STRATEGY_ATTRIBUTE = "processingStrategy";
     public static final String QUEUE_STORE = "queue-store";
     public static final String CONFIGURATION_ELEMENT = "configuration";
+    public static final String DATA_WEAVE = "weave";
 
     //TODO MULE-9638 Remove once all bean definitions parsers where migrated
     public static final String TEST_NAMESPACE = "test";
@@ -152,6 +153,7 @@ public class ApplicationModel
             .add(new ComponentIdentifier.Builder().withNamespace(BATCH_NAMESPACE).withName("execute").build())
             .add(new ComponentIdentifier.Builder().withNamespace(PARSER_TEST_NAMESPACE).withName("child").build())
             .add(new ComponentIdentifier.Builder().withNamespace(PARSER_TEST_NAMESPACE).withName("kid").build())
+            .add(new ComponentIdentifier.Builder().withNamespace(DATA_WEAVE).withName("reader-property").build())
             .build();
 
     private List<ComponentModel> muleComponentModels = new LinkedList<>();
