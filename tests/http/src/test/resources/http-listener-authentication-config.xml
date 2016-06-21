@@ -35,7 +35,7 @@
     <flow name="listenerBasicAuth">
         <httpn:listener config-ref="listenerConfigBasicAuth" path="/basic">
             <httpn:error-response-builder>
-                <httpn:http-response-builder statusCode="#[statusCode]" headersRef="#[headers]"/>
+                <httpn:simple-response-builder statusCode="#[statusCode]" headersRef="#[headers]"/>
             </httpn:error-response-builder>
         </httpn:listener>
         <httpn:basic-security-filter realm="mule-realm"/>
