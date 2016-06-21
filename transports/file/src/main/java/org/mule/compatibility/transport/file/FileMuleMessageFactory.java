@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.file;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 
 import java.io.File;
 import java.io.InputStream;
@@ -69,7 +70,7 @@ public class FileMuleMessageFactory extends AbstractMuleMessageFactory
         return file;
     }
 
-    protected void setPropertiesFromFile(DefaultMuleMessage message, File file)
+    protected void setPropertiesFromFile(MutableMuleMessage message, File file)
     {
         message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
         message.setInboundProperty(FileConnector.PROPERTY_DIRECTORY, file.getParent());

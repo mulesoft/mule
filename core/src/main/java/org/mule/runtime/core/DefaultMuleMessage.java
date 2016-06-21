@@ -1163,7 +1163,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
             {
                 if (item instanceof DefaultMuleMessage)
                 {
-                    newListPayload.add(copyToInbound((DefaultMuleMessage) item, ((DefaultMuleMessage) item)
+                    newListPayload.add(copyToInbound((DefaultMuleMessage) item, ((MuleMessage) item)
                             .getPayload()));
                 }
                 else

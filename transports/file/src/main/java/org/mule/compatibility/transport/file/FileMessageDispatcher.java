@@ -16,6 +16,7 @@ import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.types.DataTypeFactory;
@@ -51,7 +52,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     {
         Object data = event.getMessage().getPayload();
         // Wrap the transformed message before passing it to the filename parser
-        MutableMuleMessage message = new DefaultMuleMessage(data, event.getMessage(), event.getMuleContext());
+        MuleMessage message = new DefaultMuleMessage(data, event.getMessage(), event.getMuleContext());
 
         FileOutputStream fos = (FileOutputStream) connector.getOutputStream(getEndpoint(), event);
         try

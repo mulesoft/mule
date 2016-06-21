@@ -92,7 +92,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         // template method
     }
 
-    public void onMessage(MutableMuleMessage message) throws MuleException
+    public void onMessage(MuleMessage message) throws MuleException
     {
         // Rewrite the message to treat it as a new message
         MutableMuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, endpoint.getMuleContext());

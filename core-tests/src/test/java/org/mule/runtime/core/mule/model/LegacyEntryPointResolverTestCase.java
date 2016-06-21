@@ -152,7 +152,6 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
         final String methodName = "nosuchmethod";
         final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
 
-
         MuleEvent event = RequestContext.getEventContext().getEvent();
         event.setMessage(event.getMessage().transform(msg -> {
             msg.setOutboundProperty(propertyName, methodName);

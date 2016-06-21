@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.transport;
 
 import static java.lang.Thread.currentThread;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MessagingException;
@@ -94,78 +95,70 @@ public abstract class AbstractReceiverWorker implements Work
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but serveral workers
         // may have been started
-        ExecutionCallback<List<MuleEvent>> processingCallback = new ExecutionCallback<List<MuleEvent>>()
+        ExecutionCallback<List<MuleEvent>> processingCallback = () ->
         {
-            @Override
-            public List<MuleEvent> process() throws Exception
+            final Transaction tx = TransactionCoordination.getInstance().getTransaction();
+            if (tx != null)
             {
-                final Transaction tx = TransactionCoordination.getInstance().getTransaction();
-                if (tx != null)
-                {
-                    bindTransaction(tx);
-                }
-                List<MuleEvent> results = new ArrayList<MuleEvent>(messages.size());
-
-                for (final Object payload : messages)
-                {
-                    ExecutionTemplate<MuleEvent> perMessageExecutionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(endpoint.getMuleContext(), receiver.flowConstruct.getExceptionListener());
-                    MuleEvent resultEvent;
-                    try
-                    {
-                        resultEvent = perMessageExecutionTemplate.execute(new ExecutionCallback<MuleEvent>()
-                        {
-                            @Override
-                            public MuleEvent process() throws Exception
-                            {
-                                Object preProcessedPayload = preProcessMessage(payload);
-                                if (preProcessedPayload != null)
-                                {
-                                    final MutableMuleMessage muleMessage = receiver.createMuleMessage(preProcessedPayload, endpoint.getEncoding());
-                                    preRouteMuleMessage(muleMessage);
-                                    // TODO Move getSessionHandler() to the Connector interface
-                                    SessionHandler handler;
-                                    if (endpoint.getConnector() instanceof AbstractConnector)
-                                    {
-                                        handler = ((AbstractConnector) endpoint.getConnector()).getSessionHandler();
-                                    } else
-                                    {
-                                        handler = new SerializeAndEncodeSessionHandler();
-                                    }
-                                    MuleSession session = handler.retrieveSessionInfoFromMessage(muleMessage);
-
-                                    MuleEvent resultEvent;
-                                    if (session != null)
-                                    {
-                                        resultEvent = receiver.routeMessage(muleMessage, session, tx, out);
-                                    } else
-                                    {
-                                        resultEvent = receiver.routeMessage(muleMessage, tx, out);
-                                    }
-                                    return resultEvent;
-                                }
-                                else
-                                {
-                                    return null;
-                                }
-                            }
-                        });
-                    }
-                    catch (MessagingException e)
-                    {
-                        if (e.getEvent().getMessage().getExceptionPayload() != null)
-                        {
-                            throw e;
-                        }
-                        resultEvent = e.getEvent();
-                    }
-
-                    if (resultEvent != null)
-                    {
-                        results.add(resultEvent);
-                    }
-                }
-                return results;
+                bindTransaction(tx);
             }
+            List<MuleEvent> results = new ArrayList<MuleEvent>(messages.size());
+
+            for (final Object payload : messages)
+            {
+                ExecutionTemplate<MuleEvent> perMessageExecutionTemplate = TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(endpoint.getMuleContext(), receiver.flowConstruct.getExceptionListener());
+                MuleEvent resultEvent;
+                try
+                {
+                    resultEvent = perMessageExecutionTemplate.execute(() ->
+                    {
+                        Object preProcessedPayload = preProcessMessage(payload);
+                        if (preProcessedPayload != null)
+                        {
+                            final MutableMuleMessage muleMessage = receiver.createMuleMessage(preProcessedPayload, endpoint.getEncoding());
+                            preRouteMuleMessage(muleMessage);
+                            // TODO Move getSessionHandler() to the Connector interface
+                            SessionHandler handler;
+                            if (endpoint.getConnector() instanceof AbstractConnector)
+                            {
+                                handler = ((AbstractConnector) endpoint.getConnector()).getSessionHandler();
+                            } else
+                            {
+                                handler = new SerializeAndEncodeSessionHandler();
+                            }
+                            MuleSession session = handler.retrieveSessionInfoFromMessage(muleMessage);
+
+                            MuleEvent resultEvent1;
+                            if (session != null)
+                            {
+                                resultEvent1 = receiver.routeMessage(muleMessage, session, tx, out);
+                            } else
+                            {
+                                resultEvent1 = receiver.routeMessage(muleMessage, tx, out);
+                            }
+                            return resultEvent1;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    });
+                }
+                catch (MessagingException e)
+                {
+                    if (e.getEvent().getMessage().getExceptionPayload() != null)
+                    {
+                        throw e;
+                    }
+                    resultEvent = e.getEvent();
+                }
+
+                if (resultEvent != null)
+                {
+                    results.add(resultEvent);
+                }
+            }
+            return results;
         };
 
         ClassLoader originalCl = currentThread().getContextClassLoader();

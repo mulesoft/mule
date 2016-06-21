@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
@@ -49,9 +50,9 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         router.setFlowConstruct(flow);
         router.initialise();
 
-        DefaultMuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        DefaultMuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        DefaultMuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
+        MutableMuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
+        MutableMuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
+        MutableMuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
         final String correlationId = message1.getUniqueId();
         message1.setCorrelationId(correlationId);
         message2.setCorrelationId(correlationId);
@@ -87,9 +88,9 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
         router.setFlowConstruct(flow);
         router.initialise();
 
-        DefaultMuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        DefaultMuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        DefaultMuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
+        MutableMuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
+        MutableMuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
+        MutableMuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
         final String correlationId = message1.getUniqueId();
         message1.setCorrelationId(correlationId);
         message2.setCorrelationId(correlationId);

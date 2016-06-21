@@ -257,7 +257,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         event.setMessage(getTransformationService().applyTransformers(event.getMessage(), event, defaultResponseTransformers));
     }
 
-    protected MutableMuleMessage handleUnacceptedFilter(MutableMuleMessage message)
+    protected MuleMessage handleUnacceptedFilter(MutableMuleMessage message)
     {
         if (logger.isDebugEnabled())
         {

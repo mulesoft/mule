@@ -51,7 +51,7 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
         props.put("ListRating", new Integer(6));
 
         //Invoke the service
-        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(srcData, props, null, null, muleContext);
+        final MuleMessage muleMessage = new DefaultMuleMessage(srcData, props, null, null, muleContext);
         final MuleEvent muleEvent = flowRunner("Echo").withPayload(muleMessage).run();
         MuleMessage message = muleEvent.getMessage();
         assertNotNull(message);

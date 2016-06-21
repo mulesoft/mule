@@ -7,7 +7,6 @@
 package org.mule.extension.http.api.request.validator;
 
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
@@ -21,6 +20,6 @@ public class ResponseValidatorException extends MessagingException
 
     public ResponseValidatorException(String message, MuleMessage muleMessage)
     {
-        super(CoreMessages.createStaticMessage(message), (DefaultMuleMessage) muleMessage);
+        super(CoreMessages.createStaticMessage(message), (org.mule.runtime.core.api.MuleMessage) muleMessage);
     }
 }

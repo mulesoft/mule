@@ -19,7 +19,7 @@ import java.util.HashSet;
 import org.junit.Ignore;
 
 @SmallTest
-@Ignore("MULE-9072")
+@Ignore("MULE-9072 - Remove MuleSession")
 public class RemoveSessionVariableTransformerTestCase extends AbstractRemoveVariablePropertyTransformerTestCase
 {
     public RemoveSessionVariableTransformerTestCase()

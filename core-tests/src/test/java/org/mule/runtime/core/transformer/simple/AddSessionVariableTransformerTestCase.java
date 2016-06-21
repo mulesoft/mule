@@ -19,7 +19,7 @@ import org.junit.Ignore;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 @SmallTest
-@Ignore("MULE-9072")
+@Ignore("MULE-9072 - Remove MuleSession")
 public class AddSessionVariableTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase
 {
 

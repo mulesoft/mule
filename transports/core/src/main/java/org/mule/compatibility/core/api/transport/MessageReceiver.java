@@ -11,6 +11,7 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -64,7 +65,7 @@ public interface MessageReceiver extends Connectable, MessageSource
     MuleEvent routeMessage(MutableMuleMessage message, Transaction trans, OutputStream outputStream)
         throws MuleException;
 
-    MutableMuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException;
+    MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException;
 
-    MutableMuleMessage createMuleMessage(Object transportMessage) throws MuleException;
+    MuleMessage createMuleMessage(Object transportMessage) throws MuleException;
 }

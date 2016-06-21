@@ -8,6 +8,7 @@ package org.mule.compatibility.core.transport;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -102,7 +103,6 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
         String rootId = message.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
         if (rootId != null)
         {
-
             message.setMessageRootId(rootId);
             message.removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
         }

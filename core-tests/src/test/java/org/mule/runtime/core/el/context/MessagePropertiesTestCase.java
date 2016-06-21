@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MutableMuleMessage;
 
 import java.util.Collection;
 import java.util.Map;
@@ -131,7 +132,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundSize() throws Exception
     {
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         mock(DataHandler.class);
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
@@ -141,7 +142,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundKeySet() throws Exception
     {
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         mock(DataHandler.class);
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
@@ -152,7 +153,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundContainsKey() throws Exception
     {
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         mock(DataHandler.class);
         message.setInboundProperty("foo", "abc");
         Assert.assertTrue((Boolean)evaluate("message.inboundProperties.containsKey('foo')", event));
@@ -162,7 +163,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundContainsValue() throws Exception
     {
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         message.setInboundProperty("foo", "abc");
         Assert.assertTrue((Boolean)evaluate("message.inboundProperties.containsValue('abc')", event));
         Assert.assertFalse((Boolean)evaluate("message.inboundProperties.containsValue('xyz')", event));
@@ -172,7 +173,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundEntrySet() throws Exception
     {
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
         Set<Map.Entry<String, Object>> entrySet = (Set<Entry<String, Object>>)evaluate(
@@ -186,7 +187,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundValues() throws Exception
     {
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");
         Collection<DataHandler> values = (Collection<DataHandler>)evaluate(
@@ -199,7 +200,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundIsEmpty() throws Exception
     {
-        DefaultMuleMessage message = (DefaultMuleMessage) event.getMessage();
+        MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
         Assert.assertTrue((Boolean)evaluate("message.inboundProperties.isEmpty()", event));
         message.setInboundProperty("foo", "abc");
         message.setInboundProperty("bar", "xyz");

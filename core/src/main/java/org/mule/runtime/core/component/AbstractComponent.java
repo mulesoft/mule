@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -26,7 +27,6 @@ import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -175,7 +175,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         }
         else
         {
-            DefaultMuleMessage emptyMessage = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+            MutableMuleMessage emptyMessage = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
             emptyMessage.propagateRootId(event.getMessage());
             return new DefaultMuleEvent(emptyMessage, event);
         }
@@ -221,30 +221,19 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
                 this);
         }
 
-        lifecycleManager.fireInitialisePhase(new LifecycleCallback<Component>()
+        lifecycleManager.fireInitialisePhase((phaseName, object) ->
         {
-            @Override
-            public void onTransition(String phaseName, Component object) throws MuleException
+            DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(
+                flowConstruct);
+            chainBuilder.setName("Component interceptor processor chain for :" + getName());
+            for (Interceptor interceptor : interceptors)
             {
-                DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(
-                    flowConstruct);
-                chainBuilder.setName("Component interceptor processor chain for :" + getName());
-                for (Interceptor interceptor : interceptors)
-                {
-                    chainBuilder.chain(interceptor);
-                }
-                chainBuilder.chain(new MessageProcessor()
-                {
-                    @Override
-                    public MuleEvent process(MuleEvent event) throws MuleException
-                    {
-                        return invokeInternal(event);
-                    }
-                });
-                interceptorChain = chainBuilder.build();
-                applyLifecycleAndDependencyInjection(interceptorChain);
-                doInitialise();
+                chainBuilder.chain(interceptor);
             }
+            chainBuilder.chain((MessageProcessor) event -> invokeInternal(event));
+            interceptorChain = chainBuilder.build();
+            applyLifecycleAndDependencyInjection(interceptorChain);
+            doInitialise();
         });
     }
 
@@ -272,14 +261,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
     @Override
     public void dispose()
     {
-        lifecycleManager.fireDisposePhase(new LifecycleCallback<Component>()
-        {
-            @Override
-            public void onTransition(String phaseName, Component object) throws MuleException
-            {
-                doDispose();
-            }
-        });
+        lifecycleManager.fireDisposePhase((phaseName, object) -> doDispose());
     }
 
     protected void doDispose()
@@ -292,14 +274,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
     {
         try
         {
-            lifecycleManager.fireStopPhase(new LifecycleCallback<Component>()
-            {
-                @Override
-                public void onTransition(String phaseName, Component object) throws MuleException
-                {
-                    doStop();
-                }
-            });
+            lifecycleManager.fireStopPhase((phaseName, object) -> doStop());
         }
         catch (MuleException e)
         {
@@ -316,15 +291,11 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
     @Override
     public void start() throws MuleException
     {
-        lifecycleManager.fireStartPhase(new LifecycleCallback<Component>()
+        lifecycleManager.fireStartPhase((phaseName, object) ->
         {
-            @Override
-            public void onTransition(String phaseName, Component object) throws MuleException
-            {
-                notificationHandler = new OptimisedNotificationHandler(muleContext.getNotificationManager(),
-                    ComponentMessageNotification.class);
-                doStart();
-            }
+            notificationHandler = new OptimisedNotificationHandler(muleContext.getNotificationManager(),
+                ComponentMessageNotification.class);
+            doStart();
         });
 
     }

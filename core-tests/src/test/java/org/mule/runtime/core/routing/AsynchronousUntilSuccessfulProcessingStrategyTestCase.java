@@ -7,12 +7,14 @@
 package org.mule.runtime.core.routing;
 
 import static java.util.Collections.emptyMap;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -53,7 +55,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -75,17 +76,15 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     private static final int DEFAULT_TRIES = DEFAULT_RETRIES + 1;
 
     private final Latch exceptionHandlingLatch = new Latch();
-    private UntilSuccessfulConfiguration mockUntilSuccessfulConfiguration = mock(UntilSuccessfulConfiguration.class, Answers.RETURNS_DEEP_STUBS.get());
-    private MuleEvent mockEvent = mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get());
-    private MessageProcessor mockRoute = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
-    private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, Answers.RETURNS_DEEP_STUBS.get());
-    private ThreadPoolExecutor mockPool = mock(ThreadPoolExecutor.class, Answers.RETURNS_DEEP_STUBS.get());
-    private ScheduledThreadPoolExecutor mockScheduledPool = mock(ScheduledThreadPoolExecutor.class, Answers.RETURNS_DEEP_STUBS.get());
+    private UntilSuccessfulConfiguration mockUntilSuccessfulConfiguration = mock(UntilSuccessfulConfiguration.class, RETURNS_DEEP_STUBS.get());
+    private MuleEvent mockEvent = mock(MuleEvent.class, RETURNS_DEEP_STUBS.get());
+    private MessageProcessor mockRoute = mock(MessageProcessor.class, RETURNS_DEEP_STUBS.get());
+    private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, RETURNS_DEEP_STUBS.get());
+    private ThreadPoolExecutor mockPool = mock(ThreadPoolExecutor.class, RETURNS_DEEP_STUBS.get());
+    private ScheduledThreadPoolExecutor mockScheduledPool = mock(ScheduledThreadPoolExecutor.class, RETURNS_DEEP_STUBS.get());
     private SimpleMemoryObjectStore<MuleEvent> objectStore = new SimpleMemoryObjectStore<MuleEvent>();
     private MessageProcessor mockDLQ = mock(MessageProcessor.class);
-    private FailCallback failRoute = () ->
-    {
-    };
+    private FailCallback failRoute = () -> {};
     private CountDownLatch routeCountDownLatch;
     @Mock
     private MuleContext muleContext;
@@ -99,7 +98,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
         when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
         when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
-        final MuleMessage mockMessage = new DefaultMuleMessage("", emptyMap(), mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get()));
+        final MuleMessage mockMessage = new DefaultMuleMessage("", emptyMap(), mock(MuleContext.class, RETURNS_DEEP_STUBS.get()));
         when(mockEvent.getMessage()).thenReturn(mockMessage);
         when(mockEvent.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME)).thenAnswer(new Answer<Object>()
         {
@@ -393,7 +392,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         when(mockScheduledPool.schedule(any(Callable.class), anyLong(), any(TimeUnit.class))).thenAnswer(invocationOnMock ->
         {
             assertThat((Long) invocationOnMock.getArguments()[1], is(mockUntilSuccessfulConfiguration.getMillisBetweenRetries()));
-            assertThat((TimeUnit) invocationOnMock.getArguments()[2], is(TimeUnit.MILLISECONDS));
+            assertThat((TimeUnit) invocationOnMock.getArguments()[2], is(MILLISECONDS));
             new Thread(() ->
             {
                 try
@@ -411,7 +410,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
 
     private void waitUntilRouteIsExecuted() throws InterruptedException
     {
-        if (!routeCountDownLatch.await(200000, TimeUnit.MILLISECONDS))
+        if (!routeCountDownLatch.await(200000, MILLISECONDS))
         {
             fail("route should be executed " + routeCountDownLatch.getCount() + " times");
         }
@@ -437,7 +436,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
 
     private void waitUntilExceptionIsHandled() throws InterruptedException
     {
-        if (!exceptionHandlingLatch.await(100000, TimeUnit.MILLISECONDS))
+        if (!exceptionHandlingLatch.await(100000, MILLISECONDS))
         {
             fail("exception should be handled");
         }

@@ -144,10 +144,10 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         router.setFlowConstruct(flow);
         router.initialise();
 
-        MutableMuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        MutableMuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        MutableMuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
-        MutableMuleMessage message4 = new DefaultMuleMessage("test event D", muleContext);
+        MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
+        MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
+        MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
+        MuleMessage message4 = new DefaultMuleMessage("test event D", muleContext);
         List<MuleMessage> list = new ArrayList<>();
         List<MuleMessage> list2 = new ArrayList<>();
         list.add(message1);
