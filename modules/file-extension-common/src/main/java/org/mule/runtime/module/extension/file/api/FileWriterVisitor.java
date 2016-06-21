@@ -6,16 +6,14 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.apache.commons.io.IOUtils.write;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Iterator;
+import java.io.OutputStreamWriter;
 
 /**
  * A {@link FileContentVisitor} which writes the received
@@ -28,25 +26,30 @@ public class FileWriterVisitor implements FileContentVisitor
 
     private final OutputStream outputStream;
     private final MuleEvent event;
-    private final MuleContext muleContext;
+    private final String encoding;
 
     /**
      * Creates a new instance
      *
      * @param outputStream the stream to write into
      * @param event        a {@link MuleEvent} to be used to power the {@link #visit(OutputHandler)} case
+     * @param encoding     the encoding to use when writing a content of type {@link String}
      */
-    public FileWriterVisitor(OutputStream outputStream, MuleEvent event, MuleContext muleContext)
+    public FileWriterVisitor(OutputStream outputStream, MuleEvent event, String encoding)
     {
         this.outputStream = outputStream;
         this.event = event;
-        this.muleContext = muleContext;
+        this.encoding = encoding;
     }
 
     @Override
     public void visit(String content) throws Exception
     {
-        IOUtils.write(content, outputStream);
+        try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, encoding))
+        {
+            write(content, writer);
+            writer.flush();
+        }
     }
 
     @Override
@@ -58,7 +61,7 @@ public class FileWriterVisitor implements FileContentVisitor
     @Override
     public void visit(byte[] content) throws Exception
     {
-        IOUtils.write(content, outputStream);
+        write(content, outputStream);
     }
 
     @Override
@@ -68,42 +71,8 @@ public class FileWriterVisitor implements FileContentVisitor
     }
 
     @Override
-    public void visit(String[] content) throws Exception
-    {
-        for (String line : content)
-        {
-            IOUtils.write(line, outputStream);
-        }
-    }
-
-    @Override
     public void visit(InputStream content) throws Exception
     {
         IOUtils.copy(content, outputStream);
-    }
-
-    @Override
-    public void visit(Iterable<?> content) throws Exception
-    {
-        visit(content.iterator());
-    }
-
-    @Override
-    public void visit(Iterator<?> content) throws Exception
-    {
-        content.forEachRemaining(item -> {
-            if (item == null)
-            {
-                throw new IllegalArgumentException("Cannot write a null value into a file");
-            }
-            try
-            {
-                new FileContentWrapper(item, event, muleContext).accept(this);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(createStaticMessage("Could not write item of type " + item.getClass().getName()), e);
-            }
-        });
     }
 }

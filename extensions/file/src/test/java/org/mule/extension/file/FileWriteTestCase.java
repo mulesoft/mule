@@ -6,9 +6,12 @@
  */
 package org.mule.extension.file;
 
+import static java.nio.charset.Charset.availableCharsets;
+import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.APPEND;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.CREATE_NEW;
@@ -18,6 +21,7 @@ import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -131,6 +135,26 @@ public class FileWriteTestCase extends FileConnectorTestCase
 
         String content = readPathAsString(path);
         assertThat(content, is(HELLO_WORLD));
+    }
+
+    @Test
+    public void writeWithCustomEncoding() throws Exception
+    {
+        final String defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
+        assertThat(defaultEncoding, is(notNullValue()));
+
+        final String customEncoding = availableCharsets().keySet().stream()
+                .filter(encoding -> !encoding.equals(defaultEncoding))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(customEncoding, is(notNullValue()));
+        final String filename = "encoding.txt";
+
+        doWrite("write", filename, HELLO_WORLD, CREATE_NEW, false, customEncoding);
+        byte[] content = readFileToByteArray(new File(temporaryFolder.getRoot(), filename));
+
+        assertThat(Arrays.equals(content, HELLO_WORLD.getBytes(customEncoding)), is(true));
     }
 
     private void doWriteNotExistingFileWithCreatedParent(FileWriteMode mode) throws Exception

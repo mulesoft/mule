@@ -49,7 +49,13 @@ public final class SftpWriteCommand extends SftpCommand implements WriteCommand
      * {@inheritDoc}
      */
     @Override
-    public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event, boolean lock, boolean createParentDirectory)
+    public void write(String filePath,
+               Object content,
+               FileWriteMode mode,
+               MuleEvent event,
+               boolean lock,
+               boolean createParentDirectory,
+               String encoding)
     {
         Path path = resolvePath(filePath);
         FileAttributes file = getFile(filePath);
@@ -69,7 +75,7 @@ public final class SftpWriteCommand extends SftpCommand implements WriteCommand
 
         try (OutputStream outputStream = getOutputStream(path, mode))
         {
-            new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(outputStream, event, muleContext));
+            new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(outputStream, event, encoding));
             LOGGER.debug("Successfully wrote to path {}", path.toString());
         }
         catch (Exception e)

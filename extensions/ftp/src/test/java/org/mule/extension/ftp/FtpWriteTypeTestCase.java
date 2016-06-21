@@ -36,12 +36,8 @@ public class FtpWriteTypeTestCase extends FtpConnectorTestCase
                 {"Ftp - String", new ClassicFtpTestHarness(), HELLO_WORLD, HELLO_WORLD},
                 {"Ftp - native byte", new ClassicFtpTestHarness(), "A".getBytes()[0], "A"},
                 {"Ftp - Object byte", new ClassicFtpTestHarness(), new Byte("A".getBytes()[0]), "A"},
-                {"Ftp - byte[]", new ClassicFtpTestHarness(), HELLO_WORLD.getBytes(), HELLO_WORLD},
                 {"Ftp - OutputHandler", new ClassicFtpTestHarness(), new TestOutputHandler(), HELLO_WORLD},
                 {"Ftp - InputStream", new ClassicFtpTestHarness(), new ByteArrayInputStream(HELLO_WORLD.getBytes()), HELLO_WORLD},
-                {"Ftp - Iterable", new ClassicFtpTestHarness(), Arrays.asList(HELLO_WORLD, new HelloWorld()), HELLO_WORLD + HELLO_WORLD},
-                {"Ftp - Iterator", new ClassicFtpTestHarness(), Arrays.asList(HELLO_WORLD, new HelloWorld()).iterator(), HELLO_WORLD + HELLO_WORLD},
-                {"Ftp - Fallback", new ClassicFtpTestHarness(), new HelloWorld(), HELLO_WORLD},
 
                 {"Sftp - String", new SftpTestHarness(), HELLO_WORLD, HELLO_WORLD},
                 {"Sftp - native byte", new SftpTestHarness(), "A".getBytes()[0], "A"},
@@ -49,9 +45,6 @@ public class FtpWriteTypeTestCase extends FtpConnectorTestCase
                 {"Sftp - byte[]", new SftpTestHarness(), HELLO_WORLD.getBytes(), HELLO_WORLD},
                 {"Sftp - OutputHandler", new SftpTestHarness(), new TestOutputHandler(), HELLO_WORLD},
                 {"Sftp - InputStream", new SftpTestHarness(), new ByteArrayInputStream(HELLO_WORLD.getBytes()), HELLO_WORLD},
-                {"Sftp - Iterable", new SftpTestHarness(), Arrays.asList(HELLO_WORLD, new HelloWorld()), HELLO_WORLD + HELLO_WORLD},
-                {"Sftp - Iterator", new SftpTestHarness(), Arrays.asList(HELLO_WORLD, new HelloWorld()).iterator(), HELLO_WORLD + HELLO_WORLD},
-                {"Sftp - Fallback", new SftpTestHarness(), new HelloWorld(), HELLO_WORLD}
         });
     }
 
