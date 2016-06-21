@@ -131,7 +131,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
     public void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
     {
         checkArgument(event.getMessage().getAttributes() instanceof HttpRequestAttributes, "Message attributes must be HttpRequestAttributes.");
-        String header = (String) ((HttpRequestAttributes) event.getMessage().getAttributes()).getHeaders().get(AUTHORIZATION.toLowerCase());
+        String header = ((HttpRequestAttributes) event.getMessage().getAttributes()).getHeaders().get(AUTHORIZATION.toLowerCase());
 
         if (logger.isDebugEnabled())
         {

@@ -19,7 +19,6 @@ import org.mule.runtime.module.http.internal.listener.ListenerPath;
 
 import java.security.cert.Certificate;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -69,18 +68,10 @@ public class HttpRequestAttributesBuilder
         String relativePath = this.listenerPath.getRelativePath(path);
 
         final Collection<String> headerNames = request.getHeaderNames();
-        Map<String, Object> headers = new HashMap<>();
+        ParameterMap headers = new ParameterMap();
         for (String headerName : headerNames)
         {
-            final Collection<String> values = request.getHeaderValues(headerName);
-            if (values.size() == 1)
-            {
-                headers.put(headerName, values.iterator().next());
-            }
-            else
-            {
-                headers.put(headerName, values);
-            }
+            headers.put(headerName, request.getHeaderValues(headerName));
         }
         return new HttpRequestAttributes(headers, parts, listenerPath, relativePath, version, scheme, method,
                                          path, uri, queryString, queryParams, uriParams, remoteHostAddress,
