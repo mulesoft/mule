@@ -231,6 +231,40 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Test
+    public void declareStaticAndDynamicTypesInSource()
+    {
+        setDescriber(describerFor(MetadataExtension.class));
+        ExtensionDeclarer declarer = getDescriber().describe(new DefaultDescribingContext(MetadataExtension.class.getClassLoader()));
+        ExtensionDeclaration declaration = declarer.getDeclaration();
+
+        SourceDeclaration sourceDynamicAttributes = declaration.getMessageSources().stream().filter(s -> s.getName().equals("MetadataSource")).findFirst()
+                .orElseThrow(() -> new RuntimeException("Missing source declaration MetadataSource"));
+
+        assertOutputType(sourceDynamicAttributes.getOutputPayload(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
+                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object"))
+                .build(), true);
+        assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(String.class), true);
+        assertParameterType(findParameter(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class), false);
+
+        SourceDeclaration sourceStaticAttributes = declaration.getMessageSources().stream().filter(s -> s.getName().equals("MetadataSourceWithMultilevel")).findFirst()
+                .orElseThrow(() -> new RuntimeException("Missing source declaration MetadataSource"));
+
+        assertOutputType(sourceStaticAttributes.getOutputPayload(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
+                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object"))
+                .build(), true);
+        assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(String.class), false);
+
+        List<ParameterDeclaration> locationKey = sourceStaticAttributes.getParameters();
+        assertParameterType(findParameter(locationKey, "continent"), toMetadataType(String.class), false);
+        assertParameterType(findParameter(locationKey, "country"), toMetadataType(String.class), false);
+        assertParameterType(findParameter(locationKey, "city"), toMetadataType(String.class), false);
+
+    }
+
+
+    @Test
     public void parseDisplayAnnotationsOnParameter()
     {
         ExtensionDeclarer declarer = describeExtension();
