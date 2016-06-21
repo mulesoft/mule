@@ -7,9 +7,9 @@
 package org.mule.extension.http.internal.request.builder;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -36,10 +36,10 @@ public class HttpResponseAttributesBuilder
 
     public HttpResponseAttributes build()
     {
-        Map<String, Object> headers = new HashMap<>();
+        ParameterMap headers = new ParameterMap();
         for (String headerName : response.getHeaderNames())
         {
-            headers.put(headerName, response.getHeaderValue(headerName));
+            headers.put(headerName, response.getHeaderValues(headerName));
         }
 
         int statusCode = response.getStatusCode();

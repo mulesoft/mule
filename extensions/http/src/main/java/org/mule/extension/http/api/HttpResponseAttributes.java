@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api;
 
+import org.mule.runtime.module.http.internal.ParameterMap;
+
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -27,7 +29,7 @@ public class HttpResponseAttributes extends HttpAttributes
     private final String reasonPhrase;
 
     public HttpResponseAttributes(int statusCode, String reasonPhrase, Map<String, DataHandler> parts,
-                                  Map<String, Object> headers)
+                                  ParameterMap headers)
     {
         super(headers, parts);
         this.statusCode = statusCode;

@@ -106,6 +106,17 @@ public class ParameterMap implements HttpParameters, Serializable
         return previousValue.getFirst();
     }
 
+    public void put(String key, Collection<String> values)
+    {
+        LinkedList<String> newValue = paramsMap.get(key);
+        if (newValue == null)
+        {
+            newValue = new LinkedList<>();
+        }
+        newValue.addAll(values);
+        paramsMap.put(key, newValue);
+    }
+
     public String remove(Object key)
     {
         Collection<String> values = paramsMap.remove(key);

@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.integration.security;
+package org.mule.runtime.module.http.functional.listener;
 
-import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 
@@ -31,7 +31,7 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerAuthenticationTestCase extends FunctionalTestCase
+public class HttpListenerAuthenticationTestCase extends AbstractHttpTestCase
 {
 
     private static final String BASIC_REALM_MULE_REALM = "Basic realm=\"mule-realm\"";
@@ -49,7 +49,7 @@ public class HttpListenerAuthenticationTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "org/mule/test/integration/security/http-listener-authentication-config.xml";
+        return "http-listener-authentication-config.xml";
     }
 
     @After
