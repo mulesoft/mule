@@ -6,6 +6,8 @@
  */
 package org.mule.extension.file;
 
+import static java.nio.charset.Charset.availableCharsets;
+import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -19,7 +21,6 @@ import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -142,7 +143,7 @@ public class FileWriteTestCase extends FileConnectorTestCase
         final String defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
         assertThat(defaultEncoding, is(notNullValue()));
 
-        final String customEncoding = Charset.availableCharsets().keySet().stream()
+        final String customEncoding = availableCharsets().keySet().stream()
                 .filter(encoding -> !encoding.equals(defaultEncoding))
                 .findFirst()
                 .orElse(null);
@@ -151,7 +152,7 @@ public class FileWriteTestCase extends FileConnectorTestCase
         final String filename = "encoding.txt";
 
         doWrite("write", filename, HELLO_WORLD, CREATE_NEW, false, customEncoding);
-        byte[] content = FileUtils.readFileToByteArray(new File(temporaryFolder.getRoot(), filename));
+        byte[] content = readFileToByteArray(new File(temporaryFolder.getRoot(), filename));
 
         assertThat(Arrays.equals(content, HELLO_WORLD.getBytes(customEncoding)), is(true));
     }
