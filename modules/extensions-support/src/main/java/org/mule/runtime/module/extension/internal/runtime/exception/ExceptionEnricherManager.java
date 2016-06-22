@@ -55,9 +55,8 @@ public final class ExceptionEnricherManager
         }
         else
         {
-            // unwraps the exception thrown by the reflective operation.
-            Optional<? extends Throwable> failureCause = extractCauseOfType(e, UndeclaredThrowableException.class);
-            handled = failureCause.isPresent() ? failureCause.get() : e;
+            // unwraps the exception thrown by the reflective operation if exist any.
+            handled = extractCauseOfType(e, UndeclaredThrowableException.class).orElseGet(() -> e);
         }
         return wrapInException(handled);
     }

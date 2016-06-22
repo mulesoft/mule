@@ -106,7 +106,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
      * @param throwableType the type of the throwable that the cause is wanted.
      * @return the cause of the first {@link Throwable} of type {@code throwableType}.
      */
-    public static Optional<? extends Throwable> extractCauseOfType(Throwable throwable, Class<? extends Throwable> throwableType)
+    public static Optional<Throwable> extractCauseOfType(Throwable throwable, Class<? extends Throwable> throwableType)
     {
         Optional<? extends Throwable> typeThrowable = extractOfType(throwable, throwableType);
         return typeThrowable.isPresent() ? ofNullable(typeThrowable.get().getCause()) : empty();
