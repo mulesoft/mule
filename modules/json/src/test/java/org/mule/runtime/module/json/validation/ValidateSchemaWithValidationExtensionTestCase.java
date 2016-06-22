@@ -9,13 +9,11 @@ package org.mule.runtime.module.json.validation;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.internal.ValidationExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.core.api.MessagingException;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.Test;
 
 public class ValidateSchemaWithValidationExtensionTestCase extends ExtensionFunctionalTestCase
@@ -37,7 +35,6 @@ public class ValidateSchemaWithValidationExtensionTestCase extends ExtensionFunc
     public void validateInGroup() throws Exception
     {
         MessagingException e = flowRunner("validate").runExpectingException();
-        Throwable cause = ExceptionUtils.getRootCause(e);
-        assertThat(cause, is(instanceOf(ValidationException.class)));
+        assertThat(e, is(instanceOf(ValidationException.class)));
     }
 }
