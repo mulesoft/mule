@@ -10,6 +10,7 @@ package org.mule.extension.http.internal.listener;
 import static org.mule.extension.http.api.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.api.HttpStreamingType.AUTO;
 import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
@@ -195,13 +196,23 @@ public class MuleEventToHttpResponse
         {
             responseBuilder.setStatusCode(statusCode);
         }
-        String reasonPhrase = listenerResponseBuilder.getReasonPhrase(event);
+        String reasonPhrase = resolveReasonPhrase(listenerResponseBuilder.getReasonPhrase(event), statusCode);
         if (reasonPhrase != null)
         {
             responseBuilder.setReasonPhrase(reasonPhrase);
         }
         responseBuilder.setEntity(httpEntity);
         return responseBuilder.build();
+    }
+
+    public String resolveReasonPhrase(String builderReasonPhrase, Integer statusCode)
+    {
+        String reasonPhrase = builderReasonPhrase;
+        if (reasonPhrase == null && statusCode != null)
+        {
+            reasonPhrase = getReasonPhraseForStatusCode(statusCode);
+        }
+        return reasonPhrase;
     }
 
     private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder,

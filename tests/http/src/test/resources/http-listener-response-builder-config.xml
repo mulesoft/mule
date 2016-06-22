@@ -65,6 +65,24 @@
         <echo-component/>
     </flow>
 
+    <flow name="defaultReasonPhraseResponseBuilderFlow">
+        <httpn:listener config-ref="listenerConfig" path="${defaultReasonPhraseResponseBuilderPath}">
+            <httpn:response-builder>
+                <httpn:simple-response-builder statusCode="200"/>
+            </httpn:response-builder>
+        </httpn:listener>
+        <echo-component/>
+    </flow>
+
+    <flow name="noReasonPhraseUnknownStatusCodeResponseBuilderFlow">
+        <httpn:listener config-ref="listenerConfig" path="${noReasonPhraseUnknownStatusCodeResponseBuilderPath}">
+            <httpn:response-builder>
+                <httpn:simple-response-builder statusCode="1001"/>
+            </httpn:response-builder>
+        </httpn:listener>
+        <echo-component/>
+    </flow>
+
     <flow name="errorEmptyResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorEmptyResponseBuilderPath}">
             <httpn:error-response-builder/>

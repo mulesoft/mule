@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.CREATED;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
@@ -45,6 +46,10 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
     public SystemProperty headersResponseBuilderPath = new SystemProperty("headersResponseBuilderPath","headersResponseBuilderPath");
     @Rule
     public SystemProperty headersOverrideResponseBuilderPath = new SystemProperty("headersOverrideResponseBuilderPath","headersOverrideResponseBuilderPath");
+    @Rule
+    public SystemProperty defaultReasonPhraseResponseBuilderPath = new SystemProperty("defaultReasonPhraseResponseBuilderPath", "defaultReasonPhraseResponseBuilderPath");
+    @Rule
+    public SystemProperty noReasonPhraseUnknownStatusCodeResponseBuilderPath = new SystemProperty("noReasonPhraseUnknownStatusCodeResponseBuilderPath", "noReasonPhraseUnknownStatusCodeResponseBuilderPath");
     @Rule
     public SystemProperty errorEmptyResponseBuilderPath = new SystemProperty("errorEmptyResponseBuilderPath","errorEmptyResponseBuilderPath");
     @Rule
@@ -98,6 +103,20 @@ public class HttpListenerResponseBuilderTestCase extends AbstractHttpTestCase
     {
         final String url = getUrl(headersOverrideResponseBuilderPath);
         simpleHeaderTest(url);
+    }
+
+    @Test
+    public void setReasonPhraseWhenStatusCodeIsAvailable() throws Exception
+    {
+        final String url = getUrl(defaultReasonPhraseResponseBuilderPath);
+        statusLineResponseBuilderTest(url, OK.getStatusCode(), OK.getReasonPhrase());
+    }
+
+    @Test
+    public void noReasonPhraseWhenStatusCodeIsNotAndExpectedHttpStatus() throws Exception
+    {
+        final String url = getUrl(noReasonPhraseUnknownStatusCodeResponseBuilderPath);
+        statusLineResponseBuilderTest(url, 1001, "");
     }
 
     @Test
