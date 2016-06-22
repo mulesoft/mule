@@ -12,21 +12,24 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import java.nio.charset.Charset;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase
 {
 
     private static final String MIME_TYPE = "text/plain";
-    private static final String CUSTOM_ENCODING_PROPERTY = "customEncoding";
 
     private static String customEncoding;
+
+    @Rule
+    public SystemProperty customEncodingProperty = new SystemProperty("customEncoding", customEncoding);
 
     @Override
     protected String getConfigFile()
@@ -44,14 +47,6 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase
     public static void before() throws Exception
     {
         customEncoding = Charset.defaultCharset().name().equals("UTF-8") ? "ISO-8859-1" : "UTF-8";
-        System.setProperty(CUSTOM_ENCODING_PROPERTY, customEncoding);
-    }
-
-
-    @AfterClass
-    public static void after()
-    {
-        System.clearProperty(CUSTOM_ENCODING_PROPERTY);
     }
 
     @Test
