@@ -166,7 +166,7 @@ public abstract class AbstractFileSystem implements FileSystem
      * {@inheritDoc}
      */
     @Override
-    public final PathLock lock(Path path, Object... params)
+    public final synchronized PathLock lock(Path path, Object... params)
     {
         PathLock lock = createLock(path, params);
         if (!lock.tryLock())
