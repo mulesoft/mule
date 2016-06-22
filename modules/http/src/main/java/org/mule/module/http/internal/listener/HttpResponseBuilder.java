@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.module.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
@@ -214,7 +215,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         {
             httpResponseBuilder.setStatusCode(resolvedStatusCode);
         }
-        String resolvedReasonPhrase = resolveReasonPhrase(event);
+        String resolvedReasonPhrase = resolveReasonPhrase(event, resolvedStatusCode);
         if (resolvedReasonPhrase != null)
         {
             httpResponseBuilder.setReasonPhrase(resolvedReasonPhrase);
@@ -289,7 +290,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         return null;
     }
 
-    private String resolveReasonPhrase(MuleEvent event)
+    private String resolveReasonPhrase(MuleEvent event, Integer resolvedStatusCode)
     {
         if (reasonPhrase != null)
         {
@@ -300,6 +301,10 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         if (reasonPhraseOutboundProperty != null)
         {
             return reasonPhraseOutboundProperty.toString();
+        }
+        else if(resolvedStatusCode != null)
+        {
+            return getReasonPhraseForStatusCode(resolvedStatusCode);
         }
 
         return null;

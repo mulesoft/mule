@@ -10,8 +10,11 @@ import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_RELATIVE_PATH;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
+
+import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -52,6 +55,10 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     public SystemProperty headerResponseBuilderPath = new SystemProperty("headerResponseBuilderPath","headerResponseBuilderPath");
     @Rule
     public SystemProperty headersResponseBuilderPath = new SystemProperty("headersResponseBuilderPath","headersResponseBuilderPath");
+    @Rule
+    public SystemProperty defaultReasonPhraseResponseBuilderPath = new SystemProperty("defaultReasonPhraseResponseBuilderPath", "defaultReasonPhraseResponseBuilderPath");
+    @Rule
+    public SystemProperty noReasonPhraseUnknownStatusCodeResponseBuilderPath = new SystemProperty("noReasonPhraseUnknownStatusCodeResponseBuilderPath", "noReasonPhraseUnknownStatusCodeResponseBuilderPath");
     @Rule
     public SystemProperty headerDuplicatesResponseBuilderPath = new SystemProperty("headerDuplicatesResponseBuilderPath","headerDuplicatesResponseBuilderPath");
     @Rule
@@ -108,6 +115,20 @@ public class HttpListenerResponseBuilderTestCase extends FunctionalTestCase
     {
         final String url = getUrl(statusReasonPhraseResponseBuilderWontOverridePath);
         statusLineResponseBuilderTest(url, 200, "OK");
+    }
+
+    @Test
+    public void setReasonPhraseWhenStatusCodeIsAvailable() throws Exception
+    {
+        final String url = getUrl(defaultReasonPhraseResponseBuilderPath);
+        statusLineResponseBuilderTest(url, OK.getStatusCode(), OK.getReasonPhrase());
+    }
+
+    @Test
+    public void noReasonPhraseWhenStatusCodeIsNotAndExpectedHttpStatus() throws Exception
+    {
+        final String url = getUrl(noReasonPhraseUnknownStatusCodeResponseBuilderPath);
+        statusLineResponseBuilderTest(url, 1001, "");
     }
 
     @Test

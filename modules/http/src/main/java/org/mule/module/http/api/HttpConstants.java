@@ -132,6 +132,19 @@ public abstract class HttpConstants
         {
             return reasonPhrase;
         }
+
+        public static String getReasonPhraseForStatusCode(int statusCode)
+        {
+            for(HttpStatus httpStatus : HttpStatus.values())
+            {
+                if (httpStatus.getStatusCode() == statusCode)
+                {
+                    return httpStatus.getReasonPhrase();
+                }
+            }
+
+            return null;
+        }
     }
 
 }

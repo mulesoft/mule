@@ -58,6 +58,19 @@
         <echo-component/>
     </flow>
 
+    <flow name="defaultReasonPhraseResponseBuilderFlow">
+        <http:listener config-ref="listenerConfig" path="${defaultReasonPhraseResponseBuilderPath}">
+            <http:response-builder statusCode="200"/>
+        </http:listener>
+        <echo-component/>
+    </flow>
+
+    <flow name="noReasonPhraseUnknownStatusCodeResponseBuilderFlow">
+        <http:listener config-ref="listenerConfig" path="${noReasonPhraseUnknownStatusCodeResponseBuilderPath}"/>
+        <set-property propertyName="http.status" value="1001" />
+        <echo-component/>
+    </flow>
+
     <flow name="headerWithDuplicatesResponseBuilderFlow">
         <http:listener config-ref="listenerConfig" path="${headerDuplicatesResponseBuilderPath}">
             <http:response-builder>
