@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.introspection;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.core.api.expression.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.expression.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
@@ -21,7 +25,9 @@ import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ImmutableExtensionModel;
+import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
 import org.mule.runtime.extension.api.introspection.ImmutableRuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.OutputModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.ImmutableRuntimeConfigurationModel;
@@ -34,6 +40,7 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Connectio
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
@@ -226,8 +233,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                     new ImmutableRuntimeSourceModel(declaration.getName(),
                                                     declaration.getDescription(),
                                                     toParameters(declaration.getParameters()),
-                                                    declaration.getReturnType(),
-                                                    declaration.getAttributesType(),
+                                                    toOutputModel(declaration.getOutputPayload()),
+                                                    toOutputModel(declaration.getOutputAttributes()),
                                                     declaration.getSourceFactory(),
                                                     declaration.getModelProperties(),
                                                     declaration.getInterceptorFactories(),
@@ -253,8 +260,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                           declaration.getDescription(),
                                                           executorFactory,
                                                           parameterModels,
-                                                          declaration.getReturnType(),
-                                                          declaration.getAttributesType(),
+                                                          toOutputModel(declaration.getOutputPayload()),
+                                                          toOutputModel(declaration.getOutputAttributes()),
                                                           declaration.getModelProperties(),
                                                           declaration.getInterceptorFactories(),
                                                           declaration.getExceptionEnricherFactory(),
@@ -265,6 +272,14 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         private List<ConnectionProviderModel> toConnectionProviders(List<ConnectionProviderDeclaration> declarations)
         {
             return declarations.stream().map(this::toConnectionProvider).collect(new ImmutableListCollector<>());
+        }
+
+        private OutputModel toOutputModel(OutputDeclaration declaration)
+        {
+            return declaration != null ? new ImmutableOutputModel(declaration.getDescription(),
+                                                                  declaration.getType(), declaration.hasDynamicType(),
+                                                                  declaration.getModelProperties())
+                                       : new ImmutableOutputModel(EMPTY, create(JAVA).nullType().build(), false, emptySet());
         }
 
         private RuntimeConnectionProviderModel toConnectionProvider(ConnectionProviderDeclaration declaration)
@@ -313,11 +328,11 @@ public final class DefaultExtensionFactory implements ExtensionFactory
             return new ImmutableParameterModel(parameter.getName(),
                                                parameter.getDescription(),
                                                parameter.getType(),
+                                               parameter.hasDynamicType(),
                                                parameter.isRequired(),
                                                parameter.getExpressionSupport(),
                                                parameter.getDefaultValue(),
                                                parameter.getModelProperties());
-
 
         }
     }

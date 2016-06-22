@@ -9,9 +9,12 @@ package org.mule.test.metadata.extension.resolver;
 import static org.mule.metadata.java.JavaTypeLoader.JAVA;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
@@ -21,9 +24,11 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class TestNoConfigMetadataResolver implements MetadataKeysResolver, MetadataOutputResolver<Object>, MetadataContentResolver<Object>
+public class TestNoConfigMetadataResolver
+        implements MetadataKeysResolver, MetadataContentResolver<Object>, MetadataOutputResolver<Object>, MetadataAttributesResolver<Object>
 {
 
+    @Override
     public Set<MetadataKey> getMetadataKeys(MetadataContext context)
     {
         return Arrays.stream(KeyIds.values())
@@ -31,6 +36,7 @@ public class TestNoConfigMetadataResolver implements MetadataKeysResolver, Metad
                 .collect(Collectors.toSet());
     }
 
+    @Override
     public MetadataType getContentMetadata(MetadataContext context, Object key)
     {
         if (key instanceof NullMetadataKey)
@@ -41,7 +47,19 @@ public class TestNoConfigMetadataResolver implements MetadataKeysResolver, Metad
         return BaseTypeBuilder.create(JAVA).stringType().build();
     }
 
+    @Override
     public MetadataType getOutputMetadata(MetadataContext context, Object key)
+    {
+        if (key instanceof NullMetadataKey)
+        {
+            return BaseTypeBuilder.create(JAVA).nullType().build();
+        }
+
+        return BaseTypeBuilder.create(JAVA).booleanType().build();
+    }
+
+    @Override
+    public MetadataType getAttributesMetadata(MetadataContext context, Object key) throws MetadataResolvingException, ConnectionException
     {
         if (key instanceof NullMetadataKey)
         {

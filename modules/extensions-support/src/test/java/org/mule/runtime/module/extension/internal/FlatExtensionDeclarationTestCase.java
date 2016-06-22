@@ -18,6 +18,7 @@ import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
@@ -61,26 +62,10 @@ import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsume
 import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.WSDL_LOCATION;
 import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.WS_CONSUMER;
 import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.WS_CONSUMER_DESCRIPTION;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.Interceptable;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
-import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
-import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.BooleanType;
@@ -88,6 +73,21 @@ import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.Interceptable;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
+import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
+import org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -178,12 +178,12 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
         final String beta = "beta";
         final String alpha = "alpha";
 
-        ExtensionDeclarer declarer = new ExtensionDeclarer().named("test").onVersion("1.0").fromVendor("MuleSoft");
-        declarer.withConfig(defaultConfiguration).describedAs(defaultConfiguration).createdWith(mockInstantiator);
-        declarer.withConfig(beta).describedAs(beta).createdWith(mockInstantiator);
-        declarer.withConfig(alpha).describedAs(alpha).createdWith(mockInstantiator);
+        ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer().named("test").onVersion("1.0").fromVendor("MuleSoft");
+        extensionDeclarer.withConfig(defaultConfiguration).describedAs(defaultConfiguration).createdWith(mockInstantiator);
+        extensionDeclarer.withConfig(beta).describedAs(beta).createdWith(mockInstantiator);
+        extensionDeclarer.withConfig(alpha).describedAs(alpha).createdWith(mockInstantiator);
 
-        ExtensionModel extensionModel = factory.createFrom(declarer, createDescribingContext());
+        ExtensionModel extensionModel = factory.createFrom(extensionDeclarer, createDescribingContext());
         List<ConfigurationModel> configurationModels = extensionModel.getConfigurationModels();
         assertThat(configurationModels, hasSize(3));
         assertThat(configurationModels.get(1).getName(), equalTo(alpha));
@@ -209,7 +209,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     @Test(expected = IllegalParameterModelDefinitionException.class)
     public void operationWithParameterNamedName()
     {
-        extensionDeclarer.withOperation("invalidOperation").describedAs("").withRequiredParameter("name").ofType(String.class);
+        extensionDeclarer.withOperation("invalidOperation").describedAs("").withRequiredParameter("name").ofType(toMetadataType(String.class));
         factory.createFrom(extensionDeclarer, createDescribingContext());
     }
 
@@ -217,7 +217,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     public void fixedParameterWithExpressionDefault()
     {
         extensionDeclarer.withOperation("invalidOperation").describedAs("")
-                .withOptionalParameter("fixed").ofType(String.class)
+                .withOptionalParameter("fixed").ofType(toMetadataType(String.class))
                 .withExpressionSupport(NOT_SUPPORTED)
                 .defaultingTo("#['hello']");
 
@@ -228,7 +228,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     public void operationWithParameterNamedTarget()
     {
         extensionDeclarer.withOperation("invalidOperation").describedAs("")
-                .withOptionalParameter(TARGET_ATTRIBUTE).ofType(String.class);
+                .withOptionalParameter(TARGET_ATTRIBUTE).ofType(toMetadataType(String.class));
 
         factory.createFrom(extensionDeclarer, createDescribingContext());
     }
@@ -237,17 +237,10 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     public void expressionParameterWithFixedValue()
     {
         extensionDeclarer.withOperation("invalidOperation").describedAs("")
-                .withOptionalParameter("expression").ofType(String.class)
+                .withOptionalParameter("expression").ofType(toMetadataType(String.class))
                 .withExpressionSupport(REQUIRED)
                 .defaultingTo("static");
 
-        factory.createFrom(extensionDeclarer, createDescribingContext());
-    }
-
-    @Test(expected = IllegalOperationModelDefinitionException.class)
-    public void operationWithNoReturnType()
-    {
-        extensionDeclarer.withOperation("noReturn").describedAs("");
         factory.createFrom(extensionDeclarer, createDescribingContext());
     }
 
@@ -320,8 +313,8 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
         assertThat(sourceModel.getName(), is(LISTENER));
         assertThat(sourceModel.getDescription(), is(LISTEN_DESCRIPTION));
         assertThat(sourceModel.getSourceFactory().createSource(), is(sameInstance(reference.getSource())));
-        assertThat(getType(sourceModel.getReturnType()), is(equalTo(InputStream.class)));
-        assertThat(getType(sourceModel.getAttributesType()), is(equalTo(Serializable.class)));
+        assertThat(getType(sourceModel.getOutput().getType()), is(equalTo(InputStream.class)));
+        assertThat(getType(sourceModel.getOutputAttributes().getType()), is(equalTo(Serializable.class)));
 
         List<ParameterModel> parameters = sourceModel.getParameterModels();
         assertParameter(parameters.get(0), URL, URL_DESCRIPTION, SUPPORTED, true, toMetadataType(String.class), StringType.class, null);
@@ -342,7 +335,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     {
         OperationModel operationModel = operationModels.get(2);
         assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(CONSUMER).get())));
-        assertDataType(operationModel.getReturnType(), InputStream.class, BinaryType.class);
+        assertDataType(operationModel.getOutput().getType(), InputStream.class, BinaryType.class);
 
         assertThat(operationModel.getName(), equalTo(CONSUMER));
         assertThat(operationModel.getDescription(), equalTo(GO_GET_THEM_TIGER));
@@ -357,7 +350,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     {
         OperationModel operationModel = operationModels.get(1);
         assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(BROADCAST).get())));
-        assertDataType(operationModel.getReturnType(), void.class, NullType.class);
+        assertDataType(operationModel.getOutput().getType(), void.class, NullType.class);
 
         assertThat(operationModel.getName(), equalTo(BROADCAST));
         assertThat(operationModel.getDescription(), equalTo(BROADCAST_DESCRIPTION));
@@ -373,7 +366,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     {
         OperationModel operationModel = operationModels.get(0);
         assertThat(operationModel, is(sameInstance(extensionModel.getOperationModel(ARG_LESS).get())));
-        assertDataType(operationModel.getReturnType(), int.class, NumberType.class);
+        assertDataType(operationModel.getOutput().getType(), int.class, NumberType.class);
 
         assertThat(operationModel.getName(), equalTo(ARG_LESS));
         assertThat(operationModel.getDescription(), equalTo(HAS_NO_ARGS));

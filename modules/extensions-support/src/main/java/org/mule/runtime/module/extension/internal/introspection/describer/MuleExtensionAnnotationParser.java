@@ -14,9 +14,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodArgumentTypes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.ClassUtils;
@@ -329,12 +329,17 @@ public final class MuleExtensionAnnotationParser
         }
     }
 
-    static void parseConnectionAnnotation(Class<?> annotatedFieldClass, HasModelProperties parameter)
+    private static boolean isParameterFieldContainer(Set<Class<? extends Annotation>> annotations, MetadataType parameterType)
+    {
+        return (annotations.contains(ParameterGroup.class) || annotations.contains(MetadataKeyId.class)) && parameterType instanceof ObjectType;
+    }
+
+    static void addConnectionTypeModelProperty(MetadataType annotatedFieldClass, HasModelProperties parameter)
     {
         parameter.withModelProperty(new ConnectionTypeModelProperty(annotatedFieldClass));
     }
 
-    static void parseUseConfigAnnotation(Class<?> annotatedFieldClass, HasModelProperties parameter)
+    static void addConfigTypeModelProperty(MetadataType annotatedFieldClass, HasModelProperties parameter)
     {
         parameter.withModelProperty(new ConfigTypeModelProperty(annotatedFieldClass));
     }

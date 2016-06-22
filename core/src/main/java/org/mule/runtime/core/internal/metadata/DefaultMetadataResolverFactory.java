@@ -7,7 +7,9 @@
 package org.mule.runtime.core.internal.metadata;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.ClassUtils.getClassName;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
@@ -26,12 +28,14 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
 {
 
     private final MetadataOutputResolver metadataOutputResolver;
+    private final MetadataAttributesResolver metadataAttributesResolver;
     private final MetadataContentResolver metadataContentResolver;
     private final MetadataKeysResolver metadataKeysResolver;
 
     public DefaultMetadataResolverFactory(Class<? extends MetadataKeysResolver> keyResolver,
                                           Class<? extends MetadataContentResolver> contentResolver,
-                                          Class<? extends MetadataOutputResolver> outputResolver)
+                                          Class<? extends MetadataOutputResolver> outputResolver,
+                                          Class<? extends MetadataAttributesResolver> attributesResolver)
     {
         checkArgument(keyResolver != null, "MetadataKeyResolver type cannot be null");
         checkArgument(contentResolver != null, "MetadataContentResolver type cannot be null");
@@ -40,6 +44,7 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
         metadataKeysResolver = instanciateResolver(keyResolver);
         metadataContentResolver = instanciateResolver(contentResolver);
         metadataOutputResolver = instanciateResolver(outputResolver);
+        metadataAttributesResolver = instanciateResolver(attributesResolver);
     }
 
     /**
@@ -69,6 +74,15 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
         return metadataOutputResolver;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> MetadataAttributesResolver<T> getOutputAttributesResolver()
+    {
+        return metadataAttributesResolver;
+    }
+
     private <T> T instanciateResolver(Class<?> factoryType)
     {
         try
@@ -77,7 +91,7 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
         }
         catch (Exception e)
         {
-            throw new MuleRuntimeException(createStaticMessage("Could not create MetadataResolver of type " + ClassUtils.getClassName(factoryType)), e);
+            throw new MuleRuntimeException(createStaticMessage("Could not create MetadataResolver of type " + getClassName(factoryType)), e);
         }
     }
 }

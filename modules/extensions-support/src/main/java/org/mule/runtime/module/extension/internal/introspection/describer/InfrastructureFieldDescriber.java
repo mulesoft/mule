@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -27,17 +28,20 @@ import java.lang.reflect.Field;
 public class InfrastructureFieldDescriber implements FieldDescriber
 {
 
+    private final ClassTypeLoader typeLoader;
     private String attributeName;
     private Class<?> clazz;
 
     /**
      * @param clazz         Class of the desired parameter
      * @param attributeName Name of the attribute for the generated xsd schema
+     * @param typeLoader
      */
-    public InfrastructureFieldDescriber(Class<?> clazz, String attributeName)
+    public InfrastructureFieldDescriber(Class<?> clazz, String attributeName, ClassTypeLoader typeLoader)
     {
         this.clazz = clazz;
         this.attributeName = attributeName;
+        this.typeLoader = typeLoader;
     }
 
     /**
@@ -68,7 +72,7 @@ public class InfrastructureFieldDescriber implements FieldDescriber
                                        ? declarer.withOptionalParameter(attributeName)
                                        : declarer.withRequiredParameter(attributeName);
 
-        return descriptor.ofType(clazz)
+        return descriptor.ofType(typeLoader.load(clazz))
                 .withExpressionSupport(ExpressionSupport.NOT_SUPPORTED)
                 .withModelProperty(new DeclaringMemberModelProperty(field))
                 .withModelProperty(new InfrastructureParameterModelProperty());

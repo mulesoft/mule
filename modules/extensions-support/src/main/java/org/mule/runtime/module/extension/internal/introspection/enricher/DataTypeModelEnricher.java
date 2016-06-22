@@ -72,7 +72,7 @@ public final class DataTypeModelEnricher extends AbstractAnnotatedModelEnricher
         ParameterDeclaration parameter = new ParameterDeclaration(name);
         parameter.setRequired(false);
         parameter.setExpressionSupport(SUPPORTED);
-        parameter.setType(typeLoader.load(String.class));
+        parameter.setType(typeLoader.load(String.class), false);
         parameter.setDescription(description);
 
         return parameter;

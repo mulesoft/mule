@@ -184,8 +184,8 @@ final class ExportedArtifactsCollector
 
     private void collectReturnTypes(ComponentModel model)
     {
-        exportedClasses.add(getType(model.getReturnType()));
-        exportedClasses.add(getType(model.getAttributesType()));
+        exportedClasses.add(getType(model.getOutput().getType()));
+        exportedClasses.add(getType(model.getOutputAttributes().getType()));
     }
 
     private Optional<Class<?>> getParameterClass(ParameterModel parameter)

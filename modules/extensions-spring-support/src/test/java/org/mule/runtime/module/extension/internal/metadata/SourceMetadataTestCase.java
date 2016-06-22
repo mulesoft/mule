@@ -74,7 +74,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
     public void getSourceDynamicOutputMetadata() throws Exception
     {
         final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(personKey);
-        assertExpectedOutput(componentMetadata.getOutputMetadata(), personType, String.class);
+        assertExpectedOutput(componentMetadata.getOutputMetadata(), personType, personType);
     }
 
     @Test

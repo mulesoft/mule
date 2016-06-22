@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -38,18 +40,14 @@ public class OperationReturnTypeModelValidator implements ModelValidator
     {
         for (OperationModel operationModel : operations)
         {
-            if (operationModel.getReturnType() == null)
+            if (operationModel.getOutput() == null || operationModel.getOutput().getType() == null)
             {
                 throw missingReturnTypeException(extensionModel, operationModel);
             }
 
-            Class<?> returnType = getType(operationModel.getReturnType());
-            if (returnType == null)
-            {
-                throw missingReturnTypeException(extensionModel, operationModel);
-            }
-
-            if (MuleEvent.class.isAssignableFrom(returnType))
+            MetadataType returnType = operationModel.getOutput().getType();
+            if (returnType.getMetadataFormat().equals(JAVA) &&
+                MuleEvent.class.isAssignableFrom(getType(returnType)))
             {
                 throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are " +
                                                                                  "not allowed to return objects of that type",

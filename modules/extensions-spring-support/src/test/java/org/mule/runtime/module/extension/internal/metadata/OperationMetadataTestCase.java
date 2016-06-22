@@ -287,9 +287,10 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         componentId = new ProcessorId(MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA, FIRST_PROCESSOR_INDEX);
 
         final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
-        assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, String.class);
+        assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, String.class);
 
-        assertThat(metadataDescriptor.getParametersMetadata(), empty());
+        assertThat(metadataDescriptor.getParametersMetadata().size(), is(1));
+        assertExpectedType(metadataDescriptor.getParametersMetadata().get(0), "type", String.class);
     }
 
     @Test

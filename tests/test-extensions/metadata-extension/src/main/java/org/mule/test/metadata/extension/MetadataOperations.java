@@ -126,8 +126,8 @@ public class MetadataOperations extends MetadataOperationsParent
         return null;
     }
 
-    @MetadataScope(outputResolver = TestOutputNullTypeResolver.class)
-    public MuleMessage<Object, String> messageAttributesPersonTypeMetadata()
+    @MetadataScope(outputResolver = TestOutputResolverWithoutKeyResolver.class)
+    public MuleMessage<Object, String> messageAttributesPersonTypeMetadata(@MetadataKeyId String type)
     {
         return null;
     }
@@ -148,7 +148,9 @@ public class MetadataOperations extends MetadataOperationsParent
         return null;
     }
 
-    @MetadataScope(keysResolver = TestOutputAttributesResolverWithKeyResolver.class, outputResolver = TestOutputAttributesResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestOutputAttributesResolverWithKeyResolver.class,
+            outputResolver = TestOutputAttributesResolverWithKeyResolver.class,
+            attributesResolver = TestOutputAttributesResolverWithKeyResolver.class)
     public MuleMessage<Object, AbstractOutputAttributes> outputAttributesWithDynamicMetadata(@MetadataKeyId String type)
     {
         return null;
