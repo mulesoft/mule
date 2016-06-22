@@ -15,13 +15,16 @@ import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
 import org.mule.api.MuleEvent;
 import org.mule.construct.Flow;
 import org.mule.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-
+@RunWith(FlakinessDetectorTestRunner.class)
 public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase
 {
 
@@ -33,6 +36,7 @@ public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderSer
         return "http-request-expect-header-config.xml";
     }
 
+    @FlakyTest
     @Test
     public void handlesContinueResponse() throws Exception
     {
