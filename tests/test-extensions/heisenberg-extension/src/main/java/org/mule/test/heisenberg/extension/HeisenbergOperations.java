@@ -69,6 +69,7 @@ public class HeisenbergOperations
         config.setEndingHealth(HealthStatus.DEAD);
     }
 
+    @DataTypeParameters
     public MuleMessage<String, Integer> getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
     {
         Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();

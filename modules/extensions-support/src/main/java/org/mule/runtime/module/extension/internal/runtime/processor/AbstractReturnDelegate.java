@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.processor;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
-
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -68,15 +67,32 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
     {
         String mimeType = operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class);
         String encoding = operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class);
+        DataType dataType = null;
+        Class<?> type = value != null ? value.getClass() : NullPayload.class;
 
-        if (encoding == null && mimeType == null)
+        if (value instanceof MuleMessage)
         {
-            if (value instanceof MuleMessage)
+            dataType = ((MuleMessage) value).getDataType();
+            type = dataType.getType();
+            if (encoding == null && mimeType == null)
             {
-                return ((MuleMessage) value).getDataType();
+                return dataType;
             }
 
-            return null;
+            if (encoding == null)
+            {
+                encoding = dataType.getEncoding();
+            }
+
+            if (mimeType == null)
+            {
+                mimeType = dataType.getMimeType();
+            }
+        }
+
+        if (dataType != null && encoding == null && mimeType == null)
+        {
+            return dataType;
         }
 
         if (value == null || value instanceof NullPayload)
@@ -84,6 +100,11 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
             return null;
         }
 
-        return DataTypeFactory.create(value.getClass(), mimeType, encoding);
+        if (encoding == null)
+        {
+            encoding = muleContext.getConfiguration().getDefaultEncoding();
+        }
+
+        return DataTypeFactory.create(type, mimeType, encoding);
     }
 }
