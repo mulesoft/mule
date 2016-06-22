@@ -31,11 +31,11 @@
     </flow>
 
     <flow name="setsContentTypeOnXml">
-        <heisenberg:say-my-name outputEncoding="ISO-8859-1" outputMimeType="text/plain"/>
+        <heisenberg:say-my-name outputEncoding="${customEncoding}" outputMimeType="text/plain"/>
     </flow>
 
     <flow name="onlySetEncodingOnXml">
-        <heisenberg:get-enemy index="0" outputEncoding="ISO-8859-1" />
+        <heisenberg:get-enemy index="0" outputEncoding="${customEncoding}" />
     </flow>
 
     <flow name="onlySetMimeTypeOnXml">
