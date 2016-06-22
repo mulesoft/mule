@@ -7,16 +7,18 @@
 
 package org.mule.runtime.core.transformer.types;
 
+import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -52,5 +54,18 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
                 new DefaultMuleMessage("test", null, null, null, muleContext, new SimpleDataType<>(String.class, "text/plain")));
 
         assertThat(dataType, like(String.class, "text/plain", null));
+    }
+
+    @Test
+    public void mimeTypeWithEncodingInformation() throws Exception
+    {
+        final Class<String> type = String.class;
+        final String encoding = "UTF-16";
+        final String mimeType = "application/json";
+
+        DataType dataType = DataTypeFactory.create(type, format("%s; charset=UTF-8", mimeType), encoding);
+        assertThat(dataType.getType(), equalTo(type));
+        assertThat(dataType.getEncoding(), is(encoding));
+        assertThat(dataType.getMimeType(), is(mimeType));
     }
 }

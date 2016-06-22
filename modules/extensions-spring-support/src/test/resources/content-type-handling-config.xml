@@ -34,8 +34,20 @@
         <heisenberg:say-my-name outputEncoding="ISO-8859-1" outputMimeType="text/plain"/>
     </flow>
 
+    <flow name="onlySetEncodingOnXml">
+        <heisenberg:get-enemy index="0" outputEncoding="ISO-8859-1" />
+    </flow>
+
+    <flow name="onlySetMimeTypeOnXml">
+        <heisenberg:say-my-name outputMimeType="dead/dead"/>
+    </flow>
+
     <flow name="setsContentTypeProgrammatically">
         <heisenberg:get-enemy index="0"/>
+    </flow>
+
+    <flow name="setEncodingInMimeTypeAndParam">
+        <heisenberg:say-my-name outputMimeType="application/json; charset=UTF-8" outputEncoding="UTF-16"/>
     </flow>
 
 </mule>
