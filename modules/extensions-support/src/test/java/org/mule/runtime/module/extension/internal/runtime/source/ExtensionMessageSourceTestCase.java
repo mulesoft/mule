@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -29,7 +31,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
@@ -67,6 +68,7 @@ import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapte
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
@@ -249,11 +251,11 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
     @Test
     public void failWithNonConnectionExceptionWhenStartingAndGetRetryPolicyExhausted() throws Exception
     {
-        doThrow(new RuntimeException()).when(source).start();
+        doThrow(new IOException(ERROR_MESSAGE)).when(source).start();
 
         final Throwable throwable = catchThrowable(messageSource::start);
         assertThat(throwable, is(instanceOf(MuleRuntimeException.class)));
-        assertThat(throwable.getCause(), is(instanceOf(RuntimeException.class)));
+        assertThat(getThrowables(throwable), hasItemInArray(instanceOf(IOException.class)));
         verify(source, times(1)).start();
     }
 

@@ -98,10 +98,23 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
         {
             return executionMediator.execute(operationExecutor, operationContext);
         }
+        catch (MessagingException e)
+        {
+            if (e.getEvent() == null)
+            {
+                throw wrapInMessagingException(event, e);
+            }
+            throw e;
+        }
         catch (Throwable e)
         {
-            throw new MessagingException(createStaticMessage(e.getMessage()), event, e, this);
+            throw wrapInMessagingException(event, e);
         }
+    }
+
+    private MessagingException wrapInMessagingException(MuleEvent event, Throwable e)
+    {
+        return new MessagingException(createStaticMessage(e.getMessage()), event, e, this);
     }
 
     private OperationContextAdapter createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event) throws MuleException

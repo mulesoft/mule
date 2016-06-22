@@ -10,6 +10,7 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -35,7 +36,6 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.execution.NullCompletionHandler;
-import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
@@ -124,7 +124,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     public Void onException(Throwable exception)
     {
         exception = exceptionEnricherManager.processException(exception);
-        Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(exception);
+        Optional<ConnectionException> connectionException = extractConnectionException(exception);
         if (connectionException.isPresent())
         {
             try
@@ -289,7 +289,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
                 stopSource();
                 disposeSource();
                 Exception exception = exceptionEnricherManager.processException(e);
-                Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(exception);
+                Optional<ConnectionException> connectionException = extractConnectionException(exception);
                 if (connectionException.isPresent())
                 {
                     throw exception;

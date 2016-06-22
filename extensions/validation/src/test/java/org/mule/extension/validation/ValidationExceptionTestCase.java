@@ -7,25 +7,23 @@
 package org.mule.extension.validation;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
-
-import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
+import org.mule.runtime.core.api.MuleEvent;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class ValidationExceptionTestCase extends ValidationTestCase
 {
 
-    private static final Exception CUSTOM_EXCEPTION = new ValidationException(error("failed"), mock(MuleEvent.class));
+    private static final String MESSAGE_FAILED = "failed";
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     protected String getConfigFile()
@@ -54,24 +52,22 @@ public class ValidationExceptionTestCase extends ValidationTestCase
     @Test
     public void customMessage() throws Exception
     {
-        MessagingException e = flowRunner("customMessage").runExpectingException();
-        Throwable cause = ExceptionUtils.getRootCause(e);
-        assertThat(cause.getMessage(), is("Hello World!"));
+        expectedException.expectMessage("Hello World!");
+        flowRunner("customMessage").run();
     }
 
     @Test
     public void customExceptionType() throws Exception
     {
-        MessagingException e = flowRunner("customExceptionType").runExpectingException();
-        Throwable cause = ExceptionUtils.getRootCause(e);
-        assertThat(cause, is(instanceOf(IllegalArgumentException.class)));
+        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        flowRunner("customExceptionType").run();
     }
 
     private void assertCustomExceptionFactory(String flowName) throws Exception
     {
-        MessagingException e = flowRunner(flowName).runExpectingException();
-        Throwable cause = ExceptionUtils.getRootCause(e);
-        assertThat(CUSTOM_EXCEPTION, is(sameInstance(cause)));
+        expectedException.expect(instanceOf(ValidationException.class));
+        expectedException.expectMessage(MESSAGE_FAILED);
+        flowRunner(flowName).run();
     }
 
     public static class TestExceptionFactory implements ExceptionFactory
@@ -80,13 +76,13 @@ public class ValidationExceptionTestCase extends ValidationTestCase
         @Override
         public <T extends Exception> T createException(ValidationResult result, Class<T> exceptionClass, MuleEvent event)
         {
-            return (T) CUSTOM_EXCEPTION;
+            return (T) new ValidationException(error(MESSAGE_FAILED), event);
         }
 
         @Override
         public Exception createException(ValidationResult result, String exceptionClassName, MuleEvent event)
         {
-            return CUSTOM_EXCEPTION;
+            return new ValidationException(error(MESSAGE_FAILED), event);
         }
     }
 }

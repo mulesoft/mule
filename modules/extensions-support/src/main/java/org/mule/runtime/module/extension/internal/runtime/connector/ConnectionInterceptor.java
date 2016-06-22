@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connector;
 
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
+import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -18,7 +18,6 @@ import org.mule.runtime.extension.api.runtime.OperationContext;
 import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.Optional;
 
@@ -79,12 +78,11 @@ public final class ConnectionInterceptor implements Interceptor
     @Override
     public Throwable onError(OperationContext operationContext, RetryRequest retryRequest, Throwable exception)
     {
-        Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(exception);
+        Optional<ConnectionException> connectionException = extractConnectionException(exception);
         if (connectionException.isPresent())
         {
             retryRequest.request();
         }
-
         return exception;
     }
 

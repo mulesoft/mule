@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,7 +64,6 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase
         assertThat(res.getMessageAsString(), is(TEST_PAYLOAD));
     }
 
-    @Ignore("MULE-9815")
     @Test
     public void secureRequest() throws Exception
     {

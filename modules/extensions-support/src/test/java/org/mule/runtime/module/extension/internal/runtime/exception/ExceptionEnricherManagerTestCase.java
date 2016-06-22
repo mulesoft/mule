@@ -14,13 +14,15 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
-import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
+import java.io.IOException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -71,7 +73,7 @@ public class ExceptionEnricherManagerTestCase
     }
 
     @Test
-    public void process()
+    public void processAndEnrich()
     {
         ConnectionException connectionException = new ConnectionException("Connection Error");
         Exception exception = manager.processException(connectionException);
@@ -81,7 +83,7 @@ public class ExceptionEnricherManagerTestCase
     }
 
     @Test
-    public void handle()
+    public void handleConnectionException()
     {
         Throwable e = new Throwable(new RuntimeException(new ExecutionException(new ConnectionException(ERROR_MESSAGE, new Exception()))));
         Exception resultException = manager.handleException(e);
@@ -90,13 +92,20 @@ public class ExceptionEnricherManagerTestCase
     }
 
     @Test
+    public void handleInvocationTargetExceptionCause()
+    {
+        Throwable e = new Throwable(new RuntimeException(new UndeclaredThrowableException(new IOException(ERROR_MESSAGE, new Exception()))));
+        Exception resultException = manager.handleException(e);
+        assertThat(resultException, is(instanceOf(IOException.class)));
+        assertThat(resultException.getMessage(), is(ERROR_MESSAGE));
+    }
+
+    @Test
     public void findCorrectEnricher()
     {
         assertThat(manager.getExceptionEnricher(), is(sourceEnricher));
-
         when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
         ExceptionEnricherManager manager = new ExceptionEnricherManager(extensionModel, sourceModel);
         assertThat(manager.getExceptionEnricher(), is(extensionEnricher));
     }
-
 }

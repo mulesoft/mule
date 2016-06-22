@@ -17,6 +17,7 @@ import static org.mule.runtime.module.extension.file.api.FileWriteMode.APPEND;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.CREATE_NEW;
 import static org.mule.runtime.module.extension.file.api.FileWriteMode.OVERWRITE;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 
@@ -71,7 +72,7 @@ public class FileWriteTestCase extends FileConnectorTestCase
     @Test
     public void createNewOnExistingFile() throws Exception
     {
-        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        expectedException.expectCause(instanceOf(MuleRuntimeException.class));
         doWriteOnExistingFile(CREATE_NEW);
     }
 

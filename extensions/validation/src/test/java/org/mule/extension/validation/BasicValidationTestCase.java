@@ -13,15 +13,13 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import static org.mule.extension.validation.internal.ValidationExtension.DEFAULT_LOCALE;
-
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.core.api.MuleEvent;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -199,10 +197,8 @@ public class BasicValidationTestCase extends ValidationTestCase
         FlowRunner runner = flowRunner("all");
         cofigureGetAllRunner(runner, INVALID_EMAIL, INVALID_URL);
         Exception e = runner.runExpectingException();
-
-        Throwable root = ExceptionUtils.getRootCause(e);
-        assertThat(root, is(instanceOf(MultipleValidationException.class)));
-        MultipleValidationResult result = ((MultipleValidationException) root).getMultipleValidationResult();
+        assertThat(e, is(instanceOf(MultipleValidationException.class)));
+        MultipleValidationResult result = ((MultipleValidationException) e).getMultipleValidationResult();
         assertThat(result.getFailedValidationResults(), hasSize(2));
         assertThat(result.isError(), is(true));
 
@@ -223,10 +219,8 @@ public class BasicValidationTestCase extends ValidationTestCase
         FlowRunner runner = flowRunner("all");
         cofigureGetAllRunner(runner, INVALID_EMAIL, VALID_URL);
         Exception e = runner.runExpectingException();
-
-        Throwable root = ExceptionUtils.getRootCause(e);
-        assertThat(root, is(instanceOf(MultipleValidationException.class)));
-        MultipleValidationResult result = ((MultipleValidationException) root).getMultipleValidationResult();
+        assertThat(e, is(instanceOf(MultipleValidationException.class)));
+        MultipleValidationResult result = ((MultipleValidationException) e).getMultipleValidationResult();
         assertThat(result.getFailedValidationResults(), hasSize(1));
         assertThat(result.isError(), is(true));
         assertThat(result.getMessage(), is(messages.invalidEmail(INVALID_EMAIL).getMessage()));
@@ -263,9 +257,7 @@ public class BasicValidationTestCase extends ValidationTestCase
     private void assertCustomValidator(String flowName,String customMessage, String expectedMessage) throws Exception
     {
         Exception e = flowRunner(flowName).withPayload("").withFlowVariable("customMessage", customMessage).runExpectingException();
-
-        Throwable cause = ExceptionUtils.getRootCause(e);
-        assertThat(cause.getMessage(), is(expectedMessage));
+        assertThat(e.getMessage(), is(expectedMessage));
     }
 
     private void cofigureGetAllRunner(FlowRunner runner, String email, String url)

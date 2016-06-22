@@ -66,7 +66,6 @@ public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase
         assertFailure(201, "failure");
     }
 
-
     private void assertSuccess(int statusCode, String flowName) throws Exception
     {
         flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable("code", statusCode).run();
@@ -79,7 +78,6 @@ public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase
         MuleMessage response = e.getEvent().getMessage();
         assertThat(response.getExceptionPayload().getException().getCause(), instanceOf(ResponseValidatorException.class));
     }
-
 
     @Override
     protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException

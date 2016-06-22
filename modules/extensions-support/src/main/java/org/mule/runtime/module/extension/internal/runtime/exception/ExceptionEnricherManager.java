@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
+import static org.mule.runtime.core.util.ExceptionUtils.extractCauseOfType;
+import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnrichableModel;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricher;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
-import org.mule.runtime.core.util.ExceptionUtils;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Optional;
 
 /**
@@ -38,35 +40,31 @@ public final class ExceptionEnricherManager
 
     public Exception processException(Throwable t)
     {
-        Exception root = handleException(t);
-        Exception exception = exceptionEnricher.enrichException(root);
-        return exception != null ? exception : root;
+        Exception handledException = handleException(t);
+        Exception exception = exceptionEnricher.enrichException(handledException);
+        return exception != null ? exception : handledException;
     }
 
     public Exception handleException(Throwable e)
     {
-        Throwable root;
-        Optional<ConnectionException> connectionException = ExceptionUtils.extractRootConnectionException(e);
+        Throwable handled;
+        Optional<ConnectionException> connectionException = extractConnectionException(e);
         if (connectionException.isPresent())
         {
-            root = connectionException.get();
+            handled = connectionException.get();
         }
         else
         {
-            root = ExceptionUtils.getRootCause(e);
-            if (root == null)
-            {
-                root = e;
-            }
+            // unwraps the exception thrown by the reflective operation if exist any.
+            handled = extractCauseOfType(e, UndeclaredThrowableException.class).orElse(e);
         }
-        return wrapInException(root);
+        return wrapInException(handled);
     }
 
     private Exception wrapInException(Throwable t)
     {
         return t instanceof Exception ? (Exception) t : new Exception(t);
     }
-
 
     private ExceptionEnricher findExceptionEnricher(RuntimeExtensionModel extension, ExceptionEnrichableModel child)
     {
@@ -78,10 +76,8 @@ public final class ExceptionEnricherManager
         return exceptionEnricherFactory.isPresent() ? exceptionEnricherFactory.get().createEnricher() : new NullExceptionEnricher();
     }
 
-
-    public ExceptionEnricher getExceptionEnricher()
+    ExceptionEnricher getExceptionEnricher()
     {
         return exceptionEnricher;
     }
-
 }
