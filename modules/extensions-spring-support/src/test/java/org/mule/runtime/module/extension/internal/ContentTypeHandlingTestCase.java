@@ -16,15 +16,17 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import java.nio.charset.Charset;
 
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase
 {
 
     private static final String MIME_TYPE = "text/plain";
+    private static final String CUSTOM_ENCODING_PROPERTY = "customEncoding";
 
-    private String customEncoding;
+    private static String customEncoding;
 
     @Override
     protected String getConfigFile()
@@ -38,10 +40,18 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase
         return new Class<?>[] {HeisenbergExtension.class};
     }
 
-    @Before
-    public void before()
+    @BeforeClass
+    public static void before() throws Exception
     {
         customEncoding = Charset.defaultCharset().name().equals("UTF-8") ? "ISO-8859-1" : "UTF-8";
+        System.setProperty(CUSTOM_ENCODING_PROPERTY, customEncoding);
+    }
+
+
+    @AfterClass
+    public static void after()
+    {
+        System.clearProperty(CUSTOM_ENCODING_PROPERTY);
     }
 
     @Test
