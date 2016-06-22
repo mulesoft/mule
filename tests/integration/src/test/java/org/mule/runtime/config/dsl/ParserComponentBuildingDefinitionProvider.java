@@ -174,6 +174,20 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                 .withTypeDefinition(fromMapEntryType(Long.class, SimpleCollectionObject.class))
                                 .build());
 
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("global-element-with-object-factory")
+                                .withTypeDefinition(fromType(LifecycleSensingMessageProcessor.class))
+                                .withObjectFactoryType(LifecycleSensingObjectFactory.class)
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("inner-element-with-object-factory")
+                                .withTypeDefinition(fromType(LifecycleSensingMessageProcessor.class))
+                                .withObjectFactoryType(LifecycleSensingObjectFactory.class)
+                                .build());
+
         return definitions;
     }
 

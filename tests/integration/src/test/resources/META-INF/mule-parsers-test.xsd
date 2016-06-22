@@ -22,6 +22,24 @@
     <xsd:element name="container" type="containerType"/>
     <xsd:element name="parameter-collection-parser" type="simpleParameterCollectionParser" substitutionGroup="mule:abstract-extension"/>
 
+    <xsd:element name="global-element-with-object-factory" substitutionGroup="mule:abstract-extension">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractExtensionType">
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="inner-element-with-object-factory" substitutionGroup="mule:abstract-message-processor">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractMessageProcessorType"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:complexType name="simpleParameterCollectionParser">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
