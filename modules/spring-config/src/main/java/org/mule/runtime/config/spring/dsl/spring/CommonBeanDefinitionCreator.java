@@ -105,7 +105,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
         BeanDefinitionBuilder beanDefinitionBuilder;
         if (buildingDefinition.getObjectFactoryType() != null)
         {
-            beanDefinitionBuilder = createBeanDefinitionBuilderFromObjectFactory(buildingDefinition);
+            beanDefinitionBuilder = createBeanDefinitionBuilderFromObjectFactory(componentModel, buildingDefinition);
         }
         else
         {
@@ -163,13 +163,15 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
         return objectTypeVisitor.getType();
     }
 
-    private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final ComponentBuildingDefinition componentBuildingDefinition)
+    private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final ComponentModel componentModel, final ComponentBuildingDefinition componentBuildingDefinition)
     {
         /*
            We need this to allow spring create the object using a FactoryBean but using the object factory setters and getters so
            we create as FactoryBean a dynamic class that will have the same attributes and methods as the ObjectFactory that the user
            defined. This way our API does not expose spring specific classes.
          */
+        ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+        componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
         BeanDefinitionBuilder beanDefinitionBuilder;
         Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
         Enhancer enhancer = new Enhancer();
@@ -189,7 +191,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator
                         }
                         if (method.getName().equals("getObjectType"))
                         {
-                            return null;
+                            return objectTypeVisitor.getType();
                         }
                         return proxy.invokeSuper(obj, args);
                     }
