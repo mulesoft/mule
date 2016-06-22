@@ -6,8 +6,10 @@
  */
 package org.mule.test.config;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.ThreadSafeAccess;
@@ -63,6 +65,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         config.setDomainId("MY_DOMAIN");
         config.setCacheMessageAsBytes(false);
         config.setEnableStreaming(false);
+        config.setMaxQueueTransactionFilesSize(500);
         ThreadSafeAccess.AccessControl.setAssertMessageAccess(false);
         config.setAutoWrapMessageAwareTransform(false);
         
@@ -102,7 +105,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable", "false");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.assertAccess", "false");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap", "false");
-        
+
         muleContext = new DefaultMuleContextFactory().createMuleContext();
         muleContext.start();
 
@@ -200,6 +203,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase
         assertFalse(config.isEnableStreaming());
         assertFalse(ThreadSafeAccess.AccessControl.isAssertMessageAccess());
         assertFalse(config.isAutoWrapMessageAwareTransform());
+        assertThat(config.getMaxQueueTransactionFilesSizeInMegabytes(), is(500));
     }
 }
 

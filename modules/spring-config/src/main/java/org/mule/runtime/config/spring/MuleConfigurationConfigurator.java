@@ -75,7 +75,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
             defaultConfig.setExtensions(config.getExtensions());
-
+            defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
             determineDefaultProcessingStrategy(defaultConfig);
             validateDefaultExceptionStrategy();
             applyDefaultIfNoObjectSerializerSet(defaultConfig);
@@ -188,6 +188,11 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     public void setDefaultProcessingStrategy(ProcessingStrategy processingStrategy)
     {
         config.setDefaultProcessingStrategy(processingStrategy);
+    }
+
+    public void setMaxQueueTransactionFilesSize(int queueTransactionFilesSizeInMegabytes)
+    {
+        config.setMaxQueueTransactionFilesSize(queueTransactionFilesSizeInMegabytes);
     }
 
     public void setExtensions(List<Object> extensions)

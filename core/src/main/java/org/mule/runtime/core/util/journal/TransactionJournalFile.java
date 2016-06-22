@@ -47,6 +47,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
 
     private final File journalFile;
     private final JournalEntrySerializer<T, K> journalEntrySerializer;
+    private final Long clearFileMinimumSizeInBytes;
 
     private Multimap<T, K> entries = LinkedHashMultimap.create();
 
@@ -55,12 +56,13 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
 
     /**
      * @param journalFile journal file to use. Will be created if it doesn't exists. If exists then transaction entries will get loaded from it.
-     * @param journalEntrySerializer serializer for {@link org.mule.runtime.core.util.journal.JournalEntry}
+     * @param journalEntrySerializer serializer for {@link JournalEntry}
      */
-    public TransactionJournalFile(File journalFile, JournalEntrySerializer journalEntrySerializer)
+    public TransactionJournalFile(File journalFile, JournalEntrySerializer journalEntrySerializer, Long clearFileMinimumSizeInBytes)
     {
         this.journalFile = journalFile;
         this.journalEntrySerializer = journalEntrySerializer;
+        this.clearFileMinimumSizeInBytes = clearFileMinimumSizeInBytes;
         if (journalFile.exists())
         {
             loadAllEntries();
@@ -95,6 +97,15 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
         }
         if (this.entries.isEmpty())
         {
+            if (clearFileMinimumSizeInBytes != null)
+            {
+                if (fileLength() > clearFileMinimumSizeInBytes)
+                {
+                    clear();
+                    journalOperations = 0;
+                }
+            }
+            else
             if (journalOperations > MINIMUM_ENTRIES_TO_CLEAR_FILE)
             {
                 clear();
@@ -263,5 +274,12 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
         return this.entries.containsKey(txId);
     }
 
+    /**
+     * @return the file length in bytes
+     */
+    public long fileLength()
+    {
+        return journalFile.length();
+    }
 }
 

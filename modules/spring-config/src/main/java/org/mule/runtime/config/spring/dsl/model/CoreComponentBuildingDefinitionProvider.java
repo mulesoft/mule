@@ -478,6 +478,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition("defaultExceptionStrategyName", fromSimpleParameter("defaultExceptionStrategy-ref").build())
                                                  .withSetterParameterDefinition("defaultProcessingStrategy", fromSimpleReferenceParameter("defaultProcessingStrategy").build())
                                                  .withSetterParameterDefinition("defaultResponseTimeout", fromSimpleParameter("defaultResponseTimeout").build())
+                                                 .withSetterParameterDefinition("maxQueueTransactionFilesSize", fromSimpleParameter("maxQueueTransactionFilesSize").build())
                                                  .withSetterParameterDefinition("defaultTransactionTimeout", fromSimpleParameter("defaultTransactionTimeout").build())
                                                  .withSetterParameterDefinition("shutdownTimeout", fromSimpleParameter("shutdownTimeout").build())
                                                  .withSetterParameterDefinition("defaultTransactionTimeout", fromSimpleParameter("defaultTransactionTimeout").build())
