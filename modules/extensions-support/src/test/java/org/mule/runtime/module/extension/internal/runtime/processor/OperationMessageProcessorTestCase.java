@@ -172,7 +172,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         configureMockEvent(event);
 
         when(operationModel.getName()).thenReturn(getClass().getName());
-        when(operationModel.getOutputPayload()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(String.class), false, emptySet()));
+        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(String.class), false, emptySet()));
         when(operationModel.getExecutor()).thenReturn(operationExecutorFactory);
         when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(Optional.of(new MetadataKeyIdModelProperty(ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(String.class))));
         when(operationExecutorFactory.createExecutor()).thenReturn(operationExecutor);
@@ -202,7 +202,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         when(outputMock.getType()).thenReturn(stringType);
         when(outputMock.hasDynamicType()).thenReturn(true);
-        when(operationModel.getOutputPayload()).thenReturn(outputMock);
+        when(operationModel.getOutput()).thenReturn(outputMock);
         when(operationModel.getOutputAttributes()).thenReturn(outputMock);
 
         when(operationExecutorFactory.createExecutor()).thenReturn(operationExecutor);
@@ -410,7 +410,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     @Test
     public void operationIsVoid() throws Exception
     {
-        when(operationModel.getOutputPayload()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(void.class), false, emptySet()));
+        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(void.class), false, emptySet()));
         messageProcessor = createOperationMessageProcessor();
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(null);

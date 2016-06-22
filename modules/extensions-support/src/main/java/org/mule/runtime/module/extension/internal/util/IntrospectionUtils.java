@@ -306,8 +306,6 @@ public final class IntrospectionUtils
         return stream(types).map(ResolvableType::getRawClass).collect(toList());
     }
 
-
-    //public static <T> List<T> getSuperClassGenerics(Class<?> type, Class<?> superClass)
     public static List<Type> getSuperClassGenerics(Class<?> type, Class<?> superClass)
     {
         Class<?> searchClass = type;
@@ -372,7 +370,7 @@ public final class IntrospectionUtils
 
     public static boolean isVoid(ComponentModel componentModel)
     {
-        return componentModel.getOutputPayload().getType() instanceof NullType;
+        return componentModel.getOutput().getType() instanceof NullType;
     }
 
     private static boolean isVoid(Class<?> type)

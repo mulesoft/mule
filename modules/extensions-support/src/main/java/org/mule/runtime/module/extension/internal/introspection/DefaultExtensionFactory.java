@@ -18,7 +18,6 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import org.mule.common.MuleVersion;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -234,8 +233,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                     new ImmutableRuntimeSourceModel(declaration.getName(),
                                                     declaration.getDescription(),
                                                     toParameters(declaration.getParameters()),
-                                                    toOutputModel(declaration.getOutputPayload(), create(JAVA).nullType().build()),
-                                                    toOutputModel(declaration.getOutputAttributes(), create(JAVA).nullType().build()),
+                                                    toOutputModel(declaration.getOutputPayload()),
+                                                    toOutputModel(declaration.getOutputAttributes()),
                                                     declaration.getSourceFactory(),
                                                     declaration.getModelProperties(),
                                                     declaration.getInterceptorFactories(),
@@ -261,8 +260,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                           declaration.getDescription(),
                                                           executorFactory,
                                                           parameterModels,
-                                                          toOutputModel(declaration.getOutputPayload(), create(JAVA).nullType().build()),
-                                                          toOutputModel(declaration.getOutputAttributes(), create(JAVA).nullType().build()),
+                                                          toOutputModel(declaration.getOutputPayload()),
+                                                          toOutputModel(declaration.getOutputAttributes()),
                                                           declaration.getModelProperties(),
                                                           declaration.getInterceptorFactories(),
                                                           declaration.getExceptionEnricherFactory(),
@@ -275,12 +274,12 @@ public final class DefaultExtensionFactory implements ExtensionFactory
             return declarations.stream().map(this::toConnectionProvider).collect(new ImmutableListCollector<>());
         }
 
-        private OutputModel toOutputModel(OutputDeclaration declaration, MetadataType defaultType)
+        private OutputModel toOutputModel(OutputDeclaration declaration)
         {
             return declaration != null ? new ImmutableOutputModel(declaration.getDescription(),
                                                                   declaration.getType(), declaration.hasDynamicType(),
                                                                   declaration.getModelProperties())
-                                       : new ImmutableOutputModel(EMPTY, defaultType, false, emptySet());
+                                       : new ImmutableOutputModel(EMPTY, create(JAVA).nullType().build(), false, emptySet());
         }
 
         private RuntimeConnectionProviderModel toConnectionProvider(ConnectionProviderDeclaration declaration)

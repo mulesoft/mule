@@ -277,7 +277,7 @@ public class MetadataMediator
     private OutputMetadataDescriptor getOutputMetadataDescriptor()
     {
         return MetadataDescriptorBuilder.outputDescriptor()
-                .withReturnType(subTypesUnion(componentModel.getOutputPayload().getType(), subTypesMappingContainer, extensionClassLoader))
+                .withReturnType(subTypesUnion(componentModel.getOutput().getType(), subTypesMappingContainer, extensionClassLoader))
                 .withAttributesType(subTypesUnion(componentModel.getOutputAttributes().getType(), subTypesMappingContainer, extensionClassLoader))
                 .build();
     }
@@ -334,7 +334,7 @@ public class MetadataMediator
      */
     private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final MetadataKey key)
     {
-        OutputModel output = componentModel.getOutputPayload();
+        OutputModel output = componentModel.getOutput();
         if (isVoid(output.getType()) || !output.hasDynamicType())
         {
             return success(subTypesUnion(output.getType(), subTypesMappingContainer, extensionClassLoader));

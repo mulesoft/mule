@@ -42,7 +42,7 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
     public void before()
     {
         when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
-        when(operationModel.getOutputPayload()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(String.class), false, emptySet()));
+        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(String.class), false, emptySet()));
         when(operationModel.getName()).thenReturn("operation");
     }
 
@@ -55,7 +55,7 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
     @Test(expected = IllegalOperationModelDefinitionException.class)
     public void muleEventReturnType()
     {
-        when(operationModel.getOutputPayload()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(MuleEvent.class), false, emptySet()));
+        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(MuleEvent.class), false, emptySet()));
         validator.validate(extensionModel);
     }
 }

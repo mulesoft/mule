@@ -40,12 +40,12 @@ public class OperationReturnTypeModelValidator implements ModelValidator
     {
         for (OperationModel operationModel : operations)
         {
-            if (operationModel.getOutputPayload() == null || operationModel.getOutputPayload().getType() == null)
+            if (operationModel.getOutput() == null || operationModel.getOutput().getType() == null)
             {
                 throw missingReturnTypeException(extensionModel, operationModel);
             }
 
-            MetadataType returnType = operationModel.getOutputPayload().getType();
+            MetadataType returnType = operationModel.getOutput().getType();
             if (returnType.getMetadataFormat().equals(JAVA) &&
                 MuleEvent.class.isAssignableFrom(getType(returnType)))
             {

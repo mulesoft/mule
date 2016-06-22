@@ -81,7 +81,7 @@ public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclaratio
     public void listenerSource()
     {
         SourceModel source = extensionModel.getConfigurationModel(LISTENER_CONFIG_NAME).get().getSourceModel(LISTEN_MESSAGE_SOURCE).get();
-        assertDataType(source.getOutputPayload().getType(), InputStream.class, BinaryType.class);
+        assertDataType(source.getOutput().getType(), InputStream.class, BinaryType.class);
         assertDataType(source.getOutputAttributes().getType(), Serializable.class, ObjectType.class);
         assertThat(source.getParameterModels(), hasSize(1));
 
@@ -106,7 +106,7 @@ public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclaratio
     {
         OperationModel operation = extensionModel.getConfigurationModel(REQUESTER_CONFIG_NAME).get().getOperationModel(REQUEST_OPERATION_NAME).get();
         assertThat(operation.getName(), is(REQUEST_OPERATION_NAME));
-        assertDataType(operation.getOutputPayload().getType(), InputStream.class, BinaryType.class);
+        assertDataType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
         assertThat(operation.getParameterModels(), hasSize(1));
 
         ParameterModel parameter = operation.getParameterModels().get(0);
@@ -119,7 +119,7 @@ public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclaratio
     {
         OperationModel operation = extensionModel.getOperationModel(STATIC_RESOURCE_OPERATION_NAME).get();
         assertThat(operation.getName(), is(STATIC_RESOURCE_OPERATION_NAME));
-        assertDataType(operation.getOutputPayload().getType(), InputStream.class, BinaryType.class);
+        assertDataType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
         assertThat(operation.getParameterModels(), hasSize(1));
 
         ParameterModel parameter = operation.getParameterModels().get(0);
