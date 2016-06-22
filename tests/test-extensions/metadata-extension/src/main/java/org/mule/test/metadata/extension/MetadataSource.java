@@ -20,7 +20,8 @@ import java.util.Map;
 
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
         contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-        outputResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class)
+        outputResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class,
+        attributesResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class)
 public class MetadataSource extends Source<Map<String, Object>, String>
 {
 

@@ -15,6 +15,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
@@ -52,10 +53,16 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
     private MetadataComponentModelValidator validator = new MetadataComponentModelValidator();
 
-    public static class SimpleOutputResolver implements MetadataOutputResolver<String>
+    public static class SimpleOutputResolver implements MetadataOutputResolver<String>, MetadataAttributesResolver<String>
     {
         @Override
         public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
+        {
+            return null;
+        }
+
+        @Override
+        public MetadataType getAttributesMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
         {
             return null;
         }
@@ -122,7 +129,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     {
         when(sourceModel.getOutputPayload()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
         when(sourceModel.getMetadataResolverFactory())
-                .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, NullMetadataResolver.class, SimpleOutputResolver.class));
+                .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, NullMetadataResolver.class, SimpleOutputResolver.class, SimpleOutputResolver.class));
         validator.validate(extensionModel);
     }
 }

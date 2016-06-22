@@ -41,7 +41,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolverWithAttributes;
+import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
@@ -107,6 +107,7 @@ import org.mule.runtime.module.extension.internal.exception.IllegalOperationMode
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
+import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
@@ -367,7 +368,7 @@ public final class AnnotationsBasedDescriber implements Describer
                                                              sourceType.getName(), sourceGenerics.size()));
         }
 
-        Optional<MetadataScope> metadataScope = getMetadataScope(sourceType);
+        MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(getMetadataScope(sourceType));
         MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
 
         source.sourceCreatedBy(new DefaultSourceFactory(sourceType))
@@ -377,7 +378,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
         declareOutputType(source, metadataScope, typeLoader.load(sourceGenerics.get(0)));
         declareOutputAttributesType(source, metadataScope, typeLoader.load(sourceGenerics.get(1)));
-        if (metadataScope.isPresent())
+        if (metadataScope.isCustomScope())
         {
             declareMetadataKeyId(sourceType, source);
         }
@@ -581,7 +582,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
         for (Method operationMethod : getOperationMethods(actingClass))
         {
-            Optional<MetadataScope> metadataScope = getMetadataScope(operationMethod);
+            MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(getMetadataScope(operationMethod));
             MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
 
             final OperationDeclarer operation = declarer.withOperation(operationMethod.getName())
@@ -592,7 +593,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
             declareOutputType(operation, metadataScope, getMethodReturnType(operationMethod, typeLoader));
             declareOutputAttributesType(operation, metadataScope, getMethodReturnAttributesType(operationMethod, typeLoader));
-            if (metadataScope.isPresent())
+            if (metadataScope.isCustomScope())
             {
                 declareOperationMetadataKeyId(operationMethod, operation);
             }
@@ -612,12 +613,11 @@ public final class AnnotationsBasedDescriber implements Describer
                 .ifPresent(p -> operation.withModelProperty(new MetadataKeyIdModelProperty(typeLoader.load(p.getType()))));
     }
 
-    private MetadataResolverFactory getMetadataResolverFactory(Optional<MetadataScope> scope)
+    private MetadataResolverFactory getMetadataResolverFactory(MetadataScopeAdapter scope)
     {
-        return scope.isPresent() ? new DefaultMetadataResolverFactory(scope.get().keysResolver(),
-                                                                      scope.get().contentResolver(),
-                                                                      scope.get().outputResolver())
-                                 : new NullMetadataResolverFactory();
+        return scope.isCustomScope() ? new DefaultMetadataResolverFactory(scope.getKeysResolver(), scope.getContentResolver(),
+                                                                          scope.getOutputResolver(), scope.getAttributesResolver())
+                                     : new NullMetadataResolverFactory();
 
     }
 
@@ -638,20 +638,20 @@ public final class AnnotationsBasedDescriber implements Describer
      * operation class containing the method is annotated or not. And lastly, if no annotation
      * was found so far, checks if the extension class is annotated.
      */
-    private Optional<MetadataScope> getMetadataScope(Method method)
+    private MetadataScope getMetadataScope(Method method)
     {
         MetadataScope scope = method.getAnnotation(MetadataScope.class);
-        return scope != null ? Optional.of(scope) : getMetadataScope(method.getDeclaringClass());
+        return scope != null ? scope : getMetadataScope(method.getDeclaringClass());
     }
 
     /**
      * Checks if the {@link ComponentModel Component's} type is annotated with {@link MetadataScope},
      * if it doesn't then looks if the {@link ExtensionModel Extension's} type is annotated.
      */
-    private Optional<MetadataScope> getMetadataScope(Class<?> componentClass)
+    private MetadataScope getMetadataScope(Class<?> componentClass)
     {
         MetadataScope scope = getAnnotation(componentClass, MetadataScope.class);
-        return Optional.ofNullable(scope != null ? scope : getAnnotation(extensionType, MetadataScope.class));
+        return scope != null ? scope : getAnnotation(extensionType, MetadataScope.class);
     }
 
     private <T> void declareConnectionProvider(HasConnectionProviderDeclarer declarer, Class<T> providerClass)
@@ -717,7 +717,7 @@ public final class AnnotationsBasedDescriber implements Describer
         return extensionType.getAnnotation(Extensible.class) != null;
     }
 
-    private void declareOperationParameters(Method method, OperationDeclarer operation, Optional<MetadataScope> metadataScope)
+    private void declareOperationParameters(Method method, OperationDeclarer operation, MetadataScopeAdapter metadataScope)
     {
         List<ParsedParameter> descriptors = parseParameters(method, typeLoader);
 
@@ -761,29 +761,22 @@ public final class AnnotationsBasedDescriber implements Describer
         }
     }
 
-    private ParameterDeclarer declareContentType(ParameterDeclarer parameter, Optional<MetadataScope> metadataScope, MetadataType type)
+    private ParameterDeclarer declareContentType(ParameterDeclarer parameter, MetadataScopeAdapter metadataScope, MetadataType type)
     {
-        return metadataScope.isPresent() && !metadataScope.get().contentResolver().equals(NullMetadataResolver.class)
-               ? parameter.ofDynamicType(type)
-               : parameter.ofType(type);
+        return metadataScope.hasContentResolver() ? parameter.ofDynamicType(type)
+                                                  : parameter.ofType(type);
     }
 
-    private OutputDeclarer declareOutputType(ComponentDeclarer component, Optional<MetadataScope> metadataScope, MetadataType type)
+    private OutputDeclarer declareOutputType(ComponentDeclarer component, MetadataScopeAdapter metadataScope, MetadataType type)
     {
-        return metadataScope.isPresent() && !metadataScope.get().outputResolver().equals(NullMetadataResolver.class)
-               ? component.withOutput().ofDynamicType(type)
-               : component.withOutput().ofType(type);
+        return metadataScope.hasOutputResolver() ? component.withOutput().ofDynamicType(type)
+                                                 : component.withOutput().ofType(type);
     }
 
-    private OutputDeclarer declareOutputAttributesType(ComponentDeclarer component, Optional<MetadataScope> metadataScope, MetadataType type)
+    private OutputDeclarer declareOutputAttributesType(ComponentDeclarer component, MetadataScopeAdapter metadataScope, MetadataType type)
     {
-        if (metadataScope.isPresent() && !metadataScope.get().outputResolver().equals(NullMetadataResolver.class) &&
-            MetadataOutputResolverWithAttributes.class.isAssignableFrom(metadataScope.get().outputResolver()))
-        {
-            return component.withOutputAttributes().ofDynamicType(type);
-        }
-
-        return component.withOutputAttributes().ofType(type);
+        return metadataScope.hasAttributesResolver() ? component.withOutputAttributes().ofDynamicType(type)
+                                                     : component.withOutputAttributes().ofType(type);
     }
 
     private void checkAnnotationsNotUsedMoreThanOnce(Method method, OperationDeclarer operation, Class<? extends Annotation>... annotations)

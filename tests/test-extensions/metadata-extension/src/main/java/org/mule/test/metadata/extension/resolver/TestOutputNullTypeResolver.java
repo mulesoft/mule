@@ -6,9 +6,9 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.JavaTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -20,6 +20,6 @@ public class TestOutputNullTypeResolver implements MetadataOutputResolver<String
     @Override
     public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException
     {
-        return BaseTypeBuilder.create(JavaTypeLoader.JAVA).nullType().build();
+        return BaseTypeBuilder.create(JAVA).nullType().build();
     }
 }

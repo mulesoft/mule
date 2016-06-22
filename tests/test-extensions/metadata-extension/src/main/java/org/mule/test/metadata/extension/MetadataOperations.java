@@ -148,7 +148,9 @@ public class MetadataOperations extends MetadataOperationsParent
         return null;
     }
 
-    @MetadataScope(keysResolver = TestOutputAttributesResolverWithKeyResolver.class, outputResolver = TestOutputAttributesResolverWithKeyResolver.class)
+    @MetadataScope(keysResolver = TestOutputAttributesResolverWithKeyResolver.class,
+            outputResolver = TestOutputAttributesResolverWithKeyResolver.class,
+            attributesResolver = TestOutputAttributesResolverWithKeyResolver.class)
     public MuleMessage<Object, AbstractOutputAttributes> outputAttributesWithDynamicMetadata(@MetadataKeyId String type)
     {
         return null;

@@ -9,14 +9,13 @@ package org.mule.runtime.core.internal.metadata;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.getClassName;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolverWithAttributes;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
 
 
 /**
@@ -29,13 +28,14 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
 {
 
     private final MetadataOutputResolver metadataOutputResolver;
-    private final MetadataOutputResolverWithAttributes metadataAttributesResolver;
+    private final MetadataAttributesResolver metadataAttributesResolver;
     private final MetadataContentResolver metadataContentResolver;
     private final MetadataKeysResolver metadataKeysResolver;
 
     public DefaultMetadataResolverFactory(Class<? extends MetadataKeysResolver> keyResolver,
                                           Class<? extends MetadataContentResolver> contentResolver,
-                                          Class<? extends MetadataOutputResolver> outputResolver)
+                                          Class<? extends MetadataOutputResolver> outputResolver,
+                                          Class<? extends MetadataAttributesResolver> attributesResolver)
     {
         checkArgument(keyResolver != null, "MetadataKeyResolver type cannot be null");
         checkArgument(contentResolver != null, "MetadataContentResolver type cannot be null");
@@ -44,9 +44,7 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
         metadataKeysResolver = instanciateResolver(keyResolver);
         metadataContentResolver = instanciateResolver(contentResolver);
         metadataOutputResolver = instanciateResolver(outputResolver);
-        metadataAttributesResolver = MetadataOutputResolverWithAttributes.class.isAssignableFrom(outputResolver)
-                                     ? (MetadataOutputResolverWithAttributes) metadataOutputResolver
-                                     : new NullMetadataResolver();
+        metadataAttributesResolver = instanciateResolver(attributesResolver);
     }
 
     /**
@@ -80,7 +78,7 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
      * {@inheritDoc}
      */
     @Override
-    public <T> MetadataOutputResolverWithAttributes<T> getOutputAttributesResolver()
+    public <T> MetadataAttributesResolver<T> getOutputAttributesResolver()
     {
         return metadataAttributesResolver;
     }
