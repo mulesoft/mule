@@ -14,10 +14,16 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.USER_AGENT;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +35,7 @@ import org.junit.Test;
 public class HttpHeaderCaseTestCase extends FunctionalTestCase
 {
     public static final String PRESERVE_HEADER_CASE = "org.glassfish.grizzly.http.PRESERVE_HEADER_CASE";
+    public static final String HEADER_NAME = "CusTomName";
 
     @Rule
     public DynamicPort port = new DynamicPort("port");
@@ -51,6 +58,18 @@ public class HttpHeaderCaseTestCase extends FunctionalTestCase
         assertThat((String) response.getMessage().getInboundProperty(CONTENT_TYPE), is(APPLICATION_X_WWW_FORM_URLENCODED));
         assertThat((String) response.getMessage().getInboundProperty(USER_AGENT), is("Mule 3.9.0"));
         assertThat((String) response.getMessage().getInboundProperty("customname1"), is("customValue"));
-        assertThat((String) response.getMessage().getInboundProperty("CusTomName2"), is("CustomValue"));
+        assertThat((String) response.getMessage().getInboundProperty(HEADER_NAME), is("CustomValue"));
+    }
+
+    public static class InboundPropertyCaseMessageProcessor implements MessageProcessor
+    {
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            MuleMessage message = event.getMessage();
+            Set<String> inboundPropertyNames = new HashSet<>(message.getInboundPropertyNames());
+            message.setPayload(String.valueOf(inboundPropertyNames.contains(HEADER_NAME)));
+            return event;
+        }
     }
 }
