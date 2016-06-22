@@ -14,7 +14,7 @@
 
     <flow name="empty">
         <httpn:listener config-ref="listenerConfig" path="emptyHeader"/>
-        <set-payload value="#[message.getAttributes().getHeaders()['${heade}']]"/>
+        <set-payload value="#[message.getAttributes().getHeaders()['${header}']]"/>
     </flow>
 
     <flow name="simple">
