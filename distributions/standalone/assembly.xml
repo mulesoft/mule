@@ -152,6 +152,7 @@
                 <include>org.mule.modules:mule-module-spring-config</include>
                 <include>org.mule.modules:mule-module-spring-extras</include>
                 <include>org.mule.modules:mule-module-spring-security</include>
+                <include>org.mule.modules:mule-module-sockets</include>
                 <include>org.mule.modules:mule-module-tls</include>
                 <include>org.mule.modules:mule-module-tomcat</include>
                 <include>org.mule.modules:mule-module-ws</include>
@@ -164,6 +165,9 @@
                 <include>org.mule.common:mule-common</include>
                 <include>org.mule.mvel:mule-mvel2</include>
             </includes>
+            <excludes>
+                <exclude>*:zip:*</exclude>
+            </excludes>
         </dependencySet>
 
         <!-- 3rd-party libraries -->
