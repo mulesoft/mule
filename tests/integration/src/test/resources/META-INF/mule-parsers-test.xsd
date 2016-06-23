@@ -40,6 +40,24 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="element-with-attribute-and-child" substitutionGroup="mule:abstract-extension">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractExtensionType">
+                    <xsd:sequence>
+                        <xsd:element name="my-pojo" minOccurs="0">
+                            <xsd:complexType>
+                                <xsd:attribute name="someParameter" default="jose"/>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="myPojo" default="jose"/>
+                    <xsd:attribute name="name"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:complexType name="simpleParameterCollectionParser">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
@@ -290,5 +308,7 @@
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string"/>
     </xsd:complexType>
+
+
 
 </xsd:schema>

@@ -298,7 +298,7 @@ public class BeanDefinitionFactory
         Consumer<AttributeDefinition> collectWrappersConsumer = attributeDefinition -> {
             attributeDefinition.accept(wrapperIdentifiersCollector);
         };
-        buildingDefinition.getSetterParameterDefinitions().values().stream().forEach(collectWrappersConsumer);
+        buildingDefinition.getSetterParameterDefinitions().stream().map( setterAttributeDefinition -> setterAttributeDefinition.getAttributeDefinition()).forEach(collectWrappersConsumer);
         buildingDefinition.getConstructorAttributeDefinition().stream().forEach(collectWrappersConsumer);
         return wrapperIdentifierAndTypeMap;
     }

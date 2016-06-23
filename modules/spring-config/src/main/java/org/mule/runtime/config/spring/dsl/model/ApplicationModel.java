@@ -9,6 +9,9 @@ package org.mule.runtime.config.spring.dsl.model;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.pluralize;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
@@ -24,10 +27,12 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.springframework.util.PropertyPlaceholderHelper;
@@ -241,11 +246,46 @@ public class ApplicationModel
         {
             return;
         }
+        //TODO MULE-9692 all this validations will be moved to an entity that does the validation and allows to aggregate all validations instead of failing fast.
         validateNameIsNotRepeated();
         validateNameIsOnlyOnTopLevelElements();
         validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
         validateChoiceExceptionStrategyStructure();
         validateNoDefaultExceptionStrategyAsGlobal();
+        validateParameterAndChildForSameAttributeAreNotDefinedTogether();
+    }
+
+    private void validateParameterAndChildForSameAttributeAreNotDefinedTogether()
+    {
+        executeOnEveryMuleComponentTree(componentModel -> {
+            for (String parameterName : componentModel.getParameters().keySet())
+            {
+                if (!componentModel.isParameterValueProvidedBySchema(parameterName))
+                {
+                    String mapChildName = hyphenize(pluralize(parameterName));
+                    String listOrPojoChildName = hyphenize(parameterName);
+                    Optional<ComponentModel> childOptional = findRelatedChildForParameter(componentModel.getInnerComponents(), mapChildName, listOrPojoChildName);
+                    if (childOptional.isPresent())
+                    {
+                        throw new MuleRuntimeException(createStaticMessage(format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. " +
+                                                                                  "Only one must be used.", componentModel.getIdentifier(), childOptional.get().getIdentifier(), parameterName)));
+                    }
+                }
+            }
+        });
+    }
+
+    private Optional<ComponentModel> findRelatedChildForParameter(List<ComponentModel> chilrenComponents, String... possibleNames)
+    {
+        Set<String> possibleNamesSet = new HashSet<>(asList(possibleNames));
+        for (ComponentModel childrenComponent : chilrenComponents)
+        {
+            if (possibleNamesSet.contains(childrenComponent.getIdentifier().getName()))
+            {
+                return of(childrenComponent);
+            }
+        }
+        return empty();
     }
 
     private void validateNoDefaultExceptionStrategyAsGlobal()
@@ -405,7 +445,7 @@ public class ApplicationModel
             to(builder).addNode(from(configLine).getNode()).addConfigFileName(configFileName);
             for (SimpleConfigAttribute simpleConfigAttribute : configLine.getConfigAttributes().values())
             {
-                builder.addParameter(simpleConfigAttribute.getName(), resolveValueIfIsPlaceHolder(simpleConfigAttribute.getValue()));
+                builder.addParameter(simpleConfigAttribute.getName(), resolveValueIfIsPlaceHolder(simpleConfigAttribute.getValue()), simpleConfigAttribute.isValueFromSchema());
             }
             List<ComponentModel> componentModels = extractComponentDefinitionModel(configLine.getChildren(), configFileName);
             componentModels.stream().forEach(componentDefinitionModel -> {
@@ -414,7 +454,7 @@ public class ApplicationModel
                     String value = componentDefinitionModel.getParameters().get(VALUE_ATTRIBUTE);
                     if (value != null)
                     {
-                        builder.addParameter(componentDefinitionModel.getNameAttribute(), resolveValueIfIsPlaceHolder(value));
+                        builder.addParameter(componentDefinitionModel.getNameAttribute(), resolveValueIfIsPlaceHolder(value), false);
                     }
                 }
                 builder.addChildComponentModel(componentDefinitionModel);

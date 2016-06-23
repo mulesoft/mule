@@ -11,13 +11,13 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATT
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.util.Preconditions;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
@@ -45,6 +45,7 @@ public class ComponentModel
     private ComponentIdentifier identifier;
     private Map<String, Object> customAttributes = new HashMap<>();
     private Map<String, String> parameters = new HashMap<>();
+    private Set<String> schemaValueParameter = new HashSet<>();
     //TODO MULE-9638 This must go away from component model once it's immutable.
     private ComponentModel parent;
     private List<ComponentModel> innerComponents = new ArrayList<>();
@@ -182,6 +183,15 @@ public class ComponentModel
     }
 
     /**
+     * @param parameterName configuration parameter name
+     * @return true if the value provided for the configuration parameter was get from the DSL schema, false if it was explicitly defined in the config
+     */
+    public boolean isParameterValueProvidedBySchema(String parameterName)
+    {
+        return this.schemaValueParameter.contains(parameterName);
+    }
+
+    /**
      * Builder to create instances of {@code ComponentModel}.
      */
     public static class Builder
@@ -202,11 +212,16 @@ public class ComponentModel
         /**
          * @param parameterName name of the configuration parameter.
          * @param value         value contained by the configuration parameter.
+         * @param valueFromSchema
          * @return the builder.
          */
-        public Builder addParameter(String parameterName, String value)
+        public Builder addParameter(String parameterName, String value, boolean valueFromSchema)
         {
             this.model.parameters.put(parameterName, value);
+            if (valueFromSchema)
+            {
+                this.model.schemaValueParameter.add(parameterName);
+            }
             return this;
         }
 
