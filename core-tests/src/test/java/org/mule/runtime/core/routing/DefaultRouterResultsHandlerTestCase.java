@@ -90,7 +90,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
     @Test
     public void aggregateMultipleEvents() throws Exception
     {
-        DataType<String> simpleDateType1 = DataType.builder(String.class).mimeType("text/plain").build();
+        DataType<String> simpleDateType1 = DataType.builder().type(String.class).mimeType("text/plain").build();
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);

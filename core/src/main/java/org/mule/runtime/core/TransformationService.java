@@ -263,10 +263,10 @@ public class TransformationService
         String mimeType = transformed.getMimeType() == null || MimeType.ANY.equals(transformed.getMimeType()) ? original.getMimeType() : transformed.getMimeType();
         String encoding = transformed.getEncoding() == null ? message.getEncoding() : transformed.getEncoding();
         // In case if the transformed dataType is an Object type we could keep the original type if it is compatible/assignable (String->Object we want to keep String as transformed DataType)
-        Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataType.builder(payloadTransformedClass).mimeType(mimeType).build())
+        Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataType.builder().type(payloadTransformedClass).mimeType(mimeType).build())
                 ? original.getType() : transformed.getType();
 
-        return DataType.builder(type).mimeType(mimeType).encoding(encoding).build();
+        return DataType.builder().type(type).mimeType(mimeType).encoding(encoding).build();
     }
 
     /**
@@ -292,19 +292,17 @@ public class TransformationService
             throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());
         }
 
-        DataType source = DataType.createFromObject(message.getDataType());
-
         // If no conversion is necessary, just return the payload as-is
-        if (resultType.isCompatibleWith(source))
+        if (resultType.isCompatibleWith(message.getDataType()))
         {
             return (T) message.getPayload();
         }
 
         // The transformer to execute on this message
-        Transformer transformer = muleContext.getRegistry().lookupTransformer(source, resultType);
+        Transformer transformer = muleContext.getRegistry().lookupTransformer(message.getDataType(), resultType);
         if (transformer == null)
         {
-            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, resultType));
+            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(message.getDataType(), resultType));
         }
 
         // Pass in the message itself

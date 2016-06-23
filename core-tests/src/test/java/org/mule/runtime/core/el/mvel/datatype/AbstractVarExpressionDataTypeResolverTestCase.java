@@ -69,7 +69,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
 
     protected void doVarDataTypeTest(String expression) throws Exception
     {
-        DataType<String> expectedDataType = DataType.builder(String.class).mimeType(JSON).encoding(CUSTOM_ENCODING).build();
+        DataType<String> expectedDataType = DataType.builder().type(String.class).mimeType(JSON).encoding(CUSTOM_ENCODING).build();
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
         setVariable(testEvent, EXPRESSION_VALUE, expectedDataType);

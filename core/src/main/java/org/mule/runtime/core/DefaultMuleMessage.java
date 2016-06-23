@@ -126,7 +126,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         else
         {
             // TODO MULE-9855: Make MuleMessage immutable
-            DataType<?> dataType = DataType.builder(payload.getClass())
+            DataType<?> dataType = DataType.builder().type(payload.getClass())
                                            .mimeType(previous.getDataType().getMimeType())
                                            .encoding(previous.getDataType().getEncoding())
                                            .build();
@@ -219,7 +219,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     @Deprecated
     public <T> DefaultMuleMessage(T value, DataType<T> dataType, Serializable attributes, MuleContext muleContext)
     {
-        super(resolveValue(value), resolveDataType(value, dataType, muleContext));
+        super(resolveValue(value), resolveDataType(value, dataType));
         id = UUID.getUUID();
         rootId = id;
         this.attributes = attributes;
@@ -251,7 +251,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
                               Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments,
                               MuleContext muleContext)
     {
-        this(message, inboundProperties, outboundProperties, attachments, muleContext, createDefaultDataType(message, muleContext));
+        this(message, inboundProperties, outboundProperties, attachments, muleContext, createDefaultDataType(message));
     }
 
     public DefaultMuleMessage(Object message, Map<String, Serializable> inboundProperties,
@@ -289,9 +289,9 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         return value != null ? value : NullPayload.getInstance();
     }
 
-    private static DataType resolveDataType(Object value, DataType dataType, MuleContext muleContext)
+    private static DataType resolveDataType(Object value, DataType dataType)
     {
-        return dataType != null ? dataType : createDefaultDataType(value, muleContext);
+        return dataType != null ? dataType : createDefaultDataType(value);
     }
 
     public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext)
@@ -364,10 +364,10 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         }
     }
 
-    private static DataType<?> createDefaultDataType(Object payload, MuleContext muleContext)
+    private static DataType<?> createDefaultDataType(Object payload)
     {
         Class<?> type = payload == null ? Object.class : payload.getClass();
-        return DataType.builder(type).encoding(getDefaultEncoding(muleContext)).build();
+        return DataType.builder().type(type).build();
     }
 
     public void setMuleContext(MuleContext context)
@@ -729,7 +729,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         }
         else
         {
-            return SystemUtils.getDefaultEncoding(muleContext);
+            return getDefaultEncoding(muleContext);
         }
     }
 
@@ -977,7 +977,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
                 {
                     try
                     {
-                        DataType source = DataType.createFromObject(theContent);
+                        DataType source = DataType.builder().from(theContent).build();
                         Transformer transformer = muleContext.getRegistry().lookupTransformer(source, DataType.BYTE_ARRAY);
                         if (transformer == null)
                         {

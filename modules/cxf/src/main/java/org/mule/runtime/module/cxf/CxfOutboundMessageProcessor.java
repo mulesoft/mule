@@ -475,7 +475,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             }
 
             Class payloadClass = payload != null ? payload.getClass() : Object.class;
-            msg.setPayload(payload, DataType.builder(payloadClass).mimeType(getMimeType()).build());
+            msg.setPayload(payload, DataType.builder().type(payloadClass).mimeType(getMimeType()).build());
             return msg;
         }));
 

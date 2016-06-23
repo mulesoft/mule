@@ -69,7 +69,7 @@ public class MuleInvoker implements Invoker
                 Class payloadClass = payload != null ? payload.getClass() : Object.class;
                 event.setMessage(event.getMessage().transform(msg ->
                 {
-                    msg.setPayload(payload, DataType.builder(payloadClass).mimeType(cxfMmessageProcessor.getMimeType()).build());
+                    msg.setPayload(payload, DataType.builder().type(payloadClass).mimeType(cxfMmessageProcessor.getMimeType()).build());
                     return msg;
                 }));
 

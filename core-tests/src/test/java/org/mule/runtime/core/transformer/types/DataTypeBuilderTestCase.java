@@ -62,7 +62,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void templateSimple()
     {
-        final DataType<String> template = DataType.builder(String.class).mimeType("text/plain;charset=ASCII").build();
+        final DataType<String> template = DataType.builder().type(String.class).mimeType("text/plain;charset=ASCII").build();
         final DataType dataType = DataType.builder().from(template).build();
 
         assertThat(dataType, instanceOf(SimpleDataType.class));
@@ -74,7 +74,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void templateCollection()
     {
-        final DataType<Set> template = DataType.builder(Set.class).mimeType("text/plain;charset=ASCII").build();
+        final DataType<Set> template = DataType.builder().type(Set.class).mimeType("text/plain;charset=ASCII").build();
         final DataType dataType = DataType.builder().from(template).build();
 
         assertThat(dataType, instanceOf(CollectionDataType.class));
@@ -142,7 +142,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void recycleBuilder()
     {
-        final DataTypeOptionalParamsBuilder<String> builder = DataType.builder(String.class);
+        final DataTypeOptionalParamsBuilder<String> builder = DataType.builder().type(String.class);
         builder.build();
 
         expected.expect(IllegalStateException.class);
@@ -152,8 +152,8 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void cachedInstances()
     {
-        final DataTypeOptionalParamsBuilder<String> builder1 = DataType.builder(String.class);
-        final DataTypeOptionalParamsBuilder<String> builder2 = DataType.builder(String.class);
+        final DataTypeOptionalParamsBuilder<String> builder1 = DataType.builder().type(String.class);
+        final DataTypeOptionalParamsBuilder<String> builder2 = DataType.builder().type(String.class);
 
         assertThat(builder1, equalTo(builder2));
         assertThat(builder1.build(), sameInstance(builder2.build()));

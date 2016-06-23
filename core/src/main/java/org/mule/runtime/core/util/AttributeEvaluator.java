@@ -91,12 +91,12 @@ public class AttributeEvaluator
         else if (isParseExpression())
         {
             final String value = expressionManager.parse(attributeValue, event);
-            return new TypedValue(value, DataType.builder(String.class).mimeType((String) null).build());
+            return new TypedValue(value, DataType.builder().type(String.class).mimeType((String) null).build());
         }
         else
         {
             Class<?> type = attributeValue == null ? Object.class : String.class;
-            return new TypedValue(attributeValue, DataType.builder(type).mimeType((String) null).build());
+            return new TypedValue(attributeValue, DataType.builder().type(type).mimeType((String) null).build());
         }
     }
 

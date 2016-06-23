@@ -45,7 +45,7 @@ public class TransformerObjectFactory implements ObjectFactory<Transformer>
         AbstractTransformer transformerInstance = createInstance();
         if (returnClass != null || mimeType != null)
         {
-            DataTypeOptionalParamsBuilder<?> builder = DataType.builder(getReturnType()).mimeType(mimeType);
+            DataTypeOptionalParamsBuilder<?> builder = DataType.builder().type(getReturnType()).mimeType(mimeType);
             if (encoding != null)
             {
                 builder = builder.encoding(encoding);

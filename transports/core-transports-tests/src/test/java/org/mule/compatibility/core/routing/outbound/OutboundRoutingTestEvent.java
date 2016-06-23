@@ -103,7 +103,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         try
         {
-            return (String) getMuleContext().getTransformationService().transform(message, DataType.builder(String.class).encoding(encoding).build()).getPayload();
+            return (String) getMuleContext().getTransformationService().transform(message, DataType.builder().type(String.class).encoding(encoding).build()).getPayload();
         }
         catch (Exception e)
         {

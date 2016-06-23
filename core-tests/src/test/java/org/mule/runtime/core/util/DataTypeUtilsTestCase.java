@@ -26,7 +26,7 @@ public class DataTypeUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void generatesContentTypeWithCharset() throws Exception
     {
-        final DataType dataType = DataType.builder(Object.class).mimeType(APPLICATION_JSON).encoding(UTF_8.name()).build();
+        final DataType dataType = DataType.builder().type(Object.class).mimeType(APPLICATION_JSON).encoding(UTF_8.name()).build();
 
         String contentType = DataTypeUtils.getContentType(dataType);
         assertThat(contentType, equalTo("application/json; charset=UTF-8"));
@@ -35,7 +35,7 @@ public class DataTypeUtilsTestCase extends AbstractMuleTestCase
     @Test
     public void generatesContentTypeWithoutCharset() throws Exception
     {
-        DataType<Object> dataType = DataType.builder(Object.class).mimeType(MimeType.APPLICATION_JSON).build();
+        DataType<Object> dataType = DataType.builder().type(Object.class).mimeType(MimeType.APPLICATION_JSON).build();
 
         String contentType = DataTypeUtils.getContentType(dataType);
         assertThat(contentType, equalTo("application/json"));

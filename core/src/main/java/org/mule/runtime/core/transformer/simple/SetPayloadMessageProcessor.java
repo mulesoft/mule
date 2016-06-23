@@ -85,7 +85,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     {
         Class<?> type = (value == null || value instanceof NullPayload) ? Object.class : value.getClass();
 
-        return DataType.builder(type).mimeType(mimeType).encoding(encoding).build();
+        return DataType.builder().type(type).mimeType(mimeType).encoding(encoding).build();
     }
 
     public void setMimeType(String mimeType)

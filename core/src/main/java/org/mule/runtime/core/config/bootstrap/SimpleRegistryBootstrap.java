@@ -42,7 +42,7 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap
         }
         if (returnClass != null)
         {
-            trans.setReturnDataType(DataType.builder(returnClass).mimeType(bootstrapProperty.getMimeType()).build());
+            trans.setReturnDataType(DataType.builder().type(returnClass).mimeType(bootstrapProperty.getMimeType()).build());
         }
         if (bootstrapProperty.getName() != null)
         {

@@ -104,6 +104,6 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
             encoding = muleContext.getConfiguration().getDefaultEncoding();
         }
 
-        return DataType.builder(value.getClass()).mimeType(mimeType).encoding(encoding).build();
+        return DataType.builder().type(value.getClass()).mimeType(mimeType).encoding(encoding).build();
     }
 }

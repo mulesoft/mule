@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class JsonToObject extends AbstractJsonTransformer
 {
-    private static final DataType<JsonData> JSON_TYPE = DataType.builder(JsonData.class).mimeType(MimeType.APPLICATION_JSON).build();
+    private static final DataType<JsonData> JSON_TYPE = DataType.builder().type(JsonData.class).mimeType(MimeType.APPLICATION_JSON).build();
 
     private Map<Class<?>, Class<?>> deserializationMixins = new HashMap<Class<?>, Class<?>>();
 

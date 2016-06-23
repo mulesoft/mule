@@ -34,7 +34,7 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
     public void returnsInlineFlowVarDataType() throws Exception
     {
         final String expression = "foo";
-        final DataType expectedDataType = DataType.builder(String.class).mimeType(JSON).encoding(CUSTOM_ENCODING).build();
+        final DataType expectedDataType = DataType.builder().type(String.class).mimeType(JSON).encoding(CUSTOM_ENCODING).build();
 
         MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
         final CompiledExpression compiledExpression = (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
@@ -49,7 +49,7 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
     public void returnsInlineSessionPropertyDataType() throws Exception
     {
         final String expression = "foo";
-        final DataType expectedDataType = DataType.builder(String.class).mimeType(JSON).encoding(CUSTOM_ENCODING).build();
+        final DataType expectedDataType = DataType.builder().type(String.class).mimeType(JSON).encoding(CUSTOM_ENCODING).build();
 
         MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
         final CompiledExpression compiledExpression = (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));

@@ -14,6 +14,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.DataTypeOptionalParamsBuilder;
 import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.DataTypeBuilder.DataTypeCollectionTypeBuilder;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -64,14 +65,14 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * @return this builder.
      */
     @Override
-    public DataTypeOptionalParamsBuilder<T> type(Class<T> type)
+    public <N> DataTypeOptionalParamsBuilder<N> type(Class<N> type)
     {
         validateAlreadyBuilt();
 
         checkNotNull(type, "'type' cannot be null.");
         this.type = (Class<T>) handleProxy(type);
 
-        return this;
+        return (DataTypeOptionalParamsBuilder<N>) this;
     }
 
     /*
@@ -151,7 +152,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      *             {@link Collection}.
      */
     @Override
-    public <I> DataTypeBuilder.DataTypeCollectionTypeBuilder<T> collectionType(Class<T> collectionType)
+    public <N extends Collection> DataTypeCollectionTypeBuilder<N> collectionType(Class<N> collectionType)
     {
         validateAlreadyBuilt();
 
@@ -162,7 +163,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         }
 
         this.type = (Class<T>) handleProxy(collectionType);
-        return this;
+        return (DataTypeCollectionTypeBuilder<N>) this;
     }
 
     /**
@@ -288,7 +289,6 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         String mime = null;
         if (value instanceof DataHandler)
         {
-
             mime = ((DataHandler) value).getContentType();
         }
         else if (value instanceof DataSource)

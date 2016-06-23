@@ -65,7 +65,7 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
             {
                 if (!StringUtils.isEmpty(returnType.getMimeType()))
                 {
-                    DataTypeOptionalParamsBuilder<?> builder = DataType.builder(typedValue.getValue().getClass()).mimeType(getMimeType());
+                    DataTypeOptionalParamsBuilder<?> builder = DataType.builder().type(typedValue.getValue().getClass()).mimeType(getMimeType());
                     if (!StringUtils.isEmpty(returnType.getEncoding()))
                     {
                         builder = builder.encoding(getEncoding());

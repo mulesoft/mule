@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPER
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataTypeOptionalParamsBuilder;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -638,7 +639,8 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public String transformMessageToString() throws TransformerException
     {
-        return transformMessage(DataType.builder(String.class).encoding(getEncoding()).build());
+        final DataType<String> dataType = DataType.builder().type(String.class).encoding(getEncoding()).build();
+        return transformMessage(dataType);
     }
 
     @Override
@@ -660,7 +662,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         try
         {
             MuleMessage transformedMessage = getMuleContext().getTransformationService().transform(message,
-                    DataType.builder(String.class).encoding(encoding).build());
+                    DataType.builder().type(String.class).encoding(encoding).build());
             if (isConsumable(message.getPayload().getClass()))
             {
                 setMessage(transformedMessage);
@@ -1092,7 +1094,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public void setFlowVariable(String key, Object value)
     {
-        setFlowVariable(key, value, DataType.createFromObject(value));
+        setFlowVariable(key, value, DataType.builder().from(value).build());
     }
 
     @Override
