@@ -146,6 +146,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-scripting-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-scripting-jruby-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-schedulers-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-module-sockets-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-config-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-extras-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-security-${productVersion}.jar
