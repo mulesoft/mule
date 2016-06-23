@@ -7,12 +7,12 @@
 package org.mule.runtime.module.http.internal.util;
 
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
+import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
-
-import java.nio.charset.Charset;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,14 +40,23 @@ public class HttpToMuleMessage
                 }
                 else
                 {
-                    String encoding = Charset.defaultCharset().name();
-                    logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), contentTypeValue, e.getMessage()));
-                    logger.warn(String.format("Using default encoding: %s", encoding));
+                    String encoding = defaultCharset().name();
+                    logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), contentTypeValue, e.getMessage()));
+                    logger.warn(format("Using default encoding: %s", encoding));
                     dataTypeBuilder.encoding(encoding);
                 }
             }
         }
-        return dataTypeBuilder.build();
+        final DataType dataType = dataTypeBuilder.build();
+        if (dataType.getEncoding() == null)
+        {
+            // TODO MULE-9958 provide a default encoding it the builder has null
+            return DataType.builder(dataType).encoding(defaultCharset().name()).build();
+        }
+        else
+        {
+            return dataType;
+        }
     }
 
 }

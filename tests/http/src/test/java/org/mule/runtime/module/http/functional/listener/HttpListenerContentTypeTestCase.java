@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -64,14 +65,14 @@ public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase
     public void rejectsInvalidContentTypeWithoutBody() throws Exception
     {
         Request request = Request.Post(getUrl()).addHeader(CONTENT_TYPE, "application");
-        testRejectContentType(request, "Could not parse");
+        testRejectContentType(request, "MimeType cannot be parsed: application");
     }
 
     @Test
     public void rejectsInvalidContentTypeWithBody() throws Exception
     {
         Request request = Request.Post(getUrl()).body(new StringEntity(TEST_MESSAGE, "application", null));
-        testRejectContentType(request, "Could not parse");
+        testRejectContentType(request, "MimeType cannot be parsed: application");
     }
 
     private void testRejectContentType(Request request, String expectedMessage) throws IOException

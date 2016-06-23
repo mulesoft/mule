@@ -222,11 +222,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         validateAlreadyBuilt();
 
-        if (mimeType == null)
-        {
-            this.mimeType = MimeType.ANY;
-        }
-        else
+        if (!StringUtils.isEmpty(mimeType))
         {
             try
             {
@@ -244,11 +240,16 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     @Override
     public DataTypeBuilder<T> mimeType(javax.activation.MimeType mimeType)
     {
-        this.mimeType = mimeType.getPrimaryType() + "/" + mimeType.getSubType();
+        validateAlreadyBuilt();
 
-        if (encoding == null && mimeType.getParameter(CHARSET_PARAM) != null)
+        if (mimeType != null)
         {
-            encoding = mimeType.getParameter(CHARSET_PARAM);
+            this.mimeType = mimeType.getPrimaryType() + "/" + mimeType.getSubType();
+
+            if (encoding == null && mimeType.getParameter(CHARSET_PARAM) != null)
+            {
+                encoding = mimeType.getParameter(CHARSET_PARAM);
+            }
         }
 
         return this;

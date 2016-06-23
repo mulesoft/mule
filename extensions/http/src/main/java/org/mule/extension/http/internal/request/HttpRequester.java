@@ -9,6 +9,7 @@ package org.mule.extension.http.internal.request;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -20,6 +21,7 @@ import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
@@ -94,11 +96,11 @@ public class HttpRequester
         HttpResponseToMuleMessage httpResponseToMuleMessage = new HttpResponseToMuleMessage(config, parseResponse);
         MuleMessage<Object, HttpResponseAttributes> responseMessage = httpResponseToMuleMessage.convert(muleEvent, response, httpRequest.getUri());
 
-        //Create a new muleEvent based on the old and the response so that the auth can use it
+        // Create a new muleEvent based on the old and the response so that the auth can use it
         MuleEvent responseEvent = new DefaultMuleEvent(new DefaultMuleMessage(responseMessage.getPayload(),
-                                                                              null,
-                                                                              responseMessage.getAttributes(),
-                                                                              muleEvent.getMuleContext()),
+                (DataType) responseMessage.getDataType(),
+                responseMessage.getAttributes(),
+                muleEvent.getMuleContext()),
                                                        muleEvent,
                                                        muleEvent.isSynchronous());
         if (resendRequest(responseEvent, checkRetry, authentication))

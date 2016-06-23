@@ -8,9 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.processor;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
@@ -62,48 +64,34 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
         return attributes != null ? attributes : operationContext.getEvent().getMessage().getAttributes();
     }
 
+    /**
+     * If provided, mimeType and encoding configured as operation parameters will take precedence
+     * over what comes with the message's {@link DataType}.
+     * 
+     * @param value
+     * @param operationContext
+     * @return
+     */
     private DataType resolveDataType(Object value, OperationContextAdapter operationContext)
     {
-        String mimeType = operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class);
-        String encoding = operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class);
-        DataType dataType = null;
-        Class<?> type = value != null ? value.getClass() : NullPayload.class;
-
-        if (value instanceof MuleMessage)
-        {
-            dataType = ((MuleMessage) value).getDataType();
-            type = dataType.getType();
-            if (encoding == null && mimeType == null)
-            {
-                return dataType;
-            }
-
-            if (encoding == null)
-            {
-                encoding = dataType.getEncoding();
-            }
-
-            if (mimeType == null)
-            {
-                mimeType = dataType.getMimeType();
-            }
-        }
-
-        if (dataType != null && encoding == null && mimeType == null)
-        {
-            return dataType;
-        }
-
         if (value == null || value instanceof NullPayload)
         {
             return null;
         }
 
-        if (encoding == null)
+        DataTypeParamsBuilder dataTypeBuilder = null;
+        if (value instanceof MuleMessage)
         {
-            encoding = muleContext.getConfiguration().getDefaultEncoding();
+            dataTypeBuilder = DataType.builder(((MuleMessage) value).getDataType());
+        }
+        else
+        {
+            dataTypeBuilder = DataType.builder().type(value != null ? value.getClass() : Object.class);
         }
 
-        return DataType.builder().type(value.getClass()).mimeType(mimeType).encoding(encoding).build();
+        String mimeType = operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class);
+        String encoding = operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class);
+
+        return dataTypeBuilder.mimeType(mimeType).encoding(encoding).build();
     }
 }
