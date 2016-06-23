@@ -12,7 +12,9 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.config.spring.parsers.beans.ParameterAndChildElement;
 import org.mule.runtime.config.spring.parsers.beans.SimpleCollectionObject;
+import org.mule.runtime.config.spring.parsers.beans.SimplePojo;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -22,7 +24,7 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
-public class SimpleParameterParsingTestCase extends FunctionalTestCase
+public class XmlDslProcessingTestCase extends FunctionalTestCase
 {
 
     private static final String FIRST_NAME_ATTRIBUTE = "firstname";
@@ -32,7 +34,7 @@ public class SimpleParameterParsingTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "org/mule/config/spring/parsers/simpler-parameter-collection-config.xml";
+        return "org/mule/config/spring/parsers/xml-dsl-processing-config.xml";
     }
 
     @Test
@@ -143,6 +145,27 @@ public class SimpleParameterParsingTestCase extends FunctionalTestCase
         assertThat(simpleTypeMap.size(), is(2));
         assertFirstChildParameters(simpleTypeMap.get(1l).getSimpleParameters());
         assertSecondChildParameters(simpleTypeMap.get(2l).getSimpleParameters());
+    }
+
+    @Test
+    public void pojoWithDefaultValue()
+    {
+        ParameterAndChildElement parameterAndChildElement = muleContext.getRegistry().get("pojoWithDefaultValue");
+        assertThat(parameterAndChildElement.getSimplePojo().equals(new SimplePojo("jose")), is(true));
+    }
+
+    @Test
+    public void pojoFromConfiguraitonParameter()
+    {
+        ParameterAndChildElement parameterAndChildElement = muleContext.getRegistry().get("pojoWithAttribute");
+        assertThat(parameterAndChildElement.getSimplePojo().equals(new SimplePojo("pepe")), is(true));
+    }
+
+    @Test
+    public void pojoFromChildConfiguration()
+    {
+        ParameterAndChildElement parameterAndChildElement = muleContext.getRegistry().get("pojoWithChild");
+        assertThat(parameterAndChildElement.getSimplePojo().equals(new SimplePojo("pepe")), is(true));
     }
 
     private void assertSimpleTypeCollectionValues(Collection<String> simpleTypeCollectionValues)

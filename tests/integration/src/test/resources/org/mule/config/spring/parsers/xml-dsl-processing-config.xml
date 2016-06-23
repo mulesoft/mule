@@ -97,4 +97,12 @@
         </parsers-test:simple-list-type-map>
     </parsers-test:parameter-collection-parser>
 
+    <parsers-test:element-with-attribute-and-child name="pojoWithDefaultValue"/>
+
+    <parsers-test:element-with-attribute-and-child name="pojoWithAttribute" myPojo="pepe"/>
+
+    <parsers-test:element-with-attribute-and-child name="pojoWithChild">
+        <parsers-test:my-pojo someParameter="pepe"/>
+    </parsers-test:element-with-attribute-and-child>
+
 </mule>

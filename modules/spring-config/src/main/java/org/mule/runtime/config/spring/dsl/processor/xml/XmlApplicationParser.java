@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -128,13 +129,16 @@ public class XmlApplicationParser
                 .setParent(parentProvider);
         to(builder).addNode(node);
 
-        NamedNodeMap attributes = node.getAttributes();
-        if (node.hasAttributes())
+        Element element = (Element) node;
+        NamedNodeMap attributes = element.getAttributes();
+        if (element.hasAttributes())
         {
             for (int i = 0; i < attributes.getLength(); i++)
             {
                 Node attribute = attributes.item(i);
-                builder.addConfigAttribute(attribute.getNodeName(), attribute.getNodeValue());
+                Attr attributeNode = element.getAttributeNode(attribute.getNodeName());
+                boolean isFromXsd = !attributeNode.getSpecified();
+                builder.addConfigAttribute(attribute.getNodeName(), attribute.getNodeValue(), isFromXsd);
             }
         }
         if (node.hasChildNodes())

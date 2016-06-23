@@ -53,6 +53,15 @@ class BeanDefinitionBuilderHelper
         return new BeanDefinitionPropertyHelper(propertyName);
     }
 
+    /**
+     * @param propertyName name of a bean property
+     * @return true if the bean already has a value set for that property, false otherwise
+     */
+    public boolean hasValueForProperty(String propertyName)
+    {
+        return this.beanDefinitionBuilder.getBeanDefinition().getPropertyValues().contains(propertyName);
+    }
+
     class BeanDefinitionPropertyHelper
     {
 

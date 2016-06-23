@@ -41,7 +41,7 @@ public class ComponentBuildingDefinition
     private TypeDefinition typeDefinition;
     private boolean scope;
     private List<AttributeDefinition> constructorAttributeDefinition = new ArrayList<>();
-    private Map<String, AttributeDefinition> setterParameterDefinitions = new HashMap<>();
+    private List<SetterAttributeDefinition> setterParameterDefinitions = new ArrayList<>();
     private Set<String> ignoredConfigurationParameters = new HashSet<>();
     //TODO MULE-9638 Use generics. Generics cannot be used right now because this method colides with the ones defined in FactoryBeans.
     private Class<?> objectFactoryType;
@@ -79,9 +79,9 @@ public class ComponentBuildingDefinition
     }
 
     /**
-     * @return a map of the attributes that may contain configuration for the domain object to be created. The map key is the attribute name.
+     * @return a list of the attributes and its definitions that may contain configuration for the domain object to be created.
      */
-    public Map<String, AttributeDefinition> getSetterParameterDefinitions()
+    public List<SetterAttributeDefinition> getSetterParameterDefinitions()
     {
         return setterParameterDefinitions;
     }
@@ -166,7 +166,7 @@ public class ComponentBuildingDefinition
          */
         public Builder withSetterParameterDefinition(String fieldName, AttributeDefinition attributeDefinition)
         {
-            definition.setterParameterDefinitions.put(fieldName, attributeDefinition);
+            definition.setterParameterDefinitions.add(new SetterAttributeDefinition(fieldName, attributeDefinition));
             return this;
         }
 
@@ -290,7 +290,7 @@ public class ComponentBuildingDefinition
         {
             Builder builder = new Builder();
             builder.definition.typeDefinition = this.definition.typeDefinition;
-            builder.definition.setterParameterDefinitions = new HashMap<>(this.definition.setterParameterDefinitions);
+            builder.definition.setterParameterDefinitions = new ArrayList<>(this.definition.setterParameterDefinitions);
             builder.definition.constructorAttributeDefinition = new ArrayList<>(this.definition.constructorAttributeDefinition);
             builder.identifier = this.identifier;
             builder.namespace = this.namespace;

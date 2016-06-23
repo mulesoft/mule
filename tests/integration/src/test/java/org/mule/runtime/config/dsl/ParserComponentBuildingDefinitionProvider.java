@@ -16,7 +16,9 @@ import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntry
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.config.spring.parsers.beans.ParameterAndChildElement;
 import org.mule.runtime.config.spring.parsers.beans.SimpleCollectionObject;
+import org.mule.runtime.config.spring.parsers.beans.SimplePojo;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.ArrayList;
@@ -186,6 +188,20 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                 .withIdentifier("inner-element-with-object-factory")
                                 .withTypeDefinition(fromType(LifecycleSensingMessageProcessor.class))
                                 .withObjectFactoryType(LifecycleSensingObjectFactory.class)
+                                .build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("element-with-attribute-and-child")
+                                .withTypeDefinition(fromType(ParameterAndChildElement.class))
+                                .withSetterParameterDefinition("simplePojo", fromSimpleParameter("myPojo", input -> new SimplePojo((String) input)).withDefaultValue("jose").build())
+                                .withSetterParameterDefinition("simplePojo", fromChildConfiguration(SimplePojo.class).build()).build());
+
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("my-pojo")
+                                .withTypeDefinition(fromType(SimplePojo.class))
+                                .withSetterParameterDefinition("someParameter", fromSimpleParameter("someParameter").build())
                                 .build());
 
         return definitions;

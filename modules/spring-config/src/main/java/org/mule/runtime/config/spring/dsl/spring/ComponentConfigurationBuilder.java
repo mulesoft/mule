@@ -14,6 +14,7 @@ import static org.mule.runtime.config.spring.util.ProcessingStrategyUtils.parseP
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
+import org.mule.runtime.config.spring.dsl.api.SetterAttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
@@ -27,7 +28,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,9 +68,10 @@ class ComponentConfigurationBuilder
         componentBuildingDefinition.getIgnoredConfigurationParameters().stream().forEach( ignoredParameter -> {
             simpleParameters.remove(ignoredParameter);
         });
-        for (Map.Entry<String, AttributeDefinition> definitionEntry : componentBuildingDefinition.getSetterParameterDefinitions().entrySet())
+        for (SetterAttributeDefinition setterAttributeDefinition : componentBuildingDefinition.getSetterParameterDefinitions())
         {
-            definitionEntry.getValue().accept(setterVisitor(definitionEntry.getKey()));
+            AttributeDefinition attributeDefinition = setterAttributeDefinition.getAttributeDefinition();
+            attributeDefinition.accept(setterVisitor(setterAttributeDefinition.getAttributeName(), attributeDefinition));
         }
         for (AttributeDefinition attributeDefinition : componentBuildingDefinition.getConstructorAttributeDefinition())
         {
@@ -128,9 +129,23 @@ class ComponentConfigurationBuilder
         return new ConfigurableAttributeDefinitionVisitor(beanDefinitionBuilderHelper::addConstructorValue, beanDefinitionBuilderHelper::addConstructorReference);
     }
 
-    private ConfigurableAttributeDefinitionVisitor setterVisitor(String propertyName)
+    private ConfigurableAttributeDefinitionVisitor setterVisitor(String propertyName, AttributeDefinition attributeDefinition)
     {
-        return new ConfigurableAttributeDefinitionVisitor(beanDefinitionBuilderHelper.forProperty(propertyName)::addValue, beanDefinitionBuilderHelper.forProperty(propertyName)::addReference);
+        DefaultValueVisitor defaultValueVisitor = new DefaultValueVisitor();
+        attributeDefinition.accept(defaultValueVisitor);
+        Optional<Object> defaultValue = defaultValueVisitor.getDefaultValue();
+        return new ConfigurableAttributeDefinitionVisitor( value -> {
+            if (isPropertySetWithUserConfigValue(propertyName, defaultValue, value))
+            {
+                return;
+            }
+            beanDefinitionBuilderHelper.forProperty(propertyName).addValue(value);
+        }, beanDefinitionBuilderHelper.forProperty(propertyName)::addReference);
+    }
+
+    private boolean isPropertySetWithUserConfigValue(String propertyName, Optional<Object> defaultValue, Object value)
+    {
+        return defaultValue.isPresent() && defaultValue.get().equals(value) && beanDefinitionBuilderHelper.hasValueForProperty(propertyName);
     }
 
     /**

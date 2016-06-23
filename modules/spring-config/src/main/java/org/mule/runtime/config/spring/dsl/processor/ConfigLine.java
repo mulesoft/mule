@@ -143,10 +143,10 @@ public class ConfigLine
             return this;
         }
 
-        public Builder addConfigAttribute(String name, String value)
+        public Builder addConfigAttribute(String name, String value, boolean valueFromSchema)
         {
             checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
-            configLine.configAttributes.put(name, new SimpleConfigAttribute(name, value));
+            configLine.configAttributes.put(name, new SimpleConfigAttribute(name, value, valueFromSchema));
             return this;
         }
 
