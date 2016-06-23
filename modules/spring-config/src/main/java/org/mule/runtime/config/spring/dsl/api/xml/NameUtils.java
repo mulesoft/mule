@@ -6,18 +6,15 @@
  */
 package org.mule.runtime.config.spring.dsl.api.xml;
 
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Utilities for manipulating names of {@link ExtensionModel extensions} and
- * their components
+ * Utilities for manipulating names of supported by the DSL. Mostly for validating the configuration content.
  *
- * @since 3.7.0
+ * @since 4.0
  */
 public class NameUtils
 {
