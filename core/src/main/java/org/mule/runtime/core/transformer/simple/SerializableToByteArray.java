@@ -29,7 +29,7 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
 
     public SerializableToByteArray()
     {
-        this.registerSourceType(DataType.forType(Serializable.class));
+        this.registerSourceType(DataType.fromType(Serializable.class));
         this.setReturnDataType(DataType.BYTE_ARRAY);
     }
 

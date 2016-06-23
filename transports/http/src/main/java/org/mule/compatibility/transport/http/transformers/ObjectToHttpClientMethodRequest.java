@@ -72,14 +72,14 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
 {
     public ObjectToHttpClientMethodRequest()
     {
-        setReturnDataType(DataType.forType(HttpMethod.class));
+        setReturnDataType(DataType.fromType(HttpMethod.class));
         registerSourceType(DataType.MULE_MESSAGE);
         registerSourceType(DataType.BYTE_ARRAY);
         registerSourceType(DataType.STRING);
         registerSourceType(DataType.INPUT_STREAM);
-        registerSourceType(DataType.forType(OutputHandler.class));
-        registerSourceType(DataType.forType(NullPayload.class));
-        registerSourceType(DataType.forType(Map.class));
+        registerSourceType(DataType.fromType(OutputHandler.class));
+        registerSourceType(DataType.fromType(NullPayload.class));
+        registerSourceType(DataType.fromType(Map.class));
     }
 
     @Override

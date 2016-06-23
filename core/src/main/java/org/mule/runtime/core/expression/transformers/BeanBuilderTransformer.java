@@ -69,7 +69,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         {
             setBeanFactory(new PrototypeObjectFactory(getBeanClass()));
         }
-        setReturnDataType(DataType.forType(getBeanFactory().getObjectClass()));
+        setReturnDataType(DataType.fromType(getBeanFactory().getObjectClass()));
         //We need to set the MuleContext if we create the factory here
         if(getBeanFactory() instanceof MuleContextAware)
         {

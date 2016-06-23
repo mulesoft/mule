@@ -35,10 +35,10 @@ public class XmlToJson  extends AbstractToFromXmlTransformer
         this.registerSourceType(DataType.STRING);
         this.registerSourceType(DataType.INPUT_STREAM);
         this.registerSourceType(DataType.BYTE_ARRAY);
-        this.registerSourceType(DataType.forType(Reader.class));
-        this.registerSourceType(DataType.forType(URL.class));
-        this.registerSourceType(DataType.forType(File.class));
-        registerSourceType(DataType.forType(Document.class));
+        this.registerSourceType(DataType.fromType(Reader.class));
+        this.registerSourceType(DataType.fromType(URL.class));
+        this.registerSourceType(DataType.fromType(File.class));
+        registerSourceType(DataType.fromType(Document.class));
         this.setReturnDataType(DataType.JSON_STRING);
     }
 

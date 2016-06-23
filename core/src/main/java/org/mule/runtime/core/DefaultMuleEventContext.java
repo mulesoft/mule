@@ -102,7 +102,7 @@ public class DefaultMuleEventContext implements MuleEventContext
     @Override
     public Object transformMessage(Class expectedType) throws TransformerException
     {
-        return event.transformMessage(DataType.forType(expectedType));
+        return event.transformMessage(DataType.fromType(expectedType));
     }
 
     /**

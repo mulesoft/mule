@@ -26,8 +26,8 @@ public class XmlPrettyPrinter extends AbstractTransformer
     {
         super();
         this.registerSourceType(DataType.STRING);
-        this.registerSourceType(DataType.forType(org.dom4j.Document.class));
-        this.registerSourceType(DataType.forType(org.w3c.dom.Document.class));
+        this.registerSourceType(DataType.fromType(org.dom4j.Document.class));
+        this.registerSourceType(DataType.fromType(org.w3c.dom.Document.class));
         this.setReturnDataType(DataType.STRING);
     }
 

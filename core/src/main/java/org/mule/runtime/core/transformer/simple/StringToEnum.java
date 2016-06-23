@@ -38,8 +38,8 @@ public class StringToEnum extends AbstractTransformer implements DiscoverableTra
         checkArgument(enumClass != null, "enumClass cannot be null");
         this.enumClass = enumClass;
 
-        registerSourceType(DataType.forType(String.class));
-        setReturnDataType(DataType.forType(enumClass));
+        registerSourceType(DataType.fromType(String.class));
+        setReturnDataType(DataType.fromType(enumClass));
         setName(format("StringTo%sTransformer", enumClass.getSimpleName()));
     }
 

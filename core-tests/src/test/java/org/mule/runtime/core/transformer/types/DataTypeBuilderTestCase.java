@@ -36,7 +36,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void buildSimple()
     {
-        final DataType<String> dataType = DataType.forType(String.class);
+        final DataType<String> dataType = DataType.fromType(String.class);
         assertThat(dataType, instanceOf(SimpleDataType.class));
         assertThat(dataType.getType(), is(equalTo(String.class)));
     }
@@ -44,7 +44,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void buildCollection()
     {
-        final DataType<Set> dataType = DataType.forType(Set.class);
+        final DataType<Set> dataType = DataType.fromType(Set.class);
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(Set.class)));
         assertThat(((CollectionDataType) dataType).getItemType(), is(equalTo(Object.class)));
@@ -111,7 +111,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     {
         final Class<?> muleMessageProxy = Proxy.getProxyClass(DataTypeBuilderTestCase.class.getClassLoader(), MuleMessage.class);
 
-        final DataType dataType = DataType.forType(muleMessageProxy);
+        final DataType dataType = DataType.fromType(muleMessageProxy);
 
         assertThat(dataType.getType(), is(equalTo(MuleMessage.class)));
     }

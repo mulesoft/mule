@@ -32,15 +32,15 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
     {
         registerSourceType(DataType.STRING);
         registerSourceType(DataType.BYTE_ARRAY);
-        registerSourceType(DataType.forType(Source.class));
-        registerSourceType(DataType.forType(Document.class));
-        registerSourceType(DataType.forType(org.w3c.dom.Document.class));
-        registerSourceType(DataType.forType(org.w3c.dom.Element.class));
+        registerSourceType(DataType.fromType(Source.class));
+        registerSourceType(DataType.fromType(Document.class));
+        registerSourceType(DataType.fromType(org.w3c.dom.Document.class));
+        registerSourceType(DataType.fromType(org.w3c.dom.Element.class));
         registerSourceType(DataType.INPUT_STREAM);
-        registerSourceType(DataType.forType(OutputHandler.class));
-        registerSourceType(DataType.forType(XMLStreamReader.class));
-        registerSourceType(DataType.forType(DelayedResult.class));
-        setReturnDataType(DataType.forType(OutputHandler.class));
+        registerSourceType(DataType.fromType(OutputHandler.class));
+        registerSourceType(DataType.fromType(XMLStreamReader.class));
+        registerSourceType(DataType.fromType(DelayedResult.class));
+        setReturnDataType(DataType.fromType(OutputHandler.class));
     }
 
     @Override

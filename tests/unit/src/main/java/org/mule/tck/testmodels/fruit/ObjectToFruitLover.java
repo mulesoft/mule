@@ -15,9 +15,9 @@ public class ObjectToFruitLover extends AbstractTransformer
 
     public ObjectToFruitLover()
     {
-        this.setReturnDataType(DataType.forType(FruitLover.class));
+        this.setReturnDataType(DataType.fromType(FruitLover.class));
         this.registerSourceType(DataType.STRING);
-        this.registerSourceType(DataType.forType(FruitLover.class));
+        this.registerSourceType(DataType.fromType(FruitLover.class));
     }
 
     @Override

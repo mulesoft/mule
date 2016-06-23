@@ -608,7 +608,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
-        return transformMessage(DataType.forType(outputType));
+        return transformMessage(DataType.fromType(outputType));
     }
 
     @Override

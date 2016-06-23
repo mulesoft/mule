@@ -255,7 +255,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             }
         }
 
-        DataType<?> sourceType = DataType.forType(payload.getClass());
+        DataType<?> sourceType = DataType.fromType(payload.getClass());
         if (!isSourceDataTypeSupported(sourceType))
         {
             Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),

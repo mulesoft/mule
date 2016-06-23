@@ -85,7 +85,7 @@ public class FileTransformersSourceTypesTestCase extends AbstractMuleContextEndp
     private void assertSingleTransformer(Class<?> source, Class<?> target, Class<?> expectedTransformerType) throws Exception
     {
         // This lookup method fails if there is more than one transformer available.
-        Transformer transformer = muleContext.getRegistry().lookupTransformer(DataType.forType(source), DataType.forType(target));
+        Transformer transformer = muleContext.getRegistry().lookupTransformer(DataType.fromType(source), DataType.fromType(target));
         assertEquals(expectedTransformerType, transformer.getClass());
     }
 

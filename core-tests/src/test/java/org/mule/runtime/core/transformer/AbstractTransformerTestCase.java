@@ -119,7 +119,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
 
     public void doTestBadReturnType(Transformer tran, Object src) throws Exception
     {
-        tran.setReturnDataType(DataType.forType(InvalidSatsuma.class));
+        tran.setReturnDataType(DataType.fromType(InvalidSatsuma.class));
         try
         {
             tran.transform(src);

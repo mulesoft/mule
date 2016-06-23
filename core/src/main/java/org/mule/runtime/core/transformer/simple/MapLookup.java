@@ -24,7 +24,7 @@ public class MapLookup extends AbstractTransformer
 
     public MapLookup()
     {
-        registerSourceType(DataType.forType(Map.class));
+        registerSourceType(DataType.fromType(Map.class));
         setReturnDataType(DataType.OBJECT);
     }
 

@@ -32,7 +32,7 @@ public class PropertyEditorTextToValueTransformer extends AbstractTransformer
     {
         this.propertyEditor = propertyEditor;
         registerSourceType(DataType.STRING);
-        setReturnDataType(DataType.forType(clazz));
+        setReturnDataType(DataType.fromType(clazz));
     }
 
     @Override

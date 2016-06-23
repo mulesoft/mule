@@ -29,8 +29,8 @@ public class ServletRequestToOutputHandler extends AbstractTransformer implement
 
     public ServletRequestToOutputHandler()
     {
-        registerSourceType(DataType.forType(HttpServletRequest.class));
-        setReturnDataType(DataType.forType(OutputHandler.class));
+        registerSourceType(DataType.fromType(HttpServletRequest.class));
+        setReturnDataType(DataType.fromType(OutputHandler.class));
     }
 
     @Override

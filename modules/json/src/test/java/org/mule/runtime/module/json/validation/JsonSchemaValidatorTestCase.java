@@ -134,14 +134,14 @@ public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase
         private AppleToJson(Object value)
         {
             this.value = value;
-            registerSourceType(DataType.forType(Apple.class));
+            registerSourceType(DataType.fromType(Apple.class));
             if (value instanceof InputStream)
             {
-                setReturnDataType(DataType.forType(InputStream.class));
+                setReturnDataType(DataType.fromType(InputStream.class));
             }
             else
             {
-                setReturnDataType(DataType.forType(value.getClass()));
+                setReturnDataType(DataType.fromType(value.getClass()));
             }
         }
 

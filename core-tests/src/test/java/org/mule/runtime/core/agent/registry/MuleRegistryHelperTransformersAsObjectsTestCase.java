@@ -30,7 +30,7 @@ import org.junit.Test;
 public class MuleRegistryHelperTransformersAsObjectsTestCase extends AbstractMuleTestCase
 {
 
-    private static final DataType<Apple> APPLE_DATA_TYPE = DataType.forType(Apple.class);
+    private static final DataType<Apple> APPLE_DATA_TYPE = DataType.fromType(Apple.class);
 
     private final DefaultRegistryBroker registry = mock(DefaultRegistryBroker.class);
     private final MuleContext muleContext = mock(MuleContext.class);

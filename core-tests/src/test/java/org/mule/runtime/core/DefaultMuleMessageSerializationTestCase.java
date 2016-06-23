@@ -96,7 +96,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         public NonSerializableToByteArray()
         {
             super();
-            registerSourceType(DataType.forType(NonSerializable.class));
+            registerSourceType(DataType.fromType(NonSerializable.class));
             setReturnDataType(DataType.BYTE_ARRAY);
         }
 

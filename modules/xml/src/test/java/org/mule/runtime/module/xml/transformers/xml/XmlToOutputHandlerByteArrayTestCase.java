@@ -38,7 +38,7 @@ public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerT
     public Transformer getTransformer() throws Exception
     {
         Transformer trans = createObject(XmlToOutputHandler.class);
-        trans.setReturnDataType(DataType.forType(OutputHandler.class));
+        trans.setReturnDataType(DataType.fromType(OutputHandler.class));
 
         return trans;
     }

@@ -30,7 +30,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
     @Test
     public void testExactMatch() throws Exception
     {
-        Transformer trans = new MockConverterBuilder().from(DataType.forType(IOException.class)).to(DataType.BYTE_ARRAY).build();
+        Transformer trans = new MockConverterBuilder().from(DataType.fromType(IOException.class)).to(DataType.BYTE_ARRAY).build();
 
         TransformerWeighting weighting = new TransformerWeighting(IOException.class, byte[].class, trans);
 
@@ -54,7 +54,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
     @Test
     public void testNoMatchWeighting() throws Exception
     {
-        Transformer trans = new MockConverterBuilder().from(DataType.forType(Serializable.class)).to(DataType.BYTE_ARRAY).build();
+        Transformer trans = new MockConverterBuilder().from(DataType.fromType(Serializable.class)).to(DataType.BYTE_ARRAY).build();
 
         TransformerWeighting weighting = new TransformerWeighting(FruitBowl.class, byte[].class, trans);
 
@@ -66,8 +66,8 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
     @Test
     public void testCompareWeightingWithNearMatches() throws Exception
     {
-        Transformer trans1 = new MockConverterBuilder().from(DataType.forType(Serializable.class)).to(DataType.BYTE_ARRAY).build();
-        Transformer trans2 = new MockConverterBuilder().from(DataType.forType(Exception.class)).to(DataType.BYTE_ARRAY).build();
+        Transformer trans1 = new MockConverterBuilder().from(DataType.fromType(Serializable.class)).to(DataType.BYTE_ARRAY).build();
+        Transformer trans2 = new MockConverterBuilder().from(DataType.fromType(Exception.class)).to(DataType.BYTE_ARRAY).build();
 
         TransformerWeighting weighting1 = new TransformerWeighting(IOException.class, byte[].class, trans1);
         TransformerWeighting weighting2 = new TransformerWeighting(IOException.class, byte[].class, trans2);
@@ -88,8 +88,8 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
     @Test
     public void testCompareWeightingWithExactMatch() throws Exception
     {
-        Transformer trans1 = new MockConverterBuilder().from(DataType.forType(Serializable.class)).to(DataType.BYTE_ARRAY).build();
-        Transformer trans2 = new MockConverterBuilder().from(DataType.forType(IOException.class)).to(DataType.BYTE_ARRAY).build();
+        Transformer trans1 = new MockConverterBuilder().from(DataType.fromType(Serializable.class)).to(DataType.BYTE_ARRAY).build();
+        Transformer trans2 = new MockConverterBuilder().from(DataType.fromType(IOException.class)).to(DataType.BYTE_ARRAY).build();
 
         TransformerWeighting weighting1 = new TransformerWeighting(IOException.class, byte[].class, trans1);
         TransformerWeighting weighting2 = new TransformerWeighting(IOException.class, byte[].class, trans2);
@@ -110,8 +110,8 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
     @Test
     public void testCompareWeightingWithNoMatch() throws Exception
     {
-        Transformer trans1 = new MockConverterBuilder().from(DataType.forType(Serializable.class)).to(DataType.BYTE_ARRAY).build();
-        Transformer trans2 = new MockConverterBuilder().from(DataType.forType(FruitBowl.class)).to(DataType.BYTE_ARRAY).build();
+        Transformer trans1 = new MockConverterBuilder().from(DataType.fromType(Serializable.class)).to(DataType.BYTE_ARRAY).build();
+        Transformer trans2 = new MockConverterBuilder().from(DataType.fromType(FruitBowl.class)).to(DataType.BYTE_ARRAY).build();
 
         TransformerWeighting weighting1 = new TransformerWeighting(IOException.class, byte[].class, trans1);
         TransformerWeighting weighting2 = new TransformerWeighting(IOException.class, byte[].class, trans2);

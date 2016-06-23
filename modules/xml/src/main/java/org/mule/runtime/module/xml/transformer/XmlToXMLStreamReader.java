@@ -29,13 +29,13 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
     public XmlToXMLStreamReader()
     {
         super();
-        registerSourceType(DataType.forType(Source.class));
+        registerSourceType(DataType.fromType(Source.class));
         registerSourceType(DataType.INPUT_STREAM);
-        registerSourceType(DataType.forType(Document.class));
+        registerSourceType(DataType.fromType(Document.class));
         registerSourceType(DataType.BYTE_ARRAY);
         registerSourceType(DataType.STRING);
 
-        setReturnDataType(DataType.forType(XMLStreamReader.class));
+        setReturnDataType(DataType.fromType(XMLStreamReader.class));
     }
 
     @Override

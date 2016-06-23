@@ -37,8 +37,8 @@ public class XmlToObject extends AbstractXStreamTransformer
         registerSourceType(DataType.STRING);
         registerSourceType(DataType.BYTE_ARRAY);
         registerSourceType(DataType.INPUT_STREAM);
-        registerSourceType(DataType.forType(org.w3c.dom.Document.class));
-        registerSourceType(DataType.forType(org.dom4j.Document.class));
+        registerSourceType(DataType.fromType(org.w3c.dom.Document.class));
+        registerSourceType(DataType.fromType(org.dom4j.Document.class));
         setReturnDataType(DataType.OBJECT);
     }
 

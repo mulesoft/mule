@@ -25,10 +25,10 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
     public ObjectToRemoteInvocationTransformer()
     {
         super();
-        this.registerSourceType(DataType.forType(RemoteInvocation.class));
+        this.registerSourceType(DataType.fromType(RemoteInvocation.class));
         this.registerSourceType(DataType.BYTE_ARRAY);
         this.registerSourceType(DataType.INPUT_STREAM);
-        this.setReturnDataType(DataType.forType(RemoteInvocation.class));
+        this.setReturnDataType(DataType.fromType(RemoteInvocation.class));
     }
 
     @Override

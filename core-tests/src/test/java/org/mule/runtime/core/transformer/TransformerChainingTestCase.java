@@ -162,7 +162,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         };
 
         // Use this class as a bogus source type to enforce a simple invalid transformer
-        transformer.registerSourceType(DataType.forType(this.getClass()));
+        transformer.registerSourceType(DataType.fromType(this.getClass()));
         
         return transformer;
     }
@@ -178,7 +178,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
             }
         };
         
-        DataType<Integer> integerDataType = DataType.forType(Integer.class);
+        DataType<Integer> integerDataType = DataType.fromType(Integer.class);
         transformer.registerSourceType(integerDataType);
         transformer.setReturnDataType(integerDataType);
 

@@ -123,7 +123,7 @@ public class ExpressionArgument implements MuleContextAware
                 try
                 {
                     Transformer t = muleContext.getRegistry().lookupTransformer(DataType.fromObject(result),
-                                                                                DataType.forType(getReturnClass()));
+                                                                                DataType.fromType(getReturnClass()));
                     result = t.transform(result);
                 }
                 catch (TransformerException e)

@@ -58,7 +58,7 @@ public class ObjectToJson extends AbstractJsonTransformer
         if (getSourceClass() != null)
         {
             sourceTypes.clear();
-            registerSourceType(DataType.forType(getSourceClass()));
+            registerSourceType(DataType.fromType(getSourceClass()));
         }
 
         //Add shared mixins first

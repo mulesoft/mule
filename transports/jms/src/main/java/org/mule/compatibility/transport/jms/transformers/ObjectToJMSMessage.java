@@ -39,7 +39,7 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
     @Override
     protected void declareInputOutputClasses()
     {
-        setReturnDataType(DataType.forType(Message.class));
+        setReturnDataType(DataType.fromType(Message.class));
     }
 
     @Override

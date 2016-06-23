@@ -97,7 +97,7 @@ public final class FileContentWrapper
 
     private void attemptFallbackTransformation(FileContentVisitor visitor) throws Exception
     {
-        final DataType sourceDataType = DataType.forType(content.getClass());
+        final DataType sourceDataType = DataType.fromType(content.getClass());
         DataType targetDataType = DataType.INPUT_STREAM;
 
         Object transformedValue = tryTransform(sourceDataType, targetDataType);

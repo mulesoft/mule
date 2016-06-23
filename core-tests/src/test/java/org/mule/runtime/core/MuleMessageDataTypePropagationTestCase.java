@@ -247,7 +247,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         Transformer transformer = mock(Transformer.class);
         DataType outputDataType = DataType.builder().type(Object.class).mimeType(ANY).build();
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
-        when(transformer.isSourceDataTypeSupported(DataType.forType(muleMessage.getPayload().getClass()))).thenReturn(true);
+        when(transformer.isSourceDataTypeSupported(DataType.fromType(muleMessage.getPayload().getClass()))).thenReturn(true);
         when(transformer.transform(anyObject())).thenReturn(new AssertionError(TEST));
 
         MuleEvent muleEvent = mock(MuleEvent.class);
@@ -300,7 +300,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     @Test
     public void setsDataType() throws Exception
     {
-        DataType<Integer> dataType = DataType.forType(Integer.class);
+        DataType<Integer> dataType = DataType.fromType(Integer.class);
 
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
         muleMessage.setDataType(dataType);

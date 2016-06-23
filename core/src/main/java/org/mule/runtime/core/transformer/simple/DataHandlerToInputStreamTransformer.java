@@ -19,7 +19,7 @@ public class DataHandlerToInputStreamTransformer extends AbstractDiscoverableTra
 
     public DataHandlerToInputStreamTransformer()
     {
-        registerSourceType(DataType.forType(DataHandler.class));
+        registerSourceType(DataType.fromType(DataHandler.class));
         setReturnDataType(DataType.INPUT_STREAM);
     }
 

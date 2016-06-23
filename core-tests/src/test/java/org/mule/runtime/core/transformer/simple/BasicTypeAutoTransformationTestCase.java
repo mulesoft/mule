@@ -46,12 +46,12 @@ public class BasicTypeAutoTransformationTestCase extends AbstractMuleContextTest
 
     private Transformer lookupFromStringTransformer(Class to) throws TransformerException
     {
-        return muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.forType(to));
+        return muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(to));
     }
 
     private Transformer lookupToStringTransformer(Class from) throws TransformerException
     {
-        return muleContext.getRegistry().lookupTransformer(DataType.forType(from), DataType.STRING);
+        return muleContext.getRegistry().lookupTransformer(DataType.fromType(from), DataType.STRING);
     }
 
 }

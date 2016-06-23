@@ -61,7 +61,7 @@ public class StringToObjectArrayTestCase extends AbstractTransformerTestCase
     public Transformer getTransformer() throws Exception
     {
         Transformer trans = createObject(StringToObjectArray.class);
-        trans.setReturnDataType(DataType.forType(Object[].class));
+        trans.setReturnDataType(DataType.fromType(Object[].class));
 
         return trans;
     }

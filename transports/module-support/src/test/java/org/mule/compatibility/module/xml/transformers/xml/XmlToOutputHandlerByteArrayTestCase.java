@@ -49,7 +49,7 @@ public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerT
     public Transformer getTransformer() throws Exception
     {
         EndpointAwareTransformer trans = new DefaultEndpointAwareTransformer(createObject(XmlToOutputHandler.class), SystemUtils.getDefaultEncoding(muleContext));
-        trans.setReturnDataType(DataType.forType(OutputHandler.class));
+        trans.setReturnDataType(DataType.fromType(OutputHandler.class));
 
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setEncoding("UTF-8");

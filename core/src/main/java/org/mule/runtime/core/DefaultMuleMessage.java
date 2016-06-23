@@ -781,7 +781,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         }
         else
         {
-            newDataType = DataType.forType(payload.getClass());
+            newDataType = DataType.fromType(payload.getClass());
         }
 
         setPayload(payload, newDataType);

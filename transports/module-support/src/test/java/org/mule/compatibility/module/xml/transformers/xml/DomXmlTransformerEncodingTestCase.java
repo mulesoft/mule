@@ -62,7 +62,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
     public Transformer getRoundTripTransformer() throws Exception
     {
         XmlToDomDocument trans = createObject(XmlToDomDocument.class); // encoding is not interesting
-        trans.setReturnDataType(DataType.forType(org.w3c.dom.Document.class));
+        trans.setReturnDataType(DataType.fromType(org.w3c.dom.Document.class));
         return trans;
     }
 

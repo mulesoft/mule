@@ -269,8 +269,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
     {
         if (!(type.isAssignableFrom(arg.getClass())))
         {
-            DataType<?> source = DataType.forType(arg.getClass());
-            DataType<?> target = DataType.forType(type);
+            DataType<?> source = DataType.fromType(arg.getClass());
+            DataType<?> target = DataType.fromType(type);
             // Throws TransformerException if no suitable transformer is found
             Transformer t = muleContext.getRegistry().lookupTransformer(source, target);
             arg = t.transform(arg);

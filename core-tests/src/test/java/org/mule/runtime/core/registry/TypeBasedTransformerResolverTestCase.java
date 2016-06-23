@@ -45,8 +45,8 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase
     {
     }
 
-    private DataType<A> dataTypeA = DataType.forType(A.class);
-    private DataType<B> dataTypeB = DataType.forType(B.class);
+    private DataType<A> dataTypeA = DataType.fromType(A.class);
+    private DataType<B> dataTypeB = DataType.fromType(B.class);
 
     @Before
     public void setUp() throws Exception

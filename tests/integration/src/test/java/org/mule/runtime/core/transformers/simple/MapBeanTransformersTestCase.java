@@ -28,7 +28,7 @@ public class MapBeanTransformersTestCase extends AbstractTransformerTestCase
     public Transformer getRoundTripTransformer() throws Exception
     {
         MapToBean trans = new MapToBean();
-        trans.setReturnDataType(DataType.forType(GrapeFruit.class));
+        trans.setReturnDataType(DataType.fromType(GrapeFruit.class));
         trans.setMuleContext(muleContext);
         trans.initialise();
         return trans;
