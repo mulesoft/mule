@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
-import org.mule.runtime.api.metadata.SimpleDataType;
+import static org.mule.runtime.config.spring.parsers.specific.DataTypeFactoryBean.buildDataTypeDefinition;
+
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.metadata.TypedValue;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
@@ -47,8 +48,6 @@ public class TypedPropertyMapEntryDefinitionParser extends ChildMapEntryDefiniti
     {
 
         public static final String VALUE_REF = "value-ref";
-        public static final String ENCODING = "encoding";
-        public static final String MIME_TYPE = "mimeType";
 
         public TypedPropertyMapEntryBeanAssembler(PropertyConfiguration beanConfig,
                                                   BeanDefinitionBuilder bean,
@@ -85,7 +84,7 @@ public class TypedPropertyMapEntryDefinitionParser extends ChildMapEntryDefiniti
 
         private AbstractBeanDefinition getTypedValue(PropertyValues sourceProperties)
         {
-            AbstractBeanDefinition dataType = parseDataType(sourceProperties);
+            AbstractBeanDefinition dataType = buildDataTypeDefinition(Object.class.getName(), sourceProperties);
 
             BeanDefinitionBuilder typedValueBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(TypedValue.class);
             if (sourceProperties.contains(VALUE_REF))
@@ -103,17 +102,6 @@ public class TypedPropertyMapEntryDefinitionParser extends ChildMapEntryDefiniti
             typedValueBeanDefinition.addConstructorArgValue(dataType);
 
             return typedValueBeanDefinition.getBeanDefinition();
-        }
-
-        private AbstractBeanDefinition parseDataType(PropertyValues sourceProperties)
-        {
-            BeanDefinitionBuilder dataTypeBuilder = BeanDefinitionBuilder.genericBeanDefinition(SimpleDataType.class);
-            dataTypeBuilder.addConstructorArgValue(Object.class);
-            String value = (String) (sourceProperties.contains(MIME_TYPE) ? sourceProperties.getPropertyValue(MIME_TYPE).getValue() : null);
-            dataTypeBuilder.addConstructorArgValue(value);
-            dataTypeBuilder.addConstructorArgValue(sourceProperties.contains(ENCODING) ? (String) sourceProperties.getPropertyValue(ENCODING).getValue() : null);
-
-            return dataTypeBuilder.getBeanDefinition();
         }
     }
 

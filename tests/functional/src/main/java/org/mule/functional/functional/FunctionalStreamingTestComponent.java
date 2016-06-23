@@ -6,6 +6,7 @@
  */
 package org.mule.functional.functional;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.util.ClassUtils;
@@ -65,6 +66,7 @@ public class FunctionalStreamingTestComponent implements Callable
         return number;
     }
 
+    @Override
     public Object onCall(MuleEventContext context) throws Exception
     {
         InputStream in = (InputStream) context.getMessage().getPayload();

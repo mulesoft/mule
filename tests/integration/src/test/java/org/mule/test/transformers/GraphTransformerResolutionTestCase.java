@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.metadata.SimpleDataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
@@ -72,8 +72,8 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
     {
         public AtoBConverter()
         {
-            registerSourceType(new SimpleDataType<>(A.class));
-            setReturnDataType(new SimpleDataType<>(B.class));
+            registerSourceType(DataType.fromType(A.class));
+            setReturnDataType(DataType.fromType(B.class));
         }
 
         @Override
@@ -99,8 +99,8 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
 
         public BtoCConverter()
         {
-            registerSourceType(new SimpleDataType<>(B.class));
-            setReturnDataType(new SimpleDataType<>(C.class));
+            registerSourceType(DataType.fromType(B.class));
+            setReturnDataType(DataType.fromType(C.class));
         }
 
         @Override

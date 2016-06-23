@@ -12,15 +12,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import org.junit.Test;
 
@@ -36,17 +36,15 @@ public class TransformationServiceNullTransformationTestCase extends AbstractMul
         when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
         TransformationService transformationService = new TransformationService(muleContext);
 
-        DataType dataType = DataTypeFactory.create(Object.class);
-
         Transformer transformer1 = mock(Transformer.class);
         when(transformer1.transform(any(Object.class))).thenReturn(null);
         when(transformer1.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
-        when(transformer1.getReturnDataType()).thenReturn(dataType);
+        when(transformer1.getReturnDataType()).thenReturn((DataType) DataType.OBJECT);
 
         Transformer transformer2 = mock(Transformer.class);
         when(transformer2.transform(any(Object.class))).thenReturn("foo");
         when(transformer2.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
-        when(transformer2.getReturnDataType()).thenReturn(dataType);
+        when(transformer2.getReturnDataType()).thenReturn((DataType) DataType.OBJECT);
 
         MuleMessage message = new DefaultMuleMessage(null, muleContext);
         message = transformationService.applyTransformers(message, null, transformer1, transformer2);

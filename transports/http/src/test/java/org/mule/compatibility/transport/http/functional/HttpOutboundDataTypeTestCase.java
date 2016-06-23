@@ -13,11 +13,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.nio.charset.StandardCharsets;
@@ -43,13 +43,13 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        muleMessage.setOutboundProperty("Content-Type", MimeTypes.TEXT + "; charset=" + StandardCharsets.UTF_16.name());
+        muleMessage.setOutboundProperty("Content-Type", MimeType.TEXT + "; charset=" + StandardCharsets.UTF_16.name());
 
         client.dispatch("vm://testInput", muleMessage);
 
         MuleMessage response = client.request("vm://testOutput", 120000);
 
-        assertThat(response.getDataType().getMimeType(), equalTo(MimeTypes.TEXT));
+        assertThat(response.getDataType().getMimeType(), equalTo(MimeType.TEXT));
         assertThat(response.getDataType().getEncoding(), equalTo(StandardCharsets.UTF_16.name()));
         assertThat(response.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY), is(nullValue()));
         assertThat(response.getOutboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY), is(nullValue()));

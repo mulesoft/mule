@@ -6,10 +6,10 @@
  */
 package org.mule.compatibility.transport.jms.transformers;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.ClassUtils;
 
 import javax.jms.BytesMessage;
@@ -44,12 +44,12 @@ public class JMSMessageToObject extends AbstractJmsTransformer
     @Override
     protected void declareInputOutputClasses()
     {
-        registerSourceType(DataTypeFactory.create(Message.class));
-        registerSourceType(DataTypeFactory.create(TextMessage.class));
-        registerSourceType(DataTypeFactory.create(ObjectMessage.class));
-        registerSourceType(DataTypeFactory.create(BytesMessage.class));
-        registerSourceType(DataTypeFactory.create(MapMessage.class));
-        registerSourceType(DataTypeFactory.create(StreamMessage.class));
+        registerSourceType(DataType.fromType(Message.class));
+        registerSourceType(DataType.fromType(TextMessage.class));
+        registerSourceType(DataType.fromType(ObjectMessage.class));
+        registerSourceType(DataType.fromType(BytesMessage.class));
+        registerSourceType(DataType.fromType(MapMessage.class));
+        registerSourceType(DataType.fromType(StreamMessage.class));
     }
 
     @Override

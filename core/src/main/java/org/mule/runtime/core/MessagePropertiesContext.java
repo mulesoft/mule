@@ -10,8 +10,7 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MutableMessageProperties;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.ObjectUtils;
@@ -80,7 +79,7 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
     @Override
     public void setInboundProperty(String key, Serializable value)
     {
-        setInboundProperty(key, value, DataTypeFactory.createFromObject(value));
+        setInboundProperty(key, value, DataType.fromObject(value));
     }
 
     @Override
@@ -128,7 +127,7 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
     @Override
     public void setOutboundProperty(String key, Serializable value)
     {
-        setOutboundProperty(key, value, DataTypeFactory.createFromObject(value));
+        setOutboundProperty(key, value, DataType.fromObject(value));
     }
 
     @Override

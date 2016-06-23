@@ -10,6 +10,7 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -27,7 +28,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.module.cxf.CxfConfiguration;
 import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
@@ -131,18 +131,14 @@ public class MuleUniversalConduit extends AbstractConduit
         message.setContent(OutputStream.class, delegating);
         message.setContent(DelegatingOutputStream.class, delegating);
         
-        OutputHandler handler = new OutputHandler()
+        OutputHandler handler = (event, out) ->
         {
-            @Override
-            public void write(MuleEvent event, OutputStream out) throws IOException
-            {
-                out.write(cache.toByteArray());
-                
-                delegating.setOutputStream(out);
-                
-                // resume writing!
-                message.getInterceptorChain().doIntercept(message);
-            }
+            out.write(cache.toByteArray());
+            
+            delegating.setOutputStream(out);
+            
+            // resume writing!
+            message.getInterceptorChain().doIntercept(message);
         };
 
         MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
@@ -168,8 +164,9 @@ public class MuleUniversalConduit extends AbstractConduit
         }
         else 
         {
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setPayload(handler, DataTypeFactory.XML_STRING);
+            event.setMessage(event.getMessage().transform(msg ->
+            {
+                msg.setPayload(handler, DataType.XML_STRING);
                 return msg;
             }));
         }
@@ -323,9 +320,9 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             // Sometimes there may not actually be a body, in which case
             // we want to act appropriately. E.g. one way invocations over a proxy
-            InputStream is = (InputStream) result.getMuleContext().getTransformationService().transform(result.getMessage(), DataTypeFactory.create(InputStream.class)).getPayload();
+            InputStream is = (InputStream) result.getMuleContext().getTransformationService().transform(result.getMessage(), DataType.INPUT_STREAM).getPayload();
             PushbackInputStream pb = new PushbackInputStream(is);
-            result.setMessage(new DefaultMuleMessage(pb, result.getMessage(), result.getMuleContext(), DataTypeFactory.XML_STRING));
+            result.setMessage(new DefaultMuleMessage(pb, result.getMessage(), result.getMuleContext(), DataType.XML_STRING));
 
             int b = pb.read();
             if (b != -1)

@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.module.xml.transformer.jaxb;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,8 +42,8 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
 
     public JAXBMarshallerTransformer()
     {
-        setReturnDataType(DataTypeFactory.create(OutputStream.class));
-        registerSourceType(DataTypeFactory.OBJECT);
+        setReturnDataType(DataType.fromType(OutputStream.class));
+        registerSourceType(DataType.OBJECT);
     }
 
     public JAXBMarshallerTransformer(JAXBContext jaxbContext, DataType returnType)
@@ -99,6 +98,7 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
             {
                 return new OutputHandler()
                 {
+                    @Override
                     public void write(MuleEvent event, OutputStream out) throws IOException
                     {
                         try

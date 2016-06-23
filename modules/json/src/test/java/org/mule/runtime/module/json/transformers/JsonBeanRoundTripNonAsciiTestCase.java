@@ -7,7 +7,8 @@
 package org.mule.runtime.module.json.transformers;
 
 import static org.junit.Assert.fail;
-import org.mule.runtime.api.metadata.SimpleDataType;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.LocaleMessageHandler;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -59,7 +60,7 @@ public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
     public Transformer getTransformer() throws Exception
     {
         Transformer trans = super.getTransformer();
-        trans.setReturnDataType(new SimpleDataType<byte[]>(byte[].class));
+        trans.setReturnDataType(DataType.BYTE_ARRAY);
         return trans;
     }
     

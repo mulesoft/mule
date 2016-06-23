@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.util;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.metadata.TypedValue;
 
 import java.util.regex.Pattern;
 
@@ -91,12 +91,12 @@ public class AttributeEvaluator
         else if (isParseExpression())
         {
             final String value = expressionManager.parse(attributeValue, event);
-            return new TypedValue(value, DataTypeFactory.create(String.class, null));
+            return new TypedValue(value, DataType.builder().type(String.class).mimeType((String) null).build());
         }
         else
         {
             Class<?> type = attributeValue == null ? Object.class : String.class;
-            return new TypedValue(attributeValue, DataTypeFactory.create(type, null));
+            return new TypedValue(attributeValue, DataType.builder().type(type).mimeType((String) null).build());
         }
     }
 

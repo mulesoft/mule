@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -15,7 +17,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -75,8 +76,8 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>
             expectedClass = ((ParameterizedType) expectedClass).getRawType();
         }
 
-        org.mule.runtime.api.metadata.DataType sourceDataType = DataTypeFactory.create(object.getClass());
-        org.mule.runtime.api.metadata.DataType targetDataType = DataTypeFactory.create((Class) expectedClass);
+        DataType sourceDataType = DataType.fromType(object.getClass());
+        DataType targetDataType = DataType.fromType((Class<T>) expectedClass);
 
         Transformer transformer;
         try

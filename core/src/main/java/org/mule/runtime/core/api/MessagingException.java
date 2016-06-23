@@ -10,6 +10,9 @@ package org.mule.runtime.core.api;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -17,8 +20,6 @@ import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.routing.filters.RegExFilter;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -162,8 +163,7 @@ public class MessagingException extends MuleException
                     addInfo(PAYLOAD_TYPE_INFO_KEY, muleMessage.getPayload().getClass().getName());
                     try
                     {
-                        addInfo(PAYLOAD_INFO_KEY, muleMessage.getMuleContext().getTransformationService().transform
-                                (muleMessage, DataTypeFactory.STRING).getPayload());
+                        addInfo(PAYLOAD_INFO_KEY, muleMessage.getMuleContext().getTransformationService().transform(muleMessage, DataType.STRING).getPayload());
                     }
                     catch (Exception e)
                     {
@@ -237,17 +237,13 @@ public class MessagingException extends MuleException
         {
             throw new IllegalArgumentException("Class cannot be null");
         }
-        return (ExceptionHelper.traverseCauseHierarchy(this, new ExceptionHelper.ExceptionEvaluator<Object>()
+        return (ExceptionHelper.traverseCauseHierarchy(this, causeException ->
         {
-            @Override
-            public Object evaluate(Throwable causeException)
+            if (e.isAssignableFrom(causeException.getClass()))
             {
-                if (e.isAssignableFrom(causeException.getClass()))
-                {
-                    return causeException;
-                }
-                return null;
+                return causeException;
             }
+            return null;
         }) != null);
     }
 
@@ -265,17 +261,13 @@ public class MessagingException extends MuleException
         {
             throw new IllegalArgumentException("Class cannot be null");
         }
-        return (ExceptionHelper.traverseCauseHierarchy(this, new ExceptionHelper.ExceptionEvaluator<Object>()
+        return (ExceptionHelper.traverseCauseHierarchy(this, causeException ->
         {
-            @Override
-            public Object evaluate(Throwable causeException)
+            if (causeException.getClass().equals(e))
             {
-                if (causeException.getClass().equals(e))
-                {
-                    return causeException;
-                }
-                return null;
+                return causeException;
             }
+            return null;
         }) != null);
     }
 
@@ -305,31 +297,27 @@ public class MessagingException extends MuleException
         {
             throw new IllegalArgumentException("regex cannot be null");
         }
-        return (ExceptionHelper.traverseCauseHierarchy(this, new ExceptionHelper.ExceptionEvaluator<Object>()
+        return (ExceptionHelper.traverseCauseHierarchy(this, e ->
         {
-            @Override
-            public Object evaluate(Throwable e)
+            WildcardFilter wildcardFilter = new WildcardFilter(regex);
+            if (wildcardFilter.accept(e.getClass().getName()))
             {
-                WildcardFilter wildcardFilter = new WildcardFilter(regex);
-                if (wildcardFilter.accept(e.getClass().getName()))
+                return e;
+            }
+            try
+            {
+                RegExFilter regExFilter = new RegExFilter(regex);
+                if (regExFilter.accept(e.getClass().getName()))
                 {
                     return e;
                 }
-                try
-                {
-                    RegExFilter regExFilter = new RegExFilter(regex);
-                    if (regExFilter.accept(e.getClass().getName()))
-                    {
-                        return e;
-                    }
-                }
-                catch (Exception regexEx)
-                {
-                    // Do nothing, regex such as *, *something, something* will fail,
-                    // just don't match
-                }
-                return null;
             }
+            catch (Exception regexEx)
+            {
+                // Do nothing, regex such as *, *something, something* will fail,
+                // just don't match
+            }
+            return null;
         })) != null;
     }
 

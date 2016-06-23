@@ -11,14 +11,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.metadata.DataType.STRING_DATA_TYPE;
 import static org.mule.mvel2.MVEL.compileExpression;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.transformer.types.TypedValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
     public static final String MEL_EXPRESSION = "foo = bar";
 
     private final MuleEvent event = mock(MuleEvent.class);
-    private final TypedValue typedValue = new TypedValue(TEST_MESSAGE, STRING_DATA_TYPE);
+    private final TypedValue typedValue = new TypedValue(TEST_MESSAGE, DataType.STRING);
     private final EnricherDataTypePropagator propagator1 = mock(EnricherDataTypePropagator.class);
     private final EnricherDataTypePropagator propagator2 = mock(EnricherDataTypePropagator.class);
 

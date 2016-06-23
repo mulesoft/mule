@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.file.api;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
@@ -16,7 +17,6 @@ import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import com.google.common.base.Joiner;
 
@@ -97,8 +97,8 @@ public final class FileContentWrapper
 
     private void attemptFallbackTransformation(FileContentVisitor visitor) throws Exception
     {
-        final DataType sourceDataType = DataTypeFactory.create(content.getClass());
-        DataType targetDataType = DataTypeFactory.create(InputStream.class);
+        final DataType sourceDataType = DataType.fromType(content.getClass());
+        DataType targetDataType = DataType.INPUT_STREAM;
 
         Object transformedValue = tryTransform(sourceDataType, targetDataType);
         if (transformedValue != null)

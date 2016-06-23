@@ -10,8 +10,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.util.UUID;
 
@@ -141,9 +140,7 @@ public final class DefaultMuleSession implements MuleSession
             logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key).toString());
         }
 
-        DataType dataType = DataTypeFactory.createFromObject(value);
-
-        properties.put(key, new TypedValue(value, dataType));
+        properties.put(key, new TypedValue(value, DataType.fromObject(value)));
     }
 
     @Override
@@ -162,6 +159,7 @@ public final class DefaultMuleSession implements MuleSession
         return Collections.unmodifiableSet(properties.keySet());
     }
 
+    @Override
     public void merge(MuleSession updatedSession)
     {
         if (updatedSession == null)
@@ -217,7 +215,7 @@ public final class DefaultMuleSession implements MuleSession
     @Override
     public void setProperty(String key, Serializable value)
     {
-        setProperty(key, value, DataTypeFactory.createFromObject(value));
+        setProperty(key, value, DataType.fromObject(value));
     }
 
     @Override

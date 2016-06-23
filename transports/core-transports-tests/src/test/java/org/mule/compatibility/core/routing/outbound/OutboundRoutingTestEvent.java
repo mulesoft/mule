@@ -22,7 +22,6 @@ import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.UUID;
 import org.mule.tck.MuleEndpointTestUtils;
 import org.mule.tck.MuleTestUtils;
@@ -78,7 +77,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         try
         {
-            return (byte[]) getMuleContext().getTransformationService().transform(message, DataTypeFactory.BYTE_ARRAY).getPayload();
+            return (byte[]) getMuleContext().getTransformationService().transform(message, DataType.BYTE_ARRAY).getPayload();
         }
         catch (Exception e)
         {
@@ -91,7 +90,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         try
         {
-            return (String) getMuleContext().getTransformationService().transform(message, DataTypeFactory.STRING).getPayload();
+            return (String) getMuleContext().getTransformationService().transform(message, DataType.STRING).getPayload();
         }
         catch (Exception e)
         {
@@ -104,8 +103,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         try
         {
-            return (String) getMuleContext().getTransformationService().transform(message, DataTypeFactory
-                    .createWithEncoding(String.class, encoding)).getPayload();
+            return (String) getMuleContext().getTransformationService().transform(message, DataType.builder().type(String.class).encoding(encoding).build()).getPayload();
         }
         catch (Exception e)
         {
@@ -116,7 +114,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
-        return transformMessage(DataTypeFactory.create(outputType));
+        return transformMessage(DataType.fromType(outputType));
     }
 
     @Override
@@ -130,7 +128,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         try
         {
-            return new String(transformMessage(DataType.BYTE_ARRAY_DATA_TYPE), getEncoding());
+            return new String(transformMessage(DataType.BYTE_ARRAY), getEncoding());
         }
         catch (UnsupportedEncodingException e)
         {

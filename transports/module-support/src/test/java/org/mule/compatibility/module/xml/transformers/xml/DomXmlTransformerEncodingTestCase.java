@@ -14,9 +14,9 @@ import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.transport.service.DefaultEndpointAwareTransformer;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.module.xml.transformer.DomDocumentToXml;
@@ -47,7 +47,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
     public Transformer getTransformer() throws Exception
     {
         EndpointAwareTransformer trans = new DefaultEndpointAwareTransformer(createObject(DomDocumentToXml.class), SystemUtils.getDefaultEncoding(muleContext));
-        trans.setReturnDataType(DataTypeFactory.STRING);
+        trans.setReturnDataType(DataType.STRING);
 
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setEncoding("US-ASCII");
@@ -62,7 +62,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
     public Transformer getRoundTripTransformer() throws Exception
     {
         XmlToDomDocument trans = createObject(XmlToDomDocument.class); // encoding is not interesting
-        trans.setReturnDataType(DataTypeFactory.create(org.w3c.dom.Document.class));
+        trans.setReturnDataType(DataType.fromType(org.w3c.dom.Document.class));
         return trans;
     }
 

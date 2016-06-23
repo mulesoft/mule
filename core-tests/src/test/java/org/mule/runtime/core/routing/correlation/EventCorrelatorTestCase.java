@@ -12,13 +12,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.store.ListableObjectStore;
@@ -26,12 +27,12 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.routing.EventGroup;
+import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -82,7 +83,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     {
         when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mockMuleEvent);
         when(mockMuleEvent.getMessage()).thenReturn(mockMessageCollection);
-        when(mockMessageCollection.getDataType()).thenReturn(new SimpleDataType(Object.class));
+        when(mockMessageCollection.getDataType()).thenReturn((DataType) DataType.OBJECT);
     }
 
 

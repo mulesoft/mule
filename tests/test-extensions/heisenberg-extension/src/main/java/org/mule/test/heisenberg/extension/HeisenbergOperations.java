@@ -9,10 +9,10 @@ package org.mule.test.heisenberg.extension;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -73,9 +73,9 @@ public class HeisenbergOperations
     public MuleMessage<String, Integer> getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
     {
         Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
-        org.mule.runtime.api.metadata.DataType<String> dt = DataTypeFactory.create(String.class,
-                "dead/dead",
-                lastSupportedEncoding.toString());
+        org.mule.runtime.api.metadata.DataType<String> dt = DataType.builder().type(String.class).mimeType("dead/dead")
+                                                                                         .encoding(lastSupportedEncoding.toString())
+                                                                                         .build();
 
         MuleMessage message = new DefaultMuleMessage(config.getEnemies().get(index), dt, index);
         return message;

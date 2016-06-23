@@ -6,10 +6,10 @@
  */
 package org.mule.compatibility.transport.jms.transformers;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.ClassUtils;
 
 import javax.jms.Message;
@@ -39,7 +39,7 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
     @Override
     protected void declareInputOutputClasses()
     {
-        setReturnDataType(DataTypeFactory.create(Message.class));
+        setReturnDataType(DataType.fromType(Message.class));
     }
 
     @Override

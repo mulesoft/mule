@@ -18,12 +18,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
@@ -46,21 +46,21 @@ public class CompositeConverterTestCase
     public void isSourceDataTypeSupported()
     {
         Converter converter = mock(Converter.class);
-        when(converter.isSourceDataTypeSupported(DataType.STRING_DATA_TYPE)).thenReturn(true);
+        when(converter.isSourceDataTypeSupported(DataType.STRING)).thenReturn(true);
         CompositeConverter chain = new CompositeConverter(converter);
 
-        assertTrue(chain.isSourceDataTypeSupported(DataType.STRING_DATA_TYPE));
+        assertTrue(chain.isSourceDataTypeSupported(DataType.STRING));
     }
 
     @Test
     public void getSourceDataTypes()
     {
-        DataType<?>[] dataTypes = new DataType<?>[] {DataType.STRING_DATA_TYPE};
+        DataType<?>[] dataTypes = new DataType<?>[] {DataType.STRING};
         Converter converter = mock(Converter.class);
         when(converter.getSourceDataTypes()).thenReturn(Arrays.asList(dataTypes));
         CompositeConverter chain = new CompositeConverter(converter);
 
-        assertEquals(DataType.STRING_DATA_TYPE, chain.getSourceDataTypes().get(0));
+        assertEquals(DataType.STRING, chain.getSourceDataTypes().get(0));
     }
 
     @Test
@@ -88,28 +88,28 @@ public class CompositeConverterTestCase
     {
         Converter converter = mock(Converter.class);
         CompositeConverter chain = new CompositeConverter(converter);
-        chain.setReturnDataType(DataType.STRING_DATA_TYPE);
+        chain.setReturnDataType(DataType.STRING);
 
-        verify(converter, atLeastOnce()).setReturnDataType(DataType.STRING_DATA_TYPE);
+        verify(converter, atLeastOnce()).setReturnDataType(DataType.STRING);
     }
 
     @Test
     public void getReturnDataType()
     {
-        doReturn(DataType.STRING_DATA_TYPE).when(mockConverterB).getReturnDataType();
+        doReturn(DataType.STRING).when(mockConverterB).getReturnDataType();
         CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
 
-        assertEquals(DataType.STRING_DATA_TYPE, compositeConverter.getReturnDataType());
+        assertEquals(DataType.STRING, compositeConverter.getReturnDataType());
     }
 
     @Test
     public void getMimeType()
     {
-        doReturn(MimeTypes.APPLICATION_XML).when(mockConverterB).getMimeType();
+        doReturn(MimeType.APPLICATION_XML).when(mockConverterB).getMimeType();
 
         CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
 
-        assertEquals(MimeTypes.APPLICATION_XML, compositeConverter.getMimeType());
+        assertEquals(MimeType.APPLICATION_XML, compositeConverter.getMimeType());
     }
 
     @Test

@@ -8,11 +8,11 @@ package org.mule.runtime.module.json.transformers;
 
 import static org.junit.Assert.fail;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 /**
  * For this test I picked difficult beans in that they are not real beans, so I could test how to use
@@ -47,7 +47,7 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
     public Transformer getRoundTripTransformer() throws Exception
     {
         JsonToObject trans = new JsonToObject();
-        trans.setReturnDataType(DataTypeFactory.create(getTestData().getClass()));
+        trans.setReturnDataType(DataType.fromType(getTestData().getClass()));
         trans.getDeserializationMixins().put(FruitCollection.class, FruitCollectionMixin.class);
         trans.getDeserializationMixins().put(Apple.class, AppleMixin.class);
         trans.getDeserializationMixins().put(Orange.class, OrangeMixin.class);

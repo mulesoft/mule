@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.xml.transformers.xml;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.transformer.XsltTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -36,7 +36,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleContextTestCase
     public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
-        transformer.setReturnDataType(DataTypeFactory.STRING);
+        transformer.setReturnDataType(DataType.STRING);
         transformer.setXslFile("cdcatalog.xsl");
         transformer.setMuleContext(muleContext);
         transformer.initialise();
@@ -64,25 +64,21 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleContextTestCase
 
         for (int i = 0; i < getParallelThreadCount(); ++i)
         {
-            new Thread(new Runnable()
+            new Thread(() ->
             {
-                @Override
-                public void run()
+                signalStarted();
+                for (int j = 0; j < getCallsPerThread(); ++j)
                 {
-                    signalStarted();
-                    for (int j = 0; j < getCallsPerThread(); ++j)
+                    try
                     {
-                        try
-                        {
-                            actualResults.add(transformer.transform(srcData));
-                        }
-                        catch (TransformerException e)
-                        {
-                            actualResults.add(e);
-                        }
+                        actualResults.add(transformer.transform(srcData));
                     }
-                    signalDone();
+                    catch (TransformerException e)
+                    {
+                        actualResults.add(e);
+                    }
                 }
+                signalDone();
             }).start();
         }
 

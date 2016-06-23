@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.xml.util.XMLUtils;
 
@@ -25,10 +25,10 @@ public class XmlPrettyPrinter extends AbstractTransformer
     public XmlPrettyPrinter()
     {
         super();
-        this.registerSourceType(DataTypeFactory.STRING);
-        this.registerSourceType(DataTypeFactory.create(org.dom4j.Document.class));
-        this.registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
-        this.setReturnDataType(DataTypeFactory.STRING);
+        this.registerSourceType(DataType.STRING);
+        this.registerSourceType(DataType.fromType(org.dom4j.Document.class));
+        this.registerSourceType(DataType.fromType(org.w3c.dom.Document.class));
+        this.setReturnDataType(DataType.STRING);
     }
 
     public synchronized OutputFormat getOutputFormat()

@@ -13,6 +13,7 @@ import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -20,8 +21,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.util.DataTypeUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -56,8 +55,8 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
 
     public MuleMessageToHttpResponse()
     {
-        registerSourceType(DataTypeFactory.OBJECT);
-        setReturnDataType(DataTypeFactory.create(HttpResponse.class));
+        registerSourceType(DataType.OBJECT);
+        setReturnDataType(DataType.fromType(HttpResponse.class));
     }
 
     @Override
@@ -204,7 +203,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         if (contentType == null)
         {
             DataType<?> dataType = msg.getDataType();
-            if (!MimeTypes.ANY.equals(dataType.getMimeType()))
+            if (!MimeType.ANY.equals(dataType.getMimeType()))
             {
                 contentType = DataTypeUtils.getContentType(dataType);
             }

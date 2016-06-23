@@ -9,10 +9,11 @@ package org.mule.runtime.core.transformer.simple;
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 /**
  * Transforms a {@link String} to an {@link Enum} of a class specified
@@ -37,11 +38,12 @@ public class StringToEnum extends AbstractTransformer implements DiscoverableTra
         checkArgument(enumClass != null, "enumClass cannot be null");
         this.enumClass = enumClass;
 
-        registerSourceType(DataTypeFactory.create(String.class));
-        setReturnDataType(DataTypeFactory.create(enumClass));
+        registerSourceType(DataType.fromType(String.class));
+        setReturnDataType(DataType.fromType(enumClass));
         setName(format("StringTo%sTransformer", enumClass.getSimpleName()));
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         try
@@ -55,11 +57,13 @@ public class StringToEnum extends AbstractTransformer implements DiscoverableTra
         }
     }
 
+    @Override
     public int getPriorityWeighting()
     {
         return weighting;
     }
 
+    @Override
     public void setPriorityWeighting(int weighting)
     {
         this.weighting = weighting;

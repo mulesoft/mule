@@ -7,10 +7,9 @@
 
 package org.mule.runtime.core.el.mvel.datatype;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.mvel2.compiler.CompiledExpression;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleEvent;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -79,7 +78,7 @@ public class MvelDataTypeResolver
         if (result == null)
         {
             Class<?> type = value == null ? Object.class : value.getClass();
-            result = DataTypeFactory.create(type, null);
+            result = DataType.fromType(type);
         }
 
         return result;

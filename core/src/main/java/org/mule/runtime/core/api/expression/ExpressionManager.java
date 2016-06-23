@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.expression;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.metadata.TypedValue;
 
 /**
  * Provides universal access for evaluating expressions embedded in Mule configurations, such as Xml, Java,

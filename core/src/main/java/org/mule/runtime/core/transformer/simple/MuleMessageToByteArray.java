@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 /** TODO */
 public class MuleMessageToByteArray extends AbstractMessageTransformer
 {
     public MuleMessageToByteArray()
     {
-        registerSourceType(DataTypeFactory.MULE_MESSAGE);
-        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataType.MULE_MESSAGE);
+        setReturnDataType(DataType.BYTE_ARRAY);
     }
 
     @Override

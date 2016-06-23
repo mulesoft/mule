@@ -17,9 +17,9 @@ import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -47,7 +47,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     public void testConstructorWithNullPayload()
     {
         MuleMessage message = new DefaultMuleMessage(null, muleContext);
-        assertEquals(NullPayload.getInstance(), message.getPayload());
+        assertThat(message.getPayload(), is(NullPayload.getInstance()));
     }
 
     //
@@ -57,7 +57,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     public void testOneArgConstructor()
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        assertEquals(TEST_MESSAGE, message.getPayload());
+        assertThat(message.getPayload(), is(TEST_MESSAGE));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         MuleMessage oldMessage = createMuleMessage();
 
         MuleMessage message = new DefaultMuleMessage(oldMessage, muleContext);
-        assertEquals("MULE_MESSAGE", message.getPayload());
+        assertThat(message.getPayload(), is(AbstractMuleContextTestCase.TEST_PAYLOAD));
         assertOutboundMessageProperty("MuleMessage", message);
     }
 
@@ -131,7 +131,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         MuleMessage previousMessage = createMuleMessage();
 
         MuleMessage message = new DefaultMuleMessage(previousMessage, properties, muleContext);
-        assertEquals("MULE_MESSAGE", message.getPayload());
+        assertEquals(AbstractMuleContextTestCase.TEST_PAYLOAD, message.getPayload());
         assertOutboundMessageProperty("MessageProperties", message);
         assertOutboundMessageProperty("MuleMessage", message);
     }
@@ -160,7 +160,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         previous.setOutboundProperty("previous", "previous");
 
         MuleMessage message = new DefaultMuleMessage(payload, previous, muleContext);
-        assertEquals("MULE_MESSAGE", message.getPayload());
+        assertEquals(AbstractMuleContextTestCase.TEST_PAYLOAD, message.getPayload());
         assertOutboundMessageProperty("MuleMessage", message);
         assertOutboundMessageProperty("payload", message);
         assertEquals(previous.getUniqueId(), message.getUniqueId());
@@ -250,17 +250,17 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         assertEquals(0, message.getOutboundAttachmentNames().size());
 
         //Try with content type set
-        message.addOutboundAttachment("spi-props", IOUtils.getResourceAsUrl("test-spi.properties", getClass()), MimeTypes.TEXT);
+        message.addOutboundAttachment("spi-props", IOUtils.getResourceAsUrl("test-spi.properties", getClass()), MimeType.TEXT);
 
         assertTrue(message.getOutboundAttachmentNames().contains("spi-props"));
         handler = message.getOutboundAttachment("spi-props");
-        assertEquals(MimeTypes.TEXT, handler.getContentType());
+        assertEquals(MimeType.TEXT, handler.getContentType());
         assertEquals(1, message.getOutboundAttachmentNames().size());
 
         //Try without content type set
         message.addOutboundAttachment("dummy", IOUtils.getResourceAsUrl("dummy.xml", getClass()), null);
         handler = message.getOutboundAttachment("dummy");
-        assertEquals(MimeTypes.APPLICATION_XML, handler.getContentType());
+        assertEquals(MimeType.APPLICATION_XML, handler.getContentType());
         assertEquals(2, message.getOutboundAttachmentNames().size());
 
 
@@ -317,7 +317,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     private MutableMuleMessage createMuleMessage()
     {
         // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage previousMessage = new DefaultMuleMessage("MULE_MESSAGE", DataType.STRING_DATA_TYPE,
+        MutableMuleMessage previousMessage = new DefaultMuleMessage(AbstractMuleContextTestCase.TEST_PAYLOAD, DataType.STRING,
                                                                     testAttributes, muleContext);
         previousMessage.setOutboundProperty("MuleMessage", "MuleMessage");
         return previousMessage;

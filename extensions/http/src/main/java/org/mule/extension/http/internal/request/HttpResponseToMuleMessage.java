@@ -6,12 +6,11 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.core.transformer.types.DataTypeFactory.createFromDataType;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.buildContentTypeDataType;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.HttpRequesterConfig;
@@ -19,10 +18,10 @@ import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBu
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.util.DataTypeUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -31,12 +30,9 @@ import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
-import com.google.common.net.MediaType;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -71,13 +67,13 @@ public class HttpResponseToMuleMessage
     {
         String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
         DataType dataType = muleEvent.getMessage().getDataType();
-        if (StringUtils.isEmpty(responseContentType) && !MimeTypes.ANY.equals(dataType.getMimeType()))
+        if (StringUtils.isEmpty(responseContentType) && !MimeType.ANY.equals(dataType.getMimeType()))
         {
             responseContentType = DataTypeUtils.getContentType(dataType);
         }
 
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-        String encoding = getEncoding(responseContentType);
+        String encoding = buildContentTypeDataType(responseContentType).getEncoding();
 
         Object payload = responseInputStream;
         Map<String, DataHandler> parts = new HashMap<>();
@@ -108,10 +104,7 @@ public class HttpResponseToMuleMessage
 
         HttpResponseAttributes responseAttributes = createAttributes(response, parts);
 
-        if (encoding != null)
-        {
-            dataType = createFromDataType(dataType, encoding);
-        }
+        dataType = DataType.builder(dataType).encoding(encoding).build();
         MuleMessage responseMessage = new DefaultMuleMessage(payload, dataType, responseAttributes);
 
         String requestMessageId = muleEvent.getMessage().getUniqueId();
@@ -127,37 +120,6 @@ public class HttpResponseToMuleMessage
     private HttpResponseAttributes createAttributes(HttpResponse response, Map<String, DataHandler> parts)
     {
         return new HttpResponseAttributesBuilder().setResponse(response).setParts(parts).build();
-    }
-
-    private String getEncoding(String responseContentType)
-    {
-        String encoding = Charset.defaultCharset().name();
-
-        if (responseContentType != null)
-        {
-            try
-            {
-                MediaType mediaType = MediaType.parse(responseContentType);
-                if (mediaType.charset().isPresent())
-                {
-                    encoding = mediaType.charset().get().name();
-                }
-            }
-            catch (IllegalArgumentException e)
-            {
-                if (Boolean.parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
-                {
-                    throw e;
-                }
-                else
-                {
-                    logger.warn(String.format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), responseContentType, e.getMessage()));
-                    logger.warn(String.format("Using default encoding: %s", encoding));
-                }
-            }
-        }
-
-        return encoding;
     }
 
     private Map<String, DataHandler> processParts(InputStream responseInputStream, String responseContentType) throws IOException

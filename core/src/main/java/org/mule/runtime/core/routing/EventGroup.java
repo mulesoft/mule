@@ -7,6 +7,8 @@
 package org.mule.runtime.core.routing;
 
 import static java.util.stream.Collectors.toList;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -19,7 +21,6 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -412,7 +413,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
                 List<MuleMessage> messageList =  Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
                 MuleEvent lastEvent = retrieveLastStoredEvent();
-                DefaultMuleEvent muleEvent = new DefaultMuleEvent(new DefaultMuleMessage(messageList, DataTypeFactory.create(List.class), muleContext),
+                DefaultMuleEvent muleEvent = new DefaultMuleEvent(new DefaultMuleMessage(messageList, DataType.fromType(List.class), muleContext),
                                                                   lastEvent, getMergedSession());
                 if (getCommonRootId() != null)
                 {

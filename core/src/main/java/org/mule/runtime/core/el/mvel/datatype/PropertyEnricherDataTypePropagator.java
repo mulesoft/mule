@@ -8,9 +8,9 @@
 package org.mule.runtime.core.el.mvel.datatype;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.AssignmentNode;
-import org.mule.runtime.core.transformer.types.TypedValue;
 
 /**
  * Propagates data type for inlined flow and session vars used for enrichment target

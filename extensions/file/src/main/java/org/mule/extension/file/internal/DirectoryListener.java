@@ -19,6 +19,7 @@ import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.FileEventType;
@@ -34,7 +35,6 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -334,7 +334,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     private MuleMessage<InputStream, ListenerFileAttributes> createMessage(Path path, ListenerFileAttributes attributes)
     {
         Object payload = NullPayload.getInstance();
-        DataType dataType = DataTypeFactory.create(NullPayload.class);
+        DataType dataType = DataType.fromType(NullPayload.class);
         MuleMessage<InputStream, ListenerFileAttributes> message;
 
         if (attributes.getEventType() == FileEventType.DELETE)
@@ -343,7 +343,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
         }
         else if (!attributes.isDirectory())
         {
-            dataType = fileSystem.getFileMessageDataType(DataTypeFactory.create(InputStream.class), attributes);
+            dataType = fileSystem.getFileMessageDataType(DataType.INPUT_STREAM, attributes);
             payload = new FileInputStream(path, new NullPathLock());
         }
 

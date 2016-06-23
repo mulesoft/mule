@@ -10,6 +10,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -17,7 +19,6 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -95,7 +96,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
 
         public EnsureXmlDataType()
         {
-            super(MimeTypes.XML);
+            super(MimeType.XML);
         }
     }
 
@@ -104,7 +105,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
 
         public EnsureAnyDataType()
         {
-            super(MimeTypes.ANY);
+            super(MimeType.ANY);
         }
     }
 

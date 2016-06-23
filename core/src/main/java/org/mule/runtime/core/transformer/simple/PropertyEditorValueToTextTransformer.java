@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import org.mule.runtime.api.metadata.SimpleDataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.beans.PropertyEditor;
 
@@ -30,8 +29,8 @@ public class PropertyEditorValueToTextTransformer extends AbstractTransformer im
 
     public PropertyEditorValueToTextTransformer(PropertyEditor propertyEditor, Class<?> clazz)
     {
-        registerSourceType(new SimpleDataType<>(clazz));
-        setReturnDataType(DataTypeFactory.STRING);
+        registerSourceType(DataType.fromType(clazz));
+        setReturnDataType(DataType.STRING);
         this.propertyEditor = propertyEditor;
     }
 

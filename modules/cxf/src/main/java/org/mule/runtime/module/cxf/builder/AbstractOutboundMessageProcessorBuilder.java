@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.cxf.builder;
 
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.module.cxf.CxfConfiguration;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.runtime.module.cxf.CxfPayloadToArguments;
@@ -361,7 +361,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
 
     protected String getMimeType()
     {
-        return MimeTypes.ANY;
+        return MimeType.ANY;
     }
 
 }

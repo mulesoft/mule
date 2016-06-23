@@ -8,7 +8,6 @@ package org.mule.runtime.core.transformer;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -20,7 +19,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.SystemUtils;
@@ -42,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTransformer extends AbstractAnnotatedObject implements Transformer
 {
-    public static final DataType<MuleMessage> MULE_MESSAGE_DATA_TYPE = new SimpleDataType<MuleMessage>(MuleMessage.class);
 
     protected MuleContext muleContext;
 
@@ -52,7 +49,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      * The return type that will be returned by the {@link #transform} method is
      * called
      */
-    protected DataType<?> returnType = new SimpleDataType<Object>(Object.class);
+    protected DataType<?> returnType = DataType.OBJECT;
 
     /**
      * The name that identifies this transformer. If none is set the class name of
@@ -250,7 +247,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         if (src instanceof MuleMessage)
         {
             MuleMessage message = (MuleMessage) src;
-            if ((!isSourceDataTypeSupported(MULE_MESSAGE_DATA_TYPE, true) &&
+            if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true) &&
                  !(this instanceof AbstractMessageTransformer)))
             {
                 src = ((MuleMessage) src).getPayload();
@@ -258,7 +255,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             }
         }
 
-        DataType<?> sourceType = DataTypeFactory.create(payload.getClass());
+        DataType<?> sourceType = DataType.fromType(payload.getClass());
         if (!isSourceDataTypeSupported(sourceType))
         {
             Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),

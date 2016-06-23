@@ -19,10 +19,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
-import org.mule.runtime.api.metadata.DataType;
+
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
@@ -58,7 +58,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
 {
 
     private static final String CONFIG_NAME = "config";
-    private static final DataType DATA_TYPE = DataTypeFactory.create(String.class);
+    private static final DataType DATA_TYPE = DataType.STRING;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleEvent muleEvent;

@@ -12,7 +12,6 @@ import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
@@ -185,9 +184,11 @@ public abstract class AbstractFileSystem implements FileSystem
     {
         String presumedMimeType = mimetypesFileTypeMap.getContentType(attributes.getPath());
 
-        DataType<InputStream> newDataType = DataTypeFactory.create(InputStream.class,
-                presumedMimeType != null ? presumedMimeType : originalDataType.getMimeType(),
-                originalDataType.getEncoding());
+        DataType<InputStream> newDataType = DataType.builder()
+                                                    .type(InputStream.class)
+                                                    .mimeType(presumedMimeType != null ? presumedMimeType : originalDataType.getMimeType())
+                                                    .encoding(originalDataType.getEncoding())
+                                                    .build();
 
         return newDataType;
     }

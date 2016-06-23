@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.transformer.types;
+package org.mule.runtime.core.metadata;
 
 import org.mule.runtime.api.metadata.DataType;
 
@@ -31,7 +31,7 @@ public class TypedValue<T> implements Serializable
         this.value = value;
         if (dataType == null)
         {
-            this.dataType = DataTypeFactory.create((Class<T>) value.getClass());
+            this.dataType = DataType.fromType((Class<T>) value.getClass());
         }
         else
         {

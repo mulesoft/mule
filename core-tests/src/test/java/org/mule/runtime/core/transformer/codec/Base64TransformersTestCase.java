@@ -12,9 +12,9 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.Base64;
 
 import org.junit.Test;
@@ -54,7 +54,7 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
     {
         Transformer t = new Base64Decoder();
         // our input is a String so we expect a String as output
-        t.setReturnDataType(DataTypeFactory.STRING);
+        t.setReturnDataType(DataType.STRING);
         return t;
     }
 

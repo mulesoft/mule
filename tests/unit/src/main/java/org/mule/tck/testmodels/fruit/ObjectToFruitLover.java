@@ -6,18 +6,18 @@
  */
 package org.mule.tck.testmodels.fruit;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 public class ObjectToFruitLover extends AbstractTransformer
 {
 
     public ObjectToFruitLover()
     {
-        this.setReturnDataType(DataTypeFactory.create(FruitLover.class));
-        this.registerSourceType(DataTypeFactory.STRING);
-        this.registerSourceType(DataTypeFactory.create(FruitLover.class));
+        this.setReturnDataType(DataType.fromType(FruitLover.class));
+        this.registerSourceType(DataType.STRING);
+        this.registerSourceType(DataType.fromType(FruitLover.class));
     }
 
     @Override

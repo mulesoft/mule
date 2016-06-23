@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -33,7 +34,6 @@ import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.DataTypeUtils;
@@ -99,7 +99,7 @@ public class MuleEventToHttpRequest
         if (!event.getMessage().getOutboundPropertyNames().contains(MuleProperties.CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
-            if (!MimeTypes.ANY.equals(dataType.getMimeType()))
+            if (!MimeType.ANY.equals(dataType.getMimeType()))
             {
                 builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
             }

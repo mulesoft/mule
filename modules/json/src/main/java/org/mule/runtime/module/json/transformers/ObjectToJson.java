@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.json.transformers;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.module.json.filters.IsJsonFilter;
 
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class ObjectToJson extends AbstractJsonTransformer
 
     public ObjectToJson()
     {
-        this.setReturnDataType(DataTypeFactory.JSON_STRING);
+        this.setReturnDataType(DataType.JSON_STRING);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ObjectToJson extends AbstractJsonTransformer
         if (getSourceClass() != null)
         {
             sourceTypes.clear();
-            registerSourceType(DataTypeFactory.create(getSourceClass()));
+            registerSourceType(DataType.fromType(getSourceClass()));
         }
 
         //Add shared mixins first

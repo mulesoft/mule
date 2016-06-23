@@ -8,13 +8,11 @@ package org.mule.compatibility.transport.file.transformers;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.compatibility.transport.file.transformers.FileToByteArray;
-import org.mule.compatibility.transport.file.transformers.FileToString;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.transformer.simple.ObjectToString;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.File;
@@ -87,7 +85,7 @@ public class FileTransformersSourceTypesTestCase extends AbstractMuleContextEndp
     private void assertSingleTransformer(Class<?> source, Class<?> target, Class<?> expectedTransformerType) throws Exception
     {
         // This lookup method fails if there is more than one transformer available.
-        Transformer transformer = muleContext.getRegistry().lookupTransformer(DataTypeFactory.create(source), DataTypeFactory.create(target));
+        Transformer transformer = muleContext.getRegistry().lookupTransformer(DataType.fromType(source), DataType.fromType(target));
         assertEquals(expectedTransformerType, transformer.getClass());
     }
 

@@ -10,7 +10,9 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
@@ -31,7 +33,6 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
 import org.mule.runtime.module.cxf.transport.MuleUniversalDestination;
 import org.mule.runtime.module.xml.stax.StaxSource;
@@ -231,7 +232,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
         final String finalCt = ct;
         event.setMessage(event.getMessage().transform(msg -> {
-            msg.setPayload(message, DataTypeFactory.XML_STRING);
+            msg.setPayload(message, DataType.XML_STRING);
             msg.setOutboundProperty(CONTENT_TYPE, finalCt);
             return msg;
         }));
@@ -463,7 +464,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             }
             else
             {
-                msg.setPayload(getResponseOutputHandler(exchange), DataTypeFactory.XML_STRING);
+                msg.setPayload(getResponseOutputHandler(exchange), DataType.XML_STRING);
             }
 
             // Handle a fault if there is one.
@@ -472,7 +473,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             {
                 if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
                 {
-                    msg.setPayload(getResponseOutputHandler(exchange), DataTypeFactory.XML_STRING);
+                    msg.setPayload(getResponseOutputHandler(exchange), DataType.XML_STRING);
                 }
                 Exception ex = faultMsg.getContent(Exception.class);
                 if (ex != null)
@@ -519,41 +520,36 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     protected OutputHandler getResponseOutputHandler(final Exchange exchange)
     {
-        OutputHandler outputHandler = new OutputHandler()
+        OutputHandler outputHandler = (event, out) ->
         {
-            @Override
-            public void write(MuleEvent event, OutputStream out) throws IOException
+            Message outFaultMessage = exchange.getOutFaultMessage();
+            Message outMessage = exchange.getOutMessage();
+
+            Message contentMsg = null;
+            if (outFaultMessage != null && outFaultMessage.getContent(OutputStream.class) != null)
             {
-                Message outFaultMessage = exchange.getOutFaultMessage();
-                Message outMessage = exchange.getOutMessage();
-
-                Message contentMsg = null;
-                if (outFaultMessage != null && outFaultMessage.getContent(OutputStream.class) != null)
-                {
-                    contentMsg = outFaultMessage;
-                }
-                else if (outMessage != null)
-                {
-                    contentMsg = outMessage;
-                }
-
-                if (contentMsg == null)
-                {
-                    return;
-                }
-
-                DelegatingOutputStream delegate = contentMsg.getContent(DelegatingOutputStream.class);
-                if (delegate.getOutputStream() instanceof ByteArrayOutputStream)
-                {
-                    out.write(((ByteArrayOutputStream) delegate.getOutputStream()).toByteArray());
-                }
-                delegate.setOutputStream(out);
-
-                out.flush();
-
-                contentMsg.getInterceptorChain().resume();
+                contentMsg = outFaultMessage;
+            }
+            else if (outMessage != null)
+            {
+                contentMsg = outMessage;
             }
 
+            if (contentMsg == null)
+            {
+                return;
+            }
+
+            DelegatingOutputStream delegate = contentMsg.getContent(DelegatingOutputStream.class);
+            if (delegate.getOutputStream() instanceof ByteArrayOutputStream)
+            {
+                out.write(((ByteArrayOutputStream) delegate.getOutputStream()).toByteArray());
+            }
+            delegate.setOutputStream(out);
+
+            out.flush();
+
+            contentMsg.getInterceptorChain().resume();
         };
         return outputHandler;
     }
@@ -592,7 +588,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
         else
         {
-            InputStream is = ctx.transformMessage(DataTypeFactory.create(InputStream.class));
+            InputStream is = ctx.transformMessage(DataType.INPUT_STREAM);
             m.put(Message.ENCODING, ctx.getEncoding());
             m.setContent(InputStream.class, is);
         }
@@ -616,7 +612,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
         else
         {
-            is = context.transformMessage(DataTypeFactory.create(InputStream.class));
+            is = context.transformMessage(DataType.INPUT_STREAM);
         }
         return is;
     }

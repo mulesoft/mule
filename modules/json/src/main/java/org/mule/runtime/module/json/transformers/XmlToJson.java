@@ -7,21 +7,23 @@
 package org.mule.runtime.module.json.transformers;
 
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.IOUtils;
+
+import java.io.File;
+import java.io.Reader;
+import java.net.URL;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stax.StAXSource;
-import java.io.File;
-import java.io.Reader;
-import java.net.URL;
+
+import org.w3c.dom.Document;
 
 import de.odysseus.staxon.json.JsonXMLOutputFactory;
-import org.w3c.dom.Document;
 
 /**
  * Convert XML to a JSON string
@@ -30,14 +32,14 @@ public class XmlToJson  extends AbstractToFromXmlTransformer
 {
     public XmlToJson()
     {
-        this.registerSourceType(DataTypeFactory.STRING);
-        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
-        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        this.registerSourceType(DataTypeFactory.create(Reader.class));
-        this.registerSourceType(DataTypeFactory.create(URL.class));
-        this.registerSourceType(DataTypeFactory.create(File.class));
-        registerSourceType(DataTypeFactory.create(Document.class));
-        this.setReturnDataType(DataTypeFactory.JSON_STRING);
+        this.registerSourceType(DataType.STRING);
+        this.registerSourceType(DataType.INPUT_STREAM);
+        this.registerSourceType(DataType.BYTE_ARRAY);
+        this.registerSourceType(DataType.fromType(Reader.class));
+        this.registerSourceType(DataType.fromType(URL.class));
+        this.registerSourceType(DataType.fromType(File.class));
+        registerSourceType(DataType.fromType(Document.class));
+        this.setReturnDataType(DataType.JSON_STRING);
     }
 
     /**

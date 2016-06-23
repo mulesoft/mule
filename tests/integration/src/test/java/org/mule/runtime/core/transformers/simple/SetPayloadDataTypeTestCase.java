@@ -11,9 +11,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 
 import org.junit.Test;
@@ -42,6 +42,6 @@ public class SetPayloadDataTypeTestCase extends FunctionalTestCase
 
         DataType dataType = response.getDataType();
 
-        assertThat(dataType, DataTypeMatcher.like(String.class, MimeTypes.XML, "UTF-16"));
+        assertThat(dataType, DataTypeMatcher.like(String.class, MimeType.XML, "UTF-16"));
     }
 }

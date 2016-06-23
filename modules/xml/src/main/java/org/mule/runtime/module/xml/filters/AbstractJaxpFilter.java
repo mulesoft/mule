@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.xml.filters;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
 import org.mule.runtime.module.xml.util.XMLUtils;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -31,7 +31,7 @@ public abstract class AbstractJaxpFilter
     public AbstractJaxpFilter()
     {
         super();
-        xmlToDom.setReturnDataType(DataTypeFactory.create(Document.class));
+        xmlToDom.setReturnDataType(DataType.fromType(Document.class));
     }
     public void initialise() throws InitialisationException
     {

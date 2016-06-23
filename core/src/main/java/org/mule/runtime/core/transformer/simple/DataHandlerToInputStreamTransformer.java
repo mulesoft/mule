@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractDiscoverableTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
 
@@ -19,8 +19,8 @@ public class DataHandlerToInputStreamTransformer extends AbstractDiscoverableTra
 
     public DataHandlerToInputStreamTransformer()
     {
-        registerSourceType(DataTypeFactory.create(DataHandler.class));
-        setReturnDataType(DataTypeFactory.INPUT_STREAM);
+        registerSourceType(DataType.fromType(DataHandler.class));
+        setReturnDataType(DataType.INPUT_STREAM);
     }
 
     @Override

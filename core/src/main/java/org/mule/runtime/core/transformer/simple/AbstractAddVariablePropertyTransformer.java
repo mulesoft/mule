@@ -11,9 +11,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.transformer.types.TypedValue;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -26,8 +25,8 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
 
     public AbstractAddVariablePropertyTransformer()
     {
-        registerSourceType(DataTypeFactory.OBJECT);
-        setReturnDataType(DataTypeFactory.OBJECT);
+        registerSourceType(DataType.OBJECT);
+        setReturnDataType(DataType.OBJECT);
     }
 
     @Override
@@ -63,15 +62,8 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
             }
             else
             {
-                if (!StringUtils.isEmpty(returnType.getMimeType()) || !StringUtils.isEmpty(returnType.getEncoding()))
-                {
-                    DataType<?> dataType = DataTypeFactory.create(typedValue.getValue().getClass(), getMimeType(), getEncoding());
-                    addProperty(event, key, typedValue.getValue(), dataType);
-                }
-                else
-                {
-                    addProperty(event, key, typedValue.getValue(), typedValue.getDataType());
-                }
+                addProperty(event, key, typedValue.getValue(),
+                        DataType.builder().type(typedValue.getValue().getClass()).mimeType(getMimeType()).encoding(getEncoding()).build());
             }
         }
         return event.getMessage();

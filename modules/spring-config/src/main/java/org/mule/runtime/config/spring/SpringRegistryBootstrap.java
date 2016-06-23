@@ -22,7 +22,6 @@ import org.mule.runtime.core.config.bootstrap.ObjectBootstrapProperty;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.config.bootstrap.TransformerBootstrapProperty;
 import org.mule.runtime.core.transformer.TransformerUtils;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.Map.Entry;
 
@@ -93,7 +92,7 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
 
         if (returnClass != null)
         {
-            returnType = DataTypeFactory.create(returnClass, bootstrapProperty.getMimeType());
+            returnType = DataType.builder().type(returnClass).mimeType(bootstrapProperty.getMimeType()).build();
             builder.addPropertyValue("returnDataType", returnType);
         }
 

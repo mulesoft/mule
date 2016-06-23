@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.module.json.transformers;
 
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.json.JsonData;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
-import org.mule.runtime.core.transformer.types.MimeTypes;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.json.JsonData;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -34,18 +33,18 @@ import java.util.Map;
  */
 public class JsonToObject extends AbstractJsonTransformer
 {
-    private static final DataType<JsonData> JSON_TYPE = DataTypeFactory.create(JsonData.class, MimeTypes.APPLICATION_JSON);
+    private static final DataType<JsonData> JSON_TYPE = DataType.builder().type(JsonData.class).mimeType(MimeType.APPLICATION_JSON).build();
 
     private Map<Class<?>, Class<?>> deserializationMixins = new HashMap<Class<?>, Class<?>>();
 
     public JsonToObject()
     {
-        this.registerSourceType(DataTypeFactory.create(Reader.class));
-        this.registerSourceType(DataTypeFactory.create(URL.class));
-        this.registerSourceType(DataTypeFactory.create(File.class));
-        this.registerSourceType(DataTypeFactory.STRING);
-        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
-        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        this.registerSourceType(DataType.fromType(Reader.class));
+        this.registerSourceType(DataType.fromType(URL.class));
+        this.registerSourceType(DataType.fromType(File.class));
+        this.registerSourceType(DataType.STRING);
+        this.registerSourceType(DataType.INPUT_STREAM);
+        this.registerSourceType(DataType.BYTE_ARRAY);
         setReturnDataType(JSON_TYPE);
     }
 

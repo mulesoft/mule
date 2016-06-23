@@ -7,8 +7,8 @@
 package org.mule.runtime.core.registry;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.SimpleDataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -58,11 +58,13 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
 
     protected TransformerResolver graphTransformerResolver = new GraphTransformerResolver();
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         try
@@ -81,6 +83,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         }
     }
 
+    @Override
     public Transformer resolve(DataType source, DataType result) throws ResolverException
     {
         Transformer transformer = exactTransformerCache.get(source.toString() + result.toString());
@@ -121,7 +124,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
                 return null;
             }
             //Perform a more general search
-            trans = muleContext.getRegistry().lookupTransformers(source, new SimpleDataType(Object.class));
+            trans = muleContext.getRegistry().lookupTransformers(source, DataType.OBJECT);
 
             transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
             if (transformer != null)
@@ -196,11 +199,13 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         return weightings;
     }
 
+    @Override
     public void dispose()
     {
         exactTransformerCache.clear();
     }
 
+    @Override
     public void transformerChange(Transformer transformer, RegistryAction registryAction)
     {
         if (transformer instanceof Converter)

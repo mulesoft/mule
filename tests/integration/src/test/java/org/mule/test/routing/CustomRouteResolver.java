@@ -6,6 +6,7 @@
  */
 package org.mule.test.routing;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -13,7 +14,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.routing.DynamicRouteResolver;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +81,7 @@ public class CustomRouteResolver implements DynamicRouteResolver
             try
             {
                 event.setMessage(new DefaultMuleMessage(event.getMuleContext().getTransformationService().transform
-                        (event.getMessage(), DataTypeFactory.STRING).getPayload() + letter, event.getMessage(), event
+                        (event.getMessage(), DataType.STRING).getPayload() + letter, event.getMessage(), event
                         .getMuleContext()));
             }
             catch (Exception e)

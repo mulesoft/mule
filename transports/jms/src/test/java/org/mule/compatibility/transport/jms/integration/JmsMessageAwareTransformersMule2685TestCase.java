@@ -8,14 +8,15 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 
 import javax.jms.Message;
 import javax.jms.Session;
@@ -92,7 +93,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
 
         public SetTestRecipientsTransformer()
         {
-            registerSourceType(DataTypeFactory.MULE_MESSAGE);
+            registerSourceType(DataType.MULE_MESSAGE);
         }
 
         @Override

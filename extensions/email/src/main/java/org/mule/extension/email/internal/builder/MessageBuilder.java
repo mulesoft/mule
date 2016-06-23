@@ -14,10 +14,11 @@ import static javax.mail.Part.INLINE;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.MULTIPART;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.toAddressArray;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
+
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.extension.email.internal.util.EmailConnectorUtils;
-import org.mule.runtime.core.transformer.types.MimeTypes;
+import org.mule.runtime.api.metadata.MimeType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public final class MessageBuilder
 
     private Map<String, DataHandler> attachments;
     private String content = "";
-    private String contentType = MimeTypes.TEXT;
+    private String contentType = MimeType.TEXT;
 
     private MessageBuilder(Session s) throws MessagingException
     {

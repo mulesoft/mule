@@ -29,6 +29,7 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
+
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
@@ -261,7 +262,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     public void operationReturnsMuleMessageWichKeepsNoValues() throws Exception
     {
         Object payload = new Object();
-        DataType dataType = mock(DataType.class);
+        DataType dataType = DataType.OBJECT;
         Serializable attributes = mock(Serializable.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload, dataType, attributes));
@@ -286,7 +287,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         messageProcessor = createOperationMessageProcessor();
 
         Object payload = new Object();
-        DataType dataType = mock(DataType.class);
+        DataType dataType = DataType.OBJECT;
         Serializable attributes = mock(Serializable.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload, dataType, attributes));
@@ -309,11 +310,11 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     public void operationReturnsMuleMessageButKeepsAttributes() throws Exception
     {
         Object payload = new Object();
-        DataType dataType = mock(DataType.class);
+        DataType dataType = DataType.OBJECT;
         Serializable oldAttributes = mock(Serializable.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload, dataType));
-        when(event.getMessage()).thenReturn(new DefaultMuleMessage("", mock(DataType.class), oldAttributes));
+        when(event.getMessage()).thenReturn(new DefaultMuleMessage("", DataType.OBJECT, oldAttributes));
         ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
 
         messageProcessor.process(event);
@@ -334,7 +335,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         Serializable oldAttributes = mock(Serializable.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload));
-        when(event.getMessage()).thenReturn(new DefaultMuleMessage("", mock(DataType.class), oldAttributes));
+        when(event.getMessage()).thenReturn(new DefaultMuleMessage("", DataType.OBJECT, oldAttributes));
         ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
 
         messageProcessor.process(event);

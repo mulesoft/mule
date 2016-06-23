@@ -8,10 +8,11 @@ package org.mule.runtime.core.transformer.compression;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.compression.GZipCompression;
 
 import org.junit.Test;
@@ -64,7 +65,7 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
     {
         GZipUncompressTransformer transformer = new GZipUncompressTransformer();
         transformer.setMuleContext(muleContext);
-        transformer.setReturnDataType(DataTypeFactory.STRING);
+        transformer.setReturnDataType(DataType.STRING);
 
         try
         {

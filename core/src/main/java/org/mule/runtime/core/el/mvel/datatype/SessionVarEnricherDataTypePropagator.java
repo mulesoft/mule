@@ -9,7 +9,7 @@ package org.mule.runtime.core.el.mvel.datatype;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.el.mvel.MessageVariableResolverFactory;
-import org.mule.runtime.core.transformer.types.TypedValue;
+import org.mule.runtime.core.metadata.TypedValue;
 
 /**
  * Propagates data type for session vars used for enrichment target

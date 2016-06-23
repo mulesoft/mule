@@ -112,7 +112,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         MuleMessage msg = mock(MuleMessage.class);
         MuleContext muleContext = mock(MuleContext.class);
         TransformationService transformationService = mock(TransformationService.class);
-        DataType objectDataType = DataType.OBJECT_DATA_TYPE;
+        DataType objectDataType = DataType.OBJECT;
         when(msg.getDataType()).thenReturn(objectDataType);
         when(msg.getMuleContext()).thenReturn(muleContext);
         when(muleContext.getTransformationService()).thenReturn(transformationService);

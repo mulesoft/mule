@@ -15,7 +15,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.api.metadata.SimpleDataType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
@@ -90,7 +90,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextTest
     @Test
     public void aggregateMultipleEvents() throws Exception
     {
-        SimpleDataType simpleDateType1 = new SimpleDataType(String.class, "text/plain");
+        DataType<String> simpleDateType1 = DataType.builder().type(String.class).mimeType("text/plain").build();
         MuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
         MuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
         MuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);

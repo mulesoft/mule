@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
+import static org.mule.runtime.config.spring.parsers.specific.DataTypeFactoryBean.buildDataTypeDefinition;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.SimpleDataType;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
@@ -74,25 +74,4 @@ public class MessageProcessorWithDataTypeDefinitionParser extends MessageProcess
     {
         return sourceProperties.contains(ENCODING) || sourceProperties.contains(MIME_TYPE);
     }
-
-    protected AbstractBeanDefinition buildDataTypeDefinition(String typeName, PropertyValues sourceProperties)
-    {
-        BeanDefinitionBuilder dataTypeBuilder = BeanDefinitionBuilder.genericBeanDefinition(SimpleDataType.class);
-        dataTypeBuilder.addConstructorArgValue(typeName);
-        dataTypeBuilder.addConstructorArgValue(getMimeType(sourceProperties));
-        dataTypeBuilder.addConstructorArgValue(getEncoding(sourceProperties));
-
-        return dataTypeBuilder.getBeanDefinition();
-    }
-
-    private String getMimeType(PropertyValues sourceProperties)
-    {
-        return (String) (sourceProperties.contains(MIME_TYPE) ? sourceProperties.getPropertyValue(MIME_TYPE).getValue() : null);
-    }
-
-    private String getEncoding(PropertyValues sourceProperties)
-    {
-        return sourceProperties.contains(ENCODING) ? (String) sourceProperties.getPropertyValue(ENCODING).getValue() : null;
-    }
-
 }
