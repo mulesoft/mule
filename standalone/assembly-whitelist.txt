@@ -149,7 +149,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-config-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-extras-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-security-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-sockets-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-sockets-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tls-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
@@ -165,6 +164,7 @@
 /mule-standalone-${productVersion}/app-plugins/mule-module-email-${productVersion}.zip
 /mule-standalone-${productVersion}/app-plugins/mule-module-file-${productVersion}.zip
 /mule-standalone-${productVersion}/app-plugins/mule-module-ftp-${productVersion}.zip
+/mule-standalone-${productVersion}/app-plugins/mule-module-sockets-${productVersion}.zip
 /mule-standalone-${productVersion}/app-plugins/mule-module-validation-${productVersion}.zip
 
 #
