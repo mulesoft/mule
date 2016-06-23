@@ -50,22 +50,4 @@ public class TcpSendTestCase extends ParameterizedProtocolTestCase
 
         assertByteArray(receiveConnection(), testByteArray);
     }
-
-    @Test
-    public void multipleSendString() throws Exception
-    {
-        // TODO repeat this test with different messages and test that they arrive in the same order
-        for (int i = 0; i < REPETITIONS; i++)
-        {
-            flowRunner("tcp-send")
-                    .withPayload(TEST_STRING)
-                    .run();
-        }
-
-        // assert that all the messages arrived
-        for (int i = 0; i < REPETITIONS; i++)
-        {
-            assertEvent(receiveConnection(), TEST_STRING);
-        }
-    }
 }
