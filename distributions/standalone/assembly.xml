@@ -152,7 +152,6 @@
                 <include>org.mule.modules:mule-module-spring-config</include>
                 <include>org.mule.modules:mule-module-spring-extras</include>
                 <include>org.mule.modules:mule-module-spring-security</include>
-                <include>org.mule.modules:mule-module-sockets</include>
                 <include>org.mule.modules:mule-module-tls</include>
                 <include>org.mule.modules:mule-module-tomcat</include>
                 <include>org.mule.modules:mule-module-ws</include>

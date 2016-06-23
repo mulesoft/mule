@@ -65,6 +65,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
+            <type>zip</type>
         </dependency>
 
         <dependency>

@@ -164,7 +164,7 @@
 /mule-standalone-${productVersion}/app-plugins/mule-module-email-${productVersion}.zip
 /mule-standalone-${productVersion}/app-plugins/mule-module-file-${productVersion}.zip
 /mule-standalone-${productVersion}/app-plugins/mule-module-ftp-${productVersion}.zip
-/mule-standalone-${productVersion}/app-plugins/mule/mule-module-sockets-${productVersion}.jar
+/mule-standalone-${productVersion}/app-plugins/mule-module-sockets-${productVersion}.zip
 /mule-standalone-${productVersion}/app-plugins/mule-module-validation-${productVersion}.zip
 
 #
