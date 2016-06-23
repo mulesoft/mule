@@ -8,7 +8,7 @@
                http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <sockets:server-socket-properties name="globalTcpProperties" keepAlive="true" receiveBacklog="1024"
+    <sockets:tcp-server-socket-properties name="globalTcpProperties" keepAlive="true" receiveBacklog="1024"
                                   receiveBufferSize="1024" reuseAddress="true" sendBufferSize="1024"
                                   sendTcpNoDelay="true" serverTimeout="1000" linger="1000" />
 

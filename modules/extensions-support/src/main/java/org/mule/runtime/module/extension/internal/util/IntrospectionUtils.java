@@ -434,6 +434,11 @@ public final class IntrospectionUtils
         }
     }
 
+    public static boolean isInstantiableWithParameters(Class<?> type)
+    {
+        return isInstantiable(type) && !getExposedFields(type).isEmpty();
+    }
+
     public static ExpressionSupport getExpressionSupport(AnnotatedElement object)
     {
         return getExpressionSupport(object.getAnnotation(Expression.class));

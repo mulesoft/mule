@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+       http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+
+    <sockets:request-config name="tcp-requester">
+        <!--Non-rutable IP address -->
+        <sockets:tcp-requester-connection host="10.255.255.255" port="${port}"
+                                          connectionTimeout="100"
+                                          sendTcpNoDelay="true">
+            <pooling-profile maxActive="1"/>
+        </sockets:tcp-requester-connection>
+    </sockets:request-config>
+
+    <flow name="tcp-connection-timeout">
+        <sockets:send config-ref="tcp-requester" hasResponse="false"/>
+        <set-payload value="Response"/>
+    </flow>
+
+    <sub-flow name="onIncomingConnection">
+        <expression-component>org.mule.extension.socket.SocketExtensionTestCase.onIncomingConnection(message)
+        </expression-component>
+    </sub-flow>
+
+</mule>

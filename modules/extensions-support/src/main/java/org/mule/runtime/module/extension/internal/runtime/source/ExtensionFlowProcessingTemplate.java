@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -39,6 +40,7 @@ final class ExtensionFlowProcessingTemplate implements AsyncResponseFlowProcessi
     @Override
     public org.mule.runtime.core.api.MuleEvent routeEvent(org.mule.runtime.core.api.MuleEvent muleEvent) throws MuleException
     {
+        ((DefaultMuleEvent) muleEvent).resetAccessControl();
         return messageProcessor.process(muleEvent);
     }
 

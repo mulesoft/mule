@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+
+    <sockets:streaming-protocol name="streaming" rethrowExceptionOnRead="true"/>
+
+    <sockets:length-protocol name="length" rethrowExceptionOnRead="true"/>
+
+    <sockets:direct-protocol name="direct" rethrowExceptionOnRead="true"/>
+
+    <sockets:xml-message-protocol name="xml-message" rethrowExceptionOnRead="true"/>
+
+    <sockets:xml-message-eof-protocol name="xml-message-eof" rethrowExceptionOnRead="true"/>
+
+    <sockets:safe-protocol name="safe" rethrowExceptionOnRead="true"/>
+
+    <sockets:eof-protocol name="eof" rethrowExceptionOnRead="true"/>
+
+</mule>

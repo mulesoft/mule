@@ -246,11 +246,13 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
 
     private void createSource() throws Exception
     {
-        source = new SourceWrapper(sourceFactory.createSource());
-        source.setFlowConstruct(flowConstruct);
-        source.setSourceContext(new ImmutableSourceContext(this, this, getConfiguration(getInitialiserEvent(muleContext))));
-
-        initialiseIfNeeded(source, true, muleContext);
+        if (source == null)
+        {
+            source = new SourceWrapper(sourceFactory.createSource());
+            source.setFlowConstruct(flowConstruct);
+            source.setSourceContext(new ImmutableSourceContext(this, this, getConfiguration(getInitialiserEvent(muleContext))));
+            initialiseIfNeeded(source, true, muleContext);
+        }
     }
 
     private void startSource()

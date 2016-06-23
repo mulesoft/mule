@@ -6,7 +6,8 @@
  */
 package org.mule.extension.http.internal.request.grizzly;
 
-import org.mule.module.socket.api.TcpClientSocketProperties;
+
+import org.mule.module.socket.api.socket.tcp.TcpClientSocketProperties;
 
 import com.ning.http.client.providers.grizzly.TransportCustomizer;
 
@@ -18,6 +19,7 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
  */
 public class SocketConfigTransportCustomizer implements TransportCustomizer
 {
+
     private final TcpClientSocketProperties clientSocketProperties;
 
     public SocketConfigTransportCustomizer(TcpClientSocketProperties clientSocketProperties)
@@ -33,29 +35,28 @@ public class SocketConfigTransportCustomizer implements TransportCustomizer
         {
             transport.setKeepAlive(clientSocketProperties.getKeepAlive());
         }
-        if (clientSocketProperties.getSendTcpNoDelay() != null)
-        {
-            transport.setTcpNoDelay(clientSocketProperties.getSendTcpNoDelay());
-        }
-        if (clientSocketProperties.getConnectionTimeout() != null)
-        {
-            transport.setConnectionTimeout(clientSocketProperties.getConnectionTimeout());
-        }
+
         if (clientSocketProperties.getReceiveBufferSize() != null)
         {
             transport.setReadBufferSize(clientSocketProperties.getReceiveBufferSize());
         }
+
         if (clientSocketProperties.getSendBufferSize() != null)
         {
             transport.setWriteBufferSize(clientSocketProperties.getSendBufferSize());
         }
-        if (clientSocketProperties.getTimeout() != null)
+
+        if (clientSocketProperties.getClientTimeout() != null)
         {
-            transport.setClientSocketSoTimeout(clientSocketProperties.getTimeout());
+            transport.setClientSocketSoTimeout(clientSocketProperties.getClientTimeout());
         }
+
         if (clientSocketProperties.getLinger() != null)
         {
             transport.setLinger(clientSocketProperties.getLinger());
         }
+
+        transport.setTcpNoDelay(clientSocketProperties.getSendTcpNoDelay());
+        transport.setConnectionTimeout(clientSocketProperties.getConnectionTimeout());
     }
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+
+    <sockets:request-config name="tcp-requester">
+        <sockets:tcp-requester-connection host="localhost" port="${port}" clientTimeout="100" sendTcpNoDelay="true">
+            <pooling-profile maxActive="1"/>
+            <sockets:protocol>
+                <!--Necessary to catch the exception in the test-->
+                <sockets:length-protocol rethrowExceptionOnRead="true"/>
+            </sockets:protocol>
+        </sockets:tcp-requester-connection>
+    </sockets:request-config>
+
+    <sockets:listener-config name="tcp-listener">
+        <sockets:tcp-listener-connection host="localhost" port="${port}"/>
+    </sockets:listener-config>
+
+    <flow name="tcp-reading-timeout">
+        <sockets:send config-ref="tcp-requester" hasResponse="true"/>
+        <set-payload value="Response"/>
+    </flow>
+
+    <flow name="tcp-listen">
+        <sockets:socket-listener config-ref="tcp-listener"/>
+        <set-payload value="Consumed"/>
+        <test:component waitTime="200"/>
+    </flow>
+
+    <sub-flow name="onIncomingConnection">
+        <expression-component>org.mule.extension.socket.SocketExtensionTestCase.onIncomingConnection(message)
+        </expression-component>
+    </sub-flow>
+
+</mule>

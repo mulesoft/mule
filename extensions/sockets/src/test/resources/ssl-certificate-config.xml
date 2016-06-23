@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+       http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+
+
+    <tls:context name="tlsContext">
+        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
+        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+    </tls:context>
+
+
+    <sockets:request-config name="ssl-request">
+        <sockets:tcp-requester-connection host="localhost" port="${port}"
+                                          failOnUnresolvedHost="true"
+                                          sendTcpNoDelay="true"
+                                          tlsContext="tlsContext">
+            <pooling-profile maxActive="1"/>
+        </sockets:tcp-requester-connection>
+    </sockets:request-config>
+
+
+    <sockets:listener-config name="ssl-listener">
+        <sockets:tcp-listener-connection host="localhost"
+                                         port="${port}"
+                                         tlsContext="tlsContext">
+        </sockets:tcp-listener-connection>
+    </sockets:listener-config>
+
+    <flow name="ssl-send-and-receive">
+        <sockets:send config-ref="ssl-request" hasResponse="true"/>
+    </flow>
+
+    <flow name="ssl-listen">
+        <sockets:socket-listener config-ref="ssl-listener"/>
+        <flow-ref name="respond"/>
+    </flow>
+
+    <sub-flow name="respond">
+        <object-to-string-transformer mimeType="text/plain"/>
+        <set-payload value="#[payload]_modified"/>
+    </sub-flow>
+</mule>

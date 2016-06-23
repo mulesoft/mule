@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+
+    <sockets:request-config name="udp-requester">
+        <sockets:udp-requester-connection host="localhost"
+                                          port="${port}"
+                                          broadcast="false"/>
+    </sockets:request-config>
+
+    <sockets:listener-config name="udp-listener">
+        <sockets:udp-listener-connection host="localhost" port="${port}"/>
+    </sockets:listener-config>
+
+    <flow name="udp-send">
+        <sockets:send config-ref="udp-requester" hasResponse="false"/>
+    </flow>
+
+    <flow name="udp-listen">
+        <sockets:socket-listener config-ref="udp-listener"/>
+        <flow-ref name="onIncomingConnection"/>
+        <set-payload value="Consumed"/>
+    </flow>
+
+    <sub-flow name="onIncomingConnection">
+        <expression-component>org.mule.extension.socket.SocketExtensionTestCase.onIncomingConnection(message)
+        </expression-component>
+    </sub-flow>
+
+</mule>

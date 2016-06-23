@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 import org.mule.runtime.core.internal.connection.CachedConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.PooledConnectionProviderWrapper;
+import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -91,4 +91,14 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
     {
         return providerModel.getConnectionProviderFactory().newInstance();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isDynamic()
+    {
+        return resolverSet.isDynamic();
+    }
+
 }

@@ -8,7 +8,6 @@ package org.mule.functional.functional;
 
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.transformer.types.DataTypeFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
@@ -68,8 +67,7 @@ public class FunctionalStreamingTestComponent implements Callable
 
     public Object onCall(MuleEventContext context) throws Exception
     {
-        InputStream in = (InputStream) context.getMuleContext().getTransformationService().transform(context.getMessage(),
-                                                                                                     DataTypeFactory.create(InputStream.class)).getPayload();
+        InputStream in = (InputStream) context.getMessage().getPayload();
         try
         {
             logger.debug("arrived at " + toString());
@@ -83,6 +81,7 @@ public class FunctionalStreamingTestComponent implements Callable
 
             // throw data on the floor, but keep a record of size, start and end values
             long bytesRead = 0;
+
             while (bytesRead >= 0)
             {
                 bytesRead = read(in, buffer);

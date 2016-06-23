@@ -8,9 +8,10 @@
                http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <sockets:client-socket-properties name="globalTcpProperties" connectionTimeout="1000" keepAlive="true"
+
+    <sockets:tcp-client-socket-properties name="globalTcpProperties" connectionTimeout="1000" keepAlive="true"
                                   receiveBufferSize="1024" sendBufferSize="1024"
-                                  sendTcpNoDelay="true" timeout="1000" linger="1000" />
+                                  sendTcpNoDelay="true" clientTimeout="1000" linger="1000" />
 
     <httpn:request-config name="globalConfig">
         <httpn:request-connection host="localhost" port="${httpPort}" clientSocketProperties="globalTcpProperties"/>
@@ -19,7 +20,7 @@
     <httpn:request-config name="nestedConfig">
         <httpn:request-connection host="localhost" port="${httpPort}">
         <httpn:client-socket-properties>
-            <sockets:client-socket-properties connectionTimeout="1000" keepAlive="true" receiveBufferSize="1024" sendBufferSize="1024" sendTcpNoDelay="true" timeout="1000" linger="1000" />
+            <sockets:tcp-client-socket-properties connectionTimeout="1000" keepAlive="true" receiveBufferSize="1024" sendBufferSize="1024" sendTcpNoDelay="true" clientTimeout="1000" linger="1000" />
         </httpn:client-socket-properties>
         </httpn:request-connection>
     </httpn:request-config>
