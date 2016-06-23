@@ -53,16 +53,16 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     {
         registerSourceType(DataType.STRING);
         registerSourceType(DataType.BYTE_ARRAY);
-        registerSourceType(DataType.forJavaType(javax.xml.transform.Source.class));
-        registerSourceType(DataType.forJavaType(org.xml.sax.InputSource.class));
-        registerSourceType(DataType.forJavaType(org.dom4j.Node.class));
-        registerSourceType(DataType.forJavaType(org.dom4j.Document.class));
-        registerSourceType(DataType.forJavaType(org.w3c.dom.Document.class));
-        registerSourceType(DataType.forJavaType(org.w3c.dom.Element.class));
+        registerSourceType(DataType.forType(javax.xml.transform.Source.class));
+        registerSourceType(DataType.forType(org.xml.sax.InputSource.class));
+        registerSourceType(DataType.forType(org.dom4j.Node.class));
+        registerSourceType(DataType.forType(org.dom4j.Document.class));
+        registerSourceType(DataType.forType(org.w3c.dom.Document.class));
+        registerSourceType(DataType.forType(org.w3c.dom.Element.class));
         registerSourceType(DataType.INPUT_STREAM);
-        registerSourceType(DataType.forJavaType(OutputHandler.class));
-        registerSourceType(DataType.forJavaType(javax.xml.stream.XMLStreamReader.class));
-        registerSourceType(DataType.forJavaType(org.mule.runtime.module.xml.transformer.DelayedResult.class));
+        registerSourceType(DataType.forType(OutputHandler.class));
+        registerSourceType(DataType.forType(javax.xml.stream.XMLStreamReader.class));
+        registerSourceType(DataType.forType(org.mule.runtime.module.xml.transformer.DelayedResult.class));
         setReturnDataType(DataType.builder().type(byte[].class).mimeType(MimeType.XML).build());
     }
 

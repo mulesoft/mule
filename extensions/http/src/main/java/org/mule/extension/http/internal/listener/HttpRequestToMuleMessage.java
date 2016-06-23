@@ -56,7 +56,7 @@ public class HttpRequestToMuleMessage
 
         final Map<String, DataHandler> parts = new HashMap<>();
         Object payload = NullPayload.getInstance();
-        DataTypeBuilder dataTypeBuilder = DataType.builder().from(dataType);
+        DataTypeBuilder dataTypeBuilder = DataType.builder(dataType);
         if (parseRequest)
         {
             final HttpEntity entity = request.getEntity();

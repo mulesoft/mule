@@ -39,9 +39,9 @@ public class JsonToObject extends AbstractJsonTransformer
 
     public JsonToObject()
     {
-        this.registerSourceType(DataType.forJavaType(Reader.class));
-        this.registerSourceType(DataType.forJavaType(URL.class));
-        this.registerSourceType(DataType.forJavaType(File.class));
+        this.registerSourceType(DataType.forType(Reader.class));
+        this.registerSourceType(DataType.forType(URL.class));
+        this.registerSourceType(DataType.forType(File.class));
         this.registerSourceType(DataType.STRING);
         this.registerSourceType(DataType.INPUT_STREAM);
         this.registerSourceType(DataType.BYTE_ARRAY);

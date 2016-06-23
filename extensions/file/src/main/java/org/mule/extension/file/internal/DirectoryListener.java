@@ -334,7 +334,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     private MuleMessage<InputStream, ListenerFileAttributes> createMessage(Path path, ListenerFileAttributes attributes)
     {
         Object payload = NullPayload.getInstance();
-        DataType dataType = DataType.forJavaType(NullPayload.class);
+        DataType dataType = DataType.forType(NullPayload.class);
         MuleMessage<InputStream, ListenerFileAttributes> message;
 
         if (attributes.getEventType() == FileEventType.DELETE)

@@ -31,7 +31,7 @@ public abstract class AbstractJaxpFilter
     public AbstractJaxpFilter()
     {
         super();
-        xmlToDom.setReturnDataType(DataType.forJavaType(Document.class));
+        xmlToDom.setReturnDataType(DataType.forType(Document.class));
     }
     public void initialise() throws InitialisationException
     {

@@ -56,7 +56,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
     public MuleMessageToHttpResponse()
     {
         registerSourceType(DataType.OBJECT);
-        setReturnDataType(DataType.forJavaType(HttpResponse.class));
+        setReturnDataType(DataType.forType(HttpResponse.class));
     }
 
     @Override

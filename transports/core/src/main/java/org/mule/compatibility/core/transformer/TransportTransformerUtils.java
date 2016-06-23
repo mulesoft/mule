@@ -32,7 +32,7 @@ public class TransportTransformerUtils extends TransformerUtils
     public static boolean isSourceTypeSupportedByFirst(List<Transformer> transformers, Class clazz)
     {
         Transformer transformer = firstOrNull(transformers);
-        return null != transformer && transformer.isSourceDataTypeSupported(DataType.forJavaType(clazz));
+        return null != transformer && transformer.isSourceDataTypeSupported(DataType.forType(clazz));
     }
 
     /**

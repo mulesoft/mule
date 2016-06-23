@@ -27,7 +27,7 @@ public class ObjectToByteArray extends SerializableToByteArray
     {
         this.registerSourceType(DataType.INPUT_STREAM);
         this.registerSourceType(DataType.STRING);
-        this.registerSourceType(DataType.forJavaType(OutputHandler.class));
+        this.registerSourceType(DataType.forType(OutputHandler.class));
         setReturnDataType(DataType.BYTE_ARRAY);
     }
 

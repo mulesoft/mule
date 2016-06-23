@@ -149,7 +149,7 @@ public class TransformationService
                 Transformer transformer = transformers.get(index);
 
                 Class<?> srcCls = result.getPayload().getClass();
-                DataType<?> originalSourceType = DataType.forJavaType(srcCls);
+                DataType<?> originalSourceType = DataType.forType(srcCls);
 
                 if (transformer.isSourceDataTypeSupported(originalSourceType))
                 {

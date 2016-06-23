@@ -123,7 +123,7 @@ public class TransformerUtils
 
         if (transformer.getReturnDataType() != null)
         {
-            DataType<?> dt = DataType.forJavaType(value.getClass());
+            DataType<?> dt = DataType.forType(value.getClass());
             if (!transformer.getReturnDataType().isCompatibleWith(dt))
             {
                 throw new TransformerException(
@@ -140,7 +140,7 @@ public class TransformerUtils
 
     public static <T> Object transformToAny(T input, MuleContext muleContext, DataType<?>... supportedTypes)
     {
-        final DataType<T> sourceType = (DataType<T>) DataType.forJavaType(input.getClass());
+        final DataType<T> sourceType = (DataType<T>) DataType.forType(input.getClass());
         Object transformedData = null;
 
         for (DataType<?> supportedType : supportedTypes)

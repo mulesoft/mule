@@ -114,7 +114,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
-        return transformMessage(DataType.forJavaType(outputType));
+        return transformMessage(DataType.forType(outputType));
     }
 
     @Override

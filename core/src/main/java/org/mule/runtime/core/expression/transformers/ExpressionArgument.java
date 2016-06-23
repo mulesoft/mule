@@ -122,8 +122,8 @@ public class ExpressionArgument implements MuleContextAware
                 //If the return type does not match, lets attempt to transform it before throwing an error
                 try
                 {
-                    Transformer t = muleContext.getRegistry().lookupTransformer(
-                            DataType.builder().from(result).build(), DataType.forJavaType(getReturnClass()));
+                    Transformer t = muleContext.getRegistry().lookupTransformer(DataType.of(result),
+                                                                                DataType.forType(getReturnClass()));
                     result = t.transform(result);
                 }
                 catch (TransformerException e)

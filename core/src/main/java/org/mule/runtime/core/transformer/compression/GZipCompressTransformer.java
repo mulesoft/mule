@@ -23,7 +23,7 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
     {
         super();
         this.setStrategy(new GZipCompression());
-        this.registerSourceType(DataType.forJavaType(Serializable.class));
+        this.registerSourceType(DataType.forType(Serializable.class));
         this.registerSourceType(DataType.BYTE_ARRAY);
         this.registerSourceType(DataType.INPUT_STREAM);
         // No type checking for the return type by default. It could either be a byte array or an input stream.

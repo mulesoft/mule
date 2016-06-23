@@ -76,8 +76,8 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>
             expectedClass = ((ParameterizedType) expectedClass).getRawType();
         }
 
-        DataType sourceDataType = DataType.forJavaType(object.getClass());
-        DataType targetDataType = DataType.forJavaType((Class<T>) expectedClass);
+        DataType sourceDataType = DataType.forType(object.getClass());
+        DataType targetDataType = DataType.forType((Class<T>) expectedClass);
 
         Transformer transformer;
         try

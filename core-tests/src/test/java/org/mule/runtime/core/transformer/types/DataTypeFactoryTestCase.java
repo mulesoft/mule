@@ -11,19 +11,12 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MimeType;
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MutableMuleMessage;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
 import org.junit.Test;
 
 @SmallTest
@@ -33,7 +26,7 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void createsDataTypeForNullObject() throws Exception
     {
-        DataType<?> dataType = DataType.builder().from(null).build();
+        DataType<?> dataType = DataType.of(null);
 
         assertThat(dataType, like(Object.class, MimeType.ANY, null));
     }
@@ -41,7 +34,7 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void createsDataTypeForNonNullObject() throws Exception
     {
-        DataType<?> dataType = DataType.builder().from("test").build();
+        DataType<?> dataType = DataType.of("test");
 
         assertThat(dataType, like(String.class, MimeType.ANY, null));
     }

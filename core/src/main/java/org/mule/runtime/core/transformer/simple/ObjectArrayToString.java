@@ -29,7 +29,7 @@ public class ObjectArrayToString extends AbstractTransformer implements Discover
 
     public ObjectArrayToString()
     {
-        registerSourceType(DataType.forJavaType(Object[].class));
+        registerSourceType(DataType.forType(Object[].class));
         setReturnDataType(DataType.STRING);
     }
 

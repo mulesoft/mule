@@ -62,8 +62,8 @@ public class InputSoapHeadersInterceptor extends AbstractSoapInterceptor
 
                 try
                 {
-                    transformer = muleContext.getRegistry().lookupTransformer(DataType.builder().from(value).build(),
-                            DataType.forJavaType(Document.class));
+                    transformer = muleContext.getRegistry().lookupTransformer(DataType.of(value),
+                                                                              DataType.forType(Document.class));
                 }
                 catch (TransformerException e)
                 {

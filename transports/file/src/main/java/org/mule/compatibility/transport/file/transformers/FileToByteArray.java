@@ -30,8 +30,8 @@ public class FileToByteArray extends AbstractTransformer implements Discoverable
     public FileToByteArray()
     {
         super();
-        registerSourceType(DataType.forJavaType(File.class));
-        registerSourceType(DataType.forJavaType(FileInputStream.class));
+        registerSourceType(DataType.forType(File.class));
+        registerSourceType(DataType.forType(FileInputStream.class));
         setReturnDataType(DataType.BYTE_ARRAY);
     }
 

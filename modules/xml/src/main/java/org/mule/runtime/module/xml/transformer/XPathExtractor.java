@@ -44,8 +44,8 @@ public class XPathExtractor extends AbstractTransformer implements MuleContextAw
 
     public XPathExtractor()
     {
-        registerSourceType(DataType.forJavaType(org.w3c.dom.Node.class));
-        registerSourceType(DataType.forJavaType(InputSource.class));
+        registerSourceType(DataType.forType(org.w3c.dom.Node.class));
+        registerSourceType(DataType.forType(InputSource.class));
     }
 
     @Override

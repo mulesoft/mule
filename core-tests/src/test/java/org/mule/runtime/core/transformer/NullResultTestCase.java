@@ -64,7 +64,7 @@ public class NullResultTestCase extends AbstractTransformerTestCase
         {
             super();
             this.registerSourceType(DataType.OBJECT);
-            this.setReturnDataType(DataType.forJavaType(NullPayload.class));
+            this.setReturnDataType(DataType.forType(NullPayload.class));
         }
 
         @Override

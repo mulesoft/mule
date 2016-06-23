@@ -47,7 +47,7 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
     public Transformer getRoundTripTransformer() throws Exception
     {
         JsonToObject trans = new JsonToObject();
-        trans.setReturnDataType(DataType.forJavaType(getTestData().getClass()));
+        trans.setReturnDataType(DataType.forType(getTestData().getClass()));
         trans.getDeserializationMixins().put(FruitCollection.class, FruitCollectionMixin.class);
         trans.getDeserializationMixins().put(Apple.class, AppleMixin.class);
         trans.getDeserializationMixins().put(Orange.class, OrangeMixin.class);

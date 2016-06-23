@@ -31,7 +31,7 @@ public class StringToObjectArray extends AbstractTransformer
         registerSourceType(DataType.STRING);
         registerSourceType(DataType.BYTE_ARRAY);
         registerSourceType(DataType.INPUT_STREAM);
-        setReturnDataType(DataType.forJavaType(Object[].class));
+        setReturnDataType(DataType.forType(Object[].class));
     }
 
     @Override

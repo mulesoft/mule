@@ -10,7 +10,7 @@ import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeOptionalParamsBuilder;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -45,7 +45,7 @@ public class TransformerObjectFactory implements ObjectFactory<Transformer>
         AbstractTransformer transformerInstance = createInstance();
         if (returnClass != null || mimeType != null)
         {
-            DataTypeOptionalParamsBuilder<?> builder = DataType.builder().type(getReturnType()).mimeType(mimeType);
+            DataTypeParamsBuilder<?> builder = DataType.builder().type(getReturnType()).mimeType(mimeType);
             if (encoding != null)
             {
                 builder = builder.encoding(encoding);

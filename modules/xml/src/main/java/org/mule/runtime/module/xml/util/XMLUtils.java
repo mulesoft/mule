@@ -170,7 +170,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils
             // TODO Find a more direct way to do this
             XmlToDomDocument tr = new XmlToDomDocument();
             tr.setMuleContext(muleContext);
-            tr.setReturnDataType(DataType.forJavaType(org.dom4j.Document.class));
+            tr.setReturnDataType(DataType.forType(org.dom4j.Document.class));
             return (org.dom4j.Document) tr.transform(obj);
         }
         else if (obj instanceof java.io.InputStream)

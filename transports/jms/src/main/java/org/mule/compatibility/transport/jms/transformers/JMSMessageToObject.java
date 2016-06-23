@@ -44,12 +44,12 @@ public class JMSMessageToObject extends AbstractJmsTransformer
     @Override
     protected void declareInputOutputClasses()
     {
-        registerSourceType(DataType.forJavaType(Message.class));
-        registerSourceType(DataType.forJavaType(TextMessage.class));
-        registerSourceType(DataType.forJavaType(ObjectMessage.class));
-        registerSourceType(DataType.forJavaType(BytesMessage.class));
-        registerSourceType(DataType.forJavaType(MapMessage.class));
-        registerSourceType(DataType.forJavaType(StreamMessage.class));
+        registerSourceType(DataType.forType(Message.class));
+        registerSourceType(DataType.forType(TextMessage.class));
+        registerSourceType(DataType.forType(ObjectMessage.class));
+        registerSourceType(DataType.forType(BytesMessage.class));
+        registerSourceType(DataType.forType(MapMessage.class));
+        registerSourceType(DataType.forType(StreamMessage.class));
     }
 
     @Override

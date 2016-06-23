@@ -79,7 +79,7 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
     @Override
     public void setInboundProperty(String key, Serializable value)
     {
-        setInboundProperty(key, value, DataType.builder().from(value).build());
+        setInboundProperty(key, value, DataType.of(value));
     }
 
     @Override
@@ -127,7 +127,7 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
     @Override
     public void setOutboundProperty(String key, Serializable value)
     {
-        setOutboundProperty(key, value, DataType.builder().from(value).build());
+        setOutboundProperty(key, value, DataType.of(value));
     }
 
     @Override

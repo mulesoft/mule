@@ -95,7 +95,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     @Override
     public final Object transform(Object src, String enc, MuleEvent event) throws TransformerMessagingException
     {
-        DataType<?> sourceType = DataType.forJavaType(src.getClass());
+        DataType<?> sourceType = DataType.forType(src.getClass());
         if (!isSourceDataTypeSupported(sourceType))
         {
             if (isIgnoreBadInput())
@@ -185,7 +185,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
 
         if (returnType != null)
         {
-            DataType<?> dt = DataType.forJavaType(object.getClass());
+            DataType<?> dt = DataType.forType(object.getClass());
             if (!returnType.isCompatibleWith(dt))
             {
                 throw new TransformerMessagingException(

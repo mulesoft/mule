@@ -80,12 +80,12 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
 
         registerSourceType(DataType.STRING);
         registerSourceType(DataType.BYTE_ARRAY);
-        registerSourceType(DataType.forJavaType(DocumentSource.class));
-        registerSourceType(DataType.forJavaType(org.dom4j.Document.class));
-        registerSourceType(DataType.forJavaType(Document.class));
-        registerSourceType(DataType.forJavaType(Element.class));
+        registerSourceType(DataType.forType(DocumentSource.class));
+        registerSourceType(DataType.forType(org.dom4j.Document.class));
+        registerSourceType(DataType.forType(Document.class));
+        registerSourceType(DataType.forType(Element.class));
         registerSourceType(DataType.INPUT_STREAM);
-        setReturnDataType(DataType.forJavaType(List.class));
+        setReturnDataType(DataType.forType(List.class));
     }
 
     public XQueryTransformer(String xqueryFile)

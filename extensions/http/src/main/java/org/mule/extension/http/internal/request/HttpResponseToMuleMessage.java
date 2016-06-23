@@ -106,7 +106,7 @@ public class HttpResponseToMuleMessage
 
         if (encoding != null)
         {
-            dataType = DataType.builder().from(dataType).encoding(encoding).build();
+            dataType = DataType.builder(dataType).encoding(encoding).build();
         }
         MuleMessage responseMessage = new DefaultMuleMessage(payload, dataType, responseAttributes);
 

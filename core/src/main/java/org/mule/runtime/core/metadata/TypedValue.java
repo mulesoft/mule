@@ -31,7 +31,7 @@ public class TypedValue<T> implements Serializable
         this.value = value;
         if (dataType == null)
         {
-            this.dataType = DataType.forJavaType((Class<T>) value.getClass());
+            this.dataType = DataType.forType((Class<T>) value.getClass());
         }
         else
         {

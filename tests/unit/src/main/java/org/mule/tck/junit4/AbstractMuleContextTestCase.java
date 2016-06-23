@@ -600,7 +600,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      */
     protected <T> T getPayload(MuleMessage message, Class<T> clazz) throws Exception
     {
-        return getPayload(message, DataType.forJavaType(clazz));
+        return getPayload(message, DataType.forType(clazz));
     }
 
     protected MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler) throws Exception

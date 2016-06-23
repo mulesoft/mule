@@ -27,7 +27,7 @@ public class BeanToMap extends AbstractTransformer implements DiscoverableTransf
     public BeanToMap()
     {
         registerSourceType(DataType.OBJECT);
-        setReturnDataType(DataType.forJavaType(Map.class));
+        setReturnDataType(DataType.forType(Map.class));
     }
 
     @Override

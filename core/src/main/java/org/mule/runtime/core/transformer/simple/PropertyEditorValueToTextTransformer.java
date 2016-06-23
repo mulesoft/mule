@@ -29,7 +29,7 @@ public class PropertyEditorValueToTextTransformer extends AbstractTransformer im
 
     public PropertyEditorValueToTextTransformer(PropertyEditor propertyEditor, Class<?> clazz)
     {
-        registerSourceType(DataType.forJavaType(clazz));
+        registerSourceType(DataType.forType(clazz));
         setReturnDataType(DataType.STRING);
         this.propertyEditor = propertyEditor;
     }

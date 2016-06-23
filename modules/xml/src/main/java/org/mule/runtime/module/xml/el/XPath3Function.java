@@ -136,8 +136,8 @@ public class XPath3Function implements ExpressionLanguageFunction
 
     private static final XPathReturnType DEFAULT_RETURN_TYPE = XPathReturnType.STRING;
     private static final DataType<?>[] SUPPORTED_TYPES = new DataType<?>[] {
-                                                                            DataType.forJavaType(Document.class),
-                                                                            DataType.forJavaType(Node.class)
+                                                                            DataType.forType(Document.class),
+                                                                            DataType.forType(Node.class)
     };
     private static final String SUPPORTED_TYPES_AS_STRING = Joiner.on(',').join(SUPPORTED_TYPES);
 

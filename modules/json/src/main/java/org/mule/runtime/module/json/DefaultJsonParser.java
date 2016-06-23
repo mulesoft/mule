@@ -34,8 +34,8 @@ public final class DefaultJsonParser implements JsonParser
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJsonParser.class);
     private static final DataType<?>[] TRANSFORMABLE_SUPPORTED_TYPES = new DataType<?>[] {
-                                                                                          DataType.forJavaType(JsonData.class),
-                                                                                          DataType.forJavaType(JsonNode.class),
+                                                                                          DataType.forType(JsonData.class),
+                                                                                          DataType.forType(JsonNode.class),
                                                                                           DataType.STRING
     };
     private static final String TRANSFORMABLE_SUPPORTED_TYPES_AS_STRING = Joiner.on(',').join(TRANSFORMABLE_SUPPORTED_TYPES);

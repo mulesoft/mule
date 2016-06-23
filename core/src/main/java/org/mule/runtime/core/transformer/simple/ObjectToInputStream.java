@@ -26,7 +26,7 @@ public class ObjectToInputStream extends SerializableToByteArray
     public ObjectToInputStream()
     {
         this.registerSourceType(DataType.STRING);
-        this.registerSourceType(DataType.forJavaType(OutputHandler.class));
+        this.registerSourceType(DataType.forType(OutputHandler.class));
         setReturnDataType(DataType.INPUT_STREAM);
     }
 

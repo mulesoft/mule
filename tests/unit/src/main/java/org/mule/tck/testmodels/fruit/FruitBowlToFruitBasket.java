@@ -20,8 +20,8 @@ public class FruitBowlToFruitBasket extends AbstractTransformer implements Disco
 
     public FruitBowlToFruitBasket()
     {
-        registerSourceType(DataType.forJavaType(FruitBowl.class));
-        setReturnDataType(DataType.forJavaType(FruitBasket.class));
+        registerSourceType(DataType.forType(FruitBowl.class));
+        setReturnDataType(DataType.forType(FruitBasket.class));
     }
 
     @Override

@@ -42,7 +42,7 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
 
     public JAXBMarshallerTransformer()
     {
-        setReturnDataType(DataType.forJavaType(OutputStream.class));
+        setReturnDataType(DataType.forType(OutputStream.class));
         registerSourceType(DataType.OBJECT);
     }
 

@@ -33,7 +33,7 @@ public class HttpResponseToString extends AbstractTransformer
 
     public HttpResponseToString()
     {
-        registerSourceType(DataType.forJavaType(HttpResponse.class));
+        registerSourceType(DataType.forType(HttpResponse.class));
         setReturnDataType(DataType.STRING);
     }
 

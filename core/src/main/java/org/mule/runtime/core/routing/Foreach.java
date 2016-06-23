@@ -155,7 +155,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         }
         else
         {
-            return muleContext.getTransformationService().transform(message, DataType.forJavaType(Document.class));
+            return muleContext.getTransformationService().transform(message, DataType.forType(Document.class));
         }
     }
 

@@ -18,10 +18,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROP
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeOptionalParamsBuilder;
+import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -40,7 +39,6 @@ import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -740,7 +738,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     public void setEncoding(String encoding)
     {
         assertAccess(WRITE);
-        setDataType(DataType.builder().from(getDataType()).encoding(encoding).build());
+        setDataType(DataType.builder(getDataType()).encoding(encoding).build());
     }
 
     /**
@@ -750,7 +748,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     public void setMimeType(String mimeType)
     {
         assertAccess(WRITE);
-        setDataType(DataType.builder().from(getDataType()).mimeType(mimeType).encoding(getDataType().getEncoding()).build());
+        setDataType(DataType.builder(getDataType()).mimeType(mimeType).encoding(getDataType().getEncoding()).build());
     }
 
     /**
@@ -785,7 +783,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         }
         else
         {
-            newDataType = DataType.forJavaType(payload.getClass());
+            newDataType = DataType.forType(payload.getClass());
         }
 
         setPayload(payload, newDataType);
@@ -977,7 +975,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
                 {
                     try
                     {
-                        DataType source = DataType.builder().from(theContent).build();
+                        DataType source = DataType.of(theContent);
                         Transformer transformer = muleContext.getRegistry().lookupTransformer(source, DataType.BYTE_ARRAY);
                         if (transformer == null)
                         {
@@ -1398,7 +1396,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
 
     private void updateDataTypeWithProperty(String key, Object value)
     {
-        final DataTypeOptionalParamsBuilder builder = DataType.builder().from(getDataType());
+        final DataTypeBuilder builder = DataType.builder(getDataType());
 
         // updates dataType when encoding is updated using a property instead of using #setEncoding
         if (MULE_ENCODING_PROPERTY.equals(key))

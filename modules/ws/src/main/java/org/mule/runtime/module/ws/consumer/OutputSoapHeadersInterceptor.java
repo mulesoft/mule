@@ -56,7 +56,7 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor
 
                 try
                 {
-                    DataType sourceType = DataType.builder().from(header.getObject()).build();
+                    DataType sourceType = DataType.of(header.getObject());
                     transformer = muleContext.getRegistry().lookupTransformer(sourceType, DataType.STRING);
 
                     String key = WSConsumer.SOAP_HEADERS_PROPERTY_PREFIX + header.getName().getLocalPart();

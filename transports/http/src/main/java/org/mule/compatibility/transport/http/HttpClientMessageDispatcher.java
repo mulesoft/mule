@@ -259,7 +259,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             if (!(body instanceof OutputHandler))
             {
-                body = event.transformMessage(DataType.forJavaType(OutputHandler.class));
+                body = event.transformMessage(DataType.forType(OutputHandler.class));
             }
 
             OutputHandler outputHandler = (OutputHandler) body;

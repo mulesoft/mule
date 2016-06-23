@@ -32,7 +32,7 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
 
     public HttpClientMethodResponseToObject()
     {
-        registerSourceType(DataType.forJavaType(HttpMethod.class));
+        registerSourceType(DataType.forType(HttpMethod.class));
         setReturnDataType(DataType.MULE_MESSAGE);
     }
 

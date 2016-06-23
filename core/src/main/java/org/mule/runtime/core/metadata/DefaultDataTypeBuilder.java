@@ -12,9 +12,8 @@ import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionTyp
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
-import org.mule.runtime.api.metadata.DataTypeOptionalParamsBuilder;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.MimeType;
-import org.mule.runtime.api.metadata.DataTypeBuilder.DataTypeCollectionTypeBuilder;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -22,6 +21,7 @@ import com.google.common.cache.LoadingCache;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,6 +58,27 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
 
     private AtomicBoolean built = new AtomicBoolean(false);
 
+    public DefaultDataTypeBuilder()
+    {
+
+    }
+
+    public DefaultDataTypeBuilder(DataType dataType)
+    {
+        if (dataType instanceof CollectionDataType)
+        {
+            this.type = dataType.getType();
+            this.itemType = ((CollectionDataType) dataType).getItemType();
+        }
+        else
+        {
+            this.type = dataType.getType();
+        }
+
+        this.mimeType = dataType.getMimeType();
+        this.encoding = dataType.getEncoding();
+    }
+
     /**
      * Sets the given type for the {@link DataType} to be built. See {@link DataType#getType()}.
      * 
@@ -65,14 +86,14 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * @return this builder.
      */
     @Override
-    public <N> DataTypeOptionalParamsBuilder<N> type(Class<N> type)
+    public <N> DataTypeParamsBuilder<N> type(Class<N> type)
     {
         validateAlreadyBuilt();
 
         checkNotNull(type, "'type' cannot be null.");
         this.type = (Class<T>) handleProxy(type);
 
-        return (DataTypeOptionalParamsBuilder<N>) this;
+        return (DataTypeParamsBuilder<N>) this;
     }
 
     /*
@@ -170,14 +191,12 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * Sets the given types for the {@link CollectionDataType} to be built. See
      * {@link CollectionDataType#getType()} and {@link CollectionDataType#getItemType()}.
      * 
-     * @param collectionType the java collection type to set.
      * @param itemType the java type to set.
      * @return this builder.
-     * @throws IllegalArgumentException if the given collectionType is not a descendant of
-     *             {@link Collection}.
+     * @throws IllegalArgumentException if the given collectionType is not a descendant of {@link Collection}.
      */
     @Override
-    public <I> DataTypeOptionalParamsBuilder<T> itemType(Class<I> itemType)
+    public <I> DataTypeParamsBuilder<T> itemType(Class<I> itemType)
     {
         validateAlreadyBuilt();
 
@@ -242,7 +261,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * @return this builder.
      */
     @Override
-    public DataTypeBuilder<T> encoding(String encoding)
+    public DataTypeBuilder<T> encoding(String encoding) throws IllegalCharsetNameException
     {
         validateAlreadyBuilt();
 
@@ -262,26 +281,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         validateAlreadyBuilt();
 
-        if (value instanceof DataType)
-        {
-            DataType<T> typeFrom = (DataType<T>) value;
-            if (typeFrom instanceof CollectionDataType)
-            {
-                this.type = typeFrom.getType();
-                this.itemType = ((CollectionDataType) typeFrom).getItemType();
-            }
-            else
-            {
-                this.type = typeFrom.getType();
-            }
-
-            this.mimeType = typeFrom.getMimeType();
-            this.encoding = typeFrom.getEncoding();
-
-            return this;
-        }
-
-        return (DataTypeBuilder<T>) type((Class<T>) getObjectType(value)).mimeType(getObjectMimeType(value));
+        return (DataTypeBuilder<T>) type(value.getClass()).mimeType(getObjectMimeType(value));
     }
 
     private static String getObjectMimeType(Object value)
@@ -297,20 +297,6 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         }
 
         return mime;
-    }
-
-    private static Class<?> getObjectType(Object value)
-    {
-        Class<?> type;
-        if (value == null)
-        {
-            type = Object.class;
-        }
-        else
-        {
-            type = value.getClass();
-        }
-        return type;
     }
 
     /**

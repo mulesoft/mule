@@ -78,7 +78,7 @@ public class MvelDataTypeResolver
         if (result == null)
         {
             Class<?> type = value == null ? Object.class : value.getClass();
-            result = DataType.forJavaType(type);
+            result = DataType.forType(type);
         }
 
         return result;

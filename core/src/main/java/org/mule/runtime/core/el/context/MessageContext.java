@@ -112,7 +112,7 @@ public class MessageContext
      */
     public <T> T payloadAs(Class<T> type) throws TransformerException
     {
-        event.setMessage(muleContext.getTransformationService().transform(event.getMessage(), DataType.forJavaType(type)));
+        event.setMessage(muleContext.getTransformationService().transform(event.getMessage(), DataType.forType(type)));
         return (T) event.getMessage().getPayload();
     }
 

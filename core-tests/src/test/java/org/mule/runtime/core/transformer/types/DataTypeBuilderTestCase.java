@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeOptionalParamsBuilder;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.metadata.CollectionDataType;
 import org.mule.runtime.core.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -36,7 +36,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void buildSimple()
     {
-        final DataType<String> dataType = DataType.forJavaType(String.class);
+        final DataType<String> dataType = DataType.forType(String.class);
         assertThat(dataType, instanceOf(SimpleDataType.class));
         assertThat(dataType.getType(), is(equalTo(String.class)));
     }
@@ -44,7 +44,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void buildCollection()
     {
-        final DataType<Set> dataType = DataType.forJavaType(Set.class);
+        final DataType<Set> dataType = DataType.forType(Set.class);
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(Set.class)));
         assertThat(((CollectionDataType) dataType).getItemType(), is(equalTo(Object.class)));
@@ -75,7 +75,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     public void templateCollection()
     {
         final DataType<Set> template = DataType.builder().type(Set.class).mimeType("text/plain;charset=ASCII").build();
-        final DataType dataType = DataType.builder().from(template).build();
+        final DataType dataType = DataType.builder(template).build();
 
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(Set.class)));
@@ -92,7 +92,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
                                                .itemType(String.class)
                                                .mimeType("text/plain;charset=ASCII")
                                                .build();
-        final DataType dataType = DataType.builder().from(template).build();
+        final DataType dataType = DataType.builder(template).build();
 
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(List.class)));
@@ -103,7 +103,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     public void buildCollectionFails()
     {
         expected.expect(IllegalArgumentException.class);
-        final DataTypeOptionalParamsBuilder builder = DataType.builder().collectionType(String.class).itemType(String.class);
+        final DataTypeParamsBuilder builder = DataType.builder().collectionType(String.class).itemType(String.class);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     {
         final Class<?> muleMessageProxy = Proxy.getProxyClass(DataTypeBuilderTestCase.class.getClassLoader(), MuleMessage.class);
 
-        final DataType dataType = DataType.forJavaType(muleMessageProxy);
+        final DataType dataType = DataType.forType(muleMessageProxy);
 
         assertThat(dataType.getType(), is(equalTo(MuleMessage.class)));
     }
@@ -142,7 +142,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void recycleBuilder()
     {
-        final DataTypeOptionalParamsBuilder<String> builder = DataType.builder().type(String.class);
+        final DataTypeParamsBuilder<String> builder = DataType.builder().type(String.class);
         builder.build();
 
         expected.expect(IllegalStateException.class);
@@ -152,8 +152,8 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void cachedInstances()
     {
-        final DataTypeOptionalParamsBuilder<String> builder1 = DataType.builder().type(String.class);
-        final DataTypeOptionalParamsBuilder<String> builder2 = DataType.builder().type(String.class);
+        final DataTypeParamsBuilder<String> builder1 = DataType.builder().type(String.class);
+        final DataTypeParamsBuilder<String> builder2 = DataType.builder().type(String.class);
 
         assertThat(builder1, equalTo(builder2));
         assertThat(builder1.build(), sameInstance(builder2.build()));

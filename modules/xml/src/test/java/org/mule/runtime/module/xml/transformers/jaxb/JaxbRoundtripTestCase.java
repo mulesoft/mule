@@ -36,7 +36,7 @@ public class JaxbRoundtripTestCase extends AbstractTransformerTestCase
     @Override
     public Transformer getTransformer() throws Exception
     {
-        JAXBUnmarshallerTransformer t = new JAXBUnmarshallerTransformer(ctx, DataType.forJavaType(Person.class));
+        JAXBUnmarshallerTransformer t = new JAXBUnmarshallerTransformer(ctx, DataType.forType(Person.class));
         initialiseObject(t);
         return t;
     }

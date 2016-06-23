@@ -72,8 +72,8 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
     {
         public AtoBConverter()
         {
-            registerSourceType(DataType.forJavaType(A.class));
-            setReturnDataType(DataType.forJavaType(B.class));
+            registerSourceType(DataType.forType(A.class));
+            setReturnDataType(DataType.forType(B.class));
         }
 
         @Override
@@ -99,8 +99,8 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
 
         public BtoCConverter()
         {
-            registerSourceType(DataType.forJavaType(B.class));
-            setReturnDataType(DataType.forJavaType(C.class));
+            registerSourceType(DataType.forType(B.class));
+            setReturnDataType(DataType.forType(C.class));
         }
 
         @Override

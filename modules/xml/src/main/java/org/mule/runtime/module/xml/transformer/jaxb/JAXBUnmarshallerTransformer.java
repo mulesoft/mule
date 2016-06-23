@@ -43,14 +43,14 @@ public class JAXBUnmarshallerTransformer extends AbstractTransformer
     public JAXBUnmarshallerTransformer()
     {
         registerSourceType(DataType.STRING);
-        registerSourceType(DataType.forJavaType(Writer.class));
-        registerSourceType(DataType.forJavaType(File.class));
-        registerSourceType(DataType.forJavaType(URL.class));
-        registerSourceType(DataType.forJavaType(Node.class));
+        registerSourceType(DataType.forType(Writer.class));
+        registerSourceType(DataType.forType(File.class));
+        registerSourceType(DataType.forType(URL.class));
+        registerSourceType(DataType.forType(Node.class));
         registerSourceType(DataType.INPUT_STREAM);
-        registerSourceType(DataType.forJavaType(Source.class));
-        registerSourceType(DataType.forJavaType(XMLStreamReader.class));
-        registerSourceType(DataType.forJavaType(XMLEventReader.class));
+        registerSourceType(DataType.forType(Source.class));
+        registerSourceType(DataType.forType(XMLStreamReader.class));
+        registerSourceType(DataType.forType(XMLEventReader.class));
     }
 
     public JAXBUnmarshallerTransformer(JAXBContext jaxbContext, DataType<?> returnType)

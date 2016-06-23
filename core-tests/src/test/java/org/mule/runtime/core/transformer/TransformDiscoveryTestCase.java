@@ -33,18 +33,18 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
     @Test
     public void testSimpleDiscovery() throws Exception
     {
-        Transformer t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.forJavaType(Apple.class));
+        Transformer t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.forType(Apple.class));
         assertNotNull(t);
         assertEquals(StringToApple.class, t.getClass());
 
-        t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.forJavaType(Orange.class));
+        t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.forType(Orange.class));
         assertNotNull(t);
         assertEquals(StringToOrange.class, t.getClass());
 
 
         try
         {
-            muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.forJavaType(Banana.class));
+            muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.forType(Banana.class));
             fail("There is no transformer to go from String to Banana");
         }
         catch (TransformerException e)
@@ -55,7 +55,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
 
         muleContext.getRegistry().registerTransformer(new StringToRedApple());
 
-        t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.forJavaType(RedApple.class));
+        t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.forType(RedApple.class));
         assertNotNull(t);
         assertEquals(StringToRedApple.class, t.getClass());
     }
@@ -64,7 +64,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
     {
         public StringToApple()
         {
-            setReturnDataType(DataType.forJavaType(Apple.class));
+            setReturnDataType(DataType.forType(Apple.class));
         }
 
         @Override
@@ -78,7 +78,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
     {
         public StringToRedApple()
         {
-            setReturnDataType(DataType.forJavaType(RedApple.class));
+            setReturnDataType(DataType.forType(RedApple.class));
             setPriorityWeighting(MAX_PRIORITY_WEIGHTING);
         }
 
@@ -93,7 +93,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
     {
         public StringToOrange()
         {
-            setReturnDataType(DataType.forJavaType(Orange.class));
+            setReturnDataType(DataType.forType(Orange.class));
         }
 
         @Override

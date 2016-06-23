@@ -34,7 +34,7 @@ public class MapToBean extends AbstractTransformer implements DiscoverableTransf
 
     public MapToBean()
     {
-        registerSourceType(DataType.forJavaType(Map.class));
+        registerSourceType(DataType.forType(Map.class));
         setReturnDataType(DataType.OBJECT);
     }
 

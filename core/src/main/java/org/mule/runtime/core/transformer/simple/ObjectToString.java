@@ -38,7 +38,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
         registerSourceType(DataType.OBJECT);
         registerSourceType(DataType.BYTE_ARRAY);
         registerSourceType(DataType.INPUT_STREAM);
-        registerSourceType(DataType.forJavaType(OutputHandler.class));
+        registerSourceType(DataType.forType(OutputHandler.class));
         setReturnDataType(DataType.STRING);
     }
 

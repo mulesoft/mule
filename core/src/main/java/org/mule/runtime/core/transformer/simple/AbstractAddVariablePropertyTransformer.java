@@ -8,7 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeOptionalParamsBuilder;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -65,10 +65,10 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
             {
                 if (!StringUtils.isEmpty(returnType.getMimeType()))
                 {
-                    DataTypeOptionalParamsBuilder<?> builder = DataType.builder().type(typedValue.getValue().getClass()).mimeType(getMimeType());
+                    DataTypeParamsBuilder<?> builder = DataType.builder().type(typedValue.getValue().getClass()).mimeType(getMimeType());
                     if (!StringUtils.isEmpty(returnType.getEncoding()))
                     {
-                        builder = builder.encoding(getEncoding());
+                        builder.encoding(getEncoding());
                     }
                     addProperty(event, key, typedValue.getValue(), builder.build());
                 }

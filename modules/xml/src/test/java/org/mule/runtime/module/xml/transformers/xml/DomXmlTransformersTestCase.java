@@ -53,7 +53,7 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
     public Transformer getTransformer() throws Exception
     {
         XmlToDomDocument trans = createObject(XmlToDomDocument.class);
-        trans.setReturnDataType(DataType.forJavaType(org.w3c.dom.Document.class));
+        trans.setReturnDataType(DataType.forType(org.w3c.dom.Document.class));
         return trans;
     }
 
