@@ -12,6 +12,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.connector.EndpointConnectException;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -33,6 +34,7 @@ import org.mule.runtime.core.exception.RollbackMessagingExceptionStrategy;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 
 import java.beans.ExceptionListener;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +54,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   MessageExchangePattern messageExchangePattern,
                                   int responseTimeout,
                                   String initialState,
-                                  String endpointEncoding,
+                                  Charset endpointEncoding,
                                   String endpointBuilderName,
                                   MuleContext muleContext,
                                   RetryPolicyTemplate retryPolicyTemplate,
@@ -61,7 +63,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                   List <MessageProcessor> messageProcessors,
                                   List <MessageProcessor> responseMessageProcessors,
                                   boolean disableTransportTransformer,
-                                  String mimeType)
+                                  MediaType mimeType)
     {
         super(connector, endpointUri, name, properties, 
             transactionConfig, deleteUnacceptedMessage,

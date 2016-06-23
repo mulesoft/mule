@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +72,7 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
 
     void setInitialState(String initialState);
 
-    void setEncoding(String encoding);
+    void setEncoding(Charset encoding);
 
     void setRegistryId(String registryId);
 

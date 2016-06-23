@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -77,7 +78,7 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      * @throws TransformerException if a error occurs transforming the data or if the
      *                              expected returnClass isn't the same as the transformed data
      */
-    Object transform(Object src, String encoding) throws TransformerException;
+    Object transform(Object src, Charset encoding) throws TransformerException;
 
     /**
      * Sets the expected return type for the transformed data. If the transformed
@@ -98,14 +99,4 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      * @since 3.0.0
      */
     DataType<?> getReturnDataType();
-
-    /**
-     * Return the mime type returned by the transformer (if any).
-     */
-    String getMimeType();
-
-    /**
-     * Return the encoding returned by the transformer (if any).
-     */
-    String getEncoding();
 }

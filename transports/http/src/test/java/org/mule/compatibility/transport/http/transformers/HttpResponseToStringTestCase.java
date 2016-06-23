@@ -6,15 +6,14 @@
  */
 package org.mule.compatibility.transport.http.transformers;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.compatibility.transport.http.ResponseWriter;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.apache.commons.httpclient.Header;
@@ -65,7 +64,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleContextEndpointTes
             HttpConstants.TRANSFER_ENCODING_CHUNKED));
         _resultChunked += "31\r\n" + _body + "\r\n0\r\n\r\n";
 
-        String trasfRes = (String)trasf.doTransform(_resp, "ISO-8859-1");
+        String trasfRes = (String) trasf.doTransform(_resp, ISO_8859_1);
 
         assertEquals(_resultChunked, trasfRes);
     }
@@ -84,28 +83,8 @@ public class HttpResponseToStringTestCase extends AbstractMuleContextEndpointTes
 
         _resultNotChunked += _body;
 
-        String trasfRes = (String)trasf.doTransform(_resp, "ISO-8859-1");
+        String trasfRes = (String) trasf.doTransform(_resp, ISO_8859_1);
 
         assertEquals(_resultNotChunked, trasfRes);
     }
-
-    /**
-     * Expect a {@link TransformerException} when the encoding is not supported.
-     */
-    @Test
-    public void testTransformException()
-    {
-        try
-        {
-            HttpResponseToString trasf = new HttpResponseToString();
-            trasf.doTransform(_resp, "ISO-8859-20");
-
-            fail();
-        }
-        catch (TransformerException tfe)
-        {
-            // Expected
-        }
-    }
-
 }

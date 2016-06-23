@@ -12,6 +12,8 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.nio.charset.Charset;
+
 /**
  * Converts a Hex String to a Byte array
  */
@@ -24,7 +26,7 @@ public class HexStringToByteArray extends AbstractTransformer
     }
 
     @Override
-    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
+    protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         if (src == null)
         {

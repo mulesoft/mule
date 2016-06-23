@@ -12,6 +12,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.nio.charset.Charset;
+
 /**
  * <code>ObjectArrayToString</code> transformer is the opposite of
  * StringToObjectArray - it simply converts Object[] to a String in which each
@@ -34,7 +36,7 @@ public class ObjectArrayToString extends AbstractTransformer implements Discover
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         if (src == null)
         {

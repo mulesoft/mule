@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.jms;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -18,8 +19,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.compatibility.transport.jms.JmsConstants;
-import org.mule.compatibility.transport.jms.JmsMessageUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.BananaFactory;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -29,6 +28,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -59,7 +59,7 @@ import org.junit.Test;
 public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
 {
 
-    public static final String ENCODING = "UTF-8";
+    public static final Charset ENCODING = UTF_8;
 
     @Test
     public void testHeaders()
@@ -124,7 +124,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         when(session.createStreamMessage()).thenReturn(new ActiveMQStreamMessage());
 
         // Creates a test list with data
-        List<Object> data = new ArrayList<Object>();
+        List<Object> data = new ArrayList<>();
         data.add(Boolean.TRUE);
         data.add(new Byte("1"));
         data.add(new Short("2"));
@@ -164,7 +164,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         when(session.createStreamMessage()).thenReturn(new ActiveMQStreamMessage());
 
         // Creates a test list with data
-        List<Object> data = new ArrayList<Object>();
+        List<Object> data = new ArrayList<>();
         data.add(new Object());
 
         JmsMessageUtils.toMessage(data, session);

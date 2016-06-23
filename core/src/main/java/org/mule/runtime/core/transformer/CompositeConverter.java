@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class CompositeConverter implements Converter
             throw new IllegalArgumentException("There must be at least one converter");
         }
 
-        chain = new LinkedList<Converter>();
+        chain = new LinkedList<>();
 
         name = compositeConverterName(converters);
         this.transformationService = transformationService;
@@ -95,10 +96,10 @@ public class CompositeConverter implements Converter
     }
 
     @Override
-    public Object transform(Object src, String encoding) throws TransformerException
+    public Object transform(Object src, Charset encoding) throws TransformerException
     {
         Object current = src;
-        String currentEncoding = encoding;
+        Charset currentEncoding = encoding;
         for (Converter converter : chain)
         {
             if (currentEncoding != null)
@@ -109,7 +110,7 @@ public class CompositeConverter implements Converter
             {
                 current = converter.transform(current);
             }
-            currentEncoding = converter.getEncoding();
+            currentEncoding = converter.getReturnDataType().getMimeType().getEncoding().orElse(encoding);
         }
 
         return current;
@@ -125,18 +126,6 @@ public class CompositeConverter implements Converter
     public DataType<?> getReturnDataType()
     {
         return chain.peekLast().getReturnDataType();
-    }
-
-    @Override
-    public String getMimeType()
-    {
-        return chain.peekLast().getMimeType();
-    }
-
-    @Override
-    public String getEncoding()
-    {
-        return chain.peekLast().getEncoding();
     }
 
     @Override
@@ -215,6 +204,6 @@ public class CompositeConverter implements Converter
 
     public LinkedList<Converter> getConverters()
     {
-        return new LinkedList<Converter>(chain);
+        return new LinkedList<>(chain);
     }
 }

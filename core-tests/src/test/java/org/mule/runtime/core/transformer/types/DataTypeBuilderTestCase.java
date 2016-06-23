@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer.types;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -47,7 +48,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
         final DataType<Set> dataType = DataType.fromType(Set.class);
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(Set.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(equalTo(Object.class)));
+        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.OBJECT));
     }
 
     @Test
@@ -56,7 +57,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
         final DataType<Set> dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(List.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(equalTo(String.class)));
+        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.STRING));
     }
 
     @Test
@@ -67,8 +68,9 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(dataType, instanceOf(SimpleDataType.class));
         assertThat(dataType.getType(), is(equalTo(String.class)));
-        assertThat(dataType.getMimeType(), is("text/plain"));
-        assertThat(dataType.getEncoding(), is("ASCII"));
+        assertThat(dataType.getMimeType().getPrimaryType(), is("text"));
+        assertThat(dataType.getMimeType().getSubType(), is("plain"));
+        assertThat(dataType.getMimeType().getEncoding().get(), is(US_ASCII));
     }
 
     @Test
@@ -79,9 +81,10 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(Set.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(equalTo(Object.class)));
-        assertThat(dataType.getMimeType(), is("text/plain"));
-        assertThat(dataType.getEncoding(), is("ASCII"));
+        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.OBJECT));
+        assertThat(dataType.getMimeType().getPrimaryType(), is("text"));
+        assertThat(dataType.getMimeType().getSubType(), is("plain"));
+        assertThat(dataType.getMimeType().getEncoding().get(), is(US_ASCII));
     }
 
     @Test
@@ -96,14 +99,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(List.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(equalTo(String.class)));
-    }
-
-    @Test
-    public void buildCollectionFails()
-    {
-        expected.expect(IllegalArgumentException.class);
-        final DataTypeParamsBuilder builder = DataType.builder().collectionType(String.class).itemType(String.class);
+        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.STRING));
     }
 
     @Test
@@ -121,8 +117,9 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     {
         final DataType dataType = DataType.builder().mimeType("text/plain;charset=ASCII").build();
 
-        assertThat(dataType.getMimeType(), is("text/plain"));
-        assertThat(dataType.getEncoding(), is("ASCII"));
+        assertThat(dataType.getMimeType().getPrimaryType(), is("text"));
+        assertThat(dataType.getMimeType().getSubType(), is("plain"));
+        assertThat(dataType.getMimeType().getEncoding().get(), is(US_ASCII));
     }
 
     @Test

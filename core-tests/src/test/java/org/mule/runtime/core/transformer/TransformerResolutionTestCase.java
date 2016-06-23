@@ -20,6 +20,8 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import java.nio.charset.Charset;
+
 import org.junit.Test;
 
 @SmallTest
@@ -59,7 +61,7 @@ public class TransformerResolutionTestCase extends AbstractMuleContextTestCase
         }
 
         @Override
-        protected Object doTransform(Object src, String encoding) throws TransformerException
+        protected Object doTransform(Object src, Charset encoding) throws TransformerException
         {
             return new Orange();
         }

@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.file.transformers;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * <code>FileToString</code> reads file contents into a string.
@@ -31,20 +31,10 @@ public class FileToString extends FileToByteArray
      * it and tries the usual transformation.
      */
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
-        byte[] bytes;
-
-        bytes = (byte[]) super.doTransform(src, encoding);
-
-        try
-        {
-            return new String(bytes, encoding);
-        }
-        catch (UnsupportedEncodingException uee)
-        {
-            throw new TransformerException(this, uee);
-        }
+        byte[] bytes = (byte[]) super.doTransform(src, encoding);
+        return new String(bytes, encoding);
     }
 
 }

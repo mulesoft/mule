@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
 import java.text.NumberFormat;
 
 /**
@@ -39,7 +40,7 @@ public class NumberToString extends AbstractTransformer implements DiscoverableT
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         if (src == null)
         {

@@ -17,7 +17,7 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 
 import org.apache.commons.httpclient.ChunkedOutputStream;
@@ -41,7 +41,7 @@ public class HttpResponseToString extends AbstractTransformer
      * Perform the transformation to always return a String object
      */
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         try
         {
@@ -87,20 +87,7 @@ public class HttpResponseToString extends AbstractTransformer
             writer.close();
             bos.close();
 
-            String output = null;
-            try
-            {
-                output = new String(result, encoding);
-            }
-            catch (UnsupportedEncodingException uee)
-            {
-                // I believe this is never reached since a TransformerExcpetion
-                // is thrown before at new ResponseWriter(outstream, encoding) if
-                // encoding is not supported
-                output = new String(result);
-            }
-
-            return output;
+            return new String(result, encoding);
         }
         catch (IOException e)
         {

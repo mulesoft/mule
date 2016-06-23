@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.BeanUtils;
 
+import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -31,7 +32,7 @@ public class BeanToMap extends AbstractTransformer implements DiscoverableTransf
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         Map result = BeanUtils.describeBean(src);
         return result;

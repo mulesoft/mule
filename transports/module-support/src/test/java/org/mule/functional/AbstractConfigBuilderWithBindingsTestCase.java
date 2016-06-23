@@ -6,6 +6,7 @@
  */
 package org.mule.functional;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -56,7 +57,7 @@ public abstract class AbstractConfigBuilderWithBindingsTestCase extends Abstract
         // test that targets have been resolved on targets
         ImmutableEndpoint endpoint = getEndpointFactory(muleContext).getInboundEndpoint("waterMelonEndpoint");
         assertNotNull(endpoint);
-        assertEquals("UTF-8-TEST", endpoint.getEncoding());
+        assertEquals(UTF_8, endpoint.getEncoding());
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
         FlowConstruct service = muleContext.getRegistry().lookupFlowConstruct("appleComponent2");

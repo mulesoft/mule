@@ -10,10 +10,10 @@ package org.mule.runtime.core.util;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mule.runtime.api.metadata.MimeType.APPLICATION_JSON;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -28,16 +28,16 @@ public class DataTypeUtilsTestCase extends AbstractMuleTestCase
     {
         final DataType dataType = DataType.builder().type(Object.class).mimeType(APPLICATION_JSON).encoding(UTF_8.name()).build();
 
-        String contentType = DataTypeUtils.getContentType(dataType);
+        String contentType = ((DataType<?>) dataType).getMimeType().toString();
         assertThat(contentType, equalTo("application/json; charset=UTF-8"));
     }
 
     @Test
     public void generatesContentTypeWithoutCharset() throws Exception
     {
-        DataType<Object> dataType = DataType.builder().type(Object.class).mimeType(MimeType.APPLICATION_JSON).build();
+        DataType<Object> dataType = DataType.builder().type(Object.class).mimeType(MediaType.APPLICATION_JSON).build();
 
-        String contentType = DataTypeUtils.getContentType(dataType);
+        String contentType = dataType.getMimeType().toString();
         assertThat(contentType, equalTo("application/json"));
     }
 }

@@ -11,6 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
@@ -43,19 +44,12 @@ public class FileAttachmentNameTestCase extends FunctionalTestCase
     public void keepsAttachmentAndFileNames() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        DataHandler dataHandler = new DataHandler(new ByteArrayDataSource(TEST_MESSAGE.getBytes(), "text/xml", "testAttachment.txt"));
+        DataHandler dataHandler = new DataHandler(new ByteArrayDataSource(TEST_MESSAGE.getBytes(), MediaType.XML, "testAttachment.txt"));
         MutableMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         msg.addOutboundAttachment("testAttachment", dataHandler);
 
         MuleMessage response = client.send("http://localhost:" + httpPort.getValue() + "/testInput", msg);
 
         assertThat(getPayloadAsString(response), equalTo("testAttachment:testAttachment.txt"));
-    }
-
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        // TODO Auto-generated method stub
-        return 100 * super.getTestTimeoutSecs();
     }
 }

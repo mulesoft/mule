@@ -13,6 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
@@ -105,7 +106,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     private QueryHandler wsdlQueryHandler;
 
-    private String mimeType;
+    private MediaType mimeType;
 
     private HttpRequestPropertyManager requestPropertyManager;
 
@@ -381,10 +382,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         if (shouldSoapActionHeader())
         {
             // Add protocol headers with the soap action so that the SoapActionInInterceptor can find them if it is soap v1.1
-            Map<String, List<String>> protocolHeaders = new HashMap<String, List<String>>();
+            Map<String, List<String>> protocolHeaders = new HashMap<>();
             if (soapAction != null && !soapAction.isEmpty())
             {
-                List<String> soapActions = new ArrayList<String>();
+                List<String> soapActions = new ArrayList<>();
                 // An HTTP client MUST use [SOAPAction] header field when issuing a SOAP HTTP Request.
                 // The header field value of empty string ("") means that the intent of the SOAP message is provided by the HTTP Request-URI.
                 // No value means that there is no indication of the intent of the message.
@@ -556,12 +557,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     private void setPayload(MuleEvent ctx, final MessageImpl m, Object payload) throws TransformerException
     {
-        if (payload instanceof InputStream)
-        {
-            m.put(Message.ENCODING, ctx.getEncoding());
-            m.setContent(InputStream.class, payload);
-        }
-        else if (payload instanceof Reader)
+        if (payload instanceof Reader)
         {
             m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Reader) payload));
         }
@@ -588,9 +584,20 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
         else
         {
-            InputStream is = ctx.transformMessage(DataType.INPUT_STREAM);
-            m.put(Message.ENCODING, ctx.getEncoding());
-            m.setContent(InputStream.class, is);
+            ctx.getMessage().getDataType().getMimeType().getEncoding().ifPresent(encoding ->
+            {
+                m.put(Message.ENCODING, encoding.name());
+            });
+
+            if (payload instanceof InputStream)
+            {
+                m.setContent(InputStream.class, payload);
+            }
+            else
+            {
+                InputStream is = ctx.transformMessage(DataType.INPUT_STREAM);
+                m.setContent(InputStream.class, is);
+            }
         }
     }
 
@@ -664,12 +671,12 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         this.wsdlQueryHandler = wsdlQueryHandler;
     }
 
-    public String getMimeType()
+    public MediaType getMimeType()
     {
         return mimeType;
     }
 
-    public void setMimeType(String mimeType)
+    public void setMimeType(MediaType mimeType)
     {
         this.mimeType = mimeType;
     }

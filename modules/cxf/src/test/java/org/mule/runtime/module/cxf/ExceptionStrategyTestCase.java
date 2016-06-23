@@ -13,6 +13,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -20,16 +22,16 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -83,13 +85,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
         MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
-        muleContext.registerListener(new ExceptionNotificationListener() {
-            @Override
-            public void onNotification(ServerNotification notification)
-            {
-                latch.countDown();
-            }
-        });
+        registerExceptionNotificationListener();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
         assertTrue(getPayloadAsString(response).contains("<faultstring>"));
@@ -103,13 +99,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
         MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
-        muleContext.registerListener(new ExceptionNotificationListener() {
-            @Override
-            public void onNotification(ServerNotification notification)
-            {
-                latch.countDown();
-            }
-        });
+        registerExceptionNotificationListener();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
         assertTrue(getPayloadAsString(response).contains("<faultstring>"));
@@ -138,14 +128,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
-        muleContext.registerListener(new ExceptionNotificationListener()
-        {
-            @Override
-            public void onNotification(ServerNotification notification)
-            {
-                latch.countDown();
-            }
-        });
+        registerExceptionNotificationListener();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy", getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
         assertTrue(getPayloadAsString(response).contains("<faultstring>"));
@@ -154,10 +137,17 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }
 
+    protected void registerExceptionNotificationListener() throws NotificationException
+    {
+        // Do not inline this variable, otherwise the type of the listener is lost.
+        ExceptionNotificationListener listener = notification -> latch.countDown();
+        muleContext.registerListener(listener);
+    }
+
     public static class CxfTransformerThrowsExceptions extends AbstractTransformer
     {
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             throw new TransformerException(CoreMessages.failedToBuildMessage());
         }

@@ -33,6 +33,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -153,7 +154,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public String getMessageAsString(String encoding) throws MuleException
+        public String getMessageAsString(Charset encoding) throws MuleException
         {
             return null;
         }
@@ -202,12 +203,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase
 
         @Override
         public OutputStream getOutputStream()
-        {
-            return null;
-        }
-
-        @Override
-        public String getEncoding()
         {
             return null;
         }

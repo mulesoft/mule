@@ -7,6 +7,8 @@
 package org.mule.runtime.module.json.transformers;
 
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.IOUtils;
@@ -14,6 +16,7 @@ import org.mule.runtime.core.util.IOUtils;
 import java.io.File;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -46,7 +49,7 @@ public class XmlToJson  extends AbstractToFromXmlTransformer
      * Use Staxon to convert XML to a JSON string
      */
     @Override
-    protected Object doTransform(Object src, String enc) throws TransformerException
+    protected Object doTransform(Object src, Charset enc) throws TransformerException
     {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         inputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
@@ -70,7 +73,7 @@ public class XmlToJson  extends AbstractToFromXmlTransformer
                 inputs = new TransformerInputs(this, src);
                 if (inputs.getInputStream() != null)
                 {
-                    source = new StAXSource(inputFactory.createXMLStreamReader(inputs.getInputStream(),  enc == null ? "UTF-8" : enc));
+                    source = new StAXSource(inputFactory.createXMLStreamReader(inputs.getInputStream(), enc == null ? UTF_8.name() : enc.name()));
                 }
                 else
                 {

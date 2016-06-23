@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.http.transformers;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -61,7 +62,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         props.add("Set-Cookie");
         when(msg.getOutboundPropertyNames()).thenReturn(props);
 
-        HttpResponse response = transformer.createResponse(null, "UTF-8", msg);
+        HttpResponse response = transformer.createResponse(null, UTF_8, msg);
         Header[] headers = response.getHeaders();
         int cookiesSet = 0;
         for(Header header : headers)
@@ -81,7 +82,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         MuleMessage msg =
                 createMockMessage();
 
-        HttpResponse response = transformer.createResponse(null, "UTF-8", msg);
+        HttpResponse response = transformer.createResponse(null, UTF_8, msg);
         Header[] headers = response.getHeaders();
 
         boolean hasDateHeader = false;
@@ -138,7 +139,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         
         msg.setOutboundProperty(HEADER_CONTENT_TYPE, contentType);
 
-        HttpResponse response = transformer.createResponse(null, "UTF-8", msg);
+        HttpResponse response = transformer.createResponse(null, UTF_8, msg);
         Header[] headers = response.getHeaders();
 
         boolean hasContentTypeHeader = false;

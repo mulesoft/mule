@@ -18,6 +18,7 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * <code>EncryptionTransformer</code> will transform an array of bytes or string
@@ -52,7 +53,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer 
     }
 
     @Override
-    public Object doTransform(Object src, String outputEncoding) throws TransformerException
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         InputStream input;
         if (src instanceof String)

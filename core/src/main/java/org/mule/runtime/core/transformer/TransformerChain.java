@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -34,13 +35,14 @@ public class TransformerChain extends AbstractMessageTransformer
         {
             throw new IllegalArgumentException("You must set at least one transformer");
         }
-        this.transformers = new LinkedList<Transformer>(transformers);
+        this.transformers = new LinkedList<>(transformers);
     }
 
     public TransformerChain(Transformer... transformers)
     {
         this(Arrays.asList(transformers));
         this.name = generateTransformerName();
+        setReturnDataType(transformers[transformers.length - 1].getReturnDataType());
     }
 
     public TransformerChain(String name, List<Transformer> transformers)
@@ -55,7 +57,7 @@ public class TransformerChain extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         MuleMessage result = event.getMessage();
         Object temp = event.getMessage();
@@ -78,7 +80,7 @@ public class TransformerChain extends AbstractMessageTransformer
                 event.setMessage(result);
             }
         }
-        if (lastTransformer != null && lastTransformer.getReturnDataType().getType().equals(MuleMessage.class))
+        if (lastTransformer != null && MuleMessage.class.isAssignableFrom(lastTransformer.getReturnDataType().getType()))
         {
             return result;
         }

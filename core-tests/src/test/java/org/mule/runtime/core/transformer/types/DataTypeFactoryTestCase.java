@@ -8,14 +8,18 @@
 package org.mule.runtime.core.transformer.types;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
@@ -28,7 +32,7 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     {
         DataType<?> dataType = DataType.fromObject(null);
 
-        assertThat(dataType, like(Object.class, MimeType.ANY, null));
+        assertThat(dataType, like(Object.class, MediaType.ANY, null));
     }
 
     @Test
@@ -36,19 +40,20 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     {
         DataType<?> dataType = DataType.fromObject("test");
 
-        assertThat(dataType, like(String.class, MimeType.ANY, null));
+        assertThat(dataType, like(String.class, MediaType.ANY, null));
     }
 
     @Test
     public void mimeTypeWithEncodingInformation() throws Exception
     {
         final Class<String> type = String.class;
-        final String encoding = "UTF-16";
+        final Charset encoding = UTF_16;
         final String mimeType = "application/json";
 
         DataType<?> dataType = DataType.builder().type(type).mimeType(format("%s; charset=UTF-8", mimeType)).encoding(encoding).build();
         assertThat(dataType.getType(), equalTo(type));
-        assertThat(dataType.getEncoding(), is(encoding));
-        assertThat(dataType.getMimeType(), is(mimeType));
+        assertThat(dataType.getMimeType().getPrimaryType(), is(mimeType.split("/")[0]));
+        assertThat(dataType.getMimeType().getSubType(), is(mimeType.split("/")[1]));
+        assertThat(dataType.getMimeType().getEncoding().get(), is(encoding));
     }
 }

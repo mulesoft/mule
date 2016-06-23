@@ -14,10 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
-import org.mule.compatibility.transport.file.FileConnector;
-import org.mule.compatibility.transport.file.FileMuleMessageFactory;
-import org.mule.compatibility.transport.file.ReceiverFileInputStream;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
 
 import java.io.File;
@@ -86,7 +83,8 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
         ReceiverFileInputStream mockStream = new ReceiverFileInputStream(file, false, null);
 
         MuleMessage message = factory.create(mockStream, encoding, muleContext);
-        assertThat(message.getDataType().getMimeType(), equalTo(MimeType.TEXT));
+        assertThat(message.getDataType().getMimeType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
+        assertThat(message.getDataType().getMimeType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
     }
 
     private void assertMessageProperties(MuleMessage message)

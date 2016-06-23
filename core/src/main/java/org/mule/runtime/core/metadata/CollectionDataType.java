@@ -7,7 +7,7 @@
 package org.mule.runtime.core.metadata;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 
 import java.util.Collection;
 
@@ -23,15 +23,15 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
 {
     private static final long serialVersionUID = 3600944898597616006L;
 
-    private final Class<T> itemsType;
+    private final DataType<T> itemsType;
 
-    CollectionDataType(Class<C> collectionType, Class<T> type, String mimeType, String encoding)
+    CollectionDataType(Class<C> collectionType, DataType<T> type, MediaType mimeType)
     {
-        super(collectionType, mimeType, encoding);
+        super(collectionType, mimeType);
         this.itemsType = type;
     }
 
-    public Class<T> getItemType()
+    public DataType<T> getItemType()
     {
         return itemsType;
     }
@@ -50,8 +50,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
         }
         CollectionDataType that = (CollectionDataType) dataType;
 
-        //Untyped compatible collection
-        return that.getItemType() == Object.class || this.getItemType().isAssignableFrom(that.getItemType());
+        return this.getItemType().isCompatibleWith(that.getItemType());
 
     }
 
@@ -74,7 +73,8 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
             return false;
         }
 
-        if ((mimeType != null ? !mimeType.equals(that.mimeType) : that.mimeType != null) && !MimeType.ANY.equals(that.mimeType) && !MimeType.ANY.equals(this.mimeType))
+        // TODO MULE-9987 Fix this
+        if ((mimeType != null ? !mimeType.matches(that.mimeType) : that.mimeType != null) && !MediaType.ANY.matches(that.mimeType) && !MediaType.ANY.matches(this.mimeType))
         {
             return false;
         }
@@ -89,7 +89,6 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
         int result = getType().hashCode();
         result = 31 * result + getItemType().hashCode();
         result = 31 * result + (getMimeType() != null ? getMimeType().hashCode() : 0);
-        result = 31 * result + (getEncoding() != null ? getEncoding().hashCode() : 0);
         return result;
     }
 
@@ -98,7 +97,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
     {
         return "CollectionDataType{" +
                 "type=" + getType().getName() +
-                ", itemType=" + getItemType().getName() +
+               ", itemType=" + getItemType().toString() +
                 ", mimeType='" + getMimeType() + '\'' +
                 '}';
     }

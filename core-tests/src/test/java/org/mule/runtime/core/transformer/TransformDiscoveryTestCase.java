@@ -19,6 +19,8 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.RedApple;
 
+import java.nio.charset.Charset;
+
 import org.junit.Test;
 
 public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
@@ -68,7 +70,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
         }
 
         @Override
-        protected Object doTransform(Object src, String encoding) throws TransformerException
+        protected Object doTransform(Object src, Charset encoding) throws TransformerException
         {
             return new Apple();
         }
@@ -83,7 +85,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
         }
 
         @Override
-        protected Object doTransform(Object src, String encoding) throws TransformerException
+        protected Object doTransform(Object src, Charset encoding) throws TransformerException
         {
             return new RedApple();
         }
@@ -97,7 +99,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
         }
 
         @Override
-        protected Object doTransform(Object src, String encoding) throws TransformerException
+        protected Object doTransform(Object src, Charset encoding) throws TransformerException
         {
             return new Orange();
         }

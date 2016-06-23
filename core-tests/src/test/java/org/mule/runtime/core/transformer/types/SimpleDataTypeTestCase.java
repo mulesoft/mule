@@ -10,7 +10,7 @@ package org.mule.runtime.core.transformer.types;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mule.runtime.api.metadata.MimeType.JSON;
+import static org.mule.runtime.api.metadata.MediaType.JSON;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -29,7 +29,7 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     {
         DataType<?> dataType = DataType.builder().encoding(UTF_8.name()).build();
 
-        assertThat(dataType.getEncoding(), equalTo(UTF_8.name()));
+        assertThat(dataType.getMimeType().getEncoding().get(), equalTo(UTF_8));
     }
 
     @Test(expected = UnsupportedCharsetException.class)

@@ -9,10 +9,13 @@ package org.mule.compatibility.core.transport;
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
+
+import java.nio.charset.Charset;
 
 public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
 {
@@ -26,18 +29,18 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
     }
 
     @Override
-    public MutableMuleMessage create(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext) throws Exception
+    public MutableMuleMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding, MuleContext muleContext) throws Exception
     {
         return doCreate(transportMessage, previousMessage, encoding, muleContext);
     }
 
     @Override
-    public MutableMuleMessage create(Object transportMessage, String encoding, MuleContext muleContext) throws Exception
+    public MutableMuleMessage create(Object transportMessage, Charset encoding, MuleContext muleContext) throws Exception
     {
         return doCreate(transportMessage, null, encoding, muleContext);
     }
 
-    private MutableMuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext)
+    private MutableMuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, Charset encoding, MuleContext muleContext)
             throws Exception
     {
         if (transportMessage == null)
@@ -51,20 +54,19 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
         }
 
         Object payload = extractPayload(transportMessage, encoding);
-        DefaultMuleMessage message;
+        final DataType dataType = DataType.builder().type((Class) (payload == null ? Object.class : payload.getClass())).mimeType(getMimeType(transportMessage)).encoding(encoding).build();
+        MutableMuleMessage message;
         if (previousMessage != null)
         {
-            message = new DefaultMuleMessage(payload, previousMessage, muleContext);
+            message = new DefaultMuleMessage(payload, previousMessage, muleContext, dataType);
         }
         else
         {
-            message = new DefaultMuleMessage(payload, muleContext);
+            message = new DefaultMuleMessage(payload, dataType, muleContext);
         }
 
-        message.setEncoding(encoding);
-        message.setMimeType(getMimeType(transportMessage));
-        addProperties(message, transportMessage);
-        addAttachments(message, transportMessage);
+        message = addProperties(message, transportMessage);
+        message = addAttachments(message, transportMessage);
         return message;
     }
 
@@ -75,16 +77,18 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
 
     protected abstract Class<?>[] getSupportedTransportMessageTypes();
 
-    protected abstract Object extractPayload(Object transportMessage, String encoding) throws Exception;
+    protected abstract Object extractPayload(Object transportMessage, Charset encoding) throws Exception;
 
-    protected void addProperties(DefaultMuleMessage message, Object transportMessage) throws Exception
+    protected MutableMuleMessage addProperties(MutableMuleMessage message, Object transportMessage) throws Exception
     {
         // Template method
+        return message;
     }
 
-    protected void addAttachments(DefaultMuleMessage message, Object transportMessage) throws Exception
+    protected MutableMuleMessage addAttachments(MutableMuleMessage message, Object transportMessage) throws Exception
     {
         // Template method
+        return message;
     }
 
     private boolean isTransportMessageTypeSupported(Object transportMessage)

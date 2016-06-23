@@ -7,7 +7,9 @@
 package org.mule.tck;
 
 import static org.mockito.Mockito.spy;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -164,7 +166,8 @@ public final class MuleTestUtils
     {
         final MuleSession session = getTestSession(flowConstruct, context);
         // TODO MULE-9856 Replace with the builder
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data, context), mep, flowConstruct, session);
+        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data,
+                DataType.builder().fromObject(data).encoding(getDefaultEncoding(context)).build(), context), mep, flowConstruct, session);
         return event;
     }
 

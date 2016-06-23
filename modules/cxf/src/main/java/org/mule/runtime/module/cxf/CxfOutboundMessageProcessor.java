@@ -9,6 +9,7 @@ package org.mule.runtime.module.cxf;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -66,7 +67,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     private String operation;
     private BindingProvider clientProxy;
     private String decoupledEndpoint;
-    private String mimeType;
+    private MediaType mimeType;
 
     public CxfOutboundMessageProcessor(Client client)
     {
@@ -564,12 +565,12 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         return clone;
     }
 
-    public String getMimeType()
+    public MediaType getMimeType()
     {
         return mimeType;
     }
 
-    public void setMimeType(String mimeType)
+    public void setMimeType(MediaType mimeType)
     {
         this.mimeType = mimeType;
     }

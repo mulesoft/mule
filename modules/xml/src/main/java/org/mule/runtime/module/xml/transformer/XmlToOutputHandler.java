@@ -14,6 +14,7 @@ import org.mule.runtime.module.xml.util.XMLUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -44,7 +45,7 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, final String encoding)
+    public Object transformMessage(MuleEvent event, final Charset encoding)
     {
         final Object src = event.getMessage().getPayload();
         return new OutputHandler()
@@ -57,7 +58,7 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
         };
     }
 
-    protected void writeXml(final Object src, final String encoding, OutputStream out)
+    protected void writeXml(final Object src, final Charset encoding, OutputStream out)
         throws TransformerFactoryConfigurationError, IOException
     {
         try

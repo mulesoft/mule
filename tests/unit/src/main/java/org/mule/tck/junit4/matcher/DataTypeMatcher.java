@@ -8,6 +8,9 @@
 package org.mule.tck.junit4.matcher;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
+
+import java.nio.charset.Charset;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -17,10 +20,10 @@ public class DataTypeMatcher extends TypeSafeMatcher<DataType>
 {
 
     private final Class type;
-    private final String mimeType;
-    private final String encoding;
+    private final MediaType mimeType;
+    private final Charset encoding;
 
-    public DataTypeMatcher(Class type, String mimeType, String encoding)
+    public DataTypeMatcher(Class type, MediaType mimeType, Charset encoding)
     {
         this.type = type;
         this.mimeType = mimeType;
@@ -31,8 +34,8 @@ public class DataTypeMatcher extends TypeSafeMatcher<DataType>
     protected boolean matchesSafely(DataType dataType)
     {
         boolean sameType = type == null ? dataType.getType() == null : type.equals(dataType.getType());
-        boolean sameEncoding = encoding == null ? dataType.getEncoding() == null : encoding.equals(dataType.getEncoding());
-        boolean sameMimeType = mimeType == null ? dataType.getMimeType() == null : mimeType.equals(dataType.getMimeType());
+        boolean sameEncoding = encoding == null ? !dataType.getMimeType().getEncoding().isPresent() : encoding.equals(dataType.getMimeType().getEncoding().get());
+        boolean sameMimeType = mimeType == null ? dataType.getMimeType() == null : mimeType.matches(dataType.getMimeType());
 
         return sameType && sameEncoding && sameMimeType;
     }
@@ -43,13 +46,13 @@ public class DataTypeMatcher extends TypeSafeMatcher<DataType>
         description.appendText("a dataType with type = " + type.getName() + ", mimeType= " + mimeType + ", encoding=" + encoding);
     }
 
-    public static Matcher<DataType> like(Class type, String mimeType, String encoding)
+    public static Matcher<DataType> like(Class type, MediaType mimeType, Charset encoding)
     {
         return new DataTypeMatcher(type, mimeType, encoding);
     }
 
     public static Matcher<DataType> like(DataType dataType)
     {
-        return new DataTypeMatcher(dataType.getType(), dataType.getMimeType(), dataType.getEncoding());
+        return new DataTypeMatcher(dataType.getType(), dataType.getMimeType(), dataType.getMimeType().getEncoding().orElse(null));
     }
 }

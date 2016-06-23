@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api;
 
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -35,7 +36,7 @@ public class HttpPart
      */
     @Parameter
     @Optional
-    private String contentType;
+    private MediaType contentType;
 
     /**
      * File name of this part, if required.
@@ -48,7 +49,7 @@ public class HttpPart
     {
     }
 
-    public HttpPart(String id, Object data, String contentType, String filename)
+    public HttpPart(String id, Object data, MediaType contentType, String filename)
     {
         this.id = id;
         this.data = data;
@@ -61,7 +62,7 @@ public class HttpPart
         return data;
     }
 
-    public String getContentType()
+    public MediaType getContentType()
     {
         return contentType;
     }

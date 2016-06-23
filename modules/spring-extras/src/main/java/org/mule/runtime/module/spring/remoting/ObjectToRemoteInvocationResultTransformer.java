@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.io.ObjectOutputStream;
+import java.nio.charset.Charset;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -28,7 +29,7 @@ public class ObjectToRemoteInvocationResultTransformer extends AbstractTransform
     }
 
     @Override
-    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
+    protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         try
         {

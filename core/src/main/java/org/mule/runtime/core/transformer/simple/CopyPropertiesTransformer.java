@@ -16,6 +16,7 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 
 public class CopyPropertiesTransformer extends AbstractMessageTransformer
 {
@@ -36,7 +37,7 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(final MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(final MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         MuleMessage message = event.getMessage();
         if (wildcardPropertyNameEvaluator.hasWildcards())

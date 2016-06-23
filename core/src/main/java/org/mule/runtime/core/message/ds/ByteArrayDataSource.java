@@ -7,6 +7,8 @@
 package org.mule.runtime.core.message.ds;
 
 
+import org.mule.runtime.api.metadata.MediaType;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,10 +20,10 @@ public class ByteArrayDataSource implements DataSource
 {
 
     private final byte[] data;
-    private final String contentType;
+    private final MediaType contentType;
     private final String name;
 
-    public ByteArrayDataSource(byte[] data, String contentType, String name)
+    public ByteArrayDataSource(byte[] data, MediaType contentType, String name)
     {
         this.data = data;
         this.contentType = contentType;
@@ -43,7 +45,7 @@ public class ByteArrayDataSource implements DataSource
     @Override
     public String getContentType()
     {
-        return contentType;
+        return contentType.toString();
     }
 
     @Override

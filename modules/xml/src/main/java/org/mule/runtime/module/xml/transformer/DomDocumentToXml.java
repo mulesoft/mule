@@ -11,6 +11,8 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
+import java.nio.charset.Charset;
+
 /**
  * <code>DomDocumentToXml</code> Transform a org.w3c.dom.Document to XML String
  */
@@ -24,14 +26,14 @@ public class DomDocumentToXml extends AbstractXmlTransformer implements Discover
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String encoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException
     {
         Object src = event.getMessage().getPayload();
         try
         {
             // We now offer XML in byte OR String form.
             // String remains the default like before.
-            if (byte[].class.equals(returnType))
+            if (byte[].class.equals(getReturnDataType().getType()))
             {
                 return convertToBytes(src, encoding);
             }

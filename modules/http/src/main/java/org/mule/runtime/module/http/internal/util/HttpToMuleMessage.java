@@ -14,6 +14,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 
+import java.nio.charset.Charset;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +23,14 @@ public class HttpToMuleMessage
 {
     private static Logger logger = LoggerFactory.getLogger(HttpToMuleMessage.class);
 
-    public static DataType buildContentTypeDataType(final String contentTypeValue)
+    /**
+     * 
+     * @param contentTypeValue
+     * @param defaultCharset the encoding to use if the given {@code contentTypeValue} doesn't have
+     *            a {@code charset} parameter.
+     * @return
+     */
+    public static DataType buildContentTypeDataType(final String contentTypeValue, Charset defaultCharset)
     {
         DataTypeBuilder dataTypeBuilder = DataType.builder();
 
@@ -40,18 +49,16 @@ public class HttpToMuleMessage
                 }
                 else
                 {
-                    String encoding = defaultCharset().name();
                     logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), contentTypeValue, e.getMessage()));
-                    logger.warn(format("Using default encoding: %s", encoding));
-                    dataTypeBuilder.encoding(encoding);
+                    logger.warn(format("Using default encoding: %s", defaultCharset().name()));
+                    dataTypeBuilder.encoding(defaultCharset());
                 }
             }
         }
         final DataType dataType = dataTypeBuilder.build();
-        if (dataType.getEncoding() == null)
+        if (!dataType.getMimeType().getEncoding().isPresent())
         {
-            // TODO MULE-9958 provide a default encoding it the builder has null
-            return DataType.builder(dataType).encoding(defaultCharset().name()).build();
+            return DataType.builder(dataType).encoding(defaultCharset).build();
         }
         else
         {

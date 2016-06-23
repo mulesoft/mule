@@ -17,6 +17,8 @@ import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
+
 import org.junit.Test;
 
 public class GraphTransformerResolutionTestCase extends FunctionalTestCase
@@ -77,7 +79,7 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
         }
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             return new B(((A) src).value + "A");
         }
@@ -104,7 +106,7 @@ public class GraphTransformerResolutionTestCase extends FunctionalTestCase
         }
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             return new C(((B) src).value + "FromB");
         }

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.json.transformers;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -16,6 +18,7 @@ import java.io.File;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -50,7 +53,7 @@ public class JsonXsltTransformer extends XsltTransformer
      * run a JSON to JSON XSLT transformationn XML string
      */
     @Override
-    public Object transformMessage(MuleEvent event, String enc) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset enc) throws TransformerException
     {
         XMLInputFactory inputFactory = new JsonXMLInputFactory();
         inputFactory.setProperty(JsonXMLInputFactory.PROP_MULTIPLE_PI, false);
@@ -60,7 +63,7 @@ public class JsonXsltTransformer extends XsltTransformer
         {
             if (inputs.getInputStream() != null)
             {
-                source = new StAXSource(inputFactory.createXMLStreamReader(inputs.getInputStream(), enc == null ? "UTF-8" : enc));
+                source = new StAXSource(inputFactory.createXMLStreamReader(inputs.getInputStream(), enc == null ? UTF_8.name() : enc.name()));
             }
             else
             {

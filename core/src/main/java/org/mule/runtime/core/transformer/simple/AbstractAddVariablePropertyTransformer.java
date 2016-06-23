@@ -16,6 +16,7 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
 public abstract class AbstractAddVariablePropertyTransformer<T> extends AbstractMessageTransformer
@@ -38,7 +39,7 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         Object keyValue = identifierEvaluator.resolveValue(event);
         String key = (keyValue == null ? null : keyValue.toString());
@@ -63,7 +64,7 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
             else
             {
                 addProperty(event, key, typedValue.getValue(),
-                        DataType.builder().type(typedValue.getValue().getClass()).mimeType(getMimeType()).encoding(getEncoding()).build());
+                        DataType.builder().type(typedValue.getValue().getClass()).mimeType(getReturnDataType().getMimeType()).encoding(resolveEncoding(typedValue)).build());
             }
         }
         return event.getMessage();

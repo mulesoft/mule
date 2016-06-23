@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.RequestContext;
@@ -15,7 +17,7 @@ import org.mule.runtime.core.message.OutputHandler;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 
 import org.apache.commons.httpclient.ChunkedInputStream;
@@ -34,15 +36,13 @@ import org.apache.commons.httpclient.StatusLine;
 public class HttpResponse
 {
 
-    public static final String DEFAULT_CONTENT_CHARSET = "ISO-8859-1";
-
     private HttpVersion ver = HttpVersion.HTTP_1_1;
     private int statusCode = HttpStatus.SC_OK;
     private String phrase = HttpStatus.getStatusText(HttpStatus.SC_OK);
     private HeaderGroup headers = new HeaderGroup();
     private boolean keepAlive = false;
     private boolean disableKeepAlive = false;
-    private String fallbackCharset = DEFAULT_CONTENT_CHARSET;
+    private Charset fallbackCharset = ISO_8859_1;
     private OutputHandler outputHandler;
 
     public HttpResponse()
@@ -212,9 +212,9 @@ public class HttpResponse
         return this.headers.getIterator();
     }
 
-    public String getCharset()
+    public Charset getCharset()
     {
-        String charset = getFallbackCharset();
+        Charset charset = getFallbackCharset();
         Header contenttype = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
         if (contenttype != null)
         {
@@ -224,7 +224,7 @@ public class HttpResponse
                 NameValuePair param = values[0].getParameterByName("charset");
                 if (param != null)
                 {
-                    charset = param.getValue();
+                    charset = Charset.forName(param.getValue());
                 }
             }
         }
@@ -299,16 +299,7 @@ public class HttpResponse
     
     public void setBody(final String string)
     {
-        byte[] raw;
-        try
-        {
-            raw = string.getBytes(getCharset());
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            raw = string.getBytes();
-        }
-        setBody(raw);
+        setBody(string.getBytes(getCharset()));
     }
 
     private void setBody(final byte[] raw)
@@ -333,14 +324,7 @@ public class HttpResponse
         
         outputHandler.write(RequestContext.getEvent(), out);
         
-        try
-        {
-            return new String(out.toByteArray(), getCharset());
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            return new String(out.toByteArray());
-        }
+        return new String(out.toByteArray(), getCharset());
     }
     
     public boolean isKeepAlive()
@@ -368,12 +352,12 @@ public class HttpResponse
         disableKeepAlive = keepalive;
     }
 
-    public String getFallbackCharset()
+    public Charset getFallbackCharset()
     {
         return fallbackCharset;
     }
 
-    public void setFallbackCharset(String overrideCharset)
+    public void setFallbackCharset(Charset overrideCharset)
     {
         this.fallbackCharset = overrideCharset;
     }

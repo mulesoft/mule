@@ -16,6 +16,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.functional.matcher.ParamMapMatcher.isEqual;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.StringUtils;
@@ -82,7 +83,7 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase
     {
         final Response response = Request.Post(getListenerUrl())
                 .body(new StringEntity("Invalid url encoded content"))
-                .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
+                .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 .execute();
 
         final HttpResponse httpResponse = response.returnResponse();
@@ -122,7 +123,7 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase
     public void urlEncodedEmptyParamsUrlEncodedContentTypeGenerateANullPayload() throws Exception
     {
         final Response response = Request.Post(getListenerUrl())
-                .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
+                .addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 .execute();
 
         assertNullPayloadAndEmptyResponse(response);
@@ -141,9 +142,9 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase
     private void compareParameterMaps(Response response, ParameterMap payloadAsMap) throws IOException
     {
         final HttpResponse httpResponse = response.returnResponse();
-        assertThat(httpResponse.getFirstHeader(CONTENT_TYPE).getValue(), startsWith(APPLICATION_X_WWW_FORM_URLENCODED));
+        assertThat(httpResponse.getFirstHeader(CONTENT_TYPE).getValue(), startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toString()));
         final String responseContent = IOUtils.toString(httpResponse.getEntity().getContent());
-        assertThat(payloadAsMap, isEqual(HttpParser.decodeUrlEncodedBody(responseContent, UTF_8.name()).toListValuesMap()));
+        assertThat(payloadAsMap, isEqual(HttpParser.decodeUrlEncodedBody(responseContent, UTF_8).toListValuesMap()));
     }
 
     private String getListenerUrl()

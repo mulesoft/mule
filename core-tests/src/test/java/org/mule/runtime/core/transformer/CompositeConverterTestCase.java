@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -18,7 +19,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -103,26 +103,6 @@ public class CompositeConverterTestCase
     }
 
     @Test
-    public void getMimeType()
-    {
-        doReturn(MimeType.APPLICATION_XML).when(mockConverterB).getMimeType();
-
-        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
-
-        assertEquals(MimeType.APPLICATION_XML, compositeConverter.getMimeType());
-    }
-
-    @Test
-    public void getEncoding()
-    {
-        doReturn("UTF-8").when(mockConverterB).getEncoding();
-
-        CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
-
-        assertEquals("UTF-8", compositeConverter.getEncoding());
-    }
-
-    @Test
     public void priorityWeighting() throws Exception
     {
         CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
@@ -172,15 +152,15 @@ public class CompositeConverterTestCase
     public void transform() throws Exception
     {
         doReturn("MyOutput1").when(mockConverterA).transform(any());
-        doReturn("UTF-8").when(mockConverterA).getEncoding();
-        doReturn("MyOutput2").when(mockConverterB).transform(eq("MyOutput1"), eq("UTF-8"));
-        doReturn("UTF-8").when(mockConverterB).getEncoding();
+        doReturn(DataType.builder().encoding(UTF_8).build()).when(mockConverterA).getReturnDataType();
+        doReturn("MyOutput2").when(mockConverterB).transform(eq("MyOutput1"), eq(UTF_8));
+        doReturn(DataType.builder().encoding(UTF_8).build()).when(mockConverterB).getReturnDataType();
         CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
 
         Object output = compositeConverter.transform("MyInput");
 
         verify(mockConverterA, times(1)).transform("MyInput");
-        verify(mockConverterB, times(1)).transform("MyOutput1", "UTF-8");
+        verify(mockConverterB, times(1)).transform("MyOutput1", UTF_8);
         assertEquals("MyOutput2", output);
     }
 

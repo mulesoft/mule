@@ -8,6 +8,8 @@ package org.mule.runtime.core.api.transformer;
 
 import org.mule.runtime.core.api.MuleEvent;
 
+import java.nio.charset.Charset;
+
 /**
  * A transformer intended to transform Mule messages rather than arbitrary objects
  */
@@ -35,5 +37,5 @@ public interface MessageTransformer  extends Transformer
      * @throws TransformerMessagingException if a error occurs transforming the data or if the
      *                              expected returnClass isn't the same as the transformed data
      */
-    Object transform(Object src, String encoding, MuleEvent event) throws TransformerMessagingException;
+    Object transform(Object src, Charset encoding, MuleEvent event) throws TransformerMessagingException;
 }

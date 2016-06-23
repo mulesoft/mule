@@ -13,6 +13,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
+import java.nio.charset.Charset;
+
 /**
  * A transformer that uses the transform discovery mechanism to convert the message payload. This transformer
  * works much better when transforming custom object types rather that java types since there is less chance for
@@ -32,14 +34,14 @@ public class AutoTransformer extends AbstractMessageTransformer
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        if(getReturnDataType().getType().equals(Object.class))
+        if (Object.class.equals(getReturnDataType().getType()))
         {
             throw new InitialisationException(CoreMessages.transformerInvalidReturnType(Object.class, getName()), this);
         }
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         return muleContext.getTransformationService().transform(event.getMessage(), DataType.fromType(getReturnDataType().getType())).getPayload();
     }

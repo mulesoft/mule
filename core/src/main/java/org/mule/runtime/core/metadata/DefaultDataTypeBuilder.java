@@ -13,7 +13,7 @@ import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionTyp
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.cache.CacheLoader;
@@ -22,7 +22,6 @@ import com.google.common.cache.LoadingCache;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,9 +51,10 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     private static final String CHARSET_PARAM = "charset";
 
     private Class<T> type = (Class<T>) Object.class;
-    private Class<?> itemType = Object.class;
-    private String mimeType = MimeType.ANY;
-    private String encoding = null;
+    private DataTypeBuilder<?> itemTypeBuilder;
+    private String mimeType = MediaType.ANY.getPrimaryType();
+    private String mimeSubType = MediaType.ANY.getSubType();
+    private Charset encoding = null;
 
     private boolean built = false;
 
@@ -68,15 +68,19 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         if (dataType instanceof CollectionDataType)
         {
             this.type = dataType.getType();
-            this.itemType = ((CollectionDataType) dataType).getItemType();
+            this.itemTypeBuilder = DataType.builder(((CollectionDataType) dataType).getItemType());
         }
         else
         {
             this.type = dataType.getType();
         }
 
-        this.mimeType = dataType.getMimeType();
-        this.encoding = dataType.getEncoding();
+        this.mimeType = dataType.getMimeType().getPrimaryType();
+        this.mimeSubType = dataType.getMimeType().getSubType();
+        dataType.getMimeType().getEncoding().ifPresent(encoding ->
+        {
+            this.encoding = encoding;
+        });
     }
 
     /**
@@ -148,7 +152,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
 
         ProxyIndicator(Class targetClass, boolean proxy)
         {
-            this.targetClassRef = new WeakReference<Class>(targetClass);
+            this.targetClassRef = new WeakReference<>(targetClass);
             isProxy = proxy;
         }
 
@@ -173,7 +177,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      *             {@link Collection}.
      */
     @Override
-    public <N extends Collection> DataTypeCollectionTypeBuilder<N> collectionType(Class<N> collectionType)
+    public <N extends Collection<I>, I> DataTypeCollectionTypeBuilder<N> collectionType(Class<N> collectionType)
     {
         validateAlreadyBuilt();
 
@@ -184,6 +188,17 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         }
 
         this.type = (Class<T>) handleProxy(collectionType);
+
+        if (this.itemTypeBuilder == null)
+        {
+            this.itemTypeBuilder = DataType.builder();
+        }
+        final Class<?> itemType = getCollectionType((Class<? extends Collection<?>>) type);
+        if (itemType != null)
+        {
+            this.itemTypeBuilder.type(itemType);
+        }
+
         return (DataTypeCollectionTypeBuilder<N>) this;
     }
 
@@ -191,18 +206,22 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * Sets the given types for the {@link CollectionDataType} to be built. See
      * {@link CollectionDataType#getType()} and {@link CollectionDataType#getItemType()}.
      * 
-     * @param itemType the java type to set.
+     * @param itemTypeBuilder the java type to set.
      * @return this builder.
      * @throws IllegalArgumentException if the given collectionType is not a descendant of {@link Collection}.
      */
     @Override
-    public <I> DataTypeParamsBuilder<T> itemType(Class<I> itemType)
+    public <I> DataTypeCollectionTypeBuilder<T> itemType(Class<I> itemType)
     {
         validateAlreadyBuilt();
 
-        checkNotNull(itemType, "'itemType' cannot be null.");
+        checkNotNull(itemType, "'itemTypeBuilder' cannot be null.");
 
-        this.itemType = handleProxy(itemType);
+        if (this.itemTypeBuilder == null)
+        {
+            this.itemTypeBuilder = DataType.builder();
+        }
+        this.itemTypeBuilder.type(handleProxy(itemType));
         return this;
     }
 
@@ -218,7 +237,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * @throws IllegalArgumentException if the given MIME type string is invalid.
      */
     @Override
-    public DataTypeBuilder<T> mimeType(String mimeType) throws IllegalArgumentException
+    public DataTypeBuilder<T> mimeType(String mimeType)
     {
         validateAlreadyBuilt();
 
@@ -226,54 +245,108 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         {
             try
             {
-                javax.activation.MimeType mt = new javax.activation.MimeType(mimeType);
-                mimeType(mt);
+                mimeType(new javax.activation.MimeType(mimeType));
             }
             catch (MimeTypeParseException e)
             {
-                throw new IllegalArgumentException("MimeType cannot be parsed: " + mimeType);
+                throw new IllegalArgumentException("MediaType cannot be parsed: " + mimeType);
             }
         }
         return this;
     }
 
+    private DataTypeBuilder<T> mimeType(javax.activation.MimeType mimeType)
+    {
+        if (mimeType != null)
+        {
+            this.mimeType = mimeType.getPrimaryType();
+            this.mimeSubType = mimeType.getSubType();
+
+            if (encoding == null && mimeType.getParameter(CHARSET_PARAM) != null)
+            {
+                doEncoding(Charset.forName(mimeType.getParameter(CHARSET_PARAM)));
+            }
+        }
+
+        return this;
+    }
+
     @Override
-    public DataTypeBuilder<T> mimeType(javax.activation.MimeType mimeType)
+    public DataTypeBuilder<T> mimeType(MediaType mimeType)
     {
         validateAlreadyBuilt();
 
         if (mimeType != null)
         {
-            this.mimeType = mimeType.getPrimaryType() + "/" + mimeType.getSubType();
+            this.mimeType = mimeType.getPrimaryType();
+            this.mimeSubType = mimeType.getSubType();
+        }
 
-            if (encoding == null && mimeType.getParameter(CHARSET_PARAM) != null)
+        return this;
+    }
+
+    @Override
+    public <I> DataTypeCollectionTypeBuilder<T> itemMimeType(String itemMimeType)
+    {
+        validateAlreadyBuilt();
+
+        if (!StringUtils.isEmpty(itemMimeType))
+        {
+            try
             {
-                encoding = mimeType.getParameter(CHARSET_PARAM);
+                itemMimeType(new javax.activation.MimeType(itemMimeType));
             }
+            catch (MimeTypeParseException e)
+            {
+                throw new IllegalArgumentException("MediaType cannot be parsed: " + itemMimeType);
+            }
+        }
+        return this;
+    }
+
+    private DataTypeBuilder<T> itemMimeType(javax.activation.MimeType itemMimeType)
+    {
+        if (mimeType != null)
+        {
+            this.mimeType = itemMimeType.getPrimaryType();
+            this.mimeSubType = itemMimeType.getSubType();
         }
 
         return this;
     }
 
     /**
-     * Sets the given encoding. See {@link DataType#getEncoding()}.
+     * Sets the given encoding. See {@link MediaType#getEncoding()}.
      * 
      * @param encoding the encoding to set.
      * @return this builder.
      */
     @Override
-    public DataTypeBuilder<T> encoding(String encoding) throws IllegalCharsetNameException
+    public DataTypeBuilder<T> encoding(String encoding)
     {
         validateAlreadyBuilt();
 
         if (StringUtils.isNotEmpty(encoding))
         {
-            // Checks that the encoding is valid and supported
-            Charset.forName(encoding);
-            this.encoding = encoding;
+            doEncoding(Charset.forName(encoding));
         }
 
         return this;
+    }
+
+    @Override
+    public DataTypeBuilder<T> encoding(Charset encoding)
+    {
+        validateAlreadyBuilt();
+
+        doEncoding(encoding);
+
+        return this;
+    }
+
+    protected void doEncoding(Charset encoding)
+    {
+        this.encoding = encoding;
     }
 
     @Override
@@ -283,7 +356,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
 
         if(value == null)
         {
-            return (DataTypeBuilder<T>) type(Object.class).mimeType(MimeType.ANY);
+            return (DataTypeBuilder<T>) type(Object.class).mimeType(MediaType.ANY);
         }
         else
         {
@@ -327,18 +400,11 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         if (Collection.class.isAssignableFrom(type))
         {
-            if (itemType == null)
-            {
-                itemType = getCollectionType((Class<? extends Collection<?>>) type);
-            }
-
-            // TODO MULE-9958 provide a default encoding it the builder has null
-            return new CollectionDataType(type, itemType, mimeType, encoding);
+            return new CollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, new MediaType(mimeType, mimeSubType, encoding));
         }
         else
         {
-            // TODO MULE-9958 provide a default encoding it the builder has null
-            return new SimpleDataType<>(type, mimeType, encoding);
+            return new SimpleDataType<>(type, new MediaType(mimeType, mimeSubType, encoding));
         }
     }
 
@@ -358,7 +424,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     @Override
     public int hashCode()
     {
-        return Objects.hash(type, itemType, mimeType, encoding);
+        return Objects.hash(type, itemTypeBuilder, mimeType, mimeSubType, encoding);
     }
 
     @Override
@@ -379,8 +445,9 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         DefaultDataTypeBuilder other = (DefaultDataTypeBuilder) obj;
 
         return Objects.equals(type, other.type)
-               && Objects.equals(itemType, other.itemType)
+               && Objects.equals(itemTypeBuilder, other.itemTypeBuilder)
                && Objects.equals(mimeType, other.mimeType)
+               && Objects.equals(mimeSubType, other.mimeSubType)
                && Objects.equals(encoding, other.encoding);
     }
 }

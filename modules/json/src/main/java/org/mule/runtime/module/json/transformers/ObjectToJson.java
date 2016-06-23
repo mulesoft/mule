@@ -14,7 +14,7 @@ import org.mule.runtime.module.json.filters.IsJsonFilter;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +36,7 @@ public class ObjectToJson extends AbstractJsonTransformer
      */
     protected transient final Logger logger = LoggerFactory.getLogger(ObjectToJson.class);
 
-    private Map<Class<?>, Class<?>> serializationMixins = new HashMap<Class<?>, Class<?>>();
+    private Map<Class<?>, Class<?>> serializationMixins = new HashMap<>();
 
     protected Class<?> sourceClass;
 
@@ -74,7 +74,7 @@ public class ObjectToJson extends AbstractJsonTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         Object src = event.getMessage().getPayload();
         if (src instanceof String && isJsonFilter.accept(src))
@@ -103,16 +103,9 @@ public class ObjectToJson extends AbstractJsonTransformer
             throw new TransformerException(this, e);
         }
         
-        if (returnType.getType().equals(byte[].class))
+        if (byte[].class.equals(getReturnDataType().getType()))
         {
-            try
-            {
-                return writer.toString().getBytes(outputEncoding);
-            }
-            catch (UnsupportedEncodingException uee)
-            {
-                throw new TransformerException(this, uee);
-            }
+            return writer.toString().getBytes(outputEncoding);
         }
         else
         {
@@ -127,7 +120,7 @@ public class ObjectToJson extends AbstractJsonTransformer
     private Exception getException(Throwable t)
     {
         Exception returnValue = null;
-        List<Throwable> causeStack = new ArrayList<Throwable>();
+        List<Throwable> causeStack = new ArrayList<>();
 
         for (Throwable tempCause = t; tempCause != null; tempCause = tempCause.getCause())
         {

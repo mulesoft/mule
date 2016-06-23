@@ -35,7 +35,6 @@ import java.util.Map;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -778,14 +777,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     @Override
     public <T> T getExtension(final Class<T> extensionType)
     {
-        return (T) CollectionUtils.find(extensions, new Predicate()
-        {
-            @Override
-            public boolean evaluate(Object object)
-            {
-                return extensionType.isAssignableFrom(object.getClass());
-            }
-        });
+        return (T) CollectionUtils.find(extensions, object -> extensionType.isAssignableFrom(object.getClass()));
     }
 
     public List<Object> getExtensions()

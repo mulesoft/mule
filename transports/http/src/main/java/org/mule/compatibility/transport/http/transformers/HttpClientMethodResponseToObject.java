@@ -16,6 +16,7 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         Object msg;
         HttpMethod httpMethod = (HttpMethod)src;

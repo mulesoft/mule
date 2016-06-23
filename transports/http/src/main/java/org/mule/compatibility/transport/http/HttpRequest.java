@@ -11,6 +11,7 @@ import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 
 import org.apache.commons.httpclient.ChunkedInputStream;
@@ -28,14 +29,14 @@ public class HttpRequest
     private RequestLine requestLine = null;
     private HeaderGroup headers = new HeaderGroup();
     private InputStream entity = null;
-    private String defaultEncoding;
+    private Charset defaultEncoding;
 
-    public HttpRequest(final RequestLine requestLine, final Header[] headers, String defaultEncoding) throws IOException
+    public HttpRequest(final RequestLine requestLine, final Header[] headers, Charset defaultEncoding) throws IOException
     {
         this(requestLine, headers, null, defaultEncoding);
     }
 
-    public HttpRequest(final RequestLine requestLine, final Header[] headers, final InputStream content, String defaultEncoding)
+    public HttpRequest(final RequestLine requestLine, final Header[] headers, final InputStream content, Charset defaultEncoding)
             throws IOException
     {
         super();
@@ -128,9 +129,9 @@ public class HttpRequest
             return;
         }
         Header[] headersToRemove = this.headers.getHeaders(s);
-        for (int i = 0; i < headersToRemove.length; i++)
+        for (Header element : headersToRemove)
         {
-            this.headers.removeHeader(headersToRemove[i]);
+            this.headers.removeHeader(element);
         }
     }
 
@@ -171,9 +172,9 @@ public class HttpRequest
         }
     }
 
-    public String getCharset()
+    public Charset getCharset()
     {
-        String charset = null;
+        Charset charset = null;
         Header contenttype = this.headers.getFirstHeader(HttpConstants.HEADER_CONTENT_TYPE);
         if (contenttype != null)
         {
@@ -183,7 +184,7 @@ public class HttpRequest
                 NameValuePair param = values[0].getParameterByName("charset");
                 if (param != null)
                 {
-                    charset = param.getValue();
+                    charset = Charset.forName(param.getValue());
                 }
             }
         }

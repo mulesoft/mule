@@ -14,6 +14,8 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
+import java.nio.charset.Charset;
+
 /**
  * Combine {@link MessageDispatching} with various lifecycle methods for the actual instances doing message sending.
  * 
@@ -64,7 +66,7 @@ public interface MessageDispatcher extends Connectable, MessageProcessor, Lifecy
      */
     OutboundEndpoint getEndpoint();
     
-    MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException;
+    MuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
 
     MuleMessage createMuleMessage(Object transportMessage) throws MuleException;
 }

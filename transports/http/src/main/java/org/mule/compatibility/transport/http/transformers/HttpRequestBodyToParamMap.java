@@ -17,6 +17,7 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,9 +34,9 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
-        Map<String, Object> paramMap = new HashMap<String, Object>();
+        Map<String, Object> paramMap = new HashMap<>();
 
         try
         {
@@ -79,7 +80,8 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
     }
 
     protected void addQueryStringToParameterMap(String queryString, Map<String, Object> paramMap,
-        String outputEncoding) throws Exception
+                                                Charset outputEncoding)
+            throws Exception
     {
         String[] pairs = queryString.split("&");
         for (String pair : pairs)
@@ -87,7 +89,7 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
             String[] nameValue = pair.split("=");
             if (nameValue.length == 2)
             {
-                URLCodec codec = new URLCodec(outputEncoding);
+                URLCodec codec = new URLCodec(outputEncoding.name());
                 String key = codec.decode(nameValue[0]);
                 String value = codec.decode(nameValue[1]);
                 addToParameterMap(paramMap, key, value);
@@ -108,7 +110,7 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
             }
             else
             {
-                values = new ArrayList<Object>();
+                values = new ArrayList<>();
                 values.add(existingValue);
             }
 

@@ -10,6 +10,7 @@ import org.mule.compatibility.transport.http.multipart.MultiPartInputStream;
 import org.mule.compatibility.transport.http.multipart.Part;
 import org.mule.compatibility.transport.http.multipart.PartDataSource;
 import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MutableMuleMessage;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -52,7 +53,7 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
     }
 
     @Override
-    protected void addAttachments(DefaultMuleMessage message, Object transportMessage) throws Exception
+    protected MutableMuleMessage addAttachments(MutableMuleMessage message, Object transportMessage) throws Exception
     {
         if (parts != null)
         {
@@ -62,7 +63,7 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
                 {
                     if (!part.getName().equals("payload"))
                     {
-                        message.addInboundAttachment(part.getName(), new DataHandler(new PartDataSource(part)));
+                        ((DefaultMuleMessage) message).addInboundAttachment(part.getName(), new DataHandler(new PartDataSource(part)));
                     }
                 }
             }
@@ -73,6 +74,7 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
                 parts = null;
             }
         }
+        return message;
     }
 
     @Override

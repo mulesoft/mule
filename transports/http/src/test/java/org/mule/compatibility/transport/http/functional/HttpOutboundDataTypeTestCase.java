@@ -7,20 +7,20 @@
 
 package org.mule.compatibility.transport.http.functional;
 
+import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.nio.charset.StandardCharsets;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,14 +43,15 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
 
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        muleMessage.setOutboundProperty("Content-Type", MimeType.TEXT + "; charset=" + StandardCharsets.UTF_16.name());
+        muleMessage.setOutboundProperty(CONTENT_TYPE_PROPERTY, MediaType.TEXT + "; charset=" + UTF_16.name());
 
         client.dispatch("vm://testInput", muleMessage);
 
         MuleMessage response = client.request("vm://testOutput", 120000);
 
-        assertThat(response.getDataType().getMimeType(), equalTo(MimeType.TEXT));
-        assertThat(response.getDataType().getEncoding(), equalTo(StandardCharsets.UTF_16.name()));
+        assertThat(response.getDataType().getMimeType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
+        assertThat(response.getDataType().getMimeType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
+        assertThat(response.getDataType().getMimeType().getEncoding().get(), equalTo(UTF_16));
         assertThat(response.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY), is(nullValue()));
         assertThat(response.getOutboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY), is(nullValue()));
     }

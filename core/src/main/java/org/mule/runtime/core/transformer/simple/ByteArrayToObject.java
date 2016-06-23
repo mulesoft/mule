@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectStreamConstants;
 import java.io.PushbackInputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * <code>ByteArrayToObject</code> works in the same way as
@@ -26,7 +26,7 @@ public class ByteArrayToObject extends ByteArrayToSerializable
 {
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         if (src instanceof byte[])
         {
@@ -38,14 +38,7 @@ public class ByteArrayToObject extends ByteArrayToSerializable
             }
             else
             {
-                try
-                {
-                    return new String(bytes, encoding);
-                }
-                catch (UnsupportedEncodingException e)
-                {
-                    throw new TransformerException(this, e);
-                }
+                return new String(bytes, encoding);
             }
         }
         else if (src instanceof InputStream)

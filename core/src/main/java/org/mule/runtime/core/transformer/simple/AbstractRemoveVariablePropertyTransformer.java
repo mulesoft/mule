@@ -14,6 +14,7 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
+import java.nio.charset.Charset;
 import java.util.Set;
 
 public abstract class AbstractRemoveVariablePropertyTransformer extends AbstractMessageTransformer
@@ -35,7 +36,7 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         if (wildcardAttributeEvaluator.hasWildcards())
         {

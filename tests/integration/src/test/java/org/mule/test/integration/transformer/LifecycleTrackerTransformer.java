@@ -14,13 +14,14 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LifecycleTrackerTransformer extends AbstractTransformer implements Lifecycle, MuleContextAware
 {
 
-    private final List<String> tracker = new ArrayList<String>();
+    private final List<String> tracker = new ArrayList<>();
 
     public List<String> getTracker()
     {
@@ -32,6 +33,7 @@ public class LifecycleTrackerTransformer extends AbstractTransformer implements 
         tracker.add("setProperty");
     }
 
+    @Override
     public void setMuleContext(final MuleContext context)
     {
         tracker.add("setMuleContext");
@@ -45,23 +47,26 @@ public class LifecycleTrackerTransformer extends AbstractTransformer implements 
         tracker.add("initialise");
     }
 
+    @Override
     public void start() throws MuleException
     {
         tracker.add("start");
     }
 
+    @Override
     public void stop() throws MuleException
     {
         tracker.add("stop");
     }
 
+    @Override
     public void dispose()
     {
         tracker.add("dispose");
     }
 
     @Override
-    protected Object doTransform(final Object src, final String encoding)
+    protected Object doTransform(final Object src, final Charset encoding)
             throws TransformerException
     {
 

@@ -7,15 +7,16 @@
 package org.mule.compatibility.transport.file;
 
 import static java.lang.Boolean.FALSE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -35,13 +36,12 @@ import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -49,7 +49,8 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
 {
 
     public static final String IMPUT_FILES_DIR = "temp";
-    private MuleContext mockMuleContext = mock(MuleContext.class,Answers.RETURNS_DEEP_STUBS.get());
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private MuleContext mockMuleContext;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private FileConnector mockFileConnector;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -74,6 +75,11 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private ObjectStoreManager mockObjectStoreManager;
 
+    @Before
+    public void before()
+    {
+        when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn("UTF-8");
+    }
 
     /**
      *  Message processed successfully
@@ -212,6 +218,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
         when(mockInboundEndpoint.getConnector()).thenReturn(mockFileConnector);
         when(mockInboundEndpoint.getMuleContext()).thenReturn(mockMuleContext);
         when(mockInboundEndpoint.getFilter()).thenReturn(null);
+        when(mockInboundEndpoint.getEncoding()).thenReturn(UTF_8);
         when(mockFileConnector.createMuleMessageFactory()).thenReturn(mockMessageFactory);
         mockMessageFactory = new FileMuleMessageFactory();
         when(mockMessage.getInboundProperty(MULE_FORCE_SYNC_PROPERTY, FALSE)).thenReturn(true);
@@ -221,19 +228,15 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
         when(mockMuleEvent.getFlowConstruct().getExceptionListener()).thenReturn(mockMessagingExceptionHandler);
         when(mockHandledMessagingException.causedRollback()).thenReturn(false);
         when(mockUnhandledMessagingException.causedRollback()).thenReturn(true);
-        when(mockMessagingExceptionHandler.handleException(any(Exception.class),any(MuleEvent.class))).thenAnswer(new Answer<Object>()
+        when(mockMessagingExceptionHandler.handleException(any(Exception.class),any(MuleEvent.class))).thenAnswer(invocationOnMock ->
         {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
+            if (invocationOnMock.getArguments()[0] == mockHandledMessagingException)
             {
-                if (invocationOnMock.getArguments()[0] == mockHandledMessagingException)
-                {
-                    return mockMuleEvent;
-                }
-                else
-                {
-                    throw (Throwable) invocationOnMock.getArguments()[0];
-                }
+                return mockMuleEvent;
+            }
+            else
+            {
+                throw (Throwable) invocationOnMock.getArguments()[0];
             }
         });
         when(mockInboundEndpoint.getMuleContext().getRegistry().get(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mockMessageManager);

@@ -11,13 +11,13 @@ import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
@@ -96,7 +96,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
 
         public EnsureXmlDataType()
         {
-            super(MimeType.XML);
+            super(MediaType.XML);
         }
     }
 
@@ -105,23 +105,25 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
 
         public EnsureAnyDataType()
         {
-            super(MimeType.ANY);
+            super(MediaType.ANY);
         }
     }
 
     private static class EnsureDataType implements Callable
     {
 
-        private final String mimeType;
+        private final MediaType mimeType;
 
-        public EnsureDataType(String mimeType){
+        public EnsureDataType(MediaType mimeType)
+        {
             this.mimeType = mimeType;
         }
 
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            if( ! eventContext.getMessage().getDataType().getMimeType().equals(mimeType) ){
+            if (!eventContext.getMessage().getDataType().getMimeType().matches(mimeType))
+            {
                 throw new RuntimeException();
             }
             return eventContext.getMessage().getPayload();

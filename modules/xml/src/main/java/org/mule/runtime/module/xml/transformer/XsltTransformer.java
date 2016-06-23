@@ -6,21 +6,22 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.xml.i18n.XmlMessages;
-import org.mule.runtime.module.xml.util.LocalURIResolver;
-import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.xml.i18n.XmlMessages;
+import org.mule.runtime.module.xml.util.LocalURIResolver;
+import org.mule.runtime.module.xml.util.XMLUtils;
 
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -118,7 +119,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         transformerPool.setMinIdle(MIN_IDLE_TRANSFORMERS);
         transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
-        contextProperties = new HashMap<String, Object>();
+        contextProperties = new HashMap<>();
     }
 
     @Override
@@ -152,7 +153,7 @@ public class XsltTransformer extends AbstractXmlTransformer
      * @return The result in the type specified by the user
      */
     @Override
-    public Object transformMessage(MuleEvent event, String putputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         MuleMessage message = event.getMessage();
         Object src = message.getPayload();
@@ -164,7 +165,7 @@ public class XsltTransformer extends AbstractXmlTransformer
                 return null;
             }
 
-            ResultHolder holder = getResultHolder(returnType.getType());
+            ResultHolder holder = getResultHolder(getReturnDataType().getType());
 
             // If the users hasn't specified a class, lets return the same type they gave us
             if (holder == null)
@@ -174,12 +175,12 @@ public class XsltTransformer extends AbstractXmlTransformer
 
             // If we still don't have a result type, lets fall back to using a DelayedResult
             // as it is the most efficient.
-            if (holder == null || DelayedResult.class.equals(returnType.getType()))
+            if (holder == null || DelayedResult.class.equals(getReturnDataType().getType()))
             {
-                return getDelayedResult(event, putputEncoding, sourceDoc);
+                return getDelayedResult(event, outputEncoding, sourceDoc);
             }
 
-            doTransform(event, putputEncoding, sourceDoc, holder.getResult());
+            doTransform(event, outputEncoding, sourceDoc, holder.getResult());
 
             return holder.getResultObject();
         }
@@ -189,7 +190,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         }
     }
 
-    protected Object getDelayedResult(final MuleEvent event, final String outputEncoding, final Source sourceDoc)
+    protected Object getDelayedResult(final MuleEvent event, final Charset outputEncoding, final Source sourceDoc)
     {
         return new DelayedResult()
         {
@@ -215,7 +216,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         };
     }
 
-    protected void doTransform(MuleEvent event, String outputEncoding, Source sourceDoc, Result result)
+    protected void doTransform(MuleEvent event, Charset outputEncoding, Source sourceDoc, Result result)
             throws Exception
     {
         DefaultErrorListener errorListener = new DefaultErrorListener(this);
@@ -226,7 +227,7 @@ public class XsltTransformer extends AbstractXmlTransformer
             transformer = (javax.xml.transform.Transformer) transformerPool.borrowObject();
 
             transformer.setErrorListener(errorListener);
-            transformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
+            transformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding.name());
 
             // set transformation parameters
             if (contextProperties != null)

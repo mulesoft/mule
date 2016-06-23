@@ -30,6 +30,7 @@ import org.mule.tck.MuleEventCheckAnswer;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -84,7 +85,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
                 new AbstractTransformer()
                 {
                     @Override
-                    public Object doTransform(Object src, String outputEncoding) throws TransformerException
+                    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
                     {
                         return ((Exception)src).getMessage();
                     }

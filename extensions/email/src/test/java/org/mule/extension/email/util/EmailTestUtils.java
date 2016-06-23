@@ -11,10 +11,9 @@ import static javax.mail.Message.RecipientType.TO;
 import static javax.mail.Part.ATTACHMENT;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.metadata.MimeType.TEXT;
-import org.mule.runtime.core.util.IOUtils;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
 
-import com.icegreen.greenmail.util.ServerSetup;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +30,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 
 public class EmailTestUtils
 {
@@ -56,12 +58,12 @@ public class EmailTestUtils
     public static MimeMessage getMultipartTestMessage() throws Exception
     {
         MimeBodyPart body = new MimeBodyPart();
-        body.setContent(EMAIL_CONTENT, TEXT);
+        body.setContent(EMAIL_CONTENT, TEXT.toString());
 
         MimeBodyPart textAttachment = new MimeBodyPart();
         textAttachment.setDisposition(ATTACHMENT);
         textAttachment.setFileName(EMAIL_TEXT_PLAIN_ATTACHMENT_NAME);
-        textAttachment.setContent(EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT, TEXT);
+        textAttachment.setContent(EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT, TEXT.toString());
 
         MimeBodyPart jsonAttachment = new MimeBodyPart();
         URL resource = currentThread().getContextClassLoader().getResource(EMAIL_JSON_ATTACHMENT_NAME);

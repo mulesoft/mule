@@ -19,7 +19,7 @@ import org.mule.runtime.core.util.StringMessageUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * <code>ObjectToString</code> transformer is useful for debugging. It will return
@@ -43,7 +43,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
     }
 
     @Override
-    public Object doTransform(Object src, String outputEncoding) throws TransformerException
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         String output = "";
 
@@ -67,14 +67,12 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
         return output;
     }
 
-    protected String createStringFromInputStream(InputStream input, String outputEncoding)
+    protected String createStringFromInputStream(InputStream input, Charset outputEncoding)
         throws TransformerException
     {
         try
         {
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            IOUtils.copy(input, byteOut);
-            return byteOut.toString(outputEncoding);
+            return IOUtils.toString(input, outputEncoding);
         }
         catch (IOException e)
         {
@@ -93,14 +91,14 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
         }
     }
 
-    protected String createStringFromOutputHandler(OutputHandler handler, String outputEncoding)
+    protected String createStringFromOutputHandler(OutputHandler handler, Charset outputEncoding)
         throws TransformerException
     {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try
         {
             handler.write(RequestContext.getEvent(), bytes);
-            return bytes.toString(outputEncoding);
+            return bytes.toString(outputEncoding.name());
         }
         catch (IOException e)
         {
@@ -108,17 +106,10 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
         }
     }
 
-    protected String createStringFromByteArray(byte[] bytes, String outputEncoding)
+    protected String createStringFromByteArray(byte[] bytes, Charset outputEncoding)
         throws TransformerException
     {
-        try
-        {
-            return new String(bytes, outputEncoding);
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new TransformerException(this, e);
-        }
+        return new String(bytes, outputEncoding);
     }
 
     @Override

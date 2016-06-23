@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CREDENTIALS_P
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -48,6 +49,7 @@ import java.io.OptionalDataException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -79,7 +81,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     private transient FlowConstruct flowConstruct;
 
     protected Credentials credentials;
-    protected String encoding;
     protected MessageExchangePattern exchangePattern;
     protected URI messageSourceURI;
     protected String messageSourceName;
@@ -229,7 +230,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.exchangePattern = exchangePattern;
         this.outputStream = outputStream;
         this.credentials = null;
-        this.encoding = message.getMuleContext().getConfiguration().getDefaultEncoding();
         this.messageSourceName = messageSourceURI.toString();
         this.messageSourceURI = messageSourceURI;
         this.processingTime = ProcessingTime.newInstance(this);
@@ -289,7 +289,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.replyToDestination = replyToDestination;
         //TODO See MULE-9307 - define where to get these values from
         this.credentials = null;
-        this.encoding = getMuleContext().getConfiguration().getDefaultEncoding();
         this.exchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
         this.messageSourceName = null;
         this.messageSourceURI = null;
@@ -422,7 +421,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.session = session;
 
         this.credentials = rewriteEvent.getCredentials();
-        this.encoding = rewriteEvent.getEncoding();
         this.exchangePattern = messageExchangePattern;
         this.messageSourceName = rewriteEvent.getMessageSourceName();
         this.messageSourceURI = rewriteEvent.getMessageSourceURI();
@@ -465,7 +463,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             int timeout,
                             Credentials credentials,
                             OutputStream outputStream,
-                            String encoding,
                             boolean transacted,
                             Object replyToDestination,
                             ReplyToHandler replyToHandler)
@@ -476,7 +473,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         setMessage(message);
 
         this.credentials = credentials;
-        this.encoding = encoding;
         this.exchangePattern = exchangePattern;
         this.messageSourceURI = messageSourceURI;
         this.messageSourceName = messageSourceName;
@@ -501,7 +497,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             int timeout,
                             Credentials credentials,
                             OutputStream outputStream,
-                            String encoding,
                             boolean transacted,
                             boolean synchronous,
                             Object replyToDestination,
@@ -513,7 +508,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         setMessage(message);
 
         this.credentials = credentials;
-        this.encoding = encoding;
         this.exchangePattern = exchangePattern;
         this.messageSourceURI = messageSourceURI;
         this.messageSourceName = messageSourceName;
@@ -638,14 +632,14 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public String transformMessageToString() throws TransformerException
     {
-        final DataType<String> dataType = DataType.builder().type(String.class).encoding(getEncoding()).build();
+        final DataType<String> dataType = DataType.builder(getMessage().getDataType()).type(String.class).build();
         return transformMessage(dataType);
     }
 
     @Override
     public String getMessageAsString() throws MuleException
     {
-        return getMessageAsString(getEncoding());
+        return getMessageAsString(getMessage().getDataType().getMimeType().getEncoding().orElse(getDefaultEncoding(getMuleContext())));
     }
 
     /**
@@ -656,7 +650,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * @throws org.mule.runtime.core.api.MuleException if the message cannot be converted into a string
      */
     @Override
-    public String getMessageAsString(String encoding) throws MuleException
+    public String getMessageAsString(Charset encoding) throws MuleException
     {
         try
         {
@@ -854,26 +848,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         serializedData = null;
     }
 
-    /**
-     * Gets the encoding for this message. First it looks to see if encoding has been set on the endpoint, if
-     * not it will check the message itself and finally it will fall back to the Mule global configuration for
-     * encoding which cannot be null.
-     *
-     * @return the encoding for the event
-     */
-    @Override
-    public String getEncoding()
-    {
-        if (message.getEncoding() != null)
-        {
-            return message.getEncoding();
-        }
-        else
-        {
-            return encoding;
-        }
-    }
-
     @Override
     public MuleContext getMuleContext()
     {
@@ -1002,7 +976,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
-        serializedData = new HashMap<String, Object>();
+        serializedData = new HashMap<>();
 
         try
         {
@@ -1026,7 +1000,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     {
         if (serializedData == null)
         {
-            serializedData = new HashMap<String, Object>();
+            serializedData = new HashMap<>();
         }
         serializedData.put("serviceName", serviceName);
     }
@@ -1149,10 +1123,17 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      * @param transacted
      */
     @Deprecated
-    public void setEndpointFields(Credentials credentials, String encoding, MessageExchangePattern exchangePattern, String name, URI uri, int timeout, boolean transacted)
+    public void setEndpointFields(Credentials credentials, Charset encoding, MessageExchangePattern exchangePattern, String name, URI uri, int timeout, boolean transacted)
     {
         this.credentials = credentials;
-        this.encoding = encoding;
+        if (!message.getDataType().getMimeType().getEncoding().isPresent() && encoding != null)
+        {
+            this.message = message.transform(msg ->
+            {
+                ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).encoding(encoding).build());
+                return msg;
+            });
+        }
         this.exchangePattern = exchangePattern;
         this.messageSourceName = name;
         this.messageSourceURI = uri;

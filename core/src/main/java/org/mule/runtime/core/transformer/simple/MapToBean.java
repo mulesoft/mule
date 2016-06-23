@@ -15,6 +15,7 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.BeanUtils;
 import org.mule.runtime.core.util.ClassUtils;
 
+import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -42,23 +43,23 @@ public class MapToBean extends AbstractTransformer implements DiscoverableTransf
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        if(getReturnDataType().getType().equals(Object.class))
+        if (Object.class.equals(getReturnDataType().getType()))
         {
             throw new InitialisationException(CoreMessages.propertiesNotSet("returnClass"), this);
         }
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         try
         {
             Map props = (Map)src;
             String c = (String)props.remove(CLASS_PROPERTY);
             Class clazz = getReturnDataType().getType();
-            if(c==null && clazz.equals(Object.class))
+            if (c == null && Object.class.equals(clazz))
             {
-                throw new TransformerException(CoreMessages.transforemrMapBeanClassNotSet());
+                throw new TransformerException(CoreMessages.transformerMapBeanClassNotSet());
             }
             else if (c!=null)
             {

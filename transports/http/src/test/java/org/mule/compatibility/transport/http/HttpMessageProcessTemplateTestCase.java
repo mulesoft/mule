@@ -6,28 +6,25 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.compatibility.transport.http.HttpMessageProcessTemplate;
-import org.mule.compatibility.transport.http.HttpMessageReceiver;
-import org.mule.compatibility.transport.http.HttpServerConnection;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.WorkManager;
+
+import java.nio.charset.Charset;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class HttpMessageProcessTemplateTestCase
 {
-    public static final String ENCODING = "UTF-8";
+    public static final Charset ENCODING = UTF_8;
 
     public static final String PAYLOAD = "TEST PAYLOAD";
 
@@ -79,7 +76,7 @@ public class HttpMessageProcessTemplateTestCase
         message.setInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, "/");
 
         when(messageReceiver.getEndpoint().getEncoding()).thenReturn(ENCODING);
-        when(messageReceiver.createMuleMessage(any(), anyString())).thenReturn(message);
+        when(messageReceiver.createMuleMessage(any(), any())).thenReturn(message);
         when(messageReceiver.getEndpoint().getEndpointURI().getAddress()).thenReturn("http://127.0.0.1/");
     }
 
@@ -148,6 +145,6 @@ public class HttpMessageProcessTemplateTestCase
         HttpMessageProcessTemplate template = new HttpMessageProcessTemplate(messageReceiver, httpServerConnection);
         template.getMuleEvent();
         template.getMuleEvent();
-        verify(messageReceiver, times(1)).createMuleMessage(any(), anyString());
+        verify(messageReceiver, times(1)).createMuleMessage(any(), any());
     }
 }

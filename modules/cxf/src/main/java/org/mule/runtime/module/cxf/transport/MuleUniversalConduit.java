@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.cxf.transport;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -288,17 +288,13 @@ public class MuleUniversalConduit extends AbstractConduit
             InputStream is = getResponseBody(m, resEvent);
             if (is != null)
             {
+                final DataType<?> dataType = DataType.builder(result.getDataType()).mimeType(result.getInboundProperty(CONTENT_TYPE, "text/xml")).build();
                 Message inMessage = new MessageImpl();
-
-                String encoding = result.getEncoding();
-                inMessage.put(Message.ENCODING, encoding);
-
-                String contentType = result.getInboundProperty(CONTENT_TYPE, "text/xml");
-                if (encoding != null && contentType.indexOf("charset") < 0)
+                dataType.getMimeType().getEncoding().ifPresent(encoding ->
                 {
-                    contentType += "; charset=" + result.getEncoding();
-                }
-                inMessage.put(Message.CONTENT_TYPE, contentType);
+                    inMessage.put(Message.ENCODING, encoding.name());
+                });
+                inMessage.put(Message.CONTENT_TYPE, dataType.toString());
                 inMessage.setContent(InputStream.class, is);
                 inMessage.setExchange(m.getExchange());
                 getMessageObserver().onMessage(inMessage);

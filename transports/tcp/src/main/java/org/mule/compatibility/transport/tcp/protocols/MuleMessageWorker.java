@@ -37,7 +37,7 @@ class MuleMessageWorker
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try
         {
-            wireFormat.write(baos, msg, msg.getEncoding());
+            wireFormat.write(baos, msg, msg.getDataType().getMimeType().getEncoding().orElse(null));
         }
         catch (MuleException e)
         {

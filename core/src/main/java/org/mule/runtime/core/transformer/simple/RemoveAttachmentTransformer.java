@@ -16,6 +16,8 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
+import java.nio.charset.Charset;
+
 public class RemoveAttachmentTransformer extends AbstractMessageTransformer
 {
     private AttributeEvaluator nameEvaluator;
@@ -35,7 +37,7 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         MuleMessage message = event.getMessage();
         try

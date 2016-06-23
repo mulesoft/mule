@@ -14,6 +14,7 @@ import org.mule.runtime.core.util.compression.GZipCompression;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 
 /**
@@ -32,7 +33,7 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String outputEncoding) throws TransformerException
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         try
         {
@@ -46,11 +47,11 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
                 DataType<?> returnDataType = getReturnDataType();
 
                 // If a return type has been specified, then deserialize the uncompressed byte array.
-                if (DataType.STRING.equals(returnDataType))
+                if (DataType.STRING.isCompatibleWith(returnDataType))
                 {
                     return new String(buffer, outputEncoding);
                 }
-                else if (!DataType.OBJECT.equals(returnDataType) && !DataType.BYTE_ARRAY.equals(returnDataType))
+                else if (!DataType.OBJECT.isCompatibleWith(returnDataType) && !DataType.BYTE_ARRAY.isCompatibleWith(returnDataType))
                 {
                     try
                     {

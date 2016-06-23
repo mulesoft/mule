@@ -9,6 +9,10 @@ package org.mule.functional.junit4;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -145,7 +149,7 @@ public class TestEventBuilder
      *                    i.e. text/plain;charset=UTF-8
      * @return this {@link TestEventBuilder}
      */
-    public TestEventBuilder withOutboundAttachment(String key, Object object, String contentType)
+    public TestEventBuilder withOutboundAttachment(String key, Object object, MediaType contentType)
     {
         outboundAttachments.put(key, new ObjectAttachment(object, contentType));
 
@@ -258,11 +262,11 @@ public class TestEventBuilder
      */
     public MuleEvent build(MuleContext muleContext, FlowConstruct flow)
     {
-        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext);
+        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext,
+                DataType.builder().fromObject(payload).encoding(getDefaultEncoding(muleContext)).build());
         DefaultMuleEvent event = new DefaultMuleEvent(
                 (DefaultMuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern, flow, new DefaultMuleSession(),
-                muleContext.getConfiguration().getDefaultResponseTimeout(), null, null, "UTF-8", transacted,
-                null, replyToHandler);
+                muleContext.getConfiguration().getDefaultResponseTimeout(), null, null, transacted, null, replyToHandler);
 
         if (attributes != null)
         {
@@ -323,9 +327,9 @@ public class TestEventBuilder
     {
 
         private Object object;
-        private String contentType;
+        private MediaType contentType;
 
-        public ObjectAttachment(Object object, String contentType)
+        public ObjectAttachment(Object object, MediaType contentType)
         {
             this.object = object;
             this.contentType = contentType;

@@ -19,6 +19,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.apache.commons.lang.SerializationUtils;
@@ -101,7 +102,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         }
 
         @Override
-        public Object doTransform(Object src, String outputEncoding) throws TransformerException
+        public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
         {
             String content = ((NonSerializable) src).getContent();
             return content.getBytes();

@@ -10,6 +10,8 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
+import java.nio.charset.Charset;
+
 /** TODO */
 public class TransformerTemplate extends AbstractMessageTransformer
 {
@@ -21,7 +23,7 @@ public class TransformerTemplate extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         try
         {
@@ -51,6 +53,7 @@ public class TransformerTemplate extends AbstractMessageTransformer
             this.payload = payload;
         }
 
+        @Override
         public Object doTransform(MuleMessage message) throws Exception
         {
             return payload;

@@ -990,7 +990,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 303, name, properties);
     }
 
-    public static Message transforemrMapBeanClassNotSet()
+    public static Message transformerMapBeanClassNotSet()
     {
         return factory.createMessage(BUNDLE_PATH, 304);
     }

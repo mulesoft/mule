@@ -8,9 +8,9 @@ package org.mule.runtime.core.metadata;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
-import org.mule.runtime.api.metadata.DataTypeBuilderFactory;
+import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 
-public class DefaultDataTypeBuilderFactory extends DataTypeBuilderFactory
+public class DefaultDataTypeBuilderFactory extends AbstractDataTypeBuilderFactory
 {
 
     @Override

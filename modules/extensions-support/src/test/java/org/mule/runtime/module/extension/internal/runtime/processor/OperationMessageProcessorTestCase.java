@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.processor;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -34,6 +36,7 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -77,7 +80,6 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
@@ -262,7 +264,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     public void operationReturnsMuleMessageWichKeepsNoValues() throws Exception
     {
         Object payload = new Object();
-        DataType dataType = DataType.OBJECT;
+        DataType dataType = DataType.builder(DataType.OBJECT).encoding(getDefaultEncoding(context)).build();
         Serializable attributes = mock(Serializable.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload, dataType, attributes));
@@ -287,7 +289,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         messageProcessor = createOperationMessageProcessor();
 
         Object payload = new Object();
-        DataType dataType = DataType.OBJECT;
+        DataType dataType = DataType.builder(DataType.OBJECT).encoding(getDefaultEncoding(context)).build();
         Serializable attributes = mock(Serializable.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload, dataType, attributes));
@@ -310,7 +312,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     public void operationReturnsMuleMessageButKeepsAttributes() throws Exception
     {
         Object payload = new Object();
-        DataType dataType = DataType.OBJECT;
+        DataType dataType = DataType.builder(DataType.OBJECT).encoding(getDefaultEncoding(context)).build();
         Serializable oldAttributes = mock(Serializable.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload, dataType));
@@ -528,7 +530,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     private MuleEvent configureMockEvent(MuleEvent mockEvent)
     {
-        when(mockEvent.getMessage().getEncoding()).thenReturn(Charset.defaultCharset().name());
+        when(mockEvent.getMessage().getDataType().getMimeType()).thenReturn(new MediaType("*", "*", defaultCharset()));
         return mockEvent;
     }
 }

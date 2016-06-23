@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.xml.transformers.xml;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,6 +16,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -35,8 +38,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
         ObjectToXml t1 = createObject(ObjectToXml.class);
         t1.setAcceptMuleMessage(true);
 
-        MutableMuleMessage msg = new DefaultMuleMessage("test", muleContext);
-        msg.setEncoding("UTF-8");
+        MutableMuleMessage msg = new DefaultMuleMessage("test", (DataType) DataType.builder().encoding(UTF_8).build(), muleContext);
         msg.setCorrelationId("1234");
         msg.setOutboundProperty("object", new Apple());
         msg.setOutboundProperty("string", "hello");
@@ -69,8 +71,8 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
         assertNull(msg.getInboundProperty("number"));
         assertNull(msg.getOutboundProperty("number"));
 
-        assertEquals("1234", msg.getCorrelationId());
-        assertEquals("UTF-8", msg.getEncoding());
+        assertThat(msg.getCorrelationId(), is("1234"));
+        assertThat(msg.getDataType().getMimeType().getEncoding().get(), is(UTF_8));
 
 
         Set<String> outboundProps = msg.getOutboundPropertyNames();

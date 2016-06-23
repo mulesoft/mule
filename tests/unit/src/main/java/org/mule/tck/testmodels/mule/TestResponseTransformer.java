@@ -9,10 +9,13 @@ package org.mule.tck.testmodels.mule;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
+
 public class TestResponseTransformer extends AbstractTransformer
 {
 
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         return src;
     }

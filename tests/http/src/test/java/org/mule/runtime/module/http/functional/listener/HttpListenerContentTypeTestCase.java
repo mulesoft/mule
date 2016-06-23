@@ -65,14 +65,14 @@ public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase
     public void rejectsInvalidContentTypeWithoutBody() throws Exception
     {
         Request request = Request.Post(getUrl()).addHeader(CONTENT_TYPE, "application");
-        testRejectContentType(request, "MimeType cannot be parsed: application");
+        testRejectContentType(request, "MediaType cannot be parsed: application");
     }
 
     @Test
     public void rejectsInvalidContentTypeWithBody() throws Exception
     {
         Request request = Request.Post(getUrl()).body(new StringEntity(TEST_MESSAGE, "application", null));
-        testRejectContentType(request, "MimeType cannot be parsed: application");
+        testRejectContentType(request, "MediaType cannot be parsed: application");
     }
 
     private void testRejectContentType(Request request, String expectedMessage) throws IOException

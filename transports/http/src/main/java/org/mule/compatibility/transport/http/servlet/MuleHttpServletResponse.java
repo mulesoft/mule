@@ -8,6 +8,8 @@ package org.mule.compatibility.transport.http.servlet;
 
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MutableMuleMessage;
 
@@ -48,7 +50,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
     @Override
     public String getCharacterEncoding()
     {
-        return event.getEncoding();
+        return event.getMessage().getDataType().getMimeType().getEncoding().get().name();
     }
 
     @Override
@@ -72,7 +74,11 @@ public class MuleHttpServletResponse implements HttpServletResponse
     @Override
     public void setCharacterEncoding(String charset)
     {
-        message.setEncoding(charset);
+        message = (MutableMuleMessage) message.transform(msg ->
+        {
+            ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).encoding(charset).build());
+            return new DefaultMuleMessage(msg);
+        });
     }
 
     @Override
@@ -142,7 +148,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
         }
         else
         {
-            List<org.apache.commons.httpclient.Cookie> list = new ArrayList<org.apache.commons.httpclient.Cookie>(Arrays.asList(internalCookies));
+            List<org.apache.commons.httpclient.Cookie> list = new ArrayList<>(Arrays.asList(internalCookies));
             list.add(internal);
             internalCookies = list.toArray(new org.apache.commons.httpclient.Cookie[list.size()]);
         }

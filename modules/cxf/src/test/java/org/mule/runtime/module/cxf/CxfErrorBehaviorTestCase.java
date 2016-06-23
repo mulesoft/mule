@@ -15,18 +15,20 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.apache.cxf.interceptor.Fault;
@@ -160,7 +162,7 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase
     public static class CxfTransformerThrowsExceptions extends AbstractTransformer
     {
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             throw new TransformerException(CoreMessages.failedToBuildMessage());
         }

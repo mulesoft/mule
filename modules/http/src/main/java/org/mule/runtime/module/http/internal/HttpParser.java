@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.http.internal;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static org.mule.runtime.core.util.StringUtils.WHITE_SPACE;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.module.http.internal.multipart.HttpPart;
-import org.mule.runtime.core.util.StringUtils;
 
-import com.google.common.base.Charsets;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.http.internal.multipart.HttpPart;
+
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -131,20 +133,20 @@ public class HttpParser
 
     public static ParameterMap decodeQueryString(String queryString)
     {
-        return decodeUrlEncodedBody(queryString, Charsets.UTF_8.name());
+        return decodeUrlEncodedBody(queryString, UTF_8);
     }
 
     public static String encodeQueryString(Map parameters)
     {
-        return encodeString(Charsets.UTF_8.name(), parameters);
+        return encodeString(UTF_8, parameters);
     }
 
-    public static ParameterMap decodeUrlEncodedBody(String urlEncodedBody, String encoding)
+    public static ParameterMap decodeUrlEncodedBody(String urlEncodedBody, Charset encoding)
     {
         return decodeString(urlEncodedBody, encoding);
     }
 
-    public static ParameterMap decodeString(String encodedString, String encoding)
+    public static ParameterMap decodeString(String encodedString, Charset encoding)
     {
         ParameterMap queryParams = new ParameterMap();
         if (!StringUtils.isBlank(encodedString))
@@ -167,13 +169,13 @@ public class HttpParser
         return queryParams;
     }
 
-    private static void addParam(ParameterMap queryParams, String name, String value, String encoding)
+    private static void addParam(ParameterMap queryParams, String name, String value, Charset encoding)
     {
         queryParams.put(decode(name, encoding), decode(value, encoding));
     }
 
 
-    public static String encodeString(String encoding, Map parameters)
+    public static String encodeString(Charset encoding, Map parameters)
     {
         String body;
         StringBuilder result = new StringBuilder();
@@ -187,8 +189,8 @@ public class HttpParser
             {
                 try
                 {
-                    paramName = URLEncoder.encode(paramName, encoding);
-                    paramValue = value != null ? URLEncoder.encode(value.toString(), encoding) : null;
+                    paramName = URLEncoder.encode(paramName, encoding.name());
+                    paramValue = value != null ? URLEncoder.encode(value.toString(), encoding.name()) : null;
                 }
                 catch (UnsupportedEncodingException e)
                 {
@@ -236,14 +238,14 @@ public class HttpParser
                 {
                     String parameterName = listenerPart.substring(1, listenerPart.length() - 1);
                     String parameterValue = requestPathParts[i];
-                    uriParams.put(parameterName, decode(parameterValue, Charsets.UTF_8.displayName()));
+                    uriParams.put(parameterName, decode(parameterValue, UTF_8));
                 }
             }
         }
         return uriParams;
     }
 
-    private static String decode(String text, String encoding)
+    private static String decode(String text, Charset encoding)
     {
         if(text == null)
         {
@@ -251,7 +253,7 @@ public class HttpParser
         }
         try
         {
-            return URLDecoder.decode(text, encoding);
+            return URLDecoder.decode(text, encoding.name());
         }
         catch (UnsupportedEncodingException e)
         {
@@ -314,7 +316,7 @@ public class HttpParser
         try
         {
             String urlPreparedForNewParameter = url.contains("?") ? url + "&" : url + "?";
-            return urlPreparedForNewParameter + URLEncoder.encode(queryParamName, Charsets.UTF_8.name()) + "=" + URLEncoder.encode(queryParamValue, Charsets.UTF_8.name());
+            return urlPreparedForNewParameter + URLEncoder.encode(queryParamName, UTF_8.name()) + "=" + URLEncoder.encode(queryParamValue, UTF_8.name());
         }
         catch (UnsupportedEncodingException e)
         {

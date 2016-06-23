@@ -10,18 +10,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.tck.SensingNullRequestResponseMessageProcessor;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.tck.SensingNullRequestResponseMessageProcessor;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import javax.xml.ws.Holder;
@@ -137,7 +139,7 @@ import org.junit.Test;
     public static class HolderTransformer extends AbstractTransformer
     {
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             Holder<String> outS1 = new Holder<>();
             Holder<String> outS2 = new Holder<>();
@@ -154,7 +156,7 @@ import org.junit.Test;
     public static class HolderTransformer2 extends AbstractTransformer
     {
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             Holder<String> outS1 = new Holder<>();
 
@@ -170,7 +172,7 @@ import org.junit.Test;
     public static class HolderTransformer3 extends AbstractTransformer
     {
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             Holder<String> outS1 = new Holder<>();
 

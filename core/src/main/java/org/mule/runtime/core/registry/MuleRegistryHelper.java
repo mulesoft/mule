@@ -237,8 +237,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
                 {
                     continue;
                 }
-                DataType returnDataType = transformer.getReturnDataType();
-                if (result.isCompatibleWith(returnDataType) && transformer.isSourceDataTypeSupported(source))
+                if (result.isCompatibleWith(transformer.getReturnDataType()) && transformer.isSourceDataTypeSupported(source))
                 {
                     results.add(transformer);
                 }

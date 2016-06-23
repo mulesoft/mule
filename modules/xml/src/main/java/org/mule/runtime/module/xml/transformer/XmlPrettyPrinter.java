@@ -12,6 +12,8 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.xml.util.XMLUtils;
 
+import java.nio.charset.Charset;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -37,7 +39,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
     }
 
     @Override
-    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
+    protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         try
         {
@@ -48,7 +50,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
                 XMLWriter writer = new XMLWriter(resultStream, this.getOutputFormat());
                 writer.write(document);
                 writer.close();
-                return resultStream.toString(outputEncoding);
+                return resultStream.toString(outputEncoding.name());
             }
             else
             {
@@ -64,7 +66,6 @@ public class XmlPrettyPrinter extends AbstractTransformer
     /**
      * @see OutputFormat#getEncoding()
      */
-    @Override
     public synchronized String getEncoding()
     {
         return outputFormat.getEncoding();

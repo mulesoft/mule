@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf.builder;
 
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
@@ -121,9 +121,9 @@ public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageP
     }
 
     @Override
-    protected String getMimeType()
+    protected MediaType getMimeType()
     {
-        return MimeType.XML;
+        return MediaType.XML;
     }
 
 }

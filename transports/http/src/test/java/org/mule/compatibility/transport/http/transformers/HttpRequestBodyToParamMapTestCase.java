@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.http.transformers;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -18,7 +19,6 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 
-import org.mule.compatibility.transport.http.transformers.HttpRequestBodyToParamMap;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -90,7 +90,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
     {
         HttpRequestBodyToParamMap transformer = new HttpRequestBodyToParamMap();
         transformer.setMuleContext(muleContext);
-        return transformer.transformMessage(event, "UTF-8");
+        return transformer.transformMessage(event, UTF_8);
     }
 
     private void verifyTransformation(Object payload) throws TransformerException

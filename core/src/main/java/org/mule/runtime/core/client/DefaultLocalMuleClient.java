@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.client;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 
@@ -64,14 +65,70 @@ public class DefaultLocalMuleClient implements MuleClient
     public void dispatch(String url, Object payload, Map<String, Serializable> messageProperties)
         throws MuleException
     {
-        dispatch(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
+        dispatch(url, new DefaultMuleMessage(payload, emptyMap(), messageProperties, emptyMap(), muleContext/*
+                                                                                                             * ,
+                                                                                                             * DataType
+                                                                                                             * .
+                                                                                                             * builder
+                                                                                                             * (
+                                                                                                             * )
+                                                                                                             * .
+                                                                                                             * type
+                                                                                                             * (
+                                                                                                             * payload
+                                                                                                             * .
+                                                                                                             * getClass
+                                                                                                             * (
+                                                                                                             * )
+                                                                                                             * )
+                                                                                                             * .
+                                                                                                             * encoding
+                                                                                                             * (
+                                                                                                             * getDefaultEncoding
+                                                                                                             * (
+                                                                                                             * muleContext
+                                                                                                             * )
+                                                                                                             * )
+                                                                                                             * .
+                                                                                                             * build
+                                                                                                             * (
+                                                                                                             * )
+                                                                                                             */));
     }
 
     @Override
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties)
         throws MuleException
     {
-        return send(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
+        return send(url, new DefaultMuleMessage(payload, emptyMap(), messageProperties, emptyMap(), muleContext/*
+                                                                                                                * ,
+                                                                                                                * DataType
+                                                                                                                * .
+                                                                                                                * builder
+                                                                                                                * (
+                                                                                                                * )
+                                                                                                                * .
+                                                                                                                * type
+                                                                                                                * (
+                                                                                                                * payload
+                                                                                                                * .
+                                                                                                                * getClass
+                                                                                                                * (
+                                                                                                                * )
+                                                                                                                * )
+                                                                                                                * .
+                                                                                                                * encoding
+                                                                                                                * (
+                                                                                                                * getDefaultEncoding
+                                                                                                                * (
+                                                                                                                * muleContext
+                                                                                                                * )
+                                                                                                                * )
+                                                                                                                * .
+                                                                                                                * build
+                                                                                                                * (
+                                                                                                                * )
+                                                                                                                */));
     }
 
     @Override
@@ -111,7 +168,35 @@ public class DefaultLocalMuleClient implements MuleClient
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout)
         throws MuleException
     {
-        return send(url, new DefaultMuleMessage(payload, messageProperties, muleContext), timeout);
+        return send(url, new DefaultMuleMessage(payload, emptyMap(), messageProperties, emptyMap(), muleContext/*
+                                                                                                                * ,
+                                                                                                                * DataType
+                                                                                                                * .
+                                                                                                                * builder
+                                                                                                                * (
+                                                                                                                * )
+                                                                                                                * .
+                                                                                                                * type
+                                                                                                                * (
+                                                                                                                * payload
+                                                                                                                * .
+                                                                                                                * getClass
+                                                                                                                * (
+                                                                                                                * )
+                                                                                                                * )
+                                                                                                                * .
+                                                                                                                * encoding
+                                                                                                                * (
+                                                                                                                * getDefaultEncoding
+                                                                                                                * (
+                                                                                                                * muleContext
+                                                                                                                * )
+                                                                                                                * )
+                                                                                                                * .
+                                                                                                                * build
+                                                                                                                * (
+                                                                                                                * )
+                                                                                                                */), timeout);
 
     }
 
@@ -156,7 +241,26 @@ public class DefaultLocalMuleClient implements MuleClient
         final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, MessageExchangePattern.ONE_WAY);
         if (connectorMessageProcessor != null)
         {
-            final MuleEvent event = connectorMessageProcessor.process(createOneWayMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), muleContext)));
+            final MuleEvent event = connectorMessageProcessor.process(createOneWayMuleEvent(new DefaultMuleMessage(NullPayload.getInstance()/*
+                                                                                                                                             * ,
+                                                                                                                                             * DataType
+                                                                                                                                             * .
+                                                                                                                                             * builder
+                                                                                                                                             * (
+                                                                                                                                             * )
+                                                                                                                                             * .
+                                                                                                                                             * encoding
+                                                                                                                                             * (
+                                                                                                                                             * getDefaultEncoding
+                                                                                                                                             * (
+                                                                                                                                             * muleContext
+                                                                                                                                             * )
+                                                                                                                                             * )
+                                                                                                                                             * .
+                                                                                                                                             * build
+                                                                                                                                             * (
+                                                                                                                                             * )
+                                                                                                                                             */, muleContext)));
 
             return event == null || event instanceof VoidMuleEvent ? null : event.getMessage();
         }

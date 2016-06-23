@@ -7,6 +7,8 @@
 package org.mule.extension.http.api;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.message.ds.InputStreamDataSource;
@@ -80,14 +82,14 @@ public class HttpMessageBuilder
     }
 
     //This will be in IOUtils
-    public static DataHandler toDataHandler(String name, Object object, String contentType) throws Exception
+    public static DataHandler toDataHandler(String name, Object object, MediaType contentType) throws Exception
     {
         DataHandler dh;
         if (object instanceof File)
         {
             if (contentType != null)
             {
-                dh = new DataHandler(new FileInputStream((File) object), contentType);
+                dh = new DataHandler(new FileInputStream((File) object), contentType.toString());
             }
             else
             {
@@ -98,7 +100,7 @@ public class HttpMessageBuilder
         {
             if (contentType != null)
             {
-                dh = new DataHandler(((URL) object).openStream(), contentType);
+                dh = new DataHandler(((URL) object).openStream(), contentType.toString());
             }
             else
             {
@@ -126,7 +128,7 @@ public class HttpMessageBuilder
         }
         else
         {
-            dh = new DataHandler(object, contentType);
+            dh = new DataHandler(object, contentType.toString());
         }
         return dh;
     }

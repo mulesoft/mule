@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.message.ds;
 
+import org.mule.runtime.api.metadata.MediaType;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,10 +21,10 @@ public class InputStreamDataSource implements DataSource
 {
 
     private final InputStream data;
-    private final String contentType;
+    private final MediaType contentType;
     private final String name;
 
-    public InputStreamDataSource(InputStream data, String contentType, String name)
+    public InputStreamDataSource(InputStream data, MediaType contentType, String name)
     {
         this.data = data;
         this.contentType = contentType;
@@ -32,7 +34,7 @@ public class InputStreamDataSource implements DataSource
     @Override
     public String getContentType()
     {
-        return contentType;
+        return contentType.toString();
     }
 
     @Override

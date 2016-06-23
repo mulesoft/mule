@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
@@ -173,13 +174,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         {
             try
             {
-                url = (URL) AccessController.doPrivileged(new PrivilegedAction()
-                {
-                    public Object run()
-                    {
-                        return ClassUtils.getResource(resourceName, callingClass);
-                    }
-                });
+                url = (URL) AccessController.doPrivileged((PrivilegedAction) () -> ClassUtils.getResource(resourceName, callingClass));
                 if (url == null)
                 {
                     logger.debug("Unable to load resource " + resourceName + " from the classpath");
@@ -280,14 +275,14 @@ public class IOUtils extends org.apache.commons.io.IOUtils
      * @return a {@link DataHandler} of the corresponding attachment
      * @throws Exception if the transformation fails.
      */
-    public static DataHandler toDataHandler(String name, Object object, String contentType) throws Exception
+    public static DataHandler toDataHandler(String name, Object object, MediaType contentType) throws Exception
     {
         DataHandler dh;
         if (object instanceof File)
         {
             if (contentType != null)
             {
-                dh = new DataHandler(new FileInputStream((File) object), contentType);
+                dh = new DataHandler(new FileInputStream((File) object), contentType.toString());
             }
             else
             {
@@ -298,7 +293,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         {
             if (contentType != null)
             {
-                dh = new DataHandler(((URL) object).openStream(), contentType);
+                dh = new DataHandler(((URL) object).openStream(), contentType.toString());
             }
             else
             {
@@ -326,7 +321,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
         }
         else
         {
-            dh = new DataHandler(object, contentType);
+            dh = new DataHandler(object, contentType.toString());
         }
         return dh;
     }

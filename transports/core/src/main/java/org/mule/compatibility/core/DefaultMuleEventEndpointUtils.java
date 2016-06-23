@@ -11,8 +11,6 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.security.MuleCredentials;
 
-import java.util.Iterator;
-
 public class DefaultMuleEventEndpointUtils
 {
 
@@ -36,9 +34,9 @@ public class DefaultMuleEventEndpointUtils
     {
         if (endpoint != null && endpoint.getProperties() != null)
         {
-            for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
+            for (Object name : endpoint.getProperties().keySet())
             {
-                String prop = (String) iterator.next();
+                String prop = (String) name;
 
                 // don't overwrite property on the message
                 if (!event.ignoreProperty(prop))

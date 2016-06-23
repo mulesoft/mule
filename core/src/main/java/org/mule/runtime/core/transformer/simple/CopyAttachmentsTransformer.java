@@ -15,6 +15,8 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
+import java.nio.charset.Charset;
+
 import javax.activation.DataHandler;
 
 public class CopyAttachmentsTransformer extends AbstractMessageTransformer
@@ -36,7 +38,7 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         try
         {

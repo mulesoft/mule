@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.module.xml.transformers.xml;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
+
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
@@ -50,7 +52,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
         trans.setReturnDataType(DataType.STRING);
 
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
-        builder.setEncoding("US-ASCII");
+        builder.setEncoding(US_ASCII);
         ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(
             builder);
 

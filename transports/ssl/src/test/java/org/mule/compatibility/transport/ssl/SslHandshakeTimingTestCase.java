@@ -11,11 +11,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -78,7 +79,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
         InboundEndpoint endpoint = mock(InboundEndpoint.class);
         when(endpoint.getProperties()).thenReturn(properties);
         when(endpoint.getConnector()).thenReturn(connector);
-        when(endpoint.getEncoding()).thenReturn(new DefaultMuleConfiguration().getDefaultEncoding());
+        when(endpoint.getEncoding()).thenReturn(getDefaultEncoding(muleContext));
         when(endpoint.getMuleContext()).thenReturn(muleContext);
 
         return new SslMessageReceiver(connector, mock(Flow.class), endpoint);

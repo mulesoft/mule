@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -85,7 +86,7 @@ public class JAXBUnmarshallerTransformer extends AbstractTransformer
     }
 
     @Override
-    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
+    protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         try
         {

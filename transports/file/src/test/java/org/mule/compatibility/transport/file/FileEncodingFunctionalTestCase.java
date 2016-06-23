@@ -6,13 +6,17 @@
  */
 package org.mule.compatibility.transport.file;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mule.compatibility.transport.file.FileTestUtils.createDataFile;
 import static org.mule.compatibility.transport.file.FileTestUtils.createFolder;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
@@ -20,7 +24,7 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
 {
     private static final String TEST_MESSAGE_EUC_JP_ENCODED = "\u3053";
     private static final int FIVE_SECONDS_TIMEOUT = 5000;
-    private static final String ENCODING = "EUC-JP";
+    private static final Charset ENCODING = Charset.forName("EUC-JP");
 
 
     @Override
@@ -38,8 +42,8 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.request("vm://receive", FIVE_SECONDS_TIMEOUT);
 
-        assertNotNull(message);
-        assertEquals(ENCODING, message.getEncoding());
-        assertEquals(TEST_MESSAGE_EUC_JP_ENCODED, getPayloadAsString(message));
+        assertThat(message, not(nullValue()));
+        assertThat(message.getDataType().getMimeType().getEncoding().get(), is(ENCODING));
+        assertThat(getPayloadAsString(message), is(TEST_MESSAGE_EUC_JP_ENCODED));
     }
 }

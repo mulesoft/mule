@@ -11,6 +11,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.api.transport.Connector;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -32,6 +33,7 @@ import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -115,7 +117,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
      */
     private final String initialState;
 
-    private final String endpointEncoding;
+    private final Charset endpointEncoding;
 
     private MuleContext muleContext;
 
@@ -123,7 +125,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
 
     private String endpointBuilderName;
 
-    private final String endpointMimeType;
+    private final MediaType endpointMimeType;
 
     private AbstractRedeliveryPolicy redeliveryPolicy;
 
@@ -138,7 +140,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
                             MessageExchangePattern messageExchangePattern,
                             int responseTimeout,
                             String initialState,
-                            String endpointEncoding,
+                            Charset endpointEncoding,
                             String endpointBuilderName,
                             MuleContext muleContext,
                             RetryPolicyTemplate retryPolicyTemplate,
@@ -147,7 +149,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
                             List <MessageProcessor> messageProcessors,
                             List <MessageProcessor> responseMessageProcessors,
                             boolean disableTransportTransformer,
-                            String endpointMimeType)
+            MediaType endpointMimeType)
     {
         this.connector = connector;
         this.endpointUri = endpointUri;
@@ -208,13 +210,13 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
     }
 
     @Override
-    public String getEncoding()
+    public Charset getEncoding()
     {
         return endpointEncoding;
     }
 
     @Override
-    public String getMimeType()
+    public MediaType getMimeType()
     {
         return endpointMimeType;
     }
@@ -463,7 +465,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
 
     private List<Transformer> getTransformersFromProcessorList(List<MessageProcessor> processors)
     {
-        List<Transformer> transformers = new LinkedList<Transformer>();
+        List<Transformer> transformers = new LinkedList<>();
         for (MessageProcessor processor : processors)
         {
             if (processor instanceof Transformer)

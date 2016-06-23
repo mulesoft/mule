@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.core.transport;
 
+import java.nio.charset.Charset;
+
 public class DefaultMuleMessageFactory extends AbstractMuleMessageFactory
 {
     public DefaultMuleMessageFactory()
@@ -19,7 +21,7 @@ public class DefaultMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected Object extractPayload(Object transportMessage, String encoding) throws Exception
+    protected Object extractPayload(Object transportMessage, Charset encoding) throws Exception
     {
         return transportMessage;
     }

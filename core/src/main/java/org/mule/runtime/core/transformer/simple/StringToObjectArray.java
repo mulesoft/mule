@@ -13,7 +13,7 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * <code>StringToObjectArray</code> converts a String into an object array. This
@@ -35,7 +35,7 @@ public class StringToObjectArray extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String outputEncoding) throws TransformerException
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         String in;
 
@@ -56,16 +56,9 @@ public class StringToObjectArray extends AbstractTransformer
         return out;
     }
 
-    protected String createStringFromByteArray(byte[] bytes, String outputEncoding) throws TransformerException
+    protected String createStringFromByteArray(byte[] bytes, Charset outputEncoding) throws TransformerException
     {
-        try
-        {
-            return new String(bytes, outputEncoding);
-        }
-        catch (UnsupportedEncodingException uee)
-        {
-            throw new TransformerException(this, uee);
-        }
+        return new String(bytes, outputEncoding);
     }
 
     protected String createStringFromInputStream(InputStream input)

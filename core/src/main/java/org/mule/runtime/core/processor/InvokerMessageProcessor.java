@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
@@ -306,8 +308,10 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
         }
         else if (result != null)
         {
+            final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
+            template.setReturnDataType(DataType.builder(DataType.OBJECT).encoding(getDefaultEncoding(muleContext)).build());
             event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), event,
-                             Collections.<Transformer>singletonList(new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result)))));
+                             Collections.<Transformer>singletonList(template)));
             return event;
         }
         else

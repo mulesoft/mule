@@ -12,19 +12,21 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageDispatcherFactory;
 import org.mule.compatibility.core.api.transport.MessageRequesterFactory;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
-import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
@@ -35,7 +37,7 @@ import org.junit.Test;
 public abstract class AbstractConnectorTestCase extends AbstractMuleContextEndpointTestCase
 {
     protected String connectorName;
-    protected String encoding;
+    protected Charset encoding;
 
     @Override
     protected void doSetUp() throws Exception
@@ -47,7 +49,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextEndpo
         }
         connectorName = connector.getName();
         registerConnector(muleContext.getRegistry(), connector);
-        encoding = muleContext.getConfiguration().getDefaultEncoding();
+        encoding = getDefaultEncoding(muleContext);
     }
 
     @Override

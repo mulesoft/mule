@@ -7,6 +7,8 @@
 package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
+
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -124,7 +126,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
      *                    i.e. text/plain;charset=UTF-8
      * @return this {@link FlowRunner}
      */
-    public R withOutboundAttachment(String key, Object object, String contentType)
+    public R withOutboundAttachment(String key, Object object, MediaType contentType)
     {
         eventBuilder.withOutboundAttachment(key, object, contentType);
 

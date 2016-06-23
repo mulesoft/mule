@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -20,11 +21,6 @@ import static org.mockito.Mockito.when;
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactoryTestCase;
-import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.compatibility.transport.http.HttpMuleMessageFactory;
-import org.mule.compatibility.transport.http.HttpRequest;
-import org.mule.compatibility.transport.http.RequestLine;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleMessage;
 
@@ -275,7 +271,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory();
         
         String queryParams = "key1=value1&key2=value2&key1=value4&key3=value3&key1=value5";
-        Map<String, Serializable> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?" + queryParams, "UTF-8");
+        Map<String, Serializable> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?" + queryParams, UTF_8);
 
         Object value1 = processedParams.get("key1");
         assertNotNull(value1);
@@ -300,7 +296,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory();
         
         String queryParams = "key1=value%201&key2=value2&key%203=value3&key%203=value4";
-        Map<String, Serializable> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?" + queryParams, "UTF-8");
+        Map<String, Serializable> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?" + queryParams, UTF_8);
         
         Object value1 = processedParams.get("key1");
         assertNotNull(value1);
@@ -323,7 +319,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     {
         HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory();
 
-        Map<String, Serializable> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?wsdl", "UTF-8");
+        Map<String, Serializable> processedParams = messageFactory.processQueryParams("http://localhost:8080/resources?wsdl", UTF_8);
         assertTrue(processedParams.containsKey("wsdl"));
         assertNull(processedParams.get("wsdl"));
     }

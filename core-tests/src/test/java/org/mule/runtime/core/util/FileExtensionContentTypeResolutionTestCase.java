@@ -9,11 +9,13 @@ package org.mule.runtime.core.util;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.runtime.api.metadata.MimeType.HTML;
-import static org.mule.runtime.api.metadata.MimeType.JSON;
-import static org.mule.runtime.api.metadata.MimeType.TEXT;
-import static org.mule.runtime.api.metadata.MimeType.XML;
+import static org.mule.runtime.api.metadata.MediaType.BINARY;
+import static org.mule.runtime.api.metadata.MediaType.HTML;
+import static org.mule.runtime.api.metadata.MediaType.JSON;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
+import static org.mule.runtime.api.metadata.MediaType.XML;
 
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -35,17 +37,17 @@ public class FileExtensionContentTypeResolutionTestCase extends AbstractMuleTest
 {
 
     private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
-    public static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
+    public static final MediaType DEFAULT_CONTENT_TYPE = BINARY;
 
     @Test
     public void resolvesFileMimeType() throws Exception
     {
-        Map<String, String> mimeTypes = new HashMap<>();
+        Map<String, MediaType> mimeTypes = new HashMap<>();
         mimeTypes.put("txt", TEXT);
         mimeTypes.put("json", JSON);
         mimeTypes.put("xml", XML);
         mimeTypes.put("html", HTML);
-        mimeTypes.put("csv", "text/csv");
+        mimeTypes.put("csv", new MediaType("text", "csv"));
 
         for (String extension : mimeTypes.keySet())
         {
@@ -59,11 +61,11 @@ public class FileExtensionContentTypeResolutionTestCase extends AbstractMuleTest
         doFileMimeTypeTest("xxxxxx", DEFAULT_CONTENT_TYPE);
     }
 
-    private void doFileMimeTypeTest(String fileExtension, String expectedMimeType) throws IOException
+    private void doFileMimeTypeTest(String fileExtension, MediaType expectedMimeType) throws IOException
     {
         String filename = "test." + fileExtension;
         String mimeType = mimetypesFileTypeMap.getContentType(filename);
 
-        assertThat(mimeType, equalTo(expectedMimeType));
+        assertThat(mimeType, equalTo(expectedMimeType.toString()));
     }
 }

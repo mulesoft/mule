@@ -15,6 +15,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
+import java.nio.charset.Charset;
+
 /**
  * Transformer that modifies the payload of the message according to the provided value.
  */
@@ -36,7 +38,7 @@ public class SetPayloadTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         if(valueEvaluator.getRawValue() == null)
         {

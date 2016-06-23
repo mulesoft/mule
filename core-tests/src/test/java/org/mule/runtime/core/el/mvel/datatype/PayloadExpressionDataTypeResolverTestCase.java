@@ -10,7 +10,7 @@ package org.mule.runtime.core.el.mvel.datatype;
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
-import static org.mule.runtime.api.metadata.MimeType.JSON;
+import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.MESSAGE_PAYLOAD;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PAYLOAD;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
@@ -22,12 +22,14 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.nio.charset.Charset;
+
 import org.junit.Test;
 
 public class PayloadExpressionDataTypeResolverTestCase extends AbstractMuleContextTestCase
 {
 
-    public static final String CUSTOM_ENCODING = UTF_16.name();
+    public static final Charset CUSTOM_ENCODING = UTF_16;
 
     private final PayloadExpressionDataTypeResolver dataTypeResolver = new PayloadExpressionDataTypeResolver();
 

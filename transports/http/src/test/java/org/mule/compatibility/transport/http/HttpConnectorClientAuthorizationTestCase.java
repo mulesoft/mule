@@ -13,6 +13,8 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -25,6 +27,7 @@ import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -65,7 +68,7 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
 
     private MutableMuleMessage message;
 
-    private String encoding;
+    private Charset encoding;
 
     private HttpConnector connector;
 
@@ -73,7 +76,7 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
     public void setup() throws URISyntaxException {
         uri = new URI(URI_WITHOUT_CREDENTIALS);
         message = new DefaultMuleMessage(StringUtils.EMPTY, muleContext);
-        encoding = muleContext.getConfiguration().getDefaultEncoding();
+        encoding = getDefaultEncoding(muleContext);
         connector = new HttpConnector(muleContext);
         connector.setName("test");
     }

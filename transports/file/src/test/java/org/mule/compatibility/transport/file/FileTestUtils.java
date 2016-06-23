@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.file;
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 public class FileTestUtils
 {
@@ -40,7 +41,7 @@ public class FileTestUtils
      * @return the new file
      * @throws Exception
      */
-    public static File createDataFile(File folder, final String testMessage, String encoding) throws Exception
+    public static File createDataFile(File folder, final String testMessage, Charset encoding) throws Exception
     {
         File temp = File.createTempFile("mule-file-test-", ".txt");
         FileUtils.writeStringToFile(temp, testMessage, encoding);

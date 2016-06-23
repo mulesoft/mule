@@ -18,6 +18,8 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
+import java.nio.charset.Charset;
+
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
@@ -97,7 +99,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
         }
 
         @Override
-        public Object transformMessage(MuleEvent event, String outputEncoding)
+        public Object transformMessage(MuleEvent event, Charset outputEncoding)
         {
             MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
 

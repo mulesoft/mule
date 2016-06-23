@@ -11,8 +11,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.module.xml.transformer.XmlPrettyPrinter;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.xml.transformer.XmlPrettyPrinter;
 
 import org.junit.Test;
 

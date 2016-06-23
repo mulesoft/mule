@@ -11,11 +11,12 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 
 public interface WireFormat extends MuleContextAware
 {
     Object read(InputStream is) throws MuleException;
 
-    void write(OutputStream out, Object o, String encoding) throws MuleException;
+    void write(OutputStream out, Object o, Charset encoding) throws MuleException;
 }

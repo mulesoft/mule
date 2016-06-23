@@ -9,10 +9,13 @@ package org.mule.test.transformers;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
+
 public class FailingTransformer extends AbstractTransformer
 {
 
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         throw new TransformerException(this, new Exception("Wrapped test exception"));
     }

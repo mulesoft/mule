@@ -7,14 +7,13 @@
 
 package org.mule.runtime.core.transformers.simple;
 
+import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.tck.junit4.matcher.DataTypeMatcher;
 
 import org.junit.Test;
 
@@ -35,13 +34,8 @@ public class SetPayloadDataTypeTestCase extends FunctionalTestCase
 
     private void doSetPayloadTest(String flowName) throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
-        // MuleMessage response = client.send(url, TEST_MESSAGE, null);
         MuleMessage response = flowRunner(flowName).withPayload(TEST_MESSAGE).run().getMessage();
 
-        DataType dataType = response.getDataType();
-
-        assertThat(dataType, DataTypeMatcher.like(String.class, MimeType.XML, "UTF-16"));
+        assertThat(response.getDataType(), like(String.class, MediaType.XML, UTF_16));
     }
 }

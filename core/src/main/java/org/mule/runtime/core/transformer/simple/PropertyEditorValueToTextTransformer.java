@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.beans.PropertyEditor;
+import java.nio.charset.Charset;
 
 /**
  * <code>PropertyEditorValueToTextTransformer</code> adapts a {@link PropertyEditor}
@@ -35,7 +36,7 @@ public class PropertyEditorValueToTextTransformer extends AbstractTransformer im
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         synchronized (propertyEditor)
         {

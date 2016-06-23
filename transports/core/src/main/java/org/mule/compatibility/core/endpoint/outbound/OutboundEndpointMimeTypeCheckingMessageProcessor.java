@@ -7,16 +7,15 @@
 package org.mule.compatibility.core.endpoint.outbound;
 
 import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.ObjectUtils;
-
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 
 
 /**
@@ -34,7 +33,7 @@ public class OutboundEndpointMimeTypeCheckingMessageProcessor implements Message
     @Override
     public MuleEvent process(MuleEvent event) throws MessagingException
     {
-        String endpointMimeType = endpoint.getMimeType();
+        org.mule.runtime.api.metadata.MediaType endpointMimeType = endpoint.getMimeType();
         if (endpointMimeType != null)
         {
             MuleMessage message = event.getMessage();
@@ -42,25 +41,17 @@ public class OutboundEndpointMimeTypeCheckingMessageProcessor implements Message
             if (contentType == null)
             {
                 event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setOutboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType);
+                    msg.setOutboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType.toString());
                     return msg;
                 }));
             }
             else
             {
-                try
+                String messageMimeType = DataType.builder().mimeType(contentType).build().getMimeType().toString();
+                if (!messageMimeType.equals(endpointMimeType.toString()))
                 {
-                    MimeType mt = new MimeType(contentType);
-                    String messageMimeType = mt.getPrimaryType() + "/" + mt.getSubType();
-                    if (!messageMimeType.equals(endpointMimeType))
-                    {
-                        throw new MessagingException(
-                                CoreMessages.unexpectedMIMEType(messageMimeType, endpointMimeType), event, this);
-                    }
-                }
-                catch (MimeTypeParseException ex)
-                {
-                    throw new MessagingException(CoreMessages.illegalMIMEType(contentType), event, ex, this);
+                    throw new MessagingException(
+                            CoreMessages.unexpectedMIMEType(messageMimeType, endpointMimeType.toString()), event, this);
                 }
             }
         }

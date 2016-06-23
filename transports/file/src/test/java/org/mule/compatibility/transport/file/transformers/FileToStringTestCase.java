@@ -7,19 +7,14 @@
 package org.mule.compatibility.transport.file.transformers;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import org.mule.compatibility.transport.file.transformers.FileToString;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.File;
 import java.io.FileWriter;
-
-import org.junit.Test;
 
 /**
  * Test case for FileToString transformer
@@ -70,23 +65,4 @@ public class FileToStringTestCase extends AbstractTransformerTestCase
     {
         return new FileToString();
     }
-
-    /**
-     * Transform with a wrong encoding should result in an Exception to be thrown
-     */
-    @Test
-    public void testTransformExcEnc() throws Exception
-    {
-        try
-        {
-            FileToString fts = (FileToString)getTransformer();
-            fts.doTransform(getTestData(), "NO-SUCH_ENCODING");
-            fail("Should fail when the specified encoding is not supported");
-        }
-        catch (TransformerException tfe)
-        {
-            // Expected
-        }
-    }
-
 }

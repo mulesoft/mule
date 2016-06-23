@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.transformer.simple;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -29,8 +29,7 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implements MessageProcessor, MuleContextAware, Initialisable
 {
 
-    private String mimeType;
-    private String encoding;
+    private DataType dataType;
     private AttributeEvaluator valueEvaluator = new AttributeEvaluator(null);
     private MuleContext muleContext;
 
@@ -39,16 +38,30 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         event.setMessage(event.getMessage().transform(msg -> {
-            if (isEmpty(mimeType) && isEmpty(encoding))
+            if (dataType == null)
             {
                 final TypedValue typedValue = resolveTypedValue(event);
-                msg.setPayload(typedValue.getValue(), typedValue.getDataType());
+                if (typedValue.getDataType().getMimeType().getEncoding().isPresent())
+                {
+                    msg.setPayload(typedValue.getValue(), typedValue.getDataType());
+                }
+                else
+                {
+                    msg.setPayload(typedValue.getValue(), DataType.builder(typedValue.getDataType()).encoding(getDefaultEncoding(muleContext)).build());
+                }
             }
             else
             {
                 Object value = resolveValue(event);
-                DataType dataType = resolveDataType(value);
-                msg.setPayload(value, dataType);
+                if (dataType.getMimeType().getEncoding().isPresent())
+                {
+                    msg.setPayload(value, DataType.builder(dataType).type((value == null || value instanceof NullPayload) ? Object.class : value.getClass()).build());
+                }
+                else
+                {
+                    msg.setPayload(value,
+                            DataType.builder(dataType).type((value == null || value instanceof NullPayload) ? Object.class : value.getClass()).encoding(getDefaultEncoding(muleContext)).build());
+                }
             }
             return msg;
         }));
@@ -81,21 +94,26 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
         }
     }
 
-    private DataType<?> resolveDataType(Object value)
-    {
-        Class<?> type = (value == null || value instanceof NullPayload) ? Object.class : value.getClass();
-
-        return DataType.builder().type(type).mimeType(mimeType).encoding(encoding).build();
-    }
-
     public void setMimeType(String mimeType)
     {
-        this.mimeType = mimeType;
+        setDataType(DataType.builder(dataType == null ? DataType.OBJECT : dataType).mimeType(mimeType).build());
     }
 
     public void setEncoding(String encoding)
     {
-        this.encoding = encoding;
+        setDataType(DataType.builder(dataType == null ? DataType.OBJECT : dataType).encoding(encoding).build());
+    }
+
+    public void setDataType(DataType dataType)
+    {
+        if (dataType.getMimeType().getEncoding().isPresent())
+        {
+            this.dataType = dataType;
+        }
+        else
+        {
+            this.dataType = DataType.builder(dataType).build();
+        }
     }
 
     public void setValue(String value)

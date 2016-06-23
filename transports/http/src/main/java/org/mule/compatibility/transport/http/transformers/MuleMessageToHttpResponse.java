@@ -13,7 +13,7 @@ import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -21,11 +21,11 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-import org.mule.runtime.core.util.DataTypeUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Locale;
@@ -77,7 +77,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         Object src = event.getMessage().getPayload();
 
@@ -176,7 +176,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
 
     }
 
-    protected HttpResponse createResponse(Object src, String encoding, MuleMessage msg)
+    protected HttpResponse createResponse(Object src, Charset encoding, MuleMessage msg)
             throws IOException, TransformerException
     {
         HttpResponse response = new HttpResponse();
@@ -203,9 +203,9 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         if (contentType == null)
         {
             DataType<?> dataType = msg.getDataType();
-            if (!MimeType.ANY.equals(dataType.getMimeType()))
+            if (!MediaType.ANY.matches(dataType.getMimeType()))
             {
-                contentType = DataTypeUtils.getContentType(dataType);
+                contentType = dataType.getMimeType().toString();
             }
         }
 
@@ -224,7 +224,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         }
         response.setFallbackCharset(encoding);
 
-        Collection<String> headerNames = new LinkedList<String>();
+        Collection<String> headerNames = new LinkedList<>();
         headerNames.addAll(HttpConstants.RESPONSE_HEADER_NAMES.values());
         headerNames.addAll(HttpConstants.GENERAL_AND_ENTITY_HEADER_NAMES.values());
 

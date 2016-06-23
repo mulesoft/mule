@@ -7,16 +7,14 @@
 package org.mule.compatibility.transport.http.transformers;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,22 +32,18 @@ public class ServletRequestToOutputHandler extends AbstractTransformer implement
     }
 
     @Override
-    public Object doTransform(final Object src, String encoding) throws TransformerException
+    public Object doTransform(final Object src, Charset encoding) throws TransformerException
     {
-            return new OutputHandler()
+            return (OutputHandler) (event, out) ->
             {
-                @Override
-                public void write(MuleEvent event, OutputStream out) throws IOException
+                InputStream is = ((HttpServletRequest) src).getInputStream();
+                try
                 {
-                    InputStream is = ((HttpServletRequest) src).getInputStream();
-                    try
-                    {
-                        IOUtils.copyLarge(is, out);
-                    }
-                    finally
-                    {
-                        is.close();
-                    }
+                    IOUtils.copyLarge(is, out);
+                }
+                finally
+                {
+                    is.close();
                 }
             };
         }

@@ -13,6 +13,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.IOUtils;
 
+import java.nio.charset.Charset;
+
 /**
  * Loads a template and parses its content to resolve expressions. The order in which attempts to load the resource is
  * the following: from the file system, from a URL or from the classpath.
@@ -54,7 +56,7 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer
 
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         if(template == null)
         {

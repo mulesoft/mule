@@ -13,6 +13,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
+import java.nio.charset.Charset;
+
 import org.junit.Test;
 
 public class NullResultTestCase extends AbstractTransformerTestCase
@@ -68,7 +70,7 @@ public class NullResultTestCase extends AbstractTransformerTestCase
         }
 
         @Override
-        public Object doTransform(Object src, String encoding) throws TransformerException
+        public Object doTransform(Object src, Charset encoding) throws TransformerException
         {
             return null;
         }

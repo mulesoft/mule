@@ -14,10 +14,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.util.IOUtils;
@@ -30,6 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -194,7 +196,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 
         MutableMuleMessage copy = new DefaultMuleMessage(original);
         assertInboundAndOutboundMessageProperties(copy);
-        assertThat(copy.getEncoding(), equalTo(muleContext.getConfiguration().getDefaultEncoding()));
+        assertThat(copy.getDataType().getMimeType().getEncoding().get(), equalTo(Charset.forName(muleContext.getConfiguration().getDefaultEncoding())));
         assertThat(copy.getAttributes(), is(testAttributes));
         
         // Mutate original
@@ -250,17 +252,19 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         assertEquals(0, message.getOutboundAttachmentNames().size());
 
         //Try with content type set
-        message.addOutboundAttachment("spi-props", IOUtils.getResourceAsUrl("test-spi.properties", getClass()), MimeType.TEXT);
+        message.addOutboundAttachment("spi-props", IOUtils.getResourceAsUrl("test-spi.properties", getClass()), MediaType.TEXT);
 
         assertTrue(message.getOutboundAttachmentNames().contains("spi-props"));
         handler = message.getOutboundAttachment("spi-props");
-        assertEquals(MimeType.TEXT, handler.getContentType());
+        assertEquals(MediaType.TEXT.getPrimaryType(), handler.getContentType().split("/")[0]);
+        assertEquals(MediaType.TEXT.getSubType(), handler.getContentType().split("/")[1]);
         assertEquals(1, message.getOutboundAttachmentNames().size());
 
         //Try without content type set
         message.addOutboundAttachment("dummy", IOUtils.getResourceAsUrl("dummy.xml", getClass()), null);
         handler = message.getOutboundAttachment("dummy");
-        assertEquals(MimeType.APPLICATION_XML, handler.getContentType());
+        assertEquals(MediaType.APPLICATION_XML.getPrimaryType(), handler.getContentType().split("/")[0]);
+        assertEquals(MediaType.APPLICATION_XML.getSubType(), handler.getContentType().split("/")[1]);
         assertEquals(2, message.getOutboundAttachmentNames().size());
 
 
@@ -269,7 +273,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     @Test
     public void testAddingInboundAttachment() throws Exception
     {
-        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+        Map<String, DataHandler> attachments = new HashMap<>();
 
         String attachmentData = "this is the attachment";
         DataHandler dh = new DataHandler(attachmentData, "text/plain");
@@ -317,7 +321,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     private MutableMuleMessage createMuleMessage()
     {
         // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage previousMessage = new DefaultMuleMessage(AbstractMuleContextTestCase.TEST_PAYLOAD, DataType.STRING,
+        MutableMuleMessage previousMessage = new DefaultMuleMessage(AbstractMuleContextTestCase.TEST_PAYLOAD, DataType.builder(DataType.STRING).encoding(getDefaultEncoding(muleContext)).build(),
                                                                     testAttributes, muleContext);
         previousMessage.setOutboundProperty("MuleMessage", "MuleMessage");
         return previousMessage;

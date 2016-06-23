@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.metadata.MimeType.APPLICATION_XML;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.runtime.api.metadata.DataType;

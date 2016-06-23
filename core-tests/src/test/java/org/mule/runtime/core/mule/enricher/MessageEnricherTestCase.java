@@ -19,7 +19,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.metadata.MimeType.JSON;
+import static org.mule.runtime.api.metadata.MediaType.JSON;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -483,6 +484,6 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         MuleEvent out = enricher.process(in);
 
         assertEquals("bar", out.getFlowVariable("foo"));
-        assertThat(out.getFlowVariableDataType("foo"), DataTypeMatcher.like(String.class, JSON, UTF_16.name()));
+        assertThat(out.getFlowVariableDataType("foo"), DataTypeMatcher.like(String.class, JSON, UTF_16));
     }
 }

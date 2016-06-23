@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractDiscoverableTransformer;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import javax.activation.DataHandler;
 
@@ -24,7 +25,7 @@ public class DataHandlerToInputStreamTransformer extends AbstractDiscoverableTra
     }
 
     @Override
-    public Object doTransform(Object src, String enc) throws TransformerException
+    public Object doTransform(Object src, Charset enc) throws TransformerException
     {
         try
         {

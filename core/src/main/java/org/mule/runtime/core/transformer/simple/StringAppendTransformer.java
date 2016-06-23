@@ -13,6 +13,7 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 public class StringAppendTransformer extends AbstractTransformer
 {
@@ -33,7 +34,7 @@ public class StringAppendTransformer extends AbstractTransformer
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         String string;
         if (src instanceof byte[])

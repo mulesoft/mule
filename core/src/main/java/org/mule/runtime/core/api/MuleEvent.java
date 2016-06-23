@@ -19,6 +19,7 @@ import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.Set;
 
 /**
@@ -43,6 +44,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent
      * 
      * @return the message payload for this event
      */
+    @Override
     MuleMessage getMessage();
 
     Credentials getCredentials();
@@ -103,7 +105,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent
      * @return the message contents as a string
      * @throws MuleException if the message cannot be converted into a string
      */
-    String getMessageAsString(String encoding) throws MuleException;
+    String getMessageAsString(Charset encoding) throws MuleException;
 
     /**
      * Retrieves the service session for the current event
@@ -169,13 +171,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent
      *         message
      */
     OutputStream getOutputStream();
-
-    /**
-     * Gets the encoding for this message.
-     * 
-     * @return the encoding for the event. This must never return null.
-     */
-    String getEncoding();
 
     /**
      * Returns the muleContext for the Mule node that this event was received in

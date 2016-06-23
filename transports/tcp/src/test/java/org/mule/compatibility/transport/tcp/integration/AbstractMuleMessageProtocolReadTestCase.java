@@ -49,7 +49,7 @@ public abstract class AbstractMuleMessageProtocolReadTestCase extends Functional
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         WireFormat wireFormat = new SerializedMuleMessageWireFormat();
         wireFormat.setMuleContext(muleContext);
-        wireFormat.write(baos, msg, msg.getEncoding());
+        wireFormat.write(baos, msg, msg.getDataType().getMimeType().getEncoding().get());
         TcpProtocol delegate = createMuleMessageProtocol();
         delegate.write(outToServer, baos.toByteArray());
         clientSocket.close();

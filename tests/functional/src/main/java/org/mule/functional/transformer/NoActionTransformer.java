@@ -10,6 +10,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
+
 /**
  * <code>NoActionTransformer</code> doesn't do any transformation on the source
  * object and returns the source as the result. This can be used to overload the
@@ -26,7 +28,7 @@ public final class NoActionTransformer extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         return src;
     }

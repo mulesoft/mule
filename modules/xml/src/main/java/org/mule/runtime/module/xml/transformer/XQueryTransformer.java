@@ -19,6 +19,7 @@ import org.mule.runtime.module.xml.i18n.XmlMessages;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -139,7 +140,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         try
         {
@@ -153,8 +154,8 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
                 bindDocument(event.getMessage().getPayload(), transformer);
                 XQResultSequence result = transformer.executeQuery();
                 //No support for return Arrays yet
-                List<Object> results = new ArrayList<Object>();
-                Class<?> type = returnType.getType();
+                List<Object> results = new ArrayList<>();
+                Class<?> type = getReturnDataType().getType();
 
                 while (result.next())
                 {

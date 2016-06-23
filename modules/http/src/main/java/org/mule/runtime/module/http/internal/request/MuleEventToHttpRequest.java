@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
@@ -17,13 +18,17 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
+
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -34,10 +39,6 @@ import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.core.util.DataTypeUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.collect.Maps;
 
@@ -53,7 +54,6 @@ import java.util.Map;
 import javax.activation.DataHandler;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,9 +99,9 @@ public class MuleEventToHttpRequest
         if (!event.getMessage().getOutboundPropertyNames().contains(MuleProperties.CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
-            if (!MimeType.ANY.equals(dataType.getMimeType()))
+            if (!MediaType.ANY.matches(dataType.getMimeType()))
             {
-                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
+                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMimeType().toString());
             }
         }
 
@@ -139,14 +139,7 @@ public class MuleEventToHttpRequest
 
     private boolean equalsIgnoredProperty(final String outboundProperty)
     {
-        return CollectionUtils.exists(ignoredProperties, new Predicate()
-        {
-            @Override
-            public boolean evaluate(Object propertyName)
-            {
-                return outboundProperty.equalsIgnoreCase((String) propertyName);
-            }
-        });
+        return CollectionUtils.exists(ignoredProperties, propertyName -> outboundProperty.equalsIgnoreCase((String) propertyName));
     }
 
     private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, MuleEvent muleEvent, String resolvedMethod) throws MessagingException
@@ -250,12 +243,12 @@ public class MuleEventToHttpRequest
         {
             String contentType = requestBuilder.getHeaders().get(CONTENT_TYPE);
 
-            if (contentType == null || contentType.equals(APPLICATION_X_WWW_FORM_URLENCODED))
+            if (contentType == null || contentType.equals(APPLICATION_X_WWW_FORM_URLENCODED.toString()))
             {
                 if (muleEvent.getMessage().getPayload() instanceof Map)
                 {
-                    String body = HttpParser.encodeString(muleEvent.getEncoding(), (Map) payload);
-                    requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
+                    String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMimeType().getEncoding().orElse(getDefaultEncoding(muleContext)), (Map) payload);
+                    requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toString());
                     return new ByteArrayHttpEntity(body.getBytes());
                 }
             }
