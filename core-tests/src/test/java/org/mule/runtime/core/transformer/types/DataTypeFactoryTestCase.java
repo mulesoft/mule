@@ -26,7 +26,7 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void createsDataTypeForNullObject() throws Exception
     {
-        DataType<?> dataType = DataType.of(null);
+        DataType<?> dataType = DataType.fromObject(null);
 
         assertThat(dataType, like(Object.class, MimeType.ANY, null));
     }
@@ -34,7 +34,7 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void createsDataTypeForNonNullObject() throws Exception
     {
-        DataType<?> dataType = DataType.of("test");
+        DataType<?> dataType = DataType.fromObject("test");
 
         assertThat(dataType, like(String.class, MimeType.ANY, null));
     }

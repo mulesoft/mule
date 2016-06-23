@@ -184,9 +184,11 @@ public abstract class AbstractFileSystem implements FileSystem
     {
         String presumedMimeType = mimetypesFileTypeMap.getContentType(attributes.getPath());
 
-        DataType<InputStream> newDataType = DataType.builder().type(InputStream.class).mimeType(presumedMimeType != null ? presumedMimeType : originalDataType.getMimeType())
-                                                                              .encoding(originalDataType.getEncoding())
-                                                                              .build();
+        DataType<InputStream> newDataType = DataType.builder()
+                                                    .type(InputStream.class)
+                                                    .mimeType(presumedMimeType != null ? presumedMimeType : originalDataType.getMimeType())
+                                                    .encoding(originalDataType.getEncoding())
+                                                    .build();
 
         return newDataType;
     }

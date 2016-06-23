@@ -14,6 +14,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -25,7 +26,6 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -56,7 +56,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     private String mimeType = MimeType.ANY;
     private String encoding = null;
 
-    private AtomicBoolean built = new AtomicBoolean(false);
+    private boolean built = false;
 
     public DefaultDataTypeBuilder()
     {
@@ -265,23 +265,29 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         validateAlreadyBuilt();
 
-        if (encoding != null && encoding.trim().length() > 0)
+        if (StringUtils.isNotEmpty(encoding))
         {
             // Checks that the encoding is valid and supported
             Charset.forName(encoding);
+            this.encoding = encoding;
         }
-
-        this.encoding = encoding;
 
         return this;
     }
 
     @Override
-    public DataTypeBuilder<T> from(T value)
+    public DataTypeBuilder<T> fromObject(T value)
     {
         validateAlreadyBuilt();
 
-        return (DataTypeBuilder<T>) type(value.getClass()).mimeType(getObjectMimeType(value));
+        if(value == null)
+        {
+            return (DataTypeBuilder<T>) type(Object.class).mimeType(MimeType.ANY);
+        }
+        else
+        {
+            return (DataTypeBuilder<T>) type(value.getClass()).mimeType(getObjectMimeType(value));
+        }
     }
 
     private static String getObjectMimeType(Object value)
@@ -307,11 +313,12 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     @Override
     public DataType<T> build()
     {
-        if (!built.compareAndSet(false, true))
+        if (built)
         {
             throwAlreadyBuilt();
         }
 
+        built = true;
         return dataTypeCache.getUnchecked(this);
     }
 
@@ -324,17 +331,19 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
                 itemType = getCollectionType((Class<? extends Collection<?>>) type);
             }
 
+            // TODO MULE-9958 provide a default encoding it the builder has null
             return new CollectionDataType(type, itemType, mimeType, encoding);
         }
         else
         {
+            // TODO MULE-9958 provide a default encoding it the builder has null
             return new SimpleDataType<>(type, mimeType, encoding);
         }
     }
 
     protected void validateAlreadyBuilt()
     {
-        if (built.get())
+        if (built)
         {
             throwAlreadyBuilt();
         }

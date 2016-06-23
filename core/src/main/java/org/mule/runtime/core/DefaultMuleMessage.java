@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROP
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -124,10 +125,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         else
         {
             // TODO MULE-9855: Make MuleMessage immutable
-            DataType<?> dataType = DataType.builder().type(payload.getClass())
-                                           .mimeType(previous.getDataType().getMimeType())
-                                           .encoding(previous.getDataType().getEncoding())
-                                           .build();
+            DataType<?> dataType = DataType.builder(previous.getDataType()).type(payload.getClass()).build();
 
             return dataType;
         }
@@ -748,7 +746,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     public void setMimeType(String mimeType)
     {
         assertAccess(WRITE);
-        setDataType(DataType.builder(getDataType()).mimeType(mimeType).encoding(getDataType().getEncoding()).build());
+        setDataType(DataType.builder(getDataType()).mimeType(mimeType).build());
     }
 
     /**
@@ -975,7 +973,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
                 {
                     try
                     {
-                        DataType source = DataType.of(theContent);
+                        DataType source = DataType.fromObject(theContent);
                         Transformer transformer = muleContext.getRegistry().lookupTransformer(source, DataType.BYTE_ARRAY);
                         if (transformer == null)
                         {

@@ -292,17 +292,19 @@ public class TransformationService
             throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());
         }
 
+        DataType<?> dataType = DataType.builder(resultType).type(message.getPayload().getClass()).build();
+
         // If no conversion is necessary, just return the payload as-is
-        if (resultType.isCompatibleWith(message.getDataType()))
+        if (resultType.isCompatibleWith(dataType))
         {
             return (T) message.getPayload();
         }
 
         // The transformer to execute on this message
-        Transformer transformer = muleContext.getRegistry().lookupTransformer(message.getDataType(), resultType);
+        Transformer transformer = muleContext.getRegistry().lookupTransformer(dataType, resultType);
         if (transformer == null)
         {
-            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(message.getDataType(), resultType));
+            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(dataType, resultType));
         }
 
         // Pass in the message itself

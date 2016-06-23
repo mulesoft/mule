@@ -140,7 +140,7 @@ public final class DefaultMuleSession implements MuleSession
             logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key).toString());
         }
 
-        properties.put(key, new TypedValue(value, DataType.of(value)));
+        properties.put(key, new TypedValue(value, DataType.fromObject(value)));
     }
 
     @Override
@@ -215,7 +215,7 @@ public final class DefaultMuleSession implements MuleSession
     @Override
     public void setProperty(String key, Serializable value)
     {
-        setProperty(key, value, DataType.of(value));
+        setProperty(key, value, DataType.fromObject(value));
     }
 
     @Override

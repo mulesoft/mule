@@ -63,7 +63,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     public void templateSimple()
     {
         final DataType<String> template = DataType.builder().type(String.class).mimeType("text/plain;charset=ASCII").build();
-        final DataType dataType = DataType.builder().from(template).build();
+        final DataType dataType = DataType.builder(template).build();
 
         assertThat(dataType, instanceOf(SimpleDataType.class));
         assertThat(dataType.getType(), is(equalTo(String.class)));
