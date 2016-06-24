@@ -33,6 +33,7 @@ public class EmailContent
      * The text body of the message content.
      */
     @Parameter
+    @Optional(defaultValue = "#[payload]")
     private String body;
 
     /**
@@ -41,7 +42,7 @@ public class EmailContent
      * The default value is "text/plain"
      */
     @Parameter
-    @Optional(defaultValue = "text/plain")
+    @Optional(defaultValue = TEXT)
     private String contentType;
 
     /**

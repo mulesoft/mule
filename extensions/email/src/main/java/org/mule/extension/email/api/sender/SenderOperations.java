@@ -60,7 +60,7 @@ public class SenderOperations
      */
     public void send(@Connection SenderConnection connection,
                      @UseConfig SMTPConfiguration configuration,
-                     @Optional(defaultValue = PAYLOAD) EmailContent content, // TODO: create a transformer from string to EmailContent when the sdk have support for it - MULE-9181.
+                     EmailContent content, // TODO: create a transformer from string to EmailContent when the sdk have support for it - MULE-9181.
                      @Optional(defaultValue = "[No Subject]") String subject,
                      List<String> toAddresses,
                      @Optional List<String> ccAddresses,
