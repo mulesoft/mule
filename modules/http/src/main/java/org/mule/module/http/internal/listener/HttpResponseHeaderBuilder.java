@@ -6,9 +6,11 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.http.api.HttpHeaders;
 import org.mule.util.CaseInsensitiveMapWrapper;
 
 import com.google.common.base.Supplier;
@@ -24,7 +26,7 @@ import java.util.List;
 public class HttpResponseHeaderBuilder
 {
 
-    private List<String> calculatedHeadersNames = Arrays.asList(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Names.CONTENT_LENGTH);
+    private List<String> calculatedHeadersNames = Arrays.asList(TRANSFER_ENCODING, CONTENT_LENGTH);
 
     Multimap<String, String> headers =
             Multimaps.newMultimap(new CaseInsensitiveMapWrapper<Collection<String>>(HashMap.class), new Supplier<Collection<String>>(){
@@ -82,17 +84,17 @@ public class HttpResponseHeaderBuilder
 
     public String getContentType()
     {
-        return getSimpleValue(HttpHeaders.Names.CONTENT_TYPE);
+        return getSimpleValue(CONTENT_TYPE);
     }
 
     public String getTransferEncoding()
     {
-        return getSimpleValue(HttpHeaders.Names.TRANSFER_ENCODING);
+        return getSimpleValue(TRANSFER_ENCODING);
     }
 
     public String getContentLength()
     {
-        return getSimpleValue(HttpHeaders.Names.CONTENT_LENGTH);
+        return getSimpleValue(CONTENT_LENGTH);
     }
 
     private String getSimpleValue(String header)
@@ -106,12 +108,13 @@ public class HttpResponseHeaderBuilder
 
     public void addContentType(String multipartFormData)
     {
-        addSimpleValue(HttpHeaders.Names.CONTENT_TYPE, multipartFormData);
+        addSimpleValue(CONTENT_TYPE, multipartFormData);
     }
 
-    public void addContentLenght(String calculatedContentLenght)
+    public void setContentLenght(String calculatedContentLenght)
     {
-        addSimpleValue(HttpHeaders.Names.CONTENT_LENGTH, calculatedContentLenght);
+        removeHeader(CONTENT_LENGTH);
+        addSimpleValue(CONTENT_LENGTH, calculatedContentLenght);
     }
 
     public Collection<String> getHeaderNames()
