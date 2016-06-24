@@ -1667,6 +1667,12 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.mule.tools.maven</groupId>
+                    <artifactId>mule-module-maven-plugin</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                    <extensions>true</extensions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -1696,6 +1702,19 @@
                     <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
                     <shortRevisionLength>8</shortRevisionLength>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>mule-module-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>analyze</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>analyze</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>
