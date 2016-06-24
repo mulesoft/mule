@@ -8,6 +8,8 @@ package org.mule.extension.socket;
 
 import static java.lang.String.format;
 import static org.mockito.Mockito.when;
+import static org.mule.extension.socket.SocketExtensionTestCase.POLL_DELAY_MILLIS;
+import static org.mule.extension.socket.SocketExtensionTestCase.TIMEOUT_MILLIS;
 import org.mule.module.socket.api.connection.ConnectionSettings;
 import org.mule.module.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.module.socket.api.connection.tcp.TcpRequesterConnection;
@@ -22,6 +24,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 
 import java.net.InetSocketAddress;
@@ -122,19 +126,16 @@ public class TcpReconnectionTestCase extends AbstractMuleTestCase
         expectedException.expectMessage("Socket is closed");
         listenerConnection.connect();
 
-        new Runnable()
-        {
-
-            @Override
-            public void run()
+        PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
+        prober.check(new JUnitLambdaProbe(() -> {
+            if (listenerConnection.validate().isValid())
             {
-                // disconnect while blocked in the accept
                 listenerConnection.disconnect();
+                return true;
             }
-        }.run();
+            return false;
+        }));
 
         SocketWorker worker = listenerConnection.listen(muleContext, handler);
-
     }
-
 }
