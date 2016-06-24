@@ -18,6 +18,10 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOW
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfo;
+import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfoProvider;
+import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
+import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
@@ -35,15 +39,20 @@ import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProc
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.config.ConfigResource;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+
+import com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
-import java.util.ServiceLoader;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
@@ -88,7 +97,9 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     private Resource[] springResources;
     private BeanDefinitionFactory beanDefinitionFactory;
     private MuleXmlBeanDefinitionReader beanDefinitionReader;
+    private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
     private boolean useNewParsingMechanism = true;
+    protected final XmlApplicationParser xmlApplicationParser;
 
     /**
      * Parses configuration files creating a spring ApplicationContext which is used
@@ -132,13 +143,12 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         this.springResources = springResources;
         this.optionalObjectsController = optionalObjectsController;
 
-        ServiceLoader<ComponentBuildingDefinitionProvider> serviceLoader = ServiceLoader.load(ComponentBuildingDefinitionProvider.class);
-        serviceLoader.forEach(componentBuildingDefinitionProvider -> {
+        serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class).forEach(componentBuildingDefinitionProvider -> {
             componentBuildingDefinitionProvider.init(muleContext);
-            componentBuildingDefinitionProvider.getComponentBuildingDefinitions().stream().forEach(componentBuildingDefinition -> {
-                this.componentBuildingDefinitionRegistry.register(componentBuildingDefinition);
-            });
+            componentBuildingDefinitionProvider.getComponentBuildingDefinitions().stream().forEach(componentBuildingDefinitionRegistry::register);
         });
+
+        xmlApplicationParser = new XmlApplicationParser(new XmlServiceRegistry(serviceRegistry, muleContext));
 
         this.beanDefinitionFactory = new BeanDefinitionFactory(componentBuildingDefinitionRegistry);
 
@@ -153,7 +163,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
             useNewParsingMechanism = false;
             return;
         }
-        applicationModel.executeOnEveryComponentTree( componentModel -> {
+        applicationModel.executeOnEveryComponentTree(componentModel -> {
             Optional<ComponentIdentifier> parentIdentifierOptional = ofNullable(componentModel.getParent())
                     .flatMap(parentComponentModel ->
                                      Optional.ofNullable(parentComponentModel.getIdentifier())
@@ -173,7 +183,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
             for (Resource springResource : artifactConfigResources)
             {
                 Document document = getXmlDocument(springResource);
-                ConfigLine mainConfigLine = new XmlApplicationParser().parse(document.getDocumentElement()).get();
+                ConfigLine mainConfigLine = xmlApplicationParser.parse(document.getDocumentElement()).get();
                 applicationConfigBuilder.addConfigFile(new ConfigFile(getFilename(springResource), asList(mainConfigLine)));
             }
             applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
@@ -343,7 +353,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
     protected MuleBeanDefinitionDocumentReader createBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory)
     {
-        return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory);
+        return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser);
     }
 
     protected MuleDocumentLoader createLoader()
@@ -425,5 +435,44 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     public static ThreadLocal<MuleContext> getCurrentMuleContext()
     {
         return currentMuleContext;
+    }
+
+    private class XmlServiceRegistry implements ServiceRegistry
+    {
+
+        private final ServiceRegistry delegate;
+        private final XmlNamespaceInfoProvider extensionsXmlInfoProvider;
+
+        public XmlServiceRegistry(ServiceRegistry delegate, MuleContext muleContext)
+        {
+            this.delegate = delegate;
+            List<XmlNamespaceInfo> extensionNamespaces = muleContext.getExtensionManager().getExtensions().stream()
+                    .map(ext -> {
+                        XmlModelProperty xmlModelProperty = ext.getModelProperty(XmlModelProperty.class).orElse(null);
+                        return xmlModelProperty != null ? new StaticXmlNamespaceInfo(xmlModelProperty.getNamespaceUri(), xmlModelProperty.getNamespace()) : null;
+                    })
+                    .filter(info -> info != null)
+                    .collect(new ImmutableListCollector<>());
+
+            extensionsXmlInfoProvider = new StaticXmlNamespaceInfoProvider(extensionNamespaces);
+        }
+
+        @Override
+        public <T> Collection<T> lookupProviders(Class<T> providerClass, ClassLoader loader)
+        {
+            Collection<T> providers = delegate.lookupProviders(providerClass, loader);
+            if (XmlNamespaceInfoProvider.class.equals(providerClass))
+            {
+                providers = ImmutableList.<T>builder().addAll(providers).add((T) extensionsXmlInfoProvider).build();
+            }
+
+            return providers;
+        }
+
+        @Override
+        public <T> Collection<T> lookupProviders(Class<T> providerClass)
+        {
+            return lookupProviders(providerClass, Thread.currentThread().getContextClassLoader());
+        }
     }
 }

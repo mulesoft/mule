@@ -19,12 +19,12 @@ import java.util.Map;
 
 /**
  * A {@link ValueResolver} which is based on associating a set of
- * {@link ParameterModel parameterModels} -&gt; {@link ValueResolver} pairs. The result
+ * keys -&gt; {@link ValueResolver} pairs. The result
  * of evaluating this resolver is a {@link ResolverSetResult}.
  * <p/>
  * The general purpose of this class is to repeatedly evaluate a set of {@link ValueResolver}s
  * which results are to be used in the construction of an object, so that the structure
- * of such can be described only once (by the set of {@link ParameterModel parameterModels} and {@link ValueResolver}s
+ * of such can be described only once (by the set of keys and {@link ValueResolver}s
  * but evaluated many times. With this goal in mind is that the return value of this resolver
  * will always be a {@link ResolverSetResult} which then can be used by a {@link ObjectBuilder}
  * to generate an actual object.
@@ -36,7 +36,7 @@ import java.util.Map;
 public class ResolverSet implements ValueResolver<ResolverSetResult>
 {
 
-    private Map<ParameterModel, ValueResolver> resolvers = new LinkedHashMap<>();
+    private Map<String, ValueResolver> resolvers = new LinkedHashMap<>();
     private boolean dynamic = false;
 
     /**
@@ -44,19 +44,19 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>
      * If such {@code parameter} was already added, then the associated {@code resolver}
      * is replaced.
      *
-     * @param parameterModel a not {@code null} {@link ParameterModel}
-     * @param resolver  a not {@code null} {@link ValueResolver}
+     * @param key      a not {@code null} {@link ParameterModel}
+     * @param resolver a not {@code null} {@link ValueResolver}
      * @return this resolver set to allow chaining
      * @throws IllegalArgumentException is either {@code parameter} or {@code resolver} are {@code null}
      */
-    public ResolverSet add(ParameterModel parameterModel, ValueResolver resolver)
+    public ResolverSet add(String key, ValueResolver resolver)
     {
-        checkArgument(parameterModel != null, "parameter cannot be null");
+        checkArgument(key != null, "key cannot be null");
         checkArgument(resolver != null, "resolver cannot be null");
 
-        if (resolvers.put(parameterModel, resolver) != null)
+        if (resolvers.put(key, resolver) != null)
         {
-            throw new IllegalStateException("A value was already given for parameter " + parameterModel.getName());
+            throw new IllegalStateException("A value was already given for key " + key);
         }
 
         if (resolver.isDynamic())
@@ -89,15 +89,26 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>
     public ResolverSetResult resolve(MuleEvent event) throws MuleException
     {
         ResolverSetResult.Builder builder = ResolverSetResult.newBuilder();
-        for (Map.Entry<ParameterModel, ValueResolver> entry : resolvers.entrySet())
+        for (Map.Entry<String, ValueResolver> entry : resolvers.entrySet())
         {
-            builder.add(entry.getKey(), entry.getValue().resolve(event));
+            builder.add(entry.getKey(), resolveValue(entry.getValue(), event));
         }
 
         return builder.build();
     }
 
-    public Map<ParameterModel, ValueResolver> getResolvers()
+    private Object resolveValue(ValueResolver<?> resolver, MuleEvent event) throws MuleException
+    {
+        Object value = resolver.resolve(event);
+        if (value instanceof ValueResolver)
+        {
+            return resolveValue((ValueResolver<?>) value, event);
+        }
+
+        return value;
+    }
+
+    public Map<String, ValueResolver> getResolvers()
     {
         return ImmutableMap.copyOf(resolvers);
     }

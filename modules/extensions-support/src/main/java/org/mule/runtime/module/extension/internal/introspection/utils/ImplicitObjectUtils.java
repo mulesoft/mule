@@ -59,7 +59,7 @@ public final class ImplicitObjectUtils
                     valueResolver = new StaticValueResolver<>(defaultValue);
                 }
 
-                resolverSet.add(parameterModel, valueResolver);
+                resolverSet.add(parameterModel.getName(), valueResolver);
             }
         }
 

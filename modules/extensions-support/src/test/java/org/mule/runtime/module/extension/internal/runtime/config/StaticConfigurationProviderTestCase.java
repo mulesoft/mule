@@ -12,10 +12,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -74,9 +72,9 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
 
         when(operationContext.getEvent()).thenReturn(event);
 
-        Map<ParameterModel, ValueResolver> parameters = new HashMap<>();
-        parameters.put(getParameter("myName", String.class), new StaticValueResolver(MY_NAME));
-        parameters.put(getParameter("age", Integer.class), new StaticValueResolver(AGE));
+        Map<String, ValueResolver> parameters = new HashMap<>();
+        parameters.put("myName", new StaticValueResolver(MY_NAME));
+        parameters.put("age", new StaticValueResolver(AGE));
         when(resolverSet.getResolvers()).thenReturn(parameters);
         when(resolverSet.isDynamic()).thenReturn(false);
 

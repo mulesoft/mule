@@ -14,7 +14,9 @@ import org.mule.runtime.extension.api.resources.GeneratedResource;
  * Generates a Spring bundle file which links the extension's namespace to its schema file
  *
  * @since 4.0
+ * @deprecated Will be removed as soon as MULE-9865 is fixed. Do not use.
  */
+@Deprecated
 public class SpringSchemaBundleResourceFactory extends AbstractXmlResourceFactory
 {
 

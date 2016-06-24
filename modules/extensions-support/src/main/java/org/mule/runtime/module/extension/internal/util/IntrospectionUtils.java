@@ -14,15 +14,12 @@ import static org.mule.metadata.java.JavaTypeLoader.JAVA;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isObjectType;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
 import static org.reflections.ReflectionUtils.withName;
-import static org.reflections.ReflectionUtils.withTypeAssignableTo;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -43,6 +40,7 @@ import org.mule.runtime.extension.api.annotation.param.Ignore;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
+import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
@@ -51,6 +49,8 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
+import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
@@ -214,27 +214,32 @@ public final class IntrospectionUtils
 
     public static Field getField(Class<?> clazz, ParameterModel parameterModel)
     {
-        return getField(clazz, getMemberName(parameterModel, parameterModel.getName()), getType(parameterModel.getType()));
+        return getField(clazz, getMemberName(parameterModel, parameterModel.getName()));
     }
 
     public static Field getField(Class<?> clazz, ParameterDeclaration parameterDeclaration)
     {
-        return getField(clazz, getMemberName(parameterDeclaration, parameterDeclaration.getName()), getType(parameterDeclaration.getType()));
+        return getField(clazz, MuleExtensionAnnotationParser.getMemberName(parameterDeclaration, parameterDeclaration.getName()));
     }
 
-    public static Field getField(Class<?> clazz, String name, Class<?> type)
+    public static Field getField(Class<?> clazz, String name)
     {
-        Collection<Field> candidates = getAllFields(clazz, withName(name), withTypeAssignableTo(type));
+        Collection<Field> candidates = getAllFields(clazz, withName(name));
         return CollectionUtils.isEmpty(candidates) ? null : candidates.iterator().next();
     }
 
-    public static Field getFieldByAlias(Class<?> clazz, String alias, Class<?> type)
+    public static Field getFieldByAlias(Class<?> clazz, String alias)
     {
-        Collection<Field> candidates = getAllFields(clazz, withAnnotation(Alias.class), withTypeAssignableTo(type));
+        Collection<Field> candidates = getAllFields(clazz, withAnnotation(Alias.class));
         return candidates.stream()
                 .filter(f -> alias.equals(f.getAnnotation(Alias.class).value()))
                 .findFirst()
-                .orElseGet(() -> getField(clazz, alias, type));
+                .orElseGet(() -> getField(clazz, alias));
+    }
+
+    public static String getMemberName(EnrichableModel enrichableModel, String defaultName)
+    {
+        return enrichableModel.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName()).orElse(defaultName);
     }
 
     public static boolean hasDefaultConstructor(Class<?> clazz)
@@ -424,8 +429,8 @@ public final class IntrospectionUtils
         {
             PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(extensionType).getPropertyDescriptors();
             return stream(propertyDescriptors)
-                    .filter(p -> getField(extensionType, p.getName(), p.getPropertyType()) != null)
-                    .map(p -> getField(extensionType, p.getName(), p.getPropertyType()))
+                    .map(p -> getField(extensionType, p.getName()))
+                    .filter(field -> field != null)
                     .collect(toSet());
         }
         catch (IntrospectionException e)

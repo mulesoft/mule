@@ -10,16 +10,15 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.processor.chain.NestedProcessorChain;
 
 /**
- * A {@link ValueResolver} which wraps the given
+ * An {@link AbstractNestedProcessorValueResolver} which wraps the given
  * {@link MuleEvent} in a {@link NestedProcessor}.
  * This resolver returns new instances per every invocation
  *
  * @since 3.7.0
  */
-public final class NestedProcessorValueResolver implements ValueResolver<NestedProcessor>
+public final class NestedProcessorValueResolver extends AbstractNestedProcessorValueResolver<NestedProcessor>
 {
 
     private final MessageProcessor messageProcessor;
@@ -39,15 +38,6 @@ public final class NestedProcessorValueResolver implements ValueResolver<NestedP
     @Override
     public NestedProcessor resolve(MuleEvent event) throws MuleException
     {
-        return new NestedProcessorChain(event, event.getMuleContext(), messageProcessor);
-    }
-
-    /**
-     * @return {@value true}
-     */
-    @Override
-    public boolean isDynamic()
-    {
-        return true;
+        return toNestedProcessor(messageProcessor, event);
     }
 }

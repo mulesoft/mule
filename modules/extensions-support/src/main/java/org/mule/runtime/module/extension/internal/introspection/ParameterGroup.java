@@ -9,15 +9,15 @@ package org.mule.runtime.module.extension.internal.introspection;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ModelProperty;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -55,7 +55,7 @@ public class ParameterGroup implements EnrichableModel
      * A {@link Map} in which the keys are parameter names
      * and the values are their corresponding setter methods
      */
-    private final Map<String, Field> parameters = new HashMap<>();
+    private final Set<Field> parameters = new HashSet<>();
 
     /**
      * The model properties per the {@link EnrichableModel} interface
@@ -76,13 +76,12 @@ public class ParameterGroup implements EnrichableModel
     /**
      * Adds a parameter to the group
      *
-     * @param name  the name of the parameter
      * @param field the parameter's {@link Field}
      * @return {@code this}
      */
-    public ParameterGroup addParameter(String name, Field field)
+    public ParameterGroup addParameter(Field field)
     {
-        parameters.put(name, field);
+        parameters.add(field);
         return this;
     }
 
@@ -96,9 +95,9 @@ public class ParameterGroup implements EnrichableModel
         return field;
     }
 
-    public Map<String, Field> getParameters()
+    public Set<Field> getParameters()
     {
-        return ImmutableMap.copyOf(parameters);
+        return ImmutableSet.copyOf(parameters);
     }
 
     /**

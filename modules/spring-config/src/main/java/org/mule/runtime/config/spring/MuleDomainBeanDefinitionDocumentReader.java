@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.config.spring;
 
+import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.parsers.specific.DomainElementsValidator;
-
-import org.springframework.beans.factory.xml.XmlReaderContext;
 
 /**
  * Allows us to hook in our own Hierarchical Parser delegate. this enables the
@@ -20,9 +19,9 @@ import org.springframework.beans.factory.xml.XmlReaderContext;
 public class MuleDomainBeanDefinitionDocumentReader extends MuleBeanDefinitionDocumentReader
 {
 
-    public MuleDomainBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory)
+    public MuleDomainBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory, XmlApplicationParser xmlApplicationParser)
     {
-        super(beanDefinitionFactory);
+        super(beanDefinitionFactory, xmlApplicationParser);
     }
 
     @Override

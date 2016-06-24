@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.config.spring.dsl.api.xml;
 
+import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
+
 import java.util.Collection;
 
 /**
  * Mule XML extensions needs to define a {@code} XmlNamespaceProvider in which they define
  * the extensions namespace name and the extensions xml namespace uri prefix.
  * <p>
- * The extensions namespace must much the namespace provided at the {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider}.
+ * The extensions namespace must much the namespace provided at the {@link ComponentBuildingDefinitionProvider}.
  *
  * @since 4.0
  */

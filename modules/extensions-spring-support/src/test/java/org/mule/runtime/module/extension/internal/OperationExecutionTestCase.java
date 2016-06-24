@@ -186,7 +186,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
                           "bye bye, Frank\n" +
                           "bye bye, Nazi dudes\n";
 
-        assertThat(expected, is(event.getMessageAsString()));
+        assertThat(event.getMessageAsString(), is(expected));
     }
 
     @Test
@@ -321,27 +321,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
 
         List<String> result = weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
         assertThat(event.getMessage().getPayload(), is(result));
-    }
-
-    @Test
-    public void operationWithListPojoAsAttributeOverridesDefault() throws Exception
-    {
-        List<Ricin> ricins = (List<Ricin>) flowRunner("killWithRicinAsAttribute").withPayload(EMPTY)
-                                                                                    .run().getMessage().getPayload();
-
-        assertThat(ricins, hasSize(2));
-        assertThat(ricins.get(0), instanceOf(Ricin.class));
-        assertThat(ricins.get(1), instanceOf(Ricin.class));
-
-        Ricin ricin1 = ricins.get(0);
-        assertThat(ricin1.getMicrogramsPerKilo(), is(20L));
-        assertThat(ricin1.getDestination().getVictim(), is("Lidia"));
-        assertThat(ricin1.getDestination().getAddress(), is("Stevia coffe shop"));
-
-        Ricin ricin2 = ricins.get(1);
-        assertThat(ricin2.getMicrogramsPerKilo(), is(22L));
-        assertThat(ricin2.getDestination().getVictim(), is("Gustavo Fring"));
-        assertThat(ricin2.getDestination().getAddress(), is("pollos hermanos"));
     }
 
     @Test

@@ -35,7 +35,6 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
-import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasModelProperties;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
@@ -88,11 +87,6 @@ public final class MuleExtensionAnnotationParser
     public static String getMemberName(BaseDeclaration<?> declaration, String defaultName)
     {
         return declaration.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName()).orElse(defaultName);
-    }
-
-    public static String getMemberName(EnrichableModel enrichableModel, String defaultName)
-    {
-        return enrichableModel.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName()).orElse(defaultName);
     }
 
     public static Extension getExtension(Class<?> extensionType)

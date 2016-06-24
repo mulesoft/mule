@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.config;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.core.time.Time;
+
+import java.util.Optional;
 
 /**
  * Default implementation of {@link ExtensionConfig}
@@ -15,16 +19,16 @@ import org.mule.runtime.core.time.Time;
  */
 public final class DefaultExtensionConfig implements ExtensionConfig
 {
-    private Time dynamicConfigExpirationFrequency;
+    private Optional<Time> dynamicConfigExpirationFrequency = empty();
 
     @Override
-    public Time getDynamicConfigExpirationFrequency()
+    public Optional<Time> getDynamicConfigExpirationFrequency()
     {
         return dynamicConfigExpirationFrequency;
     }
 
     public void setDynamicConfigExpirationFrequency(Time dynamicConfigExpirationFrequency)
     {
-        this.dynamicConfigExpirationFrequency = dynamicConfigExpirationFrequency;
+        this.dynamicConfigExpirationFrequency = ofNullable(dynamicConfigExpirationFrequency);
     }
 }

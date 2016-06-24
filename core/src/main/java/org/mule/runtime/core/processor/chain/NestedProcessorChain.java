@@ -118,5 +118,4 @@ public class NestedProcessorChain implements NestedProcessor, MuleContextAware
         }
         return chain.process(muleEvent).getMessage().getPayload();
     }
-
 }

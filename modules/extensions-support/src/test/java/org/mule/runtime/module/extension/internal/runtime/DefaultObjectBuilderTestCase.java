@@ -58,9 +58,9 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase
     {
         builder = new DefaultObjectBuilder(PROTOTYPE_CLASS);
 
-        nameField = getField(PROTOTYPE_CLASS, "name", String.class);
-        ageField = getField(PROTOTYPE_CLASS, "age", Integer.class);
-        lifetimeInfoField = getField(PROTOTYPE_CLASS, "lifetimeInfo", LifetimeInfo.class);
+        nameField = getField(PROTOTYPE_CLASS, "name");
+        ageField = getField(PROTOTYPE_CLASS, "age");
+        lifetimeInfoField = getField(PROTOTYPE_CLASS, "lifetimeInfo");
     }
 
     @Test

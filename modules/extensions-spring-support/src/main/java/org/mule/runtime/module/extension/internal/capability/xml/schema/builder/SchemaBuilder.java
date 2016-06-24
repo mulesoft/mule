@@ -12,6 +12,10 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.sanitizeName;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.singularize;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
@@ -22,9 +26,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiableWithParameters;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
@@ -60,6 +61,7 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.utils.MetadataTypeUtils;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.config.spring.dsl.api.xml.NameUtils;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.util.StringUtils;
@@ -108,7 +110,6 @@ import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingC
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-import org.mule.runtime.module.extension.internal.util.NameUtils;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
 import com.google.common.collect.ImmutableMap;
@@ -609,7 +610,7 @@ public final class SchemaBuilder
         name = hyphenize(name);
 
         BigInteger minOccurs = required ? ONE : ZERO;
-        String collectionName = hyphenize(NameUtils.singularize(name));
+        String collectionName = hyphenize(singularize(name));
         LocalComplexType collectionComplexType = generateCollectionComplexType(collectionName, metadataType);
 
         TopLevelElement collectionElement = createTopLevelElement(name, minOccurs, "1");
@@ -673,7 +674,7 @@ public final class SchemaBuilder
         mapComplexType.setSequence(mapEntrySequence);
 
         final TopLevelElement mapEntryElement = new TopLevelElement();
-        mapEntryElement.setName(NameUtils.singularize(name));
+        mapEntryElement.setName(singularize(name));
         mapEntryElement.setMinOccurs(ZERO);
         mapEntryElement.setMaxOccurs(SchemaConstants.UNBOUNDED);
 
@@ -713,7 +714,7 @@ public final class SchemaBuilder
                 MetadataType itemType = arrayType.getType();
                 itemComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, itemType, true, REQUIRED));
 
-                String itemName = hyphenize(NameUtils.singularize(name)).concat("-item");
+                String itemName = hyphenize(singularize(name)).concat("-item");
                 TopLevelElement itemElement = createTopLevelElement(itemName, ZERO, SchemaConstants.UNBOUNDED, itemComplexType);
                 entryComplexType.getSequence().getParticle().add(objectFactory.createElement(itemElement));
             }
@@ -851,10 +852,11 @@ public final class SchemaBuilder
             public void visitArrayType(ArrayType arrayType)
             {
                 MetadataType genericType = arrayType.getType();
-                forceOptional = shouldForceOptional(genericType);
+                final boolean supportsChildElement = shouldGenerateDataTypeChildElements(genericType, expressionSupport);
+                forceOptional = supportsChildElement || shouldForceOptional(genericType);
 
                 defaultVisit(arrayType);
-                if (shouldGenerateDataTypeChildElements(genericType, expressionSupport))
+                if (supportsChildElement)
                 {
                     generateCollectionElement(all, name, description, arrayType, isRequired(true, required));
                 }

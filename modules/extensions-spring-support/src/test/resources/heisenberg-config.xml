@@ -25,7 +25,6 @@
                        firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
                        weaponTypeFunction="#[weaponType]"
-                       monthlyIncomes="monthlyIncomes"
                        literalExpressionWithoutDefault="#[money]">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
@@ -93,7 +92,6 @@
                        candidateDoors="${candidateDoors}"
                        firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
-                       monthlyIncomes="${monthlyIncomes}"
                        deathsBySeasons="${deathsBySeasons}"
                        labeledRicin="${labeledRicin}"
                        literalExpressionWithoutDefault="#[money]">
@@ -192,7 +190,7 @@
                        candidateDoors="#[app.registry.candidateDoors]"
                        enemies="#[app.registry.enemies]"
                        ricinPacks="#[app.registry.ricinPacks]"
-                       nextDoor="#[app.registry.door]"
+                       nextDoor="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDoor()]"
                        firstEndevour="Gray Matter Technologies"
                        labAddress="#['Pollos Hermanos']"
                        monthlyIncomes="#[app.registry.monthlyIncomes]"

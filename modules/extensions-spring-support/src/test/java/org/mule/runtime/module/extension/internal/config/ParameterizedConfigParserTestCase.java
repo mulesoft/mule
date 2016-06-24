@@ -66,10 +66,6 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     private static final int P2P_QUANTITY = 25;
     private static final String HANK = "Hank";
     private static final String MONEY = "1000000";
-    private static final String SKYLER = "Skyler";
-    private static final String SAUL = "Saul";
-    private static final String WHITE_ADDRESS = "308 Negra Arroyo Lane";
-    private static final String SHOPPING_MALL = "Shopping Mall";
     private static final String LAB_ADDRESS = "Pollos Hermanos";
     private static final String FIRST_ENDEVOUR = "Gray Matter Technologies";
     private static final String LITERAL_EXPRESSION = "#[money]";
@@ -286,6 +282,11 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         calendar.set(YEAR, DEATH_YEAR);
 
         return calendar;
+    }
+
+    public static KnockeableDoor getDoor() throws Exception
+    {
+        return muleContext.getRegistry().lookupObject("door");
     }
 
     private void assertLabeledRicin(HeisenbergExtension heisenberg)

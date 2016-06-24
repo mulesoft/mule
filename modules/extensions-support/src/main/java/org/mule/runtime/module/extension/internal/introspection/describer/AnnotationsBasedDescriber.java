@@ -477,9 +477,7 @@ public final class AnnotationsBasedDescriber implements Describer
                 {
                     ParameterDeclaration parameter = inheritGroupParentDisplayProperties(parent, field, group, descriptor);
 
-                    group.addParameter(parameter.getName(), getField(field.getType(),
-                                                                     getMemberName(parameter, parameter.getName()),
-                                                                     getType(parameter.getType())));
+                    group.addParameter(getField(field.getType(), getMemberName(parameter, parameter.getName())));
                 }
 
                 List<ParameterGroup> childGroups = declareConfigurationParametersGroups(field.getType(), parameterDeclarer, group);

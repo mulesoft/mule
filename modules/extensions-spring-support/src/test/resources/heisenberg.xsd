@@ -197,7 +197,7 @@
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="required" name="monthlyIncomes"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="monthlyIncomes"></xs:attribute>
                     <xs:attribute type="mule:expressionBoolean" use="required" name="cancer"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="recipe"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="deathsBySeasons"></xs:attribute>

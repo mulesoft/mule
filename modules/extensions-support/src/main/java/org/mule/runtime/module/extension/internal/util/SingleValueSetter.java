@@ -23,20 +23,20 @@ public final class SingleValueSetter implements ValueSetter
 {
 
     /**
-     * The {@link ParameterModel} which this instance sets
+     * The name of the {@link ParameterModel} which this instance sets
      */
-    private final ParameterModel parameterModel;
+    private final String parameterName;
 
     private final FieldSetter<Object, Object> fieldSetter;
 
-    public SingleValueSetter(ParameterModel parameterModel, Field field)
+    public SingleValueSetter(String parameterName, Field field)
     {
-        this.parameterModel = parameterModel;
+        this.parameterName = parameterName;
         this.fieldSetter = new FieldSetter<>(field);
     }
 
     /**
-     * Sets the {@code resolverSetResult} value for the {@link #parameterModel}
+     * Sets the {@code resolverSetResult} value for the {@link #parameterName}
      * into the {@link Field} supplied in the constructor
      *
      * @param target            the object on which the value is being set
@@ -45,7 +45,7 @@ public final class SingleValueSetter implements ValueSetter
     @Override
     public void set(Object target, ResolverSetResult resolverSetResult)
     {
-        Object value = resolverSetResult.get(parameterModel);
+        Object value = resolverSetResult.get(parameterName);
         if (value != null)
         {
             fieldSetter.set(target, value);

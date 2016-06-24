@@ -41,8 +41,8 @@ public class SingleValueResolverTestCase extends AbstractMuleTestCase
     @Before
     public void before()
     {
-        when(result.get(parameterModel)).thenReturn(NAME);
-        valueSetter = new SingleValueSetter(parameterModel, getField(PersonalInfo.class, "name", String.class));
+        when(result.get(NAME)).thenReturn(NAME);
+        valueSetter = new SingleValueSetter(NAME, getField(PersonalInfo.class, "name"));
     }
 
     @Test
