@@ -13,6 +13,7 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
@@ -20,10 +21,13 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,7 +63,10 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase
         when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
         when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
         when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
+        when(validParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+        when(invalidParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
         when(operationModel.getName()).thenReturn("dummyOperation");
+        when(extensionModel.getName()).thenReturn("extensionModel");
     }
 
     @Test
@@ -147,6 +154,17 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase
         validator.validate(extensionModel);
     }
 
+    @Test(expected = IllegalParameterModelDefinitionException.class)
+    public void invalidModelDueToNonInstantiableParameterGroup()
+    {
+        ParameterGroup child = new ParameterGroup(Serializable.class, getField(InvalidPojoParameterGroup.class, "nonInstantiableField", Serializable.class));
+        when(invalidParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.of(new ParameterGroupModelProperty(asList(child))));
+        when(invalidParameterModel.getType()).thenReturn(toMetadataType(Serializable.class));
+        when(invalidParameterModel.getName()).thenReturn("nonInstantiableField");
+        when(operationModel.getParameterModels()).thenReturn(asList(invalidParameterModel));
+        validator.validate(extensionModel);
+    }
+
     private static class InvalidPojo
     {
 
@@ -175,4 +193,12 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase
         @Parameter
         private InvalidPojo invalidPojo;
     }
+
+    public static class InvalidPojoParameterGroup
+    {
+
+        @org.mule.runtime.extension.api.annotation.ParameterGroup
+        private Serializable nonInstantiableField;
+    }
+
 }
