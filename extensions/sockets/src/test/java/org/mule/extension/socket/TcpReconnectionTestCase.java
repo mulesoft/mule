@@ -46,26 +46,25 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class TcpReconnectionTestCase extends AbstractMuleTestCase
 {
 
-    @Inject
-    MuleContext muleContext;
-
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
+    @Inject
+    private MuleContext muleContext;
+
     @Mock
     private ConnectionSettings connectionSettings;
-
-    private TcpServerSocketProperties serverSocketProperties;
-    private TcpClientSocketProperties clientSocketProperties;
 
     @Mock
     private MessageHandler handler;
 
-    private TcpListenerConnection listenerConnection;
+    private TcpServerSocketProperties serverSocketProperties;
+    private TcpClientSocketProperties clientSocketProperties;
 
+    private TcpListenerConnection listenerConnection;
     private TcpRequesterConnection requesterConnection;
 
     private String host;

@@ -66,6 +66,12 @@
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
