@@ -17,9 +17,6 @@
 
     <sockets:listener-config name="tcp-listener">
         <sockets:tcp-listener-connection host="localhost" port="${port}" protocol="myProtocolRef">
-            <sockets:protocol>
-                <sockets:safe-protocol/>
-            </sockets:protocol>
         </sockets:tcp-listener-connection>
     </sockets:listener-config>
 
