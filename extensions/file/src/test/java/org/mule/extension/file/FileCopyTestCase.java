@@ -10,12 +10,15 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class FileCopyTestCase extends FileConnectorTestCase
 {
@@ -23,6 +26,9 @@ public class FileCopyTestCase extends FileConnectorTestCase
     private static final String SOURCE_FILE_NAME = "test.txt";
     private static final String SOURCE_DIRECTORY_NAME = "source";
     private static final String EXISTING_CONTENT = "I was here first!";
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     protected String sourcePath;
 
@@ -48,6 +54,15 @@ public class FileCopyTestCase extends FileConnectorTestCase
         doExecute(target, false, false);
 
         assertCopy(format("%s/%s", target, SOURCE_FILE_NAME));
+    }
+
+    @Test
+    public void nullTarget() throws Exception
+    {
+        expectedException.expect(MessagingException.class);
+        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+
+        doExecute(null, false, false);
     }
 
     @Test

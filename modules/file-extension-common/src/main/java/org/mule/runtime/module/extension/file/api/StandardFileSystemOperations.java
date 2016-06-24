@@ -226,8 +226,17 @@ public class StandardFileSystemOperations
                      @Optional(defaultValue = "true") boolean createParentDirectories,
                      MuleEvent event)
     {
+        validateTargetPath(targetPath);
         sourcePath = resolvePath(sourcePath, event, "sourcePath");
         fileSystem.copy(sourcePath, targetPath, overwrite, createParentDirectories, event);
+    }
+
+    private void validateTargetPath(String targetPath)
+    {
+        if (StringUtils.isBlank(targetPath))
+        {
+            throw new IllegalArgumentException("target path cannot be null nor blank");
+        }
     }
 
     /**
@@ -272,6 +281,7 @@ public class StandardFileSystemOperations
                      @Optional(defaultValue = "true") boolean createParentDirectories,
                      MuleEvent event)
     {
+        validateTargetPath(targetPath);
         sourcePath = resolvePath(sourcePath, event, "sourcePath");
         fileSystem.move(sourcePath, targetPath, overwrite, createParentDirectories);
     }
