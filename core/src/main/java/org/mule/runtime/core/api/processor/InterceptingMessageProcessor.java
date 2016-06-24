@@ -20,6 +20,13 @@ import org.mule.runtime.core.api.source.MessageSource;
  * 
  * @since 3.0
  */
-public interface InterceptingMessageProcessor extends MessageProcessor, MessageSource
+public interface InterceptingMessageProcessor extends MessageProcessor
 {
+
+    /**
+     * Set the MessageProcessor listener that will be invoked
+     * when a message is received or generated.
+     */
+    void setListener(MessageProcessor listener);
+
 }
