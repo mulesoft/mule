@@ -7,6 +7,8 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static java.lang.String.format;
+import static java.lang.System.getProperties;
+import static java.lang.System.getenv;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -25,6 +27,8 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -95,6 +100,7 @@ public class ApplicationModel
     public static final String HTTP_NAMESPACE = "http";
     public static final String BATCH_NAMESPACE = "batch";
     public static final String PARSER_TEST_NAMESPACE = "parsers-test";
+    public static final String PROPERTY_PLACEHOLDER_ELEMENT = "property-placeholder";
 
     public static final ComponentIdentifier CHOICE_EXCEPTION_STRATEGY_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CHOICE_EXCEPTION_STRATEGY).build();
     public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXCEPTION_STRATEGY_REFERENCE_ELEMENT).build();
@@ -109,6 +115,7 @@ public class ApplicationModel
     public static final ComponentIdentifier TRANSFORMER_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMER_REFERENCE_ELEMENT).build();
     public static final ComponentIdentifier QUEUE_STORE_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(QUEUE_STORE).build();
     public static final ComponentIdentifier CONFIGURATION_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CONFIGURATION_ELEMENT).build();
+    public static final ComponentIdentifier SPRING_PROPERTY_PLACEHOLDER_IDENTIFIER = new ComponentIdentifier.Builder().withNamespace(SPRING_CONTEXT_NAMESPACE).withName(PROPERTY_PLACEHOLDER_ELEMENT).build();
 
     private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList = ImmutableSet.<ComponentIdentifier>builder()
             .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("flow-ref").build())
@@ -164,7 +171,7 @@ public class ApplicationModel
     private List<ComponentModel> muleComponentModels = new LinkedList<>();
     private List<ComponentModel> springComponentModels = new LinkedList<>();
     private PropertyPlaceholderHelper propertyPlaceholderHelper = new PropertyPlaceholderHelper("${", "}");
-    private SystemPropertyPlaceholderResolver systemPropertyPlaceholderResolver = new SystemPropertyPlaceholderResolver("mule config property resolver");
+    private Properties applicationProperties;
 
     /**
      * Creates an {code ApplicationModel} from a {@link ApplicationConfig}.
@@ -176,8 +183,38 @@ public class ApplicationModel
      */
     public ApplicationModel(ApplicationConfig applicationConfig) throws Exception
     {
+        configurePropertyPlaceholderResolver(applicationConfig);
         convertConfigFileToComponentModel(applicationConfig);
         validateModel();
+    }
+
+    private void configurePropertyPlaceholderResolver(ApplicationConfig applicationConfig)
+    {
+        //TODO MULE-9825: a new mechanism for property placeholders need to be defined
+        final List<String> locations = new ArrayList<>();
+        applicationConfig.getConfigFiles().stream().forEach( configFile -> {
+            configFile.getConfigLines().get(0).getChildren().stream().forEach( configLine -> {
+                if (configLine.getIdentifier().equals(PROPERTY_PLACEHOLDER_ELEMENT))
+                {
+                    locations.add(configLine.getConfigAttributes().get("location").getValue());
+                }
+            });
+        });
+        applicationProperties = new Properties();
+        applicationProperties.putAll(getenv());
+        applicationProperties.putAll(getProperties());
+        for (String propertyFileLocation : locations)
+        {
+            Properties properties = new Properties();
+            try (InputStream propertiesFileInputStream = getClass().getClassLoader().getResourceAsStream(propertyFileLocation)) {
+                properties.load(propertiesFileInputStream);
+                applicationProperties.putAll(properties);
+            }
+            catch (IOException e)
+            {
+                throw new MuleRuntimeException(e);
+            }
+        }
     }
 
     /**
@@ -476,7 +513,7 @@ public class ApplicationModel
 
     private String resolveValueIfIsPlaceHolder(String value)
     {
-        return propertyPlaceholderHelper.replacePlaceholders(value, systemPropertyPlaceholderResolver);
+        return propertyPlaceholderHelper.replacePlaceholders(value, applicationProperties);
     }
 
     private boolean isConfigurationTopComponent(ConfigLine parent)
@@ -510,40 +547,4 @@ public class ApplicationModel
         return muleComponentModels.get(0);
     }
 
-    /**
-     * PlaceholderResolver implementation that resolves against system properties
-     * and system environment variables.
-     * //TODO MULE-9825: add proper support for property placeholders
-     */
-    private static class SystemPropertyPlaceholderResolver implements PropertyPlaceholderHelper.PlaceholderResolver
-    {
-
-        private final String text;
-
-        public SystemPropertyPlaceholderResolver(String text)
-        {
-            this.text = text;
-        }
-
-        @Override
-        public String resolvePlaceholder(String placeholderName)
-        {
-            try
-            {
-                String propVal = System.getProperty(placeholderName);
-                if (propVal == null)
-                {
-                    // Fall back to searching the system environment.
-                    propVal = System.getenv(placeholderName);
-                }
-                return propVal;
-            }
-            catch (Throwable ex)
-            {
-                System.err.println("Could not resolve placeholder '" + placeholderName + "' in [" +
-                                   this.text + "] as system property: " + ex);
-                return null;
-            }
-        }
-    }
 }
