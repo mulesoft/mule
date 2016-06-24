@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transport.LegacyConnector;
@@ -60,7 +61,7 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase
         orderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
         orderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
         setOrderedLifecycleObjects(orderedObjects);
-        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, OutboundRouter.class, MuleContext.class});
+        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, InterceptingMessageProcessor.class, OutboundRouter.class, MuleContext.class});
     }
 
 

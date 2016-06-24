@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -84,7 +85,7 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase
         a CONTEXT_DISPOSING event and calling dispose on the transformer.  This is necessary since transformers are prototype objects
         and not managed by DI containers such as Spring after the creation of the object
          */
-        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, OutboundRouter.class, Transformer.class, MuleContext.class});
+        setIgnoredObjectTypes(new Class[]{Component.class, MessageSource.class, InterceptingMessageProcessor.class, OutboundRouter.class, Transformer.class, MuleContext.class});
     }
 
      @Override
