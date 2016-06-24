@@ -32,11 +32,7 @@
         <httpn:request config-ref="requestConfig" method="#[message.getAttributes().getMethod()]" path="#[message.getAttributes().getRequestPath()]" parseResponse="false"  key="ANY">
             <httpn:request-builder>
                 <httpn:simple-request-builder queryParams="#[message.getAttributes().getQueryParams()]"
-                                                 headers="#[message.getAttributes().getHeaders()]">
-                    <httpn:headers>
-                        <httpn:header key="X-Forwarded-For" value="#[message.getAttributes().getRemoteHostAddress()]"/>
-                    </httpn:headers>
-                </httpn:simple-request-builder>
+                                                 headers="#[message.getAttributes().getHeaders()]"/>
             </httpn:request-builder>
         </httpn:request>
 

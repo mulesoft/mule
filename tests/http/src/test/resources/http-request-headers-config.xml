@@ -34,11 +34,7 @@
     <flow name="headerOverride">
         <httpn:request config-ref="config" path="testPath" key="ANY">
             <httpn:request-builder>
-                <httpn:simple-request-builder headers="#[headers]">
-                    <httpn:headers>
-                        <httpn:header key="testName1" value="testValue1" />
-                    </httpn:headers>
-                </httpn:simple-request-builder>
+                <httpn:simple-request-builder headers="#[headers]"/>
             </httpn:request-builder>
         </httpn:request>
     </flow>
