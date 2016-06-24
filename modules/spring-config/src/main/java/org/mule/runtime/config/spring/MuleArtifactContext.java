@@ -45,6 +45,7 @@ import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 
 import com.google.common.collect.ImmutableList;
@@ -446,13 +447,22 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
         public XmlServiceRegistry(ServiceRegistry delegate, MuleContext muleContext)
         {
             this.delegate = delegate;
-            List<XmlNamespaceInfo> extensionNamespaces = muleContext.getExtensionManager().getExtensions().stream()
-                    .map(ext -> {
-                        XmlModelProperty xmlModelProperty = ext.getModelProperty(XmlModelProperty.class).orElse(null);
-                        return xmlModelProperty != null ? new StaticXmlNamespaceInfo(xmlModelProperty.getNamespaceUri(), xmlModelProperty.getNamespace()) : null;
-                    })
-                    .filter(info -> info != null)
-                    .collect(new ImmutableListCollector<>());
+            final ExtensionManager extensionManager = muleContext.getExtensionManager();
+            List<XmlNamespaceInfo> extensionNamespaces;
+            if (extensionManager != null)
+            {
+                extensionNamespaces = extensionManager.getExtensions().stream()
+                        .map(ext -> {
+                            XmlModelProperty xmlModelProperty = ext.getModelProperty(XmlModelProperty.class).orElse(null);
+                            return xmlModelProperty != null ? new StaticXmlNamespaceInfo(xmlModelProperty.getNamespaceUri(), xmlModelProperty.getNamespace()) : null;
+                        })
+                        .filter(info -> info != null)
+                        .collect(new ImmutableListCollector<>());
+            }
+            else
+            {
+                extensionNamespaces = ImmutableList.of();
+            }
 
             extensionsXmlInfoProvider = new StaticXmlNamespaceInfoProvider(extensionNamespaces);
         }
