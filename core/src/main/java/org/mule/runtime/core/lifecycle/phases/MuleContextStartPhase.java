@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -49,7 +50,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
 
     public MuleContextStartPhase()
     {
-        this(new Class[] {Registry.class, MuleContext.class, MessageSource.class, Component.class, OutboundRouter.class, MuleContext.class});
+        this(new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class, OutboundRouter.class, MuleContext.class});
     }
 
     public MuleContextStartPhase(Class<?>[] ignoredObjects)

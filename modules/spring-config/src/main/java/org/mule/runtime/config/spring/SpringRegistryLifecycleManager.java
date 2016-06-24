@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -93,6 +94,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
                     SpringRegistryBootstrap.class,
                     Component.class,
                     MessageSource.class,
+                    InterceptingMessageProcessor.class,
                     AbstractMessageProcessorOwner.class,
                     MessagingExceptionHandler.class,
                     AbstractAsyncRequestReplyRequester.class,
@@ -117,6 +119,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
             setIgnoredObjectTypes(new Class[] {
                     Component.class,
                     MessageSource.class,
+                    InterceptingMessageProcessor.class,
                     OutboundRouter.class,
                     Transformer.class,
                     MuleContext.class,
