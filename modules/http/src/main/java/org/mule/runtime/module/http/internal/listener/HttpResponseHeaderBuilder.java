@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
@@ -24,13 +25,10 @@ import java.util.List;
 public class HttpResponseHeaderBuilder
 {
 
-    private List<String> calculatedHeadersNames = Arrays.asList(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Names.CONTENT_LENGTH);
+    private List<String> calculatedHeadersNames = Arrays.asList(TRANSFER_ENCODING, CONTENT_LENGTH);
 
     Multimap<String, String> headers =
-            Multimaps.newMultimap(new CaseInsensitiveMapWrapper<Collection<String>>(HashMap.class), new Supplier<Collection<String>>(){
-                @Override
-                public Collection<String> get(){ return Sets.newHashSet(); }
-            });
+            Multimaps.newMultimap(new CaseInsensitiveMapWrapper<>(HashMap.class), () -> Sets.newHashSet());
 
     public void addHeader(String headerName, Object headerValue)
     {
@@ -67,7 +65,7 @@ public class HttpResponseHeaderBuilder
     {
         if (calculatedHeadersNames.contains(headerName))
         {
-            throw new MuleRuntimeException(CoreMessages.createStaticMessage("Header: " + headerName + " does not support multiple values"));
+            throw new MuleRuntimeException(createStaticMessage("Header: " + headerName + " does not support multiple values"));
         }
     }
 
@@ -82,17 +80,17 @@ public class HttpResponseHeaderBuilder
 
     public String getContentType()
     {
-        return getSimpleValue(HttpHeaders.Names.CONTENT_TYPE);
+        return getSimpleValue(CONTENT_TYPE);
     }
 
     public String getTransferEncoding()
     {
-        return getSimpleValue(HttpHeaders.Names.TRANSFER_ENCODING);
+        return getSimpleValue(TRANSFER_ENCODING);
     }
 
     public String getContentLength()
     {
-        return getSimpleValue(HttpHeaders.Names.CONTENT_LENGTH);
+        return getSimpleValue(CONTENT_LENGTH);
     }
 
     private String getSimpleValue(String header)
@@ -106,12 +104,13 @@ public class HttpResponseHeaderBuilder
 
     public void addContentType(String multipartFormData)
     {
-        addSimpleValue(HttpHeaders.Names.CONTENT_TYPE, multipartFormData);
+        addSimpleValue(CONTENT_TYPE, multipartFormData);
     }
 
-    public void addContentLenght(String calculatedContentLenght)
+    public void setContentLenght(String calculatedContentLenght)
     {
-        addSimpleValue(HttpHeaders.Names.CONTENT_LENGTH, calculatedContentLenght);
+        removeHeader(CONTENT_LENGTH);
+        addSimpleValue(CONTENT_LENGTH, calculatedContentLenght);
     }
 
     public Collection<String> getHeaderNames()

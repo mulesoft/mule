@@ -262,7 +262,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             logger.debug("Content-Length encoding is being used so the 'Transfer-Encoding' header has been removed");
             httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
         }
-        httpResponseHeaderBuilder.addContentLenght(String.valueOf(contentLength));
+        httpResponseHeaderBuilder.setContentLenght(String.valueOf(contentLength));
     }
 
     private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder)
