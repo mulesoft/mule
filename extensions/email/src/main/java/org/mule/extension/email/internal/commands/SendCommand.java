@@ -64,7 +64,7 @@ public final class SendCommand
                     .bcc(bccAddresses)
                     .withSubject(subject)
                     .withAttachments(attachments != null ? attachments : new ArrayList<>())
-                    .withContent(content.getBody(), content.getContentType())
+                    .withContent(content.getBody(), content.getContentType(), content.getCharset())
                     .withHeaders(headers)
                     .build();
 

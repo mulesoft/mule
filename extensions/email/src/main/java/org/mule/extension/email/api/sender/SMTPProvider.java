@@ -7,7 +7,7 @@
 package org.mule.extension.email.api.sender;
 
 import static org.mule.extension.email.internal.EmailProtocol.SMTP;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.SMTPS_PORT;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.SMTP_PORT;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -26,7 +26,7 @@ public class SMTPProvider extends AbstractSenderProvider
      * The port number of the mail server.
      */
     @Parameter
-    @Optional(defaultValue = SMTPS_PORT)
+    @Optional(defaultValue = SMTP_PORT)
     private String port;
 
     /**

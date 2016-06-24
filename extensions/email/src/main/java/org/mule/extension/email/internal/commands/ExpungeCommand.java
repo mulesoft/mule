@@ -10,7 +10,7 @@ import static javax.mail.Folder.READ_WRITE;
 import org.mule.extension.email.api.retriever.RetrieverConnection;
 
 /**
- * Represents the expunge (eliminate completely) emails from folder operation.
+ * Represents the expungeFolder (eliminate completely) emails from folder operation.
  * <p>
  * Removes all the emails from a folder that contains the {@code DELETED} flag.
  *
@@ -23,7 +23,7 @@ public final class ExpungeCommand
      * Removes from the mailbox all deleted messages if the flag is set true.
      *
      * @param connection the associated {@link RetrieverConnection}.
-     * @param folderName the name of the folder that is going to expunge the deleted emails.
+     * @param folderName the name of the folder that is going to erase the deleted emails.
      */
     public void expunge(RetrieverConnection connection, String folderName)
     {

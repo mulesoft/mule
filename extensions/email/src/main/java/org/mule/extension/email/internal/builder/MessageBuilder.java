@@ -6,6 +6,7 @@
  */
 package org.mule.extension.email.internal.builder;
 
+import static java.lang.String.format;
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
@@ -13,12 +14,12 @@ import static javax.mail.Part.ATTACHMENT;
 import static javax.mail.Part.INLINE;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.MULTIPART;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.toAddressArray;
+import static org.mule.runtime.api.metadata.MimeType.TEXT;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.extension.email.internal.util.EmailConnectorUtils;
-import org.mule.runtime.api.metadata.MimeType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -49,7 +50,8 @@ public final class MessageBuilder
 
     private Map<String, DataHandler> attachments;
     private String content = "";
-    private String contentType = MimeType.TEXT;
+    private String contentType;
+    private String charset;
 
     private MessageBuilder(Session s) throws MessagingException
     {
@@ -246,10 +248,11 @@ public final class MessageBuilder
      * @return this {@link MessageBuilder}
      * @throws MessagingException
      */
-    public MessageBuilder withContent(String content, String contentType) throws MessagingException
+    public MessageBuilder withContent(String content, String contentType, String charset) throws MessagingException
     {
         this.content = content;
         this.contentType = contentType;
+        this.charset = charset;
         return this;
     }
 
@@ -264,6 +267,7 @@ public final class MessageBuilder
     public MessageBuilder withContent(String content) throws MessagingException
     {
         this.content = content;
+        this.contentType = TEXT;
         return this;
     }
 
@@ -293,7 +297,7 @@ public final class MessageBuilder
             MimeMultipart multipart = new MimeMultipart();
             MimeBodyPart bodyPart = new MimeBodyPart();
             bodyPart.setDisposition(INLINE);
-            bodyPart.setContent(content, contentType);
+            bodyPart.setContent(content, getBodyType());
             multipart.addBodyPart(bodyPart);
 
             MimeBodyPart attachmentPart;
@@ -319,10 +323,18 @@ public final class MessageBuilder
         else
         {
             this.message.setDisposition(INLINE);
-            this.message.setContent(content, contentType);
+            this.message.setContent(content, getBodyType());
         }
 
         return message;
     }
 
+    private String getBodyType()
+    {
+        if (charset != null)
+        {
+            return  format("%s; charset=%s", contentType, charset);
+        }
+        return contentType;
+    }
 }

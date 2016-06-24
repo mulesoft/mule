@@ -20,13 +20,17 @@
 
     <flow name="retrieveAndThenExpungeDelete">
         <email:list config-ref="config"/>
-        <email:delete config-ref="config"/>
-        <email:expunge config-ref="config"/>
+        <email:mark-as-deleted config-ref="config"/>
+        <email:expunge-folder config-ref="config"/>
     </flow>
 
     <flow name="retrieveAndMarkDelete">
         <email:list config-ref="config"/>
-        <email:delete config-ref="config"/>
+        <email:mark-as-deleted config-ref="config"/>
+    </flow>
+
+    <flow name="failSettingFlag">
+        <email:mark-as-deleted config-ref="config"/>
     </flow>
 
     <flow name="retrieveOnlyNotReadEmails">

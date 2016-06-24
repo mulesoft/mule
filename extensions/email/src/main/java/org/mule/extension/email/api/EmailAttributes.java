@@ -22,7 +22,7 @@ import javax.mail.Message;
 
 /**
  * Contains all the metadata of an email, it carries information such as
- * the subject of the email, the id in the mailbox and the recipitiens between others.
+ * the subject of the email, the id in the mailbox and the recipients between others.
  * <p>
  * This class aims to be returned as attributes in a {@link MuleMessage} for every
  * retriever operation.
