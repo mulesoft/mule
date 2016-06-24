@@ -23,6 +23,7 @@ import org.mule.runtime.module.extension.file.api.lock.PathLock;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
@@ -69,6 +70,10 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
         try (OutputStream out = getOutputStream(path, openOptions, mode))
         {
             new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(out, event, encoding));
+        }
+        catch (AccessDeniedException e)
+        {
+            throw exception(format("Could not write to file '%s' because access was denied by the operating system", path), e);
         }
         catch (Exception e)
         {
