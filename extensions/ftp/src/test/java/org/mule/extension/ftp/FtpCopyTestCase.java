@@ -13,10 +13,13 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
 
 import org.mule.extension.FtpTestHarness;
+import org.mule.runtime.core.api.MessagingException;
 
 import java.nio.file.Paths;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class FtpCopyTestCase extends FtpConnectorTestCase
 {
@@ -25,6 +28,9 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
     private static final String SOURCE_DIRECTORY_NAME = "source";
     private static final String TARGET_DIRECTORY = "target";
     private static final String EXISTING_CONTENT = "I was here first!";
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     protected String sourcePath;
 
@@ -60,6 +66,15 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
         doExecute(path, false, false);
 
         assertCopy(format("%s/%s", path, SOURCE_FILE_NAME));
+    }
+
+    @Test
+    public void nullTarget() throws Exception
+    {
+        expectedException.expect(MessagingException.class);
+        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+
+        doExecute(null, false, false);
     }
 
     @Test
