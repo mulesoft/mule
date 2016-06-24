@@ -66,6 +66,15 @@ public class FileCopyTestCase extends FileConnectorTestCase
     }
 
     @Test
+    public void copyToItselfWithoutOverwrite() throws Exception
+    {
+        expectedException.expect(MessagingException.class);
+        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+
+        doExecute(getFlowName(), sourcePath, sourcePath, false, false);
+    }
+
+    @Test
     public void copyReadFile() throws Exception
     {
         String target = temporaryFolder.newFolder().getAbsolutePath();
@@ -192,8 +201,13 @@ public class FileCopyTestCase extends FileConnectorTestCase
 
     private void doExecute(String flowName, String target, boolean overwrite, boolean createParentFolder) throws Exception
     {
+        doExecute(flowName, sourcePath, target, overwrite, createParentFolder);
+    }
+
+    private void doExecute(String flowName, String source, String target, boolean overwrite, boolean createParentFolder) throws Exception
+    {
         flowRunner(flowName)
-                .withFlowVariable(SOURCE_DIRECTORY_NAME, sourcePath)
+                .withFlowVariable(SOURCE_DIRECTORY_NAME, source)
                 .withFlowVariable("target", target)
                 .withFlowVariable("overwrite", overwrite)
                 .withFlowVariable("createParent", createParentFolder)

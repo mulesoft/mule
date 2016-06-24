@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
-
 import org.mule.extension.FtpTestHarness;
 import org.mule.runtime.core.api.MessagingException;
 
@@ -75,6 +74,15 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
         expectedException.expectCause(instanceOf(IllegalArgumentException.class));
 
         doExecute(null, false, false);
+    }
+
+    @Test
+    public void copyToItselfWithoutOverwrite() throws Exception
+    {
+        expectedException.expect(MessagingException.class);
+        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+
+        doExecute(getFlowName(), sourcePath, sourcePath, false, false);
     }
 
     @Test
@@ -208,8 +216,13 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
 
     private void doExecute(String flowName, String target, boolean overwrite, boolean createParentFolder) throws Exception
     {
+        doExecute(flowName, sourcePath, target, overwrite, createParentFolder);
+    }
+
+    private void doExecute(String flowName, String source, String target, boolean overwrite, boolean createParentFolder) throws Exception
+    {
         flowRunner(flowName)
-                .withFlowVariable(SOURCE_DIRECTORY_NAME, sourcePath)
+                .withFlowVariable(SOURCE_DIRECTORY_NAME, source)
                 .withFlowVariable("target", target)
                 .withFlowVariable("overwrite", overwrite)
                 .withFlowVariable("createParent", createParentFolder)
