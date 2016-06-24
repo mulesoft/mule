@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static java.util.Collections.emptyMap;
 import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
@@ -119,7 +118,6 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                 .withIdentifier("dynamic-config-policy")
                                 .withTypeDefinition(fromType(DynamicConfigPolicy.class))
                                 .withObjectFactoryType(DynamicConfigPolicyObjectFactory.class)
-                                .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
                                 .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
                                 .build());
 
@@ -127,7 +125,6 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                 .withIdentifier("expiration-policy")
                                 .withTypeDefinition(fromType(ExpirationPolicy.class))
                                 .withObjectFactoryType(ExpirationPolicyObjectFactory.class)
-                                .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
                                 .withSetterParameterDefinition("maxIdleTime", fromSimpleParameter("maxIdleTime").build())
                                 .withSetterParameterDefinition("timeUnit", fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value)).build())
                                 .build());

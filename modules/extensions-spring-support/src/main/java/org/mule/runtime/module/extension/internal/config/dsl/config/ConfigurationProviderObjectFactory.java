@@ -26,6 +26,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 /**
  * A {@link AbstractExtensionObjectFactory} which produces {@link ConfigurationProvider}
  * instances
@@ -44,6 +46,10 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
     private Optional<ValueResolver<ConnectionProvider>> connectionProviderResolver = empty();
     private ConfigurationProvider<Object> instance;
     private boolean requiresConnection = false;
+
+    @Inject
+    private TimeSupplier timeSupplier;
+
 
     ConfigurationProviderObjectFactory(String name,
                                        RuntimeConfigurationModel configurationModel,
@@ -105,7 +111,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
     {
         if (dynamicConfigPolicy == null)
         {
-            dynamicConfigPolicy = DynamicConfigPolicy.getDefault(TimeSupplier.getDefault(muleContext));
+            dynamicConfigPolicy = DynamicConfigPolicy.getDefault(timeSupplier);
         }
 
         return dynamicConfigPolicy;

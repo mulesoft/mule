@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.config.spring.dsl.api.xml;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.utils.JavaTypeUtils;
+import org.mule.runtime.extension.api.annotation.Alias;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +26,7 @@ public class NameUtils
 {
 
     private static final List<Inflection> plural = new ArrayList<>();
+    private static final List<Inflection> singular = new ArrayList<>();
     private static final List<String> uncountable = new ArrayList<>();
 
     static
@@ -44,6 +51,38 @@ public class NameUtils
         plural("^(ox)$", "$1en");
         plural("(quiz)$", "$1zes");
 
+        singular("s$", "");
+        singular("(n)ews$", "$1ews");
+        singular("([ti])a$", "$1um");
+        singular("((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$", "$1$2sis");
+        singular("(^analy)ses$", "$1sis");
+        singular("([^f])ves$", "$1fe");
+        singular("(hive)s$", "$1");
+        singular("(tive)s$", "$1");
+        singular("([lr])ves$", "$1f");
+        singular("([^aeiouy]|qu)ies$", "$1y");
+        singular("(s)eries$", "$1eries");
+        singular("(m)ovies$", "$1ovie");
+        singular("(x|ch|ss|sh)es$", "$1");
+        singular("([m|l])ice$", "$1ouse");
+        singular("(bus)es$", "$1");
+        singular("(o)es$", "$1");
+        singular("(shoe)s$", "$1");
+        singular("(cris|ax|test)es$", "$1is");
+        singular("(octop|vir)i$", "$1us");
+        singular("(alias|status)es$", "$1");
+        singular("^(ox)en", "$1");
+        singular("(vert|ind)ices$", "$1ex");
+        singular("(matr)ices$", "$1ix");
+        singular("(quiz)zes$", "$1");
+
+        // irregular
+        irregular("person", "people");
+        irregular("man", "men");
+        irregular("child", "children");
+        irregular("sex", "sexes");
+        irregular("move", "moves");
+
         uncountable("equipment");
         uncountable("information");
         uncountable("rice");
@@ -67,6 +106,23 @@ public class NameUtils
     private static void plural(String pattern, String replacement)
     {
         plural.add(0, new Inflection(pattern, replacement));
+    }
+
+    /**
+     * Registers a singular {@code replacement} for the given {@code pattern}
+     *
+     * @param pattern     the pattern for which you want to register a plural form
+     * @param replacement the replacement pattern
+     */
+    private static void singular(String pattern, String replacement)
+    {
+        singular.add(0, new Inflection(pattern, replacement));
+    }
+
+    private static void irregular(String s, String p)
+    {
+        plural("(" + s.substring(0, 1) + ")" + s.substring(1) + "$", "$1" + p.substring(1));
+        singular("(" + p.substring(0, 1) + ")" + p.substring(1) + "$", "$1" + s.substring(1));
     }
 
     private static void uncountable(String word)
@@ -127,6 +183,31 @@ public class NameUtils
     }
 
     /**
+     * Return the singularized version of a word.
+     *
+     * @param word The word
+     * @return The singularized word
+     */
+    public static String singularize(String word)
+    {
+        if (isUncountable(word))
+        {
+            return word;
+        }
+        else
+        {
+            for (Inflection inflection : singular)
+            {
+                if (inflection.match(word))
+                {
+                    return inflection.replace(word);
+                }
+            }
+        }
+        return word;
+    }
+
+    /**
      * Return true if the word is uncountable.
      *
      * @param word The word
@@ -146,6 +227,38 @@ public class NameUtils
         }
 
         return false;
+    }
+
+    /**
+     * Returns a hypenized name of the give top level {@code metadataType}.
+     * <p>
+     * It uses {@link JavaTypeUtils#getType(MetadataType)} to obtain the
+     * {@link Class} that the {@code metadataType} represents. Then, it
+     * checks if the  {@link Alias} annotation is present. If so, the
+     * {@link Alias#value()} is used. Otherwise, the class name will
+     * be considered.
+     *
+     * @param metadataType the {@link MetadataType} which name you want
+     * @return the hypenized name for the given {@code type}
+     */
+    public static String getTopLevelTypeName(MetadataType metadataType)
+    {
+        Class<?> type = JavaTypeUtils.getType(metadataType);
+        Alias alias = type.getAnnotation(Alias.class);
+        String name = alias != null ? alias.value() : type.getSimpleName();
+
+        return hyphenize(name);
+    }
+
+    /**
+     * Removes everything that's not a word, a dot nor a hyphen
+     *
+     * @param originalName name that needs the removal of invalid characters
+     * @return name without invalid characters
+     */
+    public static String sanitizeName(String originalName)
+    {
+        return originalName.replaceAll("[^\\w|\\.\\-]", EMPTY);
     }
 
     private static class Inflection

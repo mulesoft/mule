@@ -7,12 +7,13 @@
 package org.mule.runtime.module.extension.internal.config.dsl.infrastructure;
 
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.time.TimeSupplier;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
 
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 /**
  * An {@link ObjectFactory} which produces instances of {@link ExpirationPolicy}
@@ -21,21 +22,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class ExpirationPolicyObjectFactory implements ObjectFactory<ExpirationPolicy>
 {
+    @Inject
+    private TimeSupplier timeSupplier;
 
-    private final MuleContext muleContext;
     private Long maxIdleTime = null;
     private TimeUnit timeUnit = null;
-
-    public ExpirationPolicyObjectFactory(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
 
     @Override
     public ExpirationPolicy getObject() throws Exception
     {
-        TimeSupplier timeSupplier = TimeSupplier.getDefault(muleContext);
-
         if (maxIdleTime != null && timeUnit != null)
         {
             return new ImmutableExpirationPolicy(maxIdleTime, timeUnit, timeSupplier);

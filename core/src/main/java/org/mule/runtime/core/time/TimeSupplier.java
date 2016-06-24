@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.core.time;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.MuleContext;
-
 import java.util.function.Supplier;
 
 /**
@@ -20,20 +16,6 @@ import java.util.function.Supplier;
  */
 public class TimeSupplier implements Supplier<Long>
 {
-
-    /**
-     * Returns the default instance from the mule registry
-     *
-     * @param muleContext the current {@link MuleContext}
-     * @return the default instance
-     */
-    public static TimeSupplier getDefault(MuleContext muleContext)
-    {
-        TimeSupplier timeSupplier = muleContext.getRegistry().get(OBJECT_TIME_SUPPLIER);
-        checkArgument(timeSupplier != null, String.format("Could not find ['%s'] in the registry", OBJECT_TIME_SUPPLIER));
-
-        return timeSupplier;
-    }
 
     /**
      * Returns {@link System#currentTimeMillis()}

@@ -10,7 +10,7 @@ import static org.apache.commons.lang.StringUtils.capitalize;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TARGET_ATTRIBUTE_DESCRIPTION;

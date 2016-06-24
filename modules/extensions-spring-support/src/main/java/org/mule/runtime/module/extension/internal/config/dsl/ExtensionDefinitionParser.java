@@ -26,10 +26,10 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.getTopLevelTypeName;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.pluralize;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.singularize;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.pluralize;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.singularize;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;

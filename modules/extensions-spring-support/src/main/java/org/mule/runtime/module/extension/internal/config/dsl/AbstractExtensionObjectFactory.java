@@ -49,7 +49,6 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
     public void setParameters(Map<String, Object> parameters)
     {
         this.parameters = normalize(parameters);
-        //this.parameters = parameters;
     }
 
     /**

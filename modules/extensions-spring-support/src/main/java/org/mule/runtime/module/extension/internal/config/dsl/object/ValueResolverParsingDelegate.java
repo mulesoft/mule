@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.module.extension.internal.util.NameUtils.hyphenize;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;

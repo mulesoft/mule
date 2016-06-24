@@ -7,10 +7,11 @@
 package org.mule.runtime.module.extension.internal.config.dsl.infrastructure;
 
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.time.TimeSupplier;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
+
+import javax.inject.Inject;
 
 /**
  * A {@link ObjectFactory} instance that produces {@link DynamicConfigPolicy} instances.
@@ -23,13 +24,10 @@ import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 public class DynamicConfigPolicyObjectFactory implements ObjectFactory<DynamicConfigPolicy>
 {
 
-    private final MuleContext muleContext;
     private ExpirationPolicy expirationPolicy;
 
-    public DynamicConfigPolicyObjectFactory(MuleContext muleContext)
-    {
-        this.muleContext = muleContext;
-    }
+    @Inject
+    private TimeSupplier timeSupplier;
 
     @Override
     public DynamicConfigPolicy getObject() throws Exception
@@ -39,7 +37,7 @@ public class DynamicConfigPolicyObjectFactory implements ObjectFactory<DynamicCo
             return new DynamicConfigPolicy(expirationPolicy);
         }
 
-        return DynamicConfigPolicy.getDefault(TimeSupplier.getDefault(muleContext));
+        return DynamicConfigPolicy.getDefault(timeSupplier);
     }
 
     public void setExpirationPolicy(ExpirationPolicy expirationPolicy)

@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
@@ -34,6 +33,8 @@ import com.google.common.base.Joiner;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * An {@link AbstractExtensionObjectFactory} that produces instances of {@link ExtensionMessageSource}
  *
@@ -48,6 +49,8 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
     private String configurationProviderName;
     private RetryPolicyTemplate retryPolicyTemplate;
+
+    @Inject
     private ConnectionManagerAdapter connectionManager;
 
     public ExtensionSourceObjectFactory(RuntimeExtensionModel extensionModel, RuntimeSourceModel sourceModel, MuleContext muleContext)
@@ -111,7 +114,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
     private RetryPolicyTemplate getRetryPolicyTemplate() throws ConfigurationException
     {
-        return retryPolicyTemplate != null ? retryPolicyTemplate : getConnectionManagerAdapter().getDefaultRetryPolicyTemplate();
+        return retryPolicyTemplate != null ? retryPolicyTemplate : connectionManager.getDefaultRetryPolicyTemplate();
     }
 
     private ConfigurationException dynamicParameterException(ResolverSet resolverSet, SourceModel model)
@@ -124,23 +127,6 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
         return new ConfigurationException(createStaticMessage(format("The '%s' message source is using expressions, which are not allowed on message sources. " +
                                                                      "Offending parameters are: [%s]",
                                                                      model.getName(), Joiner.on(',').join(dynamicParams))));
-    }
-
-    private ConnectionManagerAdapter getConnectionManagerAdapter() throws ConfigurationException
-    {
-        if (connectionManager == null)
-        {
-            try
-            {
-                connectionManager = muleContext.getRegistry().lookupObject(ConnectionManagerAdapter.class);
-            }
-            catch (RegistrationException e)
-            {
-                throw new ConfigurationException(createStaticMessage("Could not obtain connection manager adapter"), e);
-            }
-        }
-
-        return connectionManager;
     }
 
     public void setConfigurationProviderName(String configurationProviderName)

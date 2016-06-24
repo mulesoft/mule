@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.xml;
 
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CURRENT_VERSION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.DEFAULT_SCHEMA_LOCATION_MASK;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XSD_EXTENSION;
@@ -13,7 +14,6 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
-import org.mule.runtime.module.extension.internal.util.NameUtils;
 
 import java.util.function.Supplier;
 
@@ -60,7 +60,7 @@ public final class XmlModelUtils
         namespace = removeFromName(namespace, "connector");
         namespace = removeFromName(namespace, "module");
         namespace = StringUtils.isBlank(namespace) ? declarationName : namespace;
-        return NameUtils.hyphenize(namespace);
+        return hyphenize(namespace);
 
     }
 
