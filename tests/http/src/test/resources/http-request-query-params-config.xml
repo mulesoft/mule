@@ -34,11 +34,7 @@
     <flow name="multipleQueryParam">
         <httpn:request config-ref="config" path="testPath" key="ANY">
             <httpn:request-builder>
-                <httpn:simple-request-builder queryParams="#[params]">
-                    <httpn:query-params>
-                        <httpn:query-param key="testName1" value="testValue1" />
-                    </httpn:query-params>
-                </httpn:simple-request-builder>
+                <httpn:simple-request-builder queryParams="#[params]"/>
             </httpn:request-builder>
         </httpn:request>
     </flow>
