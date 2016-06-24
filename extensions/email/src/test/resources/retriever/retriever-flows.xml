@@ -30,4 +30,14 @@
         <email:store config-ref="config" localDirectory="${storePath}" emailId="1"/>
     </flow>
 
+    <flow name="retrieveAndDelete">
+        <email:list config-ref="config"/>
+        <email:delete config-ref="config"/>
+    </flow>
+
+    <flow name="retrieveAndDeleteIncomingAndScheduled">
+        <email:list config-ref="config"/>
+        <email:delete config-ref="config" emailId="6"/>
+    </flow>
+
 </mule>

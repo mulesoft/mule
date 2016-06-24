@@ -15,10 +15,13 @@ import static javax.mail.Flags.Flag.RECENT;
 import static javax.mail.Flags.Flag.SEEN;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
+import static org.mule.extension.email.internal.commands.EmailIdConsumerExecutor.NO_ID_ERROR;
 import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.Arrays;
@@ -40,7 +43,9 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
     private static final String RETRIEVE_AND_MARK_AS_DELETE = "retrieveAndMarkDelete";
     private static final String RETRIEVE_AND_MARK_AS_READ = "retrieveAndMarkRead";
     private static final String RETRIEVE_MATCH_NOT_READ = "retrieveOnlyNotReadEmails";
+    private static final String RETRIEVE_AND_DELETE_INCOMING_AND_SCHEDULED = "retrieveAndDeleteIncomingAndScheduled";
     private static final String RETRIEVE_MATCH_RECENT = "retrieveOnlyRecentEmails";
+    private static final String FAIL_SETTING_FLAG = "failSettingFlag";
 
     @Parameter
     public String protocol;
@@ -100,6 +105,24 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase
         runFlow(RETRIEVE_AND_MARK_AS_DELETE);
         assertThat(server.getReceivedMessages(), arrayWithSize(10));
         stream(server.getReceivedMessages()).forEach(m -> assertFlag(m, DELETED, true));
+    }
+
+    @Test
+    public void failSettingFlag() throws Exception
+    {
+        expectedException.expectCause(instanceOf(EmailException.class));
+        expectedException.expectMessage(NO_ID_ERROR);
+        runFlow(FAIL_SETTING_FLAG);
+    }
+
+    @Test
+    public void retrieveAndDeleteIncomingAndScheduled() throws Exception
+    {
+        MimeMessage[] startMessageBatch = server.getReceivedMessages();
+        assertThat(startMessageBatch, arrayWithSize(10));
+        startMessageBatch[0].setFlag(DELETED, true); // Scheduled for deletion
+        runFlow(RETRIEVE_AND_DELETE_INCOMING_AND_SCHEDULED);
+        assertThat(server.getReceivedMessages(), arrayWithSize(8));
     }
 
     @Test

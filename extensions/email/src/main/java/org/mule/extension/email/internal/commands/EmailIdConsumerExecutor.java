@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 public class EmailIdConsumerExecutor
 {
 
-    private static final String NO_ID_ERROR = "Expecting an explicit emailId value or email attributes in the incoming mule message in order to store an email.";
+    public static final String NO_ID_ERROR = "Expecting an explicit emailId value or email attributes in the incoming mule message in order to store an email.";
 
     /**
      * Receives {@link Consumer} operation to perform for an specific emailId.
@@ -58,7 +58,7 @@ public class EmailIdConsumerExecutor
                     }
                     else
                     {
-                        throw new EmailException("Cannot perform operation, was expecting an emailId or a payload carrying one or more emails");
+                        throw new EmailException(NO_ID_ERROR);
                     }
                 }
                 return;

@@ -60,7 +60,7 @@ public class SenderOperations
      */
     public void send(@Connection SenderConnection connection,
                      @UseConfig SMTPConfiguration configuration,
-                     @Optional(defaultValue = PAYLOAD) EmailContent content,
+                     EmailContent content, // TODO: create a transformer from string to EmailContent when the sdk have support for it - MULE-9181.
                      @Optional(defaultValue = "[No Subject]") String subject,
                      List<String> toAddresses,
                      @Optional List<String> ccAddresses,
@@ -80,8 +80,7 @@ public class SenderOperations
     }
 
     /**
-     * Forwards an email message. The message will be sent to all recipient
-     * {@code toAddresses}.
+     * Forwards an email message. The message will be sent to all recipient addresses.
      * <p>
      * This operation expects an email in the incoming {@code muleMessage}
      * to take the content in order forward, if no email message is found this operation will fail.
@@ -89,10 +88,12 @@ public class SenderOperations
      * @param connection    the connection used to send the message.
      * @param configuration the configuration of the connector.
      * @param muleMessage   the incoming {@link MuleMessage}.
+     * @param content       the content of the message to be forwarded
      * @param subject       the subject of the message.
      * @param toAddresses   the "To" (primary) recipients.
      * @param ccAddresses   the "Cc" (carbon copy) recipients.
      * @param bccAddresses  the "Bcc" (blind carbon copy) recipients.
+     * @param headers       custom headers of the message.
      */
     public void forward(@Connection SenderConnection connection,
                         @UseConfig SMTPConfiguration configuration,
@@ -126,9 +127,11 @@ public class SenderOperations
      *
      * @param connection    the connection used to send the message.
      * @param configuration the configuration of the connector.
-     * @param content       the content of the reply message
      * @param muleMessage   the incoming {@link MuleMessage}.
+     * @param content       the content of the reply message
+     * @param subject       the subject of the message, if none {@code "[No Subject]"} is the default value
      * @param replyToAll    if this reply should be sent to all recipients of this message
+     * @param headers       custom headers of the message.
      */
     public void reply(@Connection SenderConnection connection,
                       @UseConfig SMTPConfiguration configuration,

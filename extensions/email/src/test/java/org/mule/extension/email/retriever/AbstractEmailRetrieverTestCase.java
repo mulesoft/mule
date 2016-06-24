@@ -58,6 +58,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
 {
 
     protected static final String RETRIEVE_AND_READ = "retrieveAndRead";
+    protected static final String RETRIEVE_AND_DELETE = "retrieveAndDelete";
     protected static final String RETRIEVE_AND_THEN_EXPUNGE_DELETE = "retrieveAndThenExpungeDelete";
     protected static final String RETRIEVE_MATCH_SUBJECT_AND_FROM = "retrieveMatchingSubjectAndFromAddress";
     protected static final String RETRIEVE_WITH_ATTACHMENTS = "retrieveWithAttachments";
@@ -135,6 +136,14 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
         assertThat(emailAttachments.keySet(), containsInAnyOrder(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
         assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
         assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
+    }
+
+    @Test
+    public void retrieveAndDelete() throws Exception
+    {
+        assertThat(server.getReceivedMessages(), arrayWithSize(10));
+        runFlow(RETRIEVE_AND_DELETE);
+        assertThat(server.getReceivedMessages(), arrayWithSize(0));
     }
 
     @Test

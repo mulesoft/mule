@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.runners.Parameterized.Parameter;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.extension.email.internal.EmailContentProcessor.process;
@@ -44,6 +43,7 @@ import javax.mail.Multipart;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.internal.matchers.StartsWith;
 
@@ -51,10 +51,14 @@ import org.mockito.internal.matchers.StartsWith;
 public class SMTPTestCase extends EmailConnectorTestCase
 {
 
+    private static final String WEIRD_CHAR_MESSAGE = "This is a messag\u00ea with weird chars \u00f1.";
+
     private static final String SEND_EMAIL = "sendEmail";
     private static final String SEND_EMAIL_WITH_ATTACHMENT = "sendEmailWithAttachment";
     private static final String FORWARD_EMAIL = "forwardEmail";
+    private static final String FORWARD_EMAIL_WITH_CONTENT = "forwardEmailWithContent";
     private static final String REPLY_EMAIL = "replyEmail";
+    private static final String SEND_ENCODED_MESSAGE = "sendEncodedMessage";
 
     @Parameter
     public String protocol;
@@ -151,6 +155,29 @@ public class SMTPTestCase extends EmailConnectorTestCase
         Message[] messages = getReceivedMessagesAndAssertCount(1);
         String body = process(messages[0]).getBody();
         assertBodyContent(body);
+    }
+
+    @Test
+    public void forwardEmailWithContent() throws Exception
+    {
+        flowRunner(FORWARD_EMAIL_WITH_CONTENT)
+                .withPayload(EMAIL_CONTENT)
+                .withAttributes(getTestAttributes())
+                .run();
+
+        Message[] messages = getReceivedMessagesAndAssertCount(1);
+        String body = process(messages[0]).getBody();
+        assertThat(body, containsString("More Content To Forward"));
+        assertThat(body, containsString(EMAIL_CONTENT));
+    }
+
+    @Test
+    public void sendEncodedMessage() throws Exception
+    {
+        flowRunner(SEND_ENCODED_MESSAGE).withPayload(WEIRD_CHAR_MESSAGE).run();
+        Message[] messages = getReceivedMessagesAndAssertCount(1);
+        Object content = ((String) messages[0].getContent()).trim();
+        assertThat(content, is(WEIRD_CHAR_MESSAGE));
     }
 
     private Message[] getReceivedMessagesAndAssertCount(int receivedNumber)

@@ -12,8 +12,10 @@ import static javax.mail.Part.ATTACHMENT;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MimeType.TEXT;
-
 import org.mule.runtime.core.util.IOUtils;
+
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,9 +32,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetup;
 
 public class EmailTestUtils
 {

@@ -11,7 +11,7 @@
     </email:pop3>
 
     <spring:beans>
-        <spring:import resource="pop3-flows.xml"/>
+        <spring:import resource="retriever-flows.xml"/>
     </spring:beans>
 
 </mule>

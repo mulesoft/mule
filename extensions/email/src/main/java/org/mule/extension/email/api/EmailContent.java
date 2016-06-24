@@ -6,11 +6,13 @@
  */
 package org.mule.extension.email.api;
 
+import static org.mule.runtime.api.metadata.MimeType.TEXT;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
- * Represents and enables the construction of the content
+ * Represents and enables the construction of the content of an email
+ * with a body of type "text/*" and a specific character encoding.
  *
  * @since 4.0
  */
@@ -29,11 +31,9 @@ public class EmailContent
 
     /**
      * The text body of the message content.
-     * <p>
-     * The default value is an empty body.
      */
     @Parameter
-    @Optional(defaultValue = " ")
+    @Optional(defaultValue = "#[payload]")
     private String body;
 
     /**
@@ -42,8 +42,17 @@ public class EmailContent
      * The default value is "text/plain"
      */
     @Parameter
-    @Optional(defaultValue = "text/plain")
+    @Optional(defaultValue = TEXT)
     private String contentType;
+
+    /**
+     * The character encoding of the body.
+     * <p>
+     * The default value is "UTF-8"
+     */
+    @Parameter
+    @Optional(defaultValue = "UTF-8")
+    private String charset;
 
     /**
      * @return the body of the message content. The body
@@ -59,6 +68,16 @@ public class EmailContent
      */
     public String getContentType()
     {
-        return contentType;
+        // TODO: remove if when MULE-9960 is fixed since default values are not being injected properly.
+        return contentType == null ? TEXT : contentType;
+    }
+
+    /**
+     * @return the charset of the body.
+     */
+    public String getCharset()
+    {
+        // TODO: remove if when MULE-9960 is fixed since default values are not being injected properly.
+        return charset == null ? "UTF-8" : charset;
     }
 }
