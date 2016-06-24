@@ -157,7 +157,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase
     @Test(expected = IllegalParameterModelDefinitionException.class)
     public void invalidModelDueToNonInstantiableParameterGroup()
     {
-        ParameterGroup child = new ParameterGroup(Serializable.class, getField(InvalidPojoParameterGroup.class, "nonInstantiableField", Serializable.class));
+        ParameterGroup child = new ParameterGroup(Serializable.class, getField(InvalidPojoParameterGroup.class, "nonInstantiableField"));
         when(invalidParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.of(new ParameterGroupModelProperty(asList(child))));
         when(invalidParameterModel.getType()).thenReturn(toMetadataType(Serializable.class));
         when(invalidParameterModel.getName()).thenReturn("nonInstantiableField");

@@ -12,7 +12,6 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionXmlNamespaceInfo.EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -87,9 +86,10 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
     {
         this.muleContext = muleContext;
         extensionManager = muleContext.getExtensionManager();
-        checkState(extensionManager != null, "Could not obtain the ExtensionManager");
-
-        extensionManager.getExtensions().forEach(this::registerExtensionParsers);
+        if (extensionManager != null)
+        {
+            extensionManager.getExtensions().forEach(this::registerExtensionParsers);
+        }
     }
 
     /**
