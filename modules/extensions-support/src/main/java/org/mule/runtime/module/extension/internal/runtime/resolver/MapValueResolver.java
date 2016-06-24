@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
@@ -91,13 +91,15 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>
         Iterator<ValueResolver<V>> valueIt = valueResolvers.iterator();
         while (keyIt.hasNext() && valueIt.hasNext())
         {
-                      try {
+            try
+            {
                 map.put(keyIt.next().resolve(event), valueIt.next().resolve(event));
 
-                      }
-                          catch (Exception e) {
-                              throw new RuntimeException(e);
-                          }
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
         }
         return map;
     }
@@ -108,9 +110,12 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>
     @Override
     public boolean isDynamic()
     {
-        try{
-        return MuleExtensionUtils.hasAnyDynamic(keyResolvers) || MuleExtensionUtils.hasAnyDynamic(valueResolvers);
-        } catch (Exception e) {
+        try
+        {
+            return MuleExtensionUtils.hasAnyDynamic(keyResolvers) || MuleExtensionUtils.hasAnyDynamic(valueResolvers);
+        }
+        catch (Exception e)
+        {
             throw new RuntimeException(e);
         }
     }

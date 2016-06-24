@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
+import static com.google.common.collect.ImmutableList.copyOf;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
@@ -16,9 +17,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,13 +92,9 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
         else if (value instanceof Map)
         {
             Map<Object, Object> map = (Map<Object, Object>) value;
-            List<ValueResolver<Object>> keys = new ArrayList<>(map.size());
-            List<ValueResolver<Object>> values = new ArrayList<>(map.size());
-            map.forEach((key, entryValue) -> {
-                keys.add((ValueResolver<Object>) toValueResolver(key));
-                values.add((ValueResolver<Object>) toValueResolver(entryValue));
-            });
-            resolver = MapValueResolver.of(map.getClass(), keys, values);
+            Map<ValueResolver<Object>, ValueResolver<Object>> normalizedMap = new LinkedHashMap<>(map.size());
+            map.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key), (ValueResolver<Object>) toValueResolver(entryValue)));
+            resolver = MapValueResolver.of(map.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()));
         }
         else
         {
