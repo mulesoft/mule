@@ -13,6 +13,7 @@ import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 
 import java.nio.file.CopyOption;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -101,10 +102,23 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand
             }
         }
 
-        doExecute(source,
-                  targetPath,
-                  overwrite,
-                  copyOption != null ? new CopyOption[] {copyOption} : new CopyOption[] {});
+        try
+        {
+            doExecute(source,
+                      targetPath,
+                      overwrite,
+                      copyOption != null ? new CopyOption[] {copyOption} : new CopyOption[] {});
+        }
+        catch (FileAlreadyExistsException e)
+        {
+            throw new IllegalArgumentException(format("Can't copy '%s' to '%s' because the destination path " +
+                                                      "already exists. Consider setting the 'overwrite' parameter to 'true'",
+                                                      source.toAbsolutePath(), targetPath.toAbsolutePath()));
+        }
+        catch (Exception e)
+        {
+            throw exception(format("Found exception %s file '%s' to '%s': %s", getAction(), source, targetPath, e.getMessage()), e);
+        }
     }
 
     /**
@@ -115,5 +129,10 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand
      * @param overwrite  whether to overwrite existing target paths
      * @param options    an array of {@link CopyOption} which configure the copying operation
      */
-    protected abstract void doExecute(Path source, Path targetPath, boolean overwrite, CopyOption[] options);
+    protected abstract void doExecute(Path source, Path targetPath, boolean overwrite, CopyOption[] options) throws Exception;
+
+    /**
+     * @return The name of the action that the implementation is actually doing. Useful for logging and exception messages
+     */
+    protected abstract String getAction();
 }

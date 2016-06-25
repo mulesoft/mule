@@ -6,12 +6,11 @@
  */
 package org.mule.extension.file.internal.command;
 
-import static java.lang.String.format;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
@@ -50,22 +49,24 @@ public final class LocalCopyCommand extends AbstractLocalCopyCommand implements 
      * @param overwrite  whether to overwrite existing target paths
      * @param options    an array of {@link CopyOption} which configure the copying operation
      */
-    protected void doExecute(Path source, Path targetPath, boolean overwrite, CopyOption[] options)
+    protected void doExecute(Path source, Path targetPath, boolean overwrite, CopyOption[] options) throws Exception
     {
-        try
+        if (Files.isDirectory(source))
         {
-            if (Files.isDirectory(source))
-            {
-                FileUtils.copyDirectory(source.toFile(), targetPath.toFile());
-            }
-            else
-            {
-                Files.copy(source, targetPath, options);
-            }
+            FileUtils.copyDirectory(source.toFile(), targetPath.toFile());
         }
-        catch (Exception e)
+        else
         {
-            throw exception(format("Found exception copying file '%s' to '%s'", source, targetPath), e);
+            Files.copy(source, targetPath, options);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getAction()
+    {
+        return "copying";
     }
 }

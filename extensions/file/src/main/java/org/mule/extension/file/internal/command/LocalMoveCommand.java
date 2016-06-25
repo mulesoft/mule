@@ -6,11 +6,10 @@
  */
 package org.mule.extension.file.internal.command;
 
-import static java.lang.String.format;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
-import org.mule.runtime.module.extension.file.api.command.MoveCommand;
 import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.module.extension.file.api.command.MoveCommand;
 
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
@@ -50,33 +49,35 @@ public final class LocalMoveCommand extends AbstractLocalCopyCommand implements 
      * @param options    an array of {@link CopyOption} which configure the copying operation
      */
     @Override
-    protected void doExecute(Path source, Path targetPath, boolean overwrite, CopyOption[] options)
+    protected void doExecute(Path source, Path targetPath, boolean overwrite, CopyOption[] options) throws Exception
     {
-        try
+        if (Files.isDirectory(source))
         {
-            if (Files.isDirectory(source))
+            if (Files.exists(targetPath))
             {
-                if (Files.exists(targetPath))
+                if (overwrite)
                 {
-                    if (overwrite)
-                    {
-                        FileUtils.deleteTree(targetPath.toFile());
-                    }
-                    else
-                    {
-                        alreadyExistsException(targetPath);
-                    }
+                    FileUtils.deleteTree(targetPath.toFile());
                 }
-                FileUtils.moveDirectory(source.toFile(), targetPath.toFile());
+                else
+                {
+                    alreadyExistsException(targetPath);
+                }
             }
-            else
-            {
-                Files.move(source, targetPath, options);
-            }
+            FileUtils.moveDirectory(source.toFile(), targetPath.toFile());
         }
-        catch (Exception e)
+        else
         {
-            throw exception(format("Found exception copying file '%s' to '%s'", source, targetPath), e);
+            Files.move(source, targetPath, options);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getAction()
+    {
+        return "moving";
     }
 }
