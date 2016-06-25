@@ -69,7 +69,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Optional;
 
 import javax.resource.spi.work.Work;
@@ -167,7 +166,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
         when(configurationModel.getSourceModel(SOURCE_NAME)).thenReturn(Optional.of(sourceModel));
         when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(Optional.of(configurationProvider));
-        when(configurationProvider.get(configureMockEvent(event))).thenReturn(configurationInstance);
+        when(configurationProvider.get(any())).thenReturn(configurationInstance);
         when(configurationProvider.getModel()).thenReturn(configurationModel);
 
         messageSource = getNewExtensionMessageSourceInstance();
@@ -416,11 +415,5 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         messageSource.setFlowConstruct(flowConstruct);
         muleContext.getInjector().inject(messageSource);
         return messageSource;
-    }
-
-    private MuleEvent configureMockEvent(MuleEvent mockEvent)
-    {
-        when(mockEvent.getMessage().getEncoding()).thenReturn(Charset.defaultCharset().name());
-        return mockEvent;
     }
 }

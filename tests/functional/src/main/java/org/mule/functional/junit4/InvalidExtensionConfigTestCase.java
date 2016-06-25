@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 /**
  * An {@link ExtensionFunctionalTestCase} which is expected to point to a
  * somewhat invalid config. The test fails if the config is parsed correctly.
- *
+ * <p>
  * This class does not require to implement any method annotation with
  * {@link Test}
  *
@@ -31,7 +31,17 @@ public abstract class InvalidExtensionConfigTestCase extends ExtensionFunctional
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
+        configureExceptionAssertions();
+    }
+
+    private void configureExceptionAssertions()
+    {
         expectedException.expect(ConfigurationException.class);
+        additionalExceptionAssertions(expectedException);
+    }
+
+    protected void additionalExceptionAssertions(ExpectedException expectedException)
+    {
     }
 
     @Test

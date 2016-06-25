@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.metadata.MetadataAware;
@@ -26,7 +31,9 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.TemplateParser;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -53,7 +60,9 @@ import javax.inject.Inject;
 public abstract class ExtensionComponent implements MuleContextAware, MetadataAware, FlowConstructAware, Initialisable
 {
 
+    private final TemplateParser expressionParser = createMuleStyleParser();
     private final RuntimeExtensionModel extensionModel;
+    private final ComponentModel componentModel;
     private final String configurationProviderName;
     protected final ExtensionManagerAdapter extensionManager;
 
@@ -70,6 +79,7 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     protected ExtensionComponent(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel, String configurationProviderName, ExtensionManagerAdapter extensionManager)
     {
         this.extensionModel = extensionModel;
+        this.componentModel = componentModel;
         this.configurationProviderName = configurationProviderName;
         this.extensionManager = extensionManager;
         this.metadataMediator = new MetadataMediator(extensionModel, componentModel);
@@ -84,7 +94,8 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     @Override
     public final void initialise() throws InitialisationException
     {
-        Optional<ConfigurationProvider<Object>> provider = getConfigurationProvider();
+        validateConfigurationProviderIsNotExpression();
+        Optional<ConfigurationProvider<Object>> provider = findConfigurationProvider();
 
         if (provider.isPresent())
         {
@@ -155,9 +166,9 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     {
         MuleEvent fakeEvent = getInitialiserEvent(muleContext);
         ConfigurationInstance<Object> configuration = getConfiguration(fakeEvent);
-        ConfigurationProvider<Object> configurationProvider = getConfigurationProvider()
-                .orElseThrow(()-> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
-                                                                 FailureCode.INVALID_CONFIGURATION));
+        ConfigurationProvider<Object> configurationProvider = findConfigurationProvider()
+                .orElseThrow(() -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
+                                                                  FailureCode.INVALID_CONFIGURATION));
 
         if (configurationProvider instanceof DynamicConfigurationProvider)
         {
@@ -174,15 +185,48 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
      */
     protected ConfigurationInstance<Object> getConfiguration(MuleEvent event)
     {
-        return getConfigurationProvider()
+        if (isConfigurationSpecified())
+        {
+            return getConfigurationProviderByName()
+                    .map(provider -> provider.get(event))
+                    .orElseThrow(() -> new IllegalModelDefinitionException(format("Flow '%s' contains a reference to config '%s' but it doesn't exists",
+                                                                                  flowConstruct.getName(), configurationProviderName)));
+        }
+
+        return getConfigurationProviderByModel()
                 .map(provider -> provider.get(event))
                 .orElseGet(() -> extensionManager.getConfiguration(extensionModel, event));
     }
 
-    private Optional<ConfigurationProvider<Object>> getConfigurationProvider()
+    private Optional<ConfigurationProvider<Object>> findConfigurationProvider()
     {
-        return StringUtils.isBlank(configurationProviderName) ? extensionManager.getConfigurationProvider(extensionModel)
-                                                              : extensionManager.getConfigurationProvider(configurationProviderName);
+        return isConfigurationSpecified() ? getConfigurationProviderByName()
+                                          : getConfigurationProviderByModel();
     }
 
+    private Optional<ConfigurationProvider<Object>> getConfigurationProviderByName()
+    {
+        return extensionManager.getConfigurationProvider(configurationProviderName);
+    }
+
+    private Optional<ConfigurationProvider<Object>> getConfigurationProviderByModel()
+    {
+        return extensionManager.getConfigurationProvider(extensionModel);
+    }
+
+    private boolean isConfigurationSpecified()
+    {
+        return !isBlank(configurationProviderName);
+    }
+
+    private void validateConfigurationProviderIsNotExpression() throws InitialisationException
+    {
+        if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProviderName))
+        {
+            throw new InitialisationException(createStaticMessage(format(
+                    "Flow '%s' defines component '%s' which specifies the expression '%s' as a config-ref. " +
+                    "Expressions are not allowed as config references",
+                    flowConstruct.getName(), hyphenize(componentModel.getName()), configurationProviderName)), this);
+        }
+    }
 }
