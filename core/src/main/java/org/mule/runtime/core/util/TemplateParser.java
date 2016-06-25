@@ -30,7 +30,7 @@ public final class TemplateParser
     private static final String DOLLAR_ESCAPE = "@@@";
     private static final String NULL_AS_STRING = "null";
 
-    private static final Map<String, PatternInfo> patterns = new HashMap<String, PatternInfo>();
+    private static final Map<String, PatternInfo> patterns = new HashMap<>();
 
     static
     {
@@ -51,11 +51,6 @@ public final class TemplateParser
      */
     protected static final Logger logger = LoggerFactory.getLogger(TemplateParser.class);
 
-    public static final Pattern ANT_TEMPLATE_PATTERN = patterns.get(ANT_TEMPLATE_STYLE).getPattern();
-    public static final Pattern SQUARE_TEMPLATE_PATTERN = patterns.get(SQUARE_TEMPLATE_STYLE).getPattern();
-    public static final Pattern CURLY_TEMPLATE_PATTERN = patterns.get(CURLY_TEMPLATE_STYLE).getPattern();
-    public static final Pattern WIGGLY_MULE_TEMPLATE_PATTERN = patterns.get(WIGGLY_MULE_TEMPLATE_STYLE).getPattern();
-
     private final Pattern pattern;
     private final int pre;
     private final int post;
@@ -70,11 +65,6 @@ public final class TemplateParser
     public static TemplateParser createSquareBracesStyleParser()
     {
         return new TemplateParser(SQUARE_TEMPLATE_STYLE);
-    }
-
-    public static TemplateParser createCurlyBracesStyleParser()
-    {
-        return new TemplateParser(CURLY_TEMPLATE_STYLE);
     }
 
     public static TemplateParser createMuleStyleParser()
@@ -202,14 +192,11 @@ public final class TemplateParser
     {
         if (templates == null)
         {
-            return new ArrayList<Object>();
+            return new ArrayList<>();
         }
 
-        List<String> list = new ArrayList<String>(templates.size());
-        for (Object tmpl : templates)
-        {
-            list.add(parse(props, tmpl.toString()));
-        }
+        List<String> list = new ArrayList<>(templates.size());
+        templates.stream().map(tmpl -> parse(props, tmpl.toString())).forEach(list::add);
         return list;
     }
 
@@ -225,24 +212,17 @@ public final class TemplateParser
      */
     public Map<?, ?> parse(final Map<?, ?> props, Map<?, ?> templates)
     {
-        return parse(new TemplateCallback()
-        {
-            @Override
-            public Object match(String token)
-            {
-                return props.get(token);
-            }
-        }, templates);
+        return parse(token -> props.get(token), templates);
     }
 
     public Map<?, ?> parse(TemplateCallback callback, Map<?, ?> templates)
     {
         if (templates == null)
         {
-            return new HashMap<Object, Object>();
+            return new HashMap<>();
         }
 
-        Map<Object, String> map = new HashMap<Object, String>(templates.size());
+        Map<Object, String> map = new HashMap<>(templates.size());
         for (Map.Entry<?, ?> entry : templates.entrySet())
         {
             map.put(entry.getKey(), parse(callback, entry.getValue().toString()));
@@ -284,7 +264,8 @@ public final class TemplateParser
         style.validate(expression);
     }
 
-    public static interface TemplateCallback
+    @FunctionalInterface
+    public interface TemplateCallback
     {
         Object match(String token);
     }

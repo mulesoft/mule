@@ -81,6 +81,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -265,7 +266,7 @@ public abstract class ExtensionDefinitionParser
         }
         else if (Map.class.equals(mapType))
         {
-            mapType = HashMap.class;
+            mapType = LinkedHashMap.class;
         }
 
         final MetadataType keyType = dictionaryType.getKeyType();
