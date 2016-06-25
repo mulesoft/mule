@@ -11,6 +11,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.metadata.MetadataAware;
@@ -31,6 +32,7 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.util.TemplateParser;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
@@ -47,8 +49,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.logging.log4j.core.config.ConfigurationException;
-
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor}
  * and {@link ExtensionMessageSource}.
@@ -60,7 +60,7 @@ import org.apache.logging.log4j.core.config.ConfigurationException;
 public abstract class ExtensionComponent implements MuleContextAware, MetadataAware, FlowConstructAware, Initialisable
 {
 
-    private final TemplateParser expressionParser = TemplateParser.createMuleStyleParser();
+    private final TemplateParser expressionParser = createMuleStyleParser();
     private final RuntimeExtensionModel extensionModel;
     private final ComponentModel componentModel;
     private final String configurationProviderName;
@@ -189,8 +189,8 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
         {
             return getConfigurationProviderByName()
                     .map(provider -> provider.get(event))
-                    .orElseThrow(() -> new ConfigurationException(format("Flow '%s' contains a reference to config '%s' but it doesn't exists",
-                                                                         flowConstruct.getName(), configurationProviderName)));
+                    .orElseThrow(() -> new IllegalModelDefinitionException(format("Flow '%s' contains a reference to config '%s' but it doesn't exists",
+                                                                                  flowConstruct.getName(), configurationProviderName)));
         }
 
         return getConfigurationProviderByModel()
