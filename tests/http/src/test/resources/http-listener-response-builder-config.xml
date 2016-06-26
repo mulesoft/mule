@@ -14,7 +14,9 @@
 
     <flow name="emptyResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${emptyResponseBuilderPath}">
-            <httpn:response-builder/>
+            <httpn:response-builder>
+                <httpn:simple-response-builder/>
+            </httpn:response-builder>
         </httpn:listener>
         <echo-component/>
     </flow>
@@ -85,7 +87,9 @@
 
     <flow name="errorEmptyResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorEmptyResponseBuilderPath}">
-            <httpn:error-response-builder/>
+            <httpn:error-response-builder>
+                <httpn:simple-response-builder/>
+            </httpn:error-response-builder>
         </httpn:listener>
         <test:component throwException="true"/>
     </flow>
