@@ -196,7 +196,10 @@ public class ApplicationModel
             configFile.getConfigLines().get(0).getChildren().stream().forEach( configLine -> {
                 if (configLine.getIdentifier().equals(PROPERTY_PLACEHOLDER_ELEMENT))
                 {
-                    locations.add(configLine.getConfigAttributes().get("location").getValue());
+                    String locationValue = configLine.getConfigAttributes().get("location").getValue();
+                    locationValue = propertyPlaceholderHelper.replacePlaceholders(locationValue, getProperties());
+                    locationValue = locationValue.replace("classpath:/", "");
+                    locations.add(locationValue);
                 }
             });
         });
@@ -302,7 +305,7 @@ public class ApplicationModel
                     String mapChildName = hyphenize(pluralize(parameterName));
                     String listOrPojoChildName = hyphenize(parameterName);
                     Optional<ComponentModel> childOptional = findRelatedChildForParameter(componentModel.getInnerComponents(), mapChildName, listOrPojoChildName);
-                    if (childOptional.isPresent())
+                    if (childOptional.isPresent() && !childOptional.get().getIdentifier().equals(SPRING_PROPERTY_IDENTIFIER))
                     {
                         throw new MuleRuntimeException(createStaticMessage(format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. " +
                                                                                   "Only one must be used.", componentModel.getIdentifier(), childOptional.get().getIdentifier(), parameterName)));
