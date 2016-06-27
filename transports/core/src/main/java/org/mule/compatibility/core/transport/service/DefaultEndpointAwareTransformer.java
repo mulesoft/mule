@@ -120,7 +120,7 @@ public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
     {
         if (src instanceof MuleMessage)
         {
-            return ((MuleMessage) src).getDataType().getMimeType().getEncoding().orElse(getDefaultEncoding());
+            return ((MuleMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding());
         }
         else
         {

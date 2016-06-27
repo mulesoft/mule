@@ -53,8 +53,8 @@ public class FileReadTestCase extends FileConnectorTestCase
     {
         MuleEvent response = readHelloWorld();
 
-        assertThat(response.getMessage().getDataType().getMimeType().getPrimaryType(), is(JSON.getPrimaryType()));
-        assertThat(response.getMessage().getDataType().getMimeType().getSubType(), is(JSON.getSubType()));
+        assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
+        assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
 
         AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
         assertThat(payload.isLocked(), is(false));
@@ -71,8 +71,8 @@ public class FileReadTestCase extends FileConnectorTestCase
 
         MuleEvent response = getPath(binaryFile.getAbsolutePath());
 
-        assertThat(response.getMessage().getDataType().getMimeType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
-        assertThat(response.getMessage().getDataType().getMimeType().getSubType(), is(MediaType.BINARY.getSubType()));
+        assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
+        assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
 
         AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
         assertThat(payload.isLocked(), is(false));
@@ -86,8 +86,8 @@ public class FileReadTestCase extends FileConnectorTestCase
     public void readWithForcedMimeType() throws Exception
     {
         MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
-        assertThat(event.getMessage().getDataType().getMimeType().getPrimaryType(), equalTo("test"));
-        assertThat(event.getMessage().getDataType().getMimeType().getSubType(), equalTo("test"));
+        assertThat(event.getMessage().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
+        assertThat(event.getMessage().getDataType().getMediaType().getSubType(), equalTo("test"));
     }
 
     @Test

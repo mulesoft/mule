@@ -110,7 +110,7 @@ public class CompositeConverter implements Converter
             {
                 current = converter.transform(current);
             }
-            currentEncoding = converter.getReturnDataType().getMimeType().getEncoding().orElse(encoding);
+            currentEncoding = converter.getReturnDataType().getMediaType().getCharset().orElse(encoding);
         }
 
         return current;

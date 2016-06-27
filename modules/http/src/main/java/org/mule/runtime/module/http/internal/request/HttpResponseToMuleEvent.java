@@ -75,13 +75,13 @@ public class HttpResponseToMuleEvent
     {
         String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
         DataType<?> dataType = muleEvent.getMessage().getDataType();
-        if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMimeType()))
+        if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType()))
         {
-            responseContentType = dataType.getMimeType().toString();
+            responseContentType = dataType.getMediaType().toString();
         }
 
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-        Charset encoding = buildContentTypeDataType(responseContentType, getDefaultEncoding(muleContext)).getMimeType().getEncoding().get();
+        Charset encoding = buildContentTypeDataType(responseContentType, getDefaultEncoding(muleContext)).getMediaType().getCharset().get();
 
         Map<String, Serializable> inboundProperties = getInboundProperties(response);
         Map<String, DataHandler> inboundAttachments = null;

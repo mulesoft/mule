@@ -584,7 +584,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
         else
         {
-            ctx.getMessage().getDataType().getMimeType().getEncoding().ifPresent(encoding ->
+            ctx.getMessage().getDataType().getMediaType().getCharset().ifPresent(encoding ->
             {
                 m.put(Message.ENCODING, encoding.name());
             });

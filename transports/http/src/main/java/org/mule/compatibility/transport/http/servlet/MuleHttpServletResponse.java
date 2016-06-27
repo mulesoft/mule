@@ -50,7 +50,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
     @Override
     public String getCharacterEncoding()
     {
-        return event.getMessage().getDataType().getMimeType().getEncoding().get().name();
+        return event.getMessage().getDataType().getMediaType().getCharset().get().name();
     }
 
     @Override

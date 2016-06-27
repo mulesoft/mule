@@ -69,13 +69,13 @@ public class HttpRequestToMuleMessage
                 }
                 else
                 {
-                    if (dataType.getMimeType() != null)
+                    if (dataType.getMediaType() != null)
                     {
-                        if (dataType.getMimeType().matches(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
+                        if (dataType.getMediaType().matches(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
                         {
                             try
                             {
-                                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), dataType.getMimeType().getEncoding().get());
+                                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), dataType.getMediaType().getCharset().get());
                                 dataTypeBuilder.type(ParameterMap.class);
                             }
                             catch (IllegalArgumentException e)

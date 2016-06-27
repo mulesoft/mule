@@ -342,7 +342,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
     protected Charset resolveEncoding(MuleEvent event)
     {
-        return event.getMessage().getDataType().getMimeType().getEncoding().orElseGet(() ->
+        return event.getMessage().getDataType().getMediaType().getCharset().orElseGet(() ->
         {
             Charset encoding = getEndpoint().getEncoding();
             if (encoding == null)

@@ -65,7 +65,7 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
                 if (transformerInputs.getInputStream() != null)
                 {
                     jsonWriter = new StringWriter();
-                    IOUtils.copy(transformerInputs.getInputStream(), jsonWriter, msg.getDataType().getMimeType().getEncoding().orElse(getDefaultEncoding(muleContext)));
+                    IOUtils.copy(transformerInputs.getInputStream(), jsonWriter, msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
                 }
                 else
                 {
@@ -75,7 +75,7 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
                 msg = new DefaultMuleMessage(jsonString, msg, msg.getMuleContext());
                 event.setMessage(msg);
             }
-            String xmlString = (String) jToX.transform(msg.getPayload(), msg.getDataType().getMimeType().getEncoding().orElse(getDefaultEncoding(muleContext)));
+            String xmlString = (String) jToX.transform(msg.getPayload(), msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
             // TODO MULE-9856 Replace with the builder
             MuleMessage xmlMessage = new DefaultMuleMessage(xmlString, msg, msg.getMuleContext());
             boolean accepted = super.accept(new DefaultMuleEvent(xmlMessage, event.getFlowConstruct()));

@@ -40,8 +40,8 @@ public class TransformationContentTypeTestCase extends FunctionalTestCase
         MuleMessage message = new DefaultMuleMessage(inputMessage, muleContext);
         List<Transformer> transformers = Arrays.asList(new Transformer[] {trans});
         message = muleContext.getTransformationService().applyTransformers(message, null, transformers);
-        assertThat(message.getDataType().getMimeType().getPrimaryType(), is("text"));
-        assertThat(message.getDataType().getMimeType().getSubType(), is("plain"));
-        assertThat(message.getDataType().getMimeType().getEncoding().get(), is(ISO_8859_1));
+        assertThat(message.getDataType().getMediaType().getPrimaryType(), is("text"));
+        assertThat(message.getDataType().getMediaType().getSubType(), is("plain"));
+        assertThat(message.getDataType().getMediaType().getCharset().get(), is(ISO_8859_1));
     }
 }

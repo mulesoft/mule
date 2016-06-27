@@ -53,8 +53,8 @@ public class FtpReadTestCase extends FtpConnectorTestCase
     {
         MuleMessage message = readHelloWorld().getMessage();
 
-        assertThat(message.getDataType().getMimeType().getPrimaryType(), is(JSON.getPrimaryType()));
-        assertThat(message.getDataType().getMimeType().getSubType(), is(JSON.getSubType()));
+        assertThat(message.getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
+        assertThat(message.getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
 
         AbstractFileInputStream payload = (AbstractFileInputStream) message.getPayload();
         assertThat(payload.isLocked(), is(false));
@@ -68,8 +68,8 @@ public class FtpReadTestCase extends FtpConnectorTestCase
 
         MuleMessage response = readPath(BINARY_FILE_NAME);
 
-        assertThat(response.getDataType().getMimeType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
-        assertThat(response.getDataType().getMimeType().getSubType(), is(MediaType.BINARY.getSubType()));
+        assertThat(response.getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
+        assertThat(response.getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
 
         AbstractFileInputStream payload = (AbstractFileInputStream) response.getPayload();
         assertThat(payload.isLocked(), is(false));
@@ -83,8 +83,8 @@ public class FtpReadTestCase extends FtpConnectorTestCase
     public void readWithForcedMimeType() throws Exception
     {
         MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
-        assertThat(event.getMessage().getDataType().getMimeType().getPrimaryType(), equalTo("test"));
-        assertThat(event.getMessage().getDataType().getMimeType().getSubType(), equalTo("test"));
+        assertThat(event.getMessage().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
+        assertThat(event.getMessage().getDataType().getMediaType().getSubType(), equalTo("test"));
     }
 
     @Test

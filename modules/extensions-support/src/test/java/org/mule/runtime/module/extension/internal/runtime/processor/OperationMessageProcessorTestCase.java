@@ -530,7 +530,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     private MuleEvent configureMockEvent(MuleEvent mockEvent)
     {
-        when(mockEvent.getMessage().getDataType().getMimeType()).thenReturn(new MediaType("*", "*", defaultCharset()));
+        when(mockEvent.getMessage().getDataType().getMediaType()).thenReturn(new MediaType("*", "*", defaultCharset()));
         return mockEvent;
     }
 }

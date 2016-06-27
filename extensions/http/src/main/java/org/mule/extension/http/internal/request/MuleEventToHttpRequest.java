@@ -101,9 +101,9 @@ public class MuleEventToHttpRequest
         if (!builder.getHeaders().containsKey(MuleProperties.CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
-            if (!MediaType.ANY.matches(dataType.getMimeType()))
+            if (!MediaType.ANY.matches(dataType.getMediaType()))
             {
-                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMimeType().toString());
+                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMediaType().toString());
             }
         }
 
@@ -249,7 +249,7 @@ public class MuleEventToHttpRequest
             {
                 if (muleEvent.getMessage().getPayload() instanceof Map)
                 {
-                    String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMimeType().getEncoding().get(), (Map) payload);
+                    String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMediaType().getCharset().get(), (Map) payload);
                     requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toString());
                     return new ByteArrayHttpEntity(body.getBytes());
                 }

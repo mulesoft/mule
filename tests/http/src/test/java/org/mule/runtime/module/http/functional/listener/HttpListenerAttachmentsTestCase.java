@@ -327,7 +327,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
                                                 }
                                                 parts.add(new org.mule.extension.http.api.HttpPart(id,
                                                                        dataHandler.getContent(),
-                                                                       DataType.builder().mimeType(dataHandler.getContentType()).build().getMimeType(),
+                                                                       DataType.builder().mediaType(dataHandler.getContentType()).build().getMediaType(),
                                                                        filename));
                                             }
                                             catch (IOException e)

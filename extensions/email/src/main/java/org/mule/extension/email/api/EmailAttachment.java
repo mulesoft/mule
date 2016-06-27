@@ -71,6 +71,6 @@ public class EmailAttachment
      */
     public MediaType getContentType()
     {
-        return contentType != null ? DataType.builder().mimeType(contentType).build().getMimeType() : null;
+        return contentType != null ? DataType.builder().mediaType(contentType).build().getMediaType() : null;
     }
 }

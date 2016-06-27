@@ -232,11 +232,11 @@ public interface FileSystem
      * Creates a new {@link DataType} to be associated with a {@link MuleMessage} which payload is a
      * {@link InputStream} and the attributes an instance of {@link FileAttributes}
      * <p>
-     * It will try to update the {@link DataType#getMimeType()} with a best guess derived from the
+     * It will try to update the {@link DataType#getMediaType()} with a best guess derived from the
      * given {@code attributes}. If no best-guess is possible, then the {@code originalDataType}'s
      * mimeType is honoured.
      * <p>
-     * As for the {@link MediaType#getEncoding()}, the {@code dataType} one is respected
+     * As for the {@link MediaType#getCharset()}, the {@code dataType} one is respected
      *
      * @param originalDataType the original {@link DataType} that the {@link MuleMessage} had before
      *            executing the operation

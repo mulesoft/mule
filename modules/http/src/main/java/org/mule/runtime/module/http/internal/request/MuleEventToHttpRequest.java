@@ -99,9 +99,9 @@ public class MuleEventToHttpRequest
         if (!event.getMessage().getOutboundPropertyNames().contains(MuleProperties.CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
-            if (!MediaType.ANY.matches(dataType.getMimeType()))
+            if (!MediaType.ANY.matches(dataType.getMediaType()))
             {
-                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMimeType().toString());
+                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMediaType().toString());
             }
         }
 
@@ -247,7 +247,7 @@ public class MuleEventToHttpRequest
             {
                 if (muleEvent.getMessage().getPayload() instanceof Map)
                 {
-                    String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMimeType().getEncoding().orElse(getDefaultEncoding(muleContext)), (Map) payload);
+                    String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)), (Map) payload);
                     requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toString());
                     return new ByteArrayHttpEntity(body.getBytes());
                 }

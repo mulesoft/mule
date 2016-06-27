@@ -47,7 +47,7 @@ public class OutboundEndpointMimeTypeCheckingMessageProcessor implements Message
             }
             else
             {
-                String messageMimeType = DataType.builder().mimeType(contentType).build().getMimeType().toString();
+                String messageMimeType = DataType.builder().mediaType(contentType).build().getMediaType().toString();
                 if (!messageMimeType.equals(endpointMimeType.toString()))
                 {
                     throw new MessagingException(

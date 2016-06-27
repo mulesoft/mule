@@ -244,14 +244,14 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
 
     protected Charset resolveEncoding(Object src)
     {
-        return getReturnDataType().getMimeType().getEncoding().orElse(getEncoding(src));
+        return getReturnDataType().getMediaType().getCharset().orElse(getEncoding(src));
     }
 
     private Charset getEncoding(Object src)
     {
         if (src instanceof MuleMessage)
         {
-            return ((MuleMessage) src).getDataType().getMimeType().getEncoding().orElse(getDefaultEncoding(muleContext));
+            return ((MuleMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
         }
         else
         {

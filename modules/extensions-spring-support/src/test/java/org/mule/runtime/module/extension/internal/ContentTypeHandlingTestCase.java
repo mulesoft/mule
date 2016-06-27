@@ -60,8 +60,8 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase
         MuleEvent response = runFlow("setsContentTypeOnXml");
         DataType dataType = response.getMessage().getDataType();
         assertCustomEncoding(dataType);
-        assertThat(dataType.getMimeType().getPrimaryType(), is(MediaType.TEXT.getPrimaryType()));
-        assertThat(dataType.getMimeType().getSubType(), is(MediaType.TEXT.getSubType()));
+        assertThat(dataType.getMediaType().getPrimaryType(), is(MediaType.TEXT.getPrimaryType()));
+        assertThat(dataType.getMediaType().getSubType(), is(MediaType.TEXT.getSubType()));
     }
 
     @Test
@@ -97,9 +97,9 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase
     {
         MuleEvent response = runFlow("setEncodingInMimeTypeAndParam");
         DataType dataType = response.getMessage().getDataType();
-        assertThat(dataType.getMimeType().getPrimaryType(), is("application"));
-        assertThat(dataType.getMimeType().getSubType(), is("json"));
-        assertThat(dataType.getMimeType().getEncoding().get(), is(StandardCharsets.UTF_16));
+        assertThat(dataType.getMediaType().getPrimaryType(), is("application"));
+        assertThat(dataType.getMediaType().getSubType(), is("json"));
+        assertThat(dataType.getMediaType().getCharset().get(), is(StandardCharsets.UTF_16));
     }
 
     @Test
@@ -110,28 +110,28 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase
 
         final DataType dataType = response.getMessage().getDataType();
         assertCustomMimeType(dataType);
-        assertThat(dataType.getMimeType().getEncoding().get(), is(lastSupportedEncoding));
+        assertThat(dataType.getMediaType().getCharset().get(), is(lastSupportedEncoding));
     }
 
     private void assertCustomMimeType(DataType dataType)
     {
-        assertThat(dataType.getMimeType().getPrimaryType(), is("dead"));
-        assertThat(dataType.getMimeType().getSubType(), is("dead"));
+        assertThat(dataType.getMediaType().getPrimaryType(), is("dead"));
+        assertThat(dataType.getMediaType().getSubType(), is("dead"));
     }
 
     private void assertCustomEncoding(DataType dataType)
     {
-        assertThat(dataType.getMimeType().getEncoding().get(), is(customEncoding));
+        assertThat(dataType.getMediaType().getCharset().get(), is(customEncoding));
     }
 
     private void assertDefaultEncoding(DataType dataType) throws Exception
     {
-        assertThat(getDefaultDataType().getMimeType().getEncoding(), is(dataType.getMimeType().getEncoding()));
+        assertThat(getDefaultDataType().getMediaType().getCharset(), is(dataType.getMediaType().getCharset()));
     }
 
     private void assertDefaultMimeType(DataType dataType) throws Exception
     {
-        assertThat(getDefaultDataType().getMimeType(), is(dataType.getMimeType()));
+        assertThat(getDefaultDataType().getMediaType(), is(dataType.getMediaType()));
     }
 
     private DataType getDefaultDataType()

@@ -64,7 +64,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         registerSourceType(DataType.fromType(OutputHandler.class));
         registerSourceType(DataType.fromType(javax.xml.stream.XMLStreamReader.class));
         registerSourceType(DataType.fromType(org.mule.runtime.module.xml.transformer.DelayedResult.class));
-        setReturnDataType(DataType.builder().type(byte[].class).mimeType(MediaType.XML).build());
+        setReturnDataType(DataType.builder().type(byte[].class).mediaType(MediaType.XML).build());
     }
 
     @Override

@@ -336,9 +336,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
             }
             if (outboundMimeType == null)
             {
-                if (!msg.getDataType().getMimeType().equals(MediaType.ANY))
+                if (!msg.getDataType().getMediaType().equals(MediaType.ANY))
                 {
-                    outboundMimeType = msg.getDataType().getMimeType().toString();
+                    outboundMimeType = msg.getDataType().getMediaType().toString();
                 }
                 else
                 {

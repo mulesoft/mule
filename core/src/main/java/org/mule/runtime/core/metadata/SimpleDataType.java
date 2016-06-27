@@ -36,7 +36,7 @@ public class SimpleDataType<T> implements DataType<T>
     }
 
     @Override
-    public MediaType getMimeType()
+    public MediaType getMediaType()
     {
         return mimeType;
     }
@@ -56,13 +56,13 @@ public class SimpleDataType<T> implements DataType<T>
         SimpleDataType that = (SimpleDataType) dataType;
 
         //ANY_MIME_TYPE will match to a null or non-null value for MediaType        
-        if ((this.getMimeType() == null && that.getMimeType() != null || that.getMimeType() == null && this.getMimeType() != null) && !MediaType.ANY.matches(this.mimeType)
+        if ((this.getMediaType() == null && that.getMediaType() != null || that.getMediaType() == null && this.getMediaType() != null) && !MediaType.ANY.matches(this.mimeType)
             && !MediaType.ANY.matches(that.mimeType))
         {
             return false;
         }
 
-        if (this.getMimeType() != null && !this.getMimeType().matches(that.getMimeType()) && !MediaType.ANY.matches(that.getMimeType()) && !MediaType.ANY.matches(this.getMimeType()))
+        if (this.getMediaType() != null && !this.getMediaType().matches(that.getMediaType()) && !MediaType.ANY.matches(that.getMediaType()) && !MediaType.ANY.matches(this.getMediaType()))
         {
             return false;
         }

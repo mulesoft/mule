@@ -49,9 +49,9 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase
 
         MuleMessage response = client.request("vm://testOutput", 120000);
 
-        assertThat(response.getDataType().getMimeType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
-        assertThat(response.getDataType().getMimeType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
-        assertThat(response.getDataType().getMimeType().getEncoding().get(), equalTo(UTF_16));
+        assertThat(response.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
+        assertThat(response.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
+        assertThat(response.getDataType().getMediaType().getCharset().get(), equalTo(UTF_16));
         assertThat(response.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY), is(nullValue()));
         assertThat(response.getOutboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY), is(nullValue()));
     }

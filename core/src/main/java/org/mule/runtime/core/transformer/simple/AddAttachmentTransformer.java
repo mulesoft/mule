@@ -61,7 +61,7 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
                 }
                 else
                 {
-                    MediaType contentType = DataType.builder().mimeType(contentTypeEvaluator.resolveStringValue(event)).build().getMimeType();
+                    MediaType contentType = DataType.builder().mediaType(contentTypeEvaluator.resolveStringValue(event)).build().getMediaType();
                     event.setMessage(event.getMessage().transform(msg -> {
                         try
                         {

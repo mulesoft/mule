@@ -68,13 +68,13 @@ public class HttpResponseToMuleMessage
     {
         String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
         DataType dataType = muleEvent.getMessage().getDataType();
-        if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMimeType()))
+        if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType()))
         {
-            responseContentType = ((DataType<?>) dataType).getMimeType().toString();
+            responseContentType = ((DataType<?>) dataType).getMediaType().toString();
         }
 
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-        Charset encoding = buildContentTypeDataType(responseContentType, getDefaultEncoding(muleEvent.getMuleContext())).getMimeType().getEncoding().get();
+        Charset encoding = buildContentTypeDataType(responseContentType, getDefaultEncoding(muleEvent.getMuleContext())).getMediaType().getCharset().get();
 
         Object payload = responseInputStream;
         Map<String, DataHandler> parts = new HashMap<>();

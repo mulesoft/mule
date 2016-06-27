@@ -34,8 +34,8 @@ public class DataTypeMatcher extends TypeSafeMatcher<DataType>
     protected boolean matchesSafely(DataType dataType)
     {
         boolean sameType = type == null ? dataType.getType() == null : type.equals(dataType.getType());
-        boolean sameEncoding = encoding == null ? !dataType.getMimeType().getEncoding().isPresent() : encoding.equals(dataType.getMimeType().getEncoding().get());
-        boolean sameMimeType = mimeType == null ? dataType.getMimeType() == null : mimeType.matches(dataType.getMimeType());
+        boolean sameEncoding = encoding == null ? !dataType.getMediaType().getCharset().isPresent() : encoding.equals(dataType.getMediaType().getCharset().get());
+        boolean sameMimeType = mimeType == null ? dataType.getMediaType() == null : mimeType.matches(dataType.getMediaType());
 
         return sameType && sameEncoding && sameMimeType;
     }
@@ -53,6 +53,6 @@ public class DataTypeMatcher extends TypeSafeMatcher<DataType>
 
     public static Matcher<DataType> like(DataType dataType)
     {
-        return new DataTypeMatcher(dataType.getType(), dataType.getMimeType(), dataType.getMimeType().getEncoding().orElse(null));
+        return new DataTypeMatcher(dataType.getType(), dataType.getMediaType(), dataType.getMediaType().getCharset().orElse(null));
     }
 }

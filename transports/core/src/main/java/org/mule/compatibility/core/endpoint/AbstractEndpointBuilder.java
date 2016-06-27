@@ -232,7 +232,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 getRedeliveryPolicy(),
                 getMessageProcessorsFactory(), mergedProcessors, mergedResponseProcessors,
-                isDisableTransportTransformer(), mimeType != null ? DataType.builder().mimeType(mimeType).build().getMimeType() : null);
+                isDisableTransportTransformer(), mimeType != null ? DataType.builder().mediaType(mimeType).build().getMediaType() : null);
     }
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
@@ -291,7 +291,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 getRedeliveryPolicy(),
                 responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors,
-                responseMessageProcessors, isDisableTransportTransformer(), mimeType != null ? DataType.builder().mimeType(mimeType).build().getMimeType() : null);
+                responseMessageProcessors, isDisableTransportTransformer(), mimeType != null ? DataType.builder().mediaType(mimeType).build().getMediaType() : null);
     }
 
     private String getDynamicUriFrom(String uri)

@@ -75,7 +75,7 @@ public class EmailContent
     public MediaType getContentType()
     {
         // TODO: remove if when MULE-9960 is fixed since default values are not being injected properly.
-        return contentType == null ? TEXT : DataType.builder().mimeType(contentType).build().getMimeType();
+        return contentType == null ? TEXT : DataType.builder().mediaType(contentType).build().getMediaType();
     }
 
     /**

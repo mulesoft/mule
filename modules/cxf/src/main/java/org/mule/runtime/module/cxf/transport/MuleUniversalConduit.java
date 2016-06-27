@@ -288,9 +288,9 @@ public class MuleUniversalConduit extends AbstractConduit
             InputStream is = getResponseBody(m, resEvent);
             if (is != null)
             {
-                final DataType<?> dataType = DataType.builder(result.getDataType()).mimeType(result.getInboundProperty(CONTENT_TYPE, "text/xml")).build();
+                final DataType<?> dataType = DataType.builder(result.getDataType()).mediaType(result.getInboundProperty(CONTENT_TYPE, "text/xml")).build();
                 Message inMessage = new MessageImpl();
-                dataType.getMimeType().getEncoding().ifPresent(encoding ->
+                dataType.getMediaType().getCharset().ifPresent(encoding ->
                 {
                     inMessage.put(Message.ENCODING, encoding.name());
                 });

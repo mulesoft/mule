@@ -203,9 +203,9 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         if (contentType == null)
         {
             DataType<?> dataType = msg.getDataType();
-            if (!MediaType.ANY.matches(dataType.getMimeType()))
+            if (!MediaType.ANY.matches(dataType.getMediaType()))
             {
-                contentType = dataType.getMimeType().toString();
+                contentType = dataType.getMediaType().toString();
             }
         }
 

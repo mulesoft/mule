@@ -117,7 +117,7 @@ public class TransformationService
 
     protected Charset resolveEncoding(MuleMessage message)
     {
-        return message.getDataType().getMimeType().getEncoding().orElse(getDefaultEncoding(muleContext));
+        return message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
     }
 
     /**
@@ -267,14 +267,14 @@ public class TransformationService
     private DataType<?> mergeDataType(MuleMessage message, DataType<?> transformed, Class<?> payloadTransformedClass)
     {
         DataType<?> original = message.getDataType();
-        MediaType mimeType = transformed.getMimeType() == null || MediaType.ANY.matches(transformed.getMimeType()) ? original.getMimeType() : transformed.getMimeType();
-        Charset encoding = transformed.getMimeType().getEncoding().orElse(
-                message.getDataType().getMimeType().getEncoding().orElse(getDefaultEncoding(muleContext)));
+        MediaType mimeType = transformed.getMediaType() == null || MediaType.ANY.matches(transformed.getMediaType()) ? original.getMediaType() : transformed.getMediaType();
+        Charset encoding = transformed.getMediaType().getCharset().orElse(
+                message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
         // In case if the transformed dataType is an Object type we could keep the original type if it is compatible/assignable (String->Object we want to keep String as transformed DataType)
-        Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataType.builder().type(payloadTransformedClass).mimeType(mimeType).build())
+        Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataType.builder().type(payloadTransformedClass).mediaType(mimeType).build())
                 ? original.getType() : transformed.getType();
 
-        return DataType.builder().type(type).mimeType(mimeType).encoding(encoding).build();
+        return DataType.builder().type(type).mediaType(mimeType).encoding(encoding).build();
     }
 
     /**

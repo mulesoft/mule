@@ -155,7 +155,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
     public void setsCustomMimeType() throws MuleException
     {
         setPayloadMessageProcessor.setValue(PLAIN_TEXT);
-        setPayloadMessageProcessor.setDataType(DataType.builder().mimeType(MediaType.APPLICATION_XML).build());
+        setPayloadMessageProcessor.setDataType(DataType.builder().mediaType(MediaType.APPLICATION_XML).build());
         setPayloadMessageProcessor.initialise();
 
         setPayloadMessageProcessor.process(muleEvent);

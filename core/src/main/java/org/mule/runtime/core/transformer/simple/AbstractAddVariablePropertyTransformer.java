@@ -64,7 +64,7 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
             else
             {
                 addProperty(event, key, typedValue.getValue(),
-                        DataType.builder().type(typedValue.getValue().getClass()).mimeType(getReturnDataType().getMimeType()).encoding(resolveEncoding(typedValue)).build());
+                        DataType.builder().type(typedValue.getValue().getClass()).mediaType(getReturnDataType().getMediaType()).encoding(resolveEncoding(typedValue)).build());
             }
         }
         return event.getMessage();

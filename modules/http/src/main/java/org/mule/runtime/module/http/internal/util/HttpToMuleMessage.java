@@ -38,7 +38,7 @@ public class HttpToMuleMessage
         {
             try
             {
-                dataTypeBuilder.mimeType(contentTypeValue);
+                dataTypeBuilder.mediaType(contentTypeValue);
             }
             catch (IllegalArgumentException e)
             {
@@ -56,7 +56,7 @@ public class HttpToMuleMessage
             }
         }
         final DataType dataType = dataTypeBuilder.build();
-        if (!dataType.getMimeType().getEncoding().isPresent())
+        if (!dataType.getMediaType().getCharset().isPresent())
         {
             return DataType.builder(dataType).encoding(defaultCharset).build();
         }

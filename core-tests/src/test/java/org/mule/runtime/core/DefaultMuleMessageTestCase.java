@@ -196,7 +196,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 
         MutableMuleMessage copy = new DefaultMuleMessage(original);
         assertInboundAndOutboundMessageProperties(copy);
-        assertThat(copy.getDataType().getMimeType().getEncoding().get(), equalTo(Charset.forName(muleContext.getConfiguration().getDefaultEncoding())));
+        assertThat(copy.getDataType().getMediaType().getCharset().get(), equalTo(Charset.forName(muleContext.getConfiguration().getDefaultEncoding())));
         assertThat(copy.getAttributes(), is(testAttributes));
         
         // Mutate original

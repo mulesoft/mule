@@ -92,7 +92,7 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
 
         if (returnClass != null)
         {
-            returnType = DataType.builder().type(returnClass).mimeType(bootstrapProperty.getMimeType()).build();
+            returnType = DataType.builder().type(returnClass).mediaType(bootstrapProperty.getMimeType()).build();
             builder.addPropertyValue("returnDataType", returnType);
         }
 

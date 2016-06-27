@@ -188,15 +188,15 @@ public abstract class AbstractFileSystem implements FileSystem
         final DataTypeParamsBuilder<InputStream> dataTypeBuilder = DataType.builder().type(InputStream.class);
         if (presumedMimeType != null)
         {
-            dataTypeBuilder.mimeType(presumedMimeType);
+            dataTypeBuilder.mediaType(presumedMimeType);
         }
         else
         {
-            dataTypeBuilder.mimeType(originalDataType.getMimeType());
+            dataTypeBuilder.mediaType(originalDataType.getMediaType());
         }
-        if (originalDataType.getMimeType().getEncoding().isPresent())
+        if (originalDataType.getMediaType().getCharset().isPresent())
         {
-            dataTypeBuilder.encoding(originalDataType.getMimeType().getEncoding().get());
+            dataTypeBuilder.encoding(originalDataType.getMediaType().getCharset().get());
         }
         return dataTypeBuilder.build();
     }

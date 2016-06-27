@@ -639,7 +639,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public String getMessageAsString() throws MuleException
     {
-        return getMessageAsString(getMessage().getDataType().getMimeType().getEncoding().orElse(getDefaultEncoding(getMuleContext())));
+        return getMessageAsString(getMessage().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(getMuleContext())));
     }
 
     /**
@@ -1126,7 +1126,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     public void setEndpointFields(Credentials credentials, Charset encoding, MessageExchangePattern exchangePattern, String name, URI uri, int timeout, boolean transacted)
     {
         this.credentials = credentials;
-        if (!message.getDataType().getMimeType().getEncoding().isPresent() && encoding != null)
+        if (!message.getDataType().getMediaType().getCharset().isPresent() && encoding != null)
         {
             this.message = message.transform(msg ->
             {

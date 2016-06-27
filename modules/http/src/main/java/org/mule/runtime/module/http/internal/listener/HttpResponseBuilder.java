@@ -107,9 +107,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         if (!outboundProperties.contains(MuleProperties.CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
-            if (!MediaType.ANY.matches(dataType.getMimeType()))
+            if (!MediaType.ANY.matches(dataType.getMediaType()))
             {
-                httpResponseHeaderBuilder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMimeType().toString());
+                httpResponseHeaderBuilder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMediaType().toString());
             }
         }
 
@@ -323,7 +323,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         if (!mapPayload.isEmpty())
         {
             String encodedBody;
-            final Charset encoding = event.getMessage().getDataType().getMimeType().getEncoding().get();
+            final Charset encoding = event.getMessage().getDataType().getMediaType().getCharset().get();
             if (mapPayload instanceof ParameterMap)
             {
                 encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());

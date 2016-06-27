@@ -138,7 +138,7 @@ public final class EmailConnectorUtils
     {
         return attachments.entrySet().stream()
                           .map(e -> new EmailAttachment(e.getKey(), e.getValue(),
-                                  DataType.builder().mimeType(e.getValue().getContentType()).build().getMimeType()))
+                                  DataType.builder().mediaType(e.getValue().getContentType()).build().getMediaType()))
                           .collect(toList());
     }
 }

@@ -29,7 +29,7 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     {
         DataType<?> dataType = DataType.builder().encoding(UTF_8.name()).build();
 
-        assertThat(dataType.getMimeType().getEncoding().get(), equalTo(UTF_8));
+        assertThat(dataType.getMediaType().getCharset().get(), equalTo(UTF_8));
     }
 
     @Test(expected = UnsupportedCharsetException.class)
@@ -41,14 +41,14 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     @Test
     public void acceptsValidMimeType() throws Exception
     {
-        DataType<?> dataType = DataType.builder().mimeType(JSON).build();
+        DataType<?> dataType = DataType.builder().mediaType(JSON).build();
 
-        assertThat(dataType.getMimeType(), equalTo(JSON));
+        assertThat(dataType.getMediaType(), equalTo(JSON));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsValidMimeType() throws Exception
     {
-        DataType.builder().mimeType("invalidMimeType").build();
+        DataType.builder().mediaType("invalidMimeType").build();
     }
 }

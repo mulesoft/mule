@@ -123,7 +123,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
     @Test
     public void setsDefaultScopedPropertyMetaData() throws Exception
     {
-        DataType dataType = DataType.builder().type(Integer.class).mimeType(APPLICATION_XML).encoding(CUSTOM_ENCODING).build();
+        DataType dataType = DataType.builder().type(Integer.class).mediaType(APPLICATION_XML).encoding(CUSTOM_ENCODING).build();
         MessagePropertiesContext properties = new MessagePropertiesContext();
         properties.setOutboundProperty("Prop", "foo", dataType);
         DataType<?> actualDataType = properties.getOutboundPropertyDataType("Prop");

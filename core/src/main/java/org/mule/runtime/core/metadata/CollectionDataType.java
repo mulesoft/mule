@@ -88,7 +88,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
     {
         int result = getType().hashCode();
         result = 31 * result + getItemType().hashCode();
-        result = 31 * result + (getMimeType() != null ? getMimeType().hashCode() : 0);
+        result = 31 * result + (getMediaType() != null ? getMediaType().hashCode() : 0);
         return result;
     }
 
@@ -98,7 +98,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
         return "CollectionDataType{" +
                 "type=" + getType().getName() +
                ", itemType=" + getItemType().toString() +
-                ", mimeType='" + getMimeType() + '\'' +
+                ", mimeType='" + getMediaType() + '\'' +
                 '}';
     }
 }

@@ -50,10 +50,10 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
         final Charset encoding = UTF_16;
         final String mimeType = "application/json";
 
-        DataType<?> dataType = DataType.builder().type(type).mimeType(format("%s; charset=UTF-8", mimeType)).encoding(encoding).build();
+        DataType<?> dataType = DataType.builder().type(type).mediaType(format("%s; charset=UTF-8", mimeType)).encoding(encoding).build();
         assertThat(dataType.getType(), equalTo(type));
-        assertThat(dataType.getMimeType().getPrimaryType(), is(mimeType.split("/")[0]));
-        assertThat(dataType.getMimeType().getSubType(), is(mimeType.split("/")[1]));
-        assertThat(dataType.getMimeType().getEncoding().get(), is(encoding));
+        assertThat(dataType.getMediaType().getPrimaryType(), is(mimeType.split("/")[0]));
+        assertThat(dataType.getMediaType().getSubType(), is(mimeType.split("/")[1]));
+        assertThat(dataType.getMediaType().getCharset().get(), is(encoding));
     }
 }

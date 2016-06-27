@@ -41,7 +41,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
             if (dataType == null)
             {
                 final TypedValue typedValue = resolveTypedValue(event);
-                if (typedValue.getDataType().getMimeType().getEncoding().isPresent())
+                if (typedValue.getDataType().getMediaType().getCharset().isPresent())
                 {
                     msg.setPayload(typedValue.getValue(), typedValue.getDataType());
                 }
@@ -53,7 +53,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
             else
             {
                 Object value = resolveValue(event);
-                if (dataType.getMimeType().getEncoding().isPresent())
+                if (dataType.getMediaType().getCharset().isPresent())
                 {
                     msg.setPayload(value, DataType.builder(dataType).type((value == null || value instanceof NullPayload) ? Object.class : value.getClass()).build());
                 }
@@ -96,7 +96,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
 
     public void setMimeType(String mimeType)
     {
-        setDataType(DataType.builder(dataType == null ? DataType.OBJECT : dataType).mimeType(mimeType).build());
+        setDataType(DataType.builder(dataType == null ? DataType.OBJECT : dataType).mediaType(mimeType).build());
     }
 
     public void setEncoding(String encoding)
@@ -106,7 +106,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
 
     public void setDataType(DataType dataType)
     {
-        if (dataType.getMimeType().getEncoding().isPresent())
+        if (dataType.getMediaType().getCharset().isPresent())
         {
             this.dataType = dataType;
         }

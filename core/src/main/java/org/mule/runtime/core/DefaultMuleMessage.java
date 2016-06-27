@@ -1349,7 +1349,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
             final DataTypeBuilder builder = DataType.builder();
             try
             {
-                builder.mimeType((String) value);
+                builder.mediaType((String) value);
             }
             catch (IllegalArgumentException e)
             {
