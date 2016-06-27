@@ -199,14 +199,19 @@ public class DefaultMuleApplication implements Application
 
     protected void setMuleContext(final MuleContext muleContext) throws NotificationException
     {
-        statusListener = notification -> {
-            int action = notification.getAction();
-            if (action == MuleContextNotification.CONTEXT_INITIALISED ||
-                action == MuleContextNotification.CONTEXT_STARTED ||
-                action == MuleContextNotification.CONTEXT_STOPPED ||
-                action == MuleContextNotification.CONTEXT_DISPOSED)
+        statusListener = new MuleContextNotificationListener<MuleContextNotification>()
+        {
+            @Override
+            public void onNotification(MuleContextNotification notification)
             {
-                updateStatusFor(muleContext.getLifecycleManager().getCurrentPhase());
+                int action = notification.getAction();
+                if (action == MuleContextNotification.CONTEXT_INITIALISED ||
+                    action == MuleContextNotification.CONTEXT_STARTED ||
+                    action == MuleContextNotification.CONTEXT_STOPPED ||
+                    action == MuleContextNotification.CONTEXT_DISPOSED)
+                {
+                    updateStatusFor(muleContext.getLifecycleManager().getCurrentPhase());
+                }
             }
         };
 
