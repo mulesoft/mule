@@ -62,7 +62,7 @@ public final class UdpWorker extends SocketWorker
             {
                 try
                 {
-                    byte[] byteArray = getUdpAllowedByteArray(muleEvent.getMessage().getPayload(), objectSerializer);
+                    byte[] byteArray = getUdpAllowedByteArray(muleEvent.getMessage().getPayload(), encoding, objectSerializer);
                     DatagramPacket sendPacket = createPacket(byteArray);
                     sendPacket.setSocketAddress(packet.getSocketAddress());
                     socket.send(sendPacket);

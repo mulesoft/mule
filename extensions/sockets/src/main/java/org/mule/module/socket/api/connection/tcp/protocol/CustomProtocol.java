@@ -46,9 +46,9 @@ public class CustomProtocol implements TcpProtocol, Initialisable
     }
 
     @Override
-    public void write(OutputStream os, Object data) throws IOException
+    public void write(OutputStream os, Object data, String encoding) throws IOException
     {
-        delegate.write(os, data);
+        delegate.write(os, data, encoding);
     }
 
     @Override

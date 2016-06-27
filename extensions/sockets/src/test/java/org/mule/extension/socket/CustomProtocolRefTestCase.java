@@ -32,6 +32,6 @@ public class CustomProtocolRefTestCase extends SocketExtensionTestCase
         assertThat(protocol, is(not(nullValue())));
 
         // throws UnsupportedOperationException
-        protocol.write(null, null);
+        protocol.write(null, null, "UTF-8");
     }
 }

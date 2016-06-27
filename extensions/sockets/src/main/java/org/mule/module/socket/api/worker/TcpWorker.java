@@ -177,7 +177,7 @@ public final class TcpWorker extends SocketWorker
                 {
                     try
                     {
-                        protocol.write(dataOut, muleEvent.getMessage().getPayload());
+                        protocol.write(dataOut, muleEvent.getMessage().getPayload(), encoding);
                         dataOut.flush();
                     }
                     catch (IOException e)

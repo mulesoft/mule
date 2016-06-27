@@ -128,8 +128,8 @@ public class DirectProtocol extends AbstractByteProtocol
     }
 
     @Override
-    public void write(OutputStream os, Object data) throws IOException
+    public void write(OutputStream os, Object data, String encoding) throws IOException
     {
-        this.writeByteArray(os, getByteArray(data, payloadOnly, streamOk, objectSerializer));
+        this.writeByteArray(os, getByteArray(data, payloadOnly, streamOk, encoding, objectSerializer));
     }
 }

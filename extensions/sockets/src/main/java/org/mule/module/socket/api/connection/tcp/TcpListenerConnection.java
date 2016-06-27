@@ -46,7 +46,8 @@ public final class TcpListenerConnection extends AbstractTcpConnection implement
     private final SimpleServerSocketFactory serverSocketFactory;
     private ServerSocket serverSocket;
 
-    public TcpListenerConnection(ConnectionSettings connectionSettings, TcpProtocol protocol, TcpServerSocketProperties socketProperties,
+    public TcpListenerConnection(ConnectionSettings connectionSettings, TcpProtocol protocol,
+                                 TcpServerSocketProperties socketProperties,
                                  SimpleServerSocketFactory serverSocketFactory) throws ConnectionException
     {
         super(connectionSettings, protocol);

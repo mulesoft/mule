@@ -101,7 +101,8 @@ public final class TcpRequesterProvider implements ConnectionProvider<TcpRequest
             throw new MuleRuntimeException(e);
         }
 
-        TcpRequesterConnection connection = new TcpRequesterConnection(connectionSettings, localAddressSettings, protocol, tcpClientSocketProperties, simpleSocketFactory);
+        TcpRequesterConnection connection = new TcpRequesterConnection(connectionSettings, localAddressSettings, protocol,
+                                                                       tcpClientSocketProperties, simpleSocketFactory);
         connection.connect();
         return connection;
     }

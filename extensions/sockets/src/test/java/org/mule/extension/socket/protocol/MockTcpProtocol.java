@@ -20,13 +20,14 @@ public class MockTcpProtocol extends AbstractByteProtocol
         super(false);
     }
 
-
+    @Override
     public InputStream read(InputStream is) throws IOException
     {
         throw new UnsupportedOperationException("read");
     }
 
-    public void write(OutputStream os, Object data) throws IOException
+    @Override
+    public void write(OutputStream os, Object data, String encoding) throws IOException
     {
         throw new UnsupportedOperationException("write");
     }

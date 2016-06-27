@@ -49,7 +49,7 @@ public class StreamingProtocol extends EOFProtocol
 
 
     @Override
-    public void write(OutputStream os, Object data) throws IOException
+    public void write(OutputStream os, Object data, String encoding) throws IOException
     {
         if (data instanceof InputStream)
         {
@@ -61,7 +61,7 @@ public class StreamingProtocol extends EOFProtocol
         }
         else
         {
-            this.writeByteArray(os, getByteArray(data, false, true, objectSerializer));
+            this.writeByteArray(os, getByteArray(data, false, true, encoding, objectSerializer));
         }
     }
 }

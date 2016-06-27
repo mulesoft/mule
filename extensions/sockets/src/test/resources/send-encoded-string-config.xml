@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+
+    <sockets:request-config name="tcp-requester">
+        <sockets:tcp-requester-connection host="localhost"
+                                          port="${port}"
+                                          failOnUnresolvedHost="true"
+                                          sendTcpNoDelay="true"/>
+    </sockets:request-config>
+
+    <sockets:listener-config name="tcp-listener">
+        <sockets:tcp-listener-connection host="localhost"
+                                         port="${port}"
+                                         sendTcpNoDelay="true"/>
+    </sockets:listener-config>
+
+    <flow name="tcp-send">
+        <sockets:send config-ref="tcp-requester" hasResponse="false" outputEncoding="#[flowVars.encoding]"/>
+    </flow>
+
+    <flow name="tcp-listen">
+        <sockets:socket-listener config-ref="tcp-listener"/>
+        <flow-ref name="onIncomingConnection"/>
+        <set-payload value="Consumed"/>
+    </flow>
+
+    <sub-flow name="onIncomingConnection">
+        <expression-component>org.mule.extension.socket.SocketExtensionTestCase.onIncomingConnection(message)
+        </expression-component>
+    </sub-flow>
+
+</mule>

@@ -16,6 +16,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.module.socket.api.SocketOperations;
+import org.mule.module.socket.api.config.RequesterConfig;
 import org.mule.module.socket.api.connection.RequesterConnection;
 import org.mule.module.socket.api.ImmutableSocketAttributes;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -32,7 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * The output metadata only depends on whether {@link SocketOperations#send(RequesterConnection, Object, String, String, MuleMessage)}
+ * The output metadata only depends on whether {@link SocketOperations#send(RequesterConnection, RequesterConfig, String, Object, String, MuleMessage)}
  * should await a response or not. If no response is needed, the operation metadata should behave like a void operation.
  */
 public class SocketMetadataResolver implements MetadataOutputResolver<String>, MetadataAttributesResolver<String>, MetadataKeysResolver

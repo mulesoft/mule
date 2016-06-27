@@ -38,17 +38,18 @@ public final class SocketUtils
 
     }
 
+    public static final String DEFAULT_ENCODING = "UTF-8";
     private static final String SOCKET_COULD_NOT_BE_CREATED = "%s Socket could not be created correctly";
 
     /**
      * UDP doesn't allow streaming and it always sends payload when dealing with a {@link MuleMessage}
      */
-    public static byte[] getUdpAllowedByteArray(Object data, ObjectSerializer objectSerializer) throws IOException
+    public static byte[] getUdpAllowedByteArray(Object data, String encoding, ObjectSerializer objectSerializer) throws IOException
     {
-        return getByteArray(data, true, false, objectSerializer);
+        return getByteArray(data, true, false, encoding, objectSerializer);
     }
 
-    public static byte[] getByteArray(Object data, boolean payloadOnly, boolean streamingIsAllowed, ObjectSerializer objectSerializer) throws IOException
+    public static byte[] getByteArray(Object data, boolean payloadOnly, boolean streamingIsAllowed, String encoding, ObjectSerializer objectSerializer) throws IOException
     {
         if (data instanceof InputStream && !streamingIsAllowed)
         {
@@ -58,7 +59,7 @@ public final class SocketUtils
         {
             if (payloadOnly)
             {
-                return getByteArray(((MuleMessage) data).getPayload(), payloadOnly, streamingIsAllowed, objectSerializer);
+                return getByteArray(((MuleMessage) data).getPayload(), payloadOnly, streamingIsAllowed, encoding, objectSerializer);
             }
             else
             {
@@ -71,8 +72,7 @@ public final class SocketUtils
         }
         else if (data instanceof String)
         {
-            // TODO Use encoding MULE-9900
-            return ((String) data).getBytes();
+            return ((String) data).getBytes(encoding);
         }
         else if (data instanceof Serializable)
         {
