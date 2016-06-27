@@ -20,7 +20,7 @@
     <httpn:request-config name="nestedConfig">
         <httpn:request-connection host="localhost" port="${httpPort}">
         <httpn:client-socket-properties>
-            <sockets:tcp-client-socket-properties connectionTimeout="1000" keepAlive="true" receiveBufferSize="1024" sendBufferSize="1024" sendTcpNoDelay="true" clientTimeout="1000" linger="1000" />
+            <sockets:tcp-client-socket-properties />
         </httpn:client-socket-properties>
         </httpn:request-connection>
     </httpn:request-config>
