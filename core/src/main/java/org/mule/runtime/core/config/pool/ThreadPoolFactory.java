@@ -6,16 +6,14 @@
  */
 package org.mule.runtime.core.config.pool;
 
-import static java.util.ServiceLoader.load;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.config.PreferredObjectSelector;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 
-import java.util.Iterator;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -32,10 +30,10 @@ public abstract class ThreadPoolFactory implements MuleContextAware
      */
     public static ThreadPoolFactory newInstance()
     {
-        final Iterator<ThreadPoolFactory> servicesIterator = load(ThreadPoolFactory.class).iterator();
+        final Iterable<ThreadPoolFactory> threadPoolFactoryServices = new SpiServiceRegistry().lookupProviders(ThreadPoolFactory.class);
 
-        PreferredObjectSelector<ThreadPoolFactory> selector = new PreferredObjectSelector<ThreadPoolFactory>();
-        ThreadPoolFactory threadPoolFactory = selector.select(servicesIterator);
+        PreferredObjectSelector<ThreadPoolFactory> selector = new PreferredObjectSelector<>();
+        ThreadPoolFactory threadPoolFactory = selector.select(threadPoolFactoryServices.iterator());
 
         if (threadPoolFactory == null)
         {

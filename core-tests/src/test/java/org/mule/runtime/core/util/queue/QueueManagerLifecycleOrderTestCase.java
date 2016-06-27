@@ -11,8 +11,10 @@ import static org.junit.Assert.assertSame;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
@@ -24,18 +26,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
 public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase
 {
-    private List<Object> startStopOrder = new ArrayList<Object>();
+    private List<Object> startStopOrder = new ArrayList<>();
     private RecordingTQM rtqm = new RecordingTQM();
+
+    private MuleContext muleContext;
+
+    @Before
+    public void before() throws InitialisationException, ConfigurationException
+    {
+        muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
+    }
+
+    @After
+    public void after()
+    {
+        muleContext.dispose();
+    }
 
     @Test
     public void testStartupOrder() throws Exception
     {
-        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
         FlowConstruct fc = new RecordingFlow("dummy", muleContext);
         muleContext.getRegistry().registerFlowConstruct(fc);
         muleContext.start();
@@ -46,7 +63,6 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase
         assertSame(fc, startStopOrder.get(2));
         assertSame(rtqm, startStopOrder.get(3));
 
-        muleContext.dispose();
     }
 
     private class RecordingTQM implements QueueManager

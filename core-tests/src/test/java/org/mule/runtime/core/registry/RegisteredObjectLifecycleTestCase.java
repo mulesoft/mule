@@ -22,7 +22,7 @@ import org.junit.Test;
 
 public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCase
 {
-    private static final long TIMEOUT = 1000;
+    private static final long TIMEOUT = 200;
 
     protected Latch initLatch;
     protected Latch startLatch;
@@ -46,17 +46,20 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCa
     {
         muleContext.getRegistry().registerObject("dummy", bean);
         assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
         assertThat(startLatch.getCount(), is(1L));
         assertThat(stopLatch.getCount(), is(1L));
         assertThat(disposeLatch.getCount(), is(1L));
 
         muleContext.start();
         assertTrue(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
         assertThat(stopLatch.getCount(), is(1L));
         assertThat(disposeLatch.getCount(), is(1L));
 
         muleContext.stop();
         assertTrue(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
         assertThat(disposeLatch.getCount(), is(1L));
 
         muleContext.dispose();
@@ -68,12 +71,14 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCa
     {
         muleContext.getRegistry().registerObject("dummy", bean);
         assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
         assertThat(startLatch.getCount(), is(1L));
         assertThat(stopLatch.getCount(), is(1L));
         assertThat(disposeLatch.getCount(), is(1L));
 
         muleContext.start();
         assertTrue(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
         assertThat(stopLatch.getCount(), is(1L));
         assertThat(disposeLatch.getCount(), is(1L));
 
