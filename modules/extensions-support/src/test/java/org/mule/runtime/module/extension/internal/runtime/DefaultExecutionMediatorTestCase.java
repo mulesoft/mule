@@ -143,7 +143,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
         mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext));
 
-        final CachedConnectionProviderWrapper<Object, Object> connectionProviderWrapper = new CachedConnectionProviderWrapper<>(null, false, new SimpleRetryPolicyTemplate(10, RETRY_COUNT));
+        final CachedConnectionProviderWrapper<Object> connectionProviderWrapper = new CachedConnectionProviderWrapper<>(null, false, new SimpleRetryPolicyTemplate(10, RETRY_COUNT));
         LifecycleUtils.initialiseIfNeeded(connectionProviderWrapper, true, muleContext);
         Optional<ConnectionProvider> connectionProvider = Optional.of(connectionProviderWrapper);
 

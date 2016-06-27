@@ -9,8 +9,8 @@ package org.mule.extension.file.internal.command;
 import static java.lang.String.format;
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.RenameCommand;
 
 import java.nio.file.Files;
@@ -27,18 +27,18 @@ public final class LocalRenameCommand extends LocalFileCommand implements Rename
     /**
      * {@inheritDoc}
      */
-    public LocalRenameCommand(LocalFileSystem fileSystem, FileConnector config)
+    public LocalRenameCommand(LocalFileSystem fileSystem)
     {
-        super(fileSystem, config);
+        super(fileSystem);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void rename(String filePath, String newName, boolean overwrite)
+    public void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite)
     {
-        Path source = resolveExistingPath(filePath);
+        Path source = resolveExistingPath(config, filePath);
         Path target = source.getParent().resolve(newName);
 
         if (Files.exists(target) && !overwrite)

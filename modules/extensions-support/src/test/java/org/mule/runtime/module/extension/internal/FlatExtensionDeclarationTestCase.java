@@ -30,7 +30,6 @@ import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsume
 import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CALLBACK_DESCRIPTION;
 import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONFIG_NAME;
-import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONNECTION_PROVIDER_CONFIG_TYPE;
 import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONNECTION_PROVIDER_CONNECTOR_TYPE;
 import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONNECTION_PROVIDER_DESCRIPTION;
 import static org.mule.runtime.extension.tck.introspection.TestWebServiceConsumerDeclarer.CONNECTION_PROVIDER_NAME;
@@ -296,7 +295,6 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
         assertThat(connectionProvider.getName(), is(CONNECTION_PROVIDER_NAME));
         assertThat(connectionProvider.getDescription(), is(CONNECTION_PROVIDER_DESCRIPTION));
         assertThat(connectionProvider.getConnectionProviderFactory(), is(sameInstance(reference.getConnectionProviderFactory())));
-        assertThat(connectionProvider.getConfigurationType(), is(sameInstance(CONNECTION_PROVIDER_CONFIG_TYPE)));
         assertThat(connectionProvider.getConnectionType(), is(sameInstance(CONNECTION_PROVIDER_CONNECTOR_TYPE)));
 
         List<ParameterModel> parameters = connectionProvider.getParameterModels();

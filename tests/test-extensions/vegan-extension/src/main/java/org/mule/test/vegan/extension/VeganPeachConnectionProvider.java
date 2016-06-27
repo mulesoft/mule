@@ -13,7 +13,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.tck.testmodels.fruit.Peach;
 
-public class VeganPeachConnectionProvider implements ConnectionProvider<PeachConfig, Peach>
+public class VeganPeachConnectionProvider implements ConnectionProvider<Peach>
 {
     @Override
     public ConnectionHandlingStrategy getHandlingStrategy(ConnectionHandlingStrategyFactory handlingStrategyFactory)
@@ -22,7 +22,7 @@ public class VeganPeachConnectionProvider implements ConnectionProvider<PeachCon
     }
 
     @Override
-    public Peach connect(PeachConfig peachConfig) throws ConnectionException
+    public Peach connect() throws ConnectionException
     {
         return new Peach();
     }

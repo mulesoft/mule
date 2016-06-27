@@ -288,7 +288,6 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                     new ImmutableRuntimeConnectionProviderModel(
                             declaration.getName(),
                             declaration.getDescription(),
-                            declaration.getConfigurationType(),
                             declaration.getConnectionType(),
                             declaration.getFactory(),
                             toParameters(declaration.getParameters()),
@@ -356,7 +355,6 @@ public final class DefaultExtensionFactory implements ExtensionFactory
 
     private boolean isExpression(String value)
     {
-        return value.startsWith(DEFAULT_EXPRESSION_PREFIX) &&
-               value.endsWith(DEFAULT_EXPRESSION_POSTFIX);
+        return value.startsWith(DEFAULT_EXPRESSION_PREFIX) && value.endsWith(DEFAULT_EXPRESSION_POSTFIX);
     }
 }

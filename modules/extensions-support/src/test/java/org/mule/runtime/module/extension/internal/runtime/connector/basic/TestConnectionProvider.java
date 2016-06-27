@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 
-public class TestConnectionProvider implements ConnectionProvider<TestConnector, Object>
+public class TestConnectionProvider implements ConnectionProvider<Object>
 {
 
     @Parameter
@@ -55,7 +55,7 @@ public class TestConnectionProvider implements ConnectionProvider<TestConnector,
     private String connectionProviderOptionalFieldExpressionNotSupported;
 
     @Override
-    public Object connect(TestConnector testConnector) throws ConnectionException
+    public Object connect() throws ConnectionException
     {
         return new Object();
     }
@@ -73,7 +73,7 @@ public class TestConnectionProvider implements ConnectionProvider<TestConnector,
     }
 
     @Override
-    public ConnectionHandlingStrategy<Object> getHandlingStrategy(ConnectionHandlingStrategyFactory<TestConnector, Object> connectionHandlingStrategyFactory)
+    public ConnectionHandlingStrategy<Object> getHandlingStrategy(ConnectionHandlingStrategyFactory<Object> connectionHandlingStrategyFactory)
     {
         return connectionHandlingStrategyFactory.none();
     }

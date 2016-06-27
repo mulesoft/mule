@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing {@link ConnectionProviderResolver}

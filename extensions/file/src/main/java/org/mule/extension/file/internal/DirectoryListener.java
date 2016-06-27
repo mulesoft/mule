@@ -446,7 +446,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
             throw new MuleRuntimeException(createStaticMessage("Could not create watcher service"), e);
         }
 
-        TreeNode directoryNode = fileSystem.list(directoryPath.toString(), false, new DefaultMuleMessage(""), new NullFilePayloadPredicate());
+        TreeNode directoryNode = fileSystem.list(config, directoryPath.toString(), false, new DefaultMuleMessage(""), new NullFilePayloadPredicate());
         final Path rootPath = Paths.get(directoryNode.getAttributes().getPath());
         registerPath(rootPath);
 

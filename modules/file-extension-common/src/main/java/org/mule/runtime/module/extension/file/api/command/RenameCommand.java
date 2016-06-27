@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.file.api.command;
 
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 
 /**
@@ -19,9 +20,10 @@ public interface RenameCommand
     /**
      * Renames a file under the considerations of {@link FileSystem#rename(String, String, boolean)}
      *
+     * @param config    the config that is parameterizing this operation
      * @param filePath  the path to the file to be renamed
      * @param newName   the file's new name
      * @param overwrite whether to overwrite the target file if it already exists
      */
-    void rename(String filePath, String newName, boolean overwrite);
+    void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite);
 }

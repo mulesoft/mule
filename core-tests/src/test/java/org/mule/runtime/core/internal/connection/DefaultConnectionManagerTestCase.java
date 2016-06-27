@@ -44,7 +44,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase
     private Banana connection = new Banana();
 
     @Mock
-    private ConnectionProvider<Apple, Banana> connectionProvider;
+    private ConnectionProvider<Banana> connectionProvider;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
@@ -54,7 +54,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        when(connectionProvider.connect(config)).thenReturn(connection);
+        when(connectionProvider.connect()).thenReturn(connection);
         when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
         when(connectionProvider.getHandlingStrategy(any(ConnectionHandlingStrategyFactory.class))).thenAnswer(invocation -> {
             ConnectionHandlingStrategyFactory factory = (ConnectionHandlingStrategyFactory) invocation.getArguments()[0];

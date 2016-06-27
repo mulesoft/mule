@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.file.api.command;
 
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 
 /**
@@ -19,11 +20,12 @@ public interface MoveCommand
     /**
      * Moves files under the considerations of {@link FileSystem#move(String, String, boolean, boolean)}
      *
-     * @param sourcePath            the path to the file to be copied
-     * @param targetPath            the target directory
-     * @param overwrite             whether or not overwrite the file if the target destination already exists.
+     * @param config                  the config that is parameterizing this operation
+     * @param sourcePath              the path to the file to be copied
+     * @param targetPath              the target directory
+     * @param overwrite               whether or not overwrite the file if the target destination already exists.
      * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    void move(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories);
+    void move(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories);
 }

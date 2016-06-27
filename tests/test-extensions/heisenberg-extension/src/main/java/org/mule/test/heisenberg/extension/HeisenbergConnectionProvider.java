@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 
-public class HeisenbergConnectionProvider implements ConnectionProvider<HeisenbergExtension, HeisenbergConnection>
+public class HeisenbergConnectionProvider implements ConnectionProvider<HeisenbergConnection>
 {
 
     public static final String SAUL_OFFICE_NUMBER = "505-503-4455";
@@ -30,7 +30,7 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
     private TlsContextFactory tlsContextFactory;
 
     @Override
-    public HeisenbergConnection connect(HeisenbergExtension heisenbergExtension) throws ConnectionException
+    public HeisenbergConnection connect() throws ConnectionException
     {
         return new HeisenbergConnection(saulPhoneNumber);
     }
@@ -48,7 +48,7 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
     }
 
     @Override
-    public ConnectionHandlingStrategy<HeisenbergConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<HeisenbergExtension, HeisenbergConnection> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<HeisenbergConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<HeisenbergConnection> handlingStrategyFactory)
     {
         return handlingStrategyFactory.supportsPooling();
     }

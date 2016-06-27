@@ -16,9 +16,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
@@ -55,7 +62,11 @@ public class ConfigNameModelEnricherTestCase extends AbstractMuleTestCase
     @Mock
     private ConfigurationDeclaration configurationDeclaration;
 
-    private Field nameField;
+    @Mock
+    private ConnectionProviderDeclaration connectionProviderDeclaration;
+
+    private Field configNameField;
+    private Field providerNameField;
     private final ConfigNameModelEnricher enricher = new ConfigNameModelEnricher();
 
     @Before
@@ -64,47 +75,63 @@ public class ConfigNameModelEnricherTestCase extends AbstractMuleTestCase
         when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
         when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
         when(extensionDeclaration.getConfigurations()).thenReturn(asList(configurationDeclaration));
-        mockImplementingProperty(TestNameAwareConfig.class);
-        nameField = getAllFields(TestNameAwareConfig.class, withAnnotation(ConfigName.class)).iterator().next();
+        when(extensionDeclaration.getConnectionProviders()).thenReturn(asList(connectionProviderDeclaration));
+
+        mockImplementingProperty(configurationDeclaration, TestNameAwareConfig.class);
+        mockImplementingProperty(connectionProviderDeclaration, TestNameAwareConnectionProvider.class);
+        configNameField = getAllFields(TestNameAwareConfig.class, withAnnotation(ConfigName.class)).iterator().next();
+        providerNameField = getAllFields(TestNameAwareConnectionProvider.class, withAnnotation(ConfigName.class)).iterator().next();
     }
 
     @Test
     public void addModelProperty() throws Exception
     {
         enricher.enrich(describingContext);
+        assertModelPropertyAdded(configurationDeclaration, configNameField);
+    }
+
+    @Test
+    public void addModelPropertyOnConnectionProvider()
+    {
+        enricher.enrich(describingContext);
+        assertModelPropertyAdded(connectionProviderDeclaration, providerNameField);
+    }
+
+    private void assertModelPropertyAdded(BaseDeclaration declaration, Field injectionField)
+    {
         ArgumentCaptor<RequireNameField> captor = ArgumentCaptor.forClass(RequireNameField.class);
-        verify(configurationDeclaration).addModelProperty(captor.capture());
+        verify(declaration).addModelProperty(captor.capture());
 
         RequireNameField property = captor.getValue();
         assertThat(property, is(notNullValue()));
-        assertThat(property.getConfigNameField(), equalTo(nameField));
+        assertThat(property.getConfigNameField(), equalTo(injectionField));
     }
 
     @Test
     public void configWithoutImplementingProperty() throws Exception
     {
-        mockImplementingProperty(null);
+        mockImplementingProperty(configurationDeclaration, null);
         enricher.enrich(describingContext);
     }
 
     @Test(expected = IllegalConfigurationModelDefinitionException.class)
     public void manyAnnotatedFields()
     {
-        mockImplementingProperty(TestMultipleNameAwareConfig.class);
+        mockImplementingProperty(configurationDeclaration, TestMultipleNameAwareConfig.class);
         enricher.enrich(describingContext);
     }
 
     @Test(expected = IllegalConfigurationModelDefinitionException.class)
     public void annotatedFieldOfWrongType()
     {
-        mockImplementingProperty(TestIllegalNameAwareConfig.class);
+        mockImplementingProperty(configurationDeclaration, TestIllegalNameAwareConfig.class);
         enricher.enrich(describingContext);
     }
 
-    private void mockImplementingProperty(Class<?> type)
+    private void mockImplementingProperty(BaseDeclaration declaration, Class<?> type)
     {
         ImplementingTypeModelProperty property = type != null ? new ImplementingTypeModelProperty(type) : null;
-        when(configurationDeclaration.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.ofNullable(property));
+        when(declaration.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(Optional.ofNullable(property));
     }
 
     public static class TestNameAwareConfig
@@ -134,5 +161,41 @@ public class ConfigNameModelEnricherTestCase extends AbstractMuleTestCase
 
         @ConfigName
         private Apple name;
+    }
+
+    public static class TestNameAwareConnectionProvider implements ConnectionProvider<Object>
+    {
+
+        @ConfigName
+        private String name;
+
+        @Override
+        public Object connect() throws ConnectionException
+        {
+            return new Object();
+        }
+
+        @Override
+        public void disconnect(Object o)
+        {
+
+        }
+
+        @Override
+        public ConnectionValidationResult validate(Object o)
+        {
+            return ConnectionValidationResult.success();
+        }
+
+        @Override
+        public ConnectionHandlingStrategy<Object> getHandlingStrategy(ConnectionHandlingStrategyFactory<Object> handlingStrategyFactory)
+        {
+            return null;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
     }
 }

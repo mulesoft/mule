@@ -6,7 +6,6 @@
  */
 package org.mule.module.socket.api.provider.udp;
 
-import org.mule.module.socket.api.config.ListenerConfig;
 import org.mule.module.socket.api.connection.ConnectionSettings;
 import org.mule.module.socket.api.connection.udp.UdpListenerConnection;
 import org.mule.module.socket.api.exceptions.UnresolvableHostException;
@@ -31,7 +30,7 @@ import java.net.DatagramSocket;
  * @since 4.0
  */
 @Alias("udp-listener")
-public class UdpListenerProvider implements ConnectionProvider<ListenerConfig, UdpListenerConnection>
+public class UdpListenerProvider implements ConnectionProvider<UdpListenerConnection>
 {
 
     /**
@@ -47,7 +46,7 @@ public class UdpListenerProvider implements ConnectionProvider<ListenerConfig, U
     private UdpSocketProperties udpSocketProperties;
 
     @Override
-    public UdpListenerConnection connect(ListenerConfig config) throws ConnectionException, UnresolvableHostException
+    public UdpListenerConnection connect() throws ConnectionException, UnresolvableHostException
     {
         UdpListenerConnection connection = new UdpListenerConnection(connectionSettings, udpSocketProperties);
         connection.connect();
@@ -67,7 +66,7 @@ public class UdpListenerProvider implements ConnectionProvider<ListenerConfig, U
     }
 
     @Override
-    public ConnectionHandlingStrategy<UdpListenerConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<ListenerConfig, UdpListenerConnection> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<UdpListenerConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<UdpListenerConnection> handlingStrategyFactory)
     {
         return handlingStrategyFactory.none();
     }

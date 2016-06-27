@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.module.extension.file.api.AbstractFileSystem;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
@@ -50,6 +51,7 @@ import java.nio.file.Path;
  */
 public final class LocalFileSystem extends AbstractFileSystem
 {
+
     private final CopyCommand copyCommand;
     private final CreateDirectoryCommand createDirectoryCommand;
     private final DeleteCommand deleteCommand;
@@ -61,19 +63,17 @@ public final class LocalFileSystem extends AbstractFileSystem
 
     /**
      * Creates a new instance
-     *
-     * @param config a {@link FileConnector} which acts as a config
      */
-    public LocalFileSystem(FileConnector config, MuleContext muleContext)
+    public LocalFileSystem(MuleContext muleContext)
     {
-        copyCommand = new LocalCopyCommand(this, config);
-        createDirectoryCommand = new LocalCreateDirectoryCommand(this, config);
-        deleteCommand = new LocalDeleteCommand(this, config);
-        listCommand = new LocalListCommand(this, config);
-        moveCommand = new LocalMoveCommand(this, config);
-        readCommand = new LocalReadCommand(this, config);
-        renameCommand = new LocalRenameCommand(this, config);
-        writeCommand = new LocalWriteCommand(this, config, muleContext);
+        copyCommand = new LocalCopyCommand(this);
+        createDirectoryCommand = new LocalCreateDirectoryCommand(this);
+        deleteCommand = new LocalDeleteCommand(this);
+        listCommand = new LocalListCommand(this);
+        moveCommand = new LocalMoveCommand(this);
+        readCommand = new LocalReadCommand(this);
+        renameCommand = new LocalRenameCommand(this);
+        writeCommand = new LocalWriteCommand(this, muleContext);
     }
 
     @Override
@@ -130,5 +130,13 @@ public final class LocalFileSystem extends AbstractFileSystem
         return new LocalPathLock(path, ArrayUtils.isEmpty(params)
                                        ? new OpenOption[] {WRITE}
                                        : (OpenOption[]) params);
+    }
+
+    /**
+     * No-op implementation.
+     */
+    @Override
+    public void changeToBaseDir(FileConnectorConfig config)
+    {
     }
 }

@@ -6,27 +6,24 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 
 /**
- * A {@link ConnectionHandlingStrategyAdapter} which is associated to a {@link #config}.
- * A connection is lazily created and cached, so that the same instance is returned
- * each time the {@link #config} requires a connection.
+ * A {@link ConnectionHandlingStrategyAdapter} which lazily creates and caches connections,
+ * so that the same instance is returned each time that one is required.
  * <p/>
  * When {@link ConnectionHandler#release()} is invoked on the instances returned
  * by {@link #getConnectionHandler()}, the connection is not actually closed. It
  * will only be disconnected when {@link #close()} is called.
  *
- * @param <Config>     the generic type of the configuration associated to this strategy
  * @param <Connection> the generic type of the connections being managed
  * @since 4.0
  */
-final class CachedConnectionHandlingStrategy<Config, Connection> extends ConnectionHandlingStrategyAdapter<Config, Connection>
+final class CachedConnectionHandlingStrategy<Connection> extends ConnectionHandlingStrategyAdapter<Connection>
 {
 
     private final ConnectionHandlerAdapter<Connection> connection;
@@ -34,14 +31,13 @@ final class CachedConnectionHandlingStrategy<Config, Connection> extends Connect
     /**
      * Creates a new instance
      *
-     * @param config             the config to which the {@code connectionProvider} is bounded
      * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
      * @param muleContext        the owning {@link MuleContext}
      */
-    CachedConnectionHandlingStrategy(Config config, ConnectionProvider<Config, Connection> connectionProvider, MuleContext muleContext)
+    CachedConnectionHandlingStrategy(ConnectionProvider<Connection> connectionProvider, MuleContext muleContext)
     {
-        super(config, connectionProvider, muleContext);
-        connection = new CachedConnectionHandler<>(config, connectionProvider, muleContext);
+        super(connectionProvider, muleContext);
+        connection = new CachedConnectionHandler<>(connectionProvider, muleContext);
     }
 
     /**

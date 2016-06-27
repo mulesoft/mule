@@ -6,12 +6,12 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.sftp.SftpFileSystem;
 import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
 import org.mule.extension.ftp.internal.sftp.SftpFileAttributes;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,7 +22,7 @@ import java.util.Stack;
  *
  * @since 4.0
  */
-public abstract class SftpCommand extends FtpCommand<FtpConnector, SftpFileSystem>
+public abstract class SftpCommand extends FtpCommand<SftpFileSystem>
 {
 
     protected SftpClient client;
@@ -31,12 +31,11 @@ public abstract class SftpCommand extends FtpCommand<FtpConnector, SftpFileSyste
      * Creates a new instance
      *
      * @param fileSystem a {@link SftpFileSystem} used as the connection object
-     * @param config     a {@link FtpConnector} which configures this command
      * @param client     a {@link SftpClient}
      */
-    public SftpCommand(SftpFileSystem fileSystem, FtpConnector config, SftpClient client)
+    public SftpCommand(SftpFileSystem fileSystem, SftpClient client)
     {
-        super(fileSystem, config);
+        super(fileSystem);
         this.client = client;
     }
 
@@ -44,9 +43,9 @@ public abstract class SftpCommand extends FtpCommand<FtpConnector, SftpFileSyste
      * {@inheritDoc}
      */
     @Override
-    protected FtpFileAttributes getFile(String filePath, boolean requireExistence)
+    protected FtpFileAttributes getFile(FileConnectorConfig config, String filePath, boolean requireExistence)
     {
-        Path path = resolvePath(filePath);
+        Path path = resolvePath(config, filePath);
         SftpFileAttributes attributes;
         try
         {
@@ -81,13 +80,13 @@ public abstract class SftpCommand extends FtpCommand<FtpConnector, SftpFileSyste
      * @param directoryPath the {@link Path} to the directory you want to create
      */
     @Override
-    protected void doMkDirs(Path directoryPath)
+    protected void doMkDirs(FileConnectorConfig config, Path directoryPath)
     {
         Stack<Path> fragments = new Stack<>();
         for (int i = directoryPath.getNameCount(); i >= 0; i--)
         {
             Path subPath = Paths.get("/").resolve(directoryPath.subpath(0, i));
-            if (exists(subPath))
+            if (exists(config, subPath))
             {
                 break;
             }

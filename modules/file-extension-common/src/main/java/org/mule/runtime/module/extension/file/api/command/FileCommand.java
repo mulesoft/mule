@@ -24,51 +24,48 @@ import org.slf4j.LoggerFactory;
  * Base class for implementations of the Command design pattern which
  * performs operations on a file system
  *
- * @param <C> the generic type of the {@link FileConnectorConfig} which configures the operation
  * @param <F> the generic type of the {@link FileSystem} on which the operation is performed
  * @since 4.0
  */
-public abstract class FileCommand<C extends FileConnectorConfig, F extends FileSystem>
+public abstract class FileCommand<F extends FileSystem>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileCommand.class);
 
     protected final F fileSystem;
-    protected final C config;
 
     /**
      * Creates a new instance
      *
      * @param fileSystem the {@link FileSystem} on which the operation is performed
-     * @param config     the config which configures the operation
      */
-    protected FileCommand(F fileSystem, C config)
+    protected FileCommand(F fileSystem)
     {
         this.fileSystem = fileSystem;
-        this.config = config;
     }
 
     /**
      * Returns true if the given {@code path} exists
      *
+     * @param config the config which is parameterizing this operation
      * @param path the {@link Path} to test
      * @return whether the {@code path} exists
      */
-    protected abstract boolean exists(Path path);
+    protected abstract boolean exists(FileConnectorConfig config, Path path);
 
-    protected void assureParentFolderExists(Path path, boolean createParentFolder)
+    protected void assureParentFolderExists(FileConnectorConfig config, Path path, boolean createParentFolder)
     {
-        if (exists(path))
+        if (exists(config, path))
         {
             return;
         }
 
         Path parentFolder = path.getParent();
-        if (!exists(parentFolder))
+        if (!exists(config, parentFolder))
         {
             if (createParentFolder)
             {
-                mkdirs(parentFolder);
+                mkdirs(config, parentFolder);
             }
             else
             {
@@ -83,18 +80,18 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
      *
      * @param directoryPath the {@link Path} to the directory you want to create
      */
-    protected final void mkdirs(Path directoryPath)
+    protected final void mkdirs(FileConnectorConfig config, Path directoryPath)
     {
         Lock lock = fileSystem.createMuleLock(String.format("%s-mkdirs-%s", getClass().getName(), directoryPath));
         lock.lock();
         try
         {
             // verify no other thread beat us to it
-            if (exists(directoryPath))
+            if (exists(config, directoryPath))
             {
                 return;
             }
-            doMkDirs(directoryPath);
+            doMkDirs(config, directoryPath);
         }
         finally
         {
@@ -104,7 +101,7 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
         LOGGER.debug("Directory '{}' created", directoryPath);
     }
 
-    protected abstract void doMkDirs(Path directoryPath);
+    protected abstract void doMkDirs(FileConnectorConfig config, Path directoryPath);
 
     /**
      * Returns an absolute {@link Path} to the given
@@ -113,9 +110,9 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
      * @param filePath the path to a file or directory
      * @return an absolute {@link Path}
      */
-    protected Path resolvePath(String filePath)
+    protected Path resolvePath(FileConnectorConfig config, String filePath)
     {
-        Path path = getBasePath();
+        Path path = getBasePath(config);
         if (filePath != null)
         {
             path = path.resolve(filePath);
@@ -127,24 +124,26 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
     /**
      * Returns a {@link Path} to which all non absolute paths are relative to
      *
+     * @param config the config on which is parameterizing this operation
      * @return a not {@code null} {@link Path}
      */
-    protected abstract Path getBasePath();
+    protected abstract Path getBasePath(FileConnectorConfig config);
 
     /**
-     * Similar to {@link #resolvePath(String)} only that it throws a
+     * Similar to {@link #resolvePath(FileConnectorConfig, String)} only that it throws a
      * {@link IllegalArgumentException} if the given path doesn't exists.
      * <p>
      * The existence of the obtained path is verified by delegating into
-     * {@link #exists(Path)}
+     * {@link #exists(FileConnectorConfig, Path)}
      *
+     * @param config the config on which is parameterizing this operation
      * @param filePath the path to a file or directory
      * @return an absolute {@link Path}
      */
-    protected Path resolveExistingPath(String filePath)
+    protected Path resolveExistingPath(FileConnectorConfig config, String filePath)
     {
-        Path path = resolvePath(filePath);
-        if (!exists(path))
+        Path path = resolvePath(config, filePath);
+        if (!exists(config, path))
         {
             throw pathNotFoundException(path);
         }
@@ -189,7 +188,7 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
 
     /**
      * Returns an {@link IllegalArgumentException} explaining that
-     * a {@link FileSystem#read(MuleMessage, String, boolean)} operation
+     * a {@link FileSystem#read(FileConnectorConfig, MuleMessage, String, boolean)} operation
      * was attempted on a {@code path} pointing to a directory
      *
      * @param path the {@link Path} on which a read was attempted
@@ -202,7 +201,7 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
 
     /**
      * Returns a {@link IllegalArgumentException} explaining that
-     * a {@link FileSystem#list(String, boolean, MuleMessage, Predicate)}
+     * a {@link FileSystem#list(FileConnectorConfig, String, boolean, MuleMessage, Predicate)}
      * operation was attempted on a {@code path} pointing to a file.
      *
      * @param path the {@link Path} on which a list was attempted
@@ -215,7 +214,7 @@ public abstract class FileCommand<C extends FileConnectorConfig, F extends FileS
 
     /**
      * Returns a {@link IllegalArgumentException} explaining that
-     * a {@link FileSystem#list(String, boolean, MuleMessage, Predicate)} operation
+     * a {@link FileSystem#list(FileConnectorConfig, String, boolean, MuleMessage, Predicate)} operation
      * was attempted on a {@code path} pointing to a file.
      *
      * @param path the {@link Path} on which a list was attempted

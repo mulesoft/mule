@@ -6,41 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 /**
- * A default {@link ObjectParsingDelegate} which accepts any {@link ObjectType}
- * and parses it as a {@link ValueResolver}
+ * Specialization of {@link ParsingDelegate} that always produces
+ * instances of {@link ValueResolver}
  *
  * @since 4.0
  */
-public class ValueResolverParsingDelegate implements ObjectParsingDelegate
+public interface ValueResolverParsingDelegate extends ParsingDelegate<MetadataType, ValueResolver<Object>>
 {
 
-    /**
-     * @param objectType an {@link ObjectType}
-     * @return {@code true}
-     */
-    @Override
-    public boolean accepts(ObjectType objectType)
-    {
-        return true;
-    }
-
-    /**
-     * Parses the given {@code objectType} as a {@link ValueResolver}
-     *
-     * @param name       the element name
-     * @param objectType a {@link ObjectType}
-     * @return a {@link AttributeDefinition.Builder}
-     */
-    @Override
-    public AttributeDefinition.Builder parse(String name, ObjectType objectType)
-    {
-        return fromChildConfiguration(ValueResolver.class).withWrapperIdentifier(hyphenize(name));
-    }
 }

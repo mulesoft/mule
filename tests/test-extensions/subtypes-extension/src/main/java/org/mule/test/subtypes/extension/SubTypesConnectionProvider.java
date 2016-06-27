@@ -14,7 +14,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Parameter;
 
-public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesMappingConnector, SubTypesConnectorConnection>
+public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesConnectorConnection>
 {
 
     @Parameter
@@ -25,7 +25,7 @@ public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesMa
 
 
     @Override
-    public SubTypesConnectorConnection connect(SubTypesMappingConnector subtypesPojoConnector) throws ConnectionException
+    public SubTypesConnectorConnection connect() throws ConnectionException
     {
         return new SubTypesConnectorConnection(abstractShape, doorInterface);
     }
@@ -42,7 +42,7 @@ public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesMa
     }
 
     @Override
-    public ConnectionHandlingStrategy<SubTypesConnectorConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<SubTypesMappingConnector, SubTypesConnectorConnection> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<SubTypesConnectorConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<SubTypesConnectorConnection> handlingStrategyFactory)
     {
         return handlingStrategyFactory.supportsPooling();
     }

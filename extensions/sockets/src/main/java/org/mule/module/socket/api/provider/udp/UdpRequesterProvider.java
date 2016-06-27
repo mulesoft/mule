@@ -7,7 +7,6 @@
 package org.mule.module.socket.api.provider.udp;
 
 import org.mule.module.socket.api.SocketOperations;
-import org.mule.module.socket.api.config.RequesterConfig;
 import org.mule.module.socket.api.connection.ConnectionSettings;
 import org.mule.module.socket.api.connection.udp.UdpRequesterConnection;
 import org.mule.module.socket.api.exceptions.UnresolvableHostException;
@@ -32,7 +31,7 @@ import java.net.DatagramSocket;
  * @since 4.0
  */
 @Alias("udp-requester")
-public final class UdpRequesterProvider implements ConnectionProvider<RequesterConfig, UdpRequesterConnection>
+public final class UdpRequesterProvider implements ConnectionProvider<UdpRequesterConnection>
 {
 
     /**
@@ -55,7 +54,7 @@ public final class UdpRequesterProvider implements ConnectionProvider<RequesterC
     private ConnectionSettings localAddressSettings = new ConnectionSettings();
 
     @Override
-    public UdpRequesterConnection connect(RequesterConfig udpConfig) throws ConnectionException, UnresolvableHostException
+    public UdpRequesterConnection connect() throws ConnectionException, UnresolvableHostException
     {
         UdpRequesterConnection connection = new UdpRequesterConnection(connectionSettings, localAddressSettings, udpSocketProperties);
         connection.connect();
@@ -75,7 +74,7 @@ public final class UdpRequesterProvider implements ConnectionProvider<RequesterC
     }
 
     @Override
-    public ConnectionHandlingStrategy<UdpRequesterConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<RequesterConfig, UdpRequesterConnection> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<UdpRequesterConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<UdpRequesterConnection> handlingStrategyFactory)
     {
         return handlingStrategyFactory.supportsPooling();
     }

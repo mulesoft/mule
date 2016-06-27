@@ -15,11 +15,11 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.tck.testmodels.fruit.Kiwi;
 
 @Alias("kiwi")
-public class VeganKiwiConnectionProvider implements ConnectionProvider<KiwiConfig, Kiwi>
+public class VeganKiwiConnectionProvider implements ConnectionProvider<Kiwi>
 {
 
     @Override
-    public Kiwi connect(KiwiConfig config) throws ConnectionException
+    public Kiwi connect() throws ConnectionException
     {
         return new Kiwi();
     }
@@ -37,7 +37,7 @@ public class VeganKiwiConnectionProvider implements ConnectionProvider<KiwiConfi
     }
 
     @Override
-    public ConnectionHandlingStrategy<Kiwi> getHandlingStrategy(ConnectionHandlingStrategyFactory<KiwiConfig, Kiwi> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<Kiwi> getHandlingStrategy(ConnectionHandlingStrategyFactory<Kiwi> handlingStrategyFactory)
     {
         return handlingStrategyFactory.none();
     }

@@ -24,7 +24,7 @@ final class ExtensionEntityKey
 
     protected ExtensionEntityKey(String name, String vendor)
     {
-        this.vendor = vendor == null ? Extension.NO_VENDOR : vendor;
+        this.vendor = vendor == null ? Extension.MULESOFT : vendor;
         this.name = name;
     }
 

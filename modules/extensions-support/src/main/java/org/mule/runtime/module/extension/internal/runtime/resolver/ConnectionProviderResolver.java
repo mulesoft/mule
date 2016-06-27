@@ -4,14 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.config.dsl.connection;
+package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 /**
  * A {@link ValueResolver} specialization for producing {@link ConnectionProvider}
@@ -22,7 +20,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 public class ConnectionProviderResolver implements ValueResolver<ConnectionProvider>
 {
 
-    private final ObjectBuilderValueResolver<ConnectionProvider> objectBuilder;
+    private final ConnectionProviderObjectBuilder objectBuilder;
+    private final ObjectBuilderValueResolver<ConnectionProvider> valueResolver;
 
     /**
      * Creates a new instance
@@ -31,18 +30,24 @@ public class ConnectionProviderResolver implements ValueResolver<ConnectionProvi
      */
     public ConnectionProviderResolver(ConnectionProviderObjectBuilder objectBuilder)
     {
-        this.objectBuilder = new ObjectBuilderValueResolver<>(objectBuilder);
+        this.objectBuilder = objectBuilder;
+        this.valueResolver = new ObjectBuilderValueResolver<>(objectBuilder);
     }
 
     @Override
     public ConnectionProvider resolve(MuleEvent event) throws MuleException
     {
-        return objectBuilder.resolve(event);
+        return valueResolver.resolve(event);
     }
 
     @Override
     public boolean isDynamic()
     {
-        return objectBuilder.isDynamic();
+        return valueResolver.isDynamic();
+    }
+
+    public void setOwnerConfigName(String ownerConfigName)
+    {
+        objectBuilder.setOwnerConfigName(ownerConfigName);
     }
 }

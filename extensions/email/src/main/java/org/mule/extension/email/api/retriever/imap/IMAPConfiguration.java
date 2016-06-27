@@ -6,7 +6,6 @@
  */
 package org.mule.extension.email.api.retriever.imap;
 
-import org.mule.extension.email.api.AbstractEmailConfiguration;
 import org.mule.extension.email.api.retriever.RetrieverConfiguration;
 import org.mule.extension.email.api.retriever.RetrieverOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -24,7 +23,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 @Operations({IMAPOperations.class, RetrieverOperations.class})
 @Providers({IMAPProvider.class, IMAPSProvider.class})
 @Configuration(name = "imap")
-public class IMAPConfiguration extends AbstractEmailConfiguration implements RetrieverConfiguration
+public class IMAPConfiguration implements RetrieverConfiguration
 {
 
     /**

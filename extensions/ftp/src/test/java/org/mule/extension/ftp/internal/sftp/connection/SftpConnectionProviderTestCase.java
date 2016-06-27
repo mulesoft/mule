@@ -81,6 +81,8 @@ public class SftpConnectionProviderTestCase extends AbstractMuleTestCase
 
         provider.setHost(HOST);
         provider.setUsername(USERNAME);
+        provider.setConnectionTimeout(10);
+        provider.setConnectionTimeoutUnit(SECONDS);
         provider.setPreferredAuthenticationMethods(ImmutableSet.of(GSSAPI_WITH_MIC));
         provider.setKnownHostsFile(hostFile.getAbsolutePath());
 
@@ -95,8 +97,6 @@ public class SftpConnectionProviderTestCase extends AbstractMuleTestCase
 
         when(jsch.getSession(USERNAME, HOST)).thenReturn(session);
         when(session.openChannel("sftp")).thenReturn(channel);
-        when(config.getConnectionTimeout()).thenReturn(10);
-        when(config.getConnectionTimeoutUnit()).thenReturn(SECONDS);
     }
 
     @Test
@@ -150,7 +150,7 @@ public class SftpConnectionProviderTestCase extends AbstractMuleTestCase
     public void noKnownHosts() throws Exception
     {
         provider.setKnownHostsFile(null);
-        provider.connect(config);
+        provider.connect();
 
         Properties properties = captureLoginProperties();
         assertThat(properties.getProperty(STRICT_HOST_KEY_CHECKING), equalTo("no"));
@@ -163,7 +163,7 @@ public class SftpConnectionProviderTestCase extends AbstractMuleTestCase
 
     private void login() throws Exception
     {
-        provider.connect(config);
+        provider.connect();
         verify(jsch).setKnownHosts(hostFile.getAbsolutePath());
         verify(session).setTimeout(new Long(SECONDS.toMillis(TIMEOUT)).intValue());
         verify(session).connect();

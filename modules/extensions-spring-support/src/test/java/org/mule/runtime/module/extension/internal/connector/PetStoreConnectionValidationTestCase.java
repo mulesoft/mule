@@ -45,5 +45,4 @@ public class PetStoreConnectionValidationTestCase extends PetStoreConnectionTest
     {
         runFlow("getPetsWithInvalidConfigAndDisabledValidation").getMessage().getPayload();
     }
-
 }

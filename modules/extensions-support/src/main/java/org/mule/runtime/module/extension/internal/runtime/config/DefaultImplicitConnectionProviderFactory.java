@@ -30,7 +30,7 @@ public final class DefaultImplicitConnectionProviderFactory implements ImplicitC
      * {@inheritDoc}
      */
     @Override
-    public <Config, Connector> ConnectionProvider<Config, Connector> createImplicitConnectionProvider(String configName, RuntimeConfigurationModel configurationModel, MuleEvent event)
+    public <Connector> ConnectionProvider<Connector> createImplicitConnectionProvider(String configName, RuntimeConfigurationModel configurationModel, MuleEvent event)
     {
         RuntimeConnectionProviderModel implicitModel = (RuntimeConnectionProviderModel) getFirstImplicit(getAllConnectionProviders(configurationModel));
 
@@ -41,9 +41,12 @@ public final class DefaultImplicitConnectionProviderFactory implements ImplicitC
         }
 
         final ResolverSet resolverSet = buildImplicitResolverSet(implicitModel, event.getMuleContext().getExpressionManager());
+        ConnectionProviderObjectBuilder builder = new ConnectionProviderObjectBuilder(implicitModel, resolverSet, event.getMuleContext().getRegistry().get(OBJECT_CONNECTION_MANAGER));
+        builder.setOwnerConfigName(configName);
+
         try
         {
-            return new ConnectionProviderObjectBuilder(implicitModel, resolverSet, event.getMuleContext().getRegistry().get(OBJECT_CONNECTION_MANAGER)).build(event);
+            return builder.build(event);
         }
         catch (MuleException e)
         {

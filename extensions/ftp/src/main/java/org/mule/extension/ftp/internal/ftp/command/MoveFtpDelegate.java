@@ -11,6 +11,7 @@ import org.mule.extension.ftp.api.ftp.FtpFileSystem;
 import org.mule.extension.ftp.internal.FtpCopyDelegate;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 
 import java.nio.file.Path;
 
@@ -26,15 +27,15 @@ public class MoveFtpDelegate implements FtpCopyDelegate
     }
 
     @Override
-    public void doCopy(FileAttributes source, Path targetPath, boolean overwrite, MuleEvent event)
+    public void doCopy(FileConnectorConfig config, FileAttributes source, Path targetPath, boolean overwrite, MuleEvent event)
     {
         try
         {
-            if (command.exists(targetPath))
+            if (command.exists(config, targetPath))
             {
                 if (overwrite)
                 {
-                    fileSystem.delete(targetPath.toString());
+                    fileSystem.delete(config, targetPath.toString());
                 }
                 else
                 {
@@ -42,7 +43,7 @@ public class MoveFtpDelegate implements FtpCopyDelegate
                 }
             }
 
-            command.rename(source.getPath(), targetPath.toString(), overwrite);
+            command.rename(config, source.getPath(), targetPath.toString(), overwrite);
         }
         catch (Exception e)
         {

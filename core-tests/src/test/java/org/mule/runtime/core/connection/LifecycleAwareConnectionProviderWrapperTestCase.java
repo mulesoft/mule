@@ -27,19 +27,17 @@ public class LifecycleAwareConnectionProviderWrapperTestCase extends AbstractMul
 {
 
     @Mock
-    private ConnectionProvider<Object, Lifecycle> connectionProvider;
+    private ConnectionProvider<Lifecycle> connectionProvider;
 
     @Mock
     private Lifecycle connection;
 
-    private Object config = new Object();
-
-    private LifecycleAwareConnectionProviderWrapper<Object, Lifecycle> wrapper;
+    private LifecycleAwareConnectionProviderWrapper<Lifecycle> wrapper;
 
     @Before
     public void before() throws Exception
     {
-        when(connectionProvider.connect(config)).thenReturn(connection);
+        when(connectionProvider.connect()).thenReturn(connection);
 
         wrapper = new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext);
         muleContext.start();
@@ -48,7 +46,7 @@ public class LifecycleAwareConnectionProviderWrapperTestCase extends AbstractMul
     @Test
     public void connect() throws Exception
     {
-        wrapper.connect(config);
+        wrapper.connect();
         InOrder inOrder = inOrder(connection);
         inOrder.verify(connection).initialise();
         inOrder.verify(connection).start();
@@ -58,7 +56,7 @@ public class LifecycleAwareConnectionProviderWrapperTestCase extends AbstractMul
     @Test
     public void disconnect() throws Exception
     {
-        wrapper.connect(config);
+        wrapper.connect();
         wrapper.disconnect(connection);
 
         InOrder inOrder = inOrder(connection);

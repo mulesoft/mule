@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.core.api.MuleException;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,15 +21,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * {@link ConnectionProvider#disconnect(Object)} will be invoked on {@link #connectionProvider}
  * with {@link #connection} as argument.
  *
- * @param <Config>     the generic type of the objects to be used as configs
  * @param <Connection> the generic type of the connections to be handled
  * @since 4.0
  */
-final class PassThroughConnectionHandler<Config, Connection> implements ConnectionHandlerAdapter<Connection>
+final class PassThroughConnectionHandler<Connection> implements ConnectionHandlerAdapter<Connection>
 {
 
     private final Connection connection;
-    private final ConnectionProvider<Config, Connection> connectionProvider;
+    private final ConnectionProvider<Connection> connectionProvider;
     private final AtomicBoolean released = new AtomicBoolean(false);
 
     /**
@@ -38,7 +37,7 @@ final class PassThroughConnectionHandler<Config, Connection> implements Connecti
      * @param connection         the connection to be returned by {@link #getConnection()}
      * @param connectionProvider the {@link ConnectionProvider} used to manage the connection
      */
-    PassThroughConnectionHandler(Connection connection, ConnectionProvider<Config, Connection> connectionProvider)
+    PassThroughConnectionHandler(Connection connection, ConnectionProvider<Connection> connectionProvider)
     {
         this.connection = connection;
         this.connectionProvider = connectionProvider;

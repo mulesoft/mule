@@ -6,11 +6,11 @@
  */
 package org.mule.extension.file.internal.command;
 
-import org.mule.runtime.api.message.MuleMessage;
-import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.api.LocalFileSystem;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.TreeNode;
 import org.mule.runtime.module.extension.file.api.command.ListCommand;
 
@@ -30,30 +30,30 @@ public final class LocalListCommand extends LocalFileCommand implements ListComm
     /**
      * {@inheritDoc}
      */
-    public LocalListCommand(LocalFileSystem fileSystem, FileConnector config)
+    public LocalListCommand(LocalFileSystem fileSystem)
     {
-        super(fileSystem, config);
+        super(fileSystem);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public TreeNode list(String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
+    public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
     {
-        Path path = resolveExistingPath(directoryPath);
+        Path path = resolveExistingPath(config, directoryPath);
         if (!Files.isDirectory(path))
         {
             throw cannotListFileException(path);
         }
 
         TreeNode.Builder treeNodeBuilder = TreeNode.Builder.forDirectory(new LocalFileAttributes(path));
-        doList(path.toFile(), treeNodeBuilder, recursive, message, matcher);
+        doList(config, path.toFile(), treeNodeBuilder, recursive, message, matcher);
 
         return treeNodeBuilder.build();
     }
 
-    private void doList(File parent, TreeNode.Builder treeNodeBuilder, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher)
+    private void doList(FileConnectorConfig config, File parent, TreeNode.Builder treeNodeBuilder, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher)
     {
         for (File child : parent.listFiles())
         {
@@ -71,12 +71,12 @@ public final class LocalListCommand extends LocalFileCommand implements ListComm
 
                 if (recursive)
                 {
-                    doList(child, childNodeBuilder, recursive, message, matcher);
+                    doList(config, child, childNodeBuilder, recursive, message, matcher);
                 }
             }
             else
             {
-                treeNodeBuilder.addChild(TreeNode.Builder.forFile(fileSystem.read(message, child.getAbsolutePath(), false)));
+                treeNodeBuilder.addChild(TreeNode.Builder.forFile(fileSystem.read(config, message, child.getAbsolutePath(), false)));
             }
         }
     }

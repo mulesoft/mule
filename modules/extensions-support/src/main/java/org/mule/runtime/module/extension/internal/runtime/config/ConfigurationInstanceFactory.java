@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectedComponents;
-import static org.springframework.util.ReflectionUtils.setField;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectConfigName;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -18,14 +18,11 @@ import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationM
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
-import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.lang.reflect.Field;
 import java.util.Optional;
 
 /**
@@ -142,7 +139,7 @@ public final class ConfigurationInstanceFactory<T>
     private T createConfigurationInstance(String name, ResolverSetResult resolverSetResult) throws MuleException
     {
         T config = configurationObjectBuilder.build(resolverSetResult);
-        injectConfigName(name, config);
+        injectConfigName(configurationModel, config, name);
 
         return config;
     }
@@ -150,29 +147,8 @@ public final class ConfigurationInstanceFactory<T>
     private T createConfigurationInstance(String name, MuleEvent event) throws MuleException
     {
         T config = configurationObjectBuilder.build(event);
-        injectConfigName(name, config);
+        injectConfigName(configurationModel, config, name);
 
         return config;
-    }
-
-    private void injectConfigName(String name, Object configValue)
-    {
-        RequireNameField property = configurationModel.getModelProperty(RequireNameField.class).orElse(null);
-        if (property == null)
-        {
-            return;
-        }
-
-        final Field configNameField = property.getConfigNameField();
-
-        if (!configNameField.getDeclaringClass().isInstance(configValue))
-        {
-            throw new IllegalConfigurationModelDefinitionException(String.format("Config field name '%s' is not declared on config class '%s'",
-                                                                                 configNameField.toString(),
-                                                                                 configValue.getClass().getName()));
-        }
-
-        configNameField.setAccessible(true);
-        setField(configNameField, configValue, name);
     }
 }

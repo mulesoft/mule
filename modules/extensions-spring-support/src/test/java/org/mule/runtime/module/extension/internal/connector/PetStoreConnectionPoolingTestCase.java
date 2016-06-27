@@ -37,7 +37,6 @@ import org.junit.runners.Parameterized;
 public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCase
 {
 
-    private static final String DEFAULT_POOLING_CONFIG = "defaultPoolingPoolable";
     private static final String CUSTOM_POOLING_CONFIG = "customPooling";
     private static final String CUSTOM_POOLING_POOLED_CONFIG = CUSTOM_POOLING_CONFIG + "Pooled";
     private static final String CUSTOM_POOLING_POOLABLE_CONFIG = CUSTOM_POOLING_CONFIG + "Poolable";
@@ -168,4 +167,9 @@ public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCas
         }
     }
 
+    @Override
+    protected String getConfigName()
+    {
+        return name;
+    }
 }

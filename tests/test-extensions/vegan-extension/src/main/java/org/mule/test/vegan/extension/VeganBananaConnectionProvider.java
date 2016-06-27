@@ -15,11 +15,11 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.tck.testmodels.fruit.Banana;
 
 @Alias("banana")
-public class VeganBananaConnectionProvider implements ConnectionProvider<BananaConfig, Banana>
+public class VeganBananaConnectionProvider implements ConnectionProvider<Banana>
 {
 
     @Override
-    public Banana connect(BananaConfig config) throws ConnectionException
+    public Banana connect() throws ConnectionException
     {
         return new Banana();
     }
@@ -37,7 +37,7 @@ public class VeganBananaConnectionProvider implements ConnectionProvider<BananaC
     }
 
     @Override
-    public ConnectionHandlingStrategy<Banana> getHandlingStrategy(ConnectionHandlingStrategyFactory<BananaConfig, Banana> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<Banana> getHandlingStrategy(ConnectionHandlingStrategyFactory<Banana> handlingStrategyFactory)
     {
         return handlingStrategyFactory.none();
     }

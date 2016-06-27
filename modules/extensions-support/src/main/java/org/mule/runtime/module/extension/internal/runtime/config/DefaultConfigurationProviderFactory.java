@@ -8,14 +8,15 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -38,6 +39,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
             ValueResolver<ConnectionProvider> connectionProviderResolver,
             DynamicConfigPolicy dynamicConfigPolicy) throws Exception
     {
+        configureConnectionProviderResolver(name, connectionProviderResolver);
         return new DynamicConfigurationProvider<>(name,
                                                   configurationModel,
                                                   resolverSet,
@@ -56,6 +58,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
             ValueResolver<ConnectionProvider> connectionProviderResolver,
             MuleContext muleContext) throws Exception
     {
+        configureConnectionProviderResolver(name, connectionProviderResolver);
         ConfigurationInstance<T> configuration;
         try
         {
@@ -68,5 +71,13 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
         }
 
         return new StaticConfigurationProvider<>(name, configurationModel, configuration);
+    }
+
+    private void configureConnectionProviderResolver(String configName, ValueResolver<ConnectionProvider> resolver)
+    {
+        if (resolver instanceof ConnectionProviderResolver)
+        {
+            ((ConnectionProviderResolver) resolver).setOwnerConfigName(configName);
+        }
     }
 }

@@ -34,10 +34,9 @@ public interface ImplicitConnectionProviderFactory
      * @param configName         the name of the configuration that will own the returned {@link ConnectionProvider}
      * @param configurationModel the model that represents the selected config
      * @param event              the {@link MuleEvent} that will be used to evaluate any default parameters that requires resolving an expression
-     * @param <Config>           the generic type of the config types that the returned provider accepts
      * @param <Connector>        the generic type of the connections that the returned provider produces
      * @return a {@link ConnectionProvider}
      * @throws IllegalArgumentException if the {@code extensionModel} doesn't have any {@link ConnectionProviderModel} which can be used implicitly
      */
-    <Config, Connector> ConnectionProvider<Config, Connector> createImplicitConnectionProvider(String configName, RuntimeConfigurationModel configurationModel, MuleEvent event);
+    <Connector> ConnectionProvider<Connector> createImplicitConnectionProvider(String configName, RuntimeConfigurationModel configurationModel, MuleEvent event);
 }

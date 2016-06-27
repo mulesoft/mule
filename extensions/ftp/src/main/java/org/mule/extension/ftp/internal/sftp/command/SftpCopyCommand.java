@@ -6,7 +6,6 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.ftp.FtpFileSystem;
 import org.mule.extension.ftp.api.sftp.SftpFileSystem;
 import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
@@ -14,6 +13,7 @@ import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 
 import java.nio.file.Path;
@@ -30,30 +30,35 @@ public class SftpCopyCommand extends SftpCommand implements CopyCommand
     /**
      * {@inheritDoc}
      */
-    public SftpCopyCommand(SftpFileSystem fileSystem, FtpConnector config, SftpClient client)
+    public SftpCopyCommand(SftpFileSystem fileSystem, SftpClient client)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void copy(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories, MuleEvent event)
+    public void copy(FileConnectorConfig config,
+                     String sourcePath,
+                     String targetPath,
+                     boolean overwrite,
+                     boolean createParentDirectories,
+                     MuleEvent event)
     {
-        copy(sourcePath, targetPath, overwrite, createParentDirectories, event, new SftpCopyDelegate(config, this, fileSystem));
+        copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event, new SftpCopyDelegate(this, fileSystem));
     }
 
     private class SftpCopyDelegate extends AbstractFtpCopyDelegate
     {
 
-        public SftpCopyDelegate(FtpConnector config, FtpCommand command, FtpFileSystem fileSystem)
+        public SftpCopyDelegate(FtpCommand command, FtpFileSystem fileSystem)
         {
-            super(config, command, fileSystem);
+            super(command, fileSystem);
         }
 
         @Override
-        protected void copyDirectory(Path sourcePath, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
+        protected void copyDirectory(FileConnectorConfig config, Path sourcePath, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
         {
             for (FileAttributes fileAttributes : client.list(sourcePath.toString()))
             {
@@ -65,11 +70,11 @@ public class SftpCopyCommand extends SftpCommand implements CopyCommand
                 if (fileAttributes.isDirectory())
                 {
                     Path targetPath = target.resolve(fileAttributes.getName());
-                    copyDirectory(Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection, event);
+                    copyDirectory(config, Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection, event);
                 }
                 else
                 {
-                    copyFile(fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection, event);
+                    copyFile(config, fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection, event);
                 }
             }
         }

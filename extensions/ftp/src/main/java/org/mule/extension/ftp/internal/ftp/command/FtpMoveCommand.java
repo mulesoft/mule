@@ -6,8 +6,8 @@
  */
 package org.mule.extension.ftp.internal.ftp.command;
 
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.MoveCommand;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -26,18 +26,18 @@ public final class FtpMoveCommand extends ClassicFtpCommand implements MoveComma
     /**
      * {@inheritDoc}
      */
-    public FtpMoveCommand(ClassicFtpFileSystem fileSystem, FtpConnector config, FTPClient client)
+    public FtpMoveCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void move(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories)
+    public void move(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories)
     {
-        copy(sourcePath, targetPath, overwrite, createParentDirectories, null, new MoveFtpDelegate(this, fileSystem));
+        copy(config, sourcePath, targetPath, overwrite, createParentDirectories, null, new MoveFtpDelegate(this, fileSystem));
         LOGGER.debug("Moved '{}' to '{}'", sourcePath, targetPath);
     }
 }

@@ -20,16 +20,17 @@ public class PetStoreClient
     private String username;
     private String password;
     private TlsContextFactory tlsContext;
-
+    private String configName;
     private ThreadingProfile threadingProfile;
 
     private int disconnectCount;
-    public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile)
+    public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile, String configName)
     {
         this.username = username;
         this.password = password;
         this.tlsContext = tlsContextFactory;
         this.threadingProfile = threadingProfile;
+        this.configName = configName;
     }
 
     public List<String> getPets(String ownerName, PetStoreConnector config)
@@ -72,5 +73,10 @@ public class PetStoreClient
     public ThreadingProfile getThreadingProfile()
     {
         return threadingProfile;
+    }
+
+    public String getConfigName()
+    {
+        return configName;
     }
 }

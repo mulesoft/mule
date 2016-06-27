@@ -50,6 +50,7 @@ public class StandardFileSystemOperations
      * If {@code recursive} is set to {@code true} but a found directory is rejected by the
      * {@code matcher}, then there won't be any recursion into such directory.
      *
+     * @param config        the config that is parameterizing this operation
      * @param directoryPath the path to the directory to be listed
      * @param recursive     whether to include the contents of sub-directories. Defaults to {@code false}
      * @param message       the {@link MuleMessage} on which this operation was triggered
@@ -57,13 +58,15 @@ public class StandardFileSystemOperations
      * @return a {@link TreeNode} object representing the listed directory
      * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
      */
-    public TreeNode list(@Connection FileSystem fileSystem,
+    public TreeNode list(@UseConfig FileConnectorConfig config,
+                         @Connection FileSystem fileSystem,
                          @Optional String directoryPath,
                          @Optional(defaultValue = "false") boolean recursive,
                          MuleMessage<?, ?> message,
                          @Optional FilePredicateBuilder matchWith)
     {
-        return fileSystem.list(directoryPath, recursive, message, getPredicate(matchWith));
+        fileSystem.changeToBaseDir(config);
+        return fileSystem.list(config, directoryPath, recursive, message, getPredicate(matchWith));
     }
 
     /**
@@ -85,6 +88,7 @@ public class StandardFileSystemOperations
      * the chance to force the output enconding and mimeType through the {@code outputEncoding}
      * and {@code outputMimeType} optional parameters.
      *
+     * @param config     the config that is parameterizing this operation
      * @param fileSystem a reference to the host {@link FileSystem}
      * @param message    the incoming {@link MuleMessage}
      * @param path       the path to the file to be read
@@ -93,12 +97,14 @@ public class StandardFileSystemOperations
      * @throws IllegalArgumentException if the file at the given path doesn't exists
      */
     @DataTypeParameters
-    public MuleMessage<InputStream, FileAttributes> read(@Connection FileSystem fileSystem,
+    public MuleMessage<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
+                                                         @Connection FileSystem fileSystem,
                                                          MuleMessage<?, ?> message,
                                                          String path,
                                                          @Optional(defaultValue = "false") boolean lock)
     {
-        return fileSystem.read(message, path, lock);
+        fileSystem.changeToBaseDir(config);
+        return fileSystem.read(config, message, path, lock);
     }
 
     /**
@@ -174,6 +180,7 @@ public class StandardFileSystemOperations
             }
         }
 
+        fileSystem.changeToBaseDir(config);
         path = resolvePath(path, event, "path");
 
         if (encoding == null)
@@ -181,7 +188,7 @@ public class StandardFileSystemOperations
             encoding = config.getDefaultWriteEncoding();
         }
 
-        fileSystem.write(path, content, mode, event, lock, createParentDirectories, encoding);
+        fileSystem.write(config, path, content, mode, event, lock, createParentDirectories, encoding);
     }
 
     /**
@@ -211,6 +218,7 @@ public class StandardFileSystemOperations
      * As for the {@code sourcePath}, it can either be a file or a directory.
      * If it points to a directory, then it will be copied recursively.
      *
+     * @param config                  the config that is parameterizing this operation
      * @param fileSystem              a reference to the host {@link FileSystem}
      * @param sourcePath              the path to the file to be copied
      * @param targetPath              the target directory
@@ -219,16 +227,18 @@ public class StandardFileSystemOperations
      * @param event                   the {@link MuleEvent} which triggered this operation
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    public void copy(@Connection FileSystem fileSystem,
+    public void copy(@UseConfig FileConnectorConfig config,
+                     @Connection FileSystem fileSystem,
                      @Optional String sourcePath,
                      String targetPath,
                      @Optional(defaultValue = "false") boolean overwrite,
                      @Optional(defaultValue = "true") boolean createParentDirectories,
                      MuleEvent event)
     {
+        fileSystem.changeToBaseDir(config);
         validateTargetPath(targetPath);
         sourcePath = resolvePath(sourcePath, event, "sourcePath");
-        fileSystem.copy(sourcePath, targetPath, overwrite, createParentDirectories, event);
+        fileSystem.copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event);
     }
 
     private void validateTargetPath(String targetPath)
@@ -266,6 +276,7 @@ public class StandardFileSystemOperations
      * As for the {@code sourcePath}, it can either be a file or a directory.
      * If it points to a directory, then it will be moved recursively.
      *
+     * @param config                  the config that is parameterizing this operation
      * @param fileSystem              a reference to the host {@link FileSystem}
      * @param sourcePath              the path to the file to be copied
      * @param targetPath              the target directory
@@ -274,16 +285,18 @@ public class StandardFileSystemOperations
      * @param event                   The current {@link MuleEvent}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    public void move(@Connection FileSystem fileSystem,
+    public void move(@UseConfig FileConnectorConfig config,
+                     @Connection FileSystem fileSystem,
                      @Optional String sourcePath,
                      String targetPath,
                      @Optional(defaultValue = "false") boolean overwrite,
                      @Optional(defaultValue = "true") boolean createParentDirectories,
                      MuleEvent event)
     {
+        fileSystem.changeToBaseDir(config);
         validateTargetPath(targetPath);
         sourcePath = resolvePath(sourcePath, event, "sourcePath");
-        fileSystem.move(sourcePath, targetPath, overwrite, createParentDirectories);
+        fileSystem.move(config, sourcePath, targetPath, overwrite, createParentDirectories);
     }
 
     /**
@@ -295,15 +308,17 @@ public class StandardFileSystemOperations
      * will be used. If that's not the case, then an {@link IllegalArgumentException} will
      * be thrown.
      *
+     * @param config     the config that is parameterizing this operation
      * @param fileSystem a reference to the host {@link FileSystem}
      * @param path       the path to the file to be deleted
      * @param event      The current {@link MuleEvent}
      * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
      */
-    public void delete(@Connection FileSystem fileSystem, @Optional String path, MuleEvent event)
+    public void delete(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path, MuleEvent event)
     {
+        fileSystem.changeToBaseDir(config);
         path = resolvePath(path, event, "path");
-        fileSystem.delete(path);
+        fileSystem.delete(config, path);
     }
 
     /**
@@ -316,6 +331,7 @@ public class StandardFileSystemOperations
      * will be used. If that's not the case, then an {@link IllegalArgumentException} will
      * be thrown.
      *
+     * @param config     the config that is parameterizing this operation
      * @param fileSystem a reference to the host {@link FileSystem}
      * @param path       the path to the file to be renamed
      * @param to         the file's new name
@@ -323,23 +339,30 @@ public class StandardFileSystemOperations
      * @param event      The current {@link MuleEvent}
      */
     //TODO: MULE-9715
-    public void rename(@Connection FileSystem fileSystem, @Optional String path, String to, @Optional(defaultValue = "false") boolean overwrite, MuleEvent event)
+    public void rename(@UseConfig FileConnectorConfig config,
+                       @Connection FileSystem fileSystem,
+                       @Optional String path,
+                       String to,
+                       @Optional(defaultValue = "false") boolean overwrite, MuleEvent event)
     {
+        fileSystem.changeToBaseDir(config);
         path = resolvePath(path, event, "path");
-        fileSystem.rename(path, to, overwrite);
+        fileSystem.rename(config, path, to, overwrite);
     }
 
     /**
      * Creates a new directory of the given {@code directoryName} as a child
      * of the provided {@code basePath}
      *
+     * @param config        the config that is parameterizing this operation
      * @param fileSystem    a reference to the host {@link FileSystem}
      * @param basePath      the directory which contains the directory to be created
      * @param directoryName the new directory's new name
      */
-    public void createDirectory(@Connection FileSystem fileSystem, @Optional String basePath, String directoryName)
+    public void createDirectory(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String basePath, String directoryName)
     {
-        fileSystem.createDirectory(basePath, directoryName);
+        fileSystem.changeToBaseDir(config);
+        fileSystem.createDirectory(config, basePath, directoryName);
     }
 
     private String resolvePath(String path, MuleEvent event, String attributeName)

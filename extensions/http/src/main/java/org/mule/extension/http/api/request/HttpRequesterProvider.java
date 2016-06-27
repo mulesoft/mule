@@ -25,14 +25,15 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
@@ -47,11 +48,17 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @Alias("request")
-public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterConfig, HttpClient>, Initialisable
+public class HttpRequesterProvider implements ConnectionProvider<HttpClient>, Initialisable
 {
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final String OBJECT_HTTP_CLIENT_FACTORY = "_httpClientFactory";
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
+
+    @Inject
+    private MuleContext muleContext;
+
+    @ConfigName
+    private String configName;
 
     /**
      * Host where the requests will be sent.
@@ -131,9 +138,9 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
     private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
 
     @Override
-    public HttpClient connect(HttpRequesterConfig httpRequesterConfig) throws ConnectionException
+    public HttpClient connect() throws ConnectionException
     {
-        String threadNamePrefix = String.format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(httpRequesterConfig.getMuleContext()), httpRequesterConfig.getName());
+        String threadNamePrefix = String.format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), configName);
 
         HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
                 .setUriParameters(new DefaultUriParameters(protocol, host, port))
@@ -144,10 +151,10 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
                 .setUsePersistentConnections(usePersistentConnections)
                 .setConnectionIdleTimeout(connectionIdleTimeout)
                 .setThreadNamePrefix(threadNamePrefix)
-                .setOwnerName(httpRequesterConfig.getName())
+                .setOwnerName(configName)
                 .build();
 
-        HttpClientFactory httpClientFactory = httpRequesterConfig.getMuleContext().getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
+        HttpClientFactory httpClientFactory = muleContext.getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
         HttpClient httpClient;
         if (httpClientFactory == null)
         {
@@ -173,7 +180,7 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
     }
 
     @Override
-    public ConnectionHandlingStrategy<HttpClient> getHandlingStrategy(ConnectionHandlingStrategyFactory<HttpRequesterConfig, HttpClient> connectionHandlingStrategyFactory)
+    public ConnectionHandlingStrategy<HttpClient> getHandlingStrategy(ConnectionHandlingStrategyFactory<HttpClient> connectionHandlingStrategyFactory)
     {
         return connectionHandlingStrategyFactory.cached();
     }
@@ -210,7 +217,7 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpRequesterCo
     {
         if (maxConnections < UNLIMITED_CONNECTIONS || maxConnections == 0)
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("The maxConnections parameter only allows positive values or -1 for unlimited concurrent connections."), this);
+            throw new InitialisationException(createStaticMessage("The maxConnections parameter only allows positive values or -1 for unlimited concurrent connections."), this);
         }
 
         if (!usePersistentConnections)

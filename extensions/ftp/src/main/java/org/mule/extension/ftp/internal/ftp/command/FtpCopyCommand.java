@@ -7,13 +7,13 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.ftp.FtpFileSystem;
 import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
 import org.mule.extension.ftp.internal.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 
 import java.io.IOException;
@@ -34,30 +34,30 @@ public final class FtpCopyCommand extends ClassicFtpCommand implements CopyComma
     /**
      * {@inheritDoc}
      */
-    public FtpCopyCommand(ClassicFtpFileSystem fileSystem, FtpConnector config, FTPClient client)
+    public FtpCopyCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void copy(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories, MuleEvent event)
+    public void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories, MuleEvent event)
     {
-        copy(sourcePath, targetPath, overwrite, createParentDirectories, event, new RegularFtpCopyDelegate(config, this, fileSystem));
+        copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event, new RegularFtpCopyDelegate(this, fileSystem));
     }
 
     private class RegularFtpCopyDelegate extends AbstractFtpCopyDelegate
     {
 
-        public RegularFtpCopyDelegate(FtpConnector config, FtpCommand command, FtpFileSystem fileSystem)
+        public RegularFtpCopyDelegate(FtpCommand command, FtpFileSystem fileSystem)
         {
-            super(config, command, fileSystem);
+            super(command, fileSystem);
         }
 
         @Override
-        protected void copyDirectory(Path sourcePath, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
+        protected void copyDirectory(FileConnectorConfig config, Path sourcePath, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
         {
             changeWorkingDirectory(sourcePath);
             FTPFile[] files;
@@ -82,21 +82,21 @@ public final class FtpCopyCommand extends ClassicFtpCommand implements CopyComma
                 if (fileAttributes.isDirectory())
                 {
                     Path targetPath = target.resolve(fileAttributes.getName());
-                    copyDirectory(Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection, event);
+                    copyDirectory(config, Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection, event);
                 }
                 else
                 {
-                    copyFile(fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection, event);
+                    copyFile(config, fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection, event);
                 }
             }
         }
 
         @Override
-        protected void copyFile(FileAttributes source, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
+        protected void copyFile(FileConnectorConfig config, FileAttributes source, Path target, boolean overwrite, FtpFileSystem writerConnection, MuleEvent event)
         {
             try
             {
-                super.copyFile(source, target, overwrite, writerConnection, event);
+                super.copyFile(config, source, target, overwrite, writerConnection, event);
             }
             finally
             {

@@ -28,11 +28,10 @@ import org.slf4j.LoggerFactory;
  * A {@link ConnectionProviderWrapper} which performs lifecycle and dependency injection
  * operations on the generated connections
  *
- * @param <Config>     the generic type of the configs that the {@link #delegate} accepts
  * @param <Connection> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection>
+public class LifecycleAwareConnectionProviderWrapper<Connection> extends ConnectionProviderWrapper<Connection>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConnectionProviderWrapper.class);
@@ -45,7 +44,7 @@ public class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends
      * @param delegate    the {@link ConnectionProvider} to be wrapped
      * @param muleContext the owning {@link MuleContext}
      */
-    public LifecycleAwareConnectionProviderWrapper(ConnectionProvider<Config, Connection> delegate, MuleContext muleContext)
+    public LifecycleAwareConnectionProviderWrapper(ConnectionProvider<Connection> delegate, MuleContext muleContext)
     {
         super(delegate);
         this.muleContext = muleContext;
@@ -56,14 +55,13 @@ public class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends
      * dependency and the {@code muleContext}'s completed {@link Lifecycle}
      * phases
      *
-     * @param config a configuration which parametrizes the connection's creation
      * @return a {@code Connection} with dependencies injected and the correct lifecycle state
      * @throws ConnectionException if an exception was found obtaining the connection or managing it
      */
     @Override
-    public Connection connect(Config config) throws ConnectionException
+    public Connection connect() throws ConnectionException
     {
-        Connection connection = super.connect(config);
+        Connection connection = super.connect();
         try
         {
             muleContext.getInjector().inject(connection);
@@ -111,7 +109,7 @@ public class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends
     @Override
     public RetryPolicyTemplate getRetryPolicyTemplate()
     {
-        final ConnectionProvider<Config, Connection> delegate = getDelegate();
+        final ConnectionProvider<Connection> delegate = getDelegate();
         if (delegate instanceof ConnectionProviderWrapper)
         {
             return ((ConnectionProviderWrapper) delegate).getRetryPolicyTemplate();
@@ -123,7 +121,7 @@ public class LifecycleAwareConnectionProviderWrapper<Config, Connection> extends
     @Override
     public Optional<PoolingProfile> getPoolingProfile()
     {
-        ConnectionProvider<Config, Connection> delegate = getDelegate();
+        ConnectionProvider<Connection> delegate = getDelegate();
         return delegate instanceof ConnectionProviderWrapper ? ((ConnectionProviderWrapper) delegate).getPoolingProfile() : Optional.empty();
     }
 }

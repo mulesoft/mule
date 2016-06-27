@@ -50,12 +50,12 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
 
     private static final int MAX_ACTIVE = 2;
 
-    private ConnectionProvider<Object, Lifecycle> connectionProvider;
+    private ConnectionProvider<Lifecycle> connectionProvider;
 
     private Object config = new Object();
     private PoolingProfile poolingProfile = new PoolingProfile(MAX_ACTIVE, MAX_ACTIVE, DEFAULT_MAX_POOL_WAIT, WHEN_EXHAUSTED_WAIT, INITIALISE_NONE);
-    private PoolingConnectionHandlingStrategy<Object, Lifecycle> strategy;
-    private PoolingListener<Object, Lifecycle> poolingListener;
+    private PoolingConnectionHandlingStrategy< Lifecycle> strategy;
+    private PoolingListener<Lifecycle> poolingListener;
     private Injector injector;
 
     private ConnectionHandler<Lifecycle> connection1;
@@ -80,10 +80,10 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
     {
         assertThat(connection1, is(not(sameInstance(connection2))));
         assertThat(connection1.getConnection(), is(not(sameInstance(connection2.getConnection()))));
-        verify(connectionProvider, times(2)).connect(config);
+        verify(connectionProvider, times(2)).connect();
 
-        verify(poolingListener).onBorrow(config, connection1.getConnection());
-        verify(poolingListener).onBorrow(config, connection2.getConnection());
+        verify(poolingListener).onBorrow(connection1.getConnection());
+        verify(poolingListener).onBorrow(connection2.getConnection());
 
         verifyThat(Lifecycle::initialise);
         verifyThat(Lifecycle::start);
@@ -95,7 +95,7 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
         initStrategy();
         final RuntimeException exception = new RuntimeException();
 
-        doThrow(exception).when(poolingListener).onBorrow(any(), any(Lifecycle.class));
+        doThrow(exception).when(poolingListener).onBorrow(any(Lifecycle.class));
 
         try
         {
@@ -168,15 +168,15 @@ public class PoolingConnectionHandlingStrategyTestCase extends AbstractMuleConte
 
     private void resetConnectionProvider() throws ConnectionException
     {
-        ConnectionProvider<Object, Lifecycle> connectionProvider = mock(ConnectionProvider.class);
-        when(connectionProvider.connect(config)).thenAnswer(i -> mock(Lifecycle.class));
+        ConnectionProvider<Lifecycle> connectionProvider = mock(ConnectionProvider.class);
+        when(connectionProvider.connect()).thenAnswer(i -> mock(Lifecycle.class));
         when(connectionProvider.validate(anyObject())).thenReturn(ConnectionValidationResult.success());
         this.connectionProvider = spy(new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext));
     }
 
     private void initStrategy()
     {
-        strategy = new PoolingConnectionHandlingStrategy<>(config, connectionProvider, poolingProfile, poolingListener, muleContext);
+        strategy = new PoolingConnectionHandlingStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext);
     }
 
     private <T> void verifyThat(Assertion<T> assertion) throws Exception

@@ -15,7 +15,6 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
-import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
@@ -30,9 +29,6 @@ import org.mule.runtime.module.http.internal.listener.ListenerPath;
 @Sources(HttpListener.class)
 public class HttpListenerConfig implements Initialisable
 {
-    @ConfigName
-    private String configName;
-
     /**
      * Base path to use for all requests that reference this config.
      */
@@ -67,10 +63,5 @@ public class HttpListenerConfig implements Initialisable
     public Boolean resolveParseRequest(Boolean listenerParseRequest)
     {
         return listenerParseRequest != null ? listenerParseRequest : (parseRequest != null ? parseRequest : true);
-    }
-
-    public String getConfigName()
-    {
-        return configName;
     }
 }

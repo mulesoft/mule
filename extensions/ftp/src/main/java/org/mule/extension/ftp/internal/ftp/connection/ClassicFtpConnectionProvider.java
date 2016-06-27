@@ -28,7 +28,7 @@ import org.apache.commons.net.ftp.FTPReply;
  *
  * @since 4.0
  */
-public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<FtpConnector, ClassicFtpFileSystem>
+public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<ClassicFtpFileSystem>
 {
 
     /**
@@ -74,21 +74,20 @@ public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<
     /**
      * Creates and returns a new instance of {@link ClassicFtpFileSystem}
      *
-     * @param config the {@link FtpConnector} which parametrizes the return value
      * @return a {@link ClassicFtpFileSystem}
      */
     @Override
-    public ClassicFtpFileSystem connect(FtpConnector config) throws ConnectionException
+    public ClassicFtpFileSystem connect() throws ConnectionException
     {
-        return new ClassicFtpFileSystem(config, setupClient(config), muleContext);
+        return new ClassicFtpFileSystem(setupClient(), muleContext);
     }
 
-    private FTPClient setupClient(FtpConnector config) throws ConnectionException
+    private FTPClient setupClient() throws ConnectionException
     {
         FTPClient client = createClient();
-        if (config.getConnectionTimeout() != null && config.getConnectionTimeoutUnit() != null)
+        if (getConnectionTimeout() != null && getConnectionTimeoutUnit() != null)
         {
-            client.setConnectTimeout(new Long(config.getConnectionTimeoutUnit().toMillis(config.getConnectionTimeout())).intValue());
+            client.setConnectTimeout(new Long(getConnectionTimeoutUnit().toMillis(getConnectionTimeout())).intValue());
         }
 
         try
@@ -120,21 +119,20 @@ public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<ClassicFtpFileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<FtpConnector, ClassicFtpFileSystem> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<ClassicFtpFileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<ClassicFtpFileSystem> handlingStrategyFactory)
     {
-        return handlingStrategyFactory.supportsPooling(new PoolingListener<FtpConnector, ClassicFtpFileSystem>()
+        return handlingStrategyFactory.supportsPooling(new PoolingListener<ClassicFtpFileSystem>()
         {
             @Override
-            public void onBorrow(FtpConnector config, ClassicFtpFileSystem connection)
+            public void onBorrow(ClassicFtpFileSystem connection)
             {
-                connection.changeToBaseDir();
                 connection.setTransferMode(transferMode);
-                connection.setResponseTimeout(config.getResponseTimeout(), config.getResponseTimeoutUnit());
+                connection.setResponseTimeout(getResponseTimeout(), getResponseTimeoutUnit());
                 connection.setPassiveMode(passive);
             }
 
             @Override
-            public void onReturn(FtpConnector config, ClassicFtpFileSystem connection)
+            public void onReturn(ClassicFtpFileSystem connection)
             {
             }
         });

@@ -6,10 +6,10 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.sftp.SftpFileSystem;
 import org.mule.extension.ftp.internal.ftp.command.MoveFtpDelegate;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.MoveCommand;
 
 import org.slf4j.Logger;
@@ -28,18 +28,18 @@ public class SftpMoveCommand extends SftpCommand implements MoveCommand
     /**
      * {@inheritDoc}
      */
-    public SftpMoveCommand(SftpFileSystem fileSystem, FtpConnector config, SftpClient client)
+    public SftpMoveCommand(SftpFileSystem fileSystem, SftpClient client)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void move(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories)
+    public void move(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories)
     {
-        copy(sourcePath, targetPath, overwrite, createParentDirectories, null, new MoveFtpDelegate(this, fileSystem));
+        copy(config, sourcePath, targetPath, overwrite, createParentDirectories, null, new MoveFtpDelegate(this, fileSystem));
         LOGGER.debug("Moved '{}' to '{}'", sourcePath, targetPath);
     }
 }

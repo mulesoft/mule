@@ -8,6 +8,7 @@ package org.mule.extension.ftp.internal;
 
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 
 import java.nio.file.Path;
 
@@ -23,10 +24,11 @@ public interface FtpCopyDelegate
     /**
      * Performs the copy operation
      *
+     * @param config     the config which is parameterizing this operation
      * @param source     the attributes which describes the source file
      * @param targetPath the target path
      * @param overwrite  whether to overwrite the target file if it already exists
      * @param event      the {@link MuleEvent} on which context the operation is being executed
      */
-    void doCopy(FileAttributes source, Path targetPath, boolean overwrite, MuleEvent event);
+    void doCopy(FileConnectorConfig config, FileAttributes source, Path targetPath, boolean overwrite, MuleEvent event);
 }

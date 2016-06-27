@@ -9,14 +9,17 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 import static java.util.stream.Collectors.toList;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
-import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
 import com.google.common.base.Joiner;
 
@@ -42,18 +45,31 @@ public final class ConfigNameModelEnricher implements ModelEnricher
     @Override
     public void enrich(DescribingContext describingContext)
     {
-        for (ConfigurationDeclaration config : describingContext.getExtensionDeclarer().getDeclaration().getConfigurations())
+        new IdempotentDeclarationWalker()
         {
-            ImplementingTypeModelProperty typeProperty = config.getModelProperty(ImplementingTypeModelProperty.class).orElse(null);
-            if (typeProperty == null)
+            @Override
+            public void onConfiguration(ConfigurationDeclaration declaration)
             {
-                continue;
+                doEnrich(declaration);
             }
 
+            @Override
+            protected void onConnectionProvider(ConnectionProviderDeclaration declaration)
+            {
+                doEnrich(declaration);
+            }
+        }.walk(describingContext.getExtensionDeclarer().getDeclaration());
+    }
+
+    private void doEnrich(BaseDeclaration declaration)
+    {
+
+        declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(p -> {
+            ImplementingTypeModelProperty typeProperty = (ImplementingTypeModelProperty) p;
             Collection<Field> fields = getAllFields(typeProperty.getType(), withAnnotation(ConfigName.class));
             if (CollectionUtils.isEmpty(fields))
             {
-                continue;
+                return;
             }
 
             if (fields.size() > 1)
@@ -79,7 +95,7 @@ public final class ConfigNameModelEnricher implements ModelEnricher
                         configNameField.getType().getName()));
             }
 
-            config.addModelProperty(new RequireNameField(configNameField));
-        }
+            declaration.addModelProperty(new RequireNameField(configNameField));
+        });
     }
 }

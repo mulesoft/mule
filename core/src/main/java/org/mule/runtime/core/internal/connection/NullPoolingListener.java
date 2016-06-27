@@ -11,18 +11,17 @@ import org.mule.runtime.api.connection.PoolingListener;
 /**
  * Implementation of the Null Object design pattern for the {@link PoolingListener} interface.
  *
- * @param <Config>     the generic type for the config object to which the connection is bound
  * @param <Connection> the generic type for the pooled connection
  * @since 4.0
  */
-final class NullPoolingListener<Config, Connection> implements PoolingListener<Config, Connection>
+final class NullPoolingListener<Connection> implements PoolingListener<Connection>
 {
 
     /**
      * Does nothing
      */
     @Override
-    public void onBorrow(Config config, Connection connection)
+    public void onBorrow(Connection connection)
     {
 
     }
@@ -31,7 +30,7 @@ final class NullPoolingListener<Config, Connection> implements PoolingListener<C
      * Does nothing
      */
     @Override
-    public void onReturn(Config config, Connection connection)
+    public void onReturn(Connection connection)
     {
 
     }

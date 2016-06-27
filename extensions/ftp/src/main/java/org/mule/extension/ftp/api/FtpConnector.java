@@ -20,8 +20,6 @@ import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
 import org.mule.runtime.module.extension.file.api.StandardFileSystemOperations;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 
 /**
@@ -50,47 +48,6 @@ public class FtpConnector extends FileConnectorConfig
     @Optional
     private String baseDir = null;
 
-    /**
-     * A scalar value representing the amount of time to wait
-     * before a connection attempt times out. This attribute
-     * works in tandem with {@link #connectionTimeoutUnit}.
-     * <p>
-     * Defaults to {@code 10}
-     */
-    @Parameter
-    @Optional(defaultValue = "10")
-    private Integer connectionTimeout;
-
-    /**
-     * A {@link TimeUnit} which qualifies the {@link #connectionTimeout}
-     * attribute.
-     * <p>
-     * Defaults to {@code SECONDS}
-     */
-    @Parameter
-    @Optional(defaultValue = "SECONDS")
-    private TimeUnit connectionTimeoutUnit;
-
-    /**
-     * A scalar value representing the amount of time to wait
-     * before a request for data times out. This attribute
-     * works in tandem with {@link #responseTimeoutUnit}.
-     * <p>
-     * Defaults to {@code 10}
-     */
-    @Parameter
-    @Optional(defaultValue = "10")
-    private Integer responseTimeout;
-
-    /**
-     * A {@link TimeUnit} which qualifies the {@link #responseTimeoutUnit}
-     * attribute.
-     * <p>
-     * Defaults to {@code SECONDS}
-     */
-    @Parameter
-    @Optional(defaultValue = "SECONDS")
-    private TimeUnit responseTimeoutUnit;
 
     /**
      * {@inheritDoc}
@@ -99,26 +56,6 @@ public class FtpConnector extends FileConnectorConfig
     public String getBaseDir()
     {
         return baseDir;
-    }
-
-    public Integer getConnectionTimeout()
-    {
-        return connectionTimeout;
-    }
-
-    public TimeUnit getConnectionTimeoutUnit()
-    {
-        return connectionTimeoutUnit;
-    }
-
-    public Integer getResponseTimeout()
-    {
-        return responseTimeout;
-    }
-
-    public TimeUnit getResponseTimeoutUnit()
-    {
-        return responseTimeoutUnit;
     }
 
     public ConnectionManager getConnectionManager()

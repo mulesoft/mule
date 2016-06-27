@@ -9,6 +9,7 @@ package org.mule.extension.file.internal.command;
 import static java.lang.String.format;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.FileCommand;
 
 import java.io.File;
@@ -22,22 +23,22 @@ import java.nio.file.Paths;
  *
  * @since 4.0
  */
-abstract class LocalFileCommand extends FileCommand<FileConnector, LocalFileSystem>
+abstract class LocalFileCommand extends FileCommand<LocalFileSystem>
 {
 
     /**
      * {@inheritDoc}
      */
-    LocalFileCommand(LocalFileSystem fileSystem, FileConnector config)
+    LocalFileCommand(LocalFileSystem fileSystem)
     {
-        super(fileSystem, config);
+        super(fileSystem);
     }
 
     /**
      * @return a {@link Path} derived from {@link FileConnector#getBaseDir()}
      */
     @Override
-    protected Path getBasePath()
+    protected Path getBasePath(FileConnectorConfig config)
     {
         return Paths.get(config.getBaseDir());
     }
@@ -46,7 +47,7 @@ abstract class LocalFileCommand extends FileCommand<FileConnector, LocalFileSyst
      * {@inheritDoc}
      */
     @Override
-    protected boolean exists(Path path)
+    protected boolean exists(FileConnectorConfig config, Path path)
     {
         return Files.exists(path);
     }
@@ -58,7 +59,7 @@ abstract class LocalFileCommand extends FileCommand<FileConnector, LocalFileSyst
      * @param directoryPath a {@link Path} pointing to the directory you want to create
      */
     @Override
-    protected void doMkDirs(Path directoryPath)
+    protected void doMkDirs(FileConnectorConfig config, Path directoryPath)
     {
         File target = directoryPath.toFile();
         try

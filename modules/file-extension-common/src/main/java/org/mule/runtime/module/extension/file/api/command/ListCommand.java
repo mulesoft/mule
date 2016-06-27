@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.file.api.command;
 
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 import org.mule.runtime.module.extension.file.api.TreeNode;
 
@@ -24,6 +25,7 @@ public interface ListCommand
     /**
      * Lists files under the considerations of {@link FileSystem#list(String, boolean, MuleMessage, Predicate)}
      *
+     * @param config        the config that is parameterizing this operation
      * @param directoryPath the path to the directory to be listed
      * @param recursive     whether to include the contents of sub-directories
      * @param message       the {@link MuleMessage} on which this operation was triggered
@@ -31,5 +33,5 @@ public interface ListCommand
      * @return a {@link TreeNode} object representing the listed directory
      * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
      */
-    TreeNode list(String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher);
+    TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher);
 }

@@ -15,6 +15,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.ReadCommand;
 import org.mule.runtime.module.extension.file.api.lock.NullPathLock;
 import org.mule.runtime.module.extension.file.api.lock.PathLock;
@@ -36,18 +37,18 @@ public final class FtpReadCommand extends ClassicFtpCommand implements ReadComma
     /**
      * {@inheritDoc}
      */
-    public FtpReadCommand(ClassicFtpFileSystem fileSystem, FtpConnector config, FTPClient client)
+    public FtpReadCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public MuleMessage<InputStream, FileAttributes> read(MuleMessage<?, ?> message, String filePath, boolean lock)
+    public MuleMessage<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage<?, ?> message, String filePath, boolean lock)
     {
-        FtpFileAttributes attributes = getExistingFile(filePath);
+        FtpFileAttributes attributes = getExistingFile(config, filePath);
         if (attributes.isDirectory())
         {
             throw cannotReadDirectoryException(Paths.get(attributes.getPath()));
@@ -55,7 +56,7 @@ public final class FtpReadCommand extends ClassicFtpCommand implements ReadComma
 
         try
         {
-            attributes = new ClassicFtpFileAttributes(resolvePath(filePath), client.listFiles(filePath)[0]);
+            attributes = new ClassicFtpFileAttributes(resolvePath(config, filePath), client.listFiles(filePath)[0]);
         }
         catch (Exception e)
         {
@@ -77,7 +78,7 @@ public final class FtpReadCommand extends ClassicFtpCommand implements ReadComma
 
         try
         {
-            return new DefaultMuleMessage(ClassicFtpInputStream.newInstance(config, attributes, pathLock),
+            return new DefaultMuleMessage(ClassicFtpInputStream.newInstance((FtpConnector) config, attributes, pathLock),
                                           fileSystem.getFileMessageDataType(message.getDataType(), attributes),
                                           attributes).asNewMessage();
         }

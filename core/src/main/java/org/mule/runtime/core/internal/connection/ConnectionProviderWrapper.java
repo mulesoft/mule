@@ -30,33 +30,33 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class for wrappers for {@link ConnectionProvider} instances
  *
- * @param <Config>     the generic type of the configs that the {@link #delegate} accepts
  * @param <Connection> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public abstract class ConnectionProviderWrapper<Config, Connection> implements ConnectionProvider<Config, Connection>, HasPoolingProfile, Lifecycle
+public abstract class ConnectionProviderWrapper<Connection> implements ConnectionProvider<Connection>, HasPoolingProfile, Lifecycle
 {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionProviderWrapper.class);
 
     @Inject
     protected MuleContext muleContext;
 
-    private final ConnectionProvider<Config, Connection> delegate;
+    private final ConnectionProvider<Connection> delegate;
 
     /**
      * Creates a new instance which wraps the {@code delegate}
      *
      * @param delegate the {@link ConnectionProvider} to be wrapped
      */
-    ConnectionProviderWrapper(ConnectionProvider<Config, Connection> delegate)
+    ConnectionProviderWrapper(ConnectionProvider<Connection> delegate)
     {
         this.delegate = delegate;
     }
 
     @Override
-    public Connection connect(Config config) throws ConnectionException
+    public Connection connect() throws ConnectionException
     {
-        return delegate.connect(config);
+        return delegate.connect();
     }
 
     /**
@@ -78,12 +78,12 @@ public abstract class ConnectionProviderWrapper<Config, Connection> implements C
     }
 
     @Override
-    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, Connection> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Connection> handlingStrategyFactory)
     {
         return delegate.getHandlingStrategy(handlingStrategyFactory);
     }
 
-    public ConnectionProvider<Config, Connection> getDelegate()
+    public ConnectionProvider<Connection> getDelegate()
     {
         return delegate;
     }

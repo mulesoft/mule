@@ -11,15 +11,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 
 import org.junit.Before;
@@ -32,15 +31,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultConnectionHandlingStrategyFactoryTestCase extends AbstractMuleTestCase
 {
-
-    @Mock
-    private Apple config;
-
     @Mock
     private Banana connection;
 
     @Mock
-    private ConnectionProvider<Apple, Banana> connectionProvider;
+    private ConnectionProvider<Banana> connectionProvider;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
@@ -52,7 +47,7 @@ public class DefaultConnectionHandlingStrategyFactoryTestCase extends AbstractMu
     @Before
     public void before() throws MuleException
     {
-        factory = new DefaultConnectionHandlingStrategyFactory<>(config, connectionProvider, new PoolingProfile(), muleContext);
+        factory = new DefaultConnectionHandlingStrategyFactory<>(connectionProvider, new PoolingProfile(), muleContext);
 
         connectionManager = new DefaultConnectionManager(muleContext);
         connectionManager.initialise();

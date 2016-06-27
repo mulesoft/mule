@@ -6,10 +6,10 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.sftp.SftpFileSystem;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
 
 import java.nio.file.Path;
@@ -31,18 +31,18 @@ public final class SftpDeleteCommand extends SftpCommand implements DeleteComman
     /**
      * {@inheritDoc}
      */
-    public SftpDeleteCommand(SftpFileSystem fileSystem, FtpConnector config, SftpClient client)
+    public SftpDeleteCommand(SftpFileSystem fileSystem, SftpClient client)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void delete(String filePath)
+    public void delete(FileConnectorConfig config, String filePath)
     {
-        FileAttributes fileAttributes = getExistingFile(filePath);
+        FileAttributes fileAttributes = getExistingFile(config, filePath);
         final boolean isDirectory = fileAttributes.isDirectory();
         final String path = fileAttributes.getPath();
 

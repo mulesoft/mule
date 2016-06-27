@@ -8,7 +8,6 @@ package org.mule.module.socket.api.provider.tcp;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.module.socket.api.SocketOperations;
-import org.mule.module.socket.api.config.RequesterConfig;
 import org.mule.module.socket.api.connection.ConnectionSettings;
 import org.mule.module.socket.api.connection.tcp.TcpRequesterConnection;
 import org.mule.module.socket.api.protocol.SafeProtocol;
@@ -43,7 +42,7 @@ import javax.net.ssl.SSLSocket;
  * @since 4.0
  */
 @Alias("tcp-requester")
-public final class TcpRequesterProvider implements ConnectionProvider<RequesterConfig, TcpRequesterConnection>, Initialisable
+public final class TcpRequesterProvider implements ConnectionProvider<TcpRequesterConnection>, Initialisable
 {
 
     /**
@@ -86,7 +85,7 @@ public final class TcpRequesterProvider implements ConnectionProvider<RequesterC
      * {@inheritDoc}
      */
     @Override
-    public TcpRequesterConnection connect(RequesterConfig requesterConfig) throws ConnectionException
+    public TcpRequesterConnection connect() throws ConnectionException
     {
 
         SimpleSocketFactory simpleSocketFactory = null;
@@ -129,7 +128,7 @@ public final class TcpRequesterProvider implements ConnectionProvider<RequesterC
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<TcpRequesterConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<RequesterConfig, TcpRequesterConnection> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<TcpRequesterConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<TcpRequesterConnection> handlingStrategyFactory)
     {
         return handlingStrategyFactory.supportsPooling();
     }

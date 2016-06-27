@@ -28,11 +28,10 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link ConnectionHandlingStrategyAdapter} which returns connections obtained from a {@link #pool}
  *
- * @param <Config>     the generic type of the objects to be used as configs
  * @param <Connection> the generic type of the connections to be managed
  * @since 4.0
  */
-final class PoolingConnectionHandlingStrategy<Config, Connection> extends ConnectionHandlingStrategyAdapter<Config, Connection>
+final class PoolingConnectionHandlingStrategy<Connection> extends ConnectionHandlingStrategyAdapter<Connection>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PoolingConnectionHandlingStrategy.class);
@@ -40,24 +39,22 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
 
     private final PoolingProfile poolingProfile;
     private final ObjectPool<Connection> pool;
-    private final PoolingListener<Config, Connection> poolingListener;
+    private final PoolingListener<Connection> poolingListener;
 
     /**
      * Creates a new instance
      *
-     * @param config             the config for which connections are to be created
      * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
      * @param poolingProfile     the {@link PoolingProfile} which configures the {@link #pool}
      * @param poolingListener    a {@link PoolingListener}
      * @param muleContext        the application's {@link MuleContext}
      */
-    PoolingConnectionHandlingStrategy(Config config,
-                                      ConnectionProvider<Config, Connection> connectionProvider,
+    PoolingConnectionHandlingStrategy(ConnectionProvider<Connection> connectionProvider,
                                       PoolingProfile poolingProfile,
-                                      PoolingListener<Config, Connection> poolingListener,
+                                      PoolingListener<Connection> poolingListener,
                                       MuleContext muleContext)
     {
-        super(config, connectionProvider, muleContext);
+        super(connectionProvider, muleContext);
         this.poolingProfile = poolingProfile;
         this.poolingListener = poolingListener;
         pool = createPool();
@@ -94,7 +91,7 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
                 throw new ConnectionException(validationResult.getMessage(), validationResult.getException());
             }
 
-            return new PooledConnectionHandler<>(config, connection, pool, poolingListener);
+            return new PooledConnectionHandler<>(connection, pool, poolingListener);
         }
         catch (ConnectionException e)
         {
@@ -115,7 +112,7 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
         Connection connection = pool.borrowObject();
         try
         {
-            poolingListener.onBorrow(config, connection);
+            poolingListener.onBorrow(connection);
         }
         catch (Exception e)
         {
@@ -165,7 +162,7 @@ final class PoolingConnectionHandlingStrategy<Config, Connection> extends Connec
         @Override
         public Connection makeObject() throws Exception
         {
-            return connectionProvider.connect(config);
+            return connectionProvider.connect();
         }
 
         @Override

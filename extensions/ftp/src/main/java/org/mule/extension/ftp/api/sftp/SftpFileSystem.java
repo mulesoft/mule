@@ -9,7 +9,6 @@ package org.mule.extension.ftp.api.sftp;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.ftp.api.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.ftp.FtpFileSystem;
 import org.mule.extension.ftp.internal.sftp.command.SftpCopyCommand;
 import org.mule.extension.ftp.internal.sftp.command.SftpCreateDirectoryCommand;
@@ -26,6 +25,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.module.extension.file.api.AbstractFileSystem;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
@@ -53,7 +53,6 @@ public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem
 {
 
     private final MuleContext muleContext;
-    protected final FtpConnector config;
     protected final SftpClient client;
     protected final CopyCommand copyCommand;
     protected final CreateDirectoryCommand createDirectoryCommand;
@@ -68,23 +67,21 @@ public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem
     /**
      * Creates a new instance
      *
-     * @param config the {@link FtpConnector} through which {@code this} instance is used
      * @param client a ready to use {@link FTPClient}
      */
-    public SftpFileSystem(FtpConnector config, SftpClient client, MuleContext muleContext)
+    public SftpFileSystem(SftpClient client, MuleContext muleContext)
     {
-        this.config = config;
         this.client = client;
         this.muleContext = muleContext;
 
-        copyCommand = new SftpCopyCommand(this, config, client);
-        createDirectoryCommand = new SftpCreateDirectoryCommand(this, config, client);
-        deleteCommand = new SftpDeleteCommand(this, config, client);
-        listCommand = new SftpListCommand(this, config, client);
-        moveCommand = new SftpMoveCommand(this, config, client);
-        readCommand = new SftpReadCommand(this, config, client);
-        renameCommand = new SftpRenameCommand(this, config, client);
-        writeCommand = new SftpWriteCommand(this, config, client, muleContext);
+        copyCommand = new SftpCopyCommand(this, client);
+        createDirectoryCommand = new SftpCreateDirectoryCommand(this, client);
+        deleteCommand = new SftpDeleteCommand(this, client);
+        listCommand = new SftpListCommand(this, client);
+        moveCommand = new SftpMoveCommand(this, client);
+        readCommand = new SftpReadCommand(this, client);
+        renameCommand = new SftpRenameCommand(this, client);
+        writeCommand = new SftpWriteCommand(this, client, muleContext);
     }
 
     /**
@@ -100,7 +97,7 @@ public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem
      * {@inheritDoc}
      */
     @Override
-    public void changeToBaseDir()
+    public void changeToBaseDir(FileConnectorConfig config)
     {
         client.changeWorkingDirectory(config.getBaseDir());
     }

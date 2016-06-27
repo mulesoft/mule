@@ -22,7 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("imap")
-public class IMAPProvider extends AbstractRetrieverProvider<IMAPConfiguration, RetrieverConnection>
+public class IMAPProvider extends AbstractRetrieverProvider<RetrieverConnection>
 {
 
     /**
@@ -36,16 +36,16 @@ public class IMAPProvider extends AbstractRetrieverProvider<IMAPConfiguration, R
      * {@inheritDoc}
      */
     @Override
-    public RetrieverConnection connect(IMAPConfiguration config) throws ConnectionException
+    public RetrieverConnection connect() throws ConnectionException
     {
         return new RetrieverConnection(IMAP,
                                        settings.getUser(),
                                        settings.getPassword(),
                                        settings.getHost(),
                                        port,
-                                       config.getConnectionTimeout(),
-                                       config.getReadTimeout(),
-                                       config.getWriteTimeout(),
-                                       config.getProperties());
+                                       getConnectionTimeout(),
+                                       getReadTimeout(),
+                                       getWriteTimeout(),
+                                       getProperties());
     }
 }

@@ -6,8 +6,8 @@
  */
 package org.mule.extension.ftp.internal.ftp.command;
 
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -23,17 +23,17 @@ public final class FtpCreateDirectoryCommand extends ClassicFtpCommand implement
     /**
      * {@inheritDoc}
      */
-    public FtpCreateDirectoryCommand(ClassicFtpFileSystem fileSystem, FtpConnector config, FTPClient client)
+    public FtpCreateDirectoryCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createDirectory(String basePath, String directoryName)
+    public void createDirectory(FileConnectorConfig config, String basePath, String directoryName)
     {
-        super.createDirectory(basePath, directoryName);
+        super.createDirectory(config, basePath, directoryName);
     }
 }

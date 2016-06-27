@@ -6,10 +6,10 @@
  */
 package org.mule.extension.ftp.internal.ftp.command;
 
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 import org.mule.runtime.module.extension.file.api.command.FileCommand;
 
@@ -27,7 +27,7 @@ import org.apache.commons.net.ftp.FTPFile;
  *
  * @since 4.0
  */
-abstract class ClassicFtpCommand extends FtpCommand<FtpConnector, ClassicFtpFileSystem>
+abstract class ClassicFtpCommand extends FtpCommand<ClassicFtpFileSystem>
 {
 
     protected final FTPClient client;
@@ -36,33 +36,21 @@ abstract class ClassicFtpCommand extends FtpCommand<FtpConnector, ClassicFtpFile
      * Creates a new instance
      *
      * @param fileSystem the {@link FileSystem} on which the operation is performed
-     * @param config     the config which configures the operation
      * @param client     a ready to use {@link FTPClient} to perform the operations
      */
-    ClassicFtpCommand(ClassicFtpFileSystem fileSystem, FtpConnector config, FTPClient client)
+    ClassicFtpCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
     {
-        super(fileSystem, config);
+        super(fileSystem);
         this.client = client;
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @return A {@link Path} derived from the the {@link #client}'s current working directory
      */
     @Override
-    protected Path getBasePath()
+    protected FtpFileAttributes getFile(FileConnectorConfig config, String filePath, boolean requireExistence)
     {
-        return Paths.get(getCurrentWorkingDirectory());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected FtpFileAttributes getFile(String filePath, boolean requireExistence)
-    {
-        Path path = resolvePath(filePath);
+        Path path = resolvePath(config, filePath);
         FTPFile ftpFile;
         try
         {
@@ -97,7 +85,7 @@ abstract class ClassicFtpCommand extends FtpCommand<FtpConnector, ClassicFtpFile
      * @param directoryPath the {@link Path} to the directory you want to create
      */
     @Override
-    protected void doMkDirs(Path directoryPath)
+    protected void doMkDirs(FileConnectorConfig config, Path directoryPath)
     {
         String cwd = getCurrentWorkingDirectory();
         Stack<Path> fragments = new Stack<>();

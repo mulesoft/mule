@@ -18,21 +18,20 @@ import org.mule.runtime.api.connection.ConnectionHandler;
  * Each invokation to {@link #getConnectionHandler()} creates a new connection which is
  * closed when {@link ConnectionHandler#release()} is invoked.
  *
- * @param <Config>     the generic type of the config that owns {@code this} managed connection
  * @param <Connection> the generic type of the connection being wrapped
  * @since 4.0
  */
-final class NullConnectionHandlingStrategy<Config, Connection> extends ConnectionHandlingStrategyAdapter<Config, Connection>
+final class NullConnectionHandlingStrategy<Connection> extends ConnectionHandlingStrategyAdapter<Connection>
 {
 
-    public NullConnectionHandlingStrategy(Config config, ConnectionProvider<Config, Connection> connectionProvider, MuleContext muleContext)
+    public NullConnectionHandlingStrategy(ConnectionProvider<Connection> connectionProvider, MuleContext muleContext)
     {
-        super(config, connectionProvider, muleContext);
+        super(connectionProvider, muleContext);
     }
 
     /**
-     * Creates a new {@code Connection} by invoking {@link ConnectionProvider#connect(Object)} on
-     * {@link #connectionProvider} using {@link #config} as argument.
+     * Creates a new {@code Connection} by invoking {@link ConnectionProvider#connect()} on
+     * {@link #connectionProvider}
      * <p>
      * The connection will be closed when {@link ConnectionHandler#release()} is invoked on
      * the returned {@link ConnectionHandler}
@@ -43,7 +42,7 @@ final class NullConnectionHandlingStrategy<Config, Connection> extends Connectio
     @Override
     public ConnectionHandler<Connection> getConnectionHandler() throws ConnectionException
     {
-        Connection connection = connectionProvider.connect(config);
+        Connection connection = connectionProvider.connect();
         return new PassThroughConnectionHandler<>(connection, connectionProvider);
     }
 

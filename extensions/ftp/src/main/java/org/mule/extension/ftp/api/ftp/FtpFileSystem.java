@@ -27,11 +27,6 @@ public interface FtpFileSystem extends FileSystem
     void disconnect();
 
     /**
-     * Changes the current working directory to the user base
-     */
-    void changeToBaseDir();
-
-    /**
      * Returns an InputStream which obtains the content for the
      * file of the given {@code filePayload}.
      * <p>
