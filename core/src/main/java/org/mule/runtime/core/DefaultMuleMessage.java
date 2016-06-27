@@ -1342,7 +1342,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         // updates dataType when encoding is updated using a property instead of using #setEncoding
         if (MULE_ENCODING_PROPERTY.equals(key))
         {
-            setDataType(DataType.builder().type(getDataType().getType()).encoding((String) value).build());
+            setDataType(DataType.builder().type(getDataType().getType()).charset((String) value).build());
         }
         else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
         {
@@ -1362,7 +1362,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
                     String encoding = defaultCharset().name();
                     logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
                     logger.warn(format("Using defualt encoding: %s", encoding));
-                    builder.encoding(encoding);
+                    builder.charset(encoding);
                 }
             }
             setDataType(builder.type(getDataType().getType()).build());

@@ -51,14 +51,14 @@ public class HttpToMuleMessage
                 {
                     logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), contentTypeValue, e.getMessage()));
                     logger.warn(format("Using default encoding: %s", defaultCharset().name()));
-                    dataTypeBuilder.encoding(defaultCharset());
+                    dataTypeBuilder.charset(defaultCharset());
                 }
             }
         }
         final DataType dataType = dataTypeBuilder.build();
         if (!dataType.getMediaType().getCharset().isPresent())
         {
-            return DataType.builder(dataType).encoding(defaultCharset).build();
+            return DataType.builder(dataType).charset(defaultCharset).build();
         }
         else
         {

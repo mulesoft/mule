@@ -196,7 +196,7 @@ public abstract class AbstractFileSystem implements FileSystem
         }
         if (originalDataType.getMediaType().getCharset().isPresent())
         {
-            dataTypeBuilder.encoding(originalDataType.getMediaType().getCharset().get());
+            dataTypeBuilder.charset(originalDataType.getMediaType().getCharset().get());
         }
         return dataTypeBuilder.build();
     }

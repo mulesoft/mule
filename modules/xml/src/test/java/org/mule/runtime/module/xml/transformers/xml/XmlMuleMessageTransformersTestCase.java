@@ -38,7 +38,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
         ObjectToXml t1 = createObject(ObjectToXml.class);
         t1.setAcceptMuleMessage(true);
 
-        MutableMuleMessage msg = new DefaultMuleMessage("test", (DataType) DataType.builder().encoding(UTF_8).build(), muleContext);
+        MutableMuleMessage msg = new DefaultMuleMessage("test", (DataType) DataType.builder().charset(UTF_8).build(), muleContext);
         msg.setCorrelationId("1234");
         msg.setOutboundProperty("object", new Apple());
         msg.setOutboundProperty("string", "hello");

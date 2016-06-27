@@ -60,7 +60,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
     @Test
     public void setFlowVariableCustomDataType() throws Exception
     {
-        DataType<String> dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).encoding(CUSTOM_ENCODING).build();
+        DataType<String> dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
         muleEvent.setFlowVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 
@@ -80,7 +80,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
     @Test
     public void setSessionVariableCustomDataType() throws Exception
     {
-        DataType<String> dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).encoding(CUSTOM_ENCODING).build();
+        DataType<String> dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
         muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 

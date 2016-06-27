@@ -321,7 +321,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     private MutableMuleMessage createMuleMessage()
     {
         // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage previousMessage = new DefaultMuleMessage(AbstractMuleContextTestCase.TEST_PAYLOAD, DataType.builder(DataType.STRING).encoding(getDefaultEncoding(muleContext)).build(),
+        MutableMuleMessage previousMessage = new DefaultMuleMessage(AbstractMuleContextTestCase.TEST_PAYLOAD, DataType.builder(DataType.STRING).charset(getDefaultEncoding(muleContext)).build(),
                                                                     testAttributes, muleContext);
         previousMessage.setOutboundProperty("MuleMessage", "MuleMessage");
         return previousMessage;

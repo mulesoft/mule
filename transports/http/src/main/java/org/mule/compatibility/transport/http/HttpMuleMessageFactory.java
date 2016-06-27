@@ -315,7 +315,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     {
         return (MutableMuleMessage) message.transform(msg ->
         {
-            ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).encoding(encoding).build());
+            ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).charset(encoding).build());
             return msg;
         });
     }

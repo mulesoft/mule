@@ -171,7 +171,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         else if (result != null)
         {
             final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
-            template.setReturnDataType(DataType.builder(DataType.OBJECT).encoding(getDefaultEncoding(muleContext)).build());
+            template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
             event.setMessage(
                     muleContext.getTransformationService().applyTransformers(event.getMessage(), event, Collections
                             .<Transformer>singletonList

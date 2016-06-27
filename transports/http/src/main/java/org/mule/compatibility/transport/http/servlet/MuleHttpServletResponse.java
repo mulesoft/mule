@@ -76,7 +76,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
     {
         message = (MutableMuleMessage) message.transform(msg ->
         {
-            ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).encoding(charset).build());
+            ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).charset(charset).build());
             return new DefaultMuleMessage(msg);
         });
     }

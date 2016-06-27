@@ -152,9 +152,9 @@ public class CompositeConverterTestCase
     public void transform() throws Exception
     {
         doReturn("MyOutput1").when(mockConverterA).transform(any());
-        doReturn(DataType.builder().encoding(UTF_8).build()).when(mockConverterA).getReturnDataType();
+        doReturn(DataType.builder().charset(UTF_8).build()).when(mockConverterA).getReturnDataType();
         doReturn("MyOutput2").when(mockConverterB).transform(eq("MyOutput1"), eq(UTF_8));
-        doReturn(DataType.builder().encoding(UTF_8).build()).when(mockConverterB).getReturnDataType();
+        doReturn(DataType.builder().charset(UTF_8).build()).when(mockConverterB).getReturnDataType();
         CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
 
         Object output = compositeConverter.transform("MyInput");

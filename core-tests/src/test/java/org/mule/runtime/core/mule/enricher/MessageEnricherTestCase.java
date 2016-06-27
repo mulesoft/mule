@@ -464,7 +464,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 
     private void doEnrichDataTypePropagationTest(EnrichExpressionPair pair) throws Exception
     {
-        final DataType dataType = DataType.builder().type(String.class).mediaType(JSON).encoding(UTF_16.name()).build();
+        final DataType dataType = DataType.builder().type(String.class).mediaType(JSON).charset(UTF_16.name()).build();
 
         MessageEnricher enricher = new MessageEnricher();
         enricher.setMuleContext(muleContext);

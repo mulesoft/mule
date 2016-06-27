@@ -335,7 +335,7 @@ public abstract class HttpHeaders
         /**
          * {@value "application/x-www-form-urlencoded"}
          */
-        public static final MediaType APPLICATION_X_WWW_FORM_URLENCODED = new MediaType("application", "x-www-form-urlencoded");
+        public static final MediaType APPLICATION_X_WWW_FORM_URLENCODED = MediaType.build("application", "x-www-form-urlencoded");
         /**
          * {@value "base64"}
          */

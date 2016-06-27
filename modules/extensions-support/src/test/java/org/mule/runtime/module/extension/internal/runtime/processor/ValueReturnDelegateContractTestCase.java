@@ -73,7 +73,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     public void operationReturnsMuleMessageButKeepsAttributes() throws Exception
     {
         Object payload = new Object();
-        DataType dataType = DataType.builder(DataType.OBJECT).encoding(getDefaultEncoding(muleContext)).build();
+        DataType dataType = DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build();
 
         delegate.asReturnValue(new DefaultMuleMessage(payload, dataType), operationContext);
 

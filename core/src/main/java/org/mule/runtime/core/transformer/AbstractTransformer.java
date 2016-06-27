@@ -176,7 +176,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             {
                 if (returnType == null)
                 {
-                    returnType = DataType.builder().encoding(getDefaultEncoding(muleContext)).build();
+                    returnType = DataType.builder().charset(getDefaultEncoding(muleContext)).build();
                 }
             }
         }

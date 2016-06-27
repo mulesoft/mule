@@ -74,7 +74,7 @@ public class HeisenbergOperations
     {
         Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
         org.mule.runtime.api.metadata.DataType<String> dt = DataType.builder().type(String.class).mediaType("dead/dead")
-                                                                                         .encoding(lastSupportedEncoding.toString())
+                                                                                         .charset(lastSupportedEncoding.toString())
                                                                                          .build();
 
         MuleMessage message = new DefaultMuleMessage(config.getEnemies().get(index), dt, index);

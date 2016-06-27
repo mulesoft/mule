@@ -52,7 +52,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
     protected void doAssignmentDataTypePropagationTest(String expression) throws Exception
     {
-        DataType<String> expectedDataType = DataType.builder().type(String.class).mediaType(JSON).encoding(CUSTOM_ENCODING).build();
+        DataType<String> expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
 
@@ -65,7 +65,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
     protected void doInnerAssignmentDataTypePropagationTest(String expression) throws Exception
     {
-        final DataType expectedDataType = DataType.builder().type(Map.class).mediaType(UNKNOWN).encoding(CUSTOM_ENCODING).build();
+        final DataType expectedDataType = DataType.builder().type(Map.class).mediaType(UNKNOWN).charset(CUSTOM_ENCODING).build();
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
         final Map<String, String> propertyValue = new HashMap<>();

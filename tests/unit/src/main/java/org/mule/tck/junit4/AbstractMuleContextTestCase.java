@@ -376,7 +376,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     @Deprecated
     protected MutableMuleMessage getTestMuleMessage(Object message)
     {
-        return new DefaultMuleMessage(message, DataType.builder(DataType.OBJECT).encoding(SystemUtils.getDefaultEncoding(muleContext)).build(), muleContext);
+        return new DefaultMuleMessage(message, DataType.builder(DataType.OBJECT).charset(SystemUtils.getDefaultEncoding(muleContext)).build(), muleContext);
     }
 
     public static MuleEvent getTestEvent(Object data, FlowConstruct service) throws Exception

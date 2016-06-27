@@ -124,7 +124,7 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         addVariableTransformer.setIdentifier(PLAIN_STRING_KEY);
         addVariableTransformer.setValue(PLAIN_STRING_VALUE);
         addVariableTransformer.initialise();
-        addVariableTransformer.setReturnDataType(DataType.builder().encoding(CUSTOM_ENCODING).build());
+        addVariableTransformer.setReturnDataType(DataType.builder().charset(CUSTOM_ENCODING).build());
         addVariableTransformer.transform(event, ENCODING);
 
         verifyAdded(event, PLAIN_STRING_KEY, PLAIN_STRING_VALUE);

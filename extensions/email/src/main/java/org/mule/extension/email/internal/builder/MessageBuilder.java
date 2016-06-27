@@ -335,7 +335,7 @@ public final class MessageBuilder
     {
         if (charset != null)
         {
-            return DataType.builder().mediaType(contentType).encoding(charset).build().getMediaType();
+            return DataType.builder().mediaType(contentType).charset(charset).build().getMediaType();
         }
         return contentType;
     }

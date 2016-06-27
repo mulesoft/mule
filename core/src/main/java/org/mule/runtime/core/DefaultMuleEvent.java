@@ -655,7 +655,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         try
         {
             MuleMessage transformedMessage = getMuleContext().getTransformationService().transform(message,
-                    DataType.builder().type(String.class).encoding(encoding).build());
+                    DataType.builder().type(String.class).charset(encoding).build());
             if (isConsumable(message.getPayload().getClass()))
             {
                 setMessage(transformedMessage);
@@ -1130,7 +1130,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         {
             this.message = message.transform(msg ->
             {
-                ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).encoding(encoding).build());
+                ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).charset(encoding).build());
                 return msg;
             });
         }

@@ -133,7 +133,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     public void invalidEncoding()
     {
         expected.expect(IllegalArgumentException.class);
-        final DataType dataType = DataType.builder().encoding("imInvalid").build();
+        final DataType dataType = DataType.builder().charset("imInvalid").build();
     }
 
     @Test

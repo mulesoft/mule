@@ -47,7 +47,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
                 }
                 else
                 {
-                    msg.setPayload(typedValue.getValue(), DataType.builder(typedValue.getDataType()).encoding(getDefaultEncoding(muleContext)).build());
+                    msg.setPayload(typedValue.getValue(), DataType.builder(typedValue.getDataType()).charset(getDefaultEncoding(muleContext)).build());
                 }
             }
             else
@@ -60,7 +60,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
                 else
                 {
                     msg.setPayload(value,
-                            DataType.builder(dataType).type((value == null || value instanceof NullPayload) ? Object.class : value.getClass()).encoding(getDefaultEncoding(muleContext)).build());
+                            DataType.builder(dataType).type((value == null || value instanceof NullPayload) ? Object.class : value.getClass()).charset(getDefaultEncoding(muleContext)).build());
                 }
             }
             return msg;
@@ -101,7 +101,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
 
     public void setEncoding(String encoding)
     {
-        setDataType(DataType.builder(dataType == null ? DataType.OBJECT : dataType).encoding(encoding).build());
+        setDataType(DataType.builder(dataType == null ? DataType.OBJECT : dataType).charset(encoding).build());
     }
 
     public void setDataType(DataType dataType)

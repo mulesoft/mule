@@ -274,7 +274,7 @@ public class TransformationService
         Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataType.builder().type(payloadTransformedClass).mediaType(mimeType).build())
                 ? original.getType() : transformed.getType();
 
-        return DataType.builder().type(type).mediaType(mimeType).encoding(encoding).build();
+        return DataType.builder().type(type).mediaType(mimeType).charset(encoding).build();
     }
 
     /**

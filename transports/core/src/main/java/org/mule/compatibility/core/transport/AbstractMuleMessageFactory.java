@@ -54,7 +54,7 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
         }
 
         Object payload = extractPayload(transportMessage, encoding);
-        final DataType dataType = DataType.builder().type((Class) (payload == null ? Object.class : payload.getClass())).mediaType(getMimeType(transportMessage)).encoding(encoding).build();
+        final DataType dataType = DataType.builder().type((Class) (payload == null ? Object.class : payload.getClass())).mediaType(getMimeType(transportMessage)).charset(encoding).build();
         MutableMuleMessage message;
         if (previousMessage != null)
         {

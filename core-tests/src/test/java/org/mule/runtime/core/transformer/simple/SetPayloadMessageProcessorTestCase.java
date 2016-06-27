@@ -143,7 +143,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
     public void setsCustomEncoding() throws MuleException
     {
         setPayloadMessageProcessor.setValue(PLAIN_TEXT);
-        setPayloadMessageProcessor.setDataType(DataType.builder().encoding(CUSTOM_ENCODING).build());
+        setPayloadMessageProcessor.setDataType(DataType.builder().charset(CUSTOM_ENCODING).build());
         setPayloadMessageProcessor.initialise();
 
         setPayloadMessageProcessor.process(muleEvent);

@@ -93,14 +93,14 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
         String mimeType = operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class);
         String encoding = operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class);
 
-        final DataType dataType = dataTypeBuilder.mediaType(mimeType).encoding(encoding).build();
+        final DataType dataType = dataTypeBuilder.mediaType(mimeType).charset(encoding).build();
         if (dataType.getMediaType().getCharset().isPresent())
         {
             return dataType;
         }
         else
         {
-            return DataType.builder(dataType).encoding(getDefaultEncoding(muleContext)).build();
+            return DataType.builder(dataType).charset(getDefaultEncoding(muleContext)).build();
         }
     }
 }

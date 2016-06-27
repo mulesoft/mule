@@ -167,7 +167,7 @@ public final class MuleTestUtils
         final MuleSession session = getTestSession(flowConstruct, context);
         // TODO MULE-9856 Replace with the builder
         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data,
-                DataType.builder().fromObject(data).encoding(getDefaultEncoding(context)).build(), context), mep, flowConstruct, session);
+                DataType.builder().fromObject(data).charset(getDefaultEncoding(context)).build(), context), mep, flowConstruct, session);
         return event;
     }
 

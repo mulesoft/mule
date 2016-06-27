@@ -27,7 +27,7 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     @Test
     public void acceptsSupportedEncoding() throws Exception
     {
-        DataType<?> dataType = DataType.builder().encoding(UTF_8.name()).build();
+        DataType<?> dataType = DataType.builder().charset(UTF_8.name()).build();
 
         assertThat(dataType.getMediaType().getCharset().get(), equalTo(UTF_8));
     }
@@ -35,7 +35,7 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     @Test(expected = UnsupportedCharsetException.class)
     public void rejectsUnsupportedEncoding() throws Exception
     {
-        DataType.builder().encoding("unsupportedEncoding").build();
+        DataType.builder().charset("unsupportedEncoding").build();
     }
 
     @Test

@@ -264,7 +264,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     public void operationReturnsMuleMessageWichKeepsNoValues() throws Exception
     {
         Object payload = new Object();
-        DataType dataType = DataType.builder(DataType.OBJECT).encoding(getDefaultEncoding(context)).build();
+        DataType dataType = DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(context)).build();
         Serializable attributes = mock(Serializable.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload, dataType, attributes));
@@ -289,7 +289,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         messageProcessor = createOperationMessageProcessor();
 
         Object payload = new Object();
-        DataType dataType = DataType.builder(DataType.OBJECT).encoding(getDefaultEncoding(context)).build();
+        DataType dataType = DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(context)).build();
         Serializable attributes = mock(Serializable.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload, dataType, attributes));
@@ -312,7 +312,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     public void operationReturnsMuleMessageButKeepsAttributes() throws Exception
     {
         Object payload = new Object();
-        DataType dataType = DataType.builder(DataType.OBJECT).encoding(getDefaultEncoding(context)).build();
+        DataType dataType = DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(context)).build();
         Serializable oldAttributes = mock(Serializable.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(new DefaultMuleMessage(payload, dataType));
@@ -530,7 +530,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     private MuleEvent configureMockEvent(MuleEvent mockEvent)
     {
-        when(mockEvent.getMessage().getDataType().getMediaType()).thenReturn(new MediaType("*", "*", defaultCharset()));
+        when(mockEvent.getMessage().getDataType().getMediaType()).thenReturn(MediaType.build("*", "*", defaultCharset()));
         return mockEvent;
     }
 }

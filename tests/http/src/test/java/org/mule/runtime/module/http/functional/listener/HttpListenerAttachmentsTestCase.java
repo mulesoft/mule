@@ -75,7 +75,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
     //The value needs to be big enough to ensure several chunks if using transfer encoding chunked.
     private static final String FILE_BODY_FIELD_VALUE = randomAlphanumeric(1200000);
     private static final String FILE_BODY_FIELD_FILENAME = "file.ext";
-    private static final MediaType TEXT_PLAIN_LATIN = new MediaType("text", "plain", ISO_8859_1);
+    private static final MediaType TEXT_PLAIN_LATIN = MediaType.build("text", "plain", ISO_8859_1);
     private static final boolean DO_NOT_USE_CHUNKED_MODE = false;
     private static final boolean USE_CHUNKED_MODE = true;
     @Rule
