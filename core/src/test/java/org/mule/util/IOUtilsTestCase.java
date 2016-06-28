@@ -9,6 +9,7 @@ package org.mule.util;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,7 +26,6 @@ import java.io.OutputStream;
 import java.net.URLClassLoader;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class IOUtilsTestCase extends AbstractMuleTestCase
@@ -50,7 +50,7 @@ public class IOUtilsTestCase extends AbstractMuleTestCase
         IOUtils.copyLarge(in, out);
 
         // Default buffer size of 4KB required two reads to copy 8KB input stream
-        verify(out, times(2)).write(any(byte[].class), Mockito.anyInt(), Mockito.anyInt());
+        verify(out, times(2)).write(any(byte[].class), anyInt(), anyInt());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class IOUtilsTestCase extends AbstractMuleTestCase
                         clazz.newInstance(), in, out);
 
                     // With 8KB buffer define via system property only 1 read is required for 8KB input stream
-                    verify(out, times(1)).write(any(byte[].class), Mockito.anyInt(), Mockito.anyInt());
+                        verify(out, times(1)).write(any(byte[].class), anyInt(), anyInt());
                 }
             });
     }

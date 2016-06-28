@@ -8,10 +8,13 @@ package org.mule.util.queue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.construct.Flow;
 import org.mule.context.DefaultMuleContextFactory;
@@ -23,18 +26,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
 public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase
 {
-    private List<Object> startStopOrder = new ArrayList<Object>();
+    private List<Object> startStopOrder = new ArrayList<>();
     private RecordingTQM rtqm = new RecordingTQM();
+
+    private MuleContext muleContext;
+
+    @Before
+    public void before() throws InitialisationException, ConfigurationException
+    {
+        muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
+    }
+
+    @After
+    public void after()
+    {
+        muleContext.dispose();
+    }
 
     @Test
     public void testStartupOrder() throws Exception
     {
-        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext(new QueueManagerOnlyConfigurationBuilder());
         FlowConstruct fc = new RecordingFlow("dummy", muleContext);
         muleContext.getRegistry().registerFlowConstruct(fc);
         muleContext.start();
@@ -86,11 +104,13 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase
             super(name, muleContext);
         }
 
+        @Override
         public void doStart() throws MuleException
         {
             startStopOrder.add(this);
         }
 
+        @Override
         public void doStop() throws MuleException
         {
             startStopOrder.add(this);

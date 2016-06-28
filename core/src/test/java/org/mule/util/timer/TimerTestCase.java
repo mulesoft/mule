@@ -6,37 +6,59 @@
  */
 package org.mule.util.timer;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.Timer;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class TimerTestCase extends AbstractMuleTestCase implements TimeEventListener
 {
     private volatile boolean fired;
 
+    private Timer timer;
+
+    @Before
+    public void before()
+    {
+        timer = new Timer();
+    }
+
+    @After
+    public void after()
+    {
+        timer.cancel();
+    }
+
     @Test
     public void testTimer() throws Exception
     {
-        Timer timer = new Timer();
-
         EventTimerTask task = new EventTimerTask(this);
 
         timer.schedule(task, 0, 1000);
         task.start();
-        Thread.sleep(1500);
-        assertTrue(fired);
+        new PollingProber(1500, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                assertTrue(fired);
+                return true;
+            }
+        });
     }
 
     @Test
     public void testStopTimer() throws Exception
     {
         fired = false;
-        Timer timer = new Timer();
 
         EventTimerTask task = new EventTimerTask(this);
 
@@ -46,16 +68,22 @@ public class TimerTestCase extends AbstractMuleTestCase implements TimeEventList
         assertTrue(fired);
         fired = false;
         task.stop();
-        Thread.sleep(1500);
-        assertTrue(!fired);
+        new PollingProber(1500, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                assertTrue(!fired);
+                return true;
+            }
+        });
     }
 
     @Test
     public void testMultipleListeners() throws Exception
     {
         fired = false;
-        Timer timer = new Timer();
-        AnotherListener listener = new AnotherListener();
+        final AnotherListener listener = new AnotherListener();
 
         EventTimerTask task = new EventTimerTask(this);
         task.addListener(listener);
@@ -70,17 +98,23 @@ public class TimerTestCase extends AbstractMuleTestCase implements TimeEventList
 
         fired = false;
         task.stop();
-        Thread.sleep(1500);
-        assertTrue(!fired);
-        assertTrue(!listener.wasFired());
+        new PollingProber(1500, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                assertTrue(!fired);
+                assertTrue(!listener.wasFired());
+                return true;
+            }
+        });
     }
 
     @Test
     public void testRemoveListeners() throws Exception
     {
         fired = false;
-        Timer timer = new Timer();
-        AnotherListener listener = new AnotherListener();
+        final AnotherListener listener = new AnotherListener();
 
         EventTimerTask task = new EventTimerTask(this);
         task.addListener(listener);
@@ -104,11 +138,19 @@ public class TimerTestCase extends AbstractMuleTestCase implements TimeEventList
         task.stop();
         task.removeAllListeners();
         task.start();
-        Thread.sleep(1500);
-        assertTrue(!fired);
-        assertTrue(!listener.wasFired());
+        new PollingProber(1500, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                assertTrue(!fired);
+                assertTrue(!listener.wasFired());
+                return true;
+            }
+        });
     }
 
+    @Override
     public void timeExpired(TimeEvent e)
     {
         assertTrue(e.getTimeExpired() > 0);
@@ -122,6 +164,7 @@ public class TimerTestCase extends AbstractMuleTestCase implements TimeEventList
 
         private boolean wasFired;
 
+        @Override
         public void timeExpired(TimeEvent e)
         {
             wasFired = true;

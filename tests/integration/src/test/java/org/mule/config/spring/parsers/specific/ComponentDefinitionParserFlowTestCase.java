@@ -41,6 +41,7 @@ import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory;
 
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 
@@ -49,6 +50,15 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
 
     private MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     private MuleContext muleContext;
+
+    @After
+    public void after()
+    {
+        if (muleContext != null)
+        {
+            muleContext.dispose();
+        }
+    }
 
     @Test
     public void testDefaultJavaComponentShortcut() throws Exception

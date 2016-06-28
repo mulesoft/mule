@@ -17,6 +17,8 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.config.ImmutableThreadingProfile;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
@@ -118,8 +120,15 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         assertTrue(latch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // Wait even longer and ensure the other message isn't executed.
-        Thread.sleep(LONGER_WAIT_TIME);
-        assertEquals(1, counter.get());
+        new PollingProber(LONGER_WAIT_TIME, 50).check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                assertEquals(1, counter.get());
+                return true;
+            }
+        });
     }
 
     @Test
@@ -135,8 +144,15 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         assertTrue(latch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // Wait even longer and ensure the other message isn't executed.
-        Thread.sleep(LONGER_WAIT_TIME);
-        assertEquals(1, counter.get());
+        new PollingProber(LONGER_WAIT_TIME, 50).check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                assertEquals(1, counter.get());
+                return true;
+            }
+        });
     }
 
     @Test
@@ -152,8 +168,15 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         assertTrue(latch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // Wait even longer and ensure the other message isn't executed.
-        Thread.sleep(LONGER_WAIT_TIME);
-        assertEquals(1, counter.get());
+        new PollingProber(LONGER_WAIT_TIME, 50).check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                assertEquals(1, counter.get());
+                return true;
+            }
+        });
     }
 
     @Test
@@ -176,8 +199,15 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         dispatchTwoAsyncEvents();
 
         assertTrue(latch.await(SERIAL_WAIT_TIME, TimeUnit.MILLISECONDS));
-        Thread.sleep(LONGER_WAIT_TIME);
-        assertEquals(3, counter.get());
+        new PollingProber(LONGER_WAIT_TIME, 50).check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                assertEquals(3, counter.get());
+                return true;
+            }
+        });
     }
 
     protected void createTestConnectorWithSingleDispatcherThread(int exhaustedAction) throws MuleException

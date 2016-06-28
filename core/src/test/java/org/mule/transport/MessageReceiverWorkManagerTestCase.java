@@ -51,6 +51,9 @@ public class MessageReceiverWorkManagerTestCase extends AbstractMuleContextTestC
         {
             fail("Work should be executed and it was not");
         }
+
+        receiverConnector.stop();
+        receiverConnector.dispose();
     }
 
     private AbstractMessageReceiver createMessageReceiver() throws Exception

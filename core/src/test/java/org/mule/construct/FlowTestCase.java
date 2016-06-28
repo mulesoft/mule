@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -77,7 +79,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
             }
         });
 
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("f")));
         processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("e")));
         processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("d")));
@@ -102,6 +104,20 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
     protected AbstractFlowConstruct getFlowConstruct() throws Exception
     {
         return flow;
+    }
+
+    @After
+    public void after() throws MuleException
+    {
+        if (flow.isStarted())
+        {
+            flow.stop();
+        }
+
+        if (flow.getLifecycleState().isInitialised())
+        {
+            flow.dispose();
+        }
     }
 
     @Test

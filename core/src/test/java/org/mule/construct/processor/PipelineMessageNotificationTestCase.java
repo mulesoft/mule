@@ -12,9 +12,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.MessageExchangePattern.ONE_WAY;
+import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
+import static org.mule.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
+import static org.mule.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
+import static org.mule.context.notification.PipelineMessageNotification.PROCESS_END;
+import static org.mule.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -41,8 +49,9 @@ import org.mule.registry.MuleRegistryHelper;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.TriggerableMessageSource;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.transformer.simple.StringAppendTransformer;
 
 import java.util.ArrayList;
@@ -92,8 +101,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setMessageSource(source);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.REQUEST_RESPONSE, pipeline);
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext), REQUEST_RESPONSE, pipeline);
 
         source.trigger(event);
 
@@ -101,11 +109,9 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
                 argThat(new PipelineMessageNotificiationArgumentMatcher(
                         PipelineMessageNotification.PROCESS_START, false, event)));
         verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PipelineMessageNotification.PROCESS_END,
-                                                                        false, event)));
+                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
         verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_COMPLETE, false, event)));
+                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, event)));
         verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
     }
 
@@ -130,22 +136,24 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.initialise();
 
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler, pipeline);
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
         source.trigger(event);
-        nullReplyToHandler.latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_START, false, null)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PipelineMessageNotification.PROCESS_END,
-                                                                        false, null)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_COMPLETE, false, null)));
-        verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+        new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, null)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, null)));
+                verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+                return true;
+            }
+        });
     }
 
     @Test
@@ -155,22 +163,24 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setMessageSource(source);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.ONE_WAY, pipeline);
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext), ONE_WAY, pipeline);
 
         source.trigger(event);
-        pipeline.latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_START, false, event)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PipelineMessageNotification.PROCESS_END,
-                                                                        false, event)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_COMPLETE, false, event)));
-        verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+        new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, event)));
+                verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+                return true;
+            }
+        });
     }
 
     @Test
@@ -179,13 +189,12 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessr());
         pipeline.setMessageProcessors(processors);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.REQUEST_RESPONSE, pipeline);
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext), REQUEST_RESPONSE, pipeline);
 
         try
         {
@@ -196,11 +205,9 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         }
 
         verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_START, false, event)));
+                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
         verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_COMPLETE, true, event)));
+                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, event)));
         verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
     }
 
@@ -210,7 +217,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new AbstractMessageProcessorTestCase.ExceptionThrowingMessageProcessr());
         processors.add(new SensingNullMessageProcessor());
         pipeline.setMessageProcessors(processors);
@@ -218,8 +225,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.initialise();
 
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler, pipeline);
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
         try
         {
@@ -229,15 +235,19 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         {
         }
 
-        nullReplyToHandler.latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_START, false, null)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_COMPLETE, true, null)));
-        verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
+        new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
+                verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
+                return true;
+            }
+        });
     }
 
     @Test
@@ -246,7 +256,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new ResponseMessageProcessorAdapter(new AbstractMessageProcessorTestCase
                 .ExceptionThrowingMessageProcessr()));
         processors.add(new SensingNullMessageProcessor());
@@ -255,8 +265,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.initialise();
 
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler, pipeline);
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext), REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
         try
         {
@@ -266,18 +275,21 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         {
         }
 
-        nullReplyToHandler.latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_START, false, null)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PipelineMessageNotification.PROCESS_END,
-                                                                        false, null)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_COMPLETE, true, null)));
-        verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+        new PollingProber(RECEIVE_TIMEOUT, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, null)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, null)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
+                verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
+                return true;
+            }
+        });
     }
 
     @Test
@@ -286,14 +298,13 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new ResponseMessageProcessorAdapter(new AbstractMessageProcessorTestCase
                 .ExceptionThrowingMessageProcessr()));
         pipeline.setMessageProcessors(processors);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.REQUEST_RESPONSE, pipeline);
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext), REQUEST_RESPONSE, pipeline);
 
         try
         {
@@ -303,14 +314,11 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         {
         }
         verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_START, false, event)));
+                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
         verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(PipelineMessageNotification.PROCESS_END,
-                                                                        false, event)));
+                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_END, false, event)));
         verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_COMPLETE, true, event)));
+                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, event)));
         verify(notificationManager, times(3)).fireNotification(any(PipelineMessageNotification.class));
     }
 
@@ -320,14 +328,13 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new AbstractMessageProcessorTestCase
                 .ExceptionThrowingMessageProcessr());
         pipeline.setMessageProcessors(processors);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.ONE_WAY, pipeline);
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext), ONE_WAY, pipeline);
 
         try
         {
@@ -337,10 +344,9 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         {
         }
         verify(notificationManager, times(1)).fireNotification(
-            argThat(new PipelineMessageNotificiationArgumentMatcher(
-                PipelineMessageNotification.PROCESS_START, false, event)));
+                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
         verify(notificationManager, times(1)).fireNotification(
-            argThat(new PipelineMessageNotificiationArgumentMatcher(PipelineMessageNotification.PROCESS_COMPLETE, true, null)));
+                argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
         verify(notificationManager, times(2)).fireNotification(any(PipelineMessageNotification.class));
     }
 
@@ -353,7 +359,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         final CountDownLatch latch = new CountDownLatch(1);
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new MessageProcessor()
         {
             @Override
@@ -367,33 +373,37 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.initialise();
         pipeline.start();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
-                                     MessageExchangePattern.ONE_WAY, pipeline);
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext), ONE_WAY, pipeline);
 
         source.trigger(event);
-        latch.await(AbstractMuleContextTestCase.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-        Thread.sleep(2000);
+        latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        new PollingProber(2000, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_SCHEDULED, false, event)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, false, null)));
+                // Event is not same, because it's copied
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_ASYNC_COMPLETE, false, null)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(
+                                ExceptionStrategyNotification.PROCESS_START, false, null)));
+                verify(notificationManager, times(1)).fireNotification(
+                        argThat(new PipelineMessageNotificiationArgumentMatcher(
+                                ExceptionStrategyNotification.PROCESS_END, false, null)));
+                verify(notificationManager, times(6)).fireNotification(any(PipelineMessageNotification.class));
+                return true;
+            }
+        });
 
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_START, false, event)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED, false, event)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        PipelineMessageNotification.PROCESS_COMPLETE, false, null)));
-        // Event is not same, because it's copied
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        AsyncMessageNotification.PROCESS_ASYNC_COMPLETE, false, null)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        ExceptionStrategyNotification.PROCESS_START, false, null)));
-        verify(notificationManager, times(1)).fireNotification(
-                argThat(new PipelineMessageNotificiationArgumentMatcher(
-                        ExceptionStrategyNotification.PROCESS_END, false, null)));
-        verify(notificationManager, times(6)).fireNotification(any(PipelineMessageNotification.class));
+        pipeline.stop();
+        pipeline.dispose();
     }
 
 

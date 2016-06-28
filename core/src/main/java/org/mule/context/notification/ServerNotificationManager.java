@@ -6,6 +6,8 @@
  */
 package org.mule.context.notification;
 
+import static java.lang.Thread.currentThread;
+
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
@@ -67,7 +69,8 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     private boolean dynamic = false;
     private Configuration configuration = new Configuration();
     private AtomicBoolean disposed = new AtomicBoolean(false);
-    private BlockingDeque<ServerNotification> eventQueue = new LinkedBlockingDeque<ServerNotification>();
+    private volatile Thread runningThread;
+    private BlockingDeque<ServerNotification> eventQueue = new LinkedBlockingDeque<>();
     private MuleContext muleContext;
 
     @Override
@@ -239,6 +242,10 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     {
         disposed.set(true);
         configuration = null;
+        if (runningThread != null)
+        {
+            runningThread.interrupt();
+        }
     }
 
     protected void notifyListeners(ServerNotification notification)
@@ -262,6 +269,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     @Override
     public void run()
     {
+        runningThread = currentThread();
         while (!disposed.get())
         {
             try
@@ -275,7 +283,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
             }
             catch (InterruptedException e)
             {
-                Thread.currentThread().interrupt();
+                currentThread().interrupt();
             }
         }
     }

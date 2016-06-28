@@ -6,6 +6,8 @@
  */
 package org.mule.tck.junit4;
 
+import static org.mule.util.TestsLogConfigurationHelper.configureLoggingForTest;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -127,6 +129,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      * false, which means that a context will be instantiated per test method.
      */
     private boolean disposeContextPerClass;
+    private static boolean logConfigured;
 
     protected boolean isDisposeContextPerClass()
     {
@@ -141,7 +144,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     @Before
     public final void setUpMuleContext() throws Exception
     {
-        TestsLogConfigurationHelper.configureLoggingForTest(getClass());
+        if (!logConfigured)
+        {
+            configureLoggingForTest(getClass());
+            logConfigured = true;
+        }
         workingDirectory.create();
         String workingDirectoryOldValue = System.setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectory.getRoot().getAbsolutePath());
         try
@@ -176,7 +183,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 
     private void startMuleContext() throws MuleException, InterruptedException
     {
-        final AtomicReference<Latch> contextStartedLatch = new AtomicReference<Latch>();
+        final AtomicReference<Latch> contextStartedLatch = new AtomicReference<>();
 
         contextStartedLatch.set(new Latch());
         muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
@@ -231,7 +238,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         else
         {
             MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
+            List<ConfigurationBuilder> builders = new ArrayList<>();
             builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
 
             //If the annotations module is on the classpath, add the annotations config builder to the list

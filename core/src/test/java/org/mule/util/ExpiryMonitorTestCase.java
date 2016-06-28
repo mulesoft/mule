@@ -6,47 +6,69 @@
  */
 package org.mule.util;
 
+import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 {
     private boolean expired = false;
 
-    protected void doSetUp() throws Exception
+    private ExpiryMonitor monitor;
+
+    @Before
+    public void doSetUp() throws Exception
     {
         expired = false;
+        monitor = new ExpiryMonitor("test", 100, null, false);
+    }
+
+    @After
+    public void after()
+    {
+        monitor.dispose();
     }
 
     @Test
     public void testExpiry() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor("test", 100, null, false);
-        Expirable e = new Expirable()
+        final Expirable e = new Expirable()
         {
+            @Override
             public void expired()
             {
                 expired = true;
             }
         };
         monitor.addExpirable(300, TimeUnit.MILLISECONDS, e);
-        Thread.sleep(800);
-        assertTrue(expired);
-        assertTrue(!monitor.isRegistered(e));
+        new PollingProber(800, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                assertTrue(expired);
+                assertTrue(!monitor.isRegistered(e));
+                return true;
+            }
+        });
     }
 
     @Test
     public void testNotExpiry() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor("test", 100, null, false);
-        Expirable e = new Expirable()
+        final Expirable e = new Expirable()
         {
+            @Override
             public void expired()
             {
                 expired = true;
@@ -55,17 +77,24 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
         monitor.addExpirable(800, TimeUnit.MILLISECONDS, e);
         Thread.sleep(300);
         assertTrue(!expired);
-        Thread.sleep(800);
-        assertTrue(expired);
-        assertTrue(!monitor.isRegistered(e));
+        new PollingProber(800, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                assertTrue(expired);
+                assertTrue(!monitor.isRegistered(e));
+                return true;
+            }
+        });
     }
 
     @Test
     public void testExpiryWithReset() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor("test", 100, null, false);
-        Expirable e = new Expirable()
+        final Expirable e = new Expirable()
         {
+            @Override
             public void expired()
             {
                 expired = true;
@@ -77,18 +106,24 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
         monitor.resetExpirable(e);
         Thread.sleep(200);
         assertTrue(!expired);
-        Thread.sleep(600);
-        assertTrue(expired);
-
-        assertTrue(!monitor.isRegistered(e));
+        new PollingProber(600, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                assertTrue(expired);
+                assertTrue(!monitor.isRegistered(e));
+                return true;
+            }
+        });
     }
 
     @Test
     public void testNotExpiryWithRemove() throws InterruptedException
     {
-        ExpiryMonitor monitor = new ExpiryMonitor("test", 100, null, false);
-        Expirable e = new Expirable()
+        final Expirable e = new Expirable()
         {
+            @Override
             public void expired()
             {
                 expired = true;
@@ -99,9 +134,16 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
         assertTrue(!expired);
         Thread.sleep(200);
         monitor.removeExpirable(e);
-        Thread.sleep(800);
-        assertTrue(!expired);
-        assertTrue(!monitor.isRegistered(e));
+        new PollingProber(600, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                assertTrue(!expired);
+                assertTrue(!monitor.isRegistered(e));
+                return true;
+            }
+        });
     }
 
 }
