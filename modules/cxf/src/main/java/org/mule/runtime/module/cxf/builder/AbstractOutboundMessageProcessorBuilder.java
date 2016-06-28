@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf.builder;
 
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -359,9 +359,9 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         this.wsSecurity = wsSecurity;
     }
 
-    protected String getMimeType()
+    protected MediaType getMimeType()
     {
-        return MimeType.ANY;
+        return MediaType.ANY;
     }
 
 }

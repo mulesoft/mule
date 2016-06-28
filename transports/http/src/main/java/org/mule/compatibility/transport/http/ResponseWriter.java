@@ -6,12 +6,15 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+
 import java.io.BufferedWriter;
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * Provides a hybrid Writer/OutputStream for sending HTTP response data
@@ -19,22 +22,21 @@ import java.io.UnsupportedEncodingException;
 public class ResponseWriter extends FilterWriter
 {
     public static final String CRLF = "\r\n";
-    public static final String ISO_8859_1 = "ISO-8859-1";
     private OutputStream outStream = null;
-    private String encoding = null;
+    private Charset encoding = null;
 
     public ResponseWriter(final OutputStream outStream) throws UnsupportedEncodingException
     {
         this(outStream, CRLF, ISO_8859_1);
     }
 
-    public ResponseWriter(final OutputStream outStream, final String encoding)
+    public ResponseWriter(final OutputStream outStream, final Charset encoding)
         throws UnsupportedEncodingException
     {
         this(outStream, CRLF, encoding);
     }
 
-    public ResponseWriter(final OutputStream outStream, final String lineSeparator, final String encoding)
+    public ResponseWriter(final OutputStream outStream, final String lineSeparator, final Charset encoding)
         throws UnsupportedEncodingException
     {
         super(new BufferedWriter(new OutputStreamWriter(outStream, encoding)));
@@ -42,7 +44,7 @@ public class ResponseWriter extends FilterWriter
         this.encoding = encoding;
     }
 
-    public String getEncoding()
+    public Charset getEncoding()
     {
         return encoding;
     }

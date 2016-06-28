@@ -7,6 +7,7 @@
 package org.mule.runtime.module.http.functional.listener;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang.StringUtils.countMatches;
@@ -18,12 +19,15 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -39,6 +43,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -70,6 +75,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
     //The value needs to be big enough to ensure several chunks if using transfer encoding chunked.
     private static final String FILE_BODY_FIELD_VALUE = randomAlphanumeric(1200000);
     private static final String FILE_BODY_FIELD_FILENAME = "file.ext";
+    private static final MediaType TEXT_PLAIN_LATIN = MediaType.create("text", "plain", ISO_8859_1);
     private static final boolean DO_NOT_USE_CHUNKED_MODE = false;
     private static final boolean USE_CHUNKED_MODE = true;
     @Rule
@@ -278,7 +284,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
         {
             org.mule.extension.http.api.HttpPart part = new org.mule.extension.http.api.HttpPart(TEXT_BODY_FIELD_NAME,
                                                                                                  TEXT_BODY_FIELD_VALUE,
-                                                                                                 TEXT_PLAIN.toString(),
+                                                                                                 TEXT_PLAIN_LATIN,
                                                                                                  null);
             event.setFlowVariable("parts", asList(part));
             return event;
@@ -292,11 +298,11 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
         {
             org.mule.extension.http.api.HttpPart part1 = new org.mule.extension.http.api.HttpPart(TEXT_BODY_FIELD_NAME,
                                                                                                   TEXT_BODY_FIELD_VALUE,
-                                                                                                  TEXT_PLAIN.toString(),
+                                                                                                  TEXT_PLAIN_LATIN,
                                                                                                   null);
             org.mule.extension.http.api.HttpPart part2 = new org.mule.extension.http.api.HttpPart(FILE_BODY_FIELD_NAME,
                                                                                                   FILE_BODY_FIELD_VALUE.getBytes(),
-                                                                                                  APPLICATION_OCTET_STREAM.toString(),
+                                                                                                  BINARY,
                                                                                                   FILE_BODY_FIELD_FILENAME);
             event.setFlowVariable("parts", asList(part1, part2));
             return event;
@@ -321,7 +327,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
                                                 }
                                                 parts.add(new org.mule.extension.http.api.HttpPart(id,
                                                                        dataHandler.getContent(),
-                                                                       dataHandler.getContentType(),
+                                                                       DataType.builder().mediaType(dataHandler.getContentType()).build().getMediaType(),
                                                                        filename));
                                             }
                                             catch (IOException e)

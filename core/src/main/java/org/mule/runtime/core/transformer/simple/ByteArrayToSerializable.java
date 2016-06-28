@@ -14,6 +14,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * <code>ByteArrayToSerializable</code> converts a serialized object to its object
@@ -34,7 +35,7 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         ObjectSerializer serializer = muleContext.getObjectSerializer();
         try

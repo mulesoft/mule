@@ -11,7 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mule.compatibility.transport.file.FileTestUtils.createDataFile;
 
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
@@ -35,6 +35,7 @@ public class FileMimeTypeTestCase extends AbstractFileFunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.request("vm://receive", TIMEOUT);
 
-        assertThat(message.getDataType().getMimeType(), equalTo(MimeType.TEXT));
+        assertThat(message.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
+        assertThat(message.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
     }
 }

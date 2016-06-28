@@ -18,6 +18,7 @@ import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.FilterInputStream;
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
@@ -58,7 +59,7 @@ public class TransformerCachingTestCase extends AbstractMuleContextTestCase
         }
 
         @Override
-        protected Object doTransform(Object src, String outputEncoding) throws TransformerException
+        protected Object doTransform(Object src, Charset outputEncoding) throws TransformerException
         {
             throw new UnsupportedOperationException("This is a transformer only to be used for testing");
         }

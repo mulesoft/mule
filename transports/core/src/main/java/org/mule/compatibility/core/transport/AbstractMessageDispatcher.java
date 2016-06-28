@@ -9,6 +9,8 @@ package org.mule.compatibility.core.transport;
 import static org.mule.runtime.core.OptimizedRequestContext.unsafeSetEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.runtime.api.execution.CompletionHandler;
@@ -29,6 +31,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.construct.Flow;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.resource.spi.work.Work;
@@ -125,10 +128,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         if (resultMessage != null)
         {
             resultMessage.setMessageRootId(requestEvent.getMessage().getMessageRootId());
-
-            // Ensure ENCODING message property is set to give exactly same behavior as before
-            // OutboundRewriteResponseEventMessageProcessor was removed (MULE-7535).
-            resultMessage.setEncoding(resultMessage.getEncoding());
 
             MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
                     resultMessage);
@@ -340,4 +339,18 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
             ((ThreadSafeAccess) result).resetAccessControl();
         }
     }
+
+    protected Charset resolveEncoding(MuleEvent event)
+    {
+        return event.getMessage().getDataType().getMediaType().getCharset().orElseGet(() ->
+        {
+            Charset encoding = getEndpoint().getEncoding();
+            if (encoding == null)
+            {
+                encoding = getDefaultEncoding(getEndpoint().getMuleContext());
+            }
+            return encoding;
+        });
+    }
+
 }

@@ -6,9 +6,15 @@
  */
 package org.mule.extension.email.api;
 
-import static org.mule.runtime.api.metadata.MimeType.TEXT;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
+
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+
+import java.nio.charset.Charset;
 
 /**
  * Represents and enables the construction of the content of an email
@@ -42,7 +48,7 @@ public class EmailContent
      * The default value is "text/plain"
      */
     @Parameter
-    @Optional(defaultValue = TEXT)
+    @Optional(defaultValue = "text/plain")
     private String contentType;
 
     /**
@@ -66,18 +72,18 @@ public class EmailContent
     /**
      * @return the contentType of the body. one of "text/html" or "text/plain"
      */
-    public String getContentType()
+    public MediaType getContentType()
     {
         // TODO: remove if when MULE-9960 is fixed since default values are not being injected properly.
-        return contentType == null ? TEXT : contentType;
+        return contentType == null ? TEXT : DataType.builder().mediaType(contentType).build().getMediaType();
     }
 
     /**
      * @return the charset of the body.
      */
-    public String getCharset()
+    public Charset getCharset()
     {
         // TODO: remove if when MULE-9960 is fixed since default values are not being injected properly.
-        return charset == null ? "UTF-8" : charset;
+        return charset != null ? Charset.forName(charset) : UTF_8;
     }
 }

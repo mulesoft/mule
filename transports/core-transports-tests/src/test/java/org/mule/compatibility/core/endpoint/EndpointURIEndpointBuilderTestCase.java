@@ -10,12 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.util.TransportObjectNameHelper;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleException;
@@ -25,6 +25,8 @@ import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
+
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
@@ -77,7 +79,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleContextEndpo
         assertTrue(ep.getConnector() instanceof TestConnector);
         assertEquals(new TransportObjectNameHelper(muleContext).getEndpointName(ep.getEndpointURI()), ep.getName());
         assertFalse(ep.isDeleteUnacceptedMessages());
-        assertEquals(muleContext.getConfiguration().getDefaultEncoding(), ep.getEncoding());
+        assertEquals(getDefaultEncoding(muleContext), ep.getEncoding());
         assertEquals(null, ep.getFilter());
         assertEquals(ImmutableEndpoint.INITIAL_STATE_STARTED, ep.getInitialState());
     }
@@ -87,7 +89,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleContextEndpo
     {
         String uri = "test://address";
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
-        assertNotNull(endpointBuilder.getClass().getMethod("setEncoding", new Class[]{String.class}));
+        assertNotNull(endpointBuilder.getClass().getMethod("setEncoding", new Class[] {Charset.class}));
     }
     
     @Test

@@ -14,6 +14,7 @@ import org.mule.runtime.core.util.Base64;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * <code>Base64Encoder</code> transforms Base64 encoded data into strings or byte
@@ -30,7 +31,7 @@ public class Base64Decoder extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String outputEncoding) throws TransformerException
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         try
         {
@@ -45,7 +46,7 @@ public class Base64Decoder extends AbstractTransformer
                 InputStream input = (InputStream) src;
                 try
                 {
-                    data = IOUtils.toString(input);
+                    data = IOUtils.toString(input, outputEncoding);
                 }
                 finally
                 {
@@ -59,7 +60,7 @@ public class Base64Decoder extends AbstractTransformer
 
             byte[] result = Base64.decode(data);
 
-            if (DataType.STRING.equals(getReturnDataType()))
+            if (DataType.STRING.isCompatibleWith(getReturnDataType()))
             {
                 return new String(result, outputEncoding);
             }

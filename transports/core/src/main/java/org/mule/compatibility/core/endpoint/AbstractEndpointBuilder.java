@@ -10,6 +10,7 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
 import static org.mule.compatibility.core.util.TransportObjectNameHelper.getEndpointNameFor;
+
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.EndpointMessageProcessorChainFactory;
@@ -28,6 +29,7 @@ import org.mule.compatibility.core.transport.service.TransportFactoryException;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
 import org.mule.compatibility.core.transport.service.TransportServiceException;
 import org.mule.compatibility.core.util.TransportObjectNameHelper;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -55,8 +57,10 @@ import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.MapCombiner;
 import org.mule.runtime.core.util.ObjectNameHelper;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,9 +68,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,15 +95,15 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     protected MessageExchangePattern messageExchangePattern;
     protected Integer responseTimeout;
     protected String initialState = ImmutableEndpoint.INITIAL_STATE_STARTED;
-    protected String encoding;
+    protected Charset encoding;
     protected Integer createConnector;
     protected RetryPolicyTemplate retryPolicyTemplate;
     protected String responsePropertiesList;
     protected EndpointMessageProcessorChainFactory messageProcessorsFactory;
-    protected List<MessageProcessor> messageProcessors = new LinkedList<MessageProcessor>();
-    protected List<MessageProcessor> responseMessageProcessors = new LinkedList<MessageProcessor>();
-    protected List<Transformer> transformers = new LinkedList<Transformer>();
-    protected List<Transformer> responseTransformers = new LinkedList<Transformer>();
+    protected List<MessageProcessor> messageProcessors = new LinkedList<>();
+    protected List<MessageProcessor> responseMessageProcessors = new LinkedList<>();
+    protected List<Transformer> transformers = new LinkedList<>();
+    protected List<Transformer> responseTransformers = new LinkedList<>();
     protected Boolean disableTransportTransformer;
     protected String mimeType;
     protected AbstractRedeliveryPolicy redeliveryPolicy;
@@ -231,7 +232,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 getRedeliveryPolicy(),
                 getMessageProcessorsFactory(), mergedProcessors, mergedResponseProcessors,
-                isDisableTransportTransformer(), mimeType);
+                isDisableTransportTransformer(), mimeType != null ? DataType.builder().mediaType(mimeType).build().getMediaType() : null);
     }
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
@@ -290,7 +291,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 getRedeliveryPolicy(),
                 responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors,
-                responseMessageProcessors, isDisableTransportTransformer(), mimeType);
+                responseMessageProcessors, isDisableTransportTransformer(), mimeType != null ? DataType.builder().mediaType(mimeType).build().getMediaType() : null);
     }
 
     private String getDynamicUriFrom(String uri)
@@ -307,7 +308,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     
     protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException
     {
-        List<MessageProcessor> tempProcessors = new LinkedList<MessageProcessor>(messageProcessors);
+        List<MessageProcessor> tempProcessors = new LinkedList<>(messageProcessors);
         tempProcessors.addAll(getTransformersFromUri(endpointURI));
         tempProcessors.addAll(transformers);
 
@@ -344,7 +345,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
 
     protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException
     {
-        List<MessageProcessor> tempResponseProcessors = new LinkedList<MessageProcessor>(
+        List<MessageProcessor> tempResponseProcessors = new LinkedList<>(
             responseMessageProcessors);
         tempResponseProcessors.addAll(getResponseTransformersFromUri(endpointURI));
         tempResponseProcessors.addAll(responseTransformers);
@@ -507,7 +508,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     protected Map<Object, Object> getProperties()
     {
         // Add properties from builder, endpointURI and then seal (make unmodifiable)
-        LinkedList<Object> maps = new LinkedList<Object>();
+        LinkedList<Object> maps = new LinkedList<>();
         // properties from url come first
         if (null != uriBuilder)
         {
@@ -537,14 +538,14 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
         return false;
     }
 
-    protected String getEndpointEncoding(Connector connector)
+    protected Charset getEndpointEncoding(Connector connector)
     {
         return encoding != null ? encoding : getDefaultEndpointEncoding(connector);
     }
 
-    protected String getDefaultEndpointEncoding(Connector connector)
+    protected Charset getDefaultEndpointEncoding(Connector connector)
     {
-        return muleContext.getConfiguration().getDefaultEncoding();
+        return SystemUtils.getDefaultEncoding(muleContext);
     }
 
     protected String getInitialState(Connector connector)
@@ -613,23 +614,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
 
     public void setMimeType(String mimeType)
     {
-        if (mimeType == null)
-        {
-            this.mimeType = null;
-        }
-        else
-        {
-            MimeType mt;
-            try
-            {
-                mt = new MimeType(mimeType);
-            }
-            catch (MimeTypeParseException e)
-            {
-                throw new IllegalArgumentException(e.getMessage(), e);
-            }
-            this.mimeType = mt.getPrimaryType() + "/" + mt.getSubType();
-        }
+        this.mimeType = mimeType;
     }
 
     private List<Transformer> getTransformersFromString(String transformerString) throws TransportFactoryException
@@ -717,7 +702,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     {
         if (newTransformers == null)
         {
-            newTransformers = new LinkedList<Transformer>();
+            newTransformers = new LinkedList<>();
         }
         this.transformers = newTransformers;
     }
@@ -741,7 +726,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     {
         if (newResponseTransformers == null)
         {
-            newResponseTransformers = new LinkedList<Transformer>();
+            newResponseTransformers = new LinkedList<>();
         }
         this.responseTransformers = newResponseTransformers;
     }
@@ -757,7 +742,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     {
         if (newMessageProcessors == null)
         {
-            newMessageProcessors = new LinkedList<MessageProcessor>();
+            newMessageProcessors = new LinkedList<>();
         }
         this.messageProcessors = newMessageProcessors;
     }
@@ -778,7 +763,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     {
         if (newResponseMessageProcessors == null)
         {
-            newResponseMessageProcessors = new LinkedList<MessageProcessor>();
+            newResponseMessageProcessors = new LinkedList<>();
         }
         this.responseMessageProcessors = newResponseMessageProcessors;
     }
@@ -862,7 +847,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     }
 
     @Override
-    public void setEncoding(String encoding)
+    public void setEncoding(Charset encoding)
     {
         this.encoding = encoding;
     }

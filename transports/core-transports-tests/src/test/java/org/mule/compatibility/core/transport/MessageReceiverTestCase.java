@@ -6,13 +6,11 @@
  */
 package org.mule.compatibility.core.transport;
 
-import static java.lang.Boolean.FALSE;
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
@@ -20,6 +18,7 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
+import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -90,11 +89,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
 
     protected MutableMuleMessage createRequestMessage()
     {
-        MutableMuleMessage request = mock(MutableMuleMessage.class);
-        when(request.getMuleContext()).thenReturn(muleContext);
-        when(request.getInboundProperty(anyString(), eq(false))).thenReturn(FALSE);
-        when(request.getOutboundProperty(anyString(), eq(false))).thenReturn(FALSE);
-        return request;
+        return new DefaultMuleMessage("", emptyMap(), emptyMap(), emptyMap(), muleContext);
     }
 
     protected MessageReceiver createMessageReciever(MessageExchangePattern mep) throws MuleException

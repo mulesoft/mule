@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -35,7 +37,7 @@ import org.mockito.Mockito;
 @SmallTest
 public abstract class AbstractRemoveVariablePropertyTransformerTestCase extends AbstractMuleTestCase
 {
-    public static final String ENCODING = "encoding";
+    public static final Charset ENCODING = US_ASCII;
     public static final String PLAIN_STRING_KEY = "someText";
     public static final String PLAIN_STRING_VALUE = "someValue";
     public static final String EXPRESSION = "#[string:someValue]";

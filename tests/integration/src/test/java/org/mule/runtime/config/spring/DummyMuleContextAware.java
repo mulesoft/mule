@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 public class DummyMuleContextAware implements MuleContextAware, Transformer
@@ -49,7 +50,7 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
     }
 
     @Override
-    public Object transform(Object src, String encoding) throws TransformerException
+    public Object transform(Object src, Charset encoding) throws TransformerException
     {
         return null;
     }
@@ -111,18 +112,6 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer
     public List<DataType<?>> getSourceDataTypes()
     {
         return null;
-    }
-
-    @Override
-    public String getMimeType()
-    {
-        return null;
-    }
-
-    @Override
-    public String getEncoding()
-    {
-        return null;  
     }
 
     @Override

@@ -6,8 +6,11 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MutableMuleMessage;
@@ -23,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +46,7 @@ import org.slf4j.LoggerFactory;
 public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 {
     private static Logger log = LoggerFactory.getLogger(HttpMuleMessageFactory.class);
-    private static final String DEFAULT_ENCODING = "UTF-8";
+    private static final Charset DEFAULT_ENCODING = UTF_8;
 
     private boolean enableCookies = false;
     private String cookieSpec;
@@ -59,7 +63,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected Object extractPayload(Object transportMessage, String encoding) throws Exception
+    protected Object extractPayload(Object transportMessage, Charset encoding) throws Exception
     {
         if (transportMessage instanceof HttpRequest)
         {
@@ -115,7 +119,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected void addProperties(DefaultMuleMessage message, Object transportMessage) throws Exception
+    protected MutableMuleMessage addProperties(MutableMuleMessage message, Object transportMessage) throws Exception
     {
         String method;
         HttpVersion httpVersion;
@@ -155,7 +159,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 
         httpHeaders.put(HttpConnector.HTTP_HEADERS, new HashMap<String, Object>(headers));
 
-        String encoding = getEncoding(headers);
+        Charset encoding = getEncoding(headers);
         
         queryParameters.put(HttpConnector.HTTP_QUERY_PARAMS, processQueryParams(uri, encoding));
 
@@ -181,7 +185,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 
         // The encoding is stored as message property. To avoid overriding it from the message
         // properties, it must be initialized last
-        initEncoding(message, encoding);
+        return initEncoding(message, encoding);
     }
 
     protected Map<String, Serializable> processIncomingHeaders(Map<String, Serializable> headers) throws Exception
@@ -209,9 +213,8 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         throws URISyntaxException
     {
         Map<String, Serializable> headersMap = new CaseInsensitiveHashMap();
-        for (int i = 0; i < headersArray.length; i++)
+        for (final Header header : headersArray)
         {
-            final Header header = headersArray[i];
             // Cookies are a special case because there may be more than one
             // cookie.
             if (HttpConnector.HTTP_COOKIES_PROPERTY.equals(header.getName())
@@ -285,9 +288,9 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         return (String) headers.get(HttpConstants.HEADER_CONTENT_TYPE);
     }
 
-    private String getEncoding(Map<String, Serializable> headers)
+    private Charset getEncoding(Map<String, Serializable> headers)
     {
-        String encoding = DEFAULT_ENCODING;
+        Charset encoding = DEFAULT_ENCODING;
         Object contentType = headers.get(HttpConstants.HEADER_CONTENT_TYPE);
         if (contentType != null)
         {
@@ -301,16 +304,20 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
                 NameValuePair param = values[0].getParameterByName("charset");
                 if (param != null)
                 {
-                    encoding = param.getValue();
+                    encoding = Charset.forName(param.getValue());
                 }
             }
         }
         return encoding;
     }
     
-    private void initEncoding(MutableMuleMessage message, String encoding)
+    private MutableMuleMessage initEncoding(MutableMuleMessage message, Charset encoding)
     {
-        message.setEncoding(encoding);
+        return (MutableMuleMessage) message.transform(msg ->
+        {
+            ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).charset(encoding).build());
+            return msg;
+        });
     }
 
     private void rewriteConnectionAndKeepAliveHeaders(Map<String, Serializable> headers)
@@ -358,7 +365,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         headers.put(HttpConnector.HTTP_QUERY_STRING, queryString);
     }
     
-    protected HashMap<String, Serializable> processQueryParams(String uri, String encoding) throws UnsupportedEncodingException
+    protected HashMap<String, Serializable> processQueryParams(String uri, Charset encoding) throws UnsupportedEncodingException
     {
         HashMap<String, Serializable> httpParams = new HashMap<>();
         
@@ -406,11 +413,11 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
     
-    private String unescape(String escapedValue, String encoding) throws UnsupportedEncodingException
+    private String unescape(String escapedValue, Charset encoding) throws UnsupportedEncodingException
     {
         if(escapedValue != null)
         {
-            return URLDecoder.decode(escapedValue, encoding);
+            return URLDecoder.decode(escapedValue, encoding.name());
         }
         return escapedValue;
     }

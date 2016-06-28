@@ -12,6 +12,7 @@ import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURC
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_FILENAME;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
@@ -22,10 +23,8 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -47,6 +46,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,7 +67,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
     public static final String MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE = "mule.transport.file.singlepollinstance";
 
-    private static final List<File> NO_FILES = new ArrayList<File>();
+    private static final List<File> NO_FILES = new ArrayList<>();
 
     private FileConnector fileConnector = null;
     private String readDir = null;
@@ -332,19 +332,12 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
 
         MutableMuleMessage message = null;
-        String encoding = endpoint.getEncoding();
+        Charset encoding = endpoint.getEncoding();
         try
         {
             if (fileConnector.isStreaming())
             {
-                ReceiverFileInputStream payload = createReceiverFileInputStream(sourceFile, destinationFile, new InputStreamCloseListener()
-                {
-                    @Override
-                    public void fileClose(File file)
-                    {
-                        removeProcessingMark(file.getAbsolutePath());
-                    }
-                });
+                ReceiverFileInputStream payload = createReceiverFileInputStream(sourceFile, destinationFile, file1 -> removeProcessingMark(file1.getAbsolutePath()));
                 message = createMuleMessage(payload, encoding);
             }
             else
@@ -439,14 +432,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     {
         try
         {
-            executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+            executionTemplate.execute(() ->
             {
-                @Override
-                public MuleEvent process() throws Exception
-                {
-                    moveAndDelete(sourceFile, destinationFile, originalSourceFileName, originalSourceDirectory, finalMessage);
-                    return null;
-                }
+                moveAndDelete(sourceFile, destinationFile, originalSourceFileName, originalSourceDirectory, finalMessage);
+                return null;
             });
             deleteFileIfRequired(sourceFile, destinationFile);
         }
@@ -477,27 +466,23 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         try
         {
             final AtomicBoolean exceptionWasThrown = new AtomicBoolean(false);
-            executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+            executionTemplate.execute(() ->
             {
-                @Override
-                public MuleEvent process() throws Exception
+                try
                 {
-                    try
-                    {
-                        // If we are streaming no need to move/delete now, that will be done when
-                        // stream is closed
-                        finalMessage.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
-                        FileMessageReceiver.this.routeMessage(finalMessage);
-                    }
-                    catch (Exception e)
-                    {
-                        //ES will try to close stream but FileMessageReceiver is the one that must close it.
-                        exceptionWasThrown.set(true);
-                        originalPayload.setStreamProcessingError(true);
-                        throw e;
-                    }
-                    return null;
+                    // If we are streaming no need to move/delete now, that will be done when
+                    // stream is closed
+                    finalMessage.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
+                    FileMessageReceiver.this.routeMessage(finalMessage);
                 }
+                catch (Exception e)
+                {
+                    //ES will try to close stream but FileMessageReceiver is the one that must close it.
+                    exceptionWasThrown.set(true);
+                    originalPayload.setStreamProcessingError(true);
+                    throw e;
+                }
+                return null;
             });
             //Exception thrown but handled, consume inbound message.
             if (exceptionWasThrown.get())
@@ -685,7 +670,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     {
         try
         {
-            List<File> files = new ArrayList<File>();
+            List<File> files = new ArrayList<>();
             this.basicListFiles(readDirectory, files);
             return (files.isEmpty() ? NO_FILES : files);
         }

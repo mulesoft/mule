@@ -14,6 +14,8 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.runtime.module.xml.util.XMLUtils;
 
+import java.nio.charset.Charset;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
@@ -39,7 +41,7 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String encoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException
     {
         Object src = event.getMessage().getPayload();
         try

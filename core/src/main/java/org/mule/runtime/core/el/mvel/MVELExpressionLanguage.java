@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeBuilderFactory;
+import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.el.mvel.datatype.MvelEnricherDataTypePropagator;
@@ -273,7 +273,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
         // Mule
         parserConfiguration.addImport(DataType.class);
-        parserConfiguration.addImport(DataTypeBuilderFactory.class);
+        parserConfiguration.addImport(AbstractDataTypeBuilderFactory.class);
         parserConfiguration.addImport(NullPayload.class);
 
         // Global imports

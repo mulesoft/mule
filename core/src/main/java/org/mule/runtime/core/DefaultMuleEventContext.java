@@ -21,6 +21,7 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.charset.Charset;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,7 +114,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      *             string
      */
     @Override
-    public String getMessageAsString(String encoding) throws MuleException
+    public String getMessageAsString(Charset encoding) throws MuleException
     {
         return event.getMessageAsString(encoding);
     }
@@ -268,20 +269,6 @@ public class DefaultMuleEventContext implements MuleEventContext
     public int getTimeout()
     {
         return event.getTimeout();
-    }
-
-    /**
-     * Gets the encoding for the current message. For potocols that send encoding
-     * Information with the message, this method should be overriden to expose the
-     * transport encoding, otherwise the default encoding in the Mule configuration
-     * will be used
-     *
-     * @return the encoding for this message. This method must never return null
-     */
-    @Override
-    public String getEncoding()
-    {
-        return event.getEncoding();
     }
 
     @Override

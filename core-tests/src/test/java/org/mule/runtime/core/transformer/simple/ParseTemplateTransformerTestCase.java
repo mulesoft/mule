@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -17,8 +18,8 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 
@@ -51,7 +52,7 @@ public class ParseTemplateTransformerTestCase
     public void testParseTemplateNullTemplate() throws TransformerException, InitialisationException
     {
         parseTemplateTransformer.setLocation(LOCATION);
-        parseTemplateTransformer.transformMessage(mockMuleEvent, "UTF-8");
+        parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
     }
 
     @Test(expected = InitialisationException.class)
@@ -59,7 +60,7 @@ public class ParseTemplateTransformerTestCase
     {
         parseTemplateTransformer.setLocation(null);
         parseTemplateTransformer.initialise();
-        parseTemplateTransformer.transformMessage(mockMuleEvent, "UTF-8");
+        parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
     }
 
     @Test(expected = InitialisationException.class)
@@ -67,7 +68,7 @@ public class ParseTemplateTransformerTestCase
     {
         parseTemplateTransformer.setLocation(INVALID_LOCATION);
         parseTemplateTransformer.initialise();
-        parseTemplateTransformer.transformMessage(mockMuleEvent, "UTF-8");
+        parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
     }
 
     @Test
@@ -80,12 +81,12 @@ public class ParseTemplateTransformerTestCase
 
         when(mockExpressionManager.parse(expectedExpression, mockMuleEvent)).thenReturn("Parsed");
 
-        Object response = parseTemplateTransformer.transformMessage(mockMuleEvent, "UTF-8");
+        Object response = parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
         assertNotNull(response);
         assertEquals("Parsed", response);
 
         // Call a second time to make sure the template is stored once the transformer has been initialized
-        response = parseTemplateTransformer.transformMessage(mockMuleEvent, "UTF-8");
+        response = parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
         assertNotNull(response);
         assertEquals("Parsed", response);
     }

@@ -10,6 +10,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
+
 public class ObjectToFruitLover extends AbstractTransformer
 {
 
@@ -21,7 +23,7 @@ public class ObjectToFruitLover extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         if (src instanceof FruitLover)
         {

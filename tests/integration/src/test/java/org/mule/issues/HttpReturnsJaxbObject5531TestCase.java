@@ -6,17 +6,18 @@
  */
 package org.mule.issues;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.transformer.simple.ObjectToString;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -50,7 +51,7 @@ public class HttpReturnsJaxbObject5531TestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         Object response = client.send(testUrl, getTestMuleMessage("hello"), newOptions().method(POST.name()).build());
         assertNotNull(response);
-        String stringResponse = (String) new ObjectToString().transform(response, "UTF-8");
+        String stringResponse = (String) new ObjectToString().transform(response, UTF_8);
         assertTrue(stringResponse.contains("<Success>true</Success>"));
     }
 

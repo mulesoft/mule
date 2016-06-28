@@ -13,6 +13,7 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.nio.charset.Charset;
 
 import org.springframework.remoting.support.RemoteInvocation;
 
@@ -32,7 +33,7 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         if (src instanceof RemoteInvocation)
         {

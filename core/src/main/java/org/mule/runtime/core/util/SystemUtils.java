@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
+
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -101,11 +103,11 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
             String line;
             while ((line = br.readLine()) != null)
             {
-                for (int prefix = 0; prefix < UNIX_ENV_PREFIXES.length; prefix++)
+                for (String element : UNIX_ENV_PREFIXES)
                 {
-                    if (line.startsWith(UNIX_ENV_PREFIXES[prefix]))
+                    if (line.startsWith(element))
                     {
-                        line = line.substring(UNIX_ENV_PREFIXES[prefix].length());
+                        line = line.substring(element.length());
                     }
                 }
 
@@ -171,9 +173,9 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     private static CommandLine parseCommandLine(String args[], String opts[][]) throws DefaultMuleException
     {
         Options options = new Options();
-        for (int i = 0; i < opts.length; i++)
+        for (String[] opt : opts)
         {
-            options.addOption(opts[i][0], opts[i][1].equals("true") ? true : false, opts[i][2]);
+            options.addOption(opt[0], opt[1].equals("true") ? true : false, opt[2]);
         }
 
         BasicParser parser = new BasicParser();
@@ -232,9 +234,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
         Map<String, Object> ret = new HashMap<String, Object>();
         Option[] options = line.getOptions();
 
-        for (int i = 0; i < options.length; i++)
+        for (Option option : options)
         {
-            Option option = options[i];
             ret.put(option.getOpt(), option.getValue("true"));
         }
 
@@ -405,18 +406,28 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     }
 
     /**
-     * @return the configured default encoding {@link org.mule.runtime.core.api.config.MuleConfiguration#getDefaultEncoding()}, or
-     * the value of the system property 'mule.encoding' if {@link org.mule.runtime.core.api.MuleContext} is null.
+     * @return the configured default encoding, checking in the follwing order until a value is
+     *         found:
+     *         <ul>
+     *         <li>{@code muleContext} ->
+     *         {@link org.mule.runtime.core.api.config.MuleConfiguration#getDefaultEncoding()}</li>
+     *         <li>The value of the system property 'mule.encoding'</li>
+     *         <li>{@code Charset.defaultCharset()}</li>
+     *         </ul>
      */
-    public static String getDefaultEncoding(MuleContext muleContext)
+    public static Charset getDefaultEncoding(MuleContext muleContext)
     {
-        if (muleContext != null)
+        if (muleContext != null && muleContext.getConfiguration().getDefaultEncoding() != null)
         {
-            return muleContext.getConfiguration().getDefaultEncoding();
+            return Charset.forName(muleContext.getConfiguration().getDefaultEncoding());
+        }
+        else if (System.getProperty(MULE_ENCODING_SYSTEM_PROPERTY) != null)
+        {
+            return Charset.forName(System.getProperty(MULE_ENCODING_SYSTEM_PROPERTY));
         }
         else
         {
-            return System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+            return Charset.defaultCharset();
         }
     }
 

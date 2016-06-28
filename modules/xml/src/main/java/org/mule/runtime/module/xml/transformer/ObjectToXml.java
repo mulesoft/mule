@@ -10,6 +10,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
+import java.nio.charset.Charset;
+
 /**
  * <code>ObjectToXml</code> converts any object to XML using Xstream. Xstream uses
  * some clever tricks so objects that get marshalled to XML do not need to implement
@@ -47,7 +49,7 @@ public class ObjectToXml extends AbstractXStreamTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         Object src = event.getMessage().getPayload();
         /*

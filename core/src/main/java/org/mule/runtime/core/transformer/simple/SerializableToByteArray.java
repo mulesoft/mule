@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a String
@@ -51,7 +52,7 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
     }
 
     @Override
-    public Object doTransform(Object src, String outputEncoding) throws TransformerException
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         /*
          * If the MuleMessage source type has been registered then we can assume that

@@ -6,9 +6,11 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.transport.ssl.MockHandshakeCompletedEvent;
@@ -63,7 +65,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
 
         MockSslSocket socket = new MockSslSocket();
         socket.setInputStream(new ByteArrayInputStream("GET /path/to/file/index.html HTTP/1.0\n\n\n".getBytes()));
-        HttpServerConnection serverConnection = new HttpServerConnection(socket, "utf-8", (HttpConnector) messageReceiver.getConnector());
+        HttpServerConnection serverConnection = new HttpServerConnection(socket, UTF_8, (HttpConnector) messageReceiver.getConnector());
         HttpMessageProcessTemplate messageContext = messageReceiver.createMessageProcessTemplate(serverConnection);
 
         invokeHandshakeCompleted(serverConnection, socket);

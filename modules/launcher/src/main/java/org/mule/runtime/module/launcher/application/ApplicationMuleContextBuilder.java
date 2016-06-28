@@ -13,9 +13,9 @@ import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.PropertiesMuleConfigurationFactory;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
-import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.work.MuleWorkManager;
+import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 
 /**
  * Takes Mule application descriptor into account when building the context.

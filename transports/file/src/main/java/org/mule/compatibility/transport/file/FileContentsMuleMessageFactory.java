@@ -12,6 +12,7 @@ import org.mule.runtime.core.util.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * <code>FileContentsMuleMessageFactory</code> converts the
@@ -28,7 +29,7 @@ public class FileContentsMuleMessageFactory extends FileMuleMessageFactory
     }
 
     @Override
-    protected Object extractPayload(Object transportMessage, String encoding) throws Exception
+    protected Object extractPayload(Object transportMessage, Charset encoding) throws Exception
     {
         InputStream inputStream = convertToInputStream(transportMessage);
         byte[] payload = IOUtils.toByteArray(inputStream);

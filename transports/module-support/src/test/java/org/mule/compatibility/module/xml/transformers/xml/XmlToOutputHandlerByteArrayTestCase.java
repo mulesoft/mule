@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.module.xml.transformers.xml;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.fail;
 
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
@@ -52,7 +53,7 @@ public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerT
         trans.setReturnDataType(DataType.fromType(OutputHandler.class));
 
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
-        builder.setEncoding("UTF-8");
+        builder.setEncoding(UTF_8);
         ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint(builder);
 
         trans.setEndpoint(endpoint);

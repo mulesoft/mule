@@ -13,7 +13,7 @@ import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionTyp
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.StringUtils;
 
 import com.google.common.cache.CacheLoader;
@@ -22,7 +22,6 @@ import com.google.common.cache.LoadingCache;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,9 +51,10 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     private static final String CHARSET_PARAM = "charset";
 
     private Class<T> type = (Class<T>) Object.class;
-    private Class<?> itemType = Object.class;
-    private String mimeType = MimeType.ANY;
-    private String encoding = null;
+    private DataTypeBuilder<?> itemTypeBuilder;
+    private String mediaPrimaryType = MediaType.ANY.getPrimaryType();
+    private String mediaSubType = MediaType.ANY.getSubType();
+    private Charset charset = null;
 
     private boolean built = false;
 
@@ -68,15 +68,19 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         if (dataType instanceof CollectionDataType)
         {
             this.type = dataType.getType();
-            this.itemType = ((CollectionDataType) dataType).getItemType();
+            this.itemTypeBuilder = DataType.builder(((CollectionDataType) dataType).getItemType());
         }
         else
         {
             this.type = dataType.getType();
         }
 
-        this.mimeType = dataType.getMimeType();
-        this.encoding = dataType.getEncoding();
+        this.mediaPrimaryType = dataType.getMediaType().getPrimaryType();
+        this.mediaSubType = dataType.getMediaType().getSubType();
+        dataType.getMediaType().getCharset().ifPresent(charset ->
+        {
+            this.charset = charset;
+        });
     }
 
     /**
@@ -148,7 +152,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
 
         ProxyIndicator(Class targetClass, boolean proxy)
         {
-            this.targetClassRef = new WeakReference<Class>(targetClass);
+            this.targetClassRef = new WeakReference<>(targetClass);
             isProxy = proxy;
         }
 
@@ -173,7 +177,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      *             {@link Collection}.
      */
     @Override
-    public <N extends Collection> DataTypeCollectionTypeBuilder<N> collectionType(Class<N> collectionType)
+    public <N extends Collection<I>, I> DataTypeCollectionTypeBuilder<N> collectionType(Class<N> collectionType)
     {
         validateAlreadyBuilt();
 
@@ -184,6 +188,17 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         }
 
         this.type = (Class<T>) handleProxy(collectionType);
+
+        if (this.itemTypeBuilder == null)
+        {
+            this.itemTypeBuilder = DataType.builder();
+        }
+        final Class<?> itemType = getCollectionType((Class<? extends Collection<?>>) type);
+        if (itemType != null)
+        {
+            this.itemTypeBuilder.type(itemType);
+        }
+
         return (DataTypeCollectionTypeBuilder<N>) this;
     }
 
@@ -191,89 +206,139 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * Sets the given types for the {@link CollectionDataType} to be built. See
      * {@link CollectionDataType#getType()} and {@link CollectionDataType#getItemType()}.
      * 
-     * @param itemType the java type to set.
+     * @param itemTypeBuilder the java type to set.
      * @return this builder.
      * @throws IllegalArgumentException if the given collectionType is not a descendant of {@link Collection}.
      */
     @Override
-    public <I> DataTypeParamsBuilder<T> itemType(Class<I> itemType)
+    public <I> DataTypeCollectionTypeBuilder<T> itemType(Class<I> itemType)
     {
         validateAlreadyBuilt();
 
-        checkNotNull(itemType, "'itemType' cannot be null.");
+        checkNotNull(itemType, "'itemTypeBuilder' cannot be null.");
 
-        this.itemType = handleProxy(itemType);
+        if (this.itemTypeBuilder == null)
+        {
+            this.itemTypeBuilder = DataType.builder();
+        }
+        this.itemTypeBuilder.type(handleProxy(itemType));
         return this;
     }
 
     /**
-     * Sets the given mimeType string. See {@link DataType#getMimeType()}.
+     * Sets the given mediaType string. See {@link DataType#getMediaType()}.
      * <p>
-     * If the MIME type for the given string has a {@code charset} parameter, that will be set as
-     * the encoding for the {@link DataType} being built. That encoding can be overridden by calling
-     * {@link #encoding(String)}.
+     * If the media type for the given string has a {@code charset} parameter, that will be set as
+     * the charset for the {@link DataType} being built. That charset can be overridden by calling
+     * {@link #charset(String)}.
      * 
-     * @param mimeType the MIME type string to set
+     * @param mediaType the media type string to set
      * @return this builder.
-     * @throws IllegalArgumentException if the given MIME type string is invalid.
+     * @throws IllegalArgumentException if the given media type string is invalid.
      */
     @Override
-    public DataTypeBuilder<T> mimeType(String mimeType) throws IllegalArgumentException
+    public DataTypeBuilder<T> mediaType(String mediaType)
     {
         validateAlreadyBuilt();
 
-        if (!StringUtils.isEmpty(mimeType))
+        if (!StringUtils.isEmpty(mediaType))
         {
             try
             {
-                javax.activation.MimeType mt = new javax.activation.MimeType(mimeType);
-                mimeType(mt);
+                mimeType(new javax.activation.MimeType(mediaType));
             }
             catch (MimeTypeParseException e)
             {
-                throw new IllegalArgumentException("MimeType cannot be parsed: " + mimeType);
+                throw new IllegalArgumentException("MediaType cannot be parsed: " + mediaType);
             }
         }
         return this;
     }
 
+    private DataTypeBuilder<T> mimeType(javax.activation.MimeType mimeType)
+    {
+        if (mimeType != null)
+        {
+            this.mediaPrimaryType = mimeType.getPrimaryType();
+            this.mediaSubType = mimeType.getSubType();
+
+            if (charset == null && mimeType.getParameter(CHARSET_PARAM) != null)
+            {
+                doCharset(Charset.forName(mimeType.getParameter(CHARSET_PARAM)));
+            }
+
+            // TODO MULE-9995 What obout other parameters in the MimeType?
+        }
+
+        return this;
+    }
+
     @Override
-    public DataTypeBuilder<T> mimeType(javax.activation.MimeType mimeType)
+    public DataTypeBuilder<T> mediaType(MediaType mimeType)
     {
         validateAlreadyBuilt();
 
         if (mimeType != null)
         {
-            this.mimeType = mimeType.getPrimaryType() + "/" + mimeType.getSubType();
-
-            if (encoding == null && mimeType.getParameter(CHARSET_PARAM) != null)
-            {
-                encoding = mimeType.getParameter(CHARSET_PARAM);
-            }
+            this.mediaPrimaryType = mimeType.getPrimaryType();
+            this.mediaSubType = mimeType.getSubType();
         }
 
         return this;
     }
 
-    /**
-     * Sets the given encoding. See {@link DataType#getEncoding()}.
-     * 
-     * @param encoding the encoding to set.
-     * @return this builder.
-     */
     @Override
-    public DataTypeBuilder<T> encoding(String encoding) throws IllegalCharsetNameException
+    public <I> DataTypeCollectionTypeBuilder<T> itemMediaType(String itemMimeType)
     {
         validateAlreadyBuilt();
 
-        if (StringUtils.isNotEmpty(encoding))
+        itemTypeBuilder.mediaType(itemMimeType);
+
+        return this;
+    }
+
+    @Override
+    public <I> DataTypeCollectionTypeBuilder<T> itemMediaType(MediaType itemMediaType)
+    {
+        validateAlreadyBuilt();
+
+        itemTypeBuilder.mediaType(itemMediaType);
+
+        return this;
+    }
+
+    /**
+     * Sets the given charset. See {@link MediaType#getCharset()}.
+     * 
+     * @param charset the encoding to set.
+     * @return this builder.
+     */
+    @Override
+    public DataTypeBuilder<T> charset(String charset)
+    {
+        validateAlreadyBuilt();
+
+        if (StringUtils.isNotEmpty(charset))
         {
-            // Checks that the encoding is valid and supported
-            Charset.forName(encoding);
-            this.encoding = encoding;
+            doCharset(Charset.forName(charset));
         }
 
         return this;
+    }
+
+    @Override
+    public DataTypeBuilder<T> charset(Charset charset)
+    {
+        validateAlreadyBuilt();
+
+        doCharset(charset);
+
+        return this;
+    }
+
+    protected void doCharset(Charset charset)
+    {
+        this.charset = charset;
     }
 
     @Override
@@ -283,11 +348,11 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
 
         if(value == null)
         {
-            return (DataTypeBuilder<T>) type(Object.class).mimeType(MimeType.ANY);
+            return (DataTypeBuilder<T>) type(Object.class).mediaType(MediaType.ANY);
         }
         else
         {
-            return (DataTypeBuilder<T>) type(value.getClass()).mimeType(getObjectMimeType(value));
+            return (DataTypeBuilder<T>) type(value.getClass()).mediaType(getObjectMimeType(value));
         }
     }
 
@@ -327,18 +392,11 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         if (Collection.class.isAssignableFrom(type))
         {
-            if (itemType == null)
-            {
-                itemType = getCollectionType((Class<? extends Collection<?>>) type);
-            }
-
-            // TODO MULE-9958 provide a default encoding it the builder has null
-            return new CollectionDataType(type, itemType, mimeType, encoding);
+            return new CollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, MediaType.create(mediaPrimaryType, mediaSubType, charset));
         }
         else
         {
-            // TODO MULE-9958 provide a default encoding it the builder has null
-            return new SimpleDataType<>(type, mimeType, encoding);
+            return new SimpleDataType<>(type, MediaType.create(mediaPrimaryType, mediaSubType, charset));
         }
     }
 
@@ -358,7 +416,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     @Override
     public int hashCode()
     {
-        return Objects.hash(type, itemType, mimeType, encoding);
+        return Objects.hash(type, itemTypeBuilder, mediaPrimaryType, mediaSubType, charset);
     }
 
     @Override
@@ -379,8 +437,9 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         DefaultDataTypeBuilder other = (DefaultDataTypeBuilder) obj;
 
         return Objects.equals(type, other.type)
-               && Objects.equals(itemType, other.itemType)
-               && Objects.equals(mimeType, other.mimeType)
-               && Objects.equals(encoding, other.encoding);
+               && Objects.equals(itemTypeBuilder, other.itemTypeBuilder)
+               && Objects.equals(mediaPrimaryType, other.mediaPrimaryType)
+               && Objects.equals(mediaSubType, other.mediaSubType)
+               && Objects.equals(charset, other.charset);
     }
 }

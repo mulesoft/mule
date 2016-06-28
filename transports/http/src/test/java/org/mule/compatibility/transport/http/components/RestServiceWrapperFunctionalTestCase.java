@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.compatibility.transport.http.components.RestServiceException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -108,13 +107,6 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
         MuleMessage result = muleContext.getClient().send("vm://restservice4", TEST_REQUEST, null);
         assertNotNull(result);
         assertEquals("foo/bar", getPayloadAsString(result));
-    }
-
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        // TODO Auto-generated method stub
-        return 100 * super.getTestTimeoutSecs();
     }
 
     public static class CopyContentTypeFromRequest implements Callable

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -24,6 +25,8 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.nio.charset.Charset;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -155,7 +158,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer transformer = new AbstractTransformer()
         {
             @Override
-            protected Object doTransform(final Object src, final String encoding) throws TransformerException
+            protected Object doTransform(final Object src, final Charset encoding) throws TransformerException
             {
                 throw new RuntimeException("This transformer must not perform any transformations.");
             }
@@ -172,7 +175,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer transformer = new AbstractTransformer()
         {
             @Override
-            protected Object doTransform(Object src, String encoding) throws TransformerException
+            protected Object doTransform(Object src, Charset encoding) throws TransformerException
             {
                 return new Integer(((Integer) src).intValue() + 1);
             }
@@ -180,7 +183,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         
         DataType<Integer> integerDataType = DataType.fromType(Integer.class);
         transformer.registerSourceType(integerDataType);
-        transformer.setReturnDataType(integerDataType);
+        transformer.setReturnDataType(DataType.builder(integerDataType).charset(getDefaultEncoding(muleContext)).build());
 
         return transformer;
     }

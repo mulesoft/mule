@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
-
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -28,6 +28,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +43,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 @RunWith(MockitoJUnitRunner.class)
 public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
 {
-    public static final String ENCODING = "encoding";
+    public static final Charset ENCODING = US_ASCII;
     public static final String INBOUND_PROPERTY_KEY = "propKey";
     public static final DataType PROPERTY_DATA_TYPE = DataType.STRING;
     private static final Serializable PROPERTY_VALUE = StringUtils.EMPTY;

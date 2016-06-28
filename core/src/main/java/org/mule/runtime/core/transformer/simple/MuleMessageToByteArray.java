@@ -10,6 +10,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
+import java.nio.charset.Charset;
+
 /** TODO */
 public class MuleMessageToByteArray extends AbstractMessageTransformer
 {
@@ -20,7 +22,7 @@ public class MuleMessageToByteArray extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding)
+    public Object transformMessage(MuleEvent event, Charset outputEncoding)
     {
         return muleContext.getObjectSerializer().serialize(event.getMessage());
     }

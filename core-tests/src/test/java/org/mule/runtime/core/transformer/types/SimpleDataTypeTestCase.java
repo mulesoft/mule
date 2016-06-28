@@ -10,7 +10,7 @@ package org.mule.runtime.core.transformer.types;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mule.runtime.api.metadata.MimeType.JSON;
+import static org.mule.runtime.api.metadata.MediaType.JSON;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -27,28 +27,28 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     @Test
     public void acceptsSupportedEncoding() throws Exception
     {
-        DataType<?> dataType = DataType.builder().encoding(UTF_8.name()).build();
+        DataType<?> dataType = DataType.builder().charset(UTF_8.name()).build();
 
-        assertThat(dataType.getEncoding(), equalTo(UTF_8.name()));
+        assertThat(dataType.getMediaType().getCharset().get(), equalTo(UTF_8));
     }
 
     @Test(expected = UnsupportedCharsetException.class)
     public void rejectsUnsupportedEncoding() throws Exception
     {
-        DataType.builder().encoding("unsupportedEncoding").build();
+        DataType.builder().charset("unsupportedEncoding").build();
     }
 
     @Test
     public void acceptsValidMimeType() throws Exception
     {
-        DataType<?> dataType = DataType.builder().mimeType(JSON).build();
+        DataType<?> dataType = DataType.builder().mediaType(JSON).build();
 
-        assertThat(dataType.getMimeType(), equalTo(JSON));
+        assertThat(dataType.getMediaType(), equalTo(JSON));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsValidMimeType() throws Exception
     {
-        DataType.builder().mimeType("invalidMimeType").build();
+        DataType.builder().mediaType("invalidMimeType").build();
     }
 }

@@ -63,7 +63,7 @@ public final class SendCommand
                     .cc(ccAddresses)
                     .bcc(bccAddresses)
                     .withSubject(subject)
-                    .withAttachments(attachments != null ? attachments : new ArrayList<>())
+                                            .withAttachments(attachments != null ? attachments : new ArrayList<>())
                     .withContent(content.getBody(), content.getContentType(), content.getCharset())
                     .withHeaders(headers)
                     .build();

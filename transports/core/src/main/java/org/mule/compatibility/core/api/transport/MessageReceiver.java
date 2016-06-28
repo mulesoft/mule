@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.Transaction;
 
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 /**
  * <code>MessageReceiver</code> is used to receive data from an external system. Typically an implementation of this
@@ -65,7 +66,7 @@ public interface MessageReceiver extends Connectable, MessageSource
     MuleEvent routeMessage(MutableMuleMessage message, Transaction trans, OutputStream outputStream)
         throws MuleException;
 
-    MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException;
+    MuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
 
     MuleMessage createMuleMessage(Object transportMessage) throws MuleException;
 }

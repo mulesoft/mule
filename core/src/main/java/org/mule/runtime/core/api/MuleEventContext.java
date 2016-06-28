@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.charset.Charset;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current request.
@@ -97,7 +98,7 @@ public interface MuleEventContext
      * @return the message contents as a string
      * @throws MuleException if the message cannot be converted into a string
      */
-    String getMessageAsString(String encoding) throws MuleException;
+    String getMessageAsString(Charset encoding) throws MuleException;
 
     /**
      * Returns the current transaction (if any) for the session
@@ -182,16 +183,6 @@ public interface MuleEventContext
      * @return the timeout for the event
      */
     int getTimeout();
-
-    /**
-     * Gets the encoding for the current message. For potocols that send encoding
-     * Information with the message, this method should be overriden to expose the
-     * transport encoding, otherwise the default encoding in the Mule configuration
-     * will be used
-     * 
-     * @return the encoding for this message. This method must never return null
-     */
-    String getEncoding();
 
     MuleSession getSession();
 

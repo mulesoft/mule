@@ -20,7 +20,7 @@ import static org.mule.runtime.module.http.api.requester.HttpStreamingType.AUTO;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -29,7 +29,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.core.util.DataTypeUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.NumberUtils;
 import org.mule.runtime.core.util.UUID;
@@ -50,6 +49,7 @@ import org.mule.runtime.module.http.internal.multipart.HttpMultipartEncoder;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -107,9 +107,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         if (!outboundProperties.contains(MuleProperties.CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
-            if (!MimeType.ANY.equals(dataType.getMimeType()))
+            if (!MediaType.ANY.matches(dataType.getMediaType()))
             {
-                httpResponseHeaderBuilder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, DataTypeUtils.getContentType(dataType));
+                httpResponseHeaderBuilder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMediaType().toString());
             }
         }
 
@@ -161,9 +161,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             {
                 if (configuredContentType == null)
                 {
-                    httpResponseHeaderBuilder.addContentType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED);
+                    httpResponseHeaderBuilder.addContentType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toString());
                 }
-                else if (!configuredContentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
+                else if (!configuredContentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toString()))
                 {
                     warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
                 }
@@ -323,13 +323,14 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         if (!mapPayload.isEmpty())
         {
             String encodedBody;
+            final Charset encoding = event.getMessage().getDataType().getMediaType().getCharset().get();
             if (mapPayload instanceof ParameterMap)
             {
-                encodedBody = HttpParser.encodeString(event.getEncoding(), ((ParameterMap) mapPayload).toListValuesMap());
+                encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
             }
             else
             {
-                encodedBody = HttpParser.encodeString(event.getEncoding(), mapPayload);
+                encodedBody = HttpParser.encodeString(encoding, mapPayload);
             }
             entity = new ByteArrayHttpEntity(encodedBody.getBytes());
         }

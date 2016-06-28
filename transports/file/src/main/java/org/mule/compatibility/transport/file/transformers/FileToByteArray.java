@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
 
@@ -36,7 +37,7 @@ public class FileToByteArray extends AbstractTransformer implements Discoverable
     }
 
     @Override
-    public Object doTransform(Object src, String outputEncoding) throws TransformerException
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         File file = null;
         FileInputStream fileInputStream = null;

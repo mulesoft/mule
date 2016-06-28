@@ -15,6 +15,8 @@ import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
+
 /**
  * Transforms a {@link String} to an {@link Enum} of a class specified
  * through at construction.
@@ -44,7 +46,7 @@ public class StringToEnum extends AbstractTransformer implements DiscoverableTra
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         try
         {

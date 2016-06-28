@@ -11,6 +11,8 @@ import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.module.xml.util.XMLUtils;
 
+import java.nio.charset.Charset;
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -30,7 +32,7 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     @Override
-    public Object transformMessage(MuleEvent event, String encoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException
     {
         Object src = event.getMessage().getPayload();
         try
@@ -41,18 +43,18 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
                 return null;
             }
 
-            if (XMLStreamReader.class.equals(returnType))
+            if (XMLStreamReader.class.isAssignableFrom(getReturnDataType().getType()))
             {
                 return getXMLInputFactory().createXMLStreamReader(sourceDoc);
             }
-            else if (returnType.getType().isAssignableFrom(sourceDoc.getClass()))
+            else if (getReturnDataType().getType().isAssignableFrom(sourceDoc.getClass()))
             {
                 return sourceDoc;
             }
 
             // If returnClass is not set, assume W3C DOM
             // This is the original behaviour
-            ResultHolder holder = getResultHolder(returnType.getType());
+            ResultHolder holder = getResultHolder(getReturnDataType().getType());
             if (holder == null)
             {
                 holder = getResultHolder(Document.class);
@@ -73,7 +75,7 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
             }
 
             Transformer idTransformer = XMLUtils.getTransformer();
-            idTransformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+            idTransformer.setOutputProperty(OutputKeys.ENCODING, encoding.name());
             idTransformer.transform(sourceDoc, holder.getResult());
 
             return holder.getResultObject();
@@ -84,11 +86,13 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
         }
     }
 
+    @Override
     public int getPriorityWeighting()
     {
         return priorityWeighting;
     }
 
+    @Override
     public void setPriorityWeighting(int priorityWeighting)
     {
         this.priorityWeighting = priorityWeighting;

@@ -28,6 +28,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -226,7 +227,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
     private static class TestEventTransformer extends AbstractTransformer
     {
         @Override
-        public Object doTransform(Object src, String encoding) throws TransformerException
+        public Object doTransform(Object src, Charset encoding) throws TransformerException
         {
             return "Transformed Test Data";
         }

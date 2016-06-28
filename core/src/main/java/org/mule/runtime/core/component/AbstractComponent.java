@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.component;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -167,10 +170,12 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         }
         else if (result != null)
         {
+            final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
+            template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
             event.setMessage(
                     muleContext.getTransformationService().applyTransformers(event.getMessage(), event, Collections
                             .<Transformer>singletonList
-                            (new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result)))));
+                    (template)));
             return event;
         }
         else

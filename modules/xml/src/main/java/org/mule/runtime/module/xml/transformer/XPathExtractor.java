@@ -24,6 +24,7 @@ import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.runtime.module.xml.xpath.XPathEvaluator;
 import org.mule.runtime.module.xml.xpath.XPathReturnType;
 
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.xml.sax.InputSource;
@@ -91,7 +92,7 @@ public class XPathExtractor extends AbstractTransformer implements MuleContextAw
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         MuleEvent event = RequestContext.getEvent();
         try

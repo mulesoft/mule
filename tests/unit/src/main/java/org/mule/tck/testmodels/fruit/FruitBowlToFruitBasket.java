@@ -11,6 +11,8 @@ import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
+
 /**
  * Converts a FruitBowl to a FruitBasket (for testing obviously :)
  */
@@ -25,7 +27,7 @@ public class FruitBowlToFruitBasket extends AbstractTransformer implements Disco
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         FruitBowl bowl = (FruitBowl)src;
         FruitBasket basket = new FruitBasket();

@@ -22,6 +22,8 @@ import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
+import java.nio.charset.Charset;
+
 /**
  * <code>AbstractMessageTransformer</code> is a transformer that has a reference
  * to the current message. This message can be used to obtain properties associated
@@ -55,7 +57,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
      * Perform a non-message aware transform. This should never be called
      */
     @Override
-    public final Object doTransform(Object src, String enc) throws TransformerException
+    public final Object doTransform(Object src, Charset enc) throws TransformerException
     {
         throw new UnsupportedOperationException();
     }
@@ -64,7 +66,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
      * Transform the message with no event specified.
      */
     @Override
-    public final Object transform(Object src, String enc) throws TransformerException
+    public final Object transform(Object src, Charset enc) throws TransformerException
     {
         try
         {
@@ -89,11 +91,11 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     @Override
     public Object transform(Object src, MuleEvent event) throws TransformerMessagingException
     {
-        return transform(src, getEncoding(src), event);
+        return transform(src, resolveEncoding(src), event);
     }
 
     @Override
-    public final Object transform(Object src, String enc, MuleEvent event) throws TransformerMessagingException
+    public final Object transform(Object src, Charset enc, MuleEvent event) throws TransformerMessagingException
     {
         DataType<?> sourceType = DataType.fromType(src.getClass());
         if (!isSourceDataTypeSupported(sourceType))
@@ -183,13 +185,13 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
             return object;
         }
 
-        if (returnType != null)
+        if (getReturnDataType() != null)
         {
             DataType<?> dt = DataType.fromType(object.getClass());
-            if (!returnType.isCompatibleWith(dt))
+            if (!getReturnDataType().isCompatibleWith(dt))
             {
                 throw new TransformerMessagingException(
-                        CoreMessages.transformUnexpectedType(dt, returnType),
+                        CoreMessages.transformUnexpectedType(dt, getReturnDataType()),
                         event, this);
             }
         }
@@ -206,5 +208,5 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     /**
      * Transform the message
      */
-    public abstract Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException;
+    public abstract Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException;
 }

@@ -6,11 +6,14 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.core.api.transport.NoReceiverForEndpointException;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.util.monitor.Expirable;
 
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -48,7 +51,7 @@ public class HttpRequestDispatcherWork implements Runnable, Expirable
         try
         {
             long keepAliveTimeout = httpConnector.getKeepAliveTimeout();
-            String encoding = httpConnector.getMuleContext().getConfiguration().getDefaultEncoding();
+            Charset encoding = getDefaultEncoding(httpConnector.getMuleContext());
             httpServerConnection = new HttpServerConnection(socket, encoding, httpConnector);
             do
             {

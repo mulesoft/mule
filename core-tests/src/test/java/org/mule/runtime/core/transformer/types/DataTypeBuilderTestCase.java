@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer.types;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -47,7 +48,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
         final DataType<Set> dataType = DataType.fromType(Set.class);
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(Set.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(equalTo(Object.class)));
+        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.OBJECT));
     }
 
     @Test
@@ -56,32 +57,34 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
         final DataType<Set> dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(List.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(equalTo(String.class)));
+        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.STRING));
     }
 
     @Test
     public void templateSimple()
     {
-        final DataType<String> template = DataType.builder().type(String.class).mimeType("text/plain;charset=ASCII").build();
+        final DataType<String> template = DataType.builder().type(String.class).mediaType("text/plain;charset=ASCII").build();
         final DataType dataType = DataType.builder(template).build();
 
         assertThat(dataType, instanceOf(SimpleDataType.class));
         assertThat(dataType.getType(), is(equalTo(String.class)));
-        assertThat(dataType.getMimeType(), is("text/plain"));
-        assertThat(dataType.getEncoding(), is("ASCII"));
+        assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
+        assertThat(dataType.getMediaType().getSubType(), is("plain"));
+        assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
     }
 
     @Test
     public void templateCollection()
     {
-        final DataType<Set> template = DataType.builder().type(Set.class).mimeType("text/plain;charset=ASCII").build();
+        final DataType<Set> template = DataType.builder().type(Set.class).mediaType("text/plain;charset=ASCII").build();
         final DataType dataType = DataType.builder(template).build();
 
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(Set.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(equalTo(Object.class)));
-        assertThat(dataType.getMimeType(), is("text/plain"));
-        assertThat(dataType.getEncoding(), is("ASCII"));
+        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.OBJECT));
+        assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
+        assertThat(dataType.getMediaType().getSubType(), is("plain"));
+        assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
     }
 
     @Test
@@ -90,20 +93,13 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
         final DataType<Set> template = DataType.builder()
                                                .collectionType(List.class)
                                                .itemType(String.class)
-                                               .mimeType("text/plain;charset=ASCII")
+                                               .mediaType("text/plain;charset=ASCII")
                                                .build();
         final DataType dataType = DataType.builder(template).build();
 
         assertThat(dataType, instanceOf(CollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(List.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(equalTo(String.class)));
-    }
-
-    @Test
-    public void buildCollectionFails()
-    {
-        expected.expect(IllegalArgumentException.class);
-        final DataTypeParamsBuilder builder = DataType.builder().collectionType(String.class).itemType(String.class);
+        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.STRING));
     }
 
     @Test
@@ -119,24 +115,25 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void mimeTypeWithEncoding()
     {
-        final DataType dataType = DataType.builder().mimeType("text/plain;charset=ASCII").build();
+        final DataType dataType = DataType.builder().mediaType("text/plain;charset=ASCII").build();
 
-        assertThat(dataType.getMimeType(), is("text/plain"));
-        assertThat(dataType.getEncoding(), is("ASCII"));
+        assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
+        assertThat(dataType.getMediaType().getSubType(), is("plain"));
+        assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
     }
 
     @Test
     public void invalidMimeType()
     {
         expected.expect(IllegalArgumentException.class);
-        final DataType dataType = DataType.builder().mimeType("imInvalid").build();
+        final DataType dataType = DataType.builder().mediaType("imInvalid").build();
     }
 
     @Test
     public void invalidEncoding()
     {
         expected.expect(IllegalArgumentException.class);
-        final DataType dataType = DataType.builder().encoding("imInvalid").build();
+        final DataType dataType = DataType.builder().charset("imInvalid").build();
     }
 
     @Test

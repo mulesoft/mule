@@ -17,11 +17,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_S
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -100,12 +100,12 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     /**
      * Collection of attachments that were attached to the incoming message
      */
-    private transient Map<String, DataHandler> inboundAttachments = new HashMap<String, DataHandler>();
+    private transient Map<String, DataHandler> inboundAttachments = new HashMap<>();
 
     /**
      * Collection of attachments that will be sent out with this message
      */
-    private transient Map<String, DataHandler> outboundAttachments = new HashMap<String, DataHandler>();
+    private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
     private transient MuleContext muleContext;
 
@@ -311,11 +311,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
             copyMessageProperties(previous);
         }
 
-        if (getDataType().getEncoding() == null)
-        {
-            setEncoding(previous.getEncoding());
-        }
-
         if (previous.getExceptionPayload() != null)
         {
             setExceptionPayload(previous.getExceptionPayload());
@@ -440,7 +435,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         assertAccess(WRITE);
         if (StringUtils.isNotBlank(id))
         {
-            setOutboundProperty(MULE_CORRELATION_ID_PROPERTY, id, null);
+            setOutboundProperty(MULE_CORRELATION_ID_PROPERTY, id, DataType.STRING);
         }
         else
         {
@@ -587,8 +582,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         buf.append(LINE_SEPARATOR);
         buf.append("  correlationSeq=").append(getCorrelationSequence());
         buf.append(LINE_SEPARATOR);
-        buf.append("  encoding=").append(getEncoding());
-        buf.append(LINE_SEPARATOR);
         buf.append("  exceptionPayload=").append(ObjectUtils.defaultIfNull(exceptionPayload, NOT_SET));
         buf.append(LINE_SEPARATOR);
         buf.append(StringMessageUtils.headersToString(this));
@@ -614,7 +607,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     }
 
     @Override
-    public void addOutboundAttachment(String name, Object object, String contentType) throws Exception
+    public void addOutboundAttachment(String name, Object object, MediaType contentType) throws Exception
     {
         assertAccess(WRITE);
         DataHandler dh;
@@ -622,7 +615,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         {
             if (contentType != null)
             {
-                dh = new DataHandler(new FileInputStream((File) object), contentType);
+                dh = new DataHandler(new FileInputStream((File) object), contentType.toString());
 
             }
             else
@@ -634,7 +627,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         {
             if (contentType != null)
             {
-                dh = new DataHandler(((URL) object).openStream(), contentType);
+                dh = new DataHandler(((URL) object).openStream(), contentType.toString());
             }
             else
             {
@@ -662,7 +655,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         }
         else
         {
-            dh = new DataHandler(object, contentType);
+            dh = new DataHandler(object, contentType.toString());
         }
         outboundAttachments.put(name, dh);
     }
@@ -700,53 +693,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     {
         assertAccess(READ);
         return unmodifiableSet(outboundAttachments.keySet());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getEncoding()
-    {
-        assertAccess(READ);
-        String encoding = null;
-        if (getDataType() != null)
-        {
-            encoding = getDataType().getEncoding();
-            if (encoding != null)
-            {
-                return encoding;
-            }
-        }
-        encoding = getOutboundProperty(MULE_ENCODING_PROPERTY);
-        if (encoding != null)
-        {
-            return encoding;
-        }
-        else
-        {
-            return getDefaultEncoding(muleContext);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setEncoding(String encoding)
-    {
-        assertAccess(WRITE);
-        setDataType(DataType.builder(getDataType()).encoding(encoding).build());
-    }
-
-    /**
-     * @param mimeType
-     * @since 3.0
-     */
-    public void setMimeType(String mimeType)
-    {
-        assertAccess(WRITE);
-        setDataType(DataType.builder(getDataType()).mimeType(mimeType).build());
     }
 
     /**
@@ -816,7 +762,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     }
 
     @Override
-    protected void setDataType(DataType dt)
+    public void setDataType(DataType dt)
     {
         assertAccess(WRITE);
         super.setDataType(dt);
@@ -869,7 +815,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     {
         if (null == ownerThread)
         {
-            ownerThread = new AtomicReference<Thread>();
+            ownerThread = new AtomicReference<>();
         }
         if (null == mutable)
         {
@@ -1019,7 +965,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         }
         else
         {
-            toWrite = new HashMap<String, SerializedDataHandler>(attachments.size());
+            toWrite = new HashMap<>(attachments.size());
             for (Map.Entry<String, DataHandler> entry : attachments.entrySet())
             {
                 String name = entry.getKey();
@@ -1073,7 +1019,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         }
         else
         {
-            toReturn = new HashMap<String, DataHandler>(attachments.size());
+            toReturn = new HashMap<>(attachments.size());
             for (Map.Entry<String, SerializedDataHandler> entry : attachments.entrySet())
             {
                 toReturn.put(entry.getKey(), entry.getValue().getHandler());
@@ -1106,12 +1052,12 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         this.muleContext = context;
         if (this.inboundAttachments == null)
         {
-            this.inboundAttachments = new HashMap<String, DataHandler>();
+            this.inboundAttachments = new HashMap<>();
         }
 
         if (this.outboundAttachments == null)
         {
-            this.outboundAttachments = new HashMap<String, DataHandler>();
+            this.outboundAttachments = new HashMap<>();
         }
     }
 
@@ -1177,7 +1123,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         // We ignore inbound and invocation scopes since the VM receiver needs to behave the
         // same way as any other receiver in Mule and would only receive inbound headers
         // and attachments
-        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>(3);
+        Map<String, DataHandler> attachments = new HashMap<>(3);
         for (String name : currentMessage.getOutboundAttachmentNames())
         {
             attachments.put(name, getOutboundAttachment(name));
@@ -1211,7 +1157,6 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         newMessage.setCorrelationGroupSize(currentMessage.getCorrelationGroupSize());
         newMessage.setCorrelationSequence(currentMessage.getCorrelationSequence());
         newMessage.setReplyTo(currentMessage.getReplyTo());
-        newMessage.setEncoding(currentMessage.getEncoding());
         return newMessage;
     }
 
@@ -1394,18 +1339,17 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
 
     private void updateDataTypeWithProperty(String key, Object value)
     {
-        final DataTypeBuilder builder = DataType.builder(getDataType());
-
         // updates dataType when encoding is updated using a property instead of using #setEncoding
         if (MULE_ENCODING_PROPERTY.equals(key))
         {
-            builder.encoding((String) value);
+            setDataType(DataType.builder().type(getDataType().getType()).charset((String) value).build());
         }
         else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
         {
+            final DataTypeBuilder builder = DataType.builder();
             try
             {
-                builder.mimeType((String) value);
+                builder.mediaType((String) value);
             }
             catch (IllegalArgumentException e)
             {
@@ -1418,12 +1362,11 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
                     String encoding = defaultCharset().name();
                     logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
                     logger.warn(format("Using defualt encoding: %s", encoding));
-                    builder.encoding(encoding);
+                    builder.charset(encoding);
                 }
             }
+            setDataType(builder.type(getDataType().getType()).build());
         }
-
-        setDataType(builder.build());
     }
 
     /**

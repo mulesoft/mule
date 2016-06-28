@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -66,14 +67,14 @@ public abstract class MockHttpServer extends Object implements Runnable
     }
 
 
-    protected HttpRequest parseRequest(InputStream in, String encoding)
+    protected HttpRequest parseRequest(InputStream in, Charset encoding)
     {
         try
         {
-            String line = HttpParser.readLine(in, encoding);
+            String line = HttpParser.readLine(in, encoding.name());
             RequestLine requestLine = RequestLine.parseLine(line);
 
-            return new HttpRequest(requestLine, HttpParser.parseHeaders(in, encoding), in, encoding);
+            return new HttpRequest(requestLine, HttpParser.parseHeaders(in, encoding.name()), in, encoding);
 
         }
         catch (Exception e)

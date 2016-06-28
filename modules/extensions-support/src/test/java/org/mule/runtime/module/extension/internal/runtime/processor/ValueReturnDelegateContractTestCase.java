@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
@@ -72,7 +73,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     public void operationReturnsMuleMessageButKeepsAttributes() throws Exception
     {
         Object payload = new Object();
-        DataType dataType = DataType.OBJECT;
+        DataType dataType = DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build();
 
         delegate.asReturnValue(new DefaultMuleMessage(payload, dataType), operationContext);
 

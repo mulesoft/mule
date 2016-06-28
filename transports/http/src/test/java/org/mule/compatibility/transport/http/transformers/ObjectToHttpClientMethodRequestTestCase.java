@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.http.transformers;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.httpclient.HttpVersion.HTTP_1_1;
 import static org.junit.Assert.assertArrayEquals;
@@ -51,7 +52,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     
     private MutableMuleMessage setupRequestContext(final String url, final String method) throws Exception
     {
-        HttpRequest request = new HttpRequest(new RequestLine(method, url, HTTP_1_1), null, "UTF-8");
+        HttpRequest request = new HttpRequest(new RequestLine(method, url, HTTP_1_1), null, UTF_8);
         
         endpoint = getEndpointFactory().getInboundEndpoint(url);
         
@@ -67,7 +68,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     private MutableMuleMessage setupRequestContextForCollection(final String url, final String method,
                                                                    List<MuleMessage> messages) throws Exception
     {
-        HttpRequest request = new HttpRequest(new RequestLine(method, url, HTTP_1_1), null, "UTF-8");
+        HttpRequest request = new HttpRequest(new RequestLine(method, url, HTTP_1_1), null, UTF_8);
         
         endpoint = getEndpointFactory().getInboundEndpoint(url);
         

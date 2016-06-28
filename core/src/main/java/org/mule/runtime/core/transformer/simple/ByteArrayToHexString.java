@@ -13,6 +13,7 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 
 /**
@@ -40,7 +41,7 @@ public class ByteArrayToHexString extends AbstractTransformer
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         if (src == null)
         {

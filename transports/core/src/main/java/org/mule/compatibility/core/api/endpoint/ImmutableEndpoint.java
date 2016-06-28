@@ -8,6 +8,7 @@ package org.mule.compatibility.core.api.endpoint;
 
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.api.transport.Connector;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.NamedObject;
@@ -19,6 +20,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +69,7 @@ public interface ImmutableEndpoint extends Serializable, NamedObject, LegacyImmu
      * @return the encoding set on the endpoint or null if no codin has been
      *         specified
      */
-    String getEncoding();
+    Charset getEncoding();
 
     /**
      * The endpoint that will be used to send the message on. It is important that
@@ -192,7 +194,7 @@ public interface ImmutableEndpoint extends Serializable, NamedObject, LegacyImmu
     /**
      * Return the mime type defined for the endpoint, if any
      */
-    String getMimeType();
+    MediaType getMimeType();
 
     /**
      * Return the endpoint's redelivery policy, if any

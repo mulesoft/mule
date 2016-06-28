@@ -7,7 +7,7 @@
 package org.mule.runtime.module.json.transformers;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,9 +34,9 @@ import java.util.Map;
  */
 public class JsonToObject extends AbstractJsonTransformer
 {
-    private static final DataType<JsonData> JSON_TYPE = DataType.builder().type(JsonData.class).mimeType(MimeType.APPLICATION_JSON).build();
+    private static final DataType<JsonData> JSON_TYPE = DataType.builder().type(JsonData.class).mediaType(MediaType.APPLICATION_JSON).build();
 
-    private Map<Class<?>, Class<?>> deserializationMixins = new HashMap<Class<?>, Class<?>>();
+    private Map<Class<?>, Class<?>> deserializationMixins = new HashMap<>();
 
     public JsonToObject()
     {
@@ -65,7 +66,7 @@ public class JsonToObject extends AbstractJsonTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         Object src = event.getMessage().getPayload();
         Object returnValue;
@@ -93,7 +94,7 @@ public class JsonToObject extends AbstractJsonTransformer
 
             if (src instanceof Reader)
             {
-                if (getReturnDataType().equals(JSON_TYPE))
+                if (JSON_TYPE.isCompatibleWith(getReturnDataType()))
                 {
                     returnValue = new JsonData((Reader) src);
                 }
@@ -104,7 +105,7 @@ public class JsonToObject extends AbstractJsonTransformer
             }
             else if (src instanceof String)
             {
-                if (getReturnDataType().equals(JSON_TYPE))
+                if (JSON_TYPE.isCompatibleWith(getReturnDataType()))
                 {
                     returnValue = new JsonData((String) src);
                 }
@@ -116,7 +117,7 @@ public class JsonToObject extends AbstractJsonTransformer
             else
             {
                 reader = new InputStreamReader(is, outputEncoding);
-                if (getReturnDataType().equals(JSON_TYPE))
+                if (JSON_TYPE.isCompatibleWith(getReturnDataType()))
                 {
                     returnValue = new JsonData(reader);
                 }

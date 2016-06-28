@@ -21,15 +21,16 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.CompositeConverter;
 import org.mule.runtime.core.transformer.TransformerChain;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
 {
     protected final Transformer transformer;
     private ImmutableEndpoint endpoint;
-    private String defaultEncoding;
+    private Charset defaultEncoding;
 
-    public DefaultEndpointAwareTransformer(Transformer transformer, String defaultEncoding)
+    public DefaultEndpointAwareTransformer(Transformer transformer, Charset defaultEncoding)
     {
         this.transformer = transformer;
         this.defaultEncoding = defaultEncoding;
@@ -112,18 +113,25 @@ public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
     @Override
     public Object transform(Object src) throws TransformerException
     {
-        return transformer.transform(src, getEncoding(src));
+        return transformer.transform(src, resolveEncoding(src));
     }
 
-    protected String getEncoding(Object src)
+    protected Charset resolveEncoding(Object src)
     {
-        String enc = null;
         if (src instanceof MuleMessage)
         {
-            enc = ((MuleMessage) src).getEncoding();
+            return ((MuleMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding());
         }
+        else
+        {
+            return getDefaultEncoding();
+        }
+    }
 
-        if (enc == null && endpoint != null)
+    private Charset getDefaultEncoding()
+    {
+        Charset enc = null;
+        if (endpoint != null)
         {
             enc = endpoint.getEncoding();
         }
@@ -135,7 +143,7 @@ public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
     }
 
     @Override
-    public Object transform(Object src, String encoding) throws TransformerException
+    public Object transform(Object src, Charset encoding) throws TransformerException
     {
         return transformer.transform(src, encoding);
     }
@@ -150,18 +158,6 @@ public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
     public DataType<?> getReturnDataType()
     {
         return transformer.getReturnDataType();
-    }
-
-    @Override
-    public String getMimeType()
-    {
-        return transformer.getMimeType();
-    }
-
-    @Override
-    public String getEncoding()
-    {
-        return transformer.getEncoding();
     }
 
     @Override

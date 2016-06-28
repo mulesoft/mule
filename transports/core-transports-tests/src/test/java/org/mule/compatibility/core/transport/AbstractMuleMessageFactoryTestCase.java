@@ -9,6 +9,7 @@ package org.mule.compatibility.core.transport;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
@@ -16,11 +17,13 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.nio.charset.Charset;
+
 import org.junit.Test;
 
 public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleContextTestCase
 {
-    protected String encoding;
+    protected Charset encoding;
     
     /**
      * Subclasses can set this flag to false, disabling the test for unsupported transport
@@ -38,7 +41,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        encoding = muleContext.getConfiguration().getDefaultEncoding();
+        encoding = getDefaultEncoding(muleContext);
     }
     
     @Test

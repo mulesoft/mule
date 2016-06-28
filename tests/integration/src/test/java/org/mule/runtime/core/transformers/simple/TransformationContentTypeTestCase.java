@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.transformers.simple;
 
-import static org.junit.Assert.assertEquals;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +40,8 @@ public class TransformationContentTypeTestCase extends FunctionalTestCase
         MuleMessage message = new DefaultMuleMessage(inputMessage, muleContext);
         List<Transformer> transformers = Arrays.asList(new Transformer[] {trans});
         message = muleContext.getTransformationService().applyTransformers(message, null, transformers);
-        assertEquals("text/plain", message.getDataType().getMimeType());
-        assertEquals("iso-8859-1", message.getEncoding());
+        assertThat(message.getDataType().getMediaType().getPrimaryType(), is("text"));
+        assertThat(message.getDataType().getMediaType().getSubType(), is("plain"));
+        assertThat(message.getDataType().getMediaType().getCharset().get(), is(ISO_8859_1));
     }
 }

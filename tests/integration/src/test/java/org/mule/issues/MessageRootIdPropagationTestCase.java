@@ -8,13 +8,14 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
 
         public static void initialize()
         {
-            idMap = new HashMap<String, String>();
+            idMap = new HashMap<>();
             messageCount = 0;
         }
 
@@ -76,7 +77,7 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
         }
 
         @Override
-        public Object transformMessage(MuleEvent event, String outputEncoding)
+        public Object transformMessage(MuleEvent event, Charset outputEncoding)
         {
             process(event.getMessage());
             return event.getMessage().getPayload();
@@ -84,7 +85,7 @@ public class MessageRootIdPropagationTestCase extends FunctionalTestCase
 
         public static Set<String> getIds()
         {
-            return new HashSet<String>(idMap.values());
+            return new HashSet<>(idMap.values());
         }
 
         public static int getMessageCount()

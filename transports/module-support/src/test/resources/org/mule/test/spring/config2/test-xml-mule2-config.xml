@@ -43,7 +43,7 @@
     <!-- cannot have aliases -->
     <!-- transports:endpoint name="waterMelonEndpoint" ref="TestQueue"/ -->
     <transports:endpoint name="waterMelonEndpoint" address="test://test.queue" exchange-pattern="one-way"
-                   encoding="UTF-8-TEST"/>
+                   encoding="UTF-8"/>
     <transports:endpoint name="appleInEndpoint" address="test://AppleQueue" exchange-pattern="one-way"/>
     <transports:endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue"
                    exchange-pattern="one-way"/>

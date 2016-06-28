@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.module.pgp;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.runtime.core.transformer.encryption.EncryptionTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
+import org.mule.tck.testmodels.fruit.Orange;
 
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncryptionStrategyTestCase
 {
@@ -32,12 +33,12 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
 
         EncryptionTransformer etrans = new EncryptionTransformer();
         etrans.setStrategy(kbStrategy);
-        Object result = etrans.doTransform(msg.getBytes(), "UTF-8");
+        Object result = etrans.doTransform(msg.getBytes(), UTF_8);
 
         assertNotNull(result);
         InputStream inputStream = (InputStream) result;
         String message = IOUtils.toString(inputStream);
-        String encrypted = (String) new ByteArrayToObject().doTransform(message.getBytes(), "UTF-8");
+        String encrypted = (String) new ByteArrayToObject().doTransform(message.getBytes(), UTF_8);
         assertTrue(encrypted.startsWith("-----BEGIN PGP MESSAGE-----"));
     }
 }

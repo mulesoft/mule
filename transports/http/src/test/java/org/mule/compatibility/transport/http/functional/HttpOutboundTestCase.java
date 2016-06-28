@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpRequest;
@@ -126,7 +127,7 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 
         public SimpleHttpServer(int listenPort)
         {
-            super(listenPort, muleContext.getConfiguration().getDefaultEncoding());
+            super(listenPort, getDefaultEncoding(muleContext));
         }
 
         @Override

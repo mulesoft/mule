@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -156,9 +156,9 @@ public class JmsMessageUtils
     {
         MapMessage mMsg = session.createMapMessage();
 
-        for (Iterator<?> i = value.entrySet().iterator(); i.hasNext();)
+        for (Object name : value.entrySet())
         {
-            Map.Entry<?, ?> entry = (Map.Entry<?, ?>) i.next();
+            Map.Entry<?, ?> entry = (Map.Entry<?, ?>) name;
             mMsg.setObject(entry.getKey().toString(), entry.getValue());
         }
 
@@ -195,9 +195,8 @@ public class JmsMessageUtils
     {
         StreamMessage sMsg = session.createStreamMessage();
 
-        for (Iterator<?> iter = value.iterator(); iter.hasNext();)
+        for (Object o : value)
         {
-            Object o = iter.next();
             if (validateStreamMessageType(o))
             {
                 sMsg.writeObject(o);
@@ -249,7 +248,7 @@ public class JmsMessageUtils
         return bMsg;
     }
 
-    public static Object toObject(Message source, String jmsSpec, String encoding) throws JMSException, IOException
+    public static Object toObject(Message source, String jmsSpec, Charset encoding) throws JMSException, IOException
     {
         if (source instanceof ObjectMessage)
         {
@@ -257,7 +256,7 @@ public class JmsMessageUtils
         }
         else if (source instanceof MapMessage)
         {
-            Map<String, Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<>();
             MapMessage m = (MapMessage) source;
 
             for (Enumeration<?> e = m.getMapNames(); e.hasMoreElements();)
@@ -279,7 +278,7 @@ public class JmsMessageUtils
         }
         else if (source instanceof StreamMessage)
         {
-            List<Object> result = new ArrayList<Object>();
+            List<Object> result = new ArrayList<>();
             try
             {
                 StreamMessage sMsg = (StreamMessage) source;
@@ -318,7 +317,7 @@ public class JmsMessageUtils
      * @throws java.io.IOException if a failure occurs while reading the stream and
      *                             converting the message data
      */
-    public static byte[] toByteArray(Message message, String jmsSpec, String encoding) throws JMSException, IOException
+    public static byte[] toByteArray(Message message, String jmsSpec, Charset encoding) throws JMSException, IOException
     {
         if (message instanceof BytesMessage)
         {
@@ -517,9 +516,8 @@ public class JmsMessageUtils
      */
     protected static boolean validateMapMessageType(Map<?, ?> candidate)
     {
-        for (Iterator<?> iterator = candidate.values().iterator(); iterator.hasNext();)
+        for (Object o : candidate.values())
         {
-            Object o = iterator.next();
             if (!validateStreamMessageType(o))
             {
                     return false;

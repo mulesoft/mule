@@ -10,8 +10,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.metadata.MimeType.HTML;
-import static org.mule.runtime.api.metadata.MimeType.TEXT;
+import static org.mule.runtime.api.metadata.MediaType.HTML;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -19,6 +19,7 @@ import static org.mule.runtime.module.http.functional.matcher.HttpMessageAttribu
 
 import org.mule.extension.http.api.HttpPart;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -174,21 +175,21 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
         addPartToSend(name, content, null, null);
     }
 
-    private void addPartToSend(String name, Object content, String contentType) throws Exception
+    private void addPartToSend(String name, Object content, MediaType contentType) throws Exception
     {
         addPartToSend(name, content, contentType, null);
     }
 
-    private void addPartToSend(String name, Object content, String contentType, String fileName) throws Exception
+    private void addPartToSend(String name, Object content, MediaType contentType, String fileName) throws Exception
     {
         partsToSend.add(new HttpPart(name, content, contentType, fileName));
     }
 
-    private void assertPart(String name, String expectedContentType, String expectedBody) throws Exception
+    private void assertPart(String name, MediaType expectedContentType, String expectedBody) throws Exception
     {
         Part part = getPart(name);
         assertThat(part, notNullValue());
-        assertThat(part.getContentType(), startsWith(expectedContentType));
+        assertThat(part.getContentType(), startsWith(expectedContentType.toString()));
         assertThat(IOUtils.toString(part.getInputStream()), equalTo(expectedBody));
     }
 
@@ -232,7 +233,7 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
         }
 
 
-        response.setContentType(HTML);
+        response.setContentType(HTML.toString());
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().print(DEFAULT_RESPONSE);
     }

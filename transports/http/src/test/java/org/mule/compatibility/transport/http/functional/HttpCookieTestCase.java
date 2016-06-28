@@ -9,6 +9,8 @@ package org.mule.compatibility.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpRequest;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -37,7 +39,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 
     private CountDownLatch latch = new CountDownLatch(1);
     private boolean cookieFound = false;
-    private List<String> cookieHeaders = new ArrayList<String>();
+    private List<String> cookieHeaders = new ArrayList<>();
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
@@ -101,7 +103,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 
     private Map<String, String> getCookieMap()
     {
-        Map<String, String> cookieMap = new HashMap<String, String>();
+        Map<String, String> cookieMap = new HashMap<>();
         cookieMap.put("customCookie", "yes");
         cookieMap.put("expressionCookie", "#[message.inboundProperties.COOKIE_HEADER]");
         return cookieMap;
@@ -140,7 +142,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 
         public SimpleHttpServer(int listenPort)
         {
-            super(listenPort, muleContext.getConfiguration().getDefaultEncoding());
+            super(listenPort, getDefaultEncoding(muleContext));
         }
 
         @Override

@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -17,14 +18,14 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,7 +116,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
     {
 
         @Override
-        public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+        public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
         {
             MuleMessage msg = event.getMessage();
             assertEquals("param1", event.getMessage().getOutboundProperty("stringParam"));

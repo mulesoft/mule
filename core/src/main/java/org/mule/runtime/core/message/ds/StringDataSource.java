@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.message.ds;
 
+import org.mule.runtime.api.metadata.MediaType;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +18,7 @@ import javax.activation.DataSource;
 public class StringDataSource implements DataSource
 {
     protected String content;
-    protected String contentType = "text/plain";
+    protected MediaType contentType = MediaType.TEXT;
     protected String name = "StringDataSource";
 
     public StringDataSource(String payload)
@@ -32,28 +34,32 @@ public class StringDataSource implements DataSource
         this.name = name;
     }
 
-    public StringDataSource(String content, String name, String contentType)
+    public StringDataSource(String content, String name, MediaType contentType)
     {
         this.content = content;
         this.contentType = contentType;
         this.name = name;
     }
 
+    @Override
     public InputStream getInputStream() throws IOException
     {
         return new ByteArrayInputStream(content.getBytes());
     }
 
+    @Override
     public OutputStream getOutputStream()
     {
         throw new UnsupportedOperationException("Read-only javax.activation.DataSource");
     }
 
+    @Override
     public String getContentType()
     {
-        return contentType;
+        return contentType.toString();
     }
 
+    @Override
     public String getName()
     {
         return name;

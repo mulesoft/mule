@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
@@ -52,7 +53,7 @@ public class HttpRequestToMuleMessage
     {
         final HttpRequest request = requestContext.getRequest();
 
-        final DataType dataType = buildContentTypeDataType(request.getHeaderValueIgnoreCase(CONTENT_TYPE));
+        final DataType dataType = buildContentTypeDataType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
 
         final Map<String, DataHandler> parts = new HashMap<>();
         Object payload = NullPayload.getInstance();
@@ -68,13 +69,13 @@ public class HttpRequestToMuleMessage
                 }
                 else
                 {
-                    if (dataType.getMimeType() != null)
+                    if (dataType.getMediaType() != null)
                     {
-                        if (dataType.getMimeType().equals(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
+                        if (dataType.getMediaType().matches(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
                         {
                             try
                             {
-                                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), dataType.getEncoding());
+                                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), dataType.getMediaType().getCharset().get());
                                 dataTypeBuilder.type(ParameterMap.class);
                             }
                             catch (IllegalArgumentException e)

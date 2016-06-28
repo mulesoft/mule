@@ -8,19 +8,21 @@ package org.mule.runtime.core.config.bootstrap;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.registry.TransformerResolver;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.transformer.AbstractDiscoverableTransformer;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -76,7 +78,7 @@ public class SimpleRegistryBootstrapTransformersTest extends AbstractMuleContext
     {
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             return null;
         }
@@ -86,7 +88,7 @@ public class SimpleRegistryBootstrapTransformersTest extends AbstractMuleContext
     {
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             return null;
         }

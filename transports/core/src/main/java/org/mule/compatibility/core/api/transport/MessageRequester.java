@@ -13,6 +13,8 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 
+import java.nio.charset.Charset;
+
 
 /**
  * Combine {@link org.mule.compatibility.core.api.transport.MessageRequesting} with various lifecycle methods for the actual
@@ -62,7 +64,7 @@ public interface MessageRequester extends Connectable, MessageRequesting, Lifecy
      */
     InboundEndpoint getEndpoint();
     
-    MuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException;
+    MuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
 
     MuleMessage createMuleMessage(Object transportMessage) throws MuleException;
 }

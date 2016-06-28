@@ -14,6 +14,7 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.XMLEntityCodec;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * Decodes a String or byte[] containing XML entities
@@ -30,7 +31,7 @@ public class XmlEntityDecoder extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         try
         {
@@ -42,7 +43,7 @@ public class XmlEntityDecoder extends AbstractTransformer
             }
             else if (src instanceof InputStream)
             {
-                data = IOUtils.toString((InputStream)src);
+                data = IOUtils.toString((InputStream) src, encoding);
             }
             else
             {

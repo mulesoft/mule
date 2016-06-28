@@ -84,16 +84,6 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage<Ob
     ExceptionPayload getExceptionPayload();
 
     /**
-     * Gets the encoding for the current message. For potocols that send encoding
-     * information with the message, this method should be overriden to expose the
-     * transport encoding, otherwise the default encoding in the Mule configuration
-     * will be used.
-     *
-     * @return the encoding for this message. This method must never return null
-     */
-    String getEncoding();
-
-    /**
      * @deprecated
      * Avoid getting access to the MuleContext through the message.
      * You can get access to the MuleContext by making your class implement {@link org.mule.runtime.core.api.context.MuleContextAware}

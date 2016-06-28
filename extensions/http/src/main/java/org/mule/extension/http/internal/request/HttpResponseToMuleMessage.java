@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE2;
@@ -18,11 +19,10 @@ import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBu
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.util.DataTypeUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -33,6 +33,7 @@ import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -67,13 +68,13 @@ public class HttpResponseToMuleMessage
     {
         String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
         DataType dataType = muleEvent.getMessage().getDataType();
-        if (StringUtils.isEmpty(responseContentType) && !MimeType.ANY.equals(dataType.getMimeType()))
+        if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType()))
         {
-            responseContentType = DataTypeUtils.getContentType(dataType);
+            responseContentType = ((DataType<?>) dataType).getMediaType().toString();
         }
 
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-        String encoding = buildContentTypeDataType(responseContentType).getEncoding();
+        Charset encoding = buildContentTypeDataType(responseContentType, getDefaultEncoding(muleEvent.getMuleContext())).getMediaType().getCharset().get();
 
         Object payload = responseInputStream;
         Map<String, DataHandler> parts = new HashMap<>();
@@ -91,7 +92,7 @@ public class HttpResponseToMuleMessage
                     throw new MessagingException(muleEvent, e);
                 }
             }
-            else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toLowerCase()))
+            else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toString()))
             {
                 payload = HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding);
             }
@@ -104,7 +105,7 @@ public class HttpResponseToMuleMessage
 
         HttpResponseAttributes responseAttributes = createAttributes(response, parts);
 
-        dataType = DataType.builder(dataType).encoding(encoding).build();
+        dataType = DataType.builder(dataType).charset(encoding).build();
         MuleMessage responseMessage = new DefaultMuleMessage(payload, dataType, responseAttributes);
 
         String requestMessageId = muleEvent.getMessage().getUniqueId();

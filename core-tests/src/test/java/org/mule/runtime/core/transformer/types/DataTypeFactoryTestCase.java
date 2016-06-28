@@ -8,14 +8,21 @@
 package org.mule.runtime.core.transformer.types;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.metadata.CollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.nio.charset.Charset;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -23,12 +30,16 @@ import org.junit.Test;
 public class DataTypeFactoryTestCase extends AbstractMuleTestCase
 {
 
+    private final Charset encoding = UTF_16;
+    private final String mimeType = "application/json";
+    private final Class<String> type = String.class;
+
     @Test
     public void createsDataTypeForNullObject() throws Exception
     {
         DataType<?> dataType = DataType.fromObject(null);
 
-        assertThat(dataType, like(Object.class, MimeType.ANY, null));
+        assertThat(dataType, like(Object.class, MediaType.ANY, null));
     }
 
     @Test
@@ -36,19 +47,29 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     {
         DataType<?> dataType = DataType.fromObject("test");
 
-        assertThat(dataType, like(String.class, MimeType.ANY, null));
+        assertThat(dataType, like(String.class, MediaType.ANY, null));
     }
 
     @Test
     public void mimeTypeWithEncodingInformation() throws Exception
     {
-        final Class<String> type = String.class;
-        final String encoding = "UTF-16";
-        final String mimeType = "application/json";
-
-        DataType<?> dataType = DataType.builder().type(type).mimeType(format("%s; charset=UTF-8", mimeType)).encoding(encoding).build();
+        DataType<?> dataType = DataType.builder().type(type).mediaType(format("%s; charset=UTF-8", mimeType)).charset(encoding).build();
         assertThat(dataType.getType(), equalTo(type));
-        assertThat(dataType.getEncoding(), is(encoding));
-        assertThat(dataType.getMimeType(), is(mimeType));
+        assertThat(dataType.getMediaType().getPrimaryType(), is(mimeType.split("/")[0]));
+        assertThat(dataType.getMediaType().getSubType(), is(mimeType.split("/")[1]));
+        assertThat(dataType.getMediaType().getCharset().get(), is(encoding));
+    }
+
+    @Test
+    public void createsDataTypeForNonCollection()
+    {
+        final DataType dataType = DataType.builder().collectionType(List.class).itemType(type).itemMediaType(mimeType).build();
+
+        assertThat(dataType.getType(), equalTo(List.class));
+        assertThat(dataType, instanceOf(CollectionDataType.class));
+        final DataType itemDataType = ((CollectionDataType) dataType).getItemType();
+        assertThat(itemDataType.getType(), equalTo(type));
+        assertThat(itemDataType.getMediaType().getPrimaryType(), is(mimeType.split("/")[0]));
+        assertThat(itemDataType.getMediaType().getSubType(), is(mimeType.split("/")[1]));
     }
 }

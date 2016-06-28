@@ -11,21 +11,22 @@ import org.mule.compatibility.transport.http.RequestLine;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import org.apache.commons.httpclient.HttpParser;
 
 public abstract class SingleRequestMockHttpServer extends MockHttpServer
 {
 
-    private final String encoding;
+    private final Charset encoding;
     private String statusLine;
 
-    public SingleRequestMockHttpServer(int listenPort, String encoding)
+    public SingleRequestMockHttpServer(int listenPort, Charset encoding)
     {
         this(listenPort, encoding, HTTP_STATUS_LINE_OK);
     }
 
-    public SingleRequestMockHttpServer(int listenPort, String encoding, String statusLine)
+    public SingleRequestMockHttpServer(int listenPort, Charset encoding, String statusLine)
     {
         super(listenPort);
         this.encoding = encoding;
@@ -37,9 +38,9 @@ public abstract class SingleRequestMockHttpServer extends MockHttpServer
     @Override
     protected void processRequests(InputStream in, OutputStream out) throws Exception
     {
-        String line = HttpParser.readLine(in, encoding);
+        String line = HttpParser.readLine(in, encoding.name());
         RequestLine requestLine = RequestLine.parseLine(line);
-        HttpRequest request = new HttpRequest(requestLine, HttpParser.parseHeaders(in, encoding), in, encoding);
+        HttpRequest request = new HttpRequest(requestLine, HttpParser.parseHeaders(in, encoding.name()), in, encoding);
 
         processSingleRequest(request);
 

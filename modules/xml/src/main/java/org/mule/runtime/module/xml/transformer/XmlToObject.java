@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * <code>XmlToObject</code> converts xml created by the ObjectToXml transformer in to a
@@ -43,21 +43,14 @@ public class XmlToObject extends AbstractXStreamTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         Object src = event.getMessage().getPayload();
         Object result;
         if (src instanceof byte[])
         {
-            try
-            {
-                Reader xml = new InputStreamReader(new ByteArrayInputStream((byte[]) src), outputEncoding);
-                result = getXStream().fromXML(xml);
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new TransformerException(this, e);
-            }
+            Reader xml = new InputStreamReader(new ByteArrayInputStream((byte[]) src), outputEncoding);
+            result = getXStream().fromXML(xml);
         }
         else if (src instanceof InputStream)
         {

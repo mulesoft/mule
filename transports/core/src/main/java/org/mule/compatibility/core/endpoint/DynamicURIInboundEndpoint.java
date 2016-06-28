@@ -13,6 +13,7 @@ import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.connector.EndpointConnectException;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -26,6 +27,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -109,13 +111,13 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     }
 
     @Override
-    public String getEncoding()
+    public Charset getEncoding()
     {
         return endpoint.getEncoding();
     }
 
     @Override
-    public String getMimeType()
+    public MediaType getMimeType()
     {
         return endpoint.getMimeType();
     }

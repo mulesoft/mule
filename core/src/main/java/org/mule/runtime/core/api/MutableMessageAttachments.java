@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.metadata.MediaType;
+
 import javax.activation.DataHandler;
 
 /**
@@ -36,7 +38,7 @@ public interface MutableMessageAttachments extends MessageAttachments
      * @throws Exception if the attachment cannot be read or created
      * @since 3.0
      */
-    void addOutboundAttachment(String name, Object object, String contentType) throws Exception;
+    void addOutboundAttachment(String name, Object object, MediaType contentType) throws Exception;
 
     /**
      * Remove an attachment form this message with the specified name

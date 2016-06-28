@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.metadata.MimeType.JSON;
+import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.CompileException;
@@ -26,7 +26,7 @@ import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeBuilderFactory;
+import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -378,7 +378,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         assertEquals(MimeType.class, evaluate(MimeType.class.getSimpleName()));
         assertEquals(Pattern.class, evaluate(Pattern.class.getSimpleName()));
         assertEquals(DataType.class, evaluate(DataType.class.getSimpleName()));
-        assertEquals(DataTypeBuilderFactory.class, evaluate(DataTypeBuilderFactory.class.getSimpleName()));
+        assertEquals(AbstractDataTypeBuilderFactory.class, evaluate(AbstractDataTypeBuilderFactory.class.getSimpleName()));
     }
 
     static class DummyExpressionLanguageExtension implements ExpressionLanguageExtension
@@ -494,14 +494,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Test
     public void returnsDataType() throws Exception
     {
-        DataType<String> dataType = DataType.builder().type(String.class).mimeType(JSON).encoding(UTF_16.name()).build();
+        DataType<String> dataType = DataType.builder().type(String.class).mediaType(JSON).charset(UTF_16.name()).build();
 
         MuleEvent event = createMockEvent(TEST_MESSAGE, dataType);
 
         TypedValue typedValue = evaluateTyped("payload", event);
 
         assertThat((String) typedValue.getValue(), equalTo(TEST_MESSAGE));
-        assertThat(typedValue.getDataType(), like(String.class, JSON, UTF_16.name()));
+        assertThat(typedValue.getDataType(), like(String.class, JSON, UTF_16));
     }
 
     protected Object evaluate(String expression)

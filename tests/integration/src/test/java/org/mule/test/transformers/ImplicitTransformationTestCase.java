@@ -18,6 +18,7 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.apache.tools.ant.filters.StringInputStream;
 import org.junit.Test;
@@ -85,7 +86,7 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
         }
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             return StringUtils.reverse((String) src);
         }
@@ -102,7 +103,7 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
         }
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             return StringUtils.reverse(new String((byte[]) src));
         }
@@ -119,7 +120,7 @@ public class ImplicitTransformationTestCase extends FunctionalTestCase
         }
 
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
 
             InputStream input = (InputStream) src;

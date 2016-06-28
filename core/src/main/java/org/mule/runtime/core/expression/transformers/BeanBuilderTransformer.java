@@ -18,6 +18,7 @@ import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.util.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,7 +79,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         Object bean;
         try

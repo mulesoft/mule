@@ -8,9 +8,10 @@ package org.mule.runtime.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -24,6 +25,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -97,7 +99,7 @@ public class TransformationService
     {
         checkNotNull(message, "Message cannot be null");
         checkNotNull(outputDataType, "DataType cannot be null");
-        return new DefaultMuleMessage(getPayload(message, outputDataType, message.getEncoding()), message, muleContext);
+        return new DefaultMuleMessage(getPayload(message, outputDataType, resolveEncoding(message)), message, muleContext);
     }
 
     /**
@@ -110,7 +112,12 @@ public class TransformationService
      */
     public String getPayloadForLogging(MuleMessage message)
     {
-        return getPayloadForLogging(message, message.getEncoding());
+        return getPayloadForLogging(message, resolveEncoding(message));
+    }
+
+    protected Charset resolveEncoding(MuleMessage message)
+    {
+        return message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
     }
 
     /**
@@ -122,7 +129,7 @@ public class TransformationService
      *
      * @return message payload as a String or message with the payload type if payload can't be converted to a String
      */
-    public String getPayloadForLogging(MuleMessage message, String encoding)
+    public String getPayloadForLogging(MuleMessage message, Charset encoding)
     {
         Class type = message.getPayload().getClass();
         if (!isConsumable(type))
@@ -260,13 +267,14 @@ public class TransformationService
     private DataType<?> mergeDataType(MuleMessage message, DataType<?> transformed, Class<?> payloadTransformedClass)
     {
         DataType<?> original = message.getDataType();
-        String mimeType = transformed.getMimeType() == null || MimeType.ANY.equals(transformed.getMimeType()) ? original.getMimeType() : transformed.getMimeType();
-        String encoding = transformed.getEncoding() == null ? message.getEncoding() : transformed.getEncoding();
+        MediaType mimeType = transformed.getMediaType() == null || MediaType.ANY.matches(transformed.getMediaType()) ? original.getMediaType() : transformed.getMediaType();
+        Charset encoding = transformed.getMediaType().getCharset().orElse(
+                message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
         // In case if the transformed dataType is an Object type we could keep the original type if it is compatible/assignable (String->Object we want to keep String as transformed DataType)
-        Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataType.builder().type(payloadTransformedClass).mimeType(mimeType).build())
+        Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataType.builder().type(payloadTransformedClass).mediaType(mimeType).build())
                 ? original.getType() : transformed.getType();
 
-        return DataType.builder().type(type).mimeType(mimeType).encoding(encoding).build();
+        return DataType.builder().type(type).mediaType(mimeType).charset(encoding).build();
     }
 
     /**
@@ -284,7 +292,7 @@ public class TransformationService
      *                              transformation of the payload.
      */
     @SuppressWarnings("unchecked")
-    private  <T> T getPayload(MuleMessage message, DataType<T> resultType, String encoding) throws TransformerException
+    private <T> T getPayload(MuleMessage message, DataType<T> resultType, Charset encoding) throws TransformerException
     {
         // Handle null by ignoring the request
         if (resultType == null)

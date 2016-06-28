@@ -23,6 +23,7 @@ import static org.mule.runtime.module.oauth2.internal.OAuthConstants.REDIRECT_UR
 import static org.mule.runtime.module.oauth2.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.springframework.util.StringUtils.isEmpty;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -71,98 +72,96 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
      *
      * @throws MuleException if the listener couldn't be created.
      */
+    @Override
     public void init() throws MuleException
     {
         createListenerForRedirectUrl();
     }
 
+    @Override
     protected MessageProcessor createRedirectUrlProcessor()
     {
-        return new MessageProcessor()
+        return event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
+            int authorizationStatus = 0;
+            int statusCodeToReturn = OK.getStatusCode();
+            String responseMessage = "Successfully retrieved access token";
+            final Map<String, String> queryParams = event.getMessage().getInboundProperty(HTTP_QUERY_PARAMS);
+            final String state = queryParams.get(STATE_PARAMETER);
+            final StateDecoder stateDecoder = new StateDecoder(state);
+            try
             {
-                int authorizationStatus = 0;
-                int statusCodeToReturn = OK.getStatusCode();
-                String responseMessage = "Successfully retrieved access token";
-                final Map<String, String> queryParams = event.getMessage().getInboundProperty(HTTP_QUERY_PARAMS);
-                final String state = queryParams.get(STATE_PARAMETER);
-                final StateDecoder stateDecoder = new StateDecoder(state);
-                try
+                final String authorizationCode = processAuthorizationCode(event);
+
+                if (logger.isDebugEnabled())
                 {
-                    final String authorizationCode = processAuthorizationCode(event);
-
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Redirect url request state: " + state);
-                        logger.debug("Redirect url request code: " + authorizationCode);
-                    }
-
-                    MuleEvent tokenUrlResponse = callTokenUrl(event, authorizationCode);
-
-                    String decodedState = stateDecoder.decodeOriginalState();
-                    String encodedResourceOwnerId = stateDecoder.decodeResourceOwnerId();
-                    String resourceOwnerId = encodedResourceOwnerId == null ? DEFAULT_RESOURCE_OWNER_ID : encodedResourceOwnerId;
-
-                    final ResourceOwnerOAuthContext resourceOwnerOAuthContext = getOauthConfig().getUserOAuthContext().getContextForResourceOwner(resourceOwnerId);
-
-                    logResourceOwnerOAuthContextBeforeUpdate(resourceOwnerOAuthContext);
-
-                    TokenResponseProcessor tokenResponseProcessor = processTokenUrlResponse(tokenUrlResponse);
-
-                    updateResourceOwnerState(resourceOwnerOAuthContext, decodedState, tokenResponseProcessor);
-                    getOauthConfig().getUserOAuthContext().updateResourceOwnerOAuthContext(resourceOwnerOAuthContext);
+                    logger.debug("Redirect url request state: " + state);
+                    logger.debug("Redirect url request code: " + authorizationCode);
                 }
-                catch (NoAuthorizationCodeException e)
-                {
-                    logger.error("Could not extract authorization code from OAuth provider HTTP request done to the redirect URL");
-                    muleEventLogger.logContent(event);
-                    authorizationStatus = NO_AUTHORIZATION_CODE_STATUS;
-                    statusCodeToReturn = BAD_REQUEST.getStatusCode();
-                    responseMessage = "Failure retrieving access token.\n OAuth Server uri from callback: " + event.getMessage().getInboundProperty(HTTP_REQUEST_URI);
-                }
-                catch (TokenUrlResponseException e)
-                {
-                    logger.error((String.format("HTTP response from token URL %s returned a failure status code", getTokenUrl())));
-                    muleEventLogger.logContent(e.getTokenUrlResponse());
-                    authorizationStatus = TOKEN_URL_CALL_FAILED_STATUS;
-                    statusCodeToReturn = INTERNAL_SERVER_ERROR.getStatusCode();
-                    responseMessage = String.format("Failure calling token url %s. Exception message is %s", getTokenUrl(), e.getMessage());
-                }
-                catch (TokenNotFoundException e)
-                {
-                    logger.error(String.format("Could not extract access token from token URL. Access token is %s, Refresh token is %s",
-                                               e.getTokenResponseProcessor().getAccessToken(), StringUtils.isBlank(e.getTokenResponseProcessor().getRefreshToken()) ? "(Not issued)" : e.getTokenResponseProcessor().getRefreshToken()));
-                    muleEventLogger.logContent(e.getTokenUrlResponse());
-                    authorizationStatus = TOKEN_NOT_FOUND_STATUS;
-                    statusCodeToReturn = INTERNAL_SERVER_ERROR.getStatusCode();
-                    responseMessage = "Failed getting access token or refresh token from token URL response. See logs for details.";
-                }
-                catch (MuleException e)
-                {
-                    logger.error("Fail processing redirect URL request", e);
-                    authorizationStatus = FAILURE_PROCESSING_REDIRECT_URL_REQUEST_STATUS;
-                    statusCodeToReturn = INTERNAL_SERVER_ERROR.getStatusCode();
-                    responseMessage = "Failed processing redirect URL request done from OAuth provider. See logs for details.";
-                }
-                final String finalResponseMessage = responseMessage;
-                final int finalStatusCodeToReturn = statusCodeToReturn;
-                final int finalAuthorizationStatus = authorizationStatus;
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setPayload(finalResponseMessage);
-                    msg.setOutboundProperty(HTTP_STATUS_PROPERTY, finalStatusCodeToReturn);
-                    String onCompleteRedirectToValue = stateDecoder.decodeOnCompleteRedirectTo();
-                    if (!isEmpty(onCompleteRedirectToValue))
-                    {
-                        msg.setOutboundProperty(HTTP_STATUS_PROPERTY, MOVED_TEMPORARILY.getStatusCode());
-                        msg.setOutboundProperty(LOCATION, HttpParser.appendQueryParam(onCompleteRedirectToValue, AUTHORIZATION_STATUS_QUERY_PARAM_KEY, String.valueOf(finalAuthorizationStatus)));
-                    }
-                    return msg;
-                }));
 
-                return event;
+                MuleEvent tokenUrlResponse = callTokenUrl(event, authorizationCode);
+
+                String decodedState = stateDecoder.decodeOriginalState();
+                String encodedResourceOwnerId = stateDecoder.decodeResourceOwnerId();
+                String resourceOwnerId = encodedResourceOwnerId == null ? DEFAULT_RESOURCE_OWNER_ID : encodedResourceOwnerId;
+
+                final ResourceOwnerOAuthContext resourceOwnerOAuthContext = getOauthConfig().getUserOAuthContext().getContextForResourceOwner(resourceOwnerId);
+
+                logResourceOwnerOAuthContextBeforeUpdate(resourceOwnerOAuthContext);
+
+                TokenResponseProcessor tokenResponseProcessor = processTokenUrlResponse(tokenUrlResponse);
+
+                updateResourceOwnerState(resourceOwnerOAuthContext, decodedState, tokenResponseProcessor);
+                getOauthConfig().getUserOAuthContext().updateResourceOwnerOAuthContext(resourceOwnerOAuthContext);
             }
+            catch (NoAuthorizationCodeException e1)
+            {
+                logger.error("Could not extract authorization code from OAuth provider HTTP request done to the redirect URL");
+                muleEventLogger.logContent(event);
+                authorizationStatus = NO_AUTHORIZATION_CODE_STATUS;
+                statusCodeToReturn = BAD_REQUEST.getStatusCode();
+                responseMessage = "Failure retrieving access token.\n OAuth Server uri from callback: " + event.getMessage().getInboundProperty(HTTP_REQUEST_URI);
+            }
+            catch (TokenUrlResponseException e2)
+            {
+                logger.error((String.format("HTTP response from token URL %s returned a failure status code", getTokenUrl())));
+                muleEventLogger.logContent(e2.getTokenUrlResponse());
+                authorizationStatus = TOKEN_URL_CALL_FAILED_STATUS;
+                statusCodeToReturn = INTERNAL_SERVER_ERROR.getStatusCode();
+                responseMessage = String.format("Failure calling token url %s. Exception message is %s", getTokenUrl(), e2.getMessage());
+            }
+            catch (TokenNotFoundException e3)
+            {
+                logger.error(String.format("Could not extract access token from token URL. Access token is %s, Refresh token is %s",
+                                           e3.getTokenResponseProcessor().getAccessToken(), StringUtils.isBlank(e3.getTokenResponseProcessor().getRefreshToken()) ? "(Not issued)" : e3.getTokenResponseProcessor().getRefreshToken()));
+                muleEventLogger.logContent(e3.getTokenUrlResponse());
+                authorizationStatus = TOKEN_NOT_FOUND_STATUS;
+                statusCodeToReturn = INTERNAL_SERVER_ERROR.getStatusCode();
+                responseMessage = "Failed getting access token or refresh token from token URL response. See logs for details.";
+            }
+            catch (MuleException e4)
+            {
+                logger.error("Fail processing redirect URL request", e4);
+                authorizationStatus = FAILURE_PROCESSING_REDIRECT_URL_REQUEST_STATUS;
+                statusCodeToReturn = INTERNAL_SERVER_ERROR.getStatusCode();
+                responseMessage = "Failed processing redirect URL request done from OAuth provider. See logs for details.";
+            }
+            final String finalResponseMessage = responseMessage;
+            final int finalStatusCodeToReturn = statusCodeToReturn;
+            final int finalAuthorizationStatus = authorizationStatus;
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setPayload(finalResponseMessage);
+                msg.setOutboundProperty(HTTP_STATUS_PROPERTY, finalStatusCodeToReturn);
+                String onCompleteRedirectToValue = stateDecoder.decodeOnCompleteRedirectTo();
+                if (!isEmpty(onCompleteRedirectToValue))
+                {
+                    msg.setOutboundProperty(HTTP_STATUS_PROPERTY, MOVED_TEMPORARILY.getStatusCode());
+                    msg.setOutboundProperty(LOCATION, HttpParser.appendQueryParam(onCompleteRedirectToValue, AUTHORIZATION_STATUS_QUERY_PARAM_KEY, String.valueOf(finalAuthorizationStatus)));
+                }
+                return msg;
+            }));
+
+            return event;
         };
     }
 
@@ -280,6 +279,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
      * @param currentEvent              the event being processed when the refresh token was required.
      * @param resourceOwnerOAuthContext oauth context for who we need to update the access token.
      */
+    @Override
     public void doRefreshToken(final MuleEvent currentEvent, final ResourceOwnerOAuthContext resourceOwnerOAuthContext)
     {
         try

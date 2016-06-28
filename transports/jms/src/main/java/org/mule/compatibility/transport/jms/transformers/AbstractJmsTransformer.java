@@ -24,6 +24,7 @@ import org.mule.runtime.core.util.ClassUtils;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -126,7 +127,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
         }
     }
 
-    protected Object transformFromMessage(Message source, String outputEncoding) throws IOException, JMSException
+    protected Object transformFromMessage(Message source, Charset outputEncoding) throws IOException, JMSException
     {
         if (logger.isDebugEnabled())
         {

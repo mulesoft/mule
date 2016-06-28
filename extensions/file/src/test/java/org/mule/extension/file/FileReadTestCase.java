@@ -10,11 +10,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.metadata.MimeType.JSON;
+import static org.mule.runtime.api.metadata.MediaType.JSON;
 
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.util.FileUtils;
@@ -53,7 +53,8 @@ public class FileReadTestCase extends FileConnectorTestCase
     {
         MuleEvent response = readHelloWorld();
 
-        assertThat(response.getMessage().getDataType().getMimeType(), is(JSON));
+        assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
+        assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
 
         AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
         assertThat(payload.isLocked(), is(false));
@@ -70,7 +71,8 @@ public class FileReadTestCase extends FileConnectorTestCase
 
         MuleEvent response = getPath(binaryFile.getAbsolutePath());
 
-        assertThat(response.getMessage().getDataType().getMimeType(), is(MimeType.BINARY));
+        assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
+        assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
 
         AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload();
         assertThat(payload.isLocked(), is(false));
@@ -84,7 +86,8 @@ public class FileReadTestCase extends FileConnectorTestCase
     public void readWithForcedMimeType() throws Exception
     {
         MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
-        assertThat(event.getMessage().getDataType().getMimeType(), equalTo("test/test"));
+        assertThat(event.getMessage().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
+        assertThat(event.getMessage().getDataType().getMediaType().getSubType(), equalTo("test"));
     }
 
     @Test

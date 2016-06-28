@@ -6,13 +6,13 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.compatibility.transport.file.FileTestUtils.createDataFile;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.transport.file.FileMessageReceiver;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -43,7 +43,7 @@ public class FileAgeAndPollingFrequencyInteractionTestCase extends FunctionalTes
     public void processesFileOnNextPollWhenFileIsOldEnough() throws Exception
     {
         File tmpDir = FileUtils.openDirectory(getFileInsideWorkingDirectory("in").getAbsolutePath());
-        dataFile = createDataFile(tmpDir, TEST_MESSAGE, "UTF-8");
+        dataFile = createDataFile(tmpDir, TEST_MESSAGE, UTF_8);
 
         muleContext.start();
 

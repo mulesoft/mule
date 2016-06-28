@@ -10,6 +10,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.compression.AbstractCompressionTransformer;
 import org.mule.runtime.core.util.compression.GZipCompression;
 
+import java.nio.charset.Charset;
+
 public class TestCompressionTransformer extends AbstractCompressionTransformer
 {
 
@@ -25,7 +27,7 @@ public class TestCompressionTransformer extends AbstractCompressionTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         return null;
     }

@@ -66,7 +66,7 @@ final class DataTypeFactoryBean implements FactoryBean<DataType>
     @Override
     public DataType getObject() throws Exception
     {
-        return ((DataTypeParamsBuilder<?>) DataType.builder().type(type).mimeType(mimeType).encoding(encoding)).build();
+        return ((DataTypeParamsBuilder<?>) DataType.builder().type(type).mediaType(mimeType).charset(encoding)).build();
     }
 
     @Override

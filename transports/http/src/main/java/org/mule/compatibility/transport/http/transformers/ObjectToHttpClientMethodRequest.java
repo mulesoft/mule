@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.http.transformers;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_PARAMS_PROPERTY;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
@@ -19,7 +20,7 @@ import org.mule.compatibility.transport.http.multipart.MultiPartInputStream;
 import org.mule.compatibility.transport.http.multipart.PartDataSource;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -37,6 +38,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -83,7 +85,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         final MuleMessage msg = event.getMessage();
         String method = detectHttpMethod(msg);
@@ -169,7 +171,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         return msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
     }
 
-    protected HttpMethod createGetMethod(MuleMessage msg, String outputEncoding) throws Exception
+    protected HttpMethod createGetMethod(MuleMessage msg, Charset outputEncoding) throws Exception
     {
         final Object src = msg.getPayload();
         // TODO It makes testing much harder if we use the endpoint on the
@@ -183,12 +185,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         String paramName = msg.getOutboundProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, null);
         if (paramName != null)
         {
-            paramName = URLEncoder.encode(paramName, outputEncoding);
+            paramName = URLEncoder.encode(paramName, outputEncoding.name());
 
             String paramValue;
             if (msg.getOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true))
             {
-                paramValue = URLEncoder.encode(src.toString(), outputEncoding);
+                paramValue = URLEncoder.encode(src.toString(), outputEncoding.name());
             }
             else
             {
@@ -212,7 +214,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         return httpMethod;
     }
 
-    protected HttpMethod createPostMethod(MuleEvent event, String outputEncoding) throws Exception
+    protected HttpMethod createPostMethod(MuleEvent event, Charset outputEncoding) throws Exception
     {
         final MuleMessage msg = event.getMessage();
         URI uri = getURI(msg);
@@ -256,7 +258,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         return message.getOutboundProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
     }
 
-    protected HttpMethod createPutMethod(MuleEvent event, String outputEncoding) throws Exception
+    protected HttpMethod createPutMethod(MuleEvent event, Charset outputEncoding) throws Exception
     {
         final MuleMessage msg = event.getMessage();
         URI uri = getURI(msg);
@@ -292,7 +294,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         return new TraceMethod(uri.toString());
     }
 
-    protected HttpMethod createPatchMethod(MuleEvent event, String outputEncoding) throws Exception
+    protected HttpMethod createPatchMethod(MuleEvent event, Charset outputEncoding) throws Exception
     {
         final MuleMessage message = event.getMessage();
         URI uri = getURI(message);
@@ -317,7 +319,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     }
 
     protected void setupEntityMethod(Object src,
-                                     String encoding,
+                                     Charset encoding,
                                      MuleEvent event,
                                      EntityEnclosingMethod postMethod)
         throws UnsupportedEncodingException, TransformerException
@@ -327,17 +329,16 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         // This way client calls can control if a POST body is posted explicitly
         if (!(msg.getPayload() instanceof NullPayload))
         {
-            String outboundMimeType = (String) msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE
-            );
+            String outboundMimeType = (String) msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
             if (outboundMimeType == null)
             {
-                outboundMimeType = (getEndpoint() != null ? getEndpoint().getMimeType() : null);
+                outboundMimeType = (getEndpoint() != null && getEndpoint().getMimeType() != null ? getEndpoint().getMimeType().toString() : null);
             }
             if (outboundMimeType == null)
             {
-                if (!msg.getDataType().getMimeType().equals(MimeType.ANY))
+                if (!msg.getDataType().getMediaType().equals(MediaType.ANY))
                 {
-                    outboundMimeType = msg.getDataType().getMimeType();
+                    outboundMimeType = msg.getDataType().getMediaType().toString();
                 }
                 else
                 {
@@ -349,10 +350,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
                 }
             }
 
-            if (encoding != null && !"UTF-8".equals(encoding.toUpperCase())
+            if (encoding != null && !UTF_8.equals(encoding)
                 && outboundMimeType.indexOf("charset") == -1)
             {
-                outboundMimeType += "; charset=" + encoding;
+                outboundMimeType += "; charset=" + encoding.name();
             }
 
             // Ensure that we have a cached representation of the message if we're
@@ -386,7 +387,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
             if (src instanceof String)
             {
                 postMethod.setRequestEntity(new StringRequestEntity(src.toString(), outboundMimeType,
-                    encoding));
+                        encoding.name()));
                 return;
             }
 

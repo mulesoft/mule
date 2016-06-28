@@ -29,6 +29,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -126,6 +127,13 @@ public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase
         }
     }
 
+    @Override
+    public int getTestTimeoutSecs()
+    {
+        // TODO Auto-generated method stub
+        return 100 * super.getTestTimeoutSecs();
+    }
+
     private class AppleToJson extends AbstractMessageTransformer implements DiscoverableTransformer
     {
 
@@ -146,7 +154,7 @@ public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase
         }
 
         @Override
-        public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+        public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
         {
             return value;
         }

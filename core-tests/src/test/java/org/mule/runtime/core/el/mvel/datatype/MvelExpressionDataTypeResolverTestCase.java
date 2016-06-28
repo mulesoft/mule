@@ -10,7 +10,7 @@ package org.mule.runtime.core.el.mvel.datatype;
 import static java.util.Collections.EMPTY_LIST;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
-import static org.mule.runtime.api.metadata.MimeType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.ParserContext;

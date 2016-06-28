@@ -28,6 +28,8 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.ClassUtils;
 
+import java.nio.charset.Charset;
+
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -222,7 +224,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
     {
         ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
 
-        final String encoding = endpoint.getEncoding();
+        final Charset encoding = endpoint.getEncoding();
 
         if (receiveMessagesInTransaction)
         {

@@ -13,6 +13,7 @@ import org.mule.runtime.core.message.OutputHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.Charset;
 
 /**
  * <code>ObjectToInputStream</code> converts Serializable objects to an InputStream
@@ -31,7 +32,7 @@ public class ObjectToInputStream extends SerializableToByteArray
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         try
         {

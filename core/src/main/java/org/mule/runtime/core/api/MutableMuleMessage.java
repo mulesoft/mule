@@ -78,13 +78,6 @@ public interface MutableMuleMessage extends MuleMessage, MutableMessagePropertie
     void setExceptionPayload(ExceptionPayload payload);
 
     /**
-     * Sets the encoding for this message
-     *
-     * @param encoding the encoding to use
-     */
-    void setEncoding(String encoding);
-
-    /**
      * Perform any clean up operations on the message resource.
      */
     void release();

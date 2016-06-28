@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.transformer.wire;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
@@ -67,7 +69,7 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleContextTest
         // Serialize
         WireFormat wireFormat = getWireFormat();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        wireFormat.write(out, inObject, "UTF-8");
+        wireFormat.write(out, inObject, UTF_8);
 
         // De-serialize
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());

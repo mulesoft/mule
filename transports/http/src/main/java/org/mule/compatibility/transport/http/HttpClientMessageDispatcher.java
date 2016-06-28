@@ -252,7 +252,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         else if (body instanceof byte[])
         {
             byte[] buffer = event.transformMessage(DataType.BYTE_ARRAY);
-            postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getEncoding()));
+            postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getMessage().getDataType().getMediaType().getCharset().get().name()));
             httpMethod = postMethod;
         }
         else

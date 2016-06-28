@@ -12,6 +12,7 @@ import org.mule.runtime.core.util.compression.GZipCompression;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 
 /**
  * <code>GZipCompressTransformer</code> is a transformer compressing objects into
@@ -31,7 +32,7 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String outputEncoding) throws TransformerException
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         try
         {

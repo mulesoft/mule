@@ -15,6 +15,8 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
+
 import org.junit.Test;
 
 public class TransformersInvokedFromResponseTestCase extends FunctionalTestCase
@@ -45,7 +47,7 @@ public class TransformersInvokedFromResponseTestCase extends FunctionalTestCase
     public static class InvocationCounterTransformer1 extends AbstractTransformer
     {
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             counter1++;
             return src;

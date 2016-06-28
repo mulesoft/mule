@@ -22,6 +22,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.nio.charset.Charset;
 import java.security.cert.Certificate;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,14 +54,14 @@ public class HttpServerConnection implements HandshakeCompletedListener
     private final OutputStream out;
     // this should rather be isKeepSocketOpen as this is the main purpose of this flag
     private boolean keepAlive = false;
-    private final String encoding;
+    private final Charset encoding;
     private HttpRequest cachedRequest;
     private Latch sslSocketHandshakeComplete = new Latch();
     private Certificate[] peerCertificateChain;
     private Certificate[] localCertificateChain;
     private RequestLine requestLine;
 
-    public HttpServerConnection(final Socket socket, String encoding, HttpConnector connector) throws IOException
+    public HttpServerConnection(final Socket socket, Charset encoding, HttpConnector connector) throws IOException
     {
         super();
 
@@ -219,7 +220,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
 
     protected HttpRequest createHttpRequest() throws IOException
     {
-        return new HttpRequest(getRequestLine(), HttpParser.parseHeaders(this.in, encoding), this.in, encoding);
+        return new HttpRequest(getRequestLine(), HttpParser.parseHeaders(this.in, encoding.name()), this.in, encoding);
     }
 
     public HttpResponse readResponse() throws IOException
@@ -227,7 +228,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
         try
         {
             String line = readLine();
-            return new HttpResponse(new StatusLine(line), HttpParser.parseHeaders(this.in, encoding), this.in);
+            return new HttpResponse(new StatusLine(line), HttpParser.parseHeaders(this.in, encoding.name()), this.in);
         }
         catch (IOException e)
         {
@@ -242,7 +243,7 @@ public class HttpServerConnection implements HandshakeCompletedListener
 
         do
         {
-            line = HttpParser.readLine(in, encoding);
+            line = HttpParser.readLine(in, encoding.name());
         }
         while (line != null && line.length() == 0);
 

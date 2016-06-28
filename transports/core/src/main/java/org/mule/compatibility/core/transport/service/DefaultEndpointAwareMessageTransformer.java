@@ -10,10 +10,12 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 
+import java.nio.charset.Charset;
+
 public class DefaultEndpointAwareMessageTransformer extends DefaultEndpointAwareTransformer implements MessageTransformer
 {
 
-    public DefaultEndpointAwareMessageTransformer(MessageTransformer transformer, String defaultEncoding)
+    public DefaultEndpointAwareMessageTransformer(MessageTransformer transformer, Charset defaultEncoding)
     {
         super(transformer, defaultEncoding);
     }
@@ -25,7 +27,7 @@ public class DefaultEndpointAwareMessageTransformer extends DefaultEndpointAware
     }
 
     @Override
-    public Object transform(Object src, String encoding, MuleEvent event) throws TransformerMessagingException
+    public Object transform(Object src, Charset encoding, MuleEvent event) throws TransformerMessagingException
     {
         return ((MessageTransformer) transformer).transform(src, encoding, event);
     }

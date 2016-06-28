@@ -7,12 +7,12 @@
 package org.mule.compatibility.transport.file;
 
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -33,17 +33,18 @@ public class FileMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected Object extractPayload(Object transportMessage, String encoding) throws Exception
+    protected Object extractPayload(Object transportMessage, Charset encoding) throws Exception
     {
         return transportMessage;
     }
 
     @Override
-    protected void addProperties(DefaultMuleMessage message, Object transportMessage) throws Exception
+    protected MutableMuleMessage addProperties(MutableMuleMessage message, Object transportMessage) throws Exception
     {
-        super.addProperties(message, transportMessage);
+        message = super.addProperties(message, transportMessage);
         File file = convertToFile(transportMessage);
         setPropertiesFromFile(message, file);
+        return message;
     }
 
     @Override

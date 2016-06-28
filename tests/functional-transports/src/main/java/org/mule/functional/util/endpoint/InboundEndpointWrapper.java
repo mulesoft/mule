@@ -12,6 +12,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.api.transport.Connector;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -24,6 +25,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +68,7 @@ public abstract class InboundEndpointWrapper implements InboundEndpoint
     }
 
     @Override
-    public String getEncoding()
+    public Charset getEncoding()
     {
         return delegate.getEncoding();
     }
@@ -186,7 +188,7 @@ public abstract class InboundEndpointWrapper implements InboundEndpoint
     }
 
     @Override
-    public String getMimeType()
+    public MediaType getMimeType()
     {
         return delegate.getMimeType();
     }

@@ -9,8 +9,8 @@ package org.mule.runtime.core.el.mvel.datatype;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
-import static org.mule.runtime.api.metadata.MimeType.JSON;
-import static org.mule.runtime.api.metadata.MimeType.UNKNOWN;
+import static org.mule.runtime.api.metadata.MediaType.JSON;
+import static org.mule.runtime.api.metadata.MediaType.UNKNOWN;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.MVEL;
@@ -30,6 +30,7 @@ import org.mule.runtime.core.el.mvel.VariableVariableResolverFactory;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ import java.util.Map;
 public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends AbstractMuleContextTestCase
 {
 
-    public static final String CUSTOM_ENCODING = StandardCharsets.UTF_16.name();
+    public static final Charset CUSTOM_ENCODING = StandardCharsets.UTF_16;
     public static final String PROPERTY_NAME = "foo";
     public static final String INNER_PROPERTY_NAME = "bar";
 
@@ -51,7 +52,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
     protected void doAssignmentDataTypePropagationTest(String expression) throws Exception
     {
-        DataType<String> expectedDataType = DataType.builder().type(String.class).mimeType(JSON).encoding(CUSTOM_ENCODING).build();
+        DataType<String> expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
 
@@ -64,7 +65,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
     protected void doInnerAssignmentDataTypePropagationTest(String expression) throws Exception
     {
-        final DataType expectedDataType = DataType.builder().type(Map.class).mimeType(UNKNOWN).encoding(CUSTOM_ENCODING).build();
+        final DataType expectedDataType = DataType.builder().type(Map.class).mediaType(UNKNOWN).charset(CUSTOM_ENCODING).build();
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
         final Map<String, String> propertyValue = new HashMap<>();

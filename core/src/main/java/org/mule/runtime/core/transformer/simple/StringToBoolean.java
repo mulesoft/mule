@@ -12,6 +12,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
+
 /**
  * <code>ByteArrayToSerializable</code> converts a serialized object to its object
  * representation
@@ -31,7 +33,7 @@ public class StringToBoolean extends AbstractTransformer implements Discoverable
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, Charset encoding) throws TransformerException
     {
         if (src == null)
         {

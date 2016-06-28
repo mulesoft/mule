@@ -7,12 +7,12 @@
 package org.mule.compatibility.transport.jms;
 
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,13 +36,13 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected Object extractPayload(Object transportMessage, String encoding) throws Exception
+    protected Object extractPayload(Object transportMessage, Charset encoding) throws Exception
     {
         return transportMessage;
     }
 
     @Override
-    protected void addProperties(DefaultMuleMessage muleMessage, Object transportMessage) throws Exception
+    protected MutableMuleMessage addProperties(MutableMuleMessage muleMessage, Object transportMessage) throws Exception
     {        
         Message jmsMessage = (Message) transportMessage;
         
@@ -60,6 +60,8 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
         propagateJMSProperties(jmsMessage, messageProperties);
         
         muleMessage.addInboundProperties(messageProperties);
+
+        return muleMessage;
     }
 
     protected void propagateJMSProperties(Message jmsMessage, Map<String, Serializable> messageProperties)

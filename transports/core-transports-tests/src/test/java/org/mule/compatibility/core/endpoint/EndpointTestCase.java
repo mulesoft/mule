@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.endpoint;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -17,8 +18,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.core.endpoint.AbstractEndpoint;
-import org.mule.compatibility.core.endpoint.EndpointAware;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -31,14 +31,13 @@ import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 public class EndpointTestCase extends AbstractMuleTestCase
 {
@@ -56,11 +55,11 @@ public class EndpointTestCase extends AbstractMuleTestCase
         // endpoint
         final Connector mockConnector = mock(Connector.class);
         final EndpointURI uri = mock(EndpointURI.class);
-        final List<Transformer> inputTransformers = new ArrayList<Transformer>();
-        final List<Transformer> outputTransformers = new ArrayList<Transformer>();
+        final List<Transformer> inputTransformers = new ArrayList<>();
+        final List<Transformer> outputTransformers = new ArrayList<>();
         final String name = "testEndpoint";
         
-        final Map<String, String> properties = new HashMap<String, String>();
+        final Map<String, String> properties = new HashMap<>();
         final String property1 = "property1";
         final String value1 = "value1";
         properties.put(property1, value1);
@@ -71,46 +70,42 @@ public class EndpointTestCase extends AbstractMuleTestCase
         final MessageExchangePattern messageExchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
         final int responseTimeout = 5;
         final String initialState = "state1";
-        final String endpointEncoding = "enconding1";
+        final Charset endpointEncoding = US_ASCII;
         final String endpointBuilderName = "builderName1";
         final MuleContext muleContext = mock(MuleContext.class);
         final RetryPolicyTemplate retryPolicyTemplate = mock(RetryPolicyTemplate.class);
         final AbstractRedeliveryPolicy redeliveryPolicy = mock(IdempotentRedeliveryPolicy.class);
         final EndpointMessageProcessorChainFactory messageProcessorsFactory = mock(EndpointMessageProcessorChainFactory.class);
-        final List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
-        final List<MessageProcessor> responseMessageProcessors = new ArrayList<MessageProcessor>();
-        final String mimeType = "text/plain";
+        final List<MessageProcessor> messageProcessors = new ArrayList<>();
+        final List<MessageProcessor> responseMessageProcessors = new ArrayList<>();
+        final MediaType mimeType = MediaType.TEXT;
         final boolean disableTransportTransformer = true;
 
         // Creates a mock Transformer that will check that the endpoint is completely
         // configured when setEndpoint method is called.
         Transformer mockTransformer = mock(Transformer.class, withSettings().extraInterfaces(EndpointAware.class));
-        doAnswer(new Answer<Object>()
+        doAnswer(invocation ->
         {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                AbstractEndpoint endpoint = (AbstractEndpoint) invocation.getArguments()[0];
-                assertEquals(mockConnector, endpoint.getConnector());
-                assertEquals(uri, endpoint.getEndpointURI());
-                assertEquals(name, endpoint.getName());
-                assertEquals(value1, endpoint.getProperties().get(property1));
-                assertEquals(mockTransactionConfig, endpoint.getTransactionConfig());
-                assertEquals(deleteUnacceptedMessages, endpoint.isDeleteUnacceptedMessages());
-                assertEquals(mockEndpointSecurityFilter, endpoint.getSecurityFilter());
-                assertEquals(messageExchangePattern, endpoint.getExchangePattern());
-                assertEquals(responseTimeout, endpoint.getResponseTimeout());
-                assertEquals(initialState, endpoint.getInitialState());
-                assertEquals(endpointEncoding, endpoint.getEncoding());
-                assertEquals(endpointBuilderName, endpoint.getEndpointBuilderName());
-                assertEquals(muleContext, endpoint.getMuleContext());
-                assertEquals(retryPolicyTemplate, endpoint.getRetryPolicyTemplate());
-                assertEquals(redeliveryPolicy, endpoint.getRedeliveryPolicy());
-                assertEquals(mimeType, endpoint.getMimeType());
-                assertEquals(disableTransportTransformer, endpoint.isDisableTransportTransformer());
+            AbstractEndpoint endpoint = (AbstractEndpoint) invocation.getArguments()[0];
+            assertEquals(mockConnector, endpoint.getConnector());
+            assertEquals(uri, endpoint.getEndpointURI());
+            assertEquals(name, endpoint.getName());
+            assertEquals(value1, endpoint.getProperties().get(property1));
+            assertEquals(mockTransactionConfig, endpoint.getTransactionConfig());
+            assertEquals(deleteUnacceptedMessages, endpoint.isDeleteUnacceptedMessages());
+            assertEquals(mockEndpointSecurityFilter, endpoint.getSecurityFilter());
+            assertEquals(messageExchangePattern, endpoint.getExchangePattern());
+            assertEquals(responseTimeout, endpoint.getResponseTimeout());
+            assertEquals(initialState, endpoint.getInitialState());
+            assertEquals(endpointEncoding, endpoint.getEncoding());
+            assertEquals(endpointBuilderName, endpoint.getEndpointBuilderName());
+            assertEquals(muleContext, endpoint.getMuleContext());
+            assertEquals(retryPolicyTemplate, endpoint.getRetryPolicyTemplate());
+            assertEquals(redeliveryPolicy, endpoint.getRedeliveryPolicy());
+            assertEquals(mimeType, endpoint.getMimeType());
+            assertEquals(disableTransportTransformer, endpoint.isDisableTransportTransformer());
 
-                return null;
-            }
+            return null;
         }).when((EndpointAware) mockTransformer).setEndpoint(any(ImmutableEndpoint.class));
 
         inputTransformers.add(mockTransformer);

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.processor;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 
@@ -86,12 +87,20 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
         }
         else
         {
-            dataTypeBuilder = DataType.builder().type(value != null ? value.getClass() : Object.class);
+            dataTypeBuilder = DataType.builder().type((Class) (value != null ? value.getClass() : Object.class));
         }
 
         String mimeType = operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class);
         String encoding = operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class);
 
-        return dataTypeBuilder.mimeType(mimeType).encoding(encoding).build();
+        final DataType dataType = dataTypeBuilder.mediaType(mimeType).charset(encoding).build();
+        if (dataType.getMediaType().getCharset().isPresent())
+        {
+            return dataType;
+        }
+        else
+        {
+            return DataType.builder(dataType).charset(getDefaultEncoding(muleContext)).build();
+        }
     }
 }

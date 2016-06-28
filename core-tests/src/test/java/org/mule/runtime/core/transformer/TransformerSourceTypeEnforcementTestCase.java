@@ -20,6 +20,8 @@ import org.mule.tck.size.SmallTest;
 
 import com.google.common.base.Charsets;
 
+import java.nio.charset.Charset;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,7 +74,7 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
     {
         AbstractTransformer transformer = createDummyTransformer(true);
         transformer.sourceTypes.add(DataType.STRING);
-        transformer.returnType = DataType.STRING;
+        transformer.setReturnDataType(DataType.STRING);
 
         when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
 
@@ -86,7 +88,7 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
         {
 
             @Override
-            protected Object doTransform(Object src, String enc) throws TransformerException
+            protected Object doTransform(Object src, Charset enc) throws TransformerException
             {
                 return "TRANSFORMED";
             }

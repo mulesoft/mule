@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf.builder;
 
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -16,6 +16,8 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.cxf.CxfConfiguration;
 import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
 import org.mule.runtime.module.cxf.MuleInvoker;
@@ -25,8 +27,6 @@ import org.mule.runtime.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.runtime.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.runtime.module.cxf.support.MuleServiceConfiguration;
 import org.mule.runtime.module.cxf.support.WSDLQueryHandler;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -211,9 +211,9 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
         return processor;
     }
 
-    protected String getMimeType()
+    protected MediaType getMimeType()
     {
-        return MimeType.ANY;
+        return MediaType.ANY;
     }
 
     protected QueryHandler getWSDLQueryHandler()

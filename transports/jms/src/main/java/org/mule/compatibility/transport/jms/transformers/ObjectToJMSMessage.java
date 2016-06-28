@@ -12,6 +12,8 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.ClassUtils;
 
+import java.nio.charset.Charset;
+
 import javax.jms.Message;
 
 /**
@@ -43,7 +45,7 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         final MuleMessage message = event.getMessage();
         try

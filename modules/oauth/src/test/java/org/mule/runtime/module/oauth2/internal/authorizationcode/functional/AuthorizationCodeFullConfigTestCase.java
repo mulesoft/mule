@@ -13,10 +13,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -24,12 +28,9 @@ import org.mule.runtime.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.runtime.module.oauth2.asserter.AuthorizationRequestAsserter;
 import org.mule.runtime.module.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.runtime.module.oauth2.internal.OAuthConstants;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
-import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.tck.junit4.rule.SystemProperty;
 
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
@@ -41,6 +42,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 
 @RunWith(Parameterized.class)
 public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizationTestCase
@@ -126,10 +129,8 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
                 .put(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE).build();
 
 
-        wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH))
-                                     .willReturn(aResponse()
-                                                         .withHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED)
-                                                         .withBody(HttpParser.encodeString("UTF-8", tokenUrlResponseParameters))));
+        wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+                                                                                .withBody(HttpParser.encodeString(UTF_8, tokenUrlResponseParameters))));
 
         final ImmutableMap<Object, Object> redirectUrlQueryParams = ImmutableMap.builder()
                 .put(OAuthConstants.CODE_PARAMETER, AUTHENTICATION_CODE)

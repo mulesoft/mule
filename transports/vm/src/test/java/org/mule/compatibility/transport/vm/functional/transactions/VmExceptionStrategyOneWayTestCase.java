@@ -22,6 +22,7 @@ import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.concurrent.Latch;
 
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.core.Is;
@@ -119,7 +120,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
     public static class FailingTransformer extends AbstractTransformer
     {
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             throw new TransformerException(CoreMessages.failedToBuildMessage(), this);
         }

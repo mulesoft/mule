@@ -9,14 +9,15 @@ package org.mule.runtime.core.transformers.simple;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.matcher.DataTypeMatcher;
 
 import org.junit.Test;
 
@@ -36,8 +37,7 @@ public class SetFlowVariableDataTypeTestCase extends FunctionalTestCase
 
         MuleMessage response = muleEvent.getMessage();
         DataType dataType = (DataType) response.getPayload();
-
-        assertThat(dataType, DataTypeMatcher.like(String.class, MimeType.XML, UTF_16.name()));
+        assertThat(dataType, like(String.class, MediaType.XML, UTF_16));
     }
 
     public static class FlowVariableDataTypeAccessor implements Callable

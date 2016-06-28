@@ -14,13 +14,9 @@ import static org.junit.Assert.fail;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.compatibility.transport.file.FileMuleMessageFactory;
-import org.mule.compatibility.transport.file.ReceiverFileInputStream;
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
@@ -30,6 +26,7 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -242,15 +239,11 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         final Latch latch = new Latch();
         FunctionalTestComponent testComponent = new FunctionalTestComponent();
         testComponent.setMuleContext(muleContext);
-        testComponent.setEventCallback(new EventCallback()
+        testComponent.setEventCallback((context, message) ->
         {
-            @Override
-            public void eventReceived(final MuleEventContext context, final Object message) throws Exception
-            {
-                assertEquals(1, latch.getCount());
-                assertEquals(TEST_MESSAGE, context.transformMessageToString());
-                latch.countDown();
-            }
+            assertEquals(1, latch.getCount());
+            assertEquals(TEST_MESSAGE, context.transformMessageToString());
+            latch.countDown();
         });
         testComponent.initialise();
 
@@ -278,7 +271,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         }
 
         @Override
-        public Object transformMessage(MuleEvent event, String outputEncoding)
+        public Object transformMessage(MuleEvent event, Charset outputEncoding)
         {
             assertEquals(expectedPayload, event.getMessage().getPayload().getClass());
 

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.metadata.MimeType.APPLICATION_XML;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -123,7 +123,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
     @Test
     public void setsDefaultScopedPropertyMetaData() throws Exception
     {
-        DataType dataType = DataType.builder().type(Integer.class).mimeType(APPLICATION_XML).encoding(CUSTOM_ENCODING).build();
+        DataType dataType = DataType.builder().type(Integer.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
         MessagePropertiesContext properties = new MessagePropertiesContext();
         properties.setOutboundProperty("Prop", "foo", dataType);
         DataType<?> actualDataType = properties.getOutboundPropertyDataType("Prop");

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -14,6 +15,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
 public class AddAttachmentTransformer extends AbstractMessageTransformer
@@ -38,7 +40,7 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         try
         {
@@ -59,7 +61,7 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
                 }
                 else
                 {
-                    String contentType = contentTypeEvaluator.resolveValue(event).toString();
+                    MediaType contentType = DataType.builder().mediaType(contentTypeEvaluator.resolveStringValue(event)).build().getMediaType();
                     event.setMessage(event.getMessage().transform(msg -> {
                         try
                         {

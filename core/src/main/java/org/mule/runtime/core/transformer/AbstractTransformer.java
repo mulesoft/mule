@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
@@ -21,9 +23,9 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
-import org.mule.runtime.core.util.SystemUtils;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -49,7 +51,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      * The return type that will be returned by the {@link #transform} method is
      * called
      */
-    protected DataType<?> returnType = DataType.OBJECT;
+    private volatile DataType<?> returnType = null;
 
     /**
      * The name that identifies this transformer. If none is set the class name of
@@ -60,7 +62,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     /**
      * A list of supported Class types that the source payload passed into this transformer
      */
-    protected final List<DataType<?>> sourceTypes = new CopyOnWriteArrayList<DataType<?>>();
+    protected final List<DataType<?>> sourceTypes = new CopyOnWriteArrayList<>();
 
     /**
      * Determines whether the transformer will throw an exception if the message
@@ -159,25 +161,26 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     @Override
     public void setReturnDataType(DataType<?> type)
     {
-        this.returnType = type;
+        synchronized (this)
+        {
+            this.returnType = type;
+        }
     }
 
     @Override
     public DataType<?> getReturnDataType()
     {
+        if (returnType == null)
+        {
+            synchronized (this)
+            {
+                if (returnType == null)
+                {
+                    returnType = DataType.builder().charset(getDefaultEncoding(muleContext)).build();
+                }
+            }
+        }
         return returnType;
-    }
-
-    @Override
-    public String getMimeType()
-    {
-        return returnType.getMimeType();
-    }
-
-    @Override
-    public String getEncoding()
-    {
-        return returnType.getEncoding();
     }
 
     public boolean isAllowNullReturn()
@@ -236,12 +239,28 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     @Override
     public final Object transform(Object src) throws TransformerException
     {
-        String enc = returnType.getEncoding() != null ? returnType.getEncoding() : getEncoding(src);
-        return transform(src, enc);
+        return transform(src, resolveEncoding(src));
+    }
+
+    protected Charset resolveEncoding(Object src)
+    {
+        return getReturnDataType().getMediaType().getCharset().orElse(getEncoding(src));
+    }
+
+    private Charset getEncoding(Object src)
+    {
+        if (src instanceof MuleMessage)
+        {
+            return ((MuleMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
+        }
+        else
+        {
+            return getDefaultEncoding(muleContext);
+        }
     }
 
     @Override
-    public Object transform(Object src, String enc) throws TransformerException
+    public Object transform(Object src, Charset enc) throws TransformerException
     {
         Object payload = src;
         if (src instanceof MuleMessage)
@@ -287,27 +306,12 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         return result;
     }
 
-    protected String getEncoding(Object src)
-    {
-        String enc = null;
-        if (src instanceof MuleMessage)
-        {
-            enc = ((MuleMessage) src).getEncoding();
-        }
-
-        if (enc == null)
-        {
-            enc = SystemUtils.getDefaultEncoding(muleContext);
-        }
-        return enc;
-    }
-
     protected boolean isConsumed(Class<?> srcCls)
     {
         return InputStream.class.isAssignableFrom(srcCls) || StreamSource.class.isAssignableFrom(srcCls);
     }
 
-    protected abstract Object doTransform(Object src, String enc) throws TransformerException;
+    protected abstract Object doTransform(Object src, Charset enc) throws TransformerException;
 
     /**
      * Template method where deriving classes can do any initialisation after the
@@ -333,7 +337,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
 
     protected String generateTransformerName()
     {
-        return TransformerUtils.generateTransformerName(getClass(), returnType);
+        return TransformerUtils.generateTransformerName(getClass(), getReturnDataType());
     }
 
     @Override
@@ -361,7 +365,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
         sb.append(", name='").append(name).append('\'');
         sb.append(", ignoreBadInput=").append(ignoreBadInput);
-        sb.append(", returnClass=").append(returnType);
+        sb.append(", returnClass=").append(getReturnDataType());
         sb.append(", sourceTypes=").append(sourceTypes);
         sb.append('}');
         return sb.toString();

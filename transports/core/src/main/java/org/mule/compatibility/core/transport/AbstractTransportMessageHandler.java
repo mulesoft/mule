@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.core.transport;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
@@ -20,7 +22,6 @@ import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.retry.RetryContext;
@@ -33,6 +34,7 @@ import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.routing.MuleMessageInfoMapping;
 import org.mule.runtime.core.util.ClassUtils;
 
+import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -104,15 +106,11 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     {
         try
         {
-            lifecycleManager.fireInitialisePhase(new LifecycleCallback<O>()
+            lifecycleManager.fireInitialisePhase((phaseName, object) ->
             {
-                @Override
-                public void onTransition(String phaseName, O object) throws MuleException
-                {
-                    initializeRetryPolicy();
-                    initializeMessageFactory();
-                    doInitialise();
-                }
+                initializeRetryPolicy();
+                initializeMessageFactory();
+                doInitialise();
             });
         }
         catch (InitialisationException e)
@@ -179,14 +177,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
 
         try
         {
-            lifecycleManager.fireDisposePhase(new LifecycleCallback<O>() 
-            {
-                @Override
-                public void onTransition(String phaseName, O object) throws MuleException
-                {
-                    doDispose();
-                }
-            });
+            lifecycleManager.fireDisposePhase((phaseName, object) -> doDispose());
         }
         catch (MuleException e)
         {
@@ -330,14 +321,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
             }
         }
 
-        lifecycleManager.fireStartPhase(new LifecycleCallback<O>()
-        {
-            @Override
-            public void onTransition(String phaseName, O object) throws MuleException
-            {
-                doStartHandler();
-            }
-        });
+        lifecycleManager.fireStartPhase((phaseName, object) -> doStartHandler());
     }
 
     protected void doStartHandler() throws MuleException
@@ -348,19 +332,15 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     @Override
     public final void stop() throws MuleException
     {
-        lifecycleManager.fireStopPhase(new LifecycleCallback<O>()
+        lifecycleManager.fireStopPhase((phaseName, object) ->
         {
-            @Override
-            public void onTransition(String phaseName, O object) throws MuleException
+            try
             {
-                try
-                {
-                    doStop();
-                }
-                catch (MuleException e)
-                {
-                    logger.error(e.getMessage(), e);
-                }
+                doStop();
+            }
+            catch (MuleException e)
+            {
+                logger.error(e.getMessage(), e);
             }
         });
 
@@ -457,7 +437,8 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
      * message properties will be copied from <code>previousMessage</code>.
      */
     public MutableMuleMessage createMuleMessage(Object transportMessage, MuleMessage previousMessage,
-                                         String encoding) throws MuleException
+                                                Charset encoding)
+            throws MuleException
     {
         try
         {
@@ -473,7 +454,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
      * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance.
      * This is the designated way to build {@link MuleMessage}s from the transport specific message.
      */
-    public MutableMuleMessage createMuleMessage(Object transportMessage, String encoding) throws MuleException
+    public MutableMuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException
     {
         try
         {
@@ -493,7 +474,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
      */
     public MutableMuleMessage createMuleMessage(Object transportMessage) throws MuleException
     {
-        String encoding = endpoint.getMuleContext().getConfiguration().getDefaultEncoding();
+        Charset encoding = getDefaultEncoding(endpoint.getMuleContext());
         return createMuleMessage(transportMessage, encoding);
     }
 
@@ -511,5 +492,4 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     {
         return connector.getMuleContext().getTransformationService();
     }
-
 }

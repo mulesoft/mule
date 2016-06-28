@@ -12,25 +12,27 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.oauth2.internal.OAuthConstants;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Rule;
+
+import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestCase
 {
@@ -64,7 +66,7 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
     @Rule
     public SystemProperty oauthServerPortNumber = new SystemProperty("oauth.server.port", String.valueOf(oauthServerPort.getNumber()));
     @Rule
-    public SystemProperty redirectUrl = new SystemProperty("redirect.url", String.format("%s://localhost:%d/redirect", getProtocol(), localHostPort.getNumber()));
+    public SystemProperty redirectUrl = new SystemProperty("redirect.url", format("%s://localhost:%d/redirect", getProtocol(), localHostPort.getNumber()));
     @Rule
     public SystemProperty wireMockHttpPort = new SystemProperty("oauthServerHttpPort", String.valueOf(oauthServerPort.getNumber()));
 
@@ -138,21 +140,24 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
         {
             bodyParametersMapBuilder.put(customParameterName, customParameters.get(customParameterName));
         }
-        final String body = HttpParser.encodeString("UTF-8", bodyParametersMapBuilder.build());
+        final String body = HttpParser.encodeString(UTF_8, bodyParametersMapBuilder.build());
         wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH))
                                      .willReturn(aResponse()
                                                          .withBody(body)
-                                                         .withHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED)));
+                                                                                .withHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toString())));
     }
 
     protected void verifyRequestDoneToTokenUrlForAuthorizationCode() throws UnsupportedEncodingException
     {
         wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
-                                    .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "=" + URLEncoder.encode(clientId.getValue(), StandardCharsets.UTF_8.name())))
-                                    .withRequestBody(containing(OAuthConstants.CODE_PARAMETER + "=" + URLEncoder.encode(AUTHENTICATION_CODE, StandardCharsets.UTF_8.name())))
-                                    .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "=" + URLEncoder.encode(clientSecret.getValue(), StandardCharsets.UTF_8.name())))
-                                    .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "=" + URLEncoder.encode(OAuthConstants.GRANT_TYPE_AUTHENTICATION_CODE, StandardCharsets.UTF_8.name())))
-                                    .withRequestBody(containing(OAuthConstants.REDIRECT_URI_PARAMETER + "=" + URLEncoder.encode(redirectUrl.getValue(), StandardCharsets.UTF_8.name()))));
+                                                                    .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "=" + URLEncoder.encode(clientId.getValue(), UTF_8.name())))
+                                                                    .withRequestBody(containing(OAuthConstants.CODE_PARAMETER + "=" + URLEncoder.encode(AUTHENTICATION_CODE, UTF_8.name())))
+                                                                    .withRequestBody(
+                                                                            containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "=" + URLEncoder.encode(clientSecret.getValue(), UTF_8.name())))
+                                                                    .withRequestBody(containing(
+                                                                            OAuthConstants.GRANT_TYPE_PARAMETER + "=" + URLEncoder.encode(OAuthConstants.GRANT_TYPE_AUTHENTICATION_CODE, UTF_8.name())))
+                                                                    .withRequestBody(
+                                                                            containing(OAuthConstants.REDIRECT_URI_PARAMETER + "=" + URLEncoder.encode(redirectUrl.getValue(), UTF_8.name()))));
     }
 
     protected void verifyRequestDoneToTokenUrlForClientCredentials() throws UnsupportedEncodingException
@@ -168,22 +173,24 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
     protected void verifyRequestDoneToTokenUrlForClientCredentials(String scope, boolean encodeInBody) throws UnsupportedEncodingException
     {
         final RequestPatternBuilder verification = postRequestedFor(urlEqualTo(TOKEN_PATH))
-                .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "=" + URLEncoder.encode(OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS, StandardCharsets.UTF_8.name())));
+                                                                                           .withRequestBody(
+                                                                                                   containing(OAuthConstants.GRANT_TYPE_PARAMETER + "="
+                                                                                                              + URLEncoder.encode(OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS, UTF_8.name())));
         if (encodeInBody == true)
         {
             verification
-                    .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "=" + URLEncoder.encode(clientId.getValue(), StandardCharsets.UTF_8.name())))
-                    .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "=" + URLEncoder.encode(clientSecret.getValue(), StandardCharsets.UTF_8.name())));
+                        .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "=" + URLEncoder.encode(clientId.getValue(), UTF_8.name())))
+                        .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "=" + URLEncoder.encode(clientSecret.getValue(), UTF_8.name())));
         }
         else
         {
             verification.
-                    withHeader(HttpHeaders.Names.AUTHORIZATION, containing("Basic " + Base64.encodeBase64String(String.format("%s:%s", clientId.getValue(), clientSecret.getValue()).getBytes())));
+                        withHeader(HttpHeaders.Names.AUTHORIZATION, containing("Basic " + Base64.encodeBase64String(format("%s:%s", clientId.getValue(), clientSecret.getValue()).getBytes())));
         }
         if (scope != null)
         {
             verification
-                    .withRequestBody(containing(OAuthConstants.SCOPE_PARAMETER + "=" + URLEncoder.encode(scope, StandardCharsets.UTF_8.name())));
+                        .withRequestBody(containing(OAuthConstants.SCOPE_PARAMETER + "=" + URLEncoder.encode(scope, UTF_8.name())));
         }
         wireMockRule.verify(verification);
     }

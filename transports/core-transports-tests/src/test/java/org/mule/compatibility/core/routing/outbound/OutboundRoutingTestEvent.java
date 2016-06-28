@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.core.routing.outbound;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -27,8 +29,8 @@ import org.mule.tck.MuleEndpointTestUtils;
 import org.mule.tck.MuleTestUtils;
 
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -99,11 +101,11 @@ public class OutboundRoutingTestEvent implements MuleEvent
     }
 
     @Override
-    public String getMessageAsString(String encoding) throws MuleException
+    public String getMessageAsString(Charset encoding) throws MuleException
     {
         try
         {
-            return (String) getMuleContext().getTransformationService().transform(message, DataType.builder().type(String.class).encoding(encoding).build()).getPayload();
+            return (String) getMuleContext().getTransformationService().transform(message, DataType.builder().type(String.class).charset(encoding).build()).getPayload();
         }
         catch (Exception e)
         {
@@ -126,14 +128,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public String transformMessageToString() throws TransformerException
     {
-        try
-        {
-            return new String(transformMessage(DataType.BYTE_ARRAY), getEncoding());
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            return "Unsupported Encoding";
-        }
+        return new String(transformMessage(DataType.BYTE_ARRAY), message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(getMuleContext())));
     }
 
     @Override
@@ -170,12 +165,6 @@ public class OutboundRoutingTestEvent implements MuleEvent
     public OutputStream getOutputStream()
     {
         return null;
-    }
-
-    @Override
-    public String getEncoding()
-    {
-        return message.getEncoding();
     }
 
     @Override
@@ -281,7 +270,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public Set<String> getFlowVariableNames()
     {
-        return new HashSet<String>();
+        return new HashSet<>();
     }
 
     @Override

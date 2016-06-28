@@ -9,7 +9,7 @@ package org.mule.runtime.core.el.mvel.datatype;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
-import static org.mule.runtime.api.metadata.MimeType.JSON;
+import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.ParserContext;
@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
@@ -27,14 +28,14 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
 {
 
     public static final String EXPRESSION_VALUE = "bar";
-    public static final String CUSTOM_ENCODING = StandardCharsets.UTF_16.name();
+    public static final Charset CUSTOM_ENCODING = StandardCharsets.UTF_16;
     private final ExpressionDataTypeResolver expressionDataTypeResolver = new PropertyExpressionDataTypeResolver();
 
     @Test
     public void returnsInlineFlowVarDataType() throws Exception
     {
         final String expression = "foo";
-        final DataType expectedDataType = DataType.builder().type(String.class).mimeType(JSON).encoding(CUSTOM_ENCODING).build();
+        final DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
         MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
         final CompiledExpression compiledExpression = (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
@@ -49,7 +50,7 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
     public void returnsInlineSessionPropertyDataType() throws Exception
     {
         final String expression = "foo";
-        final DataType expectedDataType = DataType.builder().type(String.class).mimeType(JSON).encoding(CUSTOM_ENCODING).build();
+        final DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
         MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
         final CompiledExpression compiledExpression = (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));

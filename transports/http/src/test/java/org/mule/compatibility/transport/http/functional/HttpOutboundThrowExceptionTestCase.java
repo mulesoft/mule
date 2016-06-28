@@ -8,6 +8,7 @@ package org.mule.compatibility.transport.http.functional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpRequest;
@@ -78,7 +79,7 @@ public class HttpOutboundThrowExceptionTestCase extends AbstractMockHttpServerTe
 
         public SimpleHttpServer(int listenPort)
         {
-            super(listenPort, muleContext.getConfiguration().getDefaultEncoding(), HTTP_STATUS_LINE_BAD_REQUEST);
+            super(listenPort, getDefaultEncoding(muleContext), HTTP_STATUS_LINE_BAD_REQUEST);
         }
 
         @Override

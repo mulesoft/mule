@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,12 +27,12 @@ public class FormTransformer extends AbstractMessageTransformer
 {
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         try
         {
             String v = event.getMessageAsString();
-            Map<String, Object> values = new HashMap<String, Object>();
+            Map<String, Object> values = new HashMap<>();
 
             for (StringTokenizer st = new StringTokenizer(v, "&"); st.hasMoreTokens();)
             {
@@ -39,12 +40,12 @@ public class FormTransformer extends AbstractMessageTransformer
                 int idx = token.indexOf('=');
                 if (idx < 0)
                 {
-                    add(values, URLDecoder.decode(token, outputEncoding), null);
+                    add(values, URLDecoder.decode(token, outputEncoding.name()), null);
                 }
                 else if (idx > 0)
                 {
-                    add(values, URLDecoder.decode(token.substring(0, idx), outputEncoding),
-                        URLDecoder.decode(token.substring(idx + 1), outputEncoding));
+                    add(values, URLDecoder.decode(token.substring(0, idx), outputEncoding.name()),
+                            URLDecoder.decode(token.substring(idx + 1), outputEncoding.name()));
                 }
             }
             return values;
@@ -70,7 +71,7 @@ public class FormTransformer extends AbstractMessageTransformer
         }
         else if (existingValue instanceof String)
         {
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             list.add((String) existingValue);
             list.add(value);
             values.put(key, list);

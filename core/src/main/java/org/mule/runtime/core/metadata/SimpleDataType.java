@@ -7,7 +7,7 @@
 package org.mule.runtime.core.metadata;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 
 /**
  * A data type that simply wraps a Java type.
@@ -21,14 +21,12 @@ public class SimpleDataType<T> implements DataType<T>
     private static final long serialVersionUID = -4590745924720880358L;
 
     protected final Class<T> type;
-    protected final String mimeType;
-    protected final String encoding;
+    protected final MediaType mimeType;
 
-    SimpleDataType(Class<T> type, String mimeType, String encoding)
+    SimpleDataType(Class<T> type, MediaType mimeType)
     {
         this.type = type;
         this.mimeType = mimeType;
-        this.encoding = encoding;
     }
 
     @Override
@@ -38,15 +36,9 @@ public class SimpleDataType<T> implements DataType<T>
     }
 
     @Override
-    public String getMimeType()
+    public MediaType getMediaType()
     {
         return mimeType;
-    }
-
-    @Override
-    public String getEncoding()
-    {
-        return encoding;
     }
 
     @Override
@@ -63,13 +55,14 @@ public class SimpleDataType<T> implements DataType<T>
 
         SimpleDataType that = (SimpleDataType) dataType;
 
-        //ANY_MIME_TYPE will match to a null or non-null value for MimeType        
-        if ((this.getMimeType() == null && that.getMimeType() != null || that.getMimeType() == null && this.getMimeType() != null) && !MimeType.ANY.equals(this.mimeType) && !MimeType.ANY.equals(that.mimeType))
+        //ANY_MIME_TYPE will match to a null or non-null value for MediaType        
+        if ((this.getMediaType() == null && that.getMediaType() != null || that.getMediaType() == null && this.getMediaType() != null) && !MediaType.ANY.matches(this.mimeType)
+            && !MediaType.ANY.matches(that.mimeType))
         {
             return false;
         }
 
-        if (this.getMimeType() != null && !this.getMimeType().equals(that.getMimeType()) && !MimeType.ANY.equals(that.getMimeType()) && !MimeType.ANY.equals(this.getMimeType()))
+        if (this.getMediaType() != null && !this.getMediaType().matches(that.getMediaType()) && !MediaType.ANY.matches(that.getMediaType()) && !MediaType.ANY.matches(this.getMediaType()))
         {
             return false;
         }
@@ -152,13 +145,14 @@ public class SimpleDataType<T> implements DataType<T>
             return false;
         }
 
-        //ANY_MIME_TYPE will match to a null or non-null value for MimeType
-        if ((this.mimeType == null && that.mimeType != null || that.mimeType == null && this.mimeType != null) && !MimeType.ANY.equals(that.mimeType))
+        // TODO MULE-9987 Fix this
+        //ANY_MIME_TYPE will match to a null or non-null value for MediaType
+        if ((this.mimeType == null && that.mimeType != null || that.mimeType == null && this.mimeType != null) && !MediaType.ANY.matches(that.mimeType))
         {
             return false;
         }
 
-        if (this.mimeType != null && !mimeType.equals(that.mimeType) && !MimeType.ANY.equals(that.mimeType))
+        if (this.mimeType != null && !mimeType.matches(that.mimeType) && !MediaType.ANY.matches(that.mimeType))
         {
             return false;
         }
@@ -169,8 +163,8 @@ public class SimpleDataType<T> implements DataType<T>
     @Override
     public int hashCode()
     {
+        // TODO MULE-9987 Check if it is actually needed to leave the java type out.
         int result = type.hashCode();
-        result = 31 * result + (encoding != null ? encoding.hashCode() : 0);
         result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
         return result;
     }
@@ -182,7 +176,6 @@ public class SimpleDataType<T> implements DataType<T>
         return "SimpleDataType{" +
                "type=" + (type == null ? null : type.getName()) +
                ", mimeType='" + mimeType + '\'' +
-               ", encoding='" + encoding + '\'' +
                '}';
     }
 }

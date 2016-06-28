@@ -7,7 +7,6 @@
 package org.mule.runtime.module.xml.transformer.jaxb;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -64,12 +64,12 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
     }
 
     @Override
-    protected Object doTransform(final Object src, String encoding) throws TransformerException
+    protected Object doTransform(final Object src, Charset encoding) throws TransformerException
     {
         try
         {
             final Marshaller m = jaxbContext.createMarshaller();
-            if (getReturnDataType().getType().equals(String.class))
+            if (String.class.isAssignableFrom(getReturnDataType().getType()))
             {
                 Writer w = new StringWriter();
                 m.marshal(src, w);
@@ -94,23 +94,19 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
                 m.marshal(src, out);
                 return out;
             }
-            else if (OutputHandler.class.equals(getReturnDataType().getType()))
+            else if (OutputHandler.class.isAssignableFrom(getReturnDataType().getType()))
             {
-                return new OutputHandler()
+                return (OutputHandler) (event, out) ->
                 {
-                    @Override
-                    public void write(MuleEvent event, OutputStream out) throws IOException
+                    try
                     {
-                        try
-                        {
-                            m.marshal(src, out);
-                        }
-                        catch (JAXBException e)
-                        {
-                            IOException iox = new IOException("failed to mashal objec tto XML");
-                            iox.initCause(e);
-                            throw iox;
-                        }
+                        m.marshal(src, out);
+                    }
+                    catch (JAXBException e)
+                    {
+                        IOException iox = new IOException("failed to mashal objec tto XML");
+                        iox.initCause(e);
+                        throw iox;
                     }
                 };
             }

@@ -15,6 +15,7 @@ import org.mule.runtime.core.util.IOUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * <code>ObjectToByteArray</code> converts serilaizable object to a byte array but
@@ -32,7 +33,7 @@ public class ObjectToByteArray extends SerializableToByteArray
     }
 
     @Override
-    public Object doTransform(Object src, String outputEncoding) throws TransformerException
+    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException
     {
         try
         {

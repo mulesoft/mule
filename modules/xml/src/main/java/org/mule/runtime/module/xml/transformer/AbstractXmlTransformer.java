@@ -7,7 +7,7 @@
 package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MimeType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -20,6 +20,7 @@ import org.mule.runtime.module.xml.util.XMLUtils;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
@@ -63,7 +64,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         registerSourceType(DataType.fromType(OutputHandler.class));
         registerSourceType(DataType.fromType(javax.xml.stream.XMLStreamReader.class));
         registerSourceType(DataType.fromType(org.mule.runtime.module.xml.transformer.DelayedResult.class));
-        setReturnDataType(DataType.builder().type(byte[].class).mimeType(MimeType.XML).build());
+        setReturnDataType(DataType.builder().type(byte[].class).mediaType(MediaType.XML).build());
     }
 
     @Override
@@ -255,7 +256,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
      *          On error
      * @throws TransformerException
      */
-    protected String convertToText(Object obj, String outputEncoding) throws Exception
+    protected String convertToText(Object obj, Charset outputEncoding) throws Exception
     {
         // Catch the direct translations
         if (obj instanceof String)
@@ -279,7 +280,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
         if (outputEncoding != null)
         {
-            idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
+            idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding.name());
         }
         idTransformer.transform(src, result);
         return writer.getBuffer().toString();
@@ -299,7 +300,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
      *          On error
      * @throws TransformerException
      */
-    protected String convertToBytes(Object obj, String outputEncoding) throws Exception
+    protected String convertToBytes(Object obj, Charset outputEncoding) throws Exception
     {
         // Always use the transformer, even for byte[] (to get the encoding right!)
         Source src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
@@ -312,12 +313,12 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         StreamResult result = new StreamResult(writer);
 
         Transformer idTransformer = XMLUtils.getTransformer();
-        idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
+        idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding.name());
         idTransformer.transform(src, result);
         return writer.getBuffer().toString();
     }
     
-    protected void writeToStream(Object obj, String outputEncoding, OutputStream output) throws Exception
+    protected void writeToStream(Object obj, Charset outputEncoding, OutputStream output) throws Exception
     {
         // Always use the transformer, even for byte[] (to get the encoding right!)
         Source src = XMLUtils.toXmlSource(xmlInputFactory, useStaxSource, obj);
@@ -329,7 +330,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         StreamResult result = new StreamResult(output);
 
         Transformer idTransformer = XMLUtils.getTransformer();
-        idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
+        idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding.name());
         idTransformer.transform(src, result);
     }
     

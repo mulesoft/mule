@@ -13,7 +13,6 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
@@ -25,6 +24,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * <code>FileMessageRequester</code> is used to read/write files to the filesystem
@@ -161,7 +161,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                 }
 
                 MutableMuleMessage returnMessage = null;
-                String encoding = endpoint.getEncoding();
+                Charset encoding = endpoint.getEncoding();
                 try
                 {
                     if (fileConnector.isStreaming())

@@ -10,6 +10,7 @@ import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.extension.file.api.lock.PathLock;
 
@@ -228,17 +229,18 @@ public interface FileSystem
     Lock createMuleLock(String id);
 
     /**
-     * Creates a new {@link DataType} to be associated with a {@link MuleMessage} which payload
-     * is a {@link InputStream} and the attributes an instance of {@link FileAttributes}
+     * Creates a new {@link DataType} to be associated with a {@link MuleMessage} which payload is a
+     * {@link InputStream} and the attributes an instance of {@link FileAttributes}
      * <p>
-     * It will try to update the {@link DataType#getMimeType()} with a best guess derived
-     * from the given {@code attributes}. If no best-guess is possible, then the {@code originalDataType}'s
+     * It will try to update the {@link DataType#getMediaType()} with a best guess derived from the
+     * given {@code attributes}. If no best-guess is possible, then the {@code originalDataType}'s
      * mimeType is honoured.
      * <p>
-     * As for the {@link DataType#getEncoding()}, the {@code dataType} one is respected
+     * As for the {@link MediaType#getCharset()}, the {@code dataType} one is respected
      *
-     * @param originalDataType the original {@link DataType} that the {@link MuleMessage} had before executing the operation
-     * @param attributes       the {@link FileAttributes} of the file being processed
+     * @param originalDataType the original {@link DataType} that the {@link MuleMessage} had before
+     *            executing the operation
+     * @param attributes the {@link FileAttributes} of the file being processed
      * @return a {@link DataType} the resulting {@link DataType}.
      */
     DataType<InputStream> getFileMessageDataType(DataType<?> originalDataType, FileAttributes attributes);

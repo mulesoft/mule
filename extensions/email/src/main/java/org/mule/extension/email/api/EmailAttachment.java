@@ -6,6 +6,8 @@
  */
 package org.mule.extension.email.api;
 
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -21,11 +23,11 @@ public class EmailAttachment
     {
     }
 
-    public EmailAttachment(String id, Object content, String contentType)
+    public EmailAttachment(String id, Object content, MediaType contentType)
     {
         this.id = id;
         this.content = content;
-        this.contentType = contentType;
+        this.contentType = contentType.toString();
     }
 
     /**
@@ -67,8 +69,8 @@ public class EmailAttachment
     /**
      * @return the content type of the attachment content.
      */
-    public String getContentType()
+    public MediaType getContentType()
     {
-        return contentType;
+        return contentType != null ? DataType.builder().mediaType(contentType).build().getMediaType() : null;
     }
 }

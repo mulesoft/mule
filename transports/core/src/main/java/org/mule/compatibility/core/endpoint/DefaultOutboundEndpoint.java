@@ -11,6 +11,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractConnector;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -29,6 +30,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,7 +51,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    MessageExchangePattern messageExchangePattern,
                                    int responseTimeout,
                                    String initialState,
-                                   String endpointEncoding,
+                                   Charset endpointEncoding,
                                    String endpointBuilderName,
                                    MuleContext muleContext,
                                    RetryPolicyTemplate retryPolicyTemplate,
@@ -59,7 +61,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                    List <MessageProcessor> messageProcessors,
                                    List <MessageProcessor> responseMessageProcessors,
                                    boolean disableTransportTransformer,
-                                   String endpointMimeType)
+                                   MediaType endpointMimeType)
     {
         super(connector, endpointUri, name, properties, transactionConfig, 
                 deleteUnacceptedMessage, messageExchangePattern, responseTimeout, initialState,
@@ -70,7 +72,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         {
             logger.warn("Ignoring redelivery policy set on outbound endpoint " + endpointUri);
         }
-        responseProperties = new ArrayList<String>();
+        responseProperties = new ArrayList<>();
         // Propagate the Correlation-related properties from the previous message by default (see EE-1613).
         responseProperties.add(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
         responseProperties.add(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);

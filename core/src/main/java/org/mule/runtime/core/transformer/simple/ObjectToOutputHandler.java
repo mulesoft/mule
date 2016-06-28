@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 
 /** <code>ObjectToOutputHandler</code> converts a byte array into a String. */
 public class ObjectToOutputHandler extends AbstractTransformer implements DiscoverableTransformer
@@ -37,7 +38,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
     }
 
     @Override
-    public Object doTransform(final Object src, final String encoding) throws TransformerException
+    public Object doTransform(final Object src, final Charset encoding) throws TransformerException
     {
         if (src instanceof String)
         {

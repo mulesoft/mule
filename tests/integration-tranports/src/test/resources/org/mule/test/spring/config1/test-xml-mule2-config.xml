@@ -39,7 +39,7 @@
         <message-property-filter pattern="foo=bar"/>
     </endpoint>
     <endpoint name="waterMelonEndpoint" address="test://test.queue" exchange-pattern="one-way"
-              encoding="UTF-8-TEST"/>
+              encoding="UTF-8"/>
     <endpoint name="appleInEndpoint" address="test://AppleQueue" exchange-pattern="one-way"/>
     <endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue" exchange-pattern="one-way"/>
     <endpoint name="orangeEndpoint" address="test://orangeQ" exchange-pattern="one-way">

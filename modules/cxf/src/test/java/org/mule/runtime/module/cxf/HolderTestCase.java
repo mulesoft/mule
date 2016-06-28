@@ -8,11 +8,14 @@ package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.nio.charset.Charset;
 
 import javax.xml.ws.Holder;
 
@@ -97,7 +100,7 @@ public class HolderTestCase extends FunctionalTestCase
     public static class HolderTransformer extends AbstractTransformer
     {
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             Holder<String> outS1 = new Holder<>();
             Holder<String> outS2 = new Holder<>();
@@ -114,7 +117,7 @@ public class HolderTestCase extends FunctionalTestCase
     public static class HolderTransformer2 extends AbstractTransformer
     {
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             Holder<String> outS1 = new Holder<>();
 
@@ -130,7 +133,7 @@ public class HolderTestCase extends FunctionalTestCase
     public static class HolderTransformer3 extends AbstractTransformer
     {
         @Override
-        protected Object doTransform(Object src, String enc) throws TransformerException
+        protected Object doTransform(Object src, Charset enc) throws TransformerException
         {
             Holder<String> outS1 = new Holder<>();
 

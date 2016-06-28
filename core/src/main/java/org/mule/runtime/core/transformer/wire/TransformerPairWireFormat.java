@@ -19,6 +19,7 @@ import org.mule.runtime.core.util.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class TransformerPairWireFormat implements WireFormat
     }
 
     @Override
-    public void write(OutputStream out, Object o, String encoding) throws MuleException
+    public void write(OutputStream out, Object o, Charset encoding) throws MuleException
     {
         if (outboundTransformer == null)
         {
@@ -84,7 +85,7 @@ public class TransformerPairWireFormat implements WireFormat
         try
         {
             Class returnClass = outboundTransformer.getReturnDataType().getType();
-            if (returnClass == null)
+            if (returnClass.equals(Object.class))
             {
                 logger.warn("No return class was set on transformer: " + outboundTransformer
                                 + ". Attempting to work out how to treat the result transformation");

@@ -6,8 +6,13 @@
  */
 package org.mule.compatibility.transport.http.functional;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_16BE;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
@@ -16,6 +21,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.Serializable;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,117 +56,117 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase
         assertNotNull(reply);
         assertEquals("200", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertEquals("text/baz;charset=UTF-16BE", reply.<String>getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE));
-        assertEquals("UTF-16BE", reply.getEncoding());
+        assertThat(reply.getDataType().getMediaType().getCharset().get(), is(UTF_16BE));
         assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(reply));
     }
 
     @Test
     public void testPostEncodingUsAscii() throws Exception
     {
-        runPostEncodingTest("US-ASCII", "A");
+        runPostEncodingTest(US_ASCII, "A");
     }
 
     @Test
     public void testPostEncodingUtf8() throws Exception
     {
-        runPostEncodingTest("UTF-8", "A");
-        runPostEncodingTest("UTF-8", TEST_JAPANESE_MESSAGE);
+        runPostEncodingTest(UTF_8, "A");
+        runPostEncodingTest(UTF_8, TEST_JAPANESE_MESSAGE);
     }
 
     @Test
     @Ignore("MULE-3690 make me run green")
     public void testPostEncodingShiftJs() throws Exception
     {
-        runPostEncodingTest("Shift_JIS", TEST_JAPANESE_MESSAGE);
+        runPostEncodingTest(Charset.forName("Shift_JIS"), TEST_JAPANESE_MESSAGE);
     }
 
     @Test
     @Ignore("MULE-3690 make me run green")
     public void testPostEncodingWindows31J() throws Exception
     {
-        runPostEncodingTest("Windows-31J", TEST_JAPANESE_MESSAGE);
+        runPostEncodingTest(Charset.forName("Windows-31J"), TEST_JAPANESE_MESSAGE);
     }
 
     @Test
     @Ignore("MULE-3690 make me run green")
     public void testPostEncodingEucJp() throws Exception
     {
-        runPostEncodingTest("EUC-JP", TEST_JAPANESE_MESSAGE);
+        runPostEncodingTest(Charset.forName("EUC-JP"), TEST_JAPANESE_MESSAGE);
     }
 
     @Test
     @Ignore("MULE-3690 make me run green")
     public void testGetEncodingUsAscii() throws Exception
     {
-        runGetEncodingTest("US-ASCII", "A");
+        runGetEncodingTest(US_ASCII, "A");
     }
 
     @Test
     @Ignore("MULE-3690 make me run green")
     public void testGetEncodingUtf8() throws Exception
     {
-        runGetEncodingTest("UTF-8", "A");
-        runGetEncodingTest("UTF-8", TEST_JAPANESE_MESSAGE);
+        runGetEncodingTest(UTF_8, "A");
+        runGetEncodingTest(UTF_8, TEST_JAPANESE_MESSAGE);
     }
 
     @Test
     @Ignore("MULE-3690 make me run green")
     public void testGetEncodingShiftJs() throws Exception
     {
-        runGetEncodingTest("Shift_JIS", TEST_JAPANESE_MESSAGE);
+        runGetEncodingTest(Charset.forName("Shift_JIS"), TEST_JAPANESE_MESSAGE);
     }
 
     @Test
     @Ignore("MULE-3690 make me run green")
     public void testGetEncodingWindows31J() throws Exception
     {
-        runGetEncodingTest("Windows-31J", TEST_JAPANESE_MESSAGE);
+        runGetEncodingTest(Charset.forName("Windows-31J"), TEST_JAPANESE_MESSAGE);
     }
 
     @Test
     @Ignore("MULE-3690 make me run green")
     public void testGetEncodingEucJp() throws Exception
     {
-        runGetEncodingTest("EUC-JP", TEST_JAPANESE_MESSAGE);
+        runGetEncodingTest(Charset.forName("EUC-JP"), TEST_JAPANESE_MESSAGE);
     }
 
-    private void runPostEncodingTest(String encoding, String payload) throws Exception
+    private void runPostEncodingTest(Charset encoding, String payload) throws Exception
     {
         MuleMessage reply = runEncodingTest(encoding, payload, HttpConstants.METHOD_POST);
         assertEquals(payload + " Received", getPayloadAsString(reply));
     }
 
-    private void runGetEncodingTest(String encoding, String payload) throws Exception
+    private void runGetEncodingTest(Charset encoding, String payload) throws Exception
     {
         MuleMessage reply = runEncodingTest(encoding, payload, HttpConstants.METHOD_GET);
 
-        String expectedReplyMessage = "/" + encoding + "?body=" + URLEncoder.encode(payload, encoding);
+        String expectedReplyMessage = "/" + encoding + "?body=" + URLEncoder.encode(payload, encoding.name());
         assertEquals(expectedReplyMessage + " Received", getPayloadAsString(reply));
     }
 
-    private MuleMessage runEncodingTest(String encoding, String payload, String httpMethod) throws Exception
+    private MuleMessage runEncodingTest(Charset encoding, String payload, String httpMethod) throws Exception
     {
         Map<String, Serializable> messageProperties = createMessageProperties(encoding, httpMethod);
 
         MuleClient client = muleContext.getClient();
-        String endpointUri = "clientEndpoint." + encoding;
+        String endpointUri = "clientEndpoint." + encoding.name();
         MuleMessage reply = client.send(endpointUri, payload, messageProperties);
 
         assertNotNull(reply);
         assertEquals("200", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
 
         Object contentTypeHeader = reply.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
-        assertEquals("text/plain;charset=" + encoding, contentTypeHeader);
+        assertEquals("text/plain;charset=" + encoding.name(), contentTypeHeader);
 
-        assertEquals(encoding, reply.getEncoding());
+        assertThat(reply.getDataType().getMediaType().getCharset().get(), is(encoding));
 
         return reply;
     }
 
-    private Map<String, Serializable> createMessageProperties(String encoding, String httpMethod)
+    private Map<String, Serializable> createMessageProperties(Charset encoding, String httpMethod)
     {
         Map<String, Serializable> messageProperties = new HashMap<>();
-        String contentType = "text/plain;charset=" + encoding;
+        String contentType = "text/plain;charset=" + encoding.name();
         messageProperties.put(HttpConstants.HEADER_CONTENT_TYPE, contentType);
         messageProperties.put(HttpConnector.HTTP_METHOD_PROPERTY, httpMethod);
         return messageProperties;

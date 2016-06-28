@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.transport.jms.redelivery;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -21,6 +23,7 @@ public abstract class AbstractRedeliveryHandler implements RedeliveryHandler
 {
     protected JmsConnector connector;
 
+    @Override
     public abstract void handleRedelivery(Message message, InboundEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException;
 
     /**
@@ -39,8 +42,7 @@ public abstract class AbstractRedeliveryHandler implements RedeliveryHandler
     {
         try
         {
-            String encoding = muleContext.getConfiguration().getDefaultEncoding();
-            return connector.createMuleMessageFactory().create(message, encoding, muleContext);
+            return connector.createMuleMessageFactory().create(message, getDefaultEncoding(muleContext), muleContext);
         }
         catch (Exception e)
         {

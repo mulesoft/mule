@@ -12,6 +12,8 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.ClassUtils;
 
+import java.nio.charset.Charset;
+
 import javax.jms.BytesMessage;
 import javax.jms.MapMessage;
 import javax.jms.Message;
@@ -53,7 +55,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, String outputEncoding) throws TransformerException
+    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
         final MuleMessage message = event.getMessage();
         try
@@ -67,11 +69,11 @@ public class JMSMessageToObject extends AbstractJmsTransformer
 
             // We need to handle String / byte[] explicitly since this transformer does not define
             // a single return type
-            if (returnType.getType().equals(byte[].class) && result instanceof String)
+            if (byte[].class.isAssignableFrom(getReturnDataType().getType()) && result instanceof String)
             {
                 result = result.toString().getBytes(outputEncoding);
             }
-            else if (returnType.getType().equals(String.class) && result instanceof byte[])
+            else if (String.class.isAssignableFrom(getReturnDataType().getType()) && result instanceof byte[])
             {
                 result = new String((byte[]) result, outputEncoding);
             }

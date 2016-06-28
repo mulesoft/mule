@@ -8,10 +8,12 @@ package org.mule.extension.email.internal.util;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.metadata.DataType;
 
 import java.util.List;
 import java.util.Map;
@@ -135,7 +137,8 @@ public final class EmailConnectorUtils
     public static List<EmailAttachment> mapToEmailAttachments(Map<String, DataHandler> attachments)
     {
         return attachments.entrySet().stream()
-                .map(e -> new EmailAttachment(e.getKey(), e.getValue(), e.getValue().getContentType()))
-                .collect(toList());
+                          .map(e -> new EmailAttachment(e.getKey(), e.getValue(),
+                                  DataType.builder().mediaType(e.getValue().getContentType()).build().getMediaType()))
+                          .collect(toList());
     }
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.core.transformers.simple;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -92,12 +94,12 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
 
     public static class TransformerLifecycleTracker extends AbstractTransformer implements Disposable
     {
-        private final List<String> tracker = new ArrayList<String>();
+        private final List<String> tracker = new ArrayList<>();
 
         private String property;
 
         @Override
-        protected Object doTransform(Object src, String encoding) throws TransformerException
+        protected Object doTransform(Object src, Charset encoding) throws TransformerException
         {
             tracker.add("doTransform");
             return null;

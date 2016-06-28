@@ -8,6 +8,7 @@
 package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpRequest;
@@ -147,7 +148,7 @@ public class HttpOutboundKeepAliveTestCase extends AbstractMockHttpServerTestCas
 
             while (requestCount < MAX_REQUESTS && !closeConnection)
             {
-                HttpRequest request = parseRequest(in, muleContext.getConfiguration().getDefaultEncoding());
+                HttpRequest request = parseRequest(in, getDefaultEncoding(muleContext));
                 Header connHeader = request.getFirstHeader(HttpConstants.HEADER_CONNECTION);
 
                 connectionHeader = (connHeader == null) ? null : connHeader.getValue();
