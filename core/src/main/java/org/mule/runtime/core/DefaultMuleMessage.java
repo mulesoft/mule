@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_S
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -72,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * <code>DefaultMuleMessage</code> is a wrapper that contains a payload and properties
  * associated with the payload.
  */
-public class DefaultMuleMessage extends TypedValue<Object> implements MutableMuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
+public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
 {
     private static final String NOT_SET = "<not set>";
 
@@ -114,7 +113,30 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     private transient AtomicReference<Thread> ownerThread = null;
     private transient AtomicBoolean mutable = null;
 
+    private transient TypedValue typedValue;
     private Serializable attributes;
+
+    DefaultMuleMessage(String id, String rootId, TypedValue typedValue, Serializable attributes,
+                       Map<String, TypedValue<Serializable>> inboundProperties,
+                       Map<String, TypedValue<Serializable>> outboundProperties,
+                       Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
+                       String corealationId, int setCorrelationGroupSize, int setCorrelationSequence,
+                       Object replyTo, ExceptionPayload exceptionPayload)
+    {
+        this.id = id;
+        this.rootId = rootId;
+        this.typedValue = typedValue;
+        this.attributes = attributes;
+        this.properties.inboundMap.putAll(inboundProperties);
+        this.properties.outboundMap.putAll(outboundProperties);
+        this.inboundAttachments = inboundAttachments;
+        this.outboundAttachments = outboundAttachments;
+        this.setCorrelationId(corealationId);
+        this.setCorrelationGroupSize(setCorrelationGroupSize);
+        this.setCorrelationSequence(setCorrelationSequence);
+        setReplyTo(replyTo);
+        this.exceptionPayload = exceptionPayload;
+    }
 
     private static DataType<?> getMessageDataType(MuleMessage previous, Object payload)
     {
@@ -215,7 +237,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     @Deprecated
     public <T> DefaultMuleMessage(T value, DataType<T> dataType, Serializable attributes, MuleContext muleContext)
     {
-        super(resolveValue(value), resolveDataType(value, dataType));
+        typedValue = new TypedValue(resolveValue(value), resolveDataType(value, dataType));
         id = UUID.getUUID();
         rootId = id;
         this.attributes = attributes;
@@ -254,7 +276,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
                               Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments,
                               MuleContext muleContext, DataType dataType)
     {
-        super(resolveValue(message), dataType);
+        typedValue = new TypedValue(resolveValue(message), dataType);
         id =  UUID.getUUID();
         rootId = id;
 
@@ -297,7 +319,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
 
     public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext, DataType<?> dataType)
     {
-        super(resolveValue(message), (DataType<Object>) dataType);
+        typedValue = new TypedValue(resolveValue(message), (DataType<Object>) dataType);
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
@@ -711,7 +733,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     @Override
     public Object getPayload()
     {
-        return getValue();
+        return typedValue.getValue();
     }
 
     /**
@@ -738,14 +760,12 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     {
         if (payload == null)
         {
-            setValue(NullPayload.getInstance());
+            typedValue = new TypedValue(NullPayload.getInstance(), dataType);
         }
         else
         {
-            setValue(payload);
+            typedValue = new TypedValue(payload, dataType);
         }
-
-        setDataType(dataType);
     }
 
     public void setAttributes(Serializable attributes)
@@ -765,7 +785,7 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     public void setDataType(DataType dt)
     {
         assertAccess(WRITE);
-        super.setDataType(dt);
+        typedValue = new TypedValue(typedValue.getValue(), dt);
     }
 
     //////////////////////////////// ThreadSafeAccess Impl ///////////////////////////////
@@ -952,6 +972,8 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     private void writeObject(ObjectOutputStream out) throws Exception
     {
         out.defaultWriteObject();
+        serializeValue(out);
+        out.writeObject(typedValue.getDataType());
         out.writeObject(serializeAttachments(inboundAttachments));
         out.writeObject(serializeAttachments(outboundAttachments));
     }
@@ -976,13 +998,12 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         return toWrite;
     }
 
-    @Override
     protected void serializeValue(ObjectOutputStream out) throws Exception
     {
-        if (getValue() instanceof Serializable)
+        if (typedValue.getValue() instanceof Serializable)
         {
             out.writeBoolean(true);
-            out.writeObject(getValue());
+            out.writeObject(typedValue.getValue());
         }
         else
         {
@@ -993,20 +1014,19 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         }
     }
 
-    @Override
-    protected void deserializeValue(ObjectInputStream in) throws Exception
+    protected Object deserializeValue(ObjectInputStream in) throws Exception
     {
         boolean valueSerialized = in.readBoolean();
         if (valueSerialized)
         {
-            setValue(in.readObject());
+            return in.readObject();
         }
         else
         {
             int length = in.readInt();
             byte[] valueAsByteArray = new byte[length];
             new DataInputStream(in).readFully(valueAsByteArray);
-            setValue(valueAsByteArray);
+            return valueAsByteArray;
         }
     }
 
@@ -1029,9 +1049,10 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
         return toReturn;
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    private void readObject(ObjectInputStream in) throws Exception
     {
         in.defaultReadObject();
+        typedValue = new TypedValue(deserializeValue(in), (DataType<?>) in.readObject());
         inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
         outboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
     }
@@ -1062,9 +1083,9 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     }
 
     @Override
-    public <Payload, Attributes extends Serializable> org.mule.runtime.api.message.MuleMessage<Payload, Attributes> asNewMessage()
+    public <PAYLOAD, ATTRIBUTES extends Serializable> org.mule.runtime.api.message.MuleMessage<PAYLOAD, ATTRIBUTES> asNewMessage()
     {
-        return (org.mule.runtime.api.message.MuleMessage<Payload, Attributes>) this;
+        return (org.mule.runtime.api.message.MuleMessage<PAYLOAD, ATTRIBUTES>) this;
     }
 
     /**
@@ -1164,6 +1185,12 @@ public class DefaultMuleMessage extends TypedValue<Object> implements MutableMul
     public Serializable getAttributes()
     {
         return attributes;
+    }
+
+    @Override
+    public DataType<Object> getDataType()
+    {
+        return typedValue.getDataType();
     }
 
     @Override

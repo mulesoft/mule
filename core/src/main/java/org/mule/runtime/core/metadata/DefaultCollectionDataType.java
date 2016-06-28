@@ -19,19 +19,21 @@ import java.util.Collection;
  *
  * @since 3.0
  */
-public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataType<C>
+public class DefaultCollectionDataType<C extends Collection<T>, T> extends SimpleDataType<C> implements org.mule
+        .runtime.api.metadata.CollectionDataType<C, T>
 {
     private static final long serialVersionUID = 3600944898597616006L;
 
     private final DataType<T> itemsType;
 
-    CollectionDataType(Class<C> collectionType, DataType<T> type, MediaType mimeType)
+    DefaultCollectionDataType(Class<C> collectionType, DataType<T> type, MediaType mimeType)
     {
         super(collectionType, mimeType);
         this.itemsType = type;
     }
 
-    public DataType<T> getItemType()
+    @Override
+    public DataType<T> getItemDataType()
     {
         return itemsType;
     }
@@ -39,7 +41,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
     @Override
     public boolean isCompatibleWith(DataType dataType)
     {
-        if (!(dataType instanceof CollectionDataType))
+        if (!(dataType instanceof DefaultCollectionDataType))
         {
             return false;
         }
@@ -48,9 +50,10 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
         {
             return false;
         }
-        CollectionDataType that = (CollectionDataType) dataType;
+        DefaultCollectionDataType that = (DefaultCollectionDataType) dataType;
 
-        return DataType.OBJECT.isCompatibleWith(that.getItemType()) || this.getItemType().isCompatibleWith(that.getItemType());
+        return DataType.OBJECT.isCompatibleWith(that.getItemDataType()) || this.getItemDataType().isCompatibleWith
+                (that.getItemDataType());
 
     }
 
@@ -66,9 +69,9 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
             return false;
         }
 
-        CollectionDataType that = (CollectionDataType) o;
+        DefaultCollectionDataType that = (DefaultCollectionDataType) o;
 
-        if (!getItemType().equals(that.getItemType()))
+        if (!getItemDataType().equals(that.getItemDataType()))
         {
             return false;
         }
@@ -87,7 +90,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
     public int hashCode()
     {
         int result = getType().hashCode();
-        result = 31 * result + getItemType().hashCode();
+        result = 31 * result + getItemDataType().hashCode();
         result = 31 * result + (getMediaType() != null ? getMediaType().hashCode() : 0);
         return result;
     }
@@ -97,7 +100,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
     {
         return "CollectionDataType{" +
                 "type=" + getType().getName() +
-               ", itemType=" + getItemType().toString() +
+               ", itemType=" + getItemDataType().toString() +
                 ", mimeType='" + getMediaType() + '\'' +
                 '}';
     }

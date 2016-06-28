@@ -9,8 +9,6 @@ package org.mule.runtime.core.metadata;
 
 import org.mule.runtime.api.metadata.DataType;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -21,7 +19,7 @@ public class TypedValue<T> implements Serializable
 
     private static final long serialVersionUID = -2533879516750283994L;
 
-    private transient T value;
+    private T value;
 
     // TODO MULE-9279 Make 'final' once MuleMessage is immutable
     private DataType<T> dataType;
@@ -60,34 +58,6 @@ public class TypedValue<T> implements Serializable
     protected void setValue(T value)
     {
         this.value = value;
-    }
-
-    /**
-     * Performs serialization of the value.  The is external to #writeObject to allow it to be overriden in sub-classes.
-     */
-    protected void serializeValue(ObjectOutputStream out) throws Exception
-    {
-        out.writeObject(value);
-    }
-
-    /**
-     * Performs deserialization of the value.  The is external to #writeObject to allow it to be overriden in sub-classes.
-     */
-    protected void deserializeValue(ObjectInputStream out) throws Exception
-    {
-        value = (T) out.readObject();
-    }
-
-    private void writeObject(ObjectOutputStream out) throws Exception
-    {
-        out.defaultWriteObject();
-        serializeValue(out);
-    }
-
-    private void readObject(ObjectInputStream in) throws Exception
-    {
-        in.defaultReadObject();
-        deserializeValue(in);
     }
 
 }

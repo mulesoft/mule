@@ -17,7 +17,7 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.metadata.CollectionDataType;
+import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -66,8 +66,8 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
         final DataType dataType = DataType.builder().collectionType(List.class).itemType(type).itemMediaType(mimeType).build();
 
         assertThat(dataType.getType(), equalTo(List.class));
-        assertThat(dataType, instanceOf(CollectionDataType.class));
-        final DataType itemDataType = ((CollectionDataType) dataType).getItemType();
+        assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
+        final DataType itemDataType = ((DefaultCollectionDataType) dataType).getItemDataType();
         assertThat(itemDataType.getType(), equalTo(type));
         assertThat(itemDataType.getMediaType().getPrimaryType(), is(mimeType.split("/")[0]));
         assertThat(itemDataType.getMediaType().getSubType(), is(mimeType.split("/")[1]));

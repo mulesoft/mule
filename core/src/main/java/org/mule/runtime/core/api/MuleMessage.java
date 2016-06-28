@@ -6,25 +6,59 @@
  */
 package org.mule.runtime.core.api;
 
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
 
 import java.io.Serializable;
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.Map;
+
+import javax.activation.DataHandler;
 
 /**
- * @deprecated use org.mule.runtime.core.api.temp.MuleMessage whenever possible. This class should have dissapeared by the time the mule-api is frozen.
+ * MuleMessage
  */
-@Deprecated
-public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage<Object, Serializable>, MessageProperties, MessageAttachments
+public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message
+        .MuleMessage<PAYLOAD, ATTRIBUTES>, MessageProperties, MessageAttachments, MessageTransform
 {
+
+    /**
+     * Provides a builder to create {@link MuleMessage} objects.
+     *
+     * @return a new {@link Builder}.
+     */
+    static <PAYLOAD, ATTRIBUTES extends Serializable> PayloadBuilder<PAYLOAD, ATTRIBUTES> builder()
+    {
+        return DefaultMuleMessageBuilderFactory.getInstance().create();
+    }
+
+    /**
+     * Provides a builder to create {@link MuleMessage} objects based on an existing {@link MuleMessage} instance.
+     *
+     * @param message existing {@link MuleMessage} to use as a template to create a new {@link Builder} instance.
+     * @return a new {@link Builder} based on the template {@code message} provided.
+     */
+    static <PAYLOAD, ATTRIBUTES extends Serializable> Builder<PAYLOAD, ATTRIBUTES> builder(MuleMessage<PAYLOAD,
+            ATTRIBUTES> message)
+    {
+        return DefaultMuleMessageBuilderFactory.getInstance().create(message);
+    }
+
+    static <PAYLOAD, ATTRIBUTES extends Serializable> Builder<PAYLOAD, ATTRIBUTES> builder(org.mule.runtime.api
+                                                                                                   .message
+                                                                                                   .MuleMessage<PAYLOAD, ATTRIBUTES> message)
+    {
+        return DefaultMuleMessageBuilderFactory.getInstance().create(message);
+    }
 
     /**
      * gets the unique identifier for the message. It's up to the implementation to
      * ensure a unique id
      *
      * @return a unique message id. The Id should never be null. If the underlying
-     *         transport does not have the notion of a message Id, one should be
-     *         generated. The generated Id should be a UUID.
+     * transport does not have the notion of a message Id, one should be
+     * generated. The generated Id should be a UUID.
      */
     String getUniqueId();
 
@@ -84,21 +118,144 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage<Ob
     ExceptionPayload getExceptionPayload();
 
     /**
-     * @deprecated
      * Avoid getting access to the MuleContext through the message.
-     * You can get access to the MuleContext by making your class implement {@link org.mule.runtime.core.api.context.MuleContextAware}
+     * You can get access to the MuleContext by making your class implement
+     * {@link org.mule.runtime.core.api.context.MuleContextAware}
      */
     @Deprecated
     MuleContext getMuleContext();
 
-    /**
-     * TODO MULE-9856 Replace with the builder
-     */
-    @Deprecated
-    default MuleMessage transform(Function<MutableMuleMessage, MuleMessage> transform)
+    interface PayloadBuilder<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message
+            .MuleMessage.PayloadBuilder<PAYLOAD, ATTRIBUTES>
     {
-        MutableMuleMessage copy = new DefaultMuleMessage(this);
-        return transform.apply(copy);
+
+        @Override
+        <N> Builder<N, ATTRIBUTES> payload(N payload);
+
+        @Override
+        <N extends Collection<E>, E> CollectionBuilder<N, ATTRIBUTES> collectionPayload(N payload, Class<E> aClass);
     }
 
+    interface Builder<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message.MuleMessage
+            .Builder<PAYLOAD, ATTRIBUTES>, PayloadBuilder<PAYLOAD, ATTRIBUTES>
+    {
+
+        @Override
+        Builder<PAYLOAD, ATTRIBUTES> mediaType(MediaType mediaType);
+
+        @Override
+        <N extends Serializable> Builder<PAYLOAD, N> attributes(N value);
+
+        /**
+         * @param correlationId
+         * @return this builder.
+         */
+        Builder<PAYLOAD, ATTRIBUTES> correlationId(String correlationId);
+
+        /**
+         * @param correlationSequence
+         * @return this builder.
+         */
+        Builder<PAYLOAD, ATTRIBUTES> correlationSequence(int correlationSequence);
+
+        /**
+         * @param correlationGroupSize
+         * @return this builder.
+         */
+        Builder<PAYLOAD, ATTRIBUTES> correlationGroupSize(int correlationGroupSize);
+
+        /**
+         * @param exceptionPayload
+         * @return this builder.
+         */
+        Builder<PAYLOAD, ATTRIBUTES> exceptionPayload(ExceptionPayload exceptionPayload);
+
+        /**
+         * @param replyTo
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> replyTo(Object replyTo);
+
+        /**
+         * @param rootId
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> rootId(String rootId);
+
+        /**
+         * @param key
+         * @param value
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, Serializable value);
+
+        /**
+         * @param key
+         * @param value
+         * @param dataType
+         * @param <T>
+         * @return
+         */
+        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, DataType<T>
+                dataType);
+
+        /**
+         * @param key
+         * @param value
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, Serializable value);
+
+        /**
+         * @param key
+         * @param value
+         * @param dataType
+         * @param <T>
+         * @return
+         */
+        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, DataType<T>
+                dataType);
+
+        /**
+         * @param key
+         * @param value
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> addOutboundAttachement(String key, DataHandler value);
+
+        /**
+         * @param inboundProperties
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> inboundProperties(Map<String, Serializable> inboundProperties);
+
+        /**
+         * @param outboundProperties
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> outboundProperties(Map<String, Serializable> outboundProperties);
+
+        /**
+         * @param inboundAttachments
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> inboundAttachements(Map<String, DataHandler> inboundAttachments);
+
+        /**
+         * @param outbundAttachments
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> outboundAttachements(Map<String, DataHandler> outbundAttachments);
+
+        @Override
+        MuleMessage<PAYLOAD, ATTRIBUTES> build();
+    }
+
+    interface CollectionBuilder<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message.MuleMessage
+            .CollectionBuilder<PAYLOAD, ATTRIBUTES>, Builder<PAYLOAD, ATTRIBUTES>
+    {
+        @Override
+        CollectionBuilder<PAYLOAD, ATTRIBUTES> itemMediaType(MediaType mediaType);
+
+    }
 }
