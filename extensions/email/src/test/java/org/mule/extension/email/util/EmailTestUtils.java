@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MimeType.TEXT;
 import org.mule.runtime.core.util.IOUtils;
 
-import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
 import java.io.IOException;
@@ -48,6 +47,8 @@ public class EmailTestUtils
     public static final String ALE_EMAIL = "ale.g.marra@mulesoft.com";
     public static final String MG_EMAIL = "mariano.gonzalez@mulesoft.com";
     public static final String[] EMAILS = {JUANI_EMAIL, ESTEBAN_EMAIL, PABLON_EMAIL, ALE_EMAIL};
+
+    public static final long SERVER_STARTUP_TIMEOUT = 5000;
 
     public static final Session testSession = Session.getDefaultInstance(new Properties());
 
@@ -95,10 +96,10 @@ public class EmailTestUtils
         assertThat(attachmentAsString, is(expectedResult));
     }
 
-    public static void setUpServer(GreenMail server, int port, String protocol)
+    public static ServerSetup setUpServer(int port, String protocol)
     {
         ServerSetup serverSetup = new ServerSetup(port, null, protocol);
-        server = new GreenMail(serverSetup);
-        server.start();
+        serverSetup.setServerStartupTimeout(SERVER_STARTUP_TIMEOUT);
+        return serverSetup;
     }
 }

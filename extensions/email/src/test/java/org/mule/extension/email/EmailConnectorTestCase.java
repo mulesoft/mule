@@ -14,6 +14,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
+import static org.mule.extension.email.util.EmailTestUtils.setUpServer;
 import org.mule.extension.email.api.EmailConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -45,7 +46,7 @@ public abstract class EmailConnectorTestCase extends ExtensionFunctionalTestCase
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        ServerSetup serverSetup = new ServerSetup(PORT.getNumber(), null, getProtocol());
+        ServerSetup serverSetup = setUpServer(PORT.getNumber(), getProtocol());
         server = new GreenMail(serverSetup);
         server.start();
         user = server.setUser(JUANI_EMAIL, JUANI_EMAIL, "password");
