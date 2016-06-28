@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.dsl.model;
 import static java.lang.String.format;
 import static java.lang.System.getProperties;
 import static java.lang.System.getenv;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -209,7 +210,8 @@ public class ApplicationModel
         for (String propertyFileLocation : locations)
         {
             Properties properties = new Properties();
-            try (InputStream propertiesFileInputStream = getClass().getClassLoader().getResourceAsStream(propertyFileLocation)) {
+            try (InputStream propertiesFileInputStream = currentThread().getContextClassLoader().getResourceAsStream(propertyFileLocation))
+            {
                 properties.load(propertiesFileInputStream);
                 applicationProperties.putAll(properties);
             }
