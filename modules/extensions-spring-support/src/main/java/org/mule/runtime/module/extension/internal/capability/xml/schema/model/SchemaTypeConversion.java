@@ -25,7 +25,6 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUB
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_LONG;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_MAP;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_NAME;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -35,9 +34,10 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.java.utils.JavaTypeUtils;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
+import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import javax.xml.namespace.QName;
 

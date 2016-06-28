@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;

@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.java.utils.JavaTypeUtils;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
@@ -53,7 +53,7 @@ public class MetadataComponentModelValidator implements ModelValidator
 
         if (returnMetadataType instanceof ObjectType || returnMetadataType instanceof DictionaryType)
         {
-            validateReturnType(extensionModel, component, JavaTypeUtils.getType(returnMetadataType));
+            validateReturnType(extensionModel, component, getType(returnMetadataType));
         }
     }
 

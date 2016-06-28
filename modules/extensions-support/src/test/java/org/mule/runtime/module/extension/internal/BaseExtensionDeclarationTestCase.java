@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.when;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.extension.api.introspection.ExtensionFactory;

@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.util.Reference;
 import org.mule.runtime.extension.api.ExtensionWalker;

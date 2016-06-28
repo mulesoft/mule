@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;

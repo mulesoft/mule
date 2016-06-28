@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByAlias;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.model.ObjectType;

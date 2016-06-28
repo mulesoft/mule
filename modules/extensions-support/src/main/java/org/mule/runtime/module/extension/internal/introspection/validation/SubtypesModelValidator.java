@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.utils.JavaTypeUtils;
+import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;

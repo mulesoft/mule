@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static java.util.stream.Collectors.toSet;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import org.mule.metadata.api.annotation.EnumAnnotation;
