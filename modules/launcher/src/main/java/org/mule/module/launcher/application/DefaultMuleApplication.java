@@ -139,7 +139,9 @@ public class DefaultMuleApplication implements Application
             try
             {
                 Thread.currentThread().setContextClassLoader(null);
-                deployLogger.info(miniSplash(String.format("Started app '%s'", descriptor.getName())));
+                ApplicationStartedSplashScreen splashScreen = new ApplicationStartedSplashScreen();
+                splashScreen.doBody(descriptor);
+                deployLogger.info(splashScreen.toString());
             }
             finally
             {

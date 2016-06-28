@@ -6,6 +6,8 @@
  */
 package org.mule.util;
 
+import static java.lang.Boolean.FALSE;
+
 /**
  *  Class to check that system properties are enabled or not, the latter being the default.
  *
@@ -14,18 +16,25 @@ package org.mule.util;
 public class PropertyChecker
 {
     private final String propertyName;
+    private final String defaultValue;
     private Boolean override;
 
     public PropertyChecker(String propertyName)
     {
+        this(propertyName, FALSE.toString());
+    }
+
+    public PropertyChecker(String propertyName, String defaultValue)
+    {
         this.propertyName = propertyName;
+        this.defaultValue = defaultValue;
     }
 
     public boolean isEnabled()
     {
         if (override == null)
         {
-            return Boolean.getBoolean(propertyName);
+            return Boolean.valueOf(System.getProperty(propertyName, defaultValue));
         }
         else
         {
@@ -42,6 +51,7 @@ public class PropertyChecker
     {
         this.override = null;
     }
+
     public String getPropertyName()
     {
         return propertyName;
