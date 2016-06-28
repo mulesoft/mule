@@ -402,11 +402,11 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         if (Collection.class.isAssignableFrom(type))
         {
-            return new CollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, MediaType.build(mediaPrimaryType, mediaSubType, charset));
+            return new CollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, MediaType.create(mediaPrimaryType, mediaSubType, charset));
         }
         else
         {
-            return new SimpleDataType<>(type, MediaType.build(mediaPrimaryType, mediaSubType, charset));
+            return new SimpleDataType<>(type, MediaType.create(mediaPrimaryType, mediaSubType, charset));
         }
     }
 
