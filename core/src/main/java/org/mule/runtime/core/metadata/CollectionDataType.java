@@ -50,7 +50,7 @@ public class CollectionDataType<C extends Collection<T>, T> extends SimpleDataTy
         }
         CollectionDataType that = (CollectionDataType) dataType;
 
-        return this.getItemType().isCompatibleWith(that.getItemType());
+        return DataType.OBJECT.isCompatibleWith(that.getItemType()) || this.getItemType().isCompatibleWith(that.getItemType());
 
     }
 
