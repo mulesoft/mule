@@ -10,15 +10,17 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.Converter;
+import org.mule.runtime.module.xml.transformer.datatype.CollectionDataTypeXStreamConverter;
+import org.mule.runtime.module.xml.transformer.datatype.SimpleDataTypeXStreamConverter;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.Converter;
 
 /**
  * <code>AbstractXStreamTransformer</code> is a base class for all XStream based
@@ -27,10 +29,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class AbstractXStreamTransformer extends AbstractMessageTransformer
 {
-    private final AtomicReference<XStream> xstream = new AtomicReference<XStream>();
+    private final AtomicReference<XStream> xstream = new AtomicReference<>();
     private volatile String driverClass = XStreamFactory.XSTREAM_XPP_DRIVER;
-    private volatile Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
-    private volatile Set<Class <? extends Converter>> converters = new HashSet<Class <? extends Converter>>();
+    private volatile Map<String, Class<?>> aliases = new HashMap<>();
+    private volatile Set<Class <? extends Converter>> converters = new HashSet<>();
 
     @Override
     public void initialise() throws InitialisationException
@@ -38,6 +40,9 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
         super.initialise();
         try
         {
+            addConverter(SimpleDataTypeXStreamConverter.class);
+            addConverter(CollectionDataTypeXStreamConverter.class);
+
             // Create XStream instance as part of initialization so that we can set
             // the context classloader that will be required to load classes.
             XStream xStreamInstance = getXStream();
@@ -80,12 +85,12 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
 
         if (aliases != null)
         {
-            clone.setAliases(new HashMap<String, Class<?>>(aliases));
+            clone.setAliases(new HashMap<>(aliases));
         }
 
         if (converters != null)
         {
-            clone.setConverters(new HashSet<Class <? extends Converter>>(converters));
+            clone.setConverters(new HashSet<>(converters));
         }
 
         return clone;
