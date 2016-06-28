@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -42,9 +43,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 public class FlowTestCase extends AbstractFlowConstuctTestCase
 {
@@ -66,14 +66,10 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
         flow.setMessageSource(directInboundMessageSource);
 
         dynamicProcessorContainer = mock(DynamicMessageProcessorContainer.class);
-        when(dynamicProcessorContainer.process(any(MuleEvent.class))).then(new Answer<MuleEvent>()
+        when(dynamicProcessorContainer.process(any(MuleEvent.class))).then(invocation ->
         {
-            @Override
-            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
-            {
-                Object[] args = invocation.getArguments();
-                return (MuleEvent) args[0];
-            }
+            Object[] args = invocation.getArguments();
+            return (MuleEvent) args[0];
         });
 
         List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
@@ -84,14 +80,10 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
         processors.add(new StringAppendTransformer("b"));
         processors.add(new StringAppendTransformer("c"));
         processors.add(dynamicProcessorContainer);
-        processors.add(new MessageProcessor()
+        processors.add(event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                event.setFlowVariable("thread", Thread.currentThread());
-                return event;
-            }
+            event.setFlowVariable("thread", Thread.currentThread());
+            return event;
         });
         processors.add(sensingMessageProcessor);
         flow.setMessageProcessors(processors);
@@ -101,6 +93,20 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
     protected AbstractFlowConstruct getFlowConstruct() throws Exception
     {
         return flow;
+    }
+
+    @After
+    public void after() throws MuleException
+    {
+        if (flow.isStarted())
+        {
+            flow.stop();
+        }
+
+        if (flow.getLifecycleState().isInitialised())
+        {
+            flow.dispose();
+        }
     }
 
     @Test
@@ -144,14 +150,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
         flow.initialise();
         flow.start();
 
-        MessageProcessor processorInSubflow = new MessageProcessor()
-        {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return event;
-            }
-        };
+        MessageProcessor processorInSubflow = event -> event;
 
         assertThat(flow.getProcessorPath(sensingMessageProcessor), is("/test-flow/processors/8"));
         assertThat(flow.getProcessorPath(dynamicProcessorContainer), is("/test-flow/processors/6"));

@@ -193,7 +193,7 @@
         <junitVersion>4.11</junitVersion>
         <log4jVersion>2.5</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
-        <mockitoVersion>1.9.5</mockitoVersion>
+        <mockitoVersion>1.10.19</mockitoVersion>
         <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->

@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
+
 import org.mule.runtime.config.spring.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.util.SystemUtils;
@@ -43,6 +44,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 final class MuleDocumentLoader implements DocumentLoader
 {
+
+    private static final String DEFER_NODE_EXPANSION_FEATURE_KEY = "http://apache.org/xml/features/dom/defer-node-expansion";
 
     private static final UserDataHandler COPY_METADATA_ANNOTATIONS_DATA_HANDLER = new UserDataHandler()
     {

@@ -12,17 +12,13 @@ import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.config.PreferredObjectSelector;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 
-import java.util.Iterator;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import javax.imageio.spi.ServiceRegistry;
-
 /**
- * Uses a standard JDK's
- * <a href="http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider">SPI discovery</a>
- * mechanism to locate implementations.
+ * Uses a standard JDK's mechanism to locate implementations.
  */
 public abstract class ThreadPoolFactory implements MuleContextAware
 {
@@ -34,20 +30,10 @@ public abstract class ThreadPoolFactory implements MuleContextAware
      */
     public static ThreadPoolFactory newInstance()
     {
-        /*
-           There's a public (at last!) SPI mechanism in Java 6, java.util.ServiceLoader, but
-           it's hidden in earlier versions.
+        final Iterable<ThreadPoolFactory> threadPoolFactoryServices = new SpiServiceRegistry().lookupProviders(ThreadPoolFactory.class);
 
-           The javax.imageio.spi.ServiceRegistry, while not belonging here at first look, is
-           perfectly functional. Underneath, it wraps the sun.misc.Service class, which does the
-           lookup. The latter has been available since Java 1.3 and standardized internally at Sun.
-           Also, Sun, Bea JRockit and IBM JDK all have it readily available for use, so it's safe to
-           rely on.
-        */
-        final Iterator<ThreadPoolFactory> servicesIterator = ServiceRegistry.lookupProviders(ThreadPoolFactory.class);
-
-        PreferredObjectSelector<ThreadPoolFactory> selector = new PreferredObjectSelector<ThreadPoolFactory>();
-        ThreadPoolFactory threadPoolFactory = selector.select(servicesIterator);
+        PreferredObjectSelector<ThreadPoolFactory> selector = new PreferredObjectSelector<>();
+        ThreadPoolFactory threadPoolFactory = selector.select(threadPoolFactoryServices.iterator());
 
         if (threadPoolFactory == null)
         {

@@ -10,6 +10,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.Callable;
@@ -19,19 +21,30 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class FutureMessageResultTestCase extends AbstractMuleContextTestCase
 {
-    private static Callable Dummy = new Callable()
-    {
-        public Object call()
-        {
-            return null;
-        }
-    };
+    private static Callable Dummy = () -> null;
+
+    private ExecutorService defaultExecutor;
 
     private volatile boolean wasCalled;
+
+    @Before
+    public void before()
+    {
+        defaultExecutor = Executors.newSingleThreadExecutor(
+                new DaemonThreadFactory("FutureMessageResultTestCaseExecutor"));
+    }
+
+    @After
+    public void after()
+    {
+        defaultExecutor.shutdown();
+    }
 
     @Test
     public void testCreation()
@@ -62,16 +75,14 @@ public class FutureMessageResultTestCase extends AbstractMuleContextTestCase
     @Test
     public void testExecute() throws ExecutionException, InterruptedException, MuleException
     {
-        Callable c = new Callable()
+        Callable c = () ->
         {
-            public Object call()
-            {
-                wasCalled = true;
-                return null;
-            }
+            wasCalled = true;
+            return null;
         };
 
         FutureMessageResult f = new FutureMessageResult(c, muleContext);
+        f.setExecutor(defaultExecutor);
         f.execute();
 
         assertNull(f.getMessage());
@@ -96,24 +107,24 @@ public class FutureMessageResultTestCase extends AbstractMuleContextTestCase
         {
             // OK: fail with shutdown Executor
         }
+
+        e.shutdown();
     }
 
     @Test
     public void testExecuteWithTimeout()
         throws ExecutionException, InterruptedException, MuleException
     {
-        Callable c = new Callable()
+        Callable c = () ->
         {
-            public Object call() throws InterruptedException
-            {
-                // I'm slow, have patience with me
-                Thread.sleep(3000L);
-                wasCalled = true;
-                return null;
-            }
+            // I'm slow, have patience with me
+            Thread.sleep(3000L);
+            wasCalled = true;
+            return null;
         };
 
         FutureMessageResult f = new FutureMessageResult(c, muleContext);
+        f.setExecutor(defaultExecutor);
         f.execute();
 
         try

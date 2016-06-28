@@ -9,13 +9,13 @@ package org.mule.runtime.core.util;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.net.URLClassLoader;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class IOUtilsTestCase extends AbstractMuleTestCase
@@ -50,7 +49,7 @@ public class IOUtilsTestCase extends AbstractMuleTestCase
         IOUtils.copyLarge(in, out);
 
         // Default buffer size of 4KB required two reads to copy 8KB input stream
-        verify(out, times(2)).write(any(byte[].class), Mockito.anyInt(), Mockito.anyInt());
+        verify(out, times(2)).write(any(byte[].class), anyInt(), anyInt());
     }
 
     @Test
@@ -60,23 +59,20 @@ public class IOUtilsTestCase extends AbstractMuleTestCase
         final int newBufferSize = 8 * 1024;
 
         testWithSystemProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE, Integer.toString(newBufferSize),
-            new TestCallback()
-            {
-                @Override
-                public void run() throws Exception
+                () ->
                 {
                     InputStream in = new ByteArrayInputStream(new byte[newBufferSize]);
                     OutputStream out = mock(OutputStream.class);
 
                     Class clazz = ClassUtils.loadClass(IOUtils.class.getCanonicalName(), new URLClassLoader(
-                        ((URLClassLoader) Thread.currentThread().getContextClassLoader()).getURLs(), null));
+                            ((URLClassLoader) Thread.currentThread().getContextClassLoader()).getURLs(), null));
                     clazz.getMethod("copyLarge", InputStream.class, OutputStream.class).invoke(
-                        clazz.newInstance(), in, out);
+                            clazz.newInstance(), in, out);
 
-                    // With 8KB buffer define via system property only 1 read is required for 8KB input stream
-                    verify(out, times(1)).write(any(byte[].class), Mockito.anyInt(), Mockito.anyInt());
-                }
-            });
+                    // With 8KB buffer define via system property only 1 read is required for 8KB
+                    // input stream
+                    verify(out, times(1)).write(any(byte[].class), anyInt(), anyInt());
+                });
     }
 
 }

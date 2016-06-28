@@ -6,21 +6,23 @@
  */
 package org.mule.runtime.core.registry;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCase
 {
-    private static final long TIMEOUT = 1000;
+    private static final long TIMEOUT = 200;
 
     protected Latch initLatch;
     protected Latch startLatch;
@@ -44,18 +46,21 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCa
     {
         muleContext.getRegistry().registerObject("dummy", bean);
         assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
+        assertThat(startLatch.getCount(), is(1L));
+        assertThat(stopLatch.getCount(), is(1L));
+        assertThat(disposeLatch.getCount(), is(1L));
 
         muleContext.start();
         assertTrue(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
+        assertThat(stopLatch.getCount(), is(1L));
+        assertThat(disposeLatch.getCount(), is(1L));
 
         muleContext.stop();
         assertTrue(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
+        assertThat(disposeLatch.getCount(), is(1L));
 
         muleContext.dispose();
         assertTrue(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
@@ -66,14 +71,16 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCa
     {
         muleContext.getRegistry().registerObject("dummy", bean);
         assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
+        assertThat(startLatch.getCount(), is(1L));
+        assertThat(stopLatch.getCount(), is(1L));
+        assertThat(disposeLatch.getCount(), is(1L));
 
         muleContext.start();
         assertTrue(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-        assertFalse(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+        Thread.sleep(TIMEOUT);
+        assertThat(stopLatch.getCount(), is(1L));
+        assertThat(disposeLatch.getCount(), is(1L));
 
         muleContext.getRegistry().unregisterObject("dummy");
         assertTrue(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
@@ -87,21 +94,25 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCa
             return echo;
         }
 
+        @Override
         public void initialise() throws InitialisationException
         {
             initLatch.countDown();
         }
 
+        @Override
         public void start() throws MuleException
         {
             startLatch.countDown();
         }
 
+        @Override
         public void stop() throws MuleException
         {
             stopLatch.countDown();
         }
 
+        @Override
         public void dispose()
         {
             disposeLatch.countDown();
