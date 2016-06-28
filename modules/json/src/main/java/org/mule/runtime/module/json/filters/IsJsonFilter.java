@@ -7,7 +7,9 @@
 package org.mule.runtime.module.json.filters;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -20,7 +22,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A filter that will determine if the current message payload is a JSON encoded message.
  */
-public class IsJsonFilter implements Filter
+public class IsJsonFilter implements Filter, MuleContextAware
 {
 
     /**
@@ -29,6 +31,8 @@ public class IsJsonFilter implements Filter
     protected transient final Logger logger = LoggerFactory.getLogger(IsJsonFilter.class);
 
     private boolean validateParsing = false;
+
+    private MuleContext muleContext;
 
     public IsJsonFilter()
     {
@@ -46,7 +50,7 @@ public class IsJsonFilter implements Filter
         }
         try
         {
-            return accept(obj.getMuleContext().getTransformationService().transform(obj, DataType.STRING).getPayload());
+            return accept(muleContext.getTransformationService().transform(obj, DataType.STRING).getPayload());
         }
         catch (Exception e)
         {
@@ -117,5 +121,11 @@ public class IsJsonFilter implements Filter
         return string != null
                 && ("null".equals(string)
                 || (string.startsWith("[") && string.endsWith("]")) || (string.startsWith("{") && string.endsWith("}")));
-   }
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 }

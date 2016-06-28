@@ -84,7 +84,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
             }
             boolean hasResponse = endpoint.getExchangePattern().hasResponse();
 
-            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), event.getMessage());
+            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), event.getMessage(), endpoint.getMuleContext());
 
             if (hasResponse)
             {

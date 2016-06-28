@@ -126,7 +126,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
         event.getSession().setProperty("key", "value");
 
         // Serialize and deserialize session using default session handler
-        message = (DefaultMuleMessage) new SerializeAndEncodeSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
+        message = (DefaultMuleMessage) new SerializeAndEncodeSessionHandler().storeSessionInfoToMessage(event.getSession(), message, muleContext);
         message.setInboundProperty(MULE_SESSION_PROPERTY, message.getOutboundProperty(MULE_SESSION_PROPERTY));
         MuleSession newSession = new SerializeAndEncodeSessionHandler().retrieveSessionInfoFromMessage(message);
 
@@ -190,7 +190,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
         event.getSession().setProperty("key2", "value2");
 
         // Serialize and deserialize session using default session handler
-        message = (DefaultMuleMessage) new SerializeAndEncodeSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
+        message = (DefaultMuleMessage) new SerializeAndEncodeSessionHandler().storeSessionInfoToMessage(event.getSession(), message, muleContext);
         message.setInboundProperty(MULE_SESSION_PROPERTY, message.getOutboundProperty(MULE_SESSION_PROPERTY));
         MuleSession newSession = new SerializeAndEncodeSessionHandler().retrieveSessionInfoFromMessage(message);
 

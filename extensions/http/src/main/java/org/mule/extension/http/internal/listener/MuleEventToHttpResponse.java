@@ -22,7 +22,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.UUID;
@@ -127,7 +126,7 @@ public class MuleEventToHttpResponse
             {
                 warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
             }
-            httpEntity = createMultipartEntity(event.getMessage(), httpResponseHeaderBuilder.getContentType(), parts);
+            httpEntity = createMultipartEntity(event, httpResponseHeaderBuilder.getContentType(), parts);
             resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding, (ByteArrayHttpEntity) httpEntity);
         }
         else
@@ -299,7 +298,7 @@ public class MuleEventToHttpResponse
         }
     }
 
-    private HttpEntity createMultipartEntity(MuleMessage muleMessage, String contentType, Map<String, DataHandler> parts) throws MessagingException
+    private HttpEntity createMultipartEntity(MuleEvent event, String contentType, Map<String, DataHandler> parts) throws MessagingException
     {
         if (logger.isDebugEnabled())
         {
@@ -314,7 +313,7 @@ public class MuleEventToHttpResponse
         }
         catch (Exception e)
         {
-            throw new MessagingException(MessageFactory.createStaticMessage("Error creating multipart HTTP entity."), muleMessage, e);
+            throw new MessagingException(MessageFactory.createStaticMessage("Error creating multipart HTTP entity."), event.getMessage(), event.getMuleContext(), e);
         }
     }
 

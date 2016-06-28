@@ -286,6 +286,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
+        RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
         oos.writeObject(message);
         oos.flush();
         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));

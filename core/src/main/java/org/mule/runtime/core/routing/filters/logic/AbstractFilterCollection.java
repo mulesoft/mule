@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing.filters.logic;
 
 import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.ArrayList;
@@ -16,13 +17,13 @@ import java.util.List;
  * Manages a filter collection. Used as the base clas for the Or and AND filters
  */
 
-public abstract class AbstractFilterCollection implements Filter
+public abstract class AbstractFilterCollection implements Filter, ObjectFilter
 {
     private List<Filter> filters;
 
     public AbstractFilterCollection()
     {
-        filters = new ArrayList<Filter>();
+        filters = new ArrayList<>();
     }
 
     public AbstractFilterCollection(List<Filter> filters)
@@ -34,9 +35,9 @@ public abstract class AbstractFilterCollection implements Filter
     public AbstractFilterCollection(Filter... filters)
     {
         this();
-        for (int i = 0; i < filters.length; i++)
+        for (Filter filter : filters)
         {
-            this.filters.add(filters[i]);
+            this.filters.add(filter);
         }
     }
 
@@ -50,6 +51,7 @@ public abstract class AbstractFilterCollection implements Filter
         this.filters = filters;
     }
     
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
@@ -59,6 +61,7 @@ public abstract class AbstractFilterCollection implements Filter
         return ClassUtils.equal(filters, other.filters);
     }
 
+    @Override
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{this.getClass(), filters});

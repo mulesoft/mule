@@ -109,7 +109,7 @@ public class HttpRequester
             responseMessage = doRequest(responseEvent, client, requestBuilder, false);
         }
         notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
-        responseValidator.validate(responseMessage);
+        responseValidator.validate(responseMessage, muleEvent.getMuleContext());
         return responseMessage;
     }
 

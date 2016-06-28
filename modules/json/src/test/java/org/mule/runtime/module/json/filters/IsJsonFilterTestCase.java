@@ -6,23 +6,25 @@
  */
 package org.mule.runtime.module.json.filters;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class IsJsonFilterTestCase extends AbstractMuleContextTestCase
 {
 
     private IsJsonFilter filter;
 
+    @Override
     protected void doSetUp() throws Exception 
     {
         filter = new IsJsonFilter();
         filter.setValidateParsing(true);
+        filter.setMuleContext(muleContext);
     }
     
     @Test

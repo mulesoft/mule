@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_S
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -319,7 +320,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
 
     public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext, DataType<?> dataType)
     {
-        typedValue = new TypedValue(resolveValue(message), (DataType<Object>) dataType);
+        typedValue = new TypedValue(resolveValue(message), dataType);
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
         setMuleContext(muleContext);
@@ -991,7 +992,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
             for (Map.Entry<String, DataHandler> entry : attachments.entrySet())
             {
                 String name = entry.getKey();
-                toWrite.put(name, new SerializedDataHandler(name, entry.getValue(), muleContext));
+                toWrite.put(name, new SerializedDataHandler(name, entry.getValue(), RequestContext.getEvent().getMuleContext()));
             }
         }
 
@@ -1008,7 +1009,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
         else
         {
             out.writeBoolean(false);
-            byte[] valueAsByteArray = (byte[]) muleContext.getTransformationService().transform(this, DataType.BYTE_ARRAY).getPayload();
+            byte[] valueAsByteArray = (byte[]) RequestContext.getEvent().getMuleContext().getTransformationService().transform(this, DataType.BYTE_ARRAY).getPayload();
             out.writeInt(valueAsByteArray.length);
             new DataOutputStream(out).write(valueAsByteArray);
         }
@@ -1085,7 +1086,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
     @Override
     public <PAYLOAD, ATTRIBUTES extends Serializable> org.mule.runtime.api.message.MuleMessage<PAYLOAD, ATTRIBUTES> asNewMessage()
     {
-        return (org.mule.runtime.api.message.MuleMessage<PAYLOAD, ATTRIBUTES>) this;
+        return this;
     }
 
     /**

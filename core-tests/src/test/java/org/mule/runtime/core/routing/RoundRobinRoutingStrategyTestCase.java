@@ -9,7 +9,9 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -48,13 +50,13 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
     @Test(expected = RoutePathNotFoundException.class)
     public void testNullMessageProcessors() throws MessagingException
     {
-        roundRobinRoutingStrategy.route(null, null);
+        roundRobinRoutingStrategy.route(mock(DefaultMuleEvent.class), null);
     }
 
     @Test(expected = RoutePathNotFoundException.class)
     public void testEmptyMessageProcessors() throws MessagingException
     {
-        roundRobinRoutingStrategy.route(null, Collections.EMPTY_LIST);
+        roundRobinRoutingStrategy.route(mock(DefaultMuleEvent.class), Collections.EMPTY_LIST);
     }
 
     @Test

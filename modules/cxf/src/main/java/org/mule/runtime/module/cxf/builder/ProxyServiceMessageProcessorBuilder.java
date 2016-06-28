@@ -117,7 +117,7 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
 
     protected void addProxyInterceptors(ServerFactoryBean sfb)
     {
-        sfb.getOutInterceptors().add(new OutputPayloadInterceptor());
+        sfb.getOutInterceptors().add(new OutputPayloadInterceptor(muleContext.getTransformationService()));
         sfb.getInInterceptors().add(new CopyAttachmentInInterceptor());
         sfb.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
 

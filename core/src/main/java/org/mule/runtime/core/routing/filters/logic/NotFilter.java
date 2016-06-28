@@ -11,12 +11,13 @@ import static org.mule.runtime.core.util.ClassUtils.hash;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 
 /**
  * <code>NotFilter</code> accepts if the filter does not accept.
  */
 
-public class NotFilter implements Filter
+public class NotFilter implements Filter, ObjectFilter
 {
     private Filter filter;
 
@@ -40,11 +41,19 @@ public class NotFilter implements Filter
         this.filter = filter;
     }
 
+    @Override
     public boolean accept(MuleMessage message)
     {
         return (filter != null ? !filter.accept(message) : false);
     }
 
+    @Override
+    public boolean accept(Object object)
+    {
+        return (filter != null ? !((ObjectFilter) filter).accept(object) : false);
+    }
+
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
@@ -54,6 +63,7 @@ public class NotFilter implements Filter
         return equal(filter, other.filter);
     }
 
+    @Override
     public int hashCode()
     {
         return hash(new Object[]{this.getClass(), filter});

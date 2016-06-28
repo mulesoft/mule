@@ -106,7 +106,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         List<String> list = createList();
         event.getSession().setProperty("fooList", list);
 
-        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
         event.setMessage(message);
         // store save session to outbound, move it to the inbound
         // for retrieve to deserialize
@@ -140,7 +140,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 
         NotSerializableClass clazz = new NotSerializableClass();
         event.getSession().setProperty("foo", clazz);
-        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
         event.setMessage(message);
         // store save session to outbound, move it to the inbound
         // for retrieve to deserialize
@@ -166,7 +166,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         SecurityContext sc = new DefaultSecurityContextFactory().create(new DefaultMuleAuthentication(credentials));
         event.getSession().setSecurityContext(sc);
 
-        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        message = (DefaultMuleMessage) handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
         event.setMessage(message);
         // store save session to outbound, move it to the inbound
         // for retrieve to deserialize
@@ -206,7 +206,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 
         try
         {
-            handler.storeSessionInfoToMessage(session, message);
+            handler.storeSessionInfoToMessage(session, message, muleContext);
             fail("Should throw a SerializationException");
         }
         catch (SerializationException e)
@@ -217,7 +217,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 
     private List<String> createList()
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("bar1");
         list.add("bar2");
         return list;

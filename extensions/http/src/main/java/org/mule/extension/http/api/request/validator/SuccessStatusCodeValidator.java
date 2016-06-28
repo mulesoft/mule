@@ -9,6 +9,7 @@ package org.mule.extension.http.api.request.validator;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.api.MuleContext;
 
 /**
  * Response validator that allows specifying which status codes will be considered as successful.
@@ -34,13 +35,13 @@ public class SuccessStatusCodeValidator extends RangeStatusCodeValidator
     }
 
     @Override
-    public void validate(MuleMessage responseMessage) throws ResponseValidatorException
+    public void validate(MuleMessage responseMessage, MuleContext context) throws ResponseValidatorException
     {
         int status = ((HttpResponseAttributes) responseMessage.getAttributes()).getStatusCode();
 
         if (!belongs(status))
         {
-            throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseMessage);
+            throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseMessage, context);
         }
     }
 

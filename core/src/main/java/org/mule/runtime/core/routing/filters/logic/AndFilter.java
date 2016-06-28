@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing.filters.logic;
 
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class AndFilter extends AbstractFilterCollection
         super(filters);
     }
 
+    @Override
     public boolean accept(MuleMessage message)
     {
         if (getFilters().size() == 0)
@@ -42,6 +44,24 @@ public class AndFilter extends AbstractFilterCollection
         for (Filter filter : getFilters())
         {
             if (!filter.accept(message))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean accept(Object object)
+    {
+        if (getFilters().size() == 0)
+        {
+            return false;
+        }
+        for (Filter filter : getFilters())
+        {
+            if (!((ObjectFilter) filter).accept(object))
             {
                 return false;
             }

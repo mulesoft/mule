@@ -16,6 +16,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -344,14 +345,14 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
         DefaultMuleConfiguration.verboseExceptions = true;
 
         MuleEvent testEvent = mock(MuleEvent.class);
-        MuleMessage muleMessage = mock(MuleMessage.class);
         Object payload = mock(Object.class);
         // This has to be done this way since mockito doesn't allow to verify toString()
         when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
-        when(muleMessage.getPayload()).thenReturn(payload);
-        when(muleMessage.getMuleContext()).thenReturn(mockContext);
+        MuleMessage muleMessage = MuleMessage.builder().payload(payload).build();
+
         when(transformationService.transform(muleMessage, DataType.STRING)).thenReturn(new DefaultMuleMessage(value, muleContext));
         when(testEvent.getMessage()).thenReturn(muleMessage);
+        when(testEvent.getMuleContext()).thenReturn(mockContext);
         MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);
 
         assertThat((String) e.getInfo().get(PAYLOAD_INFO_KEY), is(value));
@@ -363,8 +364,8 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
         DefaultMuleConfiguration.verboseExceptions = true;
 
         MuleEvent testEvent = mock(MuleEvent.class);
-        MuleMessage muleMessage = mock(MuleMessage.class);
-        when(muleMessage.getPayload()).thenReturn(new ByteArrayInputStream(new byte[] {}));
+        final ByteArrayInputStream payload = new ByteArrayInputStream(new byte[] {});
+        MuleMessage muleMessage = MuleMessage.builder().payload(payload).build();
         when(testEvent.getMessage()).thenReturn(muleMessage);
         MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);
 
@@ -379,14 +380,14 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
         DefaultMuleConfiguration.verboseExceptions = true;
 
         MuleEvent testEvent = mock(MuleEvent.class);
-        MuleMessage muleMessage = mock(MuleMessage.class);
-        when(muleMessage.getMuleContext()).thenReturn(mockContext);
         Object payload = mock(Object.class);
         // This has to be done this way since mockito doesn't allow to verify toString()
         when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
-        when(muleMessage.getPayload()).thenReturn(payload);
+        MuleMessage muleMessage = MuleMessage.builder().payload(payload).build();
+
         when(transformationService.transform(muleMessage, DataType.STRING)).thenThrow(new TransformerException(CoreMessages.createStaticMessage("exception thrown")));
         when(testEvent.getMessage()).thenReturn(muleMessage);
+        when(testEvent.getMuleContext()).thenReturn(mockContext);
         MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);
 
         assertThat(e.getInfo().get(PAYLOAD_INFO_KEY), is(TransformerException.class.getName() + " while getting payload: exception thrown"));
@@ -398,8 +399,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
         DefaultMuleConfiguration.verboseExceptions = false;
 
         MuleEvent testEvent = mock(MuleEvent.class);
-        MuleMessage muleMessage = mock(MuleMessage.class);
-        when(muleMessage.getMuleContext()).thenReturn(mockContext);
+        MuleMessage muleMessage = spy(MuleMessage.builder().payload("").build());
         when(testEvent.getMessage()).thenReturn(muleMessage);
         MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);
 

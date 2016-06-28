@@ -10,6 +10,7 @@ package org.mule.runtime.core.routing;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 
 import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageRouter;
@@ -58,7 +59,7 @@ public class CompositeRoutingException extends MessagingException
     }
 
     @Override
-    protected String generateMessage(Message message)
+    protected String generateMessage(Message message, MuleContext context)
     {
         return message.getMessage();
     }

@@ -107,10 +107,12 @@ public class WebServiceMessageProcessorBuilderTestCase extends AbstractMuleConte
 
     private void addConfigProperties(WsSecurity wsSecurity)
     {
-        Map<String, Object> configProperties = new HashMap<String, Object>();
+        Map<String, Object> configProperties = new HashMap<>();
         configProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         
-        wsSecurity.setWsConfig(new WsConfig(configProperties));
+        final WsConfig wsConfig = new WsConfig(configProperties);
+        wsConfig.setMuleContext(muleContext);
+        wsSecurity.setWsConfig(wsConfig);
     }
 
     private void addSecurityManager(WsSecurity wsSecurity)
@@ -120,7 +122,7 @@ public class WebServiceMessageProcessorBuilderTestCase extends AbstractMuleConte
     
     private void addCustomValidator(WsSecurity wsSecurity)
     {
-        Map<String, Object> customValidator = new HashMap<String, Object>();
+        Map<String, Object> customValidator = new HashMap<>();
         customValidator.put(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR, new NoOpValidator());
 
         wsSecurity.setCustomValidator(customValidator);

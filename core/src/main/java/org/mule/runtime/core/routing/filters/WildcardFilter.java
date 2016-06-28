@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing.filters;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
@@ -49,15 +48,7 @@ public class WildcardFilter implements Filter, ObjectFilter
     @Override
     public boolean accept(MuleMessage message)
     {
-        try
-        {
-            return accept(message.getMuleContext().getTransformationService().transform(message, DataType.STRING).getPayload());
-        }
-        catch (Exception e)
-        {
-            logger.warn("An exception occurred while filtering", e);
-            return false;
-        }
+        throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
     }
 
     @Override

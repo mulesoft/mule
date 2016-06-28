@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.session;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -24,7 +25,7 @@ public class NullSessionHandler implements SessionHandler
     }
 
     @Override
-    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
+    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException
     {
         return message;
     }

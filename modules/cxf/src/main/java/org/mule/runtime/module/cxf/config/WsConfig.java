@@ -7,8 +7,10 @@
 package org.mule.runtime.module.cxf.config;
 
 import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.util.Collection;
@@ -17,9 +19,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class WsConfig
+public class WsConfig implements MuleContextAware
 {
-    Map<String, Object> configProperties = new HashMap<String, Object> ();
+    Map<String, Object> configProperties = new HashMap<> ();
+
+    private MuleContext muleContext;
 
     public WsConfig()
     {
@@ -38,16 +42,18 @@ public class WsConfig
 
     public Map<String, Object> getConfigProperties()
     {
-        return new DynamicAttributeEvalutorMap(new HashMap<String, Object>(configProperties));
+        return new DynamicAttributeEvalutorMap(new HashMap<>(configProperties), muleContext);
     }
 
     private static class DynamicAttributeEvalutorMap implements Map<String, Object>
     {
         private Map<String, Object> map;
+        private MuleContext muleContext;
         
-        public DynamicAttributeEvalutorMap(Map<String, Object> map)
+        public DynamicAttributeEvalutorMap(Map<String, Object> map, MuleContext muleContext)
         {
             this.map = map;
+            this.muleContext = muleContext;
         }
         
         private Map<String, Object> getEvaluatedMap()
@@ -56,13 +62,13 @@ public class WsConfig
             MuleMessage message = (event != null) ? event.getMessage() : null;
             if (map != null && message != null)
             {
-                Map<String, Object> evaluatedMap = new LinkedHashMap<String, Object>(map.size());
+                Map<String, Object> evaluatedMap = new LinkedHashMap<>(map.size());
                 for (Entry<String, Object> entry : map.entrySet())
                 {
                     if (entry.getValue() instanceof String)
                     {
                         AttributeEvaluator evaluator = new AttributeEvaluator((String)entry.getValue());
-                        evaluator.initialize(message.getMuleContext().getExpressionManager());
+                        evaluator.initialize(muleContext.getExpressionManager());
                         evaluatedMap.put(entry.getKey(), evaluator.resolveValue(event));
                     }
                     else
@@ -146,5 +152,11 @@ public class WsConfig
         {
             return getEvaluatedMap().values();
         }
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 }

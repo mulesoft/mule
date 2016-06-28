@@ -514,7 +514,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             // Do not propagate security context back to caller
             MuleSession resultSession = new DefaultMuleSession(resultEvent.getSession());
             resultSession.setSecurityContext(null);
-            connector.getSessionHandler().storeSessionInfoToMessage(resultSession, resultEvent.getMessage());
+            connector.getSessionHandler().storeSessionInfoToMessage(resultSession, resultEvent.getMessage(), endpoint.getMuleContext());
 
             if (resultEvent.getMessage() != null && !endpoint.isDisableTransportTransformer())
             {

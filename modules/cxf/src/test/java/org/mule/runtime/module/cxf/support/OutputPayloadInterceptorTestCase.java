@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.module.cxf.support;
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
@@ -20,12 +24,8 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 @SmallTest
-public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
+public class OutputPayloadInterceptorTestCase extends AbstractMuleContextTestCase
 {
 
     private OutputPayloadInterceptor interceptor;
@@ -33,13 +33,13 @@ public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
     @Before
     public void setUpInterceptor()
     {
-        interceptor = new OutputPayloadInterceptor();
+        interceptor = new OutputPayloadInterceptor(muleContext.getTransformationService());
     }
 
     @Test
     public void testCleanUpPayload_NotAnArray() throws Exception
     {
-        final List<?> someList = new ArrayList<Object>();
+        final List<?> someList = new ArrayList<>();
         assertSame(someList, interceptor.cleanUpPayload(someList));
 
         final String someString = "Some String";
@@ -81,7 +81,7 @@ public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
         Object content1 = new Object();
         messageContentsList.add(content1);
 
-        List<MessagePartInfo> parts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> parts = new ArrayList<>();
 
         MessagePartInfo part1 = new MessagePartInfo(new QName("part1"), null);
         part1.setIndex(1);
@@ -102,7 +102,7 @@ public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
         Object content2 = new Object();
         messageContentsList.add(content2);
 
-        List<MessagePartInfo> parts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> parts = new ArrayList<>();
 
         MessagePartInfo part2 = new MessagePartInfo(new QName("part2"), null);
         part2.setIndex(3);

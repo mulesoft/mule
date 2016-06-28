@@ -10,11 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.runtime.module.cxf.config.WsConfig;
 import org.mule.runtime.module.cxf.config.WsSecurity;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.api.MuleException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,10 +75,12 @@ public class SimpleClientMessageProcessorBuilderTestCase extends AbstractMuleCon
 
     private void addConfigProperties(WsSecurity wsSecurity)
     {
-        Map<String, Object> configProperties = new HashMap<String, Object>();
+        Map<String, Object> configProperties = new HashMap<>();
         configProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
 
-        wsSecurity.setWsConfig(new WsConfig(configProperties));
+        final WsConfig wsConfig = new WsConfig(configProperties);
+        wsConfig.setMuleContext(muleContext);
+        wsSecurity.setWsConfig(wsConfig);
     }
 
 }

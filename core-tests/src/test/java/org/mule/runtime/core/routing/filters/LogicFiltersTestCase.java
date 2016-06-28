@@ -6,23 +6,22 @@
  */
 package org.mule.runtime.core.routing.filters;
 
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.routing.filters.logic.AndFilter;
-import org.mule.runtime.core.routing.filters.logic.NotFilter;
-import org.mule.runtime.core.routing.filters.logic.OrFilter;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.LinkedList;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class LogicFiltersTestCase extends AbstractMuleContextTestCase
+import org.mule.runtime.core.routing.filters.logic.AndFilter;
+import org.mule.runtime.core.routing.filters.logic.NotFilter;
+import org.mule.runtime.core.routing.filters.logic.OrFilter;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.LinkedList;
+
+import org.junit.Test;
+
+public class LogicFiltersTestCase extends AbstractMuleTestCase
 {
 
     @Test
@@ -32,35 +31,35 @@ public class LogicFiltersTestCase extends AbstractMuleContextTestCase
         assertEquals(0, filter.getFilters().size());
 
         // both null
-        assertFalse(filter.accept(new DefaultMuleMessage("foo", muleContext)));
+        assertFalse(filter.accept("foo"));
 
         // only one filter set
         filter.getFilters().add(new EqualsFilter("foo"));
-        assertTrue(filter.accept(new DefaultMuleMessage("foo", muleContext)));
+        assertTrue(filter.accept("foo"));
 
         // another one set too, but does not accept
         filter.getFilters().add(new EqualsFilter("foo"));
-        assertFalse(filter.accept(new DefaultMuleMessage("bar", muleContext)));
+        assertFalse(filter.accept("bar"));
 
         // both accept
-        assertTrue(filter.accept(new DefaultMuleMessage("foo", muleContext)));
+        assertTrue(filter.accept("foo"));
 
         WildcardFilter left = new WildcardFilter("blah.blah.*");
         WildcardFilter right = new WildcardFilter("blah.*");
         filter = new AndFilter(left, right);
         assertEquals(2,filter.getFilters().size());
 
-        assertTrue(filter.accept(new DefaultMuleMessage("blah.blah.blah", muleContext)));
-        assertTrue(right.accept(new DefaultMuleMessage("blah.blah", muleContext)));
-        assertTrue(!left.accept(new DefaultMuleMessage("blah.blah", muleContext)));
-        assertTrue(!filter.accept(new DefaultMuleMessage("blah.blah", muleContext)));
+        assertTrue(filter.accept("blah.blah.blah"));
+        assertTrue(right.accept("blah.blah"));
+        assertTrue(!left.accept("blah.blah"));
+        assertTrue(!filter.accept("blah.blah"));
 
         filter = new AndFilter();
         filter.getFilters().add(left);
         filter.getFilters().add(right);
 
-        assertTrue(filter.accept(new DefaultMuleMessage("blah.blah.blah", muleContext)));
-        assertTrue(!filter.accept(new DefaultMuleMessage("blah.blah", muleContext)));
+        assertTrue(filter.accept("blah.blah.blah"));
+        assertTrue(!filter.accept("blah.blah"));
     }
 
     @Test
@@ -68,18 +67,18 @@ public class LogicFiltersTestCase extends AbstractMuleContextTestCase
     {
         OrFilter filter = new OrFilter();
         assertEquals(0, filter.getFilters().size());
-        assertFalse(filter.accept(new DefaultMuleMessage("foo", muleContext)));
+        assertFalse(filter.accept("foo"));
 
         WildcardFilter left = new WildcardFilter("blah.blah.*");
         WildcardFilter right = new WildcardFilter("blah.b*");
         filter = new OrFilter(left, right);
         assertEquals(2, filter.getFilters().size());
 
-        assertTrue(filter.accept(new DefaultMuleMessage("blah.blah.blah", muleContext)));
-        assertTrue(right.accept(new DefaultMuleMessage("blah.blah", muleContext)));
-        assertTrue(!left.accept(new DefaultMuleMessage("blah.blah", muleContext)));
-        assertTrue(filter.accept(new DefaultMuleMessage("blah.blah", muleContext)));
-        assertTrue(!filter.accept(new DefaultMuleMessage("blah.x.blah", muleContext)));
+        assertTrue(filter.accept("blah.blah.blah"));
+        assertTrue(right.accept("blah.blah"));
+        assertTrue(!left.accept("blah.blah"));
+        assertTrue(filter.accept("blah.blah"));
+        assertTrue(!filter.accept("blah.x.blah"));
 
         filter = new OrFilter();
         LinkedList filters = new LinkedList();
@@ -87,9 +86,9 @@ public class LogicFiltersTestCase extends AbstractMuleContextTestCase
         filters.addLast(right);
         filter.setFilters(filters);
 
-        assertTrue(filter.accept(new DefaultMuleMessage("blah.blah.blah", muleContext)));
-        assertTrue(filter.accept(new DefaultMuleMessage("blah.blah", muleContext)));
-        assertTrue(!filter.accept(new DefaultMuleMessage("blah.x.blah", muleContext)));
+        assertTrue(filter.accept("blah.blah.blah"));
+        assertTrue(filter.accept("blah.blah"));
+        assertTrue(!filter.accept("blah.x.blah"));
     }
 
     @Test
@@ -97,20 +96,20 @@ public class LogicFiltersTestCase extends AbstractMuleContextTestCase
     {
         NotFilter notFilter = new NotFilter();
         assertNull(notFilter.getFilter());
-        assertFalse(notFilter.accept(new DefaultMuleMessage("foo", muleContext)));
-        assertFalse(notFilter.accept(new DefaultMuleMessage(null, muleContext)));
+        assertFalse(notFilter.accept("foo"));
+        assertFalse(notFilter.accept((Object) null));
 
         WildcardFilter filter = new WildcardFilter("blah.blah.*");
         notFilter = new NotFilter(filter);
         assertNotNull(notFilter.getFilter());
 
-        assertTrue(filter.accept(new DefaultMuleMessage("blah.blah.blah", muleContext)));
-        assertTrue(!notFilter.accept(new DefaultMuleMessage("blah.blah.blah", muleContext)));
+        assertTrue(filter.accept("blah.blah.blah"));
+        assertTrue(!notFilter.accept("blah.blah.blah"));
 
         notFilter = new NotFilter();
         notFilter.setFilter(filter);
-        assertTrue(filter.accept(new DefaultMuleMessage("blah.blah.blah", muleContext)));
-        assertTrue(!notFilter.accept(new DefaultMuleMessage("blah.blah.blah", muleContext)));
+        assertTrue(filter.accept("blah.blah.blah"));
+        assertTrue(!notFilter.accept("blah.blah.blah"));
     }
 
 }
