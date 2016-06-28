@@ -23,7 +23,7 @@
     </flow>
 
     <sub-flow name="setProperties">
-        <set-property propertyName="encoding" value="#[message.getDataType().mimeType.encoding.get().name()]"/>
-        <set-property propertyName="mimeType" value="#[message.getDataType().mimeType.toString()]"/>
+        <set-property propertyName="encoding" value="#[message.dataType.mediaType.charset.get().name()]"/>
+        <set-property propertyName="mimeType" value="#[message.dataType.mediaType.toString()]"/>
     </sub-flow>
 </mule>
