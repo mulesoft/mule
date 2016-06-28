@@ -11,6 +11,7 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
@@ -19,8 +20,10 @@ import java.nio.charset.Charset;
 /**
  * Converts strings to {@link MediaType} instances. See {@link DataTypeBuilder#mediaType(String)}
  */
-public class StringToMediaTypeTransformer extends AbstractTransformer
+public class StringToMediaTypeTransformer extends AbstractTransformer implements DiscoverableTransformer
 {
+
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public StringToMediaTypeTransformer()
     {
@@ -39,6 +42,18 @@ public class StringToMediaTypeTransformer extends AbstractTransformer
         {
             throw new TransformerException(createStaticMessage("Exception transforming to MediaType."), e);
         }
+    }
+
+    @Override
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    @Override
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
     }
 
 }

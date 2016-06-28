@@ -10,6 +10,7 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
@@ -18,8 +19,10 @@ import java.nio.charset.Charset;
 /**
  * Converts strings to {@link Charset} instances. See {@link DataTypeBuilder#charset(String)}
  */
-public class StringToCharsetTransformer extends AbstractTransformer
+public class StringToCharsetTransformer extends AbstractTransformer implements DiscoverableTransformer
 {
+
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public StringToCharsetTransformer()
     {
@@ -38,6 +41,18 @@ public class StringToCharsetTransformer extends AbstractTransformer
         {
             throw new TransformerException(createStaticMessage("Exception transforming to Charset."), e);
         }
+    }
+
+    @Override
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    @Override
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
     }
 
 }
