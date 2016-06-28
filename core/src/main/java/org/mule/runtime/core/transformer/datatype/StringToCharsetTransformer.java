@@ -22,7 +22,7 @@ import java.nio.charset.Charset;
 public class StringToCharsetTransformer extends AbstractTransformer implements DiscoverableTransformer
 {
 
-    private int priorityWeighting;
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public StringToCharsetTransformer()
     {

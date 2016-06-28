@@ -23,7 +23,7 @@ import java.nio.charset.Charset;
 public class StringToMediaTypeTransformer extends AbstractTransformer implements DiscoverableTransformer
 {
 
-    private int priorityWeighting;
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public StringToMediaTypeTransformer()
     {
