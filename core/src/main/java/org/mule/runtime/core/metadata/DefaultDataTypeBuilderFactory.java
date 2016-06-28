@@ -14,13 +14,13 @@ public class DefaultDataTypeBuilderFactory extends AbstractDataTypeBuilderFactor
 {
 
     @Override
-    protected <T> DataTypeBuilder<T> builder()
+    protected <T> DataTypeBuilder<T> create()
     {
         return new DefaultDataTypeBuilder<>();
     }
 
     @Override
-    protected <T> DataTypeBuilder<T> builder(DataType<T> dataType)
+    protected <T> DataTypeBuilder<T> create(DataType<T> dataType)
     {
         return new DefaultDataTypeBuilder<>(dataType);
     }

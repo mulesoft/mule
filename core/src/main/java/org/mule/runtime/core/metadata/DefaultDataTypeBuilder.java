@@ -292,27 +292,17 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         validateAlreadyBuilt();
 
-        if (!StringUtils.isEmpty(itemMimeType))
-        {
-            try
-            {
-                itemMimeType(new javax.activation.MimeType(itemMimeType));
-            }
-            catch (MimeTypeParseException e)
-            {
-                throw new IllegalArgumentException("MediaType cannot be parsed: " + itemMimeType);
-            }
-        }
+        itemTypeBuilder.mediaType(itemMimeType);
+
         return this;
     }
 
-    private DataTypeBuilder<T> itemMimeType(javax.activation.MimeType itemMimeType)
+    @Override
+    public <I> DataTypeCollectionTypeBuilder<T> itemMediaType(MediaType itemMediaType)
     {
-        if (mediaPrimaryType != null)
-        {
-            this.mediaPrimaryType = itemMimeType.getPrimaryType();
-            this.mediaSubType = itemMimeType.getSubType();
-        }
+        validateAlreadyBuilt();
+
+        itemTypeBuilder.mediaType(itemMediaType);
 
         return this;
     }
