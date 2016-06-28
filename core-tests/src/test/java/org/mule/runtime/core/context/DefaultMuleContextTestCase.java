@@ -68,11 +68,14 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase
     @After
     public void after() throws MuleException
     {
-        if (context.isStarted())
+        if (context != null)
         {
-            context.stop();
+            if (context.isStarted())
+            {
+                context.stop();
+            }
+            context.dispose();
         }
-        context.dispose();
     }
 
     @Test
