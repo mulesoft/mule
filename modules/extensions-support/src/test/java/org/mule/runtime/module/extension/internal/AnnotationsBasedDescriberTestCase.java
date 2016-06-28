@@ -17,6 +17,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.extension.api.Category.COMMUNITY;
+import static org.mule.runtime.extension.api.Category.SELECT;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
@@ -40,6 +42,8 @@ import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+
+import org.mule.api.MuleVersion;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -95,6 +99,7 @@ import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Shape;
+import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
@@ -411,6 +416,38 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         OperationDeclaration bananaOperation = findDeclarationByName(bananaConfiguration.getOperations(), operationName);
 
         assertThat(appleOperation, is(sameInstance(bananaOperation)));
+    }
+
+    @Test
+    public void minMuleVersionIsDescribedCorrectly(){
+        setDescriber(describerFor(HeisenbergExtension.class));
+        ExtensionDeclarer declarer = describeExtension();
+        final ExtensionDeclaration declaration = declarer.getDeclaration();
+        assertThat(declaration.getMinMuleVersion(), is(new MuleVersion("4.1")));
+    }
+
+    @Test
+    public void categoryIsDescribedCorrectly(){
+        setDescriber(describerFor(HeisenbergExtension.class));
+        ExtensionDeclarer declarer = describeExtension();
+        final ExtensionDeclaration declaration = declarer.getDeclaration();
+        assertThat(declaration.getCategory(), is(SELECT));
+    }
+
+    @Test
+    public void minMuleVersionDefaultValueIsDescribedCorrectly(){
+        setDescriber(describerFor(PetStoreConnector.class));
+        ExtensionDeclarer declarer = describeExtension();
+        final ExtensionDeclaration declaration = declarer.getDeclaration();
+        assertThat(declaration.getMinMuleVersion(), is(new MuleVersion("4.0")));
+    }
+
+    @Test
+    public void categoryDefaultValueIsDescribedCorrectly(){
+        setDescriber(describerFor(PetStoreConnector.class));
+        ExtensionDeclarer declarer = describeExtension();
+        final ExtensionDeclaration declaration = declarer.getDeclaration();
+        assertThat(declaration.getCategory(), is(COMMUNITY));
     }
 
     private <T extends NamedDeclaration> T findDeclarationByName(Collection<T> declarations, String name)
