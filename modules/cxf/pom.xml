@@ -78,7 +78,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
-                    <forkMode>always</forkMode>
+                    <!-- TODO: Fix SAML tests to remove forkCount property -->
+                    <forkCount>2</forkCount>
+                    <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
         </plugins>
