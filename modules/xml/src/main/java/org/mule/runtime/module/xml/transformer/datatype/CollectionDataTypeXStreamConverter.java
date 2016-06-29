@@ -6,18 +6,19 @@
  */
 package org.mule.runtime.module.xml.transformer.datatype;
 
+import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.metadata.CollectionDataType;
+import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.util.ClassUtils;
-
-import java.util.Collection;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+
+import java.util.Collection;
 
 /**
  * A serializer to handle instances of {@link CollectionDataType}.
@@ -31,7 +32,7 @@ public class CollectionDataTypeXStreamConverter implements Converter
     @Override
     public boolean canConvert(Class type)
     {
-        return CollectionDataType.class.isAssignableFrom(type);
+        return DefaultCollectionDataType.class.isAssignableFrom(type);
     }
 
     @Override
