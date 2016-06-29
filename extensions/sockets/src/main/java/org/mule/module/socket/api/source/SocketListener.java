@@ -76,6 +76,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
         workManager.start();
 
         executorService = newSingleThreadExecutor(r -> new Thread(r, format("%s%s.socket.listener", getPrefix(muleContext), flowConstruct.getName())));
+        stopRequested.set(false);
         executorService.execute(this::listen);
     }
 

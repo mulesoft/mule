@@ -17,11 +17,12 @@ import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
@@ -86,6 +87,24 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     {
         write(new File(listenerFolder, WATCH_FILE), WATCH_CONTENT);
         assertEvent(listen(CREATE, WATCH_FILE), WATCH_CONTENT);
+    }
+
+    @Test
+    public void stopAndRestart() throws Exception
+    {
+        muleContext.getRegistry().lookupObjects(Flow.class).forEach(flow -> {
+            try
+            {
+                flow.stop();
+                flow.start();
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+        });
+
+        onFileCreated();
     }
 
     @Test

@@ -232,8 +232,9 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
         matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate();
         executorService = newSingleThreadExecutor(r -> new Thread(r, format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName())));
-        executorService.execute(this::listen);
         started = true;
+        stopRequested.set(false);
+        executorService.execute(this::listen);
     }
 
     private synchronized void initialiseClusterListener()
