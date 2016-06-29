@@ -18,7 +18,8 @@ import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.Category.COMMUNITY;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
@@ -65,6 +66,8 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.TAR
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
+import org.mule.api.MuleVersion;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.BooleanType;
@@ -97,14 +100,20 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
 @SmallTest
 public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTestCase
 {
 
+    private static final MuleVersion MIN_MULE_VERSION = new MuleVersion("4.0");
     private final TestWebServiceConsumerDeclarer reference = new TestWebServiceConsumerDeclarer();
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void assertExtension()
@@ -177,7 +186,13 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
         final String beta = "beta";
         final String alpha = "alpha";
 
-        ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer().named("test").onVersion("1.0").fromVendor("MuleSoft");
+        ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
+                .named("test")
+                .onVersion("1.0")
+                .fromVendor("MuleSoft")
+                .withCategory(COMMUNITY)
+                .withMinMuleVersion(MIN_MULE_VERSION);
+
         extensionDeclarer.withConfig(defaultConfiguration).describedAs(defaultConfiguration).createdWith(mockInstantiator);
         extensionDeclarer.withConfig(beta).describedAs(beta).createdWith(mockInstantiator);
         extensionDeclarer.withConfig(alpha).describedAs(alpha).createdWith(mockInstantiator);
@@ -243,22 +258,51 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
         factory.createFrom(extensionDeclarer, createDescribingContext());
     }
 
-    @Test(expected = IllegalModelDefinitionException.class)
+    @Test
     public void nullVendor()
     {
-        extensionDeclarer = new ExtensionDeclarer();
-        extensionDeclarer.named("IWillExplode")
-                .onVersion("1.2.3")
-                .withConfig("default")
-                .createdWith(mock(ConfigurationFactory.class));
+        exception.expect(IllegalModelDefinitionException.class);
+        exception.expectMessage("Extension Vendor cannot be null");
 
-        factory.createFrom(extensionDeclarer, createDescribingContext());
+        final ExtensionDeclarer baseDeclarer = getBaseDeclarer();
+        baseDeclarer.withCategory(COMMUNITY).withMinMuleVersion(MIN_MULE_VERSION);
+
+        factory.createFrom(baseDeclarer, createDescribingContext());
+    }
+
+    @Test
+    public void nullCategory()
+    {
+        exception.expect(IllegalModelDefinitionException.class);
+        exception.expectMessage("Extension Category cannot be null");
+
+        final ExtensionDeclarer baseDeclarer = getBaseDeclarer();
+        baseDeclarer.fromVendor("SomeVendor").withMinMuleVersion(MIN_MULE_VERSION);
+
+        factory.createFrom(baseDeclarer, createDescribingContext());
+    }
+
+    @Test
+    public void nullMinMuleVersion()
+    {
+        exception.expect(IllegalModelDefinitionException.class);
+        exception.expectMessage("Extension Minimum Mule Version cannot be null");
+
+        final ExtensionDeclarer baseDeclarer = getBaseDeclarer();
+        baseDeclarer.fromVendor("SomeVendor").withCategory(COMMUNITY);
+
+        factory.createFrom(baseDeclarer, createDescribingContext());
     }
 
     @Test
     public void configlessDescriptor()
     {
-        factory.createFrom(new ExtensionDeclarer().named("noConfigs").onVersion("1.0").fromVendor("MuleSoft"), createDescribingContext());
+        factory.createFrom(new ExtensionDeclarer()
+                                   .named("noConfigs")
+                                   .onVersion("1.0")
+                                   .fromVendor("MuleSoft")
+                                   .withCategory(COMMUNITY)
+                                   .withMinMuleVersion(MIN_MULE_VERSION), createDescribingContext());
     }
 
     @Test
@@ -373,6 +417,14 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
         assertThat(parameterModels.isEmpty(), is(true));
     }
 
+    private ExtensionDeclarer getBaseDeclarer()
+    {
+        final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
+        extensionDeclarer.named("BaseExtension")
+                .onVersion("1.2.3").withConfig("default")
+                .createdWith(mock(ConfigurationFactory.class));
+        return extensionDeclarer;
+    }
 
     @Override
     protected ExtensionDeclarer createDeclarationDescriptor()
