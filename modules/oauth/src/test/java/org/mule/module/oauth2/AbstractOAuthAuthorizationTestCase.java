@@ -91,6 +91,14 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
                                                                                        "\"" + OAuthConstants.REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"}");
     }
 
+    protected void configureWireMockToExpectOfflineTokenPathRequestForAuthorizationCodeGrantType(String accessToken)
+    {
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" +
+                                                                                       "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," +
+                                                                                       "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + "," +
+                                                                                       "\"}");
+    }
+
     protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(String body)
     {
         wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH))

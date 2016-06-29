@@ -26,7 +26,7 @@ public class TokenResponseProcessor
     protected Logger logger = LoggerFactory.getLogger(getClass());
     private final TokenResponseConfiguration tokenResponseConfiguration;
     private final ExpressionManager expressionManager;
-    private final boolean retrieveRefreshTokenIfPresent;
+    private final boolean retrieveRefreshToken;
     private String accessToken;
     private String refreshToken;
     private String expiresIn;
@@ -42,11 +42,11 @@ public class TokenResponseProcessor
         return new TokenResponseProcessor(tokenResponseConfiguration, expressionManager, false);
     }
 
-    private TokenResponseProcessor(final TokenResponseConfiguration tokenResponseConfiguration, final ExpressionManager expressionManager, boolean retrieveRefreshTokenIfPresent)
+    private TokenResponseProcessor(final TokenResponseConfiguration tokenResponseConfiguration, final ExpressionManager expressionManager, boolean retrieveRefreshToken)
     {
         this.tokenResponseConfiguration = tokenResponseConfiguration;
         this.expressionManager = expressionManager;
-        this.retrieveRefreshTokenIfPresent = retrieveRefreshTokenIfPresent;
+        this.retrieveRefreshToken = retrieveRefreshToken;
     }
 
     public void process(final MuleEvent muleEvent)
@@ -57,14 +57,10 @@ public class TokenResponseProcessor
         {
             logger.error("Could not extract access token from token URL. Expressions used to retrieve access token was " + tokenResponseConfiguration.getAccessToken());
         }
-        if (retrieveRefreshTokenIfPresent)
+        if (retrieveRefreshToken)
         {
             refreshToken = expressionManager.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent);
             refreshToken = isEmpty(refreshToken) ? null : refreshToken;
-            if (refreshToken == null)
-            {
-                logger.warn("Could not extract refresh token from token URL or not issued by the OAuth server. Expressions used to retrieve refresh token was " + tokenResponseConfiguration.getRefreshToken() + ", it will not be possible to refresh the access token once it is expired");
-            }
         }
         expiresIn = expressionManager.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent);
         customResponseParameters = new HashMap<>();
