@@ -419,7 +419,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Test
-    public void minMuleVersionIsDescribedCorrectly(){
+    public void minMuleVersionIsDescribedCorrectly()
+    {
         setDescriber(describerFor(HeisenbergExtension.class));
         ExtensionDeclarer declarer = describeExtension();
         final ExtensionDeclaration declaration = declarer.getDeclaration();
@@ -427,7 +428,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Test
-    public void categoryIsDescribedCorrectly(){
+    public void categoryIsDescribedCorrectly()
+    {
         setDescriber(describerFor(HeisenbergExtension.class));
         ExtensionDeclarer declarer = describeExtension();
         final ExtensionDeclaration declaration = declarer.getDeclaration();
@@ -435,7 +437,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Test
-    public void minMuleVersionDefaultValueIsDescribedCorrectly(){
+    public void minMuleVersionDefaultValueIsDescribedCorrectly()
+    {
         setDescriber(describerFor(PetStoreConnector.class));
         ExtensionDeclarer declarer = describeExtension();
         final ExtensionDeclaration declaration = declarer.getDeclaration();
@@ -443,7 +446,8 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     }
 
     @Test
-    public void categoryDefaultValueIsDescribedCorrectly(){
+    public void categoryDefaultValueIsDescribedCorrectly()
+    {
         setDescriber(describerFor(PetStoreConnector.class));
         ExtensionDeclarer declarer = describeExtension();
         final ExtensionDeclaration declaration = declarer.getDeclaration();
