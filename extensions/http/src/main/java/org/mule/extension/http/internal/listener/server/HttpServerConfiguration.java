@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.listener.server;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.module.http.internal.listener.Server;
 
 /**
@@ -21,16 +22,16 @@ public class HttpServerConfiguration
     private final TlsContextFactory tlsContextFactory;
     private final boolean usePersistentConnections;
     private final int connectionIdleTimeout;
-    private final String ownerName;
+    private final WorkManagerSource workManagerSource;
 
-    public HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections, int connectionIdleTimeout, String ownerName)
+    public HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections, int connectionIdleTimeout, WorkManagerSource workManagerSource)
     {
         this.host = host;
         this.port = port;
         this.tlsContextFactory = tlsContextFactory;
         this.usePersistentConnections = usePersistentConnections;
         this.connectionIdleTimeout = connectionIdleTimeout;
-        this.ownerName = ownerName;
+        this.workManagerSource = workManagerSource;
     }
 
     public String getHost()
@@ -58,9 +59,9 @@ public class HttpServerConfiguration
         return connectionIdleTimeout;
     }
 
-    public String getOwnerName()
+    public WorkManagerSource getWorkManagerSource()
     {
-        return ownerName;
+        return workManagerSource;
     }
 
     public static class Builder
@@ -70,7 +71,7 @@ public class HttpServerConfiguration
         private TlsContextFactory tlsContextFactory;
         private boolean usePersistentConnections;
         private int connectionIdleTimeout;
-        private String ownerName;
+        private WorkManagerSource workManagerSource;
 
 
         public Builder setHost(String host)
@@ -103,15 +104,15 @@ public class HttpServerConfiguration
             return this;
         }
 
-        public Builder setOwnerName(String ownerName)
+        public Builder setWorkManagerSource(WorkManagerSource workManagerSource)
         {
-            this.ownerName = ownerName;
+            this.workManagerSource = workManagerSource;
             return this;
         }
 
         public HttpServerConfiguration build()
         {
-            return new HttpServerConfiguration(host, port, tlsContextFactory, usePersistentConnections, connectionIdleTimeout, ownerName);
+            return new HttpServerConfiguration(host, port, tlsContextFactory, usePersistentConnections, connectionIdleTimeout, workManagerSource);
         }
     }
 }

@@ -9,7 +9,10 @@ package org.mule.extension.http.api.listener;
 import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -21,10 +24,18 @@ import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.WorkManager;
+import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.config.MutableThreadingProfile;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -44,8 +55,9 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @Alias("listener")
-public class HttpListenerProvider implements ConnectionProvider<Server>, Initialisable
+public class HttpListenerProvider implements ConnectionProvider<Server>, Initialisable, Startable, Stoppable
 {
+    private static final int DEFAULT_MAX_THREADS = 128;
 
     @ConfigName
     private String configName;
@@ -106,6 +118,11 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
     @Inject
     private MuleContext muleContext;
 
+    //TODO: MULE-9320 Define threading model for message sources in Mule 4 - This should be a parameter if nothing changes
+    private ThreadingProfile workerThreadingProfile;
+    private WorkManager workManager;
+    private Server server;
+
     @Override
     public void initialise() throws InitialisationException
     {
@@ -118,16 +135,16 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
 
         if (protocol.equals(HTTP) && tlsContext != null)
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("TlsContext cannot be configured with protocol HTTP. " +
-                                                                               "If you defined a tls:context element in your listener-config then you must set protocol=\"HTTPS\""), this);
+            throw new InitialisationException(createStaticMessage("TlsContext cannot be configured with protocol HTTP. " +
+                                                                  "If you defined a tls:context element in your listener-config then you must set protocol=\"HTTPS\""), this);
         }
         if (protocol.equals(HTTPS) && tlsContext == null)
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("Configured protocol is HTTPS but there's no TlsContext configured"), this);
+            throw new InitialisationException(createStaticMessage("Configured protocol is HTTPS but there's no TlsContext configured"), this);
         }
         if (tlsContext != null && !tlsContext.isKeyStoreConfigured())
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("KeyStore must be configured for server side SSL"), this);
+            throw new InitialisationException(createStaticMessage("KeyStore must be configured for server side SSL"), this);
         }
 
         if (tlsContext != null)
@@ -136,37 +153,74 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
         }
 
         verifyConnectionsParameters();
-    }
 
-    @Override
-    public Server connect() throws ConnectionException
-    {
+        //TODO: MULE-9320 Define threading model for message sources in Mule 4 - Analyse whether this can be avoided
+        workerThreadingProfile = new MutableThreadingProfile(DEFAULT_THREADING_PROFILE);
+        workerThreadingProfile.setMaxThreadsActive(DEFAULT_MAX_THREADS);
+
         HttpServerConfiguration serverConfiguration = new HttpServerConfiguration.Builder()
                 .setHost(host)
                 .setPort(port)
                 .setTlsContextFactory(tlsContext)
                 .setUsePersistentConnections(usePersistentConnections)
                 .setConnectionIdleTimeout(connectionIdleTimeout)
-                .setOwnerName(configName)
+                .setWorkManagerSource(createWorkManagerSource(workManager))
                 .build();
-        Server server = connectionManager.create(serverConfiguration);
-
         try
         {
+            server = connectionManager.create(serverConfiguration);
+        }
+        catch (ConnectionException e)
+        {
+            throw new InitialisationException(createStaticMessage("Could not create HTTP server"), this);
+        }
+    }
+
+    @Override
+    public void start() throws MuleException
+    {
+        try
+        {
+            workManager = createWorkManager(configName);
+            workManager.start();
             server.start();
         }
         catch (IOException e)
         {
-            throw new ConnectionException("Could not start server", e);
+            throw new DefaultMuleException(new ConnectionException("Could not start HTTP server", e));
         }
+    }
 
+    @Override
+    public void stop() throws MuleException
+    {
+        try
+        {
+            server.stop();
+        }
+        finally
+        {
+            try
+            {
+                workManager.dispose();
+            }
+            finally
+            {
+                workManager = null;
+            }
+        }
+    }
+
+    @Override
+    public Server connect() throws ConnectionException
+    {
         return server;
     }
 
     @Override
     public void disconnect(Server server)
     {
-        server.stop();
+        //server could be shared with other listeners, do nothing
     }
 
     @Override
@@ -199,4 +253,18 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
         }
     }
 
+    private WorkManager createWorkManager(String name)
+    {
+        final WorkManager workManager = workerThreadingProfile.createWorkManager(format("%s%s.%s", getPrefix(muleContext), name, "worker"), muleContext.getConfiguration().getShutdownTimeout());
+        if (workManager instanceof MuleContextAware)
+        {
+            ((MuleContextAware) workManager).setMuleContext(muleContext);
+        }
+        return workManager;
+    }
+
+    private WorkManagerSource createWorkManagerSource(WorkManager workManager)
+    {
+        return () -> workManager;
+    }
 }

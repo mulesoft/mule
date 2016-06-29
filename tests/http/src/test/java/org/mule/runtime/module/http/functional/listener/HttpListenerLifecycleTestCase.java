@@ -24,7 +24,6 @@ import java.net.ConnectException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -94,27 +93,31 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(404));
     }
 
-    @Ignore("MULE-9878")
     @Test
     public void stoppedListenerConfigDoNotListen() throws Exception
     {
         LifecycleAwareConfigurationProvider httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
         httpListenerConfig.stop();
-        expectedException.expect(ConnectException.class);
-        Request.Get(getLifecycleConfigUrl("/path/subpath")).execute();
-        httpListenerConfig.start();
+        try
+        {
+            expectedException.expect(ConnectException.class);
+            Request.Get(getLifecycleConfigUrl("/path/subpath")).execute();
+        }
+        finally
+        {
+            httpListenerConfig.start();
+        }
     }
 
-    @Ignore("MULE-9878")
     @Test
     public void stopOneListenerConfigDoesNotAffectAnother() throws Exception
     {
         LifecycleAwareConfigurationProvider httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
         httpListenerConfig.stop();
         callAndAssertResponseFromUnaffectedListener(getUnchangedConfigUrl(), "works");
+        httpListenerConfig.start();
     }
 
-    @Ignore("MULE-9878")
     @Test
     public void restartListenerConfig() throws Exception
     {
