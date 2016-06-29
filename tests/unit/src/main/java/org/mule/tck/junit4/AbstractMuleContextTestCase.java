@@ -67,7 +67,6 @@ import org.junit.rules.TemporaryFolder;
  */
 public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 {
-    public static final String TEST_PAYLOAD = "test";
     public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
 
     public TemporaryFolder workingDirectory = new TemporaryFolder();

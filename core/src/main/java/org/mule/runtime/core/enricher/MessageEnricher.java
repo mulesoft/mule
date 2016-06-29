@@ -99,8 +99,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
         {
             final TypedValue finalTypedValue = typedValue;
             currentEvent.setMessage(currentEvent.getMessage().transform(msg -> {
-                msg.setPayload(finalTypedValue.getValue(), finalTypedValue.getDataType());
-                return msg;
+                    msg.setPayload(finalTypedValue.getValue(), finalTypedValue.getDataType());
+                    return msg;
             }));
         }
     }

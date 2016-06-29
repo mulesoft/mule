@@ -16,7 +16,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.core.metadata.CollectionDataType;
+import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -46,18 +46,18 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     public void buildCollection()
     {
         final DataType<Set> dataType = DataType.fromType(Set.class);
-        assertThat(dataType, instanceOf(CollectionDataType.class));
+        assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(Set.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.OBJECT));
+        assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.OBJECT));
     }
 
     @Test
     public void buildTypedCollection()
     {
-        final DataType<Set> dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
-        assertThat(dataType, instanceOf(CollectionDataType.class));
+        final DataType<List> dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
+        assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(List.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.STRING));
+        assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.STRING));
     }
 
     @Test
@@ -79,9 +79,9 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
         final DataType<Set> template = DataType.builder().type(Set.class).mediaType("text/plain;charset=ASCII").build();
         final DataType dataType = DataType.builder(template).build();
 
-        assertThat(dataType, instanceOf(CollectionDataType.class));
+        assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(Set.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.OBJECT));
+        assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.OBJECT));
         assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
         assertThat(dataType.getMediaType().getSubType(), is("plain"));
         assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
@@ -90,16 +90,16 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void templateTypedCollection()
     {
-        final DataType<Set> template = DataType.builder()
+        final DataType<List> template = DataType.builder()
                                                .collectionType(List.class)
                                                .itemType(String.class)
                                                .mediaType("text/plain;charset=ASCII")
                                                .build();
         final DataType dataType = DataType.builder(template).build();
 
-        assertThat(dataType, instanceOf(CollectionDataType.class));
+        assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(List.class)));
-        assertThat(((CollectionDataType) dataType).getItemType(), is(DataType.STRING));
+        assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.STRING));
     }
 
     @Test

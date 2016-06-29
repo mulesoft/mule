@@ -7,6 +7,7 @@
 package org.mule.runtime.core.metadata;
 
 import static com.google.common.cache.CacheBuilder.newBuilder;
+import static java.util.Optional.of;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionType;
 
@@ -24,6 +25,7 @@ import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.DataHandler;
@@ -65,10 +67,10 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
 
     public DefaultDataTypeBuilder(DataType dataType)
     {
-        if (dataType instanceof CollectionDataType)
+        if (dataType instanceof DefaultCollectionDataType)
         {
             this.type = dataType.getType();
-            this.itemTypeBuilder = DataType.builder(((CollectionDataType) dataType).getItemType());
+            this.itemTypeBuilder = DataType.builder(((DefaultCollectionDataType) dataType).getItemDataType());
         }
         else
         {
@@ -168,8 +170,8 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     }
 
     /**
-     * Sets the given type for the {@link CollectionDataType} to be built. See
-     * {@link CollectionDataType#getType()}.
+     * Sets the given type for the {@link DefaultCollectionDataType} to be built. See
+     * {@link DefaultCollectionDataType#getType()}.
      * 
      * @param collectionType the java collection type to set.
      * @return this builder.
@@ -203,8 +205,8 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     }
 
     /**
-     * Sets the given types for the {@link CollectionDataType} to be built. See
-     * {@link CollectionDataType#getType()} and {@link CollectionDataType#getItemType()}.
+     * Sets the given types for the {@link DefaultCollectionDataType} to be built. See
+     * {@link DefaultCollectionDataType#getType()} and {@link DefaultCollectionDataType#getItemDataType()}.
      * 
      * @param itemTypeBuilder the java type to set.
      * @return this builder.
@@ -342,7 +344,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     }
 
     @Override
-    public DataTypeBuilder<T> fromObject(T value)
+    public DataTypeParamsBuilder<T> fromObject(T value)
     {
         validateAlreadyBuilt();
 
@@ -352,23 +354,25 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         }
         else
         {
-            return (DataTypeBuilder<T>) type(value.getClass()).mediaType(getObjectMimeType(value));
+            DataTypeBuilder<T> builder = (DataTypeBuilder<T>) type(value.getClass());
+            return getObjectMimeType(value).map(mediaType -> builder.mediaType(mediaType)).orElse(builder);
         }
     }
 
-    private static String getObjectMimeType(Object value)
+    private Optional<String> getObjectMimeType(Object value)
     {
-        String mime = null;
         if (value instanceof DataHandler)
         {
-            mime = ((DataHandler) value).getContentType();
+            return of(((DataHandler) value).getContentType());
         }
         else if (value instanceof DataSource)
         {
-            mime = ((DataSource) value).getContentType();
+            return of(((DataSource) value).getContentType());
         }
-
-        return mime;
+        else
+        {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -392,7 +396,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         if (Collection.class.isAssignableFrom(type))
         {
-            return new CollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, MediaType.create(mediaPrimaryType, mediaSubType, charset));
+            return new DefaultCollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, MediaType.create(mediaPrimaryType, mediaSubType, charset));
         }
         else
         {
