@@ -240,7 +240,10 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
     private void updateResourceOwnerState(ResourceOwnerOAuthContext resourceOwnerOAuthContext, String newState, TokenResponseProcessor tokenResponseProcessor)
     {
         resourceOwnerOAuthContext.setAccessToken(tokenResponseProcessor.getAccessToken());
-        resourceOwnerOAuthContext.setRefreshToken(tokenResponseProcessor.getRefreshToken());
+        if (tokenResponseProcessor.getRefreshToken() != null)
+        {
+            resourceOwnerOAuthContext.setRefreshToken(tokenResponseProcessor.getRefreshToken());
+        }
         resourceOwnerOAuthContext.setExpiresIn(tokenResponseProcessor.getExpiresIn());
 
         //State may be null because there's no state or because this was called after refresh token.

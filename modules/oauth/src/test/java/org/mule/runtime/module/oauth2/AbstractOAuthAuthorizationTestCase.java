@@ -15,7 +15,6 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -23,6 +22,8 @@ import org.mule.runtime.module.oauth2.internal.OAuthConstants;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.UnsupportedEncodingException;
@@ -30,9 +31,6 @@ import java.net.URLEncoder;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Rule;
-
-import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestCase
 {
@@ -91,6 +89,14 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
                                                                                        "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," +
                                                                                        "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + "," +
                                                                                        "\"" + OAuthConstants.REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"}");
+    }
+
+    protected void configureWireMockToExpectOfflineTokenPathRequestForAuthorizationCodeGrantType(String accessToken)
+    {
+        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" +
+                                                                                       "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," +
+                                                                                       "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":" + EXPIRES_IN + "," +
+                                                                                       "\"}");
     }
 
     protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(String body)

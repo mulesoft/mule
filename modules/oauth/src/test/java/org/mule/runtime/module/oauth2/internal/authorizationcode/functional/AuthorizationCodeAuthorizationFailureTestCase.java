@@ -157,7 +157,7 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
     }
 
     @Test
-    public void callToTokenUrlSuccessButNoRefreshTokenRetrievedOnSubsequentRefreshOperation() throws Exception
+    public void callToTokenUrlSuccessWithOfflineRefreshTokenSupportedByAuthorizationServer() throws Exception
     {
         // During the initial call to token url it returns an access_token and refresh_token
         configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(ACCESS_TOKEN, REFRESH_TOKEN);
@@ -175,7 +175,7 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
 
         // In order to validate that oauth context is updated (due to it is persisted with OS) we now do another call but only returning the REFRESHED_ACCESS_TOKEN without
         // a refresh token.
-        configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(REFRESHED_ACCESS_TOKEN, null);
+        configureWireMockToExpectOfflineTokenPathRequestForAuthorizationCodeGrantType(REFRESHED_ACCESS_TOKEN);
         Get(getRedirectUrlWithOnCompleteUrlAndCodeQueryParams())
                 .connectTimeout(REQUEST_TIMEOUT)
                 .socketTimeout(REQUEST_TIMEOUT)
@@ -185,7 +185,7 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
         oauthContext = tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
 
         assertThat(oauthContext.getAccessToken(), is(REFRESHED_ACCESS_TOKEN));
-        assertThat(oauthContext.getRefreshToken(), is(nullValue()));
+        assertThat(oauthContext.getRefreshToken(), is(REFRESH_TOKEN));
     }
 
     private void verifyCallToRedirectUrlFails() throws IOException
