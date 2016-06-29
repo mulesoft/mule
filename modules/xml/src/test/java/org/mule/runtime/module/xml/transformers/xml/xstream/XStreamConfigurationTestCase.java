@@ -10,8 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.module.xml.transformer.AbstractXStreamTransformer;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.module.xml.transformer.AbstractXStreamTransformer;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class XStreamConfigurationTestCase extends FunctionalTestCase
         assertNotNull(transformer.getAliases());
         assertEquals(Apple.class, transformer.getAliases().get("apple"));
         assertNotNull(transformer.getConverters());
-        assertEquals(1, transformer.getConverters().size());
+        assertEquals(3, transformer.getConverters().size());
         assertTrue(transformer.getConverters().contains(DummyConverter.class));
 
         Apple apple = new Apple();
