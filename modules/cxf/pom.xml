@@ -78,7 +78,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
-                    <forkMode>always</forkMode>
+                    <forkCount>2</forkCount>
+					<reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
         </plugins>
