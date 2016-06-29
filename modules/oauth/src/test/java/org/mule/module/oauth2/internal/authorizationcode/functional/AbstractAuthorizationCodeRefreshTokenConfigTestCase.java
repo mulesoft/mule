@@ -70,17 +70,16 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
                                     .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "=" + URLEncoder.encode(OAuthConstants.GRANT_TYPE_REFRESH_TOKEN, StandardCharsets.UTF_8.name()))));
     }
 
-    protected void executeRefreshTokenNotIssuedOnTokenCall(String flowName, String oauthConfigName, String userId, int failureStatusCode) throws Exception
+    protected void executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers(String flowName, String oauthConfigName, String userId, int resourceFailureStatusCode, int tokenFailureStatusCode) throws Exception
     {
-        configureResourceResponsesForRefreshToken(oauthConfigName, userId, failureStatusCode);
+        configureResourceResponsesForRefreshToken(oauthConfigName, userId, resourceFailureStatusCode);
 
-        // Override the refresh token to be null
-        final ConfigOAuthContext configOAuthContext = muleContext.getRegistry().<TokenManagerConfig>lookupObject(oauthConfigName).getConfigOAuthContext();
-        final ResourceOwnerOAuthContext resourceOwnerOauthContext = configOAuthContext.getContextForResourceOwner(userId);
-        resourceOwnerOauthContext.setAccessToken(ACCESS_TOKEN);
-        resourceOwnerOauthContext.setRefreshToken(null);
-        configOAuthContext.updateResourceOwnerOAuthContext(resourceOwnerOauthContext);
-
+        wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH))
+                                     .withHeader(HttpHeaders.Names.AUTHORIZATION,
+                                                 containing(REFRESHED_ACCESS_TOKEN))
+                                     .willReturn(aResponse()
+                                                         .withStatus(tokenFailureStatusCode)
+                                                         .withBody("")));
         runFlow(flowName, userId);
     }
 
