@@ -6,17 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationsConnectionType;
-
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import com.sun.org.apache.xpath.internal.ExtensionsProvider;
 
@@ -46,30 +43,11 @@ public final class ConnectionProviderModelValidator implements ModelValidator
     private void validateConnectionProviders(ExtensionModel extensionModel, Class<?> connectionType)
     {
         extensionModel.getConnectionProviders().stream().forEach(providerModel -> {
-            validateConfigType((RuntimeConnectionProviderModel) providerModel, extensionModel);
             if (connectionType != null)
             {
                 validateConnectionTypes((RuntimeConnectionProviderModel) providerModel, extensionModel, connectionType);
             }
         });
-    }
-
-    private void validateConfigType(RuntimeConnectionProviderModel providerModel, ExtensionModel extensionModel)
-    {
-        Class<?> providerConfigType = providerModel.getConfigurationType();
-        for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels())
-        {
-            ImplementingTypeModelProperty typeProperty = configurationModel.getModelProperty(ImplementingTypeModelProperty.class).orElse(null);
-            if (typeProperty != null && !providerConfigType.isAssignableFrom(typeProperty.getType()))
-            {
-                throw new IllegalConnectionProviderModelDefinitionException(String.format(
-                        "Configuration '%s' in Extension '%s' is of type '%s' which cannot be used with the connection provider of type '%s' " +
-                        "because it requires configs of type '%s'. Please make sure that all configuration models in the extension can be used with " +
-                        "any of the defined connection providers",
-                        configurationModel.getName(), extensionModel.getName(), typeProperty.getType().getName(),
-                        getImplementingType(providerModel).getName(), providerConfigType.getName()));
-            }
-        }
     }
 
     private void validateConnectionTypes(RuntimeConnectionProviderModel providerModel, ExtensionModel extensionModel, Class<?> connectionType)

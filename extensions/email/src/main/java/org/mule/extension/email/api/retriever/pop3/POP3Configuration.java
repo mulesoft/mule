@@ -6,7 +6,6 @@
  */
 package org.mule.extension.email.api.retriever.pop3;
 
-import org.mule.extension.email.api.AbstractEmailConfiguration;
 import org.mule.extension.email.api.retriever.RetrieverConfiguration;
 import org.mule.extension.email.api.retriever.RetrieverOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -22,7 +21,7 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 @Operations(RetrieverOperations.class)
 @Providers({POP3Provider.class, POP3SProvider.class})
 @Configuration(name = "pop3")
-public class POP3Configuration extends AbstractEmailConfiguration implements RetrieverConfiguration
+public class POP3Configuration implements RetrieverConfiguration
 {
 
     /**

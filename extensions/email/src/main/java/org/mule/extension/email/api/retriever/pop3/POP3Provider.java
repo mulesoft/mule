@@ -22,7 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("pop3")
-public class POP3Provider extends AbstractRetrieverProvider<POP3Configuration, RetrieverConnection>
+public class POP3Provider extends AbstractRetrieverProvider<RetrieverConnection>
 {
     /**
      * The port number of the mail server.
@@ -35,16 +35,16 @@ public class POP3Provider extends AbstractRetrieverProvider<POP3Configuration, R
      * {@inheritDoc}
      */
     @Override
-    public RetrieverConnection connect(POP3Configuration config) throws ConnectionException
+    public RetrieverConnection connect() throws ConnectionException
     {
         return new RetrieverConnection(POP3,
                                        settings.getUser(),
                                        settings.getPassword(),
                                        settings.getHost(),
                                        port,
-                                       config.getConnectionTimeout(),
-                                       config.getReadTimeout(),
-                                       config.getWriteTimeout(),
-                                       config.getProperties());
+                                       getConnectionTimeout(),
+                                       getReadTimeout(),
+                                       getWriteTimeout(),
+                                       getProperties());
     }
 }

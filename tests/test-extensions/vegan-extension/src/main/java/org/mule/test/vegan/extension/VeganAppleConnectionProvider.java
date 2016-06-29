@@ -15,11 +15,11 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.tck.testmodels.fruit.Apple;
 
 @Alias("apple")
-public class VeganAppleConnectionProvider implements ConnectionProvider<AppleConfig, Apple>
+public class VeganAppleConnectionProvider implements ConnectionProvider<Apple>
 {
 
     @Override
-    public Apple connect(AppleConfig config) throws ConnectionException
+    public Apple connect() throws ConnectionException
     {
         return new Apple();
     }
@@ -37,7 +37,7 @@ public class VeganAppleConnectionProvider implements ConnectionProvider<AppleCon
     }
 
     @Override
-    public ConnectionHandlingStrategy<Apple> getHandlingStrategy(ConnectionHandlingStrategyFactory<AppleConfig, Apple> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<Apple> getHandlingStrategy(ConnectionHandlingStrategyFactory<Apple> handlingStrategyFactory)
     {
         return handlingStrategyFactory.none();
     }

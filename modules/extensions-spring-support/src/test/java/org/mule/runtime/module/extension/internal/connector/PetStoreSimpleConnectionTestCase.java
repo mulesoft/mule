@@ -9,12 +9,11 @@ package org.mule.runtime.module.extension.internal.connector;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
-import org.junit.Test;
 
 public class PetStoreSimpleConnectionTestCase extends PetStoreConnectionTestCase
 {
     @Rule
-    public SystemProperty configNameProperty = new SystemProperty("configName", "petstore");
+    public SystemProperty configNameProperty = new SystemProperty("configName", DEFAULT_CONFIG_NAME);
 
     @Override
     protected String getConfigFile()

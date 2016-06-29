@@ -15,6 +15,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.ReadCommand;
 import org.mule.runtime.module.extension.file.api.lock.NullPathLock;
 import org.mule.runtime.module.extension.file.api.lock.PathLock;
@@ -34,18 +35,18 @@ public final class SftpReadCommand extends SftpCommand implements ReadCommand
     /**
      * {@inheritDoc}
      */
-    public SftpReadCommand(SftpFileSystem fileSystem, FtpConnector config, SftpClient client)
+    public SftpReadCommand(SftpFileSystem fileSystem, SftpClient client)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public MuleMessage<InputStream, FileAttributes> read(MuleMessage<?, ?> message, String filePath, boolean lock)
+    public MuleMessage<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage<?, ?> message, String filePath, boolean lock)
     {
-        FtpFileAttributes attributes = getExistingFile(filePath);
+        FtpFileAttributes attributes = getExistingFile(config, filePath);
         if (attributes.isDirectory())
         {
             throw cannotReadDirectoryException(Paths.get(attributes.getPath()));
@@ -66,7 +67,7 @@ public final class SftpReadCommand extends SftpCommand implements ReadCommand
 
         try
         {
-            return new DefaultMuleMessage(SftpInputStream.newInstance(config, attributes, pathLock),
+            return new DefaultMuleMessage(SftpInputStream.newInstance((FtpConnector) config, attributes, pathLock),
                                           fileSystem.getFileMessageDataType(message.getDataType(), attributes),
                                           attributes).asNewMessage();
         }

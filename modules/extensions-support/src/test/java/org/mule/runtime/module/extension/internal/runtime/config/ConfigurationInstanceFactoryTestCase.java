@@ -38,7 +38,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Kiwi;
 
@@ -129,11 +128,11 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         assertThat(((Interceptable) configurationInstance).getInterceptors(), containsInAnyOrder(interceptor1, interceptor2));
     }
 
-    public static class InvalidConfigTestConnectionProvider implements ConnectionProvider<Apple, Banana>
+    public static class InvalidConfigTestConnectionProvider implements ConnectionProvider<Banana>
     {
 
         @Override
-        public Banana connect(Apple apple) throws ConnectionException
+        public Banana connect() throws ConnectionException
         {
             return new Banana();
         }
@@ -151,17 +150,17 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public ConnectionHandlingStrategy<Banana> getHandlingStrategy(ConnectionHandlingStrategyFactory<Apple, Banana> handlingStrategyFactory)
+        public ConnectionHandlingStrategy<Banana> getHandlingStrategy(ConnectionHandlingStrategyFactory<Banana> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
         }
     }
 
-    public static class InvalidConnectionTypeProvider implements ConnectionProvider<TestConfig, Kiwi>
+    public static class InvalidConnectionTypeProvider implements ConnectionProvider<Kiwi>
     {
 
         @Override
-        public Kiwi connect(TestConfig testConfig) throws ConnectionException
+        public Kiwi connect() throws ConnectionException
         {
             return new Kiwi();
         }
@@ -179,7 +178,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public ConnectionHandlingStrategy<Kiwi> getHandlingStrategy(ConnectionHandlingStrategyFactory<TestConfig, Kiwi> handlingStrategyFactory)
+        public ConnectionHandlingStrategy<Kiwi> getHandlingStrategy(ConnectionHandlingStrategyFactory<Kiwi> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
         }

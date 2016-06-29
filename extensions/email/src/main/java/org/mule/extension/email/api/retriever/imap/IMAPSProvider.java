@@ -28,7 +28,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("imaps")
-public class IMAPSProvider extends AbstractRetrieverProvider<IMAPConfiguration, RetrieverConnection> implements Initialisable
+public class IMAPSProvider extends AbstractRetrieverProvider<RetrieverConnection> implements Initialisable
 {
 
     /**
@@ -58,17 +58,17 @@ public class IMAPSProvider extends AbstractRetrieverProvider<IMAPConfiguration, 
      * {@inheritDoc}
      */
     @Override
-    public RetrieverConnection connect(IMAPConfiguration config) throws ConnectionException
+    public RetrieverConnection connect() throws ConnectionException
     {
         return new RetrieverConnection(IMAPS,
                                        settings.getUser(),
                                        settings.getPassword(),
                                        settings.getHost(),
                                        port,
-                                       config.getConnectionTimeout(),
-                                       config.getReadTimeout(),
-                                       config.getWriteTimeout(),
-                                       config.getProperties(),
+                                       getConnectionTimeout(),
+                                       getReadTimeout(),
+                                       getWriteTimeout(),
+                                       getProperties(),
                                        tlsContextFactory);
     }
 }

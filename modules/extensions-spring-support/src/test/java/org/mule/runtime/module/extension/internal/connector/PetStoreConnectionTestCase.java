@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.connector;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -22,6 +23,8 @@ import org.junit.Test;
 
 public abstract class PetStoreConnectionTestCase extends ExtensionFunctionalTestCase
 {
+
+    protected static final String DEFAULT_CONFIG_NAME = "petstore";
 
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
@@ -70,10 +73,16 @@ public abstract class PetStoreConnectionTestCase extends ExtensionFunctionalTest
         assertThat(client.getPassword(), is("doe"));
 
         assertConnected(client);
+        assertThat(client.getConfigName(), equalTo(getConfigName()));
     }
 
     protected void assertConnected(PetStoreClient client)
     {
         assertThat(client.isConnected(), is(true));
+    }
+
+    protected String getConfigName()
+    {
+        return DEFAULT_CONFIG_NAME;
     }
 }

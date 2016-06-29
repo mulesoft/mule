@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.extension.file.api.AbstractFileSystem;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
@@ -80,9 +81,12 @@ public class ConcurrentLockTestCase
     {
         try
         {
-            if (fileSystem.lock(PATH).tryLock()) {
+            if (fileSystem.lock(PATH).tryLock())
+            {
                 successful.incrementAndGet();
-            } else {
+            }
+            else
+            {
                 failed.incrementAndGet();
             }
         }
@@ -161,6 +165,11 @@ public class ConcurrentLockTestCase
                 locked = true;
                 return new NullPathLock();
             }
+        }
+
+        @Override
+        public void changeToBaseDir(FileConnectorConfig config)
+        {
         }
     }
 }

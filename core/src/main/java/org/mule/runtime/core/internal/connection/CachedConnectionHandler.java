@@ -7,13 +7,12 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
-
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -37,8 +36,7 @@ final class CachedConnectionHandler<Config, Connection> implements ConnectionHan
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedConnectionHandler.class);
 
-    private final Config config;
-    private final ConnectionProvider<Config, Connection> connectionProvider;
+    private final ConnectionProvider<Connection> connectionProvider;
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
@@ -49,13 +47,11 @@ final class CachedConnectionHandler<Config, Connection> implements ConnectionHan
     /**
      * Creates a new instance
      *
-     * @param config             the {@code Config} that owns the wrapped connection
      * @param connectionProvider the {@link ConnectionProvider} to be used to managed the connection
      * @param muleContext        the owning {@link MuleContext}
      */
-    public CachedConnectionHandler(Config config, ConnectionProvider<Config, Connection> connectionProvider, MuleContext muleContext)
+    public CachedConnectionHandler(ConnectionProvider<Connection> connectionProvider, MuleContext muleContext)
     {
-        this.config = config;
         this.connectionProvider = connectionProvider;
         this.muleContext = muleContext;
     }
@@ -111,7 +107,7 @@ final class CachedConnectionHandler<Config, Connection> implements ConnectionHan
     private Connection createConnection() throws ConnectionException
     {
         assertNotStopping(muleContext, "Mule is shutting down... Cannot establish new connections");
-        connection = connectionProvider.connect(config);
+        connection = connectionProvider.connect();
         return connection;
     }
 

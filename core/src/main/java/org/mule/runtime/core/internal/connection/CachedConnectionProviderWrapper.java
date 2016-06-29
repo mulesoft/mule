@@ -23,13 +23,13 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class CachedConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection>
+public final class CachedConnectionProviderWrapper<Connection> extends ConnectionProviderWrapper<Connection>
 {
 
     private final boolean disableValidation;
     private final RetryPolicyTemplate retryPolicyTemplate;
 
-    public CachedConnectionProviderWrapper(ConnectionProvider<Config, Connection> provider, boolean disableValidation, RetryPolicyTemplate retryPolicyTemplate)
+    public CachedConnectionProviderWrapper(ConnectionProvider<Connection> provider, boolean disableValidation, RetryPolicyTemplate retryPolicyTemplate)
     {
         super(provider);
         this.disableValidation = disableValidation;

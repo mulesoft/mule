@@ -30,7 +30,7 @@ public class PassThroughConnectionHandlerTestCase extends AbstractMuleTestCase
     private Banana connection;
 
     @Mock
-    private ConnectionProvider<?, Banana> connectionProvider;
+    private ConnectionProvider<Banana> connectionProvider;
 
     private ConnectionHandlerAdapter<Banana> managedConnection;
 

@@ -33,7 +33,7 @@ public class NullConnectionHandlingStrategyTestCase extends AbstractMuleTestCase
 {
 
     @Mock
-    private ConnectionProvider<Apple, Banana> connectionProvider;
+    private ConnectionProvider<Banana> connectionProvider;
 
     @Mock
     private Apple config;
@@ -44,13 +44,13 @@ public class NullConnectionHandlingStrategyTestCase extends AbstractMuleTestCase
     @Mock
     private MuleContext muleContext;
 
-    private NullConnectionHandlingStrategy<Apple, Banana> strategy;
+    private NullConnectionHandlingStrategy<Banana> strategy;
 
     @Before
     public void before() throws Exception
     {
-        when(connectionProvider.connect(config)).thenReturn(connection);
-        strategy = new NullConnectionHandlingStrategy<>(config, connectionProvider, muleContext);
+        when(connectionProvider.connect()).thenReturn(connection);
+        strategy = new NullConnectionHandlingStrategy<>(connectionProvider, muleContext);
     }
 
     @Test

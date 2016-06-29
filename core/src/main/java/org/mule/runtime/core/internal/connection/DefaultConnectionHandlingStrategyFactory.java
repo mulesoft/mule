@@ -6,45 +6,37 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
+import org.mule.runtime.core.api.MuleContext;
 
 /**
  * Default implementation of {@link ConnectionHandlingStrategyFactory}.
- * <p/>
- * This implementation is stateful an is tightly associated to a {@link #config},
- * {@link #connectionProvider}, a {@link #poolingProfile} and {@link #muleContext}.
  *
- * @param <Config>     the generic type of the config for which connections will be produced
  * @param <Connection> the generic type of the connections that will be produced
  * @since 4.0
  */
-final class DefaultConnectionHandlingStrategyFactory<Config, Connection> implements ConnectionHandlingStrategyFactory<Config, Connection>
+final class DefaultConnectionHandlingStrategyFactory<Connection> implements ConnectionHandlingStrategyFactory<Connection>
 {
 
-    private final Config config;
-    private final ConnectionProvider<Config, Connection> connectionProvider;
+    private final ConnectionProvider<Connection> connectionProvider;
     private final MuleContext muleContext;
     private final PoolingProfile poolingProfile;
 
     /**
      * Creates a new instance
      *
-     * @param config             the config for which we try to create connections
      * @param connectionProvider the {@link ConnectionProvider} that will be used to manage connections
      * @param poolingProfile     the {@link PoolingProfile} that will be used to configure the pool of connections
      * @param muleContext        the owning  {@link MuleContext}
      */
-    DefaultConnectionHandlingStrategyFactory(Config config,
-                                             ConnectionProvider<Config, Connection> connectionProvider,
+    DefaultConnectionHandlingStrategyFactory(ConnectionProvider<Connection> connectionProvider,
                                              PoolingProfile poolingProfile,
                                              MuleContext muleContext)
     {
-        this.config = config;
         this.connectionProvider = connectionProvider;
         this.poolingProfile = poolingProfile;
         this.muleContext = muleContext;
@@ -63,7 +55,7 @@ final class DefaultConnectionHandlingStrategyFactory<Config, Connection> impleme
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingListener<Config, Connection> poolingListener)
+    public ConnectionHandlingStrategy<Connection> supportsPooling(PoolingListener<Connection> poolingListener)
     {
         return poolingProfile.isDisabled() ? none() : createPoolingStrategy(poolingListener);
     }
@@ -87,7 +79,7 @@ final class DefaultConnectionHandlingStrategyFactory<Config, Connection> impleme
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingListener<Config, Connection> poolingListener)
+    public ConnectionHandlingStrategy<Connection> requiresPooling(PoolingListener<Connection> poolingListener)
     {
         return createPoolingStrategy(poolingListener);
     }
@@ -98,7 +90,7 @@ final class DefaultConnectionHandlingStrategyFactory<Config, Connection> impleme
     @Override
     public ConnectionHandlingStrategy<Connection> cached()
     {
-        return new CachedConnectionHandlingStrategy<>(config, connectionProvider, muleContext);
+        return new CachedConnectionHandlingStrategy<>(connectionProvider, muleContext);
     }
 
     /**
@@ -107,11 +99,11 @@ final class DefaultConnectionHandlingStrategyFactory<Config, Connection> impleme
     @Override
     public ConnectionHandlingStrategy<Connection> none()
     {
-        return new NullConnectionHandlingStrategy<>(config, connectionProvider, muleContext);
+        return new NullConnectionHandlingStrategy<>(connectionProvider, muleContext);
     }
 
-    private PoolingConnectionHandlingStrategy<Config, Connection> createPoolingStrategy(PoolingListener<Config, Connection> poolingListener)
+    private PoolingConnectionHandlingStrategy<Connection> createPoolingStrategy(PoolingListener<Connection> poolingListener)
     {
-        return new PoolingConnectionHandlingStrategy<>(config, connectionProvider, poolingProfile, poolingListener, muleContext);
+        return new PoolingConnectionHandlingStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext);
     }
 }

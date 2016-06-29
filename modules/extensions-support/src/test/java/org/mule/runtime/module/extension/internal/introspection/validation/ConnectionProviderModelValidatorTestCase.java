@@ -55,12 +55,6 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
     }
 
     @Test(expected = IllegalConnectionProviderModelDefinitionException.class)
-    public void invalidConfigConnectionProviderTestConnector()
-    {
-        validate(InvalidConfigConnectionProviderTestConnector.class);
-    }
-
-    @Test(expected = IllegalConnectionProviderModelDefinitionException.class)
     public void invalidConnectionTypeProviderTestConnector()
     {
         validate(InvalidConnectionTypeProviderTestConnector.class);
@@ -136,11 +130,11 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
     }
 
     @Alias("provider1")
-    public static class TestConnectionProvider implements ConnectionProvider<Config, ValidatorTestConnection>
+    public static class TestConnectionProvider implements ConnectionProvider<ValidatorTestConnection>
     {
 
         @Override
-        public ValidatorTestConnection connect(Config config) throws ConnectionException
+        public ValidatorTestConnection connect() throws ConnectionException
         {
             return new ValidatorTestConnection();
         }
@@ -158,7 +152,7 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         }
 
         @Override
-        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, ValidatorTestConnection> handlingStrategyFactory)
+        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<ValidatorTestConnection> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
         }
@@ -171,11 +165,11 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
     }
 
     @Alias("invalidConfig")
-    public static class InvalidConfigConnectionProvider implements ConnectionProvider<Apple, ValidatorTestConnection>
+    public static class InvalidConfigConnectionProvider implements ConnectionProvider<ValidatorTestConnection>
     {
 
         @Override
-        public ValidatorTestConnection connect(Apple apple) throws ConnectionException
+        public ValidatorTestConnection connect() throws ConnectionException
         {
             return new ValidatorTestConnection();
         }
@@ -193,18 +187,18 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         }
 
         @Override
-        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Apple, ValidatorTestConnection> handlingStrategyFactory)
+        public ConnectionHandlingStrategy<ValidatorTestConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<ValidatorTestConnection> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
         }
     }
 
     @Alias("invalidConnection")
-    public static class InvalidTypeConnectionProvider implements ConnectionProvider<Config, Apple>
+    public static class InvalidTypeConnectionProvider implements ConnectionProvider<Apple>
     {
 
         @Override
-        public Apple connect(Config config) throws ConnectionException
+        public Apple connect() throws ConnectionException
         {
             return new Apple();
         }
@@ -222,7 +216,7 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
         }
 
         @Override
-        public ConnectionHandlingStrategy<Apple> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, Apple> handlingStrategyFactory)
+        public ConnectionHandlingStrategy<Apple> getHandlingStrategy(ConnectionHandlingStrategyFactory<Apple> handlingStrategyFactory)
         {
             return handlingStrategyFactory.cached();
         }

@@ -21,21 +21,22 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public final class LocalFileConnectionProvider implements ConnectionProvider<FileConnector, FileSystem>
+public final class LocalFileConnectionProvider implements ConnectionProvider<FileSystem>
 {
     @Inject
     private MuleContext muleContext;
 
+
+
     /**
      * Creates and returns a new instance of {@link LocalFileSystem}
      *
-     * @param fileConnector the {@link FileConnector} which parametrizes the return value
      * @return a {@link LocalFileSystem}
      */
     @Override
-    public FileSystem connect(FileConnector fileConnector)
+    public FileSystem connect()
     {
-        return new LocalFileSystem(fileConnector, muleContext);
+        return new LocalFileSystem(muleContext);
     }
 
     /**
@@ -60,7 +61,7 @@ public final class LocalFileConnectionProvider implements ConnectionProvider<Fil
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<FileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<FileConnector, FileSystem> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<FileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<FileSystem> handlingStrategyFactory)
     {
         return handlingStrategyFactory.cached();
     }

@@ -73,14 +73,15 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
      *
      * @throws IllegalStateException if invoked while the {@link #muleContext} is stopped or stopping
      */
-    public <Config, Connection> void bind(Config owner, ConnectionProvider<Config, Connection> connectionProvider)
+    @Override
+    public <Config, Connection> void bind(Config owner, ConnectionProvider<Connection> connectionProvider)
     {
         assertNotStopping(muleContext, "Mule is shutting down... cannot bind new connections");
 
         connectionProvider = new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext);
 
-        ConnectionHandlingStrategyAdapter<Config, Connection> managementStrategy = getManagementStrategy(owner, connectionProvider);
-        ConnectionHandlingStrategyAdapter<Config, Connection> previous = null;
+        ConnectionHandlingStrategyAdapter<Connection> managementStrategy = getManagementStrategy(connectionProvider);
+        ConnectionHandlingStrategyAdapter<Connection> previous = null;
 
         writeLock.lock();
         try
@@ -189,7 +190,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
         }
     }
 
-    private <Config, Connection> ConnectionHandlingStrategyAdapter<Config, Connection> getManagementStrategy(Config config, ConnectionProvider<Config, Connection> connectionProvider)
+    private <Connection> ConnectionHandlingStrategyAdapter<Connection> getManagementStrategy(ConnectionProvider<Connection> connectionProvider)
     {
         PoolingProfile poolingProfile;
         if (connectionProvider instanceof ConnectionProviderWrapper)
@@ -201,9 +202,9 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
             poolingProfile = getDefaultPoolingProfile();
         }
 
-        ConnectionHandlingStrategyFactory<Config, Connection> connectionHandlingStrategyFactory;
-        connectionHandlingStrategyFactory = new DefaultConnectionHandlingStrategyFactory<>(config, connectionProvider, poolingProfile, muleContext);
-        return (ConnectionHandlingStrategyAdapter<Config, Connection>) connectionProvider.getHandlingStrategy(connectionHandlingStrategyFactory);
+        ConnectionHandlingStrategyFactory<Connection> connectionHandlingStrategyFactory;
+        connectionHandlingStrategyFactory = new DefaultConnectionHandlingStrategyFactory<>(connectionProvider, poolingProfile, muleContext);
+        return (ConnectionHandlingStrategyAdapter<Connection>) connectionProvider.getHandlingStrategy(connectionHandlingStrategyFactory);
     }
 
     @Override

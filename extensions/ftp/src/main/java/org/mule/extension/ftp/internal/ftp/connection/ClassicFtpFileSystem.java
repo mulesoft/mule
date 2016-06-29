@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.ftp.api.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.ftp.FtpFileSystem;
 import org.mule.extension.ftp.api.ftp.FtpTransferMode;
 import org.mule.extension.ftp.internal.ftp.command.FtpCopyCommand;
@@ -27,6 +26,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.module.extension.file.api.AbstractFileSystem;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
 import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
@@ -63,7 +63,6 @@ public final class ClassicFtpFileSystem extends AbstractFileSystem implements Ft
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassicFtpFileSystem.class);
 
     private final MuleContext muleContext;
-    private final FtpConnector config;
     private final FTPClient client;
     private final CopyCommand copyCommand;
     private final CreateDirectoryCommand createDirectoryCommand;
@@ -78,23 +77,21 @@ public final class ClassicFtpFileSystem extends AbstractFileSystem implements Ft
     /**
      * Creates a new instance
      *
-     * @param config the {@link FtpConnector} through which {@code this} instance is used
      * @param client a ready to use {@link FTPClient}
      */
-    ClassicFtpFileSystem(FtpConnector config, FTPClient client, MuleContext muleContext)
+    ClassicFtpFileSystem(FTPClient client, MuleContext muleContext)
     {
-        this.config = config;
         this.client = client;
         this.muleContext = muleContext;
 
-        copyCommand = new FtpCopyCommand(this, config, client);
-        createDirectoryCommand = new FtpCreateDirectoryCommand(this, config, client);
-        deleteCommand = new FtpDeleteCommand(this, config, client);
-        listCommand = new FtpListCommand(this, config, client);
-        moveCommand = new FtpMoveCommand(this, config, client);
-        readCommand = new FtpReadCommand(this, config, client);
-        renameCommand = new FtpRenameCommand(this, config, client);
-        writeCommand = new FtpWriteCommand(this, config, client, muleContext);
+        copyCommand = new FtpCopyCommand(this, client);
+        createDirectoryCommand = new FtpCreateDirectoryCommand(this, client);
+        deleteCommand = new FtpDeleteCommand(this, client);
+        listCommand = new FtpListCommand(this, client);
+        moveCommand = new FtpMoveCommand(this, client);
+        readCommand = new FtpReadCommand(this, client);
+        renameCommand = new FtpRenameCommand(this, client);
+        writeCommand = new FtpWriteCommand(this, client, muleContext);
     }
 
     /**
@@ -278,10 +275,10 @@ public final class ClassicFtpFileSystem extends AbstractFileSystem implements Ft
 
     /**
      * Changes the {@link #client}'s current working directory to
-     * the {@link #config}'s {@link FtpConnector#getBaseDir()}
+     * the {@code config}'s {@link FileConnectorConfig#getBaseDir()}
      */
     @Override
-    public void changeToBaseDir()
+    public void changeToBaseDir(FileConnectorConfig config)
     {
         if (config.getBaseDir() != null)
         {

@@ -44,6 +44,7 @@ public interface FileSystem
      * If {@code recursive} is set to {@code true} but a found directory is rejected by the
      * {@code matcher}, then there won't be any recursion into such directory.
      *
+     * @param config        the config that is parameterizing this operation
      * @param directoryPath the path to the directory to be listed
      * @param recursive     whether to include the contents of sub-directories
      * @param message       the {@link MuleMessage} on which this operation was triggered
@@ -51,7 +52,7 @@ public interface FileSystem
      * @return a {@link TreeNode} object representing the listed directory
      * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
      */
-    TreeNode list(String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher);
+    TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher);
 
     /**
      * Obtains the content and metadata of a file at a given path.
@@ -70,6 +71,7 @@ public interface FileSystem
      * file being read. a {@link MimetypesFileTypeMap} will be used to
      * make an educated guess on the file's mime type
      *
+     * @param config   the config that is parameterizing this operation
      * @param message  the incoming {@link MuleMessage}
      * @param filePath the path of the file you want to read
      * @param lock     whether or not to lock the file
@@ -77,7 +79,7 @@ public interface FileSystem
      * and a {@link FileAttributes} object as {@link MuleMessage#getAttributes()}
      * @throws IllegalArgumentException if the file at the given path doesn't exists
      */
-    MuleMessage<InputStream, FileAttributes> read(MuleMessage<?, ?> message, String filePath, boolean lock);
+    MuleMessage<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage<?, ?> message, String filePath, boolean lock);
 
     /**
      * Writes the {@code content} into the file pointed by {@code filePath}.
@@ -105,8 +107,9 @@ public interface FileSystem
      * <p>
      * This method also supports locking support depending on the value of the
      * {@code lock} argument, but following the same rules and considerations
-     * as described in the {@link #read(MuleMessage, String, boolean)} method
+     * as described in the {@link #read(FileConnectorConfig, MuleMessage, String, boolean)} method
      *
+     * @param config                  the config on which is parameterizing this operation
      * @param filePath                the path of the file to be written
      * @param content                 the content to be written into the file
      * @param mode                    a {@link FileWriteMode}
@@ -118,7 +121,8 @@ public interface FileSystem
      *                                {@link FileConnectorConfig#getDefaultWriteEncoding()}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    void write(String filePath,
+    void write(FileConnectorConfig config,
+               String filePath,
                Object content,
                FileWriteMode mode,
                MuleEvent event,
@@ -147,6 +151,7 @@ public interface FileSystem
      * As for the {@code sourcePath}, it can either be a file or a directory.
      * If it points to a directory, then it will be copied recursively
      *
+     * @param config                  the config that is parameterizing this operation
      * @param sourcePath              the path to the file to be copied
      * @param targetPath              the target directory
      * @param overwrite               whether or not overwrite the file if the target destination already exists.
@@ -154,7 +159,7 @@ public interface FileSystem
      * @param event                   whether or not to attempt creating the parent directory if it doesn't exists.
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    void copy(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories, MuleEvent event);
+    void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories, MuleEvent event);
 
     /**
      * Moves the file at the {@code sourcePath} into the {@code targetPath}.
@@ -177,39 +182,43 @@ public interface FileSystem
      * As for the {@code sourcePath}, it can either be a file or a directory.
      * If it points to a directory, then it will be moved recursively
      *
+     * @param config                  the config that is parameterizing this operation
      * @param sourcePath              the path to the file to be copied
      * @param targetPath              the target directory
      * @param overwrite               whether or not overwrite the file if the target destination already exists.
      * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
-    void move(String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories);
+    void move(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories);
 
     /**
      * Deletes the file pointed by {@code filePath}, provided that it's not locked
      *
+     * @param config   the config that is parameterizing this operation
      * @param filePath the path to the file to be deleted
      * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
      */
-    void delete(String filePath);
+    void delete(FileConnectorConfig config, String filePath);
 
     /**
      * Renames the file pointed by {@code filePath} to the provided {@code newName}
      *
+     * @param config    the config that is parameterizing this operation
      * @param filePath  the path to the file to be renamed
      * @param newName   the file's new name
      * @param overwrite whether or not overwrite the file if the target destination already exists.
      */
-    void rename(String filePath, String newName, boolean overwrite);
+    void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite);
 
     /**
      * Creates a new directory of the given {@code directoryName} as a child
      * of the provided {@code basePath}
      *
+     * @param config        the config that is parameterizing this operation
      * @param basePath      the directory which contains the directory to be created
      * @param directoryName the new directory's new name
      */
-    void createDirectory(String basePath, String directoryName);
+    void createDirectory(FileConnectorConfig config, String basePath, String directoryName);
 
     /**
      * Acquires and returns lock over the given {@code path}.
@@ -253,4 +262,10 @@ public interface FileSystem
      */
     void verifyNotLocked(Path path);
 
+    /**
+     * Changes the current working directory to the user base
+     *
+     * @param config the config which is parameterizing this operation
+     */
+    void changeToBaseDir(FileConnectorConfig config);
 }

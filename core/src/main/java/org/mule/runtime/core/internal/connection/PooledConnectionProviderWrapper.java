@@ -26,7 +26,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class PooledConnectionProviderWrapper<Config, Connection> extends ConnectionProviderWrapper<Config, Connection>
+public final class PooledConnectionProviderWrapper<Connection> extends ConnectionProviderWrapper<Connection>
 {
 
     private final PoolingProfile poolingProfile;
@@ -40,7 +40,7 @@ public final class PooledConnectionProviderWrapper<Config, Connection> extends C
      * @param poolingProfile      a not {@code null} {@link PoolingProfile}
      * @param retryPolicyTemplate a {@link AbstractPolicyTemplate} which will hold the retry policy configured in the Mule Application
      */
-    public PooledConnectionProviderWrapper(ConnectionProvider<Config, Connection> delegate,
+    public PooledConnectionProviderWrapper(ConnectionProvider<Connection> delegate,
                                            PoolingProfile poolingProfile,
                                            boolean disableValidation,
                                            RetryPolicyTemplate retryPolicyTemplate)

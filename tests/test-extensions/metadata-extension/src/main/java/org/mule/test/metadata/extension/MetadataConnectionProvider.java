@@ -12,11 +12,11 @@ import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 
-public class MetadataConnectionProvider implements ConnectionProvider<MetadataExtension, MetadataConnection>
+public class MetadataConnectionProvider implements ConnectionProvider<MetadataConnection>
 {
 
     @Override
-    public MetadataConnection connect(MetadataExtension metadataExtension) throws ConnectionException
+    public MetadataConnection connect() throws ConnectionException
     {
         return new MetadataConnection();
     }
@@ -34,7 +34,7 @@ public class MetadataConnectionProvider implements ConnectionProvider<MetadataEx
     }
 
     @Override
-    public ConnectionHandlingStrategy<MetadataConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<MetadataExtension, MetadataConnection> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<MetadataConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<MetadataConnection> handlingStrategyFactory)
     {
         return handlingStrategyFactory.cached();
     }

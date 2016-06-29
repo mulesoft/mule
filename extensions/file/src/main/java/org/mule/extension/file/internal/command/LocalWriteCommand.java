@@ -10,10 +10,10 @@ import static java.lang.String.format;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
-import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FileContentWrapper;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 import org.mule.runtime.module.extension.file.api.FileWriterVisitor;
@@ -43,9 +43,9 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
     /**
      * {@inheritDoc}
      */
-    public LocalWriteCommand(LocalFileSystem fileSystem, FileConnector config, MuleContext muleContext)
+    public LocalWriteCommand(LocalFileSystem fileSystem, MuleContext muleContext)
     {
-        super(fileSystem, config);
+        super(fileSystem);
         this.muleContext = muleContext;
     }
 
@@ -53,7 +53,8 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
      * {@inheritDoc}
      */
     @Override
-    public void write(String filePath,
+    public void write(FileConnectorConfig config,
+                      String filePath,
                       Object content,
                       FileWriteMode mode,
                       MuleEvent event,
@@ -61,8 +62,8 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
                       boolean createParentDirectory,
                       String encoding)
     {
-        Path path = resolvePath(filePath);
-        assureParentFolderExists(path, createParentDirectory);
+        Path path = resolvePath(config, filePath);
+        assureParentFolderExists(config, path, createParentDirectory);
 
         final OpenOption[] openOptions = getOpenOptions(mode);
         PathLock pathLock = lock ? fileSystem.lock(path, openOptions) : new NullPathLock();

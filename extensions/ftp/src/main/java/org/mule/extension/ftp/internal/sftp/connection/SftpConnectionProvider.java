@@ -13,7 +13,6 @@ import org.mule.extension.ftp.internal.AbstractFtpConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -31,7 +30,7 @@ import java.util.Set;
  * @since 4.0
  */
 @Alias("sftp")
-public class SftpConnectionProvider extends AbstractFtpConnectionProvider<FtpConnector, SftpFileSystem>
+public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFileSystem>
 {
 
     /**
@@ -91,10 +90,10 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<FtpCon
     private SftpClientFactory clientFactory = new SftpClientFactory();
 
     @Override
-    public SftpFileSystem connect(FtpConnector config) throws ConnectionException
+    public SftpFileSystem connect() throws ConnectionException
     {
         SftpClient client = clientFactory.createInstance(getHost(), port);
-        client.setConnectionTimeoutMillis(config.getConnectionTimeoutUnit().toMillis(config.getConnectionTimeout()));
+        client.setConnectionTimeoutMillis(getConnectionTimeoutUnit().toMillis(getConnectionTimeout()));
         client.setPassword(password);
         client.setIdentity(identityFile, passphrase);
         if (!CollectionUtils.isEmpty(preferredAuthenticationMethods))
@@ -111,7 +110,7 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<FtpCon
             throw new ConnectionException(e);
         }
 
-        return new SftpFileSystem(config, client, muleContext);
+        return new SftpFileSystem(client, muleContext);
     }
 
 
@@ -119,21 +118,9 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<FtpCon
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<SftpFileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<FtpConnector, SftpFileSystem> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<SftpFileSystem> getHandlingStrategy(ConnectionHandlingStrategyFactory<SftpFileSystem> handlingStrategyFactory)
     {
-        return handlingStrategyFactory.supportsPooling(new PoolingListener<FtpConnector, SftpFileSystem>()
-        {
-            @Override
-            public void onBorrow(FtpConnector config, SftpFileSystem connection)
-            {
-                connection.changeToBaseDir();
-            }
-
-            @Override
-            public void onReturn(FtpConnector sftpConfig, SftpFileSystem sftpFileSystem)
-            {
-            }
-        });
+        return handlingStrategyFactory.supportsPooling();
     }
 
     void setPort(int port)

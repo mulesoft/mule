@@ -15,7 +15,7 @@ import org.mule.runtime.core.time.TimeSupplier;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
-import org.mule.runtime.module.extension.internal.config.dsl.connection.ConnectionProviderResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;

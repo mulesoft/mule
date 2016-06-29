@@ -6,6 +6,7 @@
  */
 package org.mule.extension.email.api;
 
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -17,16 +18,8 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 4.0
  */
-public abstract class AbstractEmailConfiguration
+public abstract class AbstractEmailConnectionProvider<T> implements ConnectionProvider<T>
 {
-
-    /**
-     * An additional custom set of properties to configure the connection
-     * session.
-     */
-    @Parameter
-    @Optional
-    protected Map<String, String> properties;
 
     /**
      * The socket connection timeout. This attribute
@@ -68,11 +61,18 @@ public abstract class AbstractEmailConfiguration
     @Optional(defaultValue = "SECONDS")
     private TimeUnit timeoutUnit;
 
+    /**
+     * An additional custom set of properties to configure the connection
+     * session.
+     */
+    @Parameter
+    @Optional
+    private Map<String, String> properties;
 
     /**
      * @return the additional custom properties to configure the session.
      */
-    public Map<String, String> getProperties()
+    protected Map<String, String> getProperties()
     {
         return properties;
     }
@@ -80,7 +80,7 @@ public abstract class AbstractEmailConfiguration
     /**
      * @return the configured client socket connection timeout in milliseconds.
      */
-    public long getConnectionTimeout()
+    protected long getConnectionTimeout()
     {
         return timeoutUnit.toMillis(connectionTimeout);
     }
@@ -88,7 +88,7 @@ public abstract class AbstractEmailConfiguration
     /**
      * @return he configured client socket read timeout in milliseconds.
      */
-    public long getReadTimeout()
+    protected long getReadTimeout()
     {
         return timeoutUnit.toMillis(readTimeout);
     }
@@ -96,9 +96,8 @@ public abstract class AbstractEmailConfiguration
     /**
      * @return he configured client socket write timeout in milliseconds.
      */
-    public long getWriteTimeout()
+    protected long getWriteTimeout()
     {
         return timeoutUnit.toMillis(writeTimeout);
     }
-
 }

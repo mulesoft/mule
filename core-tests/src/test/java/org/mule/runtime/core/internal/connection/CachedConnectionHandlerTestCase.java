@@ -37,12 +37,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase
 {
 
-    private Apple config = new Apple();
-
     private Banana connection = new Banana();
 
     @Mock
-    private ConnectionProvider<Apple, Banana> connectionProvider;
+    private ConnectionProvider<Banana> connectionProvider;
 
     @Mock
     private MuleContext muleContext;
@@ -52,8 +50,8 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        when(connectionProvider.connect(config)).thenReturn(connection);
-        managedConnection = new CachedConnectionHandler<>(config, connectionProvider, muleContext);
+        when(connectionProvider.connect()).thenReturn(connection);
+        managedConnection = new CachedConnectionHandler<>(connectionProvider, muleContext);
         when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
     }
 
@@ -61,7 +59,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase
     public void getConnection() throws Exception
     {
         Banana connection = managedConnection.getConnection();
-        verify(connectionProvider).connect(config);
+        verify(connectionProvider).connect();
         assertThat(connection, is(sameInstance(connection)));
     }
 
@@ -72,7 +70,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase
         Banana connection2 = managedConnection.getConnection();
 
         assertThat(connection1, is(sameInstance(connection2)));
-        verify(connectionProvider).connect(config);
+        verify(connectionProvider).connect();
     }
 
     @Test
@@ -83,7 +81,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase
         before();
 
         Latch latch = new Latch();
-        when(connectionProvider.connect(config)).thenAnswer(invocation -> {
+        when(connectionProvider.connect()).thenAnswer(invocation -> {
             new Thread(() -> {
                 try
                 {
@@ -102,7 +100,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase
         Banana connection = managedConnection.getConnection();
         assertThat(latch.await(5, TimeUnit.SECONDS), is(true));
         assertThat(connection, is(sameInstance(mockConnection)));
-        verify(connectionProvider).connect(config);
+        verify(connectionProvider).connect();
     }
 
     @Test
@@ -126,7 +124,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase
         reset(connectionProvider);
         Banana newConnection = new Banana();
         when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult.success());
-        when(connectionProvider.connect(config)).thenReturn(newConnection);
+        when(connectionProvider.connect()).thenReturn(newConnection);
 
         getConnection();
         assertThat(managedConnection.getConnection(), is(sameInstance(newConnection)));

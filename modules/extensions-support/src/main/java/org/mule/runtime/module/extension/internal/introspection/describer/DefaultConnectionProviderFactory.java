@@ -8,11 +8,11 @@ package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderFactory;
+import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 
 /**
  * Creates instances of {@link ConnectionProvider} based on a {@link #providerClass}
@@ -21,7 +21,7 @@ import org.mule.runtime.extension.api.introspection.connection.ConnectionProvide
  * @param <Connection> the generic type for the connections that the created  {@link ConnectionProvider providers} produce
  * @since 4.0
  */
-final class DefaultConnectionProviderFactory<Config, Connection> implements ConnectionProviderFactory<Config, Connection>
+final class DefaultConnectionProviderFactory<Config, Connection> implements ConnectionProviderFactory<Connection>
 {
 
     private final Class<? extends ConnectionProvider> providerClass;
@@ -51,7 +51,7 @@ final class DefaultConnectionProviderFactory<Config, Connection> implements Conn
      * {@inheritDoc}
      */
     @Override
-    public ConnectionProvider<Config, Connection> newInstance()
+    public ConnectionProvider<Connection> newInstance()
     {
         try
         {

@@ -31,7 +31,7 @@ public class SftpInputStream extends FtpInputStream
      * <p>
      * Instances returned by this method <b>MUST</b> be closed or fully consumed.
      *
-     * @param config     the {@link FtpConnector} which is configuring the connection
+     * @param config     the config which is parameterizing this operation
      * @param attributes a {@link FileAttributes} referencing the file which contents are to be fetched
      * @param lock       the {@link PathLock} to be used
      * @return a new {@link FtpInputStream}

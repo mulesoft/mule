@@ -7,9 +7,9 @@
 package org.mule.extension.file.internal.command;
 
 import static java.lang.String.format;
-import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
 import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 
 import java.nio.file.CopyOption;
@@ -38,24 +38,25 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand
     /**
      * {@inheritDoc}
      */
-    AbstractLocalCopyCommand(LocalFileSystem fileSystem, FileConnector config)
+    AbstractLocalCopyCommand(LocalFileSystem fileSystem)
     {
-        super(fileSystem, config);
+        super(fileSystem);
     }
 
     /**
      * Performs the base logic and delegates into {@link #doExecute(Path, Path, boolean, CopyOption[])} to perform
      * the actual copying logic
      *
+     * @param config                the config that is parameterizing this operation
      * @param sourcePath            the path to be copied
      * @param target                the path to the target destination
      * @param overwrite             whether to overwrite existing target paths
      * @param createParentDirectory whether to create the target's parent directory if it doesn't exists
      */
-    protected final void execute(String sourcePath, String target, boolean overwrite, boolean createParentDirectory)
+    protected final void execute(FileConnectorConfig config, String sourcePath, String target, boolean overwrite, boolean createParentDirectory)
     {
-        Path source = resolveExistingPath(sourcePath);
-        Path targetPath = resolvePath(target);
+        Path source = resolveExistingPath(config, sourcePath);
+        Path targetPath = resolvePath(config, target);
 
         CopyOption copyOption = null;
         if (Files.exists(targetPath))

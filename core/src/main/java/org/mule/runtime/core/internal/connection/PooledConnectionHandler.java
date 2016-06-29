@@ -21,12 +21,11 @@ import org.slf4j.LoggerFactory;
  * @param <Connection> the generic type of the connection to be returned
  * @since 4.0
  */
-final class PooledConnectionHandler<Config, Connection> implements ConnectionHandlerAdapter<Connection>
+final class PooledConnectionHandler<Connection> implements ConnectionHandlerAdapter<Connection>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PooledConnectionHandler.class);
 
-    private final Config config;
     private final Connection connection;
     private final ObjectPool<Connection> pool;
     private final PoolingListener poolingListener;
@@ -37,9 +36,8 @@ final class PooledConnectionHandler<Config, Connection> implements ConnectionHan
      * @param connection the connection to be wrapped
      * @param pool       the pool from which the {@code connection} was obtained and to which it has to be returned
      */
-    PooledConnectionHandler(Config config, Connection connection, ObjectPool<Connection> pool, PoolingListener poolingListener)
+    PooledConnectionHandler(Connection connection, ObjectPool<Connection> pool, PoolingListener poolingListener)
     {
-        this.config = config;
         this.connection = connection;
         this.pool = pool;
         this.poolingListener = poolingListener;
@@ -63,7 +61,7 @@ final class PooledConnectionHandler<Config, Connection> implements ConnectionHan
         boolean returnAttempted = false;
         try
         {
-            poolingListener.onReturn(config, connection);
+            poolingListener.onReturn(connection);
 
             returnAttempted = true;
             pool.returnObject(connection);

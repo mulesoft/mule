@@ -22,7 +22,6 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
-import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.net.CookieManager;
@@ -40,9 +39,6 @@ import javax.inject.Inject;
 @Operations({HttpRequestOperations.class})
 public class HttpRequesterConfig implements Initialisable, Stoppable
 {
-    @ConfigName
-    private String configName;
-
     //TODO: document
     @Parameter
     @Optional
@@ -117,11 +113,6 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
     private MuleContext muleContext;
     private CookieManager cookieManager;
     private boolean stopped = false;
-
-    public String getName()
-    {
-        return configName;
-    }
 
     @Override
     public void initialise() throws InitialisationException

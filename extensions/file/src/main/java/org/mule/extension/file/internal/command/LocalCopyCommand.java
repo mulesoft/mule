@@ -6,10 +6,10 @@
  */
 package org.mule.extension.file.internal.command;
 
-import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.LocalFileSystem;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 
 import java.nio.file.CopyOption;
@@ -27,18 +27,18 @@ public final class LocalCopyCommand extends AbstractLocalCopyCommand implements 
     /**
      * {@inheritDoc}
      */
-    public LocalCopyCommand(LocalFileSystem fileSystem, FileConnector config)
+    public LocalCopyCommand(LocalFileSystem fileSystem)
     {
-        super(fileSystem, config);
+        super(fileSystem);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void copy(String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories, MuleEvent event)
+    public void copy(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories, MuleEvent event)
     {
-        execute(sourcePath, targetDirectory, overwrite, createParentDirectories);
+        execute(config, sourcePath, targetDirectory, overwrite, createParentDirectories);
     }
 
     /**

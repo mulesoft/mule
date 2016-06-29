@@ -28,6 +28,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.listener.Server;
@@ -43,8 +44,11 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @Alias("listener")
-public class HttpListenerProvider implements ConnectionProvider<HttpListenerConfig, Server>, Initialisable
+public class HttpListenerProvider implements ConnectionProvider<Server>, Initialisable
 {
+
+    @ConfigName
+    private String configName;
 
     /**
      * Host where the requests will be sent.
@@ -135,7 +139,7 @@ public class HttpListenerProvider implements ConnectionProvider<HttpListenerConf
     }
 
     @Override
-    public Server connect(HttpListenerConfig httpListenerConfig) throws ConnectionException
+    public Server connect() throws ConnectionException
     {
         HttpServerConfiguration serverConfiguration = new HttpServerConfiguration.Builder()
                 .setHost(host)
@@ -143,7 +147,7 @@ public class HttpListenerProvider implements ConnectionProvider<HttpListenerConf
                 .setTlsContextFactory(tlsContext)
                 .setUsePersistentConnections(usePersistentConnections)
                 .setConnectionIdleTimeout(connectionIdleTimeout)
-                .setOwnerName(httpListenerConfig.getConfigName())
+                .setOwnerName(configName)
                 .build();
         Server server = connectionManager.create(serverConfiguration);
 
@@ -182,7 +186,7 @@ public class HttpListenerProvider implements ConnectionProvider<HttpListenerConf
     }
 
     @Override
-    public ConnectionHandlingStrategy<Server> getHandlingStrategy(ConnectionHandlingStrategyFactory<HttpListenerConfig, Server> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<Server> getHandlingStrategy(ConnectionHandlingStrategyFactory<Server> handlingStrategyFactory)
     {
         return handlingStrategyFactory.cached();
     }

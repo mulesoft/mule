@@ -20,16 +20,16 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.pluralize;
+import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.singularize;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.pluralize;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.singularize;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -58,15 +58,20 @@ import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultObjectParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.FixedTypeParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.MediaTypeValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ObjectParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
+import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterParser;
 import org.mule.runtime.module.extension.internal.introspection.BasicTypeMetadataVisitor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -120,12 +125,16 @@ public abstract class ExtensionDefinitionParser
     private final Map<String, AttributeDefinition.Builder> parameters = new HashMap<>();
     private final Builder baseDefinitionBuilder;
     private final List<ComponentBuildingDefinition> parsedDefinitions = new ArrayList<>();
-    private final ObjectParsingDelegate defaultObjectParsingDelegate = new ValueResolverParsingDelegate();
     private final List<ObjectParsingDelegate> objectParsingDelegates = ImmutableList.of(
             new FixedTypeParsingDelegate(PoolingProfile.class),
             new FixedTypeParsingDelegate(RetryPolicyTemplate.class),
             new FixedTypeParsingDelegate(TlsContextFactory.class),
-            new FixedTypeParsingDelegate(ThreadingProfile.class));
+            new FixedTypeParsingDelegate(ThreadingProfile.class),
+            new DefaultObjectParsingDelegate());
+    private final List<ValueResolverParsingDelegate> valueResolverParsingDelegates = ImmutableList.of(
+            new CharsetValueResolverParsingDelegate(),
+            new MediaTypeValueResolverParsingDelegate(),
+            new DefaultValueResolverParsingDelegate());
 
     /**
      * Creates a new instance
@@ -387,13 +396,12 @@ public abstract class ExtensionDefinitionParser
             itemIdentifier = hyphenize(singularize(name));
         }
 
-        Builder itemDefinitionBuilder = baseDefinitionBuilder.copy().withIdentifier(itemIdentifier);
-
         arrayType.getType().accept(new BasicTypeMetadataVisitor()
         {
             @Override
             protected void visitBasicType(MetadataType metadataType)
             {
+                Builder itemDefinitionBuilder = baseDefinitionBuilder.copy().withIdentifier(itemIdentifier);
                 itemDefinitionBuilder.withTypeDefinition(fromType(getType(metadataType)))
                         .withTypeConverter(value -> resolverOf(name,
                                                                metadataType,
@@ -401,18 +409,23 @@ public abstract class ExtensionDefinitionParser
                                                                getDefaultValue(metadataType).orElse(null),
                                                                getExpressionSupport(metadataType),
                                                                false));
+
+                addDefinition(itemDefinitionBuilder.build());
             }
 
             @Override
             public void visitObject(ObjectType objectType)
             {
-                itemDefinitionBuilder.withTypeDefinition(fromType(ValueResolver.class))
-                        .withObjectFactoryType(TopLevelParameterObjectFactory.class)
-                        .withConstructorParameterDefinition(fromFixedValue(objectType).build());
+                try
+                {
+                    new TopLevelParameterParser(baseDefinitionBuilder.copy(), objectType).parse().forEach(definition -> addDefinition(definition));
+                }
+                catch (ConfigurationException e)
+                {
+                    throw new MuleRuntimeException(createStaticMessage("Could not create parser for collection complex type"), e);
+                }
             }
         });
-
-        addDefinition(itemDefinitionBuilder.build());
     }
 
     private ValueResolver<?> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue, ExpressionSupport expressionSupport, boolean required)
@@ -475,7 +488,7 @@ public abstract class ExtensionDefinitionParser
                 @Override
                 protected void defaultVisit(MetadataType metadataType)
                 {
-                    resolverValueHolder.set(new RegistryLookupValueResolver(value.toString()));
+                    resolverValueHolder.set(locateParsingDelegate(valueResolverParsingDelegates, metadataType).parse(value.toString(), metadataType));
                 }
             });
 
@@ -570,12 +583,17 @@ public abstract class ExtensionDefinitionParser
     protected void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue, ExpressionSupport expressionSupport, boolean required)
     {
         parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required);
-        ObjectParsingDelegate delegate = objectParsingDelegates.stream()
-                .filter(candidate -> candidate.accepts(type))
-                .findFirst()
-                .orElse(defaultObjectParsingDelegate);
 
+        ObjectParsingDelegate delegate = (ObjectParsingDelegate) locateParsingDelegate(objectParsingDelegates, type);
         addParameter(getChildKey(key), delegate.parse(name, type));
+    }
+
+    private <M extends MetadataType, T> ParsingDelegate<M, T> locateParsingDelegate(List<? extends ParsingDelegate<M, T>> delegatesList, M metadataType)
+    {
+        return delegatesList.stream()
+                .filter(candidate -> candidate.accepts(metadataType))
+                .findFirst()
+                .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find a parsing delegate for type " + getType(metadataType).getName())));
     }
 
     /**

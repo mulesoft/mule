@@ -7,12 +7,12 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.internal.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.TreeNode;
 import org.mule.runtime.module.extension.file.api.command.ListCommand;
 
@@ -35,24 +35,25 @@ import org.slf4j.LoggerFactory;
  */
 public final class FtpListCommand extends ClassicFtpCommand implements ListCommand
 {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FtpListCommand.class);
     private static final int FTP_LIST_PAGE_SIZE = 25;
 
     /**
      * {@inheritDoc}
      */
-    public FtpListCommand(ClassicFtpFileSystem fileSystem, FtpConnector config, FTPClient client)
+    public FtpListCommand(ClassicFtpFileSystem fileSystem, FTPClient client)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public TreeNode list(String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
+    public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
     {
-        FileAttributes directoryAttributes = getExistingFile(directoryPath);
+        FileAttributes directoryAttributes = getExistingFile(config, directoryPath);
         Path path = Paths.get(directoryAttributes.getPath());
 
         if (!directoryAttributes.isDirectory())
@@ -68,7 +69,7 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
         TreeNode.Builder treeNodeBuilder = TreeNode.Builder.forDirectory(directoryAttributes);
         try
         {
-            doList(path, treeNodeBuilder, recursive, message, matcher);
+            doList(config, path, treeNodeBuilder, recursive, message, matcher);
 
             if (!FTPReply.isPositiveCompletion(client.getReplyCode()))
             {
@@ -85,7 +86,12 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
         return treeNodeBuilder.build();
     }
 
-    private void doList(Path path, TreeNode.Builder treeNodeBuilder, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher) throws IOException
+    private void doList(FileConnectorConfig config,
+                        Path path,
+                        TreeNode.Builder treeNodeBuilder,
+                        boolean recursive,
+                        MuleMessage message,
+                        Predicate<FileAttributes> matcher) throws IOException
     {
         LOGGER.debug("Listing directory {}", path);
 
@@ -120,7 +126,7 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
                         {
                             throw exception(format("Could not change working directory to '%s' while performing recursion on list operation", recursionPath));
                         }
-                        doList(recursionPath, childNodeBuilder, recursive, message, matcher);
+                        doList(config, recursionPath, childNodeBuilder, recursive, message, matcher);
                         if (!client.changeToParentDirectory())
                         {
                             throw exception(format("Could not return to parent working directory '%s' while performing recursion on list operation", recursionPath.getParent()));
@@ -129,7 +135,7 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
                 }
                 else
                 {
-                    treeNodeBuilder.addChild(TreeNode.Builder.forFile(fileSystem.read(message, filePath.toString(), false)));
+                    treeNodeBuilder.addChild(TreeNode.Builder.forFile(fileSystem.read(config, message, filePath.toString(), false)));
                 }
             }
         }

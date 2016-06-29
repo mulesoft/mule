@@ -56,17 +56,17 @@ public class SMTPSProvider extends AbstractSenderProvider implements Initialisab
      * {@inheritDoc}
      */
     @Override
-    public SenderConnection connect(SMTPConfiguration config) throws ConnectionException
+    public SenderConnection connect() throws ConnectionException
     {
         return new SenderConnection(SMTPS,
                                     settings.getUser(),
                                     settings.getPassword(),
                                     settings.getHost(),
                                     port,
-                                    config.getConnectionTimeout(),
-                                    config.getReadTimeout(),
-                                    config.getWriteTimeout(),
-                                    config.getProperties(),
+                                    getConnectionTimeout(),
+                                    getReadTimeout(),
+                                    getWriteTimeout(),
+                                    getProperties(),
                                     tlsContextFactory);
     }
 }

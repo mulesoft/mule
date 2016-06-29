@@ -6,14 +6,14 @@
  */
 package org.mule.extension.email.api.sender;
 
+import org.mule.extension.email.api.AbstractEmailConnectionProvider;
 import org.mule.extension.email.api.EmailConnectionSettings;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 
-public abstract class AbstractSenderProvider implements ConnectionProvider<SMTPConfiguration, SenderConnection>
+public abstract class AbstractSenderProvider extends AbstractEmailConnectionProvider<SenderConnection>
 {
 
     /**
@@ -44,7 +44,7 @@ public abstract class AbstractSenderProvider implements ConnectionProvider<SMTPC
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<SenderConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<SMTPConfiguration, SenderConnection> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<SenderConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<SenderConnection> handlingStrategyFactory)
     {
         return handlingStrategyFactory.supportsPooling();
     }

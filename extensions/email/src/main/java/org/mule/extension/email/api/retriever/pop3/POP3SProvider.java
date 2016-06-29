@@ -28,7 +28,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("pop3s")
-public class POP3SProvider extends AbstractRetrieverProvider<POP3Configuration, RetrieverConnection> implements Initialisable
+public class POP3SProvider extends AbstractRetrieverProvider<RetrieverConnection> implements Initialisable
 {
 
     /**
@@ -58,17 +58,17 @@ public class POP3SProvider extends AbstractRetrieverProvider<POP3Configuration, 
      * {@inheritDoc}
      */
     @Override
-    public RetrieverConnection connect(POP3Configuration config) throws ConnectionException
+    public RetrieverConnection connect() throws ConnectionException
     {
         return new RetrieverConnection(POP3S,
                                        settings.getUser(),
                                        settings.getPassword(),
                                        settings.getHost(),
                                        port,
-                                       config.getConnectionTimeout(),
-                                       config.getReadTimeout(),
-                                       config.getWriteTimeout(),
-                                       config.getProperties(),
+                                       getConnectionTimeout(),
+                                       getReadTimeout(),
+                                       getWriteTimeout(),
+                                       getProperties(),
                                        tlsContextFactory);
     }
 }

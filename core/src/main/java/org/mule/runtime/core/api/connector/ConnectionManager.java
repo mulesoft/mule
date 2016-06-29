@@ -41,7 +41,7 @@ public interface ConnectionManager
      * @param <Config>           the generic type of the {@code config}
      * @param <Connection>       the generic type of the connections to be produced
      */
-    <Config, Connection> void bind(Config config, ConnectionProvider<Config, Connection> connectionProvider);
+    <Config, Connection> void bind(Config config, ConnectionProvider<Connection> connectionProvider);
 
     /**
      * @param config the config that acts as the binding key

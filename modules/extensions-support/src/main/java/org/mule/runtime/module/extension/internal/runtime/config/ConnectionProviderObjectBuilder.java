@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectConfigName;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleException;
@@ -32,6 +33,8 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
     private final boolean disableValidation;
     private final RetryPolicyTemplate retryPolicyTemplate;
     private final PoolingProfile poolingProfile;
+
+    private String ownerConfigName = "";
 
     /**
      * Creates a new instances which produces instances based on the given {@code providerModel} and
@@ -65,6 +68,8 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
     public ConnectionProvider build(ResolverSetResult result) throws MuleException
     {
         ConnectionProvider provider = super.build(result);
+        injectConfigName(providerModel, provider, ownerConfigName);
+
         ConnectionHandlingTypeModelProperty connectionHandlingType = providerModel.getModelProperty(ConnectionHandlingTypeModelProperty.class).orElse(null);
 
         if (connectionHandlingType != null)
@@ -101,4 +106,8 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
         return resolverSet.isDynamic();
     }
 
+    public void setOwnerConfigName(String ownerConfigName)
+    {
+        this.ownerConfigName = ownerConfigName;
+    }
 }

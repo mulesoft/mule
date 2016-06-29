@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 
-public class SecureConnectionProvider implements ConnectionProvider<SecureConnector, Object>
+public class SecureConnectionProvider implements ConnectionProvider<Object>
 {
 
     @Parameter
@@ -27,7 +27,7 @@ public class SecureConnectionProvider implements ConnectionProvider<SecureConnec
     private String anotherLongText;
 
     @Override
-    public Object connect(SecureConnector secureConnector) throws ConnectionException
+    public Object connect() throws ConnectionException
     {
         return null;
     }
@@ -45,7 +45,7 @@ public class SecureConnectionProvider implements ConnectionProvider<SecureConnec
     }
 
     @Override
-    public ConnectionHandlingStrategy<Object> getHandlingStrategy(ConnectionHandlingStrategyFactory<SecureConnector, Object> connectionHandlingStrategyFactory)
+    public ConnectionHandlingStrategy<Object> getHandlingStrategy(ConnectionHandlingStrategyFactory<Object> connectionHandlingStrategyFactory)
     {
         return null;
     }

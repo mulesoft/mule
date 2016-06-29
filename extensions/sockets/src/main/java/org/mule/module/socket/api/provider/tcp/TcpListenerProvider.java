@@ -7,7 +7,6 @@
 package org.mule.module.socket.api.provider.tcp;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.module.socket.api.config.ListenerConfig;
 import org.mule.module.socket.api.connection.ConnectionSettings;
 import org.mule.module.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.module.socket.api.protocol.SafeProtocol;
@@ -45,7 +44,7 @@ import javax.net.ssl.SSLServerSocket;
  * @since 4.0
  */
 @Alias("tcp-listener")
-public final class TcpListenerProvider implements ConnectionProvider<ListenerConfig, TcpListenerConnection>, Initialisable
+public final class TcpListenerProvider implements ConnectionProvider<TcpListenerConnection>, Initialisable
 {
 
     /**
@@ -77,7 +76,7 @@ public final class TcpListenerProvider implements ConnectionProvider<ListenerCon
     private TcpProtocol protocol = new SafeProtocol();
 
     @Override
-    public TcpListenerConnection connect(ListenerConfig listenerConfig) throws ConnectionException
+    public TcpListenerConnection connect() throws ConnectionException
     {
         SimpleServerSocketFactory serverSocketFactory = null;
 
@@ -119,7 +118,7 @@ public final class TcpListenerProvider implements ConnectionProvider<ListenerCon
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<TcpListenerConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<ListenerConfig, TcpListenerConnection> handlingStrategyFactory)
+    public ConnectionHandlingStrategy<TcpListenerConnection> getHandlingStrategy(ConnectionHandlingStrategyFactory<TcpListenerConnection> handlingStrategyFactory)
     {
         return handlingStrategyFactory.none();
     }

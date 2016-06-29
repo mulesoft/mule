@@ -88,25 +88,26 @@ public abstract class AbstractFileSystem implements FileSystem
      * {@inheritDoc}
      */
     @Override
-    public TreeNode list(String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
+    public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
     {
-        return getListCommand().list(directoryPath, recursive, message, matcher);
+        return getListCommand().list(config, directoryPath, recursive, message, matcher);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public MuleMessage<InputStream, FileAttributes> read(MuleMessage<?, ?> message, String filePath, boolean lock)
+    public MuleMessage<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage<?, ?> message, String filePath, boolean lock)
     {
-        return getReadCommand().read(message, filePath, lock);
+        return getReadCommand().read(config, message, filePath, lock);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void write(String filePath,
+    public void write(FileConnectorConfig config,
+                      String filePath,
                       Object content,
                       FileWriteMode mode,
                       MuleEvent event,
@@ -114,52 +115,52 @@ public abstract class AbstractFileSystem implements FileSystem
                       boolean createParentDirectories,
                       String encoding)
     {
-        getWriteCommand().write(filePath, content, mode, event, lock, createParentDirectories, encoding);
+        getWriteCommand().write(config, filePath, content, mode, event, lock, createParentDirectories, encoding);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void copy(String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories, MuleEvent event)
+    public void copy(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories, MuleEvent event)
     {
-        getCopyCommand().copy(sourcePath, targetDirectory, overwrite, createParentDirectories, event);
+        getCopyCommand().copy(config, sourcePath, targetDirectory, overwrite, createParentDirectories, event);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void move(String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories)
+    public void move(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite, boolean createParentDirectories)
     {
-        getMoveCommand().move(sourcePath, targetDirectory, overwrite, createParentDirectories);
+        getMoveCommand().move(config, sourcePath, targetDirectory, overwrite, createParentDirectories);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void delete(String filePath)
+    public void delete(FileConnectorConfig config, String filePath)
     {
-        getDeleteCommand().delete(filePath);
+        getDeleteCommand().delete(config, filePath);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final void rename(String filePath, String newName, boolean overwrite)
+    public final void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite)
     {
-        getRenameCommand().rename(filePath, newName, overwrite);
+        getRenameCommand().rename(config, filePath, newName, overwrite);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createDirectory(String basePath, String directoryName)
+    public void createDirectory(FileConnectorConfig config, String basePath, String directoryName)
     {
-        getCreateDirectoryCommand().createDirectory(basePath, directoryName);
+        getCreateDirectoryCommand().createDirectory(config, basePath, directoryName);
     }
 
     /**

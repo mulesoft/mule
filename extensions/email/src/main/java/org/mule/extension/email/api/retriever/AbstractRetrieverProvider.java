@@ -6,12 +6,11 @@
  */
 package org.mule.extension.email.api.retriever;
 
-import org.mule.extension.email.api.AbstractEmailConfiguration;
 import org.mule.extension.email.api.AbstractEmailConnection;
+import org.mule.extension.email.api.AbstractEmailConnectionProvider;
 import org.mule.extension.email.api.EmailConnectionSettings;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
@@ -23,7 +22,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
  * @since 4.0
  */
 // TODO: Change generic signature for a more specific one. MULE-9874
-public abstract class AbstractRetrieverProvider<Config extends AbstractEmailConfiguration, Connection extends AbstractEmailConnection> implements ConnectionProvider<Config, Connection>
+public abstract class AbstractRetrieverProvider<Connection extends AbstractEmailConnection> extends AbstractEmailConnectionProvider<Connection>
 {
 
     /**
@@ -54,12 +53,12 @@ public abstract class AbstractRetrieverProvider<Config extends AbstractEmailConf
      * {@inheritDoc}
      */
     @Override
-    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Config, Connection> connectionHandlingStrategyFactory)
+    public ConnectionHandlingStrategy<Connection> getHandlingStrategy(ConnectionHandlingStrategyFactory<Connection> connectionHandlingStrategyFactory)
     {
-        return connectionHandlingStrategyFactory.supportsPooling(new PoolingListener<Config, Connection>()
+        return connectionHandlingStrategyFactory.supportsPooling(new PoolingListener<Connection>()
         {
             @Override
-            public void onBorrow(Config config, Connection connection)
+            public void onBorrow(Connection connection)
             {
                 if (connection instanceof RetrieverConnection)
                 {
@@ -68,7 +67,7 @@ public abstract class AbstractRetrieverProvider<Config extends AbstractEmailConf
             }
 
             @Override
-            public void onReturn(Config config, Connection connection)
+            public void onReturn(Connection connection)
             {
                 // do nothing
             }

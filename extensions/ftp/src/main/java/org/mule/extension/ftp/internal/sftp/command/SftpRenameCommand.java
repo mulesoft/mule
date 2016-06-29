@@ -6,9 +6,9 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.api.sftp.SftpFileSystem;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.RenameCommand;
 
 /**
@@ -22,17 +22,17 @@ public final class SftpRenameCommand extends SftpCommand implements RenameComman
     /**
      * {@inheritDoc}
      */
-    public SftpRenameCommand(SftpFileSystem fileSystem, FtpConnector config, SftpClient client)
+    public SftpRenameCommand(SftpFileSystem fileSystem, SftpClient client)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void rename(String filePath, String newName, boolean overwrite)
+    public void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite)
     {
-        super.rename(filePath, newName, overwrite);
+        super.rename(config, filePath, newName, overwrite);
     }
 }

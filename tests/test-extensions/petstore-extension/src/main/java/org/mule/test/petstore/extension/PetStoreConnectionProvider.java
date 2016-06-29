@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 
@@ -23,7 +24,7 @@ import javax.inject.Inject;
 
 ;
 
-public abstract class PetStoreConnectionProvider implements ConnectionProvider<PetStoreConnector, PetStoreClient>, Lifecycle
+public abstract class PetStoreConnectionProvider implements ConnectionProvider<PetStoreClient>, Lifecycle
 {
 
     public static final String USER = "john";
@@ -33,6 +34,9 @@ public abstract class PetStoreConnectionProvider implements ConnectionProvider<P
 
     @Inject
     private MuleContext muleContext;
+
+    @ConfigName
+    private String configName;
 
     @Parameter
     private String username;
@@ -50,9 +54,9 @@ public abstract class PetStoreConnectionProvider implements ConnectionProvider<P
     private ThreadingProfile threadingProfile;
 
     @Override
-    public PetStoreClient connect(PetStoreConnector config)
+    public PetStoreClient connect()
     {
-        return new PetStoreClient(username, password, tls, threadingProfile);
+        return new PetStoreClient(username, password, tls, threadingProfile, configName);
     }
 
     @Override

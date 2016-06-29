@@ -7,11 +7,11 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
-import org.mule.extension.ftp.api.FtpConnector;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
+import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FileContentWrapper;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 import org.mule.runtime.module.extension.file.api.FileWriterVisitor;
@@ -39,9 +39,9 @@ public final class FtpWriteCommand extends ClassicFtpCommand implements WriteCom
     /**
      * {@inheritDoc}
      */
-    public FtpWriteCommand(ClassicFtpFileSystem fileSystem, FtpConnector config, FTPClient client, MuleContext muleContext)
+    public FtpWriteCommand(ClassicFtpFileSystem fileSystem, FTPClient client, MuleContext muleContext)
     {
-        super(fileSystem, config, client);
+        super(fileSystem, client);
         this.muleContext = muleContext;
     }
 
@@ -49,20 +49,20 @@ public final class FtpWriteCommand extends ClassicFtpCommand implements WriteCom
      * {@inheritDoc}
      */
     @Override
-    public void write(String filePath,
-               Object content,
-               FileWriteMode mode,
-               MuleEvent event,
-               boolean lock,
-               boolean createParentDirectory,
-               String encoding)
+    public void write(FileConnectorConfig config, String filePath,
+                      Object content,
+                      FileWriteMode mode,
+                      MuleEvent event,
+                      boolean lock,
+                      boolean createParentDirectory,
+                      String encoding)
     {
-        Path path = resolvePath(filePath);
-        FileAttributes file = getFile(filePath);
+        Path path = resolvePath(config, filePath);
+        FileAttributes file = getFile(config, filePath);
 
         if (file == null)
         {
-            assureParentFolderExists(path, createParentDirectory);
+            assureParentFolderExists(config, path, createParentDirectory);
         }
         else
         {
@@ -73,7 +73,7 @@ public final class FtpWriteCommand extends ClassicFtpCommand implements WriteCom
             }
             else if (mode == FileWriteMode.OVERWRITE)
             {
-                fileSystem.delete(file.getPath());
+                fileSystem.delete(config, file.getPath());
             }
         }
 

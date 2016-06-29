@@ -72,7 +72,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
     public void setConnection() throws Exception
     {
         PetStoreClient connection = getConnection();
-        verify(connectionProvider).connect(config);
+        verify(connectionProvider).connect();
 
         assertThat(connection, is(notNullValue()));
         assertThat(connection.getUsername(), is(USER));
@@ -86,7 +86,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase
         PetStoreClient connection2 = getConnection();
 
         assertThat(connection1, is(sameInstance(connection2)));
-        verify(connectionProvider).connect(config);
+        verify(connectionProvider).connect();
     }
 
     @Test

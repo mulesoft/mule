@@ -6,7 +6,6 @@
  */
 package org.mule.extension.email.api.sender;
 
-import org.mule.extension.email.api.AbstractEmailConfiguration;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -22,7 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 @Operations(SenderOperations.class)
 @Providers({SMTPProvider.class, SMTPSProvider.class})
 @Configuration(name = "smtp")
-public class SMTPConfiguration extends AbstractEmailConfiguration
+public class SMTPConfiguration
 {
 
     /**
