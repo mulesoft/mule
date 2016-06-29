@@ -61,6 +61,7 @@ final class SourceWrapper extends Source implements Lifecycle, FlowConstructAwar
     private SourceContext sourceContext;
     private ConnectionHandler<Object> connectionHandler;
     private FlowConstruct flowConstruct;
+    private boolean connectionSet = false;
 
     @Inject
     private ConnectionManager connectionManager;
@@ -95,6 +96,7 @@ final class SourceWrapper extends Source implements Lifecycle, FlowConstructAwar
     {
         try
         {
+            setConnection(sourceContext);
             delegate.start();
         }
         catch (Exception e)
@@ -143,12 +145,13 @@ final class SourceWrapper extends Source implements Lifecycle, FlowConstructAwar
 
     private void setConnection(SourceContext sourceContext)
     {
-        if (connectionSetter.isPresent())
+        if (connectionSetter.isPresent() && !connectionSet)
         {
             try
             {
                 connectionHandler = connectionManager.getConnection(sourceContext.getConfigurationInstance().getValue());
                 connectionSetter.get().set(delegate, connectionHandler.getConnection());
+                connectionSet = true;
             }
             catch (ConnectionException e)
             {
@@ -162,8 +165,15 @@ final class SourceWrapper extends Source implements Lifecycle, FlowConstructAwar
     {
         if (connectionHandler != null)
         {
-            connectionHandler.release();
-            connectionHandler = null;
+            try
+            {
+                connectionHandler.release();
+            }
+            finally
+            {
+                connectionHandler = null;
+                connectionSet = false;
+            }
         }
     }
 
