@@ -7,9 +7,8 @@
 package org.mule.runtime.config.spring.dsl.api.xml;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.utils.JavaTypeUtils;
+import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 import java.util.ArrayList;

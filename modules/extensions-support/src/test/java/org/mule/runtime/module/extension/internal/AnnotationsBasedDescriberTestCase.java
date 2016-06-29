@@ -43,7 +43,7 @@ import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
-import org.mule.metadata.java.annotation.GenericTypesAnnotation;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleEvent;
@@ -242,7 +242,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         assertOutputType(sourceDynamicAttributes.getOutputPayload(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object"))
+                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object").with(new ClassInformationAnnotation(Object.class, null)))
                 .build(), true);
         assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(String.class), true);
         assertParameterType(findParameter(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class), false);
@@ -252,7 +252,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         assertOutputType(sourceStaticAttributes.getOutputPayload(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object"))
+                .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object").with(new ClassInformationAnnotation(Object.class, null)))
                 .build(), true);
         assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(String.class), false);
 
@@ -461,7 +461,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "weapon", "", toMetadataType(Weapon.class), false, SUPPORTED, null);
         assertParameter(parameters, "weaponTypeFunction", "", TYPE_BUILDER.objectType()
                                 .id(Function.class.getName())
-                                .with(new GenericTypesAnnotation(asList(MuleEvent.class.getName(), WeaponType.class.getName())))
+                                .with(new ClassInformationAnnotation(Function.class, asList(MuleEvent.class, WeaponType.class)))
                                 .build(),
                         false, SUPPORTED, null);
         assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED, null);

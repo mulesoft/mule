@@ -13,7 +13,7 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.springframework.util.ReflectionUtils.setField;
-import org.mule.metadata.java.utils.JavaTypeUtils;
+import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;

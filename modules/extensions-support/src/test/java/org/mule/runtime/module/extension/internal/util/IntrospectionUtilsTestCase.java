@@ -22,7 +22,7 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.utils.JavaTypeUtils;
+import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

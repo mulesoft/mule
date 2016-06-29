@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
-import static org.mule.metadata.java.JavaTypeLoader.JAVA;
+import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;

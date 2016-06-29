@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationFactory;

@@ -10,11 +10,10 @@ import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;

@@ -10,7 +10,7 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;

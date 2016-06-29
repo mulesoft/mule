@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
-
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;

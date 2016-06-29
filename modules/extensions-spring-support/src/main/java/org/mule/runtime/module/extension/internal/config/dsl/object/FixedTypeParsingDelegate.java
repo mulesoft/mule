@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;

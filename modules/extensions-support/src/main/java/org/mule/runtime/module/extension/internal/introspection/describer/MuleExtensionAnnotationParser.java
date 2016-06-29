@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.util.Arrays.stream;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodArgumentTypes;

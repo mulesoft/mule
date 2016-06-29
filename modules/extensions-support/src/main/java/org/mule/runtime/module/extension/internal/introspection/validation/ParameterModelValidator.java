@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.introspection.parameter.ParameterModel.RESERVED_NAMES;

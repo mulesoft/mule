@@ -12,8 +12,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
-
-import org.mule.metadata.java.JavaTypeLoader;
+import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;

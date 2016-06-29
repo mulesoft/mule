@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.lang.String.format;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getGenericTypeAt;
-import static org.mule.metadata.java.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
@@ -38,7 +38,7 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.java.annotation.GenericTypesAnnotation;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
@@ -89,6 +89,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -644,18 +645,18 @@ public abstract class ExtensionDefinitionParser
             return false;
         }
 
-        GenericTypesAnnotation generics = getSingleAnnotation(metadataType, GenericTypesAnnotation.class).orElse(null);
-        if (generics == null)
+        Optional<ClassInformationAnnotation> generics = getSingleAnnotation(metadataType, ClassInformationAnnotation.class);
+        if (!generics.isPresent())
         {
             return false;
         }
 
-        if (generics.getGenericTypes().size() != 2)
+        if (generics.get().getGenericTypes().size() != 2)
         {
             return false;
         }
 
-        final String genericClassName = generics.getGenericTypes().get(0);
+        final String genericClassName = generics.get().getGenericTypes().get(0);
         try
         {
             return MuleEvent.class.isAssignableFrom(ClassUtils.getClass(genericClassName));
