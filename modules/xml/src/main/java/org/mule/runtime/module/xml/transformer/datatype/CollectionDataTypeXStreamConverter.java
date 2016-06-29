@@ -21,7 +21,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import java.util.Collection;
 
 /**
- * A serializer to handle instances of {@link CollectionDataType}.
+ * A serializer to handle instances of {@link DefaultCollectionDataType}.
  *
  * @since 4.0
  */
@@ -38,7 +38,7 @@ public class CollectionDataTypeXStreamConverter implements Converter
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context)
     {
-        final CollectionDataType dataType = (CollectionDataType) source;
+        final DefaultCollectionDataType dataType = (DefaultCollectionDataType) source;
         writer.addAttribute("type", dataType.getType().getName());
         writer.addAttribute("mediaType", dataType.getMediaType().toString());
         writer.addAttribute("itemType", dataType.getType().getName());
@@ -67,7 +67,7 @@ public class CollectionDataTypeXStreamConverter implements Converter
 
     protected CollectionDataType createDataType(Class<? extends Collection> type, String mimeType, Class<?> itemType, String itemMediaType)
     {
-        return (CollectionDataType) DataType.builder().collectionType(type).itemType(itemType).itemMediaType(itemMediaType).mediaType(mimeType).build();
+        return (DefaultCollectionDataType) DataType.builder().collectionType(type).itemType(itemType).itemMediaType(itemMediaType).mediaType(mimeType).build();
     }
 
 }
