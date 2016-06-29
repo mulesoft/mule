@@ -46,6 +46,7 @@ public final class ExtensionManifestGenerator implements GeneratedResourceFactor
         builder.setName(extensionModel.getName())
                 .setDescription(extensionModel.getDescription())
                 .setVersion(extensionModel.getVersion())
+                .setMinMuleVersion(extensionModel.getMinMuleVersion())
                 .addExportedPackages(exportCollector.getExportedPackages())
                 .addExportedResources(exportCollector.getExportedResources())
                 .withDescriber()

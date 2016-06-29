@@ -6,9 +6,11 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static org.mule.runtime.extension.api.Category.SELECT;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -50,7 +52,7 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
-@Extension(name = HeisenbergExtension.HEISENBERG, description = HeisenbergExtension.EXTENSION_DESCRIPTION)
+@Extension(name = HeisenbergExtension.HEISENBERG, description = HeisenbergExtension.EXTENSION_DESCRIPTION, category = SELECT, minMuleVersion = "4.1")
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
 @Extensible(alias = "heisenberg-empire")
 @OnException(HeisenbergConnectionExceptionEnricher.class)

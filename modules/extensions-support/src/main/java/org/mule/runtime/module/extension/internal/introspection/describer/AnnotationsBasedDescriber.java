@@ -37,6 +37,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isMultiLevelMetadataKeyId;
+
+import org.mule.api.MuleVersion;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -198,6 +200,8 @@ public final class AnnotationsBasedDescriber implements Describer
                 .named(extension.name())
                 .onVersion(getVersion(extension))
                 .fromVendor(extension.vendor())
+                .withCategory(extension.category())
+                .withMinMuleVersion(new MuleVersion(extension.minMuleVersion()))
                 .describedAs(extension.description())
                 .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionType))
                 .withModelProperty(new ImplementingTypeModelProperty(extensionType));

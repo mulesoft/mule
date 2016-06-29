@@ -17,6 +17,7 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.alphaSortDescribedList;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
+
 import org.mule.common.MuleVersion;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -147,6 +148,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                                                       extensionDeclaration.getDescription(),
                                                                                       extensionDeclaration.getVersion(),
                                                                                       extensionDeclaration.getVendor(),
+                                                                                      extensionDeclaration.getCategory(),
+                                                                                      extensionDeclaration.getMinMuleVersion(),
                                                                                       sortConfigurations(toConfigurations(extensionDeclaration.getConfigurations(), extensionModelValueHolder)),
                                                                                       toOperations(extensionDeclaration.getOperations()),
                                                                                       toConnectionProviders(extensionDeclaration.getConnectionProviders()),
