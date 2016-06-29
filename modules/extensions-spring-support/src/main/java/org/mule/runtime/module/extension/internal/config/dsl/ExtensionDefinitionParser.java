@@ -69,6 +69,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolve
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterParser;
 import org.mule.runtime.module.extension.internal.introspection.BasicTypeMetadataVisitor;
+import org.mule.runtime.module.extension.internal.model.property.NoReferencesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
@@ -132,10 +133,11 @@ public abstract class ExtensionDefinitionParser
             new FixedTypeParsingDelegate(TlsContextFactory.class),
             new FixedTypeParsingDelegate(ThreadingProfile.class),
             new DefaultObjectParsingDelegate());
+
     private final List<ValueResolverParsingDelegate> valueResolverParsingDelegates = ImmutableList.of(
             new CharsetValueResolverParsingDelegate(),
-            new MediaTypeValueResolverParsingDelegate(),
-            new DefaultValueResolverParsingDelegate());
+            new MediaTypeValueResolverParsingDelegate());
+    private final ValueResolverParsingDelegate defaultValueResolverParsingDelegate = new DefaultValueResolverParsingDelegate();
 
     /**
      * Creates a new instance
@@ -431,6 +433,11 @@ public abstract class ExtensionDefinitionParser
 
     private ValueResolver<?> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue, ExpressionSupport expressionSupport, boolean required)
     {
+        return resolverOf(parameterName, expectedType, value, defaultValue, expressionSupport, required, true);
+    }
+
+    private ValueResolver<?> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue, ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences)
+    {
         if (value instanceof ValueResolver)
         {
             return (ValueResolver<?>) value;
@@ -489,7 +496,11 @@ public abstract class ExtensionDefinitionParser
                 @Override
                 protected void defaultVisit(MetadataType metadataType)
                 {
-                    resolverValueHolder.set(locateParsingDelegate(valueResolverParsingDelegates, metadataType).parse(value.toString(), metadataType));
+                    ValueResolver delegateResolver = locateParsingDelegate(valueResolverParsingDelegates, metadataType)
+                            .map(delegate -> delegate.parse(value.toString(), metadataType))
+                            .orElseGet(() -> acceptsReferences ? defaultValueResolverParsingDelegate.parse(value.toString(), metadataType) : new StaticValueResolver<>(value));
+
+                    resolverValueHolder.set(delegateResolver);
                 }
             });
 
@@ -550,7 +561,12 @@ public abstract class ExtensionDefinitionParser
      */
     protected AttributeDefinition.Builder parseAttributeParameter(String key, String name, MetadataType type, Object defaultValue, ExpressionSupport expressionSupport, boolean required)
     {
-        AttributeDefinition.Builder definitionBuilder = fromSimpleParameter(name, value -> resolverOf(name, type, value, defaultValue, expressionSupport, required));
+        return parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, true);
+    }
+
+    private AttributeDefinition.Builder parseAttributeParameter(String key, String name, MetadataType type, Object defaultValue, ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences)
+    {
+        AttributeDefinition.Builder definitionBuilder = fromSimpleParameter(name, value -> resolverOf(name, type, value, defaultValue, expressionSupport, required, acceptsReferences));
         addParameter(key, definitionBuilder);
 
         return definitionBuilder;
@@ -568,7 +584,8 @@ public abstract class ExtensionDefinitionParser
                              (ObjectType) parameterModel.getType(),
                              parameterModel.getDefaultValue(),
                              parameterModel.getExpressionSupport(),
-                             parameterModel.isRequired());
+                             parameterModel.isRequired(),
+                             !parameterModel.getModelProperty(NoReferencesModelProperty.class).isPresent());
     }
 
     /**
@@ -583,18 +600,24 @@ public abstract class ExtensionDefinitionParser
      */
     protected void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue, ExpressionSupport expressionSupport, boolean required)
     {
-        parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required);
+        parseObjectParameter(key, name, type, defaultValue, expressionSupport, required, true);
+    }
 
-        ObjectParsingDelegate delegate = (ObjectParsingDelegate) locateParsingDelegate(objectParsingDelegates, type);
+    private void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue, ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences)
+    {
+        parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, acceptsReferences);
+
+        ObjectParsingDelegate delegate = (ObjectParsingDelegate) locateParsingDelegate(objectParsingDelegates, type).orElseThrow(
+                () -> new MuleRuntimeException(createStaticMessage("Could not find a parsing delegate for type " + getType(type).getName())));
+
         addParameter(getChildKey(key), delegate.parse(name, type));
     }
 
-    private <M extends MetadataType, T> ParsingDelegate<M, T> locateParsingDelegate(List<? extends ParsingDelegate<M, T>> delegatesList, M metadataType)
+    private <M extends MetadataType, T> Optional<ParsingDelegate<M, T>> locateParsingDelegate(List<? extends ParsingDelegate<M, T>> delegatesList, M metadataType)
     {
-        return delegatesList.stream()
+        return (Optional<ParsingDelegate<M, T>>) delegatesList.stream()
                 .filter(candidate -> candidate.accepts(metadataType))
-                .findFirst()
-                .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find a parsing delegate for type " + getType(metadataType).getName())));
+                .findFirst();
     }
 
     /**

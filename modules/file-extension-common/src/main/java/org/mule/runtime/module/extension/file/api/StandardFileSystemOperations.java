@@ -6,17 +6,15 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.module.extension.file.api.matcher.NullFilePayloadPredicate;
@@ -157,7 +155,7 @@ public class StandardFileSystemOperations
     public void write(@UseConfig FileConnectorConfig config,
                       @Connection FileSystem fileSystem,
                       @Optional String path,
-                      @Optional(defaultValue = "#[payload]") @Expression(LITERAL) Object content,
+                      @Optional(defaultValue = "#[payload]") @NoRef Object content,
                       @Optional(defaultValue = "OVERWRITE") FileWriteMode mode,
                       @Optional(defaultValue = "false") boolean lock,
                       @Optional(defaultValue = "true") boolean createParentDirectories,
@@ -167,17 +165,6 @@ public class StandardFileSystemOperations
         if (content == null || content instanceof NullPayload)
         {
             throw new IllegalArgumentException("Cannot write a null content");
-        }
-
-        if (content instanceof String)
-        {
-            String value = (String) content;
-            AttributeEvaluator evaluator = new AttributeEvaluator(value);
-            evaluator.initialize(muleContext.getExpressionManager());
-            if (evaluator.isExpression() || evaluator.isParseExpression())
-            {
-                content = evaluator.resolveValue(event);
-            }
         }
 
         fileSystem.changeToBaseDir(config);

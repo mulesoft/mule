@@ -27,11 +27,10 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * This implementation is thread-safe.
  *
- * @param <Config>     the generic type of the config that owns {@code this} managed connection
  * @param <Connection> the generic type of the connection being wrapped
  * @since 4.0
  */
-final class CachedConnectionHandler<Config, Connection> implements ConnectionHandlerAdapter<Connection>
+final class CachedConnectionHandler<Connection> implements ConnectionHandlerAdapter<Connection>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedConnectionHandler.class);

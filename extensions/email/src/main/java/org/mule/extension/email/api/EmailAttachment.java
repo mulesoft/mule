@@ -9,6 +9,7 @@ package org.mule.extension.email.api;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
@@ -39,8 +40,8 @@ public class EmailAttachment
     /**
      * the content of the attachment.
      */
-    //TODO add @NoRef when is available - MULE-9811
     @Parameter
+    @NoRef
     private Object content;
 
     /**

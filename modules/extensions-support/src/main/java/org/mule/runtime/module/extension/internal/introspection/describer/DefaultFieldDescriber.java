@@ -6,17 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getAliasName;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.NoReferencesModelProperty;
 
 import java.lang.reflect.Field;
 
@@ -56,13 +59,18 @@ final class DefaultFieldDescriber implements FieldDescriber
     @Override
     public ParameterDeclarer describe(Field field, ParameterizedDeclarer declarer)
     {
-        String parameterName = MuleExtensionAnnotationParser.getAliasName(field);
+        String parameterName = getAliasName(field);
         ParameterDeclarer parameterDeclarer;
         MetadataType fieldType = getFieldMetadataType(field, typeLoader);
 
         Optional optional = field.getAnnotation(Optional.class);
         parameterDeclarer = optional == null ? declarer.withRequiredParameter(parameterName)
                                              : declarer.withOptionalParameter(parameterName).defaultingTo(getDefaultValue(optional));
+
+        if (field.getAnnotation(NoRef.class) != null)
+        {
+            parameterDeclarer.withModelProperty(new NoReferencesModelProperty());
+        }
 
         parameterDeclarer.ofType(fieldType)
                 .withExpressionSupport(getExpressionSupport(field))
