@@ -12,6 +12,7 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -35,7 +36,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.config.MutableThreadingProfile;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -118,6 +118,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
     @Inject
     private MuleContext muleContext;
 
+    //TODO: MULE-9320 Define threading model for message sources in Mule 4 - This should be a parameter if nothing changes
     private ThreadingProfile workerThreadingProfile;
     private WorkManager workManager;
     private Server server;
@@ -186,7 +187,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
         }
         catch (IOException e)
         {
-            throw new DefaultMuleException("Could not start HTTP server", e);
+            throw new DefaultMuleException(new ConnectionException("Could not start HTTP server", e));
         }
     }
 
@@ -213,7 +214,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
     @Override
     public void disconnect(Server server)
     {
-        //server could be shared with others, do nothing.
+        //server could be shared with other listeners, do nothing
     }
 
     @Override
@@ -235,7 +236,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
     @Override
     public ConnectionHandlingStrategy<Server> getHandlingStrategy(ConnectionHandlingStrategyFactory<Server> handlingStrategyFactory)
     {
-        return handlingStrategyFactory.none();
+        return handlingStrategyFactory.cached();
     }
 
     private void verifyConnectionsParameters() throws InitialisationException
@@ -248,7 +249,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
 
     private WorkManager createWorkManager(String name)
     {
-        final WorkManager workManager = workerThreadingProfile.createWorkManager(format("%s%s.%s", ThreadNameHelper.getPrefix(muleContext), name, "worker"), muleContext.getConfiguration().getShutdownTimeout());
+        final WorkManager workManager = workerThreadingProfile.createWorkManager(format("%s%s.%s", getPrefix(muleContext), name, "worker"), muleContext.getConfiguration().getShutdownTimeout());
         if (workManager instanceof MuleContextAware)
         {
             ((MuleContextAware) workManager).setMuleContext(muleContext);
