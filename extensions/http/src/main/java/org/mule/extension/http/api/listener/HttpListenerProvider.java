@@ -41,7 +41,6 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.listener.Server;
 import org.mule.runtime.module.http.internal.listener.ServerAddress;
@@ -181,7 +180,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
     {
         try
         {
-            workManager = createWorkManager("pepe");
+            workManager = createWorkManager(configName);
             workManager.start();
             server.start();
         }
