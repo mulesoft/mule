@@ -196,13 +196,19 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
     {
         try
         {
-            workManager.dispose();
+            server.stop();
         }
         finally
         {
-            workManager = null;
+            try
+            {
+                workManager.dispose();
+            }
+            finally
+            {
+                workManager = null;
+            }
         }
-        server.stop();
     }
 
     @Override
