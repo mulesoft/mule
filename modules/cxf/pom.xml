@@ -79,7 +79,7 @@
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
                     <forkCount>2</forkCount>
-					<reuseForks>true</reuseForks>
+                    <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
         </plugins>
