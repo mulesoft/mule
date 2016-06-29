@@ -193,22 +193,13 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
             Boolean shouldRetryRequest = (Boolean) value;
             if (shouldRetryRequest)
             {
-                final String resourceId = resourceOwnerIdEvaluator.resolveStringValue(firstAttemptResponseEvent);
-                final Boolean refreshTokenIssuedByServer = !StringUtils.isBlank(this.getConfigOAuthContext().getContextForResourceOwner(resourceId).getRefreshToken());
-                if (refreshTokenIssuedByServer)
+                try
                 {
-                    try
-                    {
-                        refreshToken(firstAttemptResponseEvent, resourceId);
-                    }
-                    catch (MuleException e)
-                    {
-                        throw new MuleRuntimeException(e);
-                    }
+                    refreshToken(firstAttemptResponseEvent, resourceOwnerIdEvaluator.resolveStringValue(firstAttemptResponseEvent));
                 }
-                else
+                catch (MuleException e)
                 {
-                    throw new RequestAuthenticationException(createStaticMessage(String.format("Cannot do a refresh token to get a new access token for the %s user due to OAuth server did not issued a refresh_token. You would have to re-authenticate the user before trying to execute an operation to the API.", resourceId)));
+                    throw new MuleRuntimeException(e);
                 }
             }
             return shouldRetryRequest;
