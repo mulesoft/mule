@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
-import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.runtime.module.http.internal.listener.HttpServerManager;
 import org.mule.runtime.module.http.internal.listener.Server;
@@ -48,8 +47,6 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     public static final String SERVER_ALREADY_EXISTS_FORMAT = "A server in port(%s) already exists for ip(%s) or one overlapping it (0.0.0.0).";
     private static final String LISTENER_THREAD_NAME_PREFIX = "http.listener";
 
-    // TODO: Remove @Paremeter which was added as a workaround of MULE-9942.
-    @Parameter
     private HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
     private HttpServerManager httpServerManager;
 
