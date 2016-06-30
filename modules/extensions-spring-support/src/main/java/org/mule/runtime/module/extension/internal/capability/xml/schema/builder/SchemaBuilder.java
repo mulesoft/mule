@@ -832,11 +832,10 @@ public final class SchemaBuilder
                                                                final ExplicitGroup all, final ObjectFieldType field)
     {
         final String name = field.getKey().getName().getLocalPart();
-        final MetadataType fieldType = field.getValue();
-        final String defaultValue = MetadataTypeUtils.getDefaultValue(fieldType).orElse(null);
+        final String defaultValue = MetadataTypeUtils.getDefaultValue(field).orElse(null);
         final ExpressionSupport expressionSupport = TypeUtils.getExpressionSupport(field);
 
-        return getParameterDeclarationVisitor(extensionType, all, name, EMPTY, fieldType,
+        return getParameterDeclarationVisitor(extensionType, all, name, EMPTY, field.getValue(),
                                               expressionSupport, field.isRequired(), defaultValue);
     }
 

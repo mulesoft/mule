@@ -6,9 +6,9 @@
  */
 package org.mule.extension.email.api;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.mule.runtime.api.metadata.MediaType.TEXT;
 
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT_PLAIN;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.UTF_8;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -29,10 +29,19 @@ public class EmailContent
     {
     }
 
-    public EmailContent(String body, String contentType)
+
+    public EmailContent(String body)
     {
         this.body = body;
-        this.contentType = contentType;
+        this.contentType = TEXT_PLAIN;
+        this.charset = UTF_8;
+    }
+
+    public EmailContent(String body, MediaType contentType, Charset charset)
+    {
+        this.body = body;
+        this.contentType = contentType.toString();
+        this.charset = charset.name();
     }
 
     /**
@@ -48,7 +57,7 @@ public class EmailContent
      * The default value is "text/plain"
      */
     @Parameter
-    @Optional(defaultValue = "text/plain")
+    @Optional(defaultValue = TEXT_PLAIN)
     private String contentType;
 
     /**
@@ -57,7 +66,7 @@ public class EmailContent
      * The default value is "UTF-8"
      */
     @Parameter
-    @Optional(defaultValue = "UTF-8")
+    @Optional(defaultValue = UTF_8)
     private String charset;
 
     /**
@@ -74,8 +83,7 @@ public class EmailContent
      */
     public MediaType getContentType()
     {
-        // TODO: remove if when MULE-9960 is fixed since default values are not being injected properly.
-        return contentType == null ? TEXT : DataType.builder().mediaType(contentType).build().getMediaType();
+        return DataType.builder().mediaType(contentType).build().getMediaType();
     }
 
     /**
@@ -83,7 +91,6 @@ public class EmailContent
      */
     public Charset getCharset()
     {
-        // TODO: remove if when MULE-9960 is fixed since default values are not being injected properly.
-        return charset != null ? Charset.forName(charset) : UTF_8;
+        return Charset.forName(charset);
     }
 }
