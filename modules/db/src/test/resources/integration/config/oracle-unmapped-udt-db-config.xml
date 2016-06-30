@@ -5,6 +5,11 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <db:oracle-config name="dbConfig" host="172.16.20.66" port="1521" instance="XE" user="pocholo"
-                      password="password"/>
+    <db:oracle-config name="dbConfig" url="jdbc:oracle:thin:@172.16.20.66:1521:xe" user="pocholo" password="password">
+        <db:data-types>
+            <db:data-type name="CONTACT_DETAILS" id="2002"/>
+            <db:data-type name="CONTACT_DETAILS_ARRAY" id="2003"/>
+        </db:data-types>
+    </db:oracle-config>
+
 </mule>

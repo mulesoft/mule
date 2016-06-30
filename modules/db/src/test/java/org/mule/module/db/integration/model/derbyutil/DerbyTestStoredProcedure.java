@@ -7,6 +7,8 @@
 
 package org.mule.module.db.integration.model.derbyutil;
 
+import org.mule.module.db.integration.model.ContactDetails;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -148,4 +150,27 @@ public class DerbyTestStoredProcedure
 
         return 1;
     }
+
+    public static ContactDetails createContactDetails(String description, String phone, String email)
+    {
+        return new ContactDetails(description, phone, email);
+    }
+
+    public static void getManagerDetails(String name, ContactDetails[] result) throws SQLException
+    {
+        Connection conn = DriverManager.getConnection("jdbc:default:connection");
+
+        try
+        {
+            Statement ps1 = conn.createStatement();
+            ResultSet resultSet = ps1.executeQuery("SELECT DETAILS FROM REGION_MANAGERS WHERE REGION_NAME ='" + name + "'");
+            resultSet.next();
+            result[0] = (ContactDetails) resultSet.getObject(1);
+        }
+        finally
+        {
+            conn.close();
+        }
+    }
+
 }

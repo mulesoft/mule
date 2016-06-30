@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="returnsObject">
+        <inbound-endpoint address="vm://returnsObject" exchange-pattern="request-response"/>
+
+        <transactional>
+            <db:stored-procedure>
+                <db:parameterized-query>{ CALL getManagerDetails('Southwest', :out) }</db:parameterized-query>
+                <db:out-param name="out" type="CONTACT_DETAILS"/>
+            </db:stored-procedure>
+
+            <!--Obtains the UDT -->
+            <set-payload value="#[payload['out']]"/>
+        </transactional>
+    </flow>
+</mule>

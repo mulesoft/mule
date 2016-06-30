@@ -82,6 +82,18 @@ public class DerbyTestDatabase extends AbstractTestDatabase
                                                            "returns INTEGER language java parameter style java external name " +
                                                            "'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.timeDelay'";
 
+    public static final String SQL_CREATE_CONTACT_DETAIL_FUNCTION = "create function createContactDetails(DESCRIPTION VARCHAR(32), PHONE VARCHAR(32), EMAIL VARCHAR(32)) " +
+                                                           "returns CONTACT_DETAILS language java parameter style java external name " +
+                                                           "'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.createContactDetails'";
+
+
+    public static final String SQL_CREATE_SP_GET_MANAGER_DETAILS =
+            "CREATE PROCEDURE getManagerDetails(IN NAME VARCHAR(32), OUT RESULT CONTACT_DETAILS)\n" +
+            "PARAMETER STYLE JAVA\n" +
+            "LANGUAGE JAVA\n" +
+            "DYNAMIC RESULT SETS 0\n" +
+            "EXTERNAL NAME 'org.mule.module.db.integration.model.derbyutil.DerbyTestStoredProcedure.getManagerDetails'";
+
     @Override
     public void createPlanetTable(Connection connection) throws SQLException
     {
@@ -128,6 +140,68 @@ public class DerbyTestDatabase extends AbstractTestDatabase
     public void createStoredProcedureDoubleMyInt(DataSource dataSource) throws SQLException
     {
         createStoredProcedure(dataSource, SQL_CREATE_SP_DOUBLE_MY_INT);
+    }
+
+    @Override
+    protected boolean supportsSimpleUdt()
+    {
+        return true;
+    }
+
+    @Override
+    public void createStoredProcedureGetManagerDetails(DataSource dataSource) throws SQLException
+    {
+        createStoredProcedure(dataSource, SQL_CREATE_SP_GET_MANAGER_DETAILS);
+    }
+
+    @Override
+    protected void createContactDetailsType(Connection connection) throws SQLException
+    {
+        try
+        {
+            String ddl = "CREATE TYPE CONTACT_DETAILS EXTERNAL NAME 'org.mule.module.db.integration.model.ContactDetails' LANGUAGE JAVA";
+
+            executeDdl(connection, ddl);
+        }
+        catch (SQLException e)
+        {
+            // Ignore exception when type already exists
+            if (!DERBY_ERROR_OBJECT_ALREADY_EXISTS.equals(e.getSQLState()))
+            {
+                throw e;
+            }
+        }
+    }
+
+    @Override
+    protected void deleteRegionManagersTable(Connection connection) throws SQLException
+    {
+        executeUpdate(connection, "DELETE FROM REGION_MANAGERS");
+    }
+
+    @Override
+    protected void createRegionManagersTable(Connection connection) throws SQLException
+    {
+        String ddl = "CREATE TABLE REGION_MANAGERS(" +
+                     "REGION_NAME VARCHAR(32) NOT NULL PRIMARY KEY," +
+                     "MANAGER_NAME VARCHAR(32) NOT NULL," +
+                     "DETAILS CONTACT_DETAILS NOT NULL)" ;
+        executeDdl(connection, ddl);
+
+        executeDdl(connection, SQL_CREATE_CONTACT_DETAIL_FUNCTION);
+    }
+
+    @Override
+    protected String getInsertRegionManagerSql(RegionManager regionManager)
+    {
+        StringBuilder builder = new StringBuilder("INSERT INTO REGION_MANAGERS VALUES ('").append(regionManager.getRegionName()).append("', '")
+                .append(regionManager.getName()).append("', createContactDetails('")
+                .append(regionManager.getContactDetails().getDescription()).append("', '")
+                .append(regionManager.getContactDetails().getPhoneNumber()).append("', '")
+                .append(regionManager.getContactDetails().getEmail())
+                .append("'))");
+
+        return builder.toString();
     }
 
     @Override
