@@ -7,8 +7,7 @@
 package org.mule.compatibility.core.context.notification;
 
 import org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener;
-import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
-import org.mule.runtime.core.context.notification.AbstractNotificationLogger;
+import org.mule.test.core.context.notification.AbstractNotificationLogger;
 
 public class EndpointMessageNotificationLogger extends AbstractNotificationLogger<EndpointMessageNotification>
     implements EndpointMessageNotificationListener<EndpointMessageNotification>

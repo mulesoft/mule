@@ -6,6 +6,6 @@
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
     <spring:beans>
-        <spring:bean id="failInit" class="org.mule.runtime.core.context.FailLifecycleTestObject" />
+        <spring:bean id="failInit" class="org.mule.test.core.context.FailLifecycleTestObject" />
     </spring:beans>
 </mule>

@@ -219,7 +219,7 @@
     </flow>
 
     <flow name="enricherFlowVar">
-        <enricher target="flowVars[org.mule.runtime.core.NonBlockingFullySupportedFunctionalTestCase.FOO]">
+        <enricher target="flowVars[org.mule.test.core.NonBlockingFullySupportedFunctionalTestCase.FOO]">
             <test:non-blocking-processor/>
         </enricher>
         <test:assert expression="#[assertPayload()]"/>

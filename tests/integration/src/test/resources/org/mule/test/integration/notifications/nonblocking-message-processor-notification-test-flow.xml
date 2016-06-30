@@ -12,7 +12,7 @@
         <notification event="MESSAGE-PROCESSOR"/>
     </notifications>
 
-    <spring:bean name="notificationLogger" class="org.mule.runtime.core.context.notification.processors.MessageProcessorNotificationLogger"/>
+    <spring:bean name="notificationLogger" class="org.mule.test.core.context.notification.processors.MessageProcessorNotificationLogger"/>
 
     <notifications>
         <notification-listener ref="notificationLogger"/>

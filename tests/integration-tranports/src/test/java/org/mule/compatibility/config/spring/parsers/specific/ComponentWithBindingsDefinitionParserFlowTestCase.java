@@ -19,7 +19,7 @@ import org.mule.compatibility.core.component.DefaultJavaWithBindingComponent;
 import org.mule.compatibility.core.component.PooledJavaWithBindingsComponent;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefinitionParser.CheckExclusiveClassAttributeObjectFactoryException;
-import org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding;
+import org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.JavaComponent;

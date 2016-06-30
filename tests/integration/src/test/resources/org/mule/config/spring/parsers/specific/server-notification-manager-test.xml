@@ -10,12 +10,12 @@
 
         <!-- the test event is routed to the test interface -->
         <notification
-                event-class="org.mule.runtime.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestEvent"
-                interface-class="org.mule.runtime.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface"/>
+                event-class="org.mule.test.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestEvent"
+                interface-class="org.mule.test.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface"/>
 
         <!-- adming events are routed to the test interface 2, but disabled for the usual admin listener -->
         <notification event="SECURITY"
-                interface-class="org.mule.runtime.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface2"/>
+                interface-class="org.mule.test.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface2"/>
         <disable-notification interface="SECURITY"/>
 
         <!-- this receives the simple test event -->
@@ -31,22 +31,22 @@
     </notifications>
 
     <spring:bean name="listener"
-                 class="org.mule.runtime.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener"/>
+                 class="org.mule.test.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener"/>
     <spring:bean name="listener2"
-                 class="org.mule.runtime.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener2"/>
+                 class="org.mule.test.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener2"/>
     <spring:bean name="securityListener"
-                 class="org.mule.runtime.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestSecurityListener"/>
+                 class="org.mule.test.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestSecurityListener"/>
 
     <!-- This bean is a listener but will only be registered using explicit configuration above (with subscription) -->
     <spring:bean name="listener3"
-                class="org.mule.runtime.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener2"/>
+                class="org.mule.test.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener2"/>
    
     <!--
          This bean is a listener and will be registered with null subscription automatically because the same listener
          is not defined as a listener explicity above.
     -->
     <spring:bean name="listener4"
-                class="org.mule.runtime.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener2"/>
+                class="org.mule.test.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener2"/>
         
 
 </mule>

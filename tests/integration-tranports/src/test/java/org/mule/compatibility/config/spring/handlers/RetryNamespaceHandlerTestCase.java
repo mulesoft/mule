@@ -12,8 +12,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.config.spring.handlers.TestRetryNotifier;
-import org.mule.runtime.config.spring.handlers.TestRetryPolicyTemplate;
+import org.mule.test.config.spring.handlers.TestRetryNotifier;
+import org.mule.test.config.spring.handlers.TestRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;

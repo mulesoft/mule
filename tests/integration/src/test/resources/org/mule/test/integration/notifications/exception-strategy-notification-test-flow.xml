@@ -8,7 +8,7 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <spring:bean name="notificationLogger" class="org.mule.runtime.core.context.notification.ExceptionStrategyNotificationLogger"/>
+    <spring:bean name="notificationLogger" class="org.mule.test.core.context.notification.ExceptionStrategyNotificationLogger"/>
 
     <notifications>
         <notification-listener ref="notificationLogger"/>
