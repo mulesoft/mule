@@ -15,8 +15,6 @@ import org.mule.compatibility.config.spring.parsers.specific.endpoint.support.Ch
 import org.mule.compatibility.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.runtime.config.spring.parsers.beans.OrphanBean;
-import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 
 /**
  * Registers a Bean Definition Parser for handling <code><parsers-test:...></code> elements.

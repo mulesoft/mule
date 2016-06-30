@@ -9,8 +9,8 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <spring:beans>
-        <spring:bean id="processorTraceAsserter" name="processorTraceAsserter" class="org.mule.runtime.core.context.notification.ProcessorsTraceTestCase.ProcessorsTraceAsserter" scope="prototype" />
-        <spring:bean id="processorTraceAsyncAsserter" name="processorTraceAsyncAsserter" class="org.mule.runtime.core.context.notification.ProcessorsTraceTestCase.ProcessorsTraceAsyncAsserter" scope="prototype" />
+        <spring:bean id="processorTraceAsserter" name="processorTraceAsserter" class="org.mule.test.core.context.notification.ProcessorsTraceTestCase.ProcessorsTraceAsserter" scope="prototype" />
+        <spring:bean id="processorTraceAsyncAsserter" name="processorTraceAsyncAsserter" class="org.mule.test.core.context.notification.ProcessorsTraceTestCase.ProcessorsTraceAsyncAsserter" scope="prototype" />
     </spring:beans>
 
 

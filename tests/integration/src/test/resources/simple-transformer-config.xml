@@ -6,7 +6,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <custom-transformer name="lifecycle" class="org.mule.runtime.core.transformers.simple.RegistryTransformerLifecycleTestCase$TransformerLifecycleTracker">
+    <custom-transformer name="lifecycle" class="org.mule.test.core.transformers.simple.RegistryTransformerLifecycleTestCase$TransformerLifecycleTracker">
        <spring:property name="property" value="foo"/>
     </custom-transformer>
     

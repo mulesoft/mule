@@ -67,7 +67,7 @@
                                       maxThreads="10" minThreads="5" threadTTL="100" maxBufferSize="10" threadWaitTimeout="1000"
                                       poolExhaustedAction="WAIT" />
 
-    <custom-processing-strategy name="customStrategy" class="org.mule.runtime.config.spring.flow.FlowProcessingStrategyConfigTestCase$CustomProcessingStrategy">
+    <custom-processing-strategy name="customStrategy" class="org.mule.test.config.spring.flow.FlowProcessingStrategyConfigTestCase$CustomProcessingStrategy">
         <spring:property name="foo" value="bar" />
     </custom-processing-strategy>
 

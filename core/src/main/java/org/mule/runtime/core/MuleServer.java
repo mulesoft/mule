@@ -61,7 +61,7 @@ public class MuleServer implements Runnable
     /**
      * Don't use a class object so the core doesn't depend on mule-module-spring-config.
      */
-    protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.runtime.core.config.builders.AutoConfigurationBuilder";
+    public static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.runtime.core.config.builders.AutoConfigurationBuilder";
 
     /**
      * This builder sets up the configuration for an idle Mule node - a node that
@@ -115,7 +115,7 @@ public class MuleServer implements Runnable
      * handle to the local MuleContext can be obtained from anywhere by calling
      * MuleServer.getMuleContext()
      */
-    protected static MuleContext muleContext = null;
+    protected MuleContext muleContext = null;
 
     /**
      * Application entry point.

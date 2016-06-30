@@ -222,7 +222,7 @@
 
     <flow name="enricherFlowVar">
         <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
-        <enricher target="flowVars[org.mule.runtime.core.NonBlockingFullySupportedFunctionalTestCase.FOO]">
+        <enricher target="flowVars[org.mule.test.core.NonBlockingFullySupportedFunctionalTestCase.FOO]">
             <test:non-blocking-processor/>
         </enricher>
         <test:assert expression="#[assertPayload()]"/>

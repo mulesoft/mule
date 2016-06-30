@@ -9,7 +9,7 @@
           http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <spring:beans>
-        <spring:bean name="exceptionListener" class="org.mule.runtime.core.context.notification.FailingNotificationListenerTestCase$ExceptionFailingListener"/>
+        <spring:bean name="exceptionListener" class="org.mule.test.core.context.notification.FailingNotificationListenerTestCase$ExceptionFailingListener"/>
     </spring:beans>
 
     <flow name="testFlow">

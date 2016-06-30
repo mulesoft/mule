@@ -6,14 +6,14 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <spring:bean name="bean"
-        class="org.mule.runtime.config.spring.DummyMuleContextAware" />
+        class="org.mule.test.config.spring.DummyMuleContextAware" />
 
 
 
     <flow name="service">
         <transformer ref="bean" />
         <component>
-            <singleton-object class="org.mule.runtime.config.spring.DummyComponent">
+            <singleton-object class="org.mule.test.config.spring.DummyComponent">
                 <property key="property" value-ref="bean" />
             </singleton-object>
         </component>

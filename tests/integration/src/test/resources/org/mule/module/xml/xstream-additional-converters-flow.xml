@@ -8,7 +8,7 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <mulexml:xml-to-object-transformer name="XmlToObject">
-        <mulexml:alias name="test-bean" class="org.mule.runtime.module.xml.functional.XStreamAdditionalConvertersTestCase$TestBean"/>
+        <mulexml:alias name="test-bean" class="org.mule.test.xml.functional.XStreamAdditionalConvertersTestCase$TestBean"/>
         <mulexml:converter class="com.thoughtworks.xstream.converters.extended.ISO8601DateConverter"/>
     </mulexml:xml-to-object-transformer>
 

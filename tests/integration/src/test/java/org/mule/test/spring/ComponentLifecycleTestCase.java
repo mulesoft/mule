@@ -8,14 +8,14 @@ package org.mule.test.spring;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.config.dsl.LifecycleAction.DISPOSE;
-import static org.mule.runtime.config.dsl.LifecycleAction.GET_OBJECT;
-import static org.mule.runtime.config.dsl.LifecycleAction.INITIALISE;
-import static org.mule.runtime.config.dsl.LifecycleAction.START;
-import static org.mule.runtime.config.dsl.LifecycleAction.STOP;
+import static org.mule.test.config.dsl.LifecycleAction.DISPOSE;
+import static org.mule.test.config.dsl.LifecycleAction.GET_OBJECT;
+import static org.mule.test.config.dsl.LifecycleAction.INITIALISE;
+import static org.mule.test.config.dsl.LifecycleAction.START;
+import static org.mule.test.config.dsl.LifecycleAction.STOP;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.config.dsl.LifecycleSensingMessageProcessor;
-import org.mule.runtime.config.dsl.LifecycleSensingObjectFactory;
+import org.mule.test.config.dsl.LifecycleSensingMessageProcessor;
+import org.mule.test.config.dsl.LifecycleSensingObjectFactory;
 import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;

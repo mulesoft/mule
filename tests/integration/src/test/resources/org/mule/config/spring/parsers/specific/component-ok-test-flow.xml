@@ -6,12 +6,12 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     
-    <spring:bean name="testSpringBean" class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding"/>
+    <spring:bean name="testSpringBean" class="org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding"/>
 
 
 
         <flow name="service1">
-            <component class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding">
+            <component class="org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding">
                 <entry-point-resolver-set>
                     <array-entry-point-resolver/>
                     <callable-entry-point-resolver/>
@@ -25,7 +25,7 @@
                 <entry-point-resolver-set>
                     <callable-entry-point-resolver/>
                 </entry-point-resolver-set>
-                <prototype-object class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding" />
+                <prototype-object class="org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding" />
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
             </component>
         </flow>
@@ -37,7 +37,7 @@
                         <include-entry-point method="onCall"/>
                     </method-entry-point-resolver>
                 </entry-point-resolver-set>
-                <singleton-object class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding" />
+                <singleton-object class="org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding" />
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
             </component>
         </flow>
@@ -53,7 +53,7 @@
         </flow>
 
         <flow name="service5">
-            <pooled-component class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding">
+            <pooled-component class="org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding">
                 <entry-point-resolver-set>
                     <property-entry-point-resolver/>
                 </entry-point-resolver-set>
@@ -67,7 +67,7 @@
         <flow name="service6">
             <pooled-component>
                 <reflection-entry-point-resolver/>
-                <prototype-object class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding" />
+                <prototype-object class="org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding" />
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
                 <pooling-profile exhaustedAction="WHEN_EXHAUSTED_FAIL"
                     initialisationPolicy="INITIALISE_ALL" maxActive="1"
@@ -80,7 +80,7 @@
                 <entry-point-resolver-set>
                     <reflection-entry-point-resolver/>
                 </entry-point-resolver-set>
-                <singleton-object class="org.mule.runtime.config.spring.parsers.specific.DummyComponentWithBinding" />
+                <singleton-object class="org.mule.test.config.spring.parsers.specific.DummyComponentWithBinding" />
                 <custom-lifecycle-adapter-factory class="org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory"/>
                 <pooling-profile exhaustedAction="WHEN_EXHAUSTED_FAIL"
                     initialisationPolicy="INITIALISE_ALL" maxActive="1"
