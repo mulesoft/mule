@@ -6,20 +6,20 @@
  */
 package org.mule.test.integration.domain.http;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
+import org.mule.functional.junit4.ApplicationContextBuilder;
+import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.functional.junit4.ApplicationContextBuilder;
-import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import org.hamcrest.core.IsInstanceOf;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
 {
@@ -29,22 +29,34 @@ public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
     @Rule
     public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
 
+    @Rule
+    public ExpectedException expected = ExpectedException.none();
+
+    private MuleContext domainContext;
+    private MuleContext firstAppContext;
+
+    @After
+    public void after()
+    {
+        if (firstAppContext != null)
+        {
+            firstAppContext.dispose();
+        }
+        if (domainContext != null)
+        {
+            domainContext.dispose();
+        }
+    }
+
     @Test
     public void samePathDefinedInTwoAppsWithinSameDomain() throws Exception
     {
-        MuleContext domainContext = new DomainContextBuilder().setDomainConfig("domain/http/http-shared-listener-config.xml").build();
-        MuleContext firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
+        domainContext = new DomainContextBuilder().setDomainConfig("domain/http/http-shared-listener-config.xml").build();
+        firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
         ApplicationContextBuilder secondApp = new ApplicationContextBuilder();
-        try
-        {
-            secondApp.setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
-            fail("Second app context start should fail");
-        }
-        catch (Exception e)
-        {
-            assertThat(e.getCause(), IsInstanceOf.instanceOf(InitialisationException.class));
-        }
-        firstAppContext.dispose();
+
+        expected.expectCause(instanceOf(InitialisationException.class));
+        secondApp.setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
     }
 
     public SystemProperty getEndpointSchemeSystemProperty()
