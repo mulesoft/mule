@@ -217,7 +217,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
             for (MuleMessage<?, ListenerFileAttributes> message : receivedMessages)
             {
                 ListenerFileAttributes attributes = message.getAttributes();
-                if (attributes.getPath().endsWith("/" + fileName) && attributes.getEventType() == type)
+                if (attributes.getPath().endsWith("/" + fileName) && attributes.getEventType().equals(type.name()))
                 {
                     messageHolder.set(message);
                     return true;
