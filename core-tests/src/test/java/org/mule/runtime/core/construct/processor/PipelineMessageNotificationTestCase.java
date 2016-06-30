@@ -161,8 +161,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setMessageSource(source);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request"),
-                                     ONE_WAY, pipeline);
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request"), ONE_WAY, pipeline);
 
         source.trigger(event);
 
