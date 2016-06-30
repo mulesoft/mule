@@ -940,6 +940,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
             for (Map.Entry<String, DataHandler> entry : attachments.entrySet())
             {
                 String name = entry.getKey();
+                // TODO MULE-10013 remove this logic from here
                 toWrite.put(name, new SerializedDataHandler(name, entry.getValue(), RequestContext.getEvent().getMuleContext()));
             }
         }
@@ -957,6 +958,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
         else
         {
             out.writeBoolean(false);
+            // TODO MULE-10013 remove this logic from here
             byte[] valueAsByteArray = (byte[]) RequestContext.getEvent().getMuleContext().getTransformationService().transform(this, DataType.BYTE_ARRAY).getPayload();
             out.writeInt(valueAsByteArray.length);
             new DataOutputStream(out).write(valueAsByteArray);
