@@ -52,7 +52,6 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML
 import static org.mule.runtime.module.extension.internal.xml.XmlModelUtils.createXmlModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
-import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -855,10 +854,7 @@ public final class SchemaBuilder
                 MetadataType genericType = arrayType.getType();
                 final boolean supportsChildElement = shouldGenerateDataTypeChildElements(genericType, expressionSupport);
 
-                Optional<TypeIdAnnotation> genericTypeId = getSingleAnnotation(genericType, TypeIdAnnotation.class);
-                boolean genericIsObjectClass = genericTypeId.isPresent() && genericTypeId.get().getValue().equals(Object.class.getName());
-
-                forceOptional = !genericIsObjectClass && (supportsChildElement || shouldForceOptional(genericType));
+                forceOptional = !getType(genericType).equals(Object.class) && (supportsChildElement || shouldForceOptional(genericType));
                 defaultVisit(arrayType);
                 if (supportsChildElement)
                 {
