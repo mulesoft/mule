@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.introspection.ModelProperty;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 
 /**
- * Marks that the enriched {@link ParameterModel} does not accepts
+ * Marks that the enriched {@link ParameterModel} does not accept
  * references to objects in the mule registry. All static String values
  * should be mapped to the actual String value
  *
