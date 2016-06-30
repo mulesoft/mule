@@ -6,6 +6,9 @@
  */
 package org.mule.module.launcher;
 
+import static java.util.Arrays.asList;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.module.launcher.MuleFoldersUtil.getUserLibFolder;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.config.MuleManifest;
@@ -15,9 +18,13 @@ import org.mule.util.SecurityUtils;
 import org.mule.util.SplashScreen;
 import org.mule.util.StringUtils;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -73,6 +80,41 @@ public class MuleContainerStartupSplashScreen extends SplashScreen
         {
             doBody("Security model: " + SecurityUtils.getSecurityModel());
         }
+        if (RUNTIME_VERBOSE_PROPERTY.isEnabled())
+        {
+            listPatchesIfPresent();
+            listMuleSystemProperties();
+        }
+    }
+
+    private void listPatchesIfPresent()
+    {
+        File patchesDirectory = getUserLibFolder();
+        if (patchesDirectory != null && patchesDirectory.exists())
+        {
+            String[] patches = patchesDirectory.list(new FilenameFilter()
+            {
+                @Override
+                public boolean accept(File dir, String name)
+                {
+                    return name.startsWith("SE-");
+                }
+            });
+            listItems(asList(patches), "Applied patches:");
+        }
+    }
+
+    private void listMuleSystemProperties()
+    {
+        Map<String, String> muleProperties = new HashMap<>();
+        for (String property : System.getProperties().stringPropertyNames())
+        {
+            if (property.startsWith(SYSTEM_PROPERTY_PREFIX))
+            {
+                muleProperties.put(property, System.getProperty(property));
+            }
+        }
+        listItems(muleProperties, "Mule system properties:");
     }
 
     @Override
