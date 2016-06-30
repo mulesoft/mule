@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.lang.Boolean.FALSE;
+
 /**
  *  Class to check that system properties are enabled or not, the latter being the default.
  *
@@ -14,18 +16,36 @@ package org.mule.runtime.core.util;
 public class PropertyChecker
 {
     private final String propertyName;
+    private final String defaultValue;
     private Boolean override;
 
+    /**
+     * Similar to {@link PropertyChecker#PropertyChecker(String, String)} only the default value is {@code false}.
+     *
+     * @param propertyName the name of the system property
+     */
     public PropertyChecker(String propertyName)
     {
+        this(propertyName, FALSE.toString());
+    }
+
+    /**
+     * Creates a {@link PropertyChecker} with a custom default value.
+     *
+     * @param propertyName the name of the system property
+     * @param defaultValue the default value to use in case the property is not set
+     */
+    public PropertyChecker(String propertyName, String defaultValue)
+    {
         this.propertyName = propertyName;
+        this.defaultValue = defaultValue;
     }
 
     public boolean isEnabled()
     {
         if (override == null)
         {
-            return Boolean.getBoolean(propertyName);
+            return Boolean.valueOf(System.getProperty(propertyName, defaultValue));
         }
         else
         {

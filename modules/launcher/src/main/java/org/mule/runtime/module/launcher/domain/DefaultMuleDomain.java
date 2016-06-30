@@ -243,7 +243,11 @@ public class DefaultMuleDomain implements Domain
             }
             // null CCL ensures we log at 'system' level
             // TODO create a more usable wrapper for any logger to be logged at sys level
-            withContextClassLoader(null, () -> deployLogger.info(miniSplash(String.format("Started domain '%s'", getArtifactName()))));
+            withContextClassLoader(null, () -> {
+                DomainStartedSplashScreen splashScreen = new DomainStartedSplashScreen();
+                splashScreen.createMessage(descriptor);
+                deployLogger.info(splashScreen.toString());
+            });
         }
         catch (Exception e)
         {

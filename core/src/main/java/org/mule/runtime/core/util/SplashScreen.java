@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.lang.Boolean.TRUE;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implements singleton pattern to allow different splash-screen implementations
@@ -23,6 +27,14 @@ import java.util.List;
  */
 public abstract class SplashScreen
 {
+    public static final String RUNTIME_VERBOSE = SYSTEM_PROPERTY_PREFIX + "runtime.verbose";
+    /**
+     * Determines whether extra information should be display.
+     */
+    protected static PropertyChecker RUNTIME_VERBOSE_PROPERTY = new PropertyChecker(RUNTIME_VERBOSE, TRUE.toString());
+
+    protected static final String VALUE_FORMAT = " - %s";
+    private static final String KEY_VALUE_FORMAT = VALUE_FORMAT + " = %s";
     protected List<String> header = new ArrayList<String>();
     protected List<String> body = new ArrayList<String>();
     protected List<String> footer = new ArrayList<String>();
@@ -68,7 +80,31 @@ public abstract class SplashScreen
     protected void doFooter(MuleContext context)
     {
         // default reserved for mule core info
-    }    
+    }
+
+    protected void listItems(Collection<String> items, String description)
+    {
+        if (!items.isEmpty())
+        {
+            doBody(description);
+            for (String item : items)
+            {
+                doBody(String.format(VALUE_FORMAT, item));
+            }
+        }
+    }
+
+    protected void listItems(Map<String, String> map, String description)
+    {
+        if (!map.isEmpty())
+        {
+            doBody(description);
+            for (String key : map.keySet())
+            {
+                doBody(String.format(KEY_VALUE_FORMAT, key, map.get(key)));
+            }
+        }
+    }
     
     public String toString()
     {

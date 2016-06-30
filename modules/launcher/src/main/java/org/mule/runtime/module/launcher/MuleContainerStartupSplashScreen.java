@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static java.util.Arrays.asList;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getUserLibFolder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.config.MuleManifest;
@@ -15,9 +18,12 @@ import org.mule.runtime.core.util.SecurityUtils;
 import org.mule.runtime.core.util.SplashScreen;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -73,6 +79,30 @@ public class MuleContainerStartupSplashScreen extends SplashScreen
         {
             doBody("Security model: " + SecurityUtils.getSecurityModel());
         }
+        if (RUNTIME_VERBOSE_PROPERTY.isEnabled())
+        {
+            listPatchesIfPresent();
+            listMuleSystemProperties();
+        }
+    }
+
+    private void listPatchesIfPresent()
+    {
+        File patchesDirectory = getUserLibFolder();
+        if (patchesDirectory != null && patchesDirectory.exists())
+        {
+            String[] patches = patchesDirectory.list((dir, name) -> name.startsWith("SE-"));
+            listItems(asList(patches), "Applied patches:");
+        }
+    }
+
+    private void listMuleSystemProperties()
+    {
+        Map<String, String> muleProperties = new HashMap<>();
+        System.getProperties().stringPropertyNames().stream()
+                .filter(property -> property.startsWith(SYSTEM_PROPERTY_PREFIX))
+                .forEach(property -> muleProperties.put(property, System.getProperty(property)));
+        listItems(muleProperties, "Mule system properties:");
     }
 
     @Override

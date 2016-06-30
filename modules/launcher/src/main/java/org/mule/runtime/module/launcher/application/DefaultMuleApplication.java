@@ -138,7 +138,11 @@ public class DefaultMuleApplication implements Application
 
             // null CCL ensures we log at 'system' level
             // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
-            withContextClassLoader(null, () -> deployLogger.info(miniSplash(format("Started app '%s'", descriptor.getName()))));
+            withContextClassLoader(null, () -> {
+                ApplicationStartedSplashScreen splashScreen = new ApplicationStartedSplashScreen();
+                splashScreen.createMessage(descriptor);
+                deployLogger.info(splashScreen.toString());
+            });
         }
         catch (Exception e)
         {
