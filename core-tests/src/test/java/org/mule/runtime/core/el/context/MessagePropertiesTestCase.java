@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MutableMuleMessage;
@@ -25,10 +26,11 @@ import java.util.Set;
 
 import javax.activation.DataHandler;
 
-import junit.framework.Assert;
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import org.junit.Before;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 public class MessagePropertiesTestCase extends AbstractELTestCase
 {
@@ -49,7 +51,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundPropertyMap() throws Exception
     {
-        event = getTestEvent(new DefaultMuleMessage("", singletonMap("foo", "bar"), null, null, muleContext));
+        event = getTestEvent(new DefaultMuleMessage("", singletonMap("foo", "bar"), null, null));
         assertTrue(evaluate("message.inboundProperties", event) instanceof Map);
     }
 
@@ -62,14 +64,14 @@ public class MessagePropertiesTestCase extends AbstractELTestCase
     @Test
     public void inboundProperty() throws Exception
     {
-        event = getTestEvent(new DefaultMuleMessage("", singletonMap("foo", "bar"), null, null, muleContext));
+        event = getTestEvent(new DefaultMuleMessage("", singletonMap("foo", "bar"), null, null));
         assertEquals("bar", evaluate("message.inboundProperties['foo']", event));
     }
 
     @Test
     public void assignValueToInboundProperty() throws Exception
     {
-        event = getTestEvent(new DefaultMuleMessage("", singletonMap("foo", "bar"), null, null, muleContext));
+        event = getTestEvent(new DefaultMuleMessage("", singletonMap("foo", "bar"), null, null));
         assertUnsupportedOperation("message.inboundProperties['foo']='bar'", event);
     }
 

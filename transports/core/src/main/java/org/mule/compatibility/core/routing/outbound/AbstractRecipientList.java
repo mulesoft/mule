@@ -72,7 +72,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         {
             // Make a copy of the message. Question is do we do a proper clone? in
             // which case there would potentially be multiple messages with the same id...
-            MuleMessage request = new DefaultMuleMessage(message.getPayload(), message, muleContext);
+            MuleMessage request = new DefaultMuleMessage(message.getPayload(), message);
             try
             {
                 endpoint = getRecipientEndpoint(request, recipient);
@@ -95,7 +95,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             }
         }
 
-        return resultsHandler.aggregateResults(results, event, muleContext);
+        return resultsHandler.aggregateResults(results, event);
     }
 
     protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws MuleException

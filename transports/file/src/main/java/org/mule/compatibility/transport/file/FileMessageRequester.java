@@ -202,7 +202,7 @@ public class FileMessageRequester extends AbstractMessageRequester
     {
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
-        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, getEndpoint().getMuleContext());
+        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null);
         fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalFileName);
         fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalDirectory);
 

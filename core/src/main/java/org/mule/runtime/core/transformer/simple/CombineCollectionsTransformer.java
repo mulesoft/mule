@@ -36,7 +36,7 @@ public class CombineCollectionsTransformer implements MessageProcessor
     {
         MuleMessage msg = event.getMessage();
 
-        List<Object> payload = new ArrayList<Object>();
+        List<Object> payload = new ArrayList<>();
         if (msg.getDataType().isCompatibleWith(MULE_MESSAGE_COLLECTION))
         {
             for (MuleMessage child : (Collection<MuleMessage>) msg.getPayload())
@@ -61,7 +61,7 @@ public class CombineCollectionsTransformer implements MessageProcessor
             payload.add(msg.getPayload());
         }
 
-        MuleMessage listMessage = new DefaultMuleMessage(payload, msg, msg.getMuleContext());
+        MuleMessage listMessage = new DefaultMuleMessage(payload, msg);
         return new DefaultMuleEvent(listMessage, event);
     }
 

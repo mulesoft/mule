@@ -61,12 +61,12 @@ public class MessagingException extends MuleException
      * @deprecated use MessagingException(Message, MuleEvent)
      */
     @Deprecated
-    public MessagingException(Message message, MuleMessage muleMessage)
+    public MessagingException(Message message, MuleMessage muleMessage, MuleContext context)
     {
         super();
         this.muleMessage = muleMessage;
         this.event = null;
-        setMessage(generateMessage(message));
+        setMessage(generateMessage(message, context));
     }
 
     public MessagingException(Message message, MuleEvent event)
@@ -74,7 +74,7 @@ public class MessagingException extends MuleException
         super();
         this.event = event;
         extractMuleMessage(event);
-        setMessage(generateMessage(message));
+        setMessage(generateMessage(message, event.getMuleContext()));
     }
 
     public MessagingException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor)
@@ -83,19 +83,19 @@ public class MessagingException extends MuleException
         this.event = event;
         extractMuleMessage(event);
         this.failingMessageProcessor = failingMessageProcessor;
-        setMessage(generateMessage(message));
+        setMessage(generateMessage(message, event.getMuleContext()));
     }
 
     /**
      * @deprecated use MessagingException(Message, MuleEvent, Throwable)
      */
     @Deprecated
-    public MessagingException(Message message, MuleMessage muleMessage, Throwable cause)
+    public MessagingException(Message message, MuleMessage muleMessage, MuleContext context, Throwable cause)
     {
         super(cause);
         this.muleMessage = muleMessage;
         this.event = null;
-        setMessage(generateMessage(message));
+        setMessage(generateMessage(message, context));
     }
 
     public MessagingException(Message message, MuleEvent event, Throwable cause)
@@ -103,7 +103,7 @@ public class MessagingException extends MuleException
         super(cause);
         this.event = event;
         extractMuleMessage(event);
-        setMessage(generateMessage(message));
+        setMessage(generateMessage(message, event.getMuleContext()));
     }
 
     public MessagingException(Message message,
@@ -115,7 +115,7 @@ public class MessagingException extends MuleException
         this.event = event;
         extractMuleMessage(event);
         this.failingMessageProcessor = failingMessageProcessor;
-        setMessage(generateMessage(message));
+        setMessage(generateMessage(message, event.getMuleContext()));
     }
 
     public MessagingException(MuleEvent event, Throwable cause)
@@ -123,7 +123,7 @@ public class MessagingException extends MuleException
         super(cause);
         this.event = event;
         extractMuleMessage(event);
-        setMessage(generateMessage(getI18nMessage()));
+        setMessage(generateMessage(getI18nMessage(), event.getMuleContext()));
     }
 
     public MessagingException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor)
@@ -132,10 +132,10 @@ public class MessagingException extends MuleException
         this.event = event;
         extractMuleMessage(event);
         this.failingMessageProcessor = failingMessageProcessor;
-        setMessage(generateMessage(getI18nMessage()));
+        setMessage(generateMessage(getI18nMessage(), event.getMuleContext()));
     }
 
-    protected String generateMessage(Message message)
+    protected String generateMessage(Message message, MuleContext muleContext)
     {
         StringBuilder buf = new StringBuilder(80);
 
@@ -163,7 +163,7 @@ public class MessagingException extends MuleException
                     addInfo(PAYLOAD_TYPE_INFO_KEY, muleMessage.getPayload().getClass().getName());
                     try
                     {
-                        addInfo(PAYLOAD_INFO_KEY, muleMessage.getMuleContext().getTransformationService().transform(muleMessage, DataType.STRING).getPayload());
+                        addInfo(PAYLOAD_INFO_KEY, muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload());
                     }
                     catch (Exception e)
                     {

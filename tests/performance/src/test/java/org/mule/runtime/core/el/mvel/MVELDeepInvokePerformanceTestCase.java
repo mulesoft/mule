@@ -113,7 +113,7 @@ public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCa
 
     protected MuleEvent createMuleEvent()
     {
-        return new DefaultMuleEvent(new DefaultMuleMessage(payload, muleContext),
+        return new DefaultMuleEvent(new DefaultMuleMessage(payload),
             MessageExchangePattern.ONE_WAY, (Flow) null);
     }
 

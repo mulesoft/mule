@@ -268,8 +268,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                 {
                     HttpResponse expected = new HttpResponse();
                     expected.setStatusLine(requestLine.getHttpVersion(), SC_CONTINUE);
-                    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
-                            getMuleContext()), getFlowConstruct());
+                    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected), getFlowConstruct());
                     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
 
                     RequestContext.setEvent(event);
@@ -302,7 +301,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         }
         else
         {
-            message = new DefaultMuleMessage(response, getMessageReceiver().getEndpoint().getMuleContext());
+            message = new DefaultMuleMessage(response);
         }
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class

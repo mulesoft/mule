@@ -38,7 +38,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
         registerAction("message processor post invoke", MESSAGE_PROCESSOR_POST_INVOKE);
     }
 
-    private static ThreadLocal<String> lastRootMessageId = new ThreadLocal<String>();
+    private static ThreadLocal<String> lastRootMessageId = new ThreadLocal<>();
     private MessagingException exceptionThrown;
 
     public MessageProcessorNotification(FlowConstruct flowConstruct,
@@ -99,7 +99,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
         }
         else if (rootId != null && flowConstruct != null)
         {
-            MutableMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance(), flowConstruct.getMuleContext());
+            MutableMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance());
             msg.setMessageRootId(rootId);
             return new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
         }

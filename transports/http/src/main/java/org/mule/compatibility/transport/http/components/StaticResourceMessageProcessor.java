@@ -107,7 +107,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         {
             // Return a 302 with the new location
             // Return a 302 with the new location
-            MutableMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance() , event.getMuleContext());
+            MutableMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
             message.setOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_MOVED_TEMPORARILY));
             message.setOutboundProperty(HEADER_CONTENT_LENGTH, 0);
             message.setOutboundProperty(HEADER_LOCATION, event.getMessage().getInboundProperty(HTTP_REQUEST_PATH_PROPERTY) + "/");
@@ -131,7 +131,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
                 mimetype = DEFAULT_MIME_TYPE;
             }
 
-            MutableMuleMessage message = new DefaultMuleMessage(buffer , event.getMuleContext());
+            MutableMuleMessage message = new DefaultMuleMessage(buffer);
             message.setOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_OK));
             message.setOutboundProperty(HEADER_CONTENT_TYPE, mimetype);
             message.setOutboundProperty(HEADER_CONTENT_LENGTH, buffer.length);

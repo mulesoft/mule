@@ -13,6 +13,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -100,7 +101,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase
         RegExFilter filter = new RegExFilter("The quick (.*)");
         filter.setMuleContext(muleContext);
         assertNotNull(filter.getPattern());
-        MuleMessage message = new DefaultMuleMessage("The quick brown fox", muleContext);
+        MuleMessage message = new DefaultMuleMessage("The quick brown fox");
         assertTrue(filter.accept(message));
     }
 
@@ -180,7 +181,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase
     {
         regExWithValue.setValue("#[payload]");
         regExWithValue.initialise();
-        MuleMessage muleMessage = new DefaultMuleMessage("run with the mules", muleContext);
+        MuleMessage muleMessage = new DefaultMuleMessage("run with the mules");
         assertThat(regExWithValue.accept(muleMessage), is(true));
     }
 
@@ -189,7 +190,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase
     {
         regExWithValue.setValue("#[payload]");
         regExWithValue.initialise();
-        MuleMessage muleMessage = new DefaultMuleMessage("run with the zebras", muleContext);
+        MuleMessage muleMessage = new DefaultMuleMessage("run with the zebras");
         assertThat(regExWithValue.accept(muleMessage), is(false));
     }
 
@@ -208,7 +209,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase
     {
         regExWithValue.setValue("run with the mules");
         regExWithValue.initialise();
-        MuleMessage muleMessage = new DefaultMuleMessage(null, muleContext);
+        MuleMessage muleMessage = new DefaultMuleMessage("");
         assertThat(regExWithValue.accept(muleMessage), is(true));
     }
 

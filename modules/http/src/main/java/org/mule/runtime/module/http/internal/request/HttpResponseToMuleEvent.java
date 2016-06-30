@@ -110,7 +110,7 @@ public class HttpResponseToMuleEvent
         String requestMessageId = muleEvent.getMessage().getUniqueId();
         String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
         DefaultMuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
-                                                     null, inboundAttachments, muleContext, muleEvent.getMessage().getDataType());
+                null, inboundAttachments, muleEvent.getMessage().getDataType());
 
         // Setting uniqueId and rootId in order to correlate messages from request to response generated.
         message.setUniqueId(requestMessageId);

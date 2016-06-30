@@ -77,7 +77,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         MuleMessageFactory factory = createMuleMessageFactory();
         
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding, muleContext);
+        MuleMessage message = factory.create(payload, encoding);
         assertNotNull(message);
         assertEquals("/services/Echo", message.getPayload());
         // note that on this level it's only message factory, and it adds messages from http request to the inbound scope
@@ -99,7 +99,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         factory.setExchangePattern(MessageExchangePattern.ONE_WAY);
 
         HttpRequest request = createPostHttpRequest();
-        MuleMessage message = factory.create(request, encoding, muleContext);
+        MuleMessage message = factory.create(request, encoding);
         assertNotNull(message);
         assertEquals(byte[].class, message.getPayload().getClass());
         byte[] payload = (byte[]) message.getPayload();
@@ -121,7 +121,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         factory.setExchangePattern(MessageExchangePattern.ONE_WAY);
 
         HttpRequest request = createMultiPartHttpRequest();
-        MuleMessage message = factory.create(request, encoding, muleContext);
+        MuleMessage message = factory.create(request, encoding);
         assertNotNull(message);
         assertEquals(byte[].class, message.getPayload().getClass());
         byte[] payload = (byte[]) message.getPayload();
@@ -144,7 +144,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_GET, body, URI, HEADERS);
         
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage message = factory.create(method, encoding, muleContext);
+        MuleMessage message = factory.create(method, encoding);
         assertNotNull(message);
         assertEquals("/services/Echo", getPayloadAsString(message));
         assertEquals(HttpConstants.METHOD_GET, message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY));
@@ -159,7 +159,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_POST, body, "http://localhost/services/Echo", HEADERS);
 
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage message = factory.create(method, encoding, muleContext);
+        MuleMessage message = factory.create(method, encoding);
         assertNotNull(message);
         assertEquals(TEST_MESSAGE, getPayloadAsString(message));
         assertEquals(HttpConstants.METHOD_POST, message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY));
@@ -174,7 +174,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_GET, body, "http://localhost" + REQUEST, HEADERS);
 
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage message = factory.create(method, encoding, muleContext);
+        MuleMessage message = factory.create(method, encoding);
         Map<String, Object> queryParams = (Map<String, Object>) message.getInboundProperty(HttpConnector.HTTP_QUERY_PARAMS);
         assertNotNull(queryParams);
         assertEquals("John", queryParams.get("name"));
@@ -197,7 +197,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         HttpMethod method = createMockHttpMethod(HttpConstants.METHOD_GET, body, URI, headers);
 
         MuleMessageFactory factory = createMuleMessageFactory();
-        MuleMessage message = factory.create(method, encoding, muleContext);
+        MuleMessage message = factory.create(method, encoding);
         Map<String, Object> httpHeaders = message.getInboundProperty(HttpConnector.HTTP_HEADERS);
         assertNotNull(headers);
         assertEquals("foo-value", httpHeaders.get("foo-header"));

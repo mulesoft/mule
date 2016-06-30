@@ -44,7 +44,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpoin
         Map<String, Serializable> inboundProperties = new HashMap<>();
         inboundProperties.put(FileConnector.PROPERTY_ORIGINAL_FILENAME, "originalName");
         inboundProperties.put(FileConnector.PROPERTY_FILENAME, "newName");
-        message = new DefaultMuleMessage("hello", inboundProperties, null, null, muleContext);
+        message = new DefaultMuleMessage("hello", inboundProperties, null, null);
         message.setOutboundProperty("foo", "bar");
         event = new DefaultMuleEvent(message, getTestFlow());
     }

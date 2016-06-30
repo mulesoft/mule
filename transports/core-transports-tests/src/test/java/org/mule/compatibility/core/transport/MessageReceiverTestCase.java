@@ -89,7 +89,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
 
     protected MutableMuleMessage createRequestMessage()
     {
-        return new DefaultMuleMessage("", emptyMap(), emptyMap(), emptyMap(), muleContext);
+        return new DefaultMuleMessage("", emptyMap(), emptyMap(), emptyMap());
     }
 
     protected MessageReceiver createMessageReciever(MessageExchangePattern mep) throws MuleException
@@ -99,6 +99,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
         when(connector.getMuleContext()).thenReturn(muleContext);
 
         FlowConstruct flowConstruct = mock(FlowConstruct.class);
+        when(flowConstruct.getMuleContext()).thenReturn(muleContext);
 
         InboundEndpoint endpoint = mock(InboundEndpoint.class);
         when(endpoint.getExchangePattern()).thenReturn(mep);

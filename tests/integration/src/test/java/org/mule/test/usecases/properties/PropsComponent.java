@@ -34,7 +34,7 @@ public class PropsComponent implements Callable
             Map props = new HashMap();
             props.put("stringParam", "param1");
             props.put("objectParam", testObjectProperty);
-            MuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props, context.getMuleContext());
+            MuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props);
             logger.debug("Adding done: " + context.getFlowConstruct().getName());
             return msg;
         }

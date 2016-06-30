@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -42,7 +43,7 @@ abstract class AbstractNestedProcessorValueResolver<T> implements ValueResolver<
         {
             throw new MuleRuntimeException(createStaticMessage("Could not register nested operation message processor"), e);
         }
-        return new NestedProcessorChain(event, event.getMuleContext(), messageProcessor);
+        return new NestedProcessorChain(event, messageProcessor);
     }
 
     /**

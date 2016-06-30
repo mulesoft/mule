@@ -9,6 +9,7 @@ package org.mule.runtime.module.pgp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -47,7 +48,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         byte[] msg = loadEncryptedMessage();
         Map<String, Serializable> props = createMessageProperties();
 
-        flowRunner("echo").withPayload(getTestEvent(new DefaultMuleMessage(new String(msg), props, muleContext))).asynchronously().run();
+        flowRunner("echo").withPayload(getTestEvent(new DefaultMuleMessage(new String(msg), props))).asynchronously().run();
 
         MuleMessage message = client.request("test://output", RECEIVE_TIMEOUT);
         assertEquals("This is a test message.\r\nThis is another line.\r\n", getPayloadAsString(message));

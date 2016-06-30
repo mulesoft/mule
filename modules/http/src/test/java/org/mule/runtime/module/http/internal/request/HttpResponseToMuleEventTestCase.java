@@ -74,7 +74,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     @Test
     public void previousInboundPropertiesAreRemoved() throws Exception
     {
-        event = getTestEvent(new DefaultMuleMessage(null, singletonMap("TestInboundProperty", TEST_VALUE), null, null, muleContext));
+        event = getTestEvent(new DefaultMuleMessage(null, singletonMap("TestInboundProperty", TEST_VALUE), null, null));
         httpResponseToMuleEvent.convert(event, httpResponse, null);
         assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
     }

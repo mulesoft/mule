@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
@@ -44,9 +45,9 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
         router.setMuleContext(muleContext);
         router.setFlowConstruct(flow);
         router.initialise();
-        MutableMuleMessage message1 = new DefaultMuleMessage("test event A", muleContext);
-        MutableMuleMessage message2 = new DefaultMuleMessage("test event B", muleContext);
-        MutableMuleMessage message3 = new DefaultMuleMessage("test event C", muleContext);
+        MutableMuleMessage message1 = new DefaultMuleMessage("test event A");
+        MutableMuleMessage message2 = new DefaultMuleMessage("test event B");
+        MutableMuleMessage message3 = new DefaultMuleMessage("test event C");
         message1.setCorrelationId(message1.getUniqueId());
         message2.setCorrelationId(message1.getUniqueId());
         message3.setCorrelationId(message1.getUniqueId());
@@ -129,7 +130,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
                         throw new AggregationException(events, next, e); 
                     }
 
-                    return new DefaultMuleEvent(new DefaultMuleMessage(newPayload.toString(), muleContext),
+                    return new DefaultMuleEvent(new DefaultMuleMessage(newPayload.toString()),
                         events.getMessageCollectionEvent());
                 }
             };

@@ -9,6 +9,7 @@ package org.mule.runtime.core.mule.model;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.message.NullPayload.getInstance;
+
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -122,7 +123,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
 
     private MuleEventContext createMuleEventContext(Object payload, Map<String, Serializable> inboundProperties) throws Exception
     {
-        return new DefaultMuleEventContext(getTestEvent(new DefaultMuleMessage(payload, inboundProperties, null, null, muleContext)));
+        return new DefaultMuleEventContext(getTestEvent(new DefaultMuleMessage(payload, inboundProperties, null, null)));
     }
 
     public static class TestFruitCleaner

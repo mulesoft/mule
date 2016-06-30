@@ -271,7 +271,7 @@ public class JsonSchemaValidator
 
             if ((input instanceof Reader) || (input instanceof InputStream))
             {
-                event.setMessage(new DefaultMuleMessage(jsonNode.toString(), event.getMuleContext()));
+                event.setMessage(new DefaultMuleMessage(jsonNode.toString()));
             }
 
             report = schema.validate(jsonNode);

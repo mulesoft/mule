@@ -7,6 +7,8 @@
 package org.mule.runtime.core.session;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
+
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -26,7 +28,7 @@ import java.io.IOException;
 public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandler
 {
     @Override
-    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
+    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException
     {
         MuleSession session = null;
         String serializedEncodedSession = message.getInboundProperty(MULE_SESSION_PROPERTY);
@@ -36,17 +38,17 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
             byte[] serializedSession = Base64.decodeWithoutUnzipping(serializedEncodedSession);
             if (serializedSession != null)
             {
-                session = deserialize(message, serializedSession);
+                session = deserialize(message, serializedSession, muleContext);
             }
         }
         return session;
     }
 
     @Override
-    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
+    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException
     {        
-        session = removeNonSerializableProperties(session, message.getMuleContext());
-        byte[] serializedSession = serialize(message, session);
+        session = removeNonSerializableProperties(session, context);
+        byte[] serializedSession = serialize(message, session, context);
 
         String serializedEncodedSession;
         try

@@ -43,6 +43,7 @@ import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -102,8 +103,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.mockito.verification.VerificationMode;
 
 public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
@@ -275,28 +274,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysExplodedAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception
     {
-        Action deployExplodedWaitAppAction = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                addExplodedAppFromBuilder(waitAppFileBuilder);
-            }
-        };
+        Action deployExplodedWaitAppAction = () -> addExplodedAppFromBuilder(waitAppFileBuilder);
         deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployExplodedWaitAppAction);
     }
 
     @Test
     public void deploysPackagedAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception
     {
-        Action deployPackagedWaitAppAction = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                addPackedAppFromBuilder(waitAppFileBuilder);
-            }
-        };
+        Action deployPackagedWaitAppAction = () -> addPackedAppFromBuilder(waitAppFileBuilder);
         deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployPackagedWaitAppAction);
     }
 
@@ -1386,7 +1371,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1420,7 +1405,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1440,7 +1425,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1461,7 +1446,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1477,7 +1462,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1493,7 +1478,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, application.getMuleContext());
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1513,56 +1498,41 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        Thread deploymentServiceThread = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                deploymentService.start();
-            }
-        });
+        Thread deploymentServiceThread = new Thread(() -> deploymentService.start());
 
         final boolean[] lockedFromClient = new boolean[1];
 
-        Mockito.doAnswer(new Answer()
+        Mockito.doAnswer(invocation ->
         {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
+
+            Thread deploymentClientThread = new Thread(() ->
             {
+                ReentrantLock deploymentLock = deploymentService.getLock();
 
-                Thread deploymentClientThread = new Thread(new Runnable()
+                try
                 {
-                    @Override
-                    public void run()
+                    try
                     {
-                        ReentrantLock deploymentLock = deploymentService.getLock();
-
-                        try
-                        {
-                            try
-                            {
-                                lockedFromClient[0] = deploymentLock.tryLock(1000, TimeUnit.MILLISECONDS);
-                            }
-                            catch (InterruptedException e)
-                            {
-                                // Ignore
-                            }
-                        }
-                        finally
-                        {
-                            if (deploymentLock.isHeldByCurrentThread())
-                            {
-                                deploymentLock.unlock();
-                            }
-                        }
+                        lockedFromClient[0] = deploymentLock.tryLock(1000, TimeUnit.MILLISECONDS);
                     }
-                });
+                    catch (InterruptedException e)
+                    {
+                        // Ignore
+                    }
+                }
+                finally
+                {
+                    if (deploymentLock.isHeldByCurrentThread())
+                    {
+                        deploymentLock.unlock();
+                    }
+                }
+            });
 
-                deploymentClientThread.start();
-                deploymentClientThread.join();
+            deploymentClientThread.start();
+            deploymentClientThread.join();
 
-                return null;
-            }
+            return null;
         }).when(applicationDeploymentListener).onDeploymentStart(emptyAppFileBuilder.getId());
 
         deploymentServiceThread.start();
@@ -1592,28 +1562,14 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysPackagedDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception
     {
-        Action deployPackagedWaitDomainAction = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                addPackedDomainFromBuilder(waitDomainFileBuilder);
-            }
-        };
+        Action deployPackagedWaitDomainAction = () -> addPackedDomainFromBuilder(waitDomainFileBuilder);
         deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployPackagedWaitDomainAction);
     }
 
     @Test
     public void deploysExplodedDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds() throws Exception
     {
-        Action deployExplodedWaitDomainAction = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                addExplodedDomainFromBuilder(waitDomainFileBuilder);
-            }
-        };
+        Action deployExplodedWaitDomainAction = () -> addExplodedDomainFromBuilder(waitDomainFileBuilder);
         deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployExplodedWaitDomainAction);
     }
 
@@ -2075,14 +2031,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void undeploysDomainAndDomainsApps() throws Exception
     {
-        doDomainUndeployAndVerifyAppsAreUndeployed(new Action()
+        doDomainUndeployAndVerifyAppsAreUndeployed(() ->
         {
-            @Override
-            public void perform()
-            {
-                Domain domain = findADomain(dummyDomainFileBuilder.getId());
-                deploymentService.undeploy(domain);
-            }
+            Domain domain = findADomain(dummyDomainFileBuilder.getId());
+            deploymentService.undeploy(domain);
         });
     }
 
@@ -2425,14 +2377,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private Action createUndeployDummyDomainAction()
     {
-        return new Action()
-        {
-            @Override
-            public void perform()
-            {
-                removeDomainAnchorFile(dummyDomainFileBuilder.getId());
-            }
-        };
+        return () -> removeDomainAnchorFile(dummyDomainFileBuilder.getId());
     }
 
     private void doDomainUndeployAndVerifyAppsAreUndeployed(Action undeployAction) throws Exception
@@ -2720,59 +2665,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(Action deployArtifactAction) throws Exception
     {
-        Action verifyAnchorFileDoesNotExistsAction = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                assertApplicationAnchorFileDoesNotExists(waitAppFileBuilder.getId());
-            }
-        };
-        Action verifyDeploymentSuccessfulAction = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                assertApplicationDeploymentSuccess(applicationDeploymentListener, waitAppFileBuilder.getId());
-            }
-        };
-        Action verifyAnchorFileExistsAction = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                assertApplicationAnchorFileExists(waitAppFileBuilder.getId());
-            }
-        };
+        Action verifyAnchorFileDoesNotExistsAction = () -> assertApplicationAnchorFileDoesNotExists(waitAppFileBuilder.getId());
+        Action verifyDeploymentSuccessfulAction = () -> assertApplicationDeploymentSuccess(applicationDeploymentListener, waitAppFileBuilder.getId());
+        Action verifyAnchorFileExistsAction = () -> assertApplicationAnchorFileExists(waitAppFileBuilder.getId());
         deploysArtifactAndVerifyAnchorFileCreatedWhenDeploymentEnds(deployArtifactAction, verifyAnchorFileDoesNotExistsAction, verifyDeploymentSuccessfulAction, verifyAnchorFileExistsAction);
     }
 
     private void deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(Action deployArtifactAction) throws Exception
     {
-        Action verifyAnchorFileDoesNotExists = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                assertDomainAnchorFileDoesNotExists(waitDomainFileBuilder.getId());
-            }
-        };
-        Action verifyDeploymentSuccessful = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                assertDeploymentSuccess(domainDeploymentListener, waitDomainFileBuilder.getId());
-            }
-        };
-        Action verifyAnchorFileExists = new Action()
-        {
-            @Override
-            public void perform() throws Exception
-            {
-                assertDomainAnchorFileExists(waitDomainFileBuilder.getId());
-            }
-        };
+        Action verifyAnchorFileDoesNotExists = () -> assertDomainAnchorFileDoesNotExists(waitDomainFileBuilder.getId());
+        Action verifyDeploymentSuccessful = () -> assertDeploymentSuccess(domainDeploymentListener, waitDomainFileBuilder.getId());
+        Action verifyAnchorFileExists = () -> assertDomainAnchorFileExists(waitDomainFileBuilder.getId());
         deploysArtifactAndVerifyAnchorFileCreatedWhenDeploymentEnds(deployArtifactAction, verifyAnchorFileDoesNotExists, verifyDeploymentSuccessful, verifyAnchorFileExists);
     }
 

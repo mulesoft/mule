@@ -152,7 +152,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
 
     protected DefaultMuleEvent createMuleEvent() throws Exception
     {
-        return new DefaultMuleEvent(new DefaultMuleMessage(payload, muleContext),
+        return new DefaultMuleEvent(new DefaultMuleMessage(payload),
             MessageExchangePattern.ONE_WAY, flow);
     }
 

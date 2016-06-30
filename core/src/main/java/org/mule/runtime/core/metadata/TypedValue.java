@@ -59,5 +59,4 @@ public class TypedValue<T> implements Serializable
     {
         this.value = value;
     }
-
 }

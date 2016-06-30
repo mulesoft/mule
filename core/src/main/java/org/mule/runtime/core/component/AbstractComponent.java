@@ -64,7 +64,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
     protected FlowConstruct flowConstruct;
     protected ComponentStatistics statistics = null;
     protected ServerNotificationHandler notificationHandler;
-    protected List<Interceptor> interceptors = new ArrayList<Interceptor>();
+    protected List<Interceptor> interceptors = new ArrayList<>();
     protected MessageProcessorChain interceptorChain;
     protected MuleContext muleContext;
     protected ComponentLifecycleManager lifecycleManager;
@@ -180,7 +180,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         }
         else
         {
-            MutableMuleMessage emptyMessage = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+            MutableMuleMessage emptyMessage = new DefaultMuleMessage(NullPayload.getInstance());
             emptyMessage.propagateRootId(event.getMessage());
             return new DefaultMuleEvent(emptyMessage, event);
         }

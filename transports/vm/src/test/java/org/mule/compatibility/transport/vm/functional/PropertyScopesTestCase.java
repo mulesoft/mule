@@ -36,7 +36,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, Collections.singletonMap("foo", "bar"), null,
-                                                     null, muleContext);
+                                                     null);
 
         MuleMessage response = client.send("vm://in-synch", message);
         assertNotNull(response);
@@ -47,7 +47,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     public void noPropagationOfOutboundScopeSynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
         message.setOutboundProperty("foo", "bar");
         MuleMessage response = client.send("vm://in-synch", message);
         assertNotNull(response);
@@ -58,7 +58,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     public void noPropagationOfInboundScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
         message.setOutboundProperty("foo", "bar");
         client.dispatch("vm://in-asynch", message);
         MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);
@@ -70,7 +70,7 @@ public class PropertyScopesTestCase extends FunctionalTestCase
     public void noPropagationOfOutboundScopeAsynchronous() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
         message.setOutboundProperty("foo", "bar");
         client.dispatch("vm://in-asynch", message);
         MuleMessage response = client.request("vm://out-asynch", RECEIVE_TIMEOUT);

@@ -55,7 +55,7 @@ public class MulticastingRoutingStrategy extends AbstractRoutingStrategy
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }
 
-        List<MuleEvent> results = new ArrayList<MuleEvent>(messageProcessors.size());
+        List<MuleEvent> results = new ArrayList<>(messageProcessors.size());
 
         validateMessageIsNotConsumable(event, message);
 
@@ -64,7 +64,7 @@ public class MulticastingRoutingStrategy extends AbstractRoutingStrategy
             for (int i = 0; i < messageProcessors.size(); i++)
             {
                 MessageProcessor mp = messageProcessors.get(i);
-                MuleMessage clonedMessage = cloneMessage(message,getMuleContext());
+                MuleMessage clonedMessage = cloneMessage(message);
                 clonedMessage = AbstractRoutingStrategy.propagateMagicProperties(clonedMessage);
                 MuleEvent result = sendRequest(event, clonedMessage, mp, true);
                 if (result != null && !VoidMuleEvent.getInstance().equals(result))
@@ -77,7 +77,7 @@ public class MulticastingRoutingStrategy extends AbstractRoutingStrategy
         {
             throw new CouldNotRouteOutboundMessageException(event, messageProcessors.get(0), e);
         }
-        return resultsHandler.aggregateResults(results, event, getMuleContext());
+        return resultsHandler.aggregateResults(results, event);
     }
 
 

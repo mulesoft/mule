@@ -151,6 +151,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
             payload.append("1234567890");
         }
         MuleEvent testEvent = getTestEvent(new ByteArrayInputStream(payload.toString().getBytes()));
+        RequestContext.setEvent(testEvent);
         byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
         testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);
 
@@ -167,7 +168,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         trans2.setName("Bumblebee");
         muleContext.getRegistry().registerTransformer(trans2);
 
-        List<Transformer> transformers = new ArrayList<Transformer>();
+        List<Transformer> transformers = new ArrayList<>();
         transformers.add(trans1);
         transformers.add(trans2);
 

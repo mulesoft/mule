@@ -44,7 +44,7 @@ public class CustomRouteResolver implements DynamicRouteResolver
         {
             try
             {
-                event.setMessage(new DefaultMuleMessage(letter, event.getMessage(), event.getMuleContext()));
+                event.setMessage(new DefaultMuleMessage(letter, event.getMessage()));
                 return event;
             }
             catch (Exception e)
@@ -81,8 +81,7 @@ public class CustomRouteResolver implements DynamicRouteResolver
             try
             {
                 event.setMessage(new DefaultMuleMessage(event.getMuleContext().getTransformationService().transform
-                        (event.getMessage(), DataType.STRING).getPayload() + letter, event.getMessage(), event
-                        .getMuleContext()));
+                        (event.getMessage(), DataType.STRING).getPayload() + letter, event.getMessage()));
             }
             catch (Exception e)
             {

@@ -8,11 +8,9 @@ package org.mule.runtime.core.processor.chain;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.Map;
@@ -24,13 +22,9 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-public class NestedProcessorChain implements NestedProcessor, MuleContextAware
+public class NestedProcessorChain implements NestedProcessor
 {
 
-    /**
-     * Mule Context
-     */
-    private MuleContext muleContext;
     /**
      * Chain that will be executed upon calling process
      */
@@ -40,21 +34,10 @@ public class NestedProcessorChain implements NestedProcessor, MuleContextAware
      */
     private MuleEvent event;
 
-    public NestedProcessorChain(MuleEvent event, MuleContext muleContext, MessageProcessor chain)
+    public NestedProcessorChain(MuleEvent event, MessageProcessor chain)
     {
         this.event = event;
         this.chain = chain;
-        this.muleContext = muleContext;
-    }
-
-    /**
-     * Sets muleContext
-     *
-     * @param value Value to set
-     */
-    public void setMuleContext(MuleContext value)
-    {
-        this.muleContext = value;
     }
 
     /**
@@ -77,6 +60,7 @@ public class NestedProcessorChain implements NestedProcessor, MuleContextAware
         this.event = value;
     }
 
+    @Override
     public Object process() throws Exception
     {
         MuleEvent muleEvent;
@@ -84,15 +68,17 @@ public class NestedProcessorChain implements NestedProcessor, MuleContextAware
         return chain.process(muleEvent).getMessage().getPayload();
     }
 
+    @Override
     public Object process(Object payload) throws Exception
     {
         MuleMessage muleMessage;
-        muleMessage = new DefaultMuleMessage(payload, muleContext);
+        muleMessage = new DefaultMuleMessage(payload);
         MuleEvent muleEvent;
         muleEvent = new DefaultMuleEvent(muleMessage, event);
         return chain.process(muleEvent).getMessage().getPayload();
     }
 
+    @Override
     public Object processWithExtraProperties(Map<String, Object> properties) throws Exception
     {
         MuleMessage muleMessage;
@@ -106,10 +92,11 @@ public class NestedProcessorChain implements NestedProcessor, MuleContextAware
         return chain.process(muleEvent).getMessage().getPayload();
     }
 
+    @Override
     public Object process(Object payload, Map<String, Object> properties) throws Exception
     {
         MuleMessage muleMessage;
-        muleMessage = new DefaultMuleMessage(payload, muleContext);
+        muleMessage = new DefaultMuleMessage(payload);
         MuleEvent muleEvent;
         muleEvent = new DefaultMuleEvent(muleMessage, event);
         for (String property : properties.keySet())

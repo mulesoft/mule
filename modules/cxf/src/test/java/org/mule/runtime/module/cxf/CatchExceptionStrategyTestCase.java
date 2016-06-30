@@ -77,7 +77,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String, Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String, Serializable>) null);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -88,7 +88,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfServiceWithCatchExceptionStrategyRethrown() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String, Serializable>) null);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -99,7 +99,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testExceptionThrownInTransformerWithCatchExceptionStrategy() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -148,7 +148,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             String payload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\"><return>Hello Anonymous</return></ns2:sayHiResponse></soap:Body></soap:Envelope>";
-            event.setMessage(new DefaultMuleMessage(payload, event.getMessage(), event.getMuleContext()));
+            event.setMessage(new DefaultMuleMessage(payload, event.getMessage()));
             return event;
         }
     }

@@ -63,7 +63,7 @@ public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
         MuleMessageFactory factory = createMuleMessageFactory();
 
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding, muleContext);
+        MuleMessage message = factory.create(payload, encoding);
         assertNotNull(message);
         assertEquals(payload, message.getPayload());
         // message factory populates the inbound scope

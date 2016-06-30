@@ -125,7 +125,7 @@ public class MessageContextTestCase extends AbstractELTestCase
     @Test
     public void dataType() throws Exception
     {
-        when(message.getDataType()).thenReturn((DataType) DataType.STRING);
+        when(message.getDataType()).thenReturn(DataType.STRING);
         assertThat(evaluate("message.dataType", event), is(DataType.STRING));
         assertFinalProperty("message.mimType=2", event);
     }
@@ -144,7 +144,7 @@ public class MessageContextTestCase extends AbstractELTestCase
     @Test
     public void assignPayload() throws Exception
     {
-        message = new DefaultMuleMessage("", muleContext);
+        message = new DefaultMuleMessage("");
         evaluate("message.payload = 'foo'", event);
         assertEquals("foo", event.getMessage().getPayload());
     }

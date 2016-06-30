@@ -133,7 +133,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
         Object payload = Collections.emptySet();
         Flow fc = getTestFlow();
         MuleSession session = getTestSession(fc, muleContext);
-        MuleMessage toSplit = new DefaultMuleMessage(payload, new HashMap<>(), new HashMap<>(), null, muleContext);
+        MuleMessage toSplit = new DefaultMuleMessage(payload, new HashMap<>(), new HashMap<>(), null);
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(toSplit, fc, session);
@@ -173,7 +173,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
             expectedSequences.add(i);
         }
 
-        MuleMessage toSplit = new DefaultMuleMessage(payload, inboundProps, outboundProps, null, muleContext);
+        MuleMessage toSplit = new DefaultMuleMessage(payload, inboundProps, outboundProps, null);
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
         Grabber grabber = new Grabber();

@@ -18,7 +18,7 @@ public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleConte
 {
     protected ThreadSafeAccess dummyEvent() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null, muleContext);
+        MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null);
         return new DefaultMuleEvent(message, getTestFlow());
     }
 
@@ -70,9 +70,9 @@ public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleConte
         {
             try
             {
-                for (int i = 0; i < write.length; i++)
+                for (boolean element : write)
                 {
-                    target.assertAccess(write[i]);
+                    target.assertAccess(element);
                 }
             }
             catch (IllegalStateException e)

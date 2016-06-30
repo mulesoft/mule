@@ -12,14 +12,15 @@ import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.tck.testmodels.fruit.Orange;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BeanBuilderTestCase extends AbstractTransformerTestCase
 {
+    @Override
     public Transformer getTransformer() throws Exception
     {
         BeanBuilderTransformer trans = new BeanBuilderTransformer();
@@ -34,19 +35,22 @@ public class BeanBuilderTestCase extends AbstractTransformerTestCase
         return trans;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
     }
 
+    @Override
     public Object getTestData()
     {
         Map props = new HashMap();
         props.put("segments", "14");
         props.put("radius", "5.43");
-        return new DefaultMuleMessage("Juicy", props, muleContext);
+        return new DefaultMuleMessage("Juicy", props);
     }
 
+    @Override
     public Object getResultData()
     {
         return new Orange(14, 5.43, "Juicy");

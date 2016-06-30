@@ -125,7 +125,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                 // is being used for notifications then ignore.
                 return;
             }
-            MuleMessage msg = new DefaultMuleMessage(e, muleContext);
+            MuleMessage msg = new DefaultMuleMessage(e);
             try
             {
                 //TODO: Filters should really be applied by the endpoint

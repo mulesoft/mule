@@ -18,9 +18,9 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -107,7 +107,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         assertFalse(g3.equals(g1));
 
         // now test Set compatibility
-        Set<EventGroup> s = new HashSet<EventGroup>();
+        Set<EventGroup> s = new HashSet<>();
         s.add(g1);
 
         // make sure g1 is in the set
@@ -201,7 +201,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         assertTrue(es.contains("events=1"));
         assertTrue(es.endsWith("[" + firstId + "]}"));
 
-        MuleEvent secondEvent = new DefaultMuleEvent(new DefaultMuleMessage("foo2", muleContext),
+        MuleEvent secondEvent = new DefaultMuleEvent(new DefaultMuleMessage("foo2"),
             getTestEvent("foo2"));
         String secondId = secondEvent.getMessage().getUniqueId();
         eg.addEvent(secondEvent);

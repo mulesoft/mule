@@ -27,12 +27,11 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.metadata.TypedValue;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.nio.charset.Charset;
@@ -43,7 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public abstract class AbstractAddVariablePropertyTransformerTestCase extends AbstractMuleTestCase
+public abstract class AbstractAddVariablePropertyTransformerTestCase extends AbstractMuleContextTestCase
 {
     public static final Charset ENCODING = US_ASCII;
     public static final String PLAIN_STRING_KEY = "someText";
@@ -66,7 +65,7 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
     }
 
     @Before
-    public void setUpTest() throws MimeTypeParseException
+    public void setUpTest() throws Exception
     {
         addVariableTransformer.setReturnDataType(DataType.OBJECT);
 
@@ -78,8 +77,8 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         when(mockExpressionManager.evaluateTyped(eq(EXPRESSION), any(MuleEvent.class))).thenReturn(typedValue);
         addVariableTransformer.setMuleContext(mockMuleContext);
 
-        message = new DefaultMuleMessage("", mockMuleContext);
-        event = new DefaultMuleEvent(message, (FlowConstruct) null, mockSession);
+        message = new DefaultMuleMessage("");
+        event = new DefaultMuleEvent(message, getTestFlow(), mockSession);
     }
 
     @Test

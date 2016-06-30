@@ -48,7 +48,7 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
         when(textMessage.getJMSType()).thenReturn(null);
         when(textMessage.getObjectProperty("JMS_CUSTOM_PROPERTY")).thenReturn("customValue");
 
-        MutableMuleMessage msg = new DefaultMuleMessage(textMessage, muleContext);
+        MutableMuleMessage msg = new DefaultMuleMessage(textMessage);
 
         // Now we set a custom "JMS-like" property on the MuleMessage
         msg.setOutboundProperty("JMS_CUSTOM_PROPERTY", "customValue");

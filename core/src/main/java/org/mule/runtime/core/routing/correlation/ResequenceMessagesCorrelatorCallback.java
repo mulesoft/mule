@@ -72,7 +72,7 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
                 results[i] = (MuleEvent)((ThreadSafeAccess)results[i]).newThreadCopy();
             }
         }
-        return new DefaultMuleEvent(new DefaultMuleMessage(results, muleContext), results[0]);
+        return new DefaultMuleEvent(new DefaultMuleMessage(results), results[0]);
     }
 
 }

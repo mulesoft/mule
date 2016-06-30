@@ -13,6 +13,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -54,7 +55,7 @@ public class HttpResponseBuilderTestCase
 
     private void mockMuleMessage(InputStream payload, int contentLength)
     {
-        mockMuleMessage = new DefaultMuleMessage(payload, muleContext);
+        mockMuleMessage = new DefaultMuleMessage(payload);
         mockMuleMessage.setOutboundProperty(CONTENT_LENGTH, contentLength);
         when(mockEvent.getMessage()).thenReturn(mockMuleMessage);
     }

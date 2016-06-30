@@ -7,6 +7,8 @@
 package org.mule.runtime.core.session;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
+
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -26,13 +28,13 @@ public class SimpleSessionHandler implements SessionHandler
     protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
+    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException
     {
         return message.getInboundProperty(MULE_SESSION_PROPERTY);
     }
 
     @Override
-    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
+    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException
     {
         return message.transform(msg -> {
             msg.setOutboundProperty(MULE_SESSION_PROPERTY, session);

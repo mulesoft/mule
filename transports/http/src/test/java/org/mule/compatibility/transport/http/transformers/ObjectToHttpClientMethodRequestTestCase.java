@@ -73,7 +73,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
         endpoint = getEndpointFactory().getInboundEndpoint(url);
         
         MuleEvent event = getTestEvent(request, endpoint);
-        MutableMuleMessage message = new DefaultMuleMessage(messages, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(messages);
         message.setOutboundProperty(HTTP_METHOD_PROPERTY, method);
         message.setOutboundProperty(MULE_ENDPOINT_PROPERTY, url);
         RequestContext.setEvent(event);

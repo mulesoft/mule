@@ -145,7 +145,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     {
         Map<String, Serializable> props = new HashMap<>();
         props.put("prop1", "value1");
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext),
+        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props),
                 getTestFlow(), getTestSession(null, muleContext));
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
         return event;
@@ -233,7 +233,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         {
             flow.setExceptionListener(exceptionListener);
         }
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext),
+        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props),
                 flow, getTestSession(null, muleContext));
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
         return event;
@@ -241,7 +241,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
 
     protected MutableMuleMessage createTestResponseMuleMessage()
     {
-        return new DefaultMuleMessage(RESPONSE_MESSAGE, muleContext);
+        return new DefaultMuleMessage(RESPONSE_MESSAGE);
     }
 
     public static class TestFilter implements Filter

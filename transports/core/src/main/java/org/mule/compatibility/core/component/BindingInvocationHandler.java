@@ -38,8 +38,6 @@ public class BindingInvocationHandler implements InvocationHandler
 
     protected Map<String, InterfaceBinding> routers = null;
 
-    protected MuleContext muleContext;
-
     public BindingInvocationHandler(InterfaceBinding router)
     {
         this.routers = new ConcurrentHashMap<String, InterfaceBinding>();
@@ -63,7 +61,6 @@ public class BindingInvocationHandler implements InvocationHandler
         {
             routers.put(router.getMethod(), router);
         }
-        muleContext = router.getEndpoint().getMuleContext();
     }
 
     @Override
@@ -113,15 +110,15 @@ public class BindingInvocationHandler implements InvocationHandler
     {
         if (args == null)
         {
-            return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+            return new DefaultMuleMessage(NullPayload.getInstance());
         }
         else if (args.length == 1)
         {
-            return new DefaultMuleMessage(args[0], muleContext);
+            return new DefaultMuleMessage(args[0]);
         }
         else
         {
-            return new DefaultMuleMessage(args, muleContext);
+            return new DefaultMuleMessage(args);
         }
     }
 

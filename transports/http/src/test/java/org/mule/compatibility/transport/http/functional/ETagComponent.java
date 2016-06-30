@@ -25,7 +25,7 @@ public class ETagComponent implements org.mule.runtime.core.api.lifecycle.Callab
         String etag = message.getOutboundProperty(HttpConstants.HEADER_IF_NONE_MATCH);
         if ((etag != null) && etag.equals(ETAG_VALUE))
         {
-            message = new DefaultMuleMessage(StringUtils.EMPTY, eventContext.getMuleContext());
+            message = new DefaultMuleMessage(StringUtils.EMPTY);
             message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_NOT_MODIFIED);
         }
         

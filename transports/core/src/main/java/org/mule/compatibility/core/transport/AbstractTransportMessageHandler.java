@@ -442,7 +442,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     {
         try
         {
-            return muleMessageFactory.create(transportMessage, previousMessage, encoding, endpoint.getMuleContext());
+            return muleMessageFactory.create(transportMessage, previousMessage, encoding);
         }
         catch (Exception e)
         {
@@ -458,7 +458,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     {
         try
         {
-            return muleMessageFactory.create(transportMessage, encoding, endpoint.getMuleContext());
+            return muleMessageFactory.create(transportMessage, encoding);
         }
         catch (Exception e)
         {

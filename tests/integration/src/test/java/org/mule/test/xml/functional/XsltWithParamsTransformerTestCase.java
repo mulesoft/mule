@@ -7,6 +7,7 @@
 package org.mule.test.xml.functional;
 
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
@@ -35,7 +36,7 @@ public class XsltWithParamsTransformerTestCase extends FunctionalTestCase
     {
         Transformer trans = muleContext.getRegistry().lookupTransformer("test1");
         assertNotNull(trans);
-        MutableMuleMessage message = new DefaultMuleMessage("<testing/>", muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage("<testing/>");
         message.setOutboundProperty("Welcome", "hello");
         Object result = trans.transform(message);
         assertNotNull(result);

@@ -36,7 +36,7 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleContextTest
         // Create message to send over wire
         Map<String, Serializable> messageProerties = new HashMap<>();
         messageProerties.put("key1", "val1");
-        MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties, muleContext);
+        MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties);
 
         Object outMessage = readWrite(inMessage);
 

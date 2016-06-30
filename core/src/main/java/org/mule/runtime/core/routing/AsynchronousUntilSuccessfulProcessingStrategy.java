@@ -314,8 +314,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
     protected MuleEvent threadSafeCopy(final MuleEvent event)
     {
-        final MuleMessage message = new DefaultMuleMessage(event.getMessage().getPayload(),
-                                                                  event.getMessage(), getUntilSuccessfulConfiguration().getMuleContext());
+        final MuleMessage message = new DefaultMuleMessage(event.getMessage().getPayload(), event.getMessage());
 
         return new DefaultMuleEvent(message, event);
     }

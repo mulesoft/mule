@@ -158,7 +158,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                             currentTx.setRollbackOnly();
                             return null;
                         }
-                        return defaultRouterResultsHandler.aggregateResults(results, results.getLast(), results.getLast().getMuleContext());
+                        return defaultRouterResultsHandler.aggregateResults(results, results.getLast());
                     }
                 };
                 pt.execute(cb);

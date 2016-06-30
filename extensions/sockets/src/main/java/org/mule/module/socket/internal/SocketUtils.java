@@ -20,7 +20,6 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 
 import java.io.IOException;
@@ -92,7 +91,7 @@ public final class SocketUtils
         return connection.validate();
     }
 
-    public static MuleMessage<InputStream, SocketAttributes> createMuleMessage(InputStream content, SocketAttributes attributes, MuleContext muleContext)
+    public static MuleMessage<InputStream, SocketAttributes> createMuleMessage(InputStream content, SocketAttributes attributes)
     {
         DataType dataType = DataType.INPUT_STREAM;
         Object payload = NullPayload.getInstance();
@@ -103,7 +102,7 @@ public final class SocketUtils
             payload = content;
         }
 
-        message = (MuleMessage) new DefaultMuleMessage(payload, dataType, attributes, muleContext);
+        message = new DefaultMuleMessage(payload, dataType, attributes);
         return message;
     }
 

@@ -8,6 +8,7 @@ package org.mule.runtime.module.cxf.support;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.module.xml.transformer.DelayedResult;
@@ -17,9 +18,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.sax.SAXResult;
 
 import org.apache.cxf.databinding.stax.XMLStreamWriterCallback;
@@ -38,9 +37,12 @@ import javanet.staxutils.ContentHandlerToXMLStreamWriter;
 public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
 {
 
-    public OutputPayloadInterceptor()
+    private TransformationService transformationService;
+
+    public OutputPayloadInterceptor(TransformationService transformationService)
     {
         super(Phase.PRE_LOGICAL);
+        this.transformationService = transformationService;
     }
 
     @Override
@@ -72,16 +74,12 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                     }
                     else if (payload instanceof XMLStreamReader)
                     {
-                        o = new XMLStreamWriterCallback()
+                        o = (XMLStreamWriterCallback) writer ->
                         {
-                            @Override
-                            public void write(XMLStreamWriter writer) throws Fault, XMLStreamException
-                            {
-                                XMLStreamReader xsr = (XMLStreamReader)payload;
-                                StaxUtils.copy(xsr, writer);      
-                                writer.flush();
-                                xsr.close();
-                            }
+                            XMLStreamReader xsr = (XMLStreamReader)payload;
+                            StaxUtils.copy(xsr, writer);      
+                            writer.flush();
+                            xsr.close();
                         };
                     } 
                     else if (payload instanceof NullPayload)
@@ -90,7 +88,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                     }
                     else
                     {
-                        o = muleMsg.getMuleContext().getTransformationService().transform(muleMsg, DataType.fromType(XMLStreamReader.class)).getPayload();
+                        o = transformationService.transform(muleMsg, DataType.fromType(XMLStreamReader.class)).getPayload();
                     }
     
                     objs.add(o);
@@ -133,7 +131,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
 
         // In some circumstances, parts is a {@link UnmodifiableList} instance, so a new copy
         // is required in order to sort its content.
-        List<MessagePartInfo> sortedParts = new LinkedList<MessagePartInfo>();
+        List<MessagePartInfo> sortedParts = new LinkedList<>();
         sortedParts.addAll(parts);
         sortPartsByIndex(sortedParts);
 
@@ -176,7 +174,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
         if (payload instanceof Object[])
         {
             final Object[] payloadArray = (Object[]) payload;
-            final List<Object> payloadList = new ArrayList<Object>(payloadArray.length);
+            final List<Object> payloadList = new ArrayList<>(payloadArray.length);
             for (Object object : payloadArray)
             {
                 if (object != null && object != MessageContentsList.REMOVED_MARKER)
@@ -202,43 +200,39 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
 
     protected Object getDelayedResultCallback(final DelayedResult r)
     {
-        return new XMLStreamWriterCallback()
+        return (XMLStreamWriterCallback) writer ->
         {
-            @Override
-            public void write(XMLStreamWriter writer) throws Fault, XMLStreamException
-            {
-                ContentHandlerToXMLStreamWriter handler = new ContentHandlerToXMLStreamWriter(writer) {
+            ContentHandlerToXMLStreamWriter handler = new ContentHandlerToXMLStreamWriter(writer) {
 
-                    @Override
-                    public void endDocument() throws SAXException
-                    {
-                    }
+                @Override
+                public void endDocument() throws SAXException
+                {
+                }
 
-                    @Override
-                    public void processingInstruction(String target, String data) throws SAXException
-                    {
-                    }
+                @Override
+                public void processingInstruction(String target, String data) throws SAXException
+                {
+                }
 
-                    @Override
-                    public void startDocument() throws SAXException
-                    {
-                    }
+                @Override
+                public void startDocument() throws SAXException
+                {
+                }
 
-                    @Override
-                    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException
-                    {
-                    }
-                    
-                };
+                @Override
+                public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException
+                {
+                }
                 
-                try
-                {
-                    r.write(new SAXResult(handler));
-                }
-                catch (Exception e)
-                {
-                    throw new Fault(e);
-                }
+            };
+            
+            try
+            {
+                r.write(new SAXResult(handler));
+            }
+            catch (Exception e)
+            {
+                throw new Fault(e);
             }
         };
     }

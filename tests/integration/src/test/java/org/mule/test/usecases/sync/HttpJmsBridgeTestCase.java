@@ -47,7 +47,7 @@ public class HttpJmsBridgeTestCase extends FunctionalTestCase
         final String customHeader = "X-Custom-Header";
         headers.put(customHeader, "value");
 
-        client.dispatch(String.format("http://localhost:%d/in", httpPort.getNumber()), new DefaultMuleMessage(payload, headers, muleContext), newOptions().method(POST.name()).build());
+        client.dispatch(String.format("http://localhost:%d/in", httpPort.getNumber()), new DefaultMuleMessage(payload, headers), newOptions().method(POST.name()).build());
 
         MuleMessage msg = client.request("test://out", RECEIVE_TIMEOUT);
         assertNotNull(msg);

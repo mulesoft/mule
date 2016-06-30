@@ -74,7 +74,7 @@ public class ExceptionReturnTcpMessageReceiver extends TcpMessageReceiver
             {
                 logger.warn("Failed to read message: " + readingException);
 
-                MutableMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
+                MutableMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance());
                 ExceptionPayload exceptionPayload = new DefaultExceptionPayload(readingException);
                 msg.setExceptionPayload(exceptionPayload);
                 List msgList = new ArrayList(1);

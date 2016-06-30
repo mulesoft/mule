@@ -18,7 +18,6 @@ import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -148,8 +147,7 @@ public class MuleUniversalConduit extends AbstractConduit
         if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled)
         {
             // we've got an out of band WS-RM message or a message from a standalone client
-            MuleContext muleContext = configuration.getMuleContext();
-            MuleMessage muleMsg = new DefaultMuleMessage(handler, muleContext);
+            MuleMessage muleMsg = new DefaultMuleMessage(handler);
             
             String url = setupURL(message);
 
@@ -318,7 +316,7 @@ public class MuleUniversalConduit extends AbstractConduit
             // we want to act appropriately. E.g. one way invocations over a proxy
             InputStream is = (InputStream) result.getMuleContext().getTransformationService().transform(result.getMessage(), DataType.INPUT_STREAM).getPayload();
             PushbackInputStream pb = new PushbackInputStream(is);
-            result.setMessage(new DefaultMuleMessage(pb, result.getMessage(), result.getMuleContext(), DataType.XML_STRING));
+            result.setMessage(new DefaultMuleMessage(pb, result.getMessage(), DataType.XML_STRING));
 
             int b = pb.read();
             if (b != -1)

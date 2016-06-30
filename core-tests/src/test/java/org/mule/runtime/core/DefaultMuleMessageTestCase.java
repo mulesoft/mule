@@ -48,7 +48,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     @Test
     public void testConstructorWithNullPayload()
     {
-        MuleMessage message = new DefaultMuleMessage(null, muleContext);
+        MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
         assertThat(message.getPayload(), is(NullPayload.getInstance()));
     }
 
@@ -58,7 +58,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     @Test
     public void testOneArgConstructor()
     {
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
         assertThat(message.getPayload(), is(TEST_MESSAGE));
     }
 
@@ -67,7 +67,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage oldMessage = createMuleMessage();
 
-        MuleMessage message = new DefaultMuleMessage(oldMessage, muleContext);
+        MuleMessage message = new DefaultMuleMessage(oldMessage);
         assertThat(message.getPayload(), is(AbstractMuleContextTestCase.TEST_PAYLOAD));
         assertOutboundMessageProperty("MuleMessage", message);
     }
@@ -80,7 +80,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     {
         Map<String, Serializable> properties = createMessageProperties();
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, properties, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, properties);
         assertEquals(TEST_MESSAGE, message.getPayload());
         assertOutboundMessageProperty("MessageProperties", message);
     }
@@ -95,7 +95,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         properties.put("boolean", "true");
         Apple apple = new Apple(true);
         properties.put("apple", apple);
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, properties, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, properties);
         assertTrue(message.getOutboundProperty("boolean", false));
         assertEquals(new Integer(24), message.getOutboundProperty("number", 0));
         assertEquals(new Byte((byte) 24), message.getOutboundProperty("number", (byte) 0));
@@ -132,7 +132,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         Map<String, Serializable> properties = createMessageProperties();
         MuleMessage previousMessage = createMuleMessage();
 
-        MuleMessage message = new DefaultMuleMessage(previousMessage, properties, muleContext);
+        MuleMessage message = new DefaultMuleMessage(previousMessage, properties);
         assertEquals(AbstractMuleContextTestCase.TEST_PAYLOAD, message.getPayload());
         assertOutboundMessageProperty("MessageProperties", message);
         assertOutboundMessageProperty("MuleMessage", message);
@@ -146,7 +146,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage previous = createMuleMessage();
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, previous, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, previous);
         assertEquals(TEST_MESSAGE, message.getPayload());
         assertOutboundMessageProperty("MuleMessage", message);
         assertEquals(previous.getUniqueId(), message.getUniqueId());
@@ -161,7 +161,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         MutableMuleMessage previous = createMuleMessage();
         previous.setOutboundProperty("previous", "previous");
 
-        MuleMessage message = new DefaultMuleMessage(payload, previous, muleContext);
+        MuleMessage message = new DefaultMuleMessage(payload, previous);
         assertEquals(AbstractMuleContextTestCase.TEST_PAYLOAD, message.getPayload());
         assertOutboundMessageProperty("MuleMessage", message);
         assertOutboundMessageProperty("payload", message);
@@ -226,7 +226,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     public void testLegacyAddingAttachment() throws Exception
     {
         // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
 
         DataHandler handler = new DataHandler("this is the attachment", "text/plain");
         message.addOutboundAttachment("attachment", handler);
@@ -239,7 +239,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     public void testAddingOutboundAttachment() throws Exception
     {
         // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
 
         DataHandler handler = new DataHandler("this is the attachment", "text/plain");
         message.addOutboundAttachment("attachment", handler);
@@ -278,7 +278,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         String attachmentData = "this is the attachment";
         DataHandler dh = new DataHandler(attachmentData, "text/plain");
         attachments.put("attachment", dh);
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, null, attachments, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, null, attachments);
 
         assertTrue(message.getInboundAttachmentNames().contains("attachment"));
         assertEquals(dh, message.getInboundAttachment("attachment"));
@@ -286,6 +286,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
+        RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
         oos.writeObject(message);
         oos.flush();
         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
@@ -303,7 +304,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         DataHandler handler = new DataHandler("this is the attachment", "text/plain");
         previous.addOutboundAttachment("attachment", handler);
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, previous, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, previous);
         assertTrue(message.getOutboundAttachmentNames().contains("attachment"));
         assertEquals(handler, message.getOutboundAttachment("attachment"));
     }
@@ -322,7 +323,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     {
         // TODO MULE-9856 Replace with the builder
         MutableMuleMessage previousMessage = new DefaultMuleMessage(AbstractMuleContextTestCase.TEST_PAYLOAD, DataType.builder(DataType.STRING).charset(getDefaultEncoding(muleContext)).build(),
-                                                                    testAttributes, muleContext);
+                testAttributes);
         previousMessage.setOutboundProperty("MuleMessage", "MuleMessage");
         return previousMessage;
     }

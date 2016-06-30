@@ -361,8 +361,10 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor();
         enricher.setEnrichmentMessageProcessor(sensingNullMessageProcessor);
 
-        MuleEvent in = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, muleContext),
-                                            MessageExchangePattern.REQUEST_RESPONSE, mock(Flow.class));
+        Flow flow = mock(Flow.class);
+        when(flow.getMuleContext()).thenReturn(muleContext);
+        MuleEvent in = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE),
+                MessageExchangePattern.REQUEST_RESPONSE, flow);
         MuleEvent out = enricher.process(in);
 
         assertThat(out, is(sameInstance(in)));
@@ -436,8 +438,9 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     {
         Flow flow = mock(Flow.class);
         when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
+        when(flow.getMuleContext()).thenReturn(muleContext);
 
-        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, muleContext),
+        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE),
                                                   MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler,
                                                   flow);
     }

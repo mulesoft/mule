@@ -10,7 +10,6 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.simple.EchoService;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.module.cxf.builder.SimpleClientMessageProcessorBuilder;
@@ -48,24 +47,20 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
         
         CxfOutboundMessageProcessor processor = builder.build();
         
-        MessageProcessor messageProcessor = new MessageProcessor()
+        MessageProcessor messageProcessor = event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
+            payload = event.getMessage().getPayload();
+            try
             {
-                payload = event.getMessage().getPayload();
-                try
-                {
-                    System.out.println(getPayloadAsString(event.getMessage()));
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-                event.setMessage(new DefaultMuleMessage(msg, event.getMessage(), event.getMuleContext()));
-                gotEvent = true;
-                return event;
+                System.out.println(getPayloadAsString(event.getMessage()));
             }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            event.setMessage(new DefaultMuleMessage(msg, event.getMessage()));
+            gotEvent = true;
+            return event;
         };
         processor.setListener(messageProcessor);
         

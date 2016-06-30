@@ -34,7 +34,6 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
     {
         super(muleContext, storePrefix);
         this.eventComparator = eventComparator;
-        this.muleContext = muleContext;
     }
 
     /**
@@ -70,7 +69,7 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
         }
         // This is a bit of a hack since we wrap the the collection of events in a
         // Mule Message to pass back
-        return new DefaultMuleEvent(new DefaultMuleMessage(results, muleContext), results[0]);
+        return new DefaultMuleEvent(new DefaultMuleMessage(results), results[0]);
     }
 
 }

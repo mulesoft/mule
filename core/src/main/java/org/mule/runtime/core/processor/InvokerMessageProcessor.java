@@ -61,7 +61,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
     protected Object object;
     protected Class<?> objectType;
     protected String methodName;
-    protected List<?> arguments = new ArrayList<Object>();
+    protected List<?> arguments = new ArrayList<>();
     protected Class<?>[] argumentTypes;
     protected String name;
     protected PatternInfo patternInfo = TemplateParser.createMuleStyleParser().getStyle();
@@ -96,7 +96,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
         }
         else
         {
-            List<Method> matchingMethods = new ArrayList<Method>();
+            List<Method> matchingMethods = new ArrayList<>();
             int argSize = arguments != null ? arguments.size() : 0;
             for (Method methodCandidate : object.getClass().getMethods())
             {
@@ -208,7 +208,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
         if (expressionCandidate instanceof Collection<?>)
         {
             Collection<Object> collectionTemplate = (Collection<Object>) expressionCandidate;
-            Collection<Object> newCollection = new ArrayList<Object>();
+            Collection<Object> newCollection = new ArrayList<>();
             for (Object object : collectionTemplate)
             {
                 newCollection.add(evaluateExpressionCandidate(object, event));
@@ -218,7 +218,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
         else if (expressionCandidate instanceof Map<?, ?>)
         {
             Map<Object, Object> mapTemplate = (Map<Object, Object>) expressionCandidate;
-            Map<Object, Object> newMap = new HashMap<Object, Object>();
+            Map<Object, Object> newMap = new HashMap<>();
             for (Entry<Object, Object> entry : mapTemplate.entrySet())
             {
                 newMap.put(evaluateExpressionCandidate(entry.getKey(), event), evaluateExpressionCandidate(
@@ -316,8 +316,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
         }
         else
         {
-            return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(),
-                event.getMuleContext()), event);
+            return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance()), event);
         }
     }
 

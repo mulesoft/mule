@@ -38,17 +38,13 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     {
         CxfInboundMessageProcessor processor = createCxfMessageProcessor();
         
-        MessageProcessor messageProcessor = new MessageProcessor()
+        MessageProcessor messageProcessor = event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                payload = event.getMessage().getPayload();
-                assertEquals("echo", payload);
-                event.setMessage(new DefaultMuleMessage("echo", event.getMessage(), event.getMuleContext()));
-                gotEvent = true;
-                return event;
-            }
+            payload = event.getMessage().getPayload();
+            assertEquals("echo", payload);
+            event.setMessage(new DefaultMuleMessage("echo", event.getMessage()));
+            gotEvent = true;
+            return event;
         };
         processor.setListener(messageProcessor);
         
@@ -68,17 +64,13 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     {
         CxfInboundMessageProcessor processor = createCxfMessageProcessor();
         
-        MessageProcessor messageProcessor = new MessageProcessor()
+        MessageProcessor messageProcessor = event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                payload = event.getMessage().getPayload();
-                assertEquals("echo", payload);
-                event.setMessage(new DefaultMuleMessage("echo", event.getMessage(), event.getMuleContext()));
-                gotEvent = true;
-                return null;
-            }
+            payload = event.getMessage().getPayload();
+            assertEquals("echo", payload);
+            event.setMessage(new DefaultMuleMessage("echo", event.getMessage()));
+            gotEvent = true;
+            return null;
         };
         processor.setListener(messageProcessor);
         

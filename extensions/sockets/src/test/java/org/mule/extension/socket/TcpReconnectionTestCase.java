@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mockito.Mockito.when;
 import static org.mule.extension.socket.SocketExtensionTestCase.POLL_DELAY_MILLIS;
 import static org.mule.extension.socket.SocketExtensionTestCase.TIMEOUT_MILLIS;
+
 import org.mule.module.socket.api.connection.ConnectionSettings;
 import org.mule.module.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.module.socket.api.connection.tcp.TcpRequesterConnection;
@@ -135,6 +136,6 @@ public class TcpReconnectionTestCase extends AbstractMuleTestCase
             return false;
         }));
 
-        SocketWorker worker = listenerConnection.listen(muleContext, handler);
+        SocketWorker worker = listenerConnection.listen(handler);
     }
 }

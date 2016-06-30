@@ -76,7 +76,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         public void run()
         {
             // TODO MULE-9856 Replace with the builder
-            MutableMuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
+            MutableMuleMessage okMessage = new DefaultMuleMessage("OK");
             okMessage.setOutboundProperty("id", "1");
             MuleEvent event = new DefaultMuleEvent(okMessage, flow, session);
 
@@ -106,7 +106,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     private class RaceConditionEnforcingObjectStore implements ObjectStore<String>
     {
         protected CountDownLatch barrier;
-        Map<Serializable, String> map = new TreeMap<Serializable, String>();
+        Map<Serializable, String> map = new TreeMap<>();
 
         public RaceConditionEnforcingObjectStore(CountDownLatch latch)
         {

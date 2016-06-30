@@ -42,7 +42,7 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
         ir.setStore(new InMemoryObjectStore<String>());
         ir.setMuleContext(muleContext);
 
-        MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
+        MuleMessage okMessage = new DefaultMuleMessage("OK");
         MuleEvent event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
 
         // This one will process the event on the target endpoint
@@ -50,13 +50,13 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
         assertNotNull(processedEvent);
 
          // This will not process, because the message is a duplicate
-        okMessage = new DefaultMuleMessage("OK", muleContext);
+        okMessage = new DefaultMuleMessage("OK");
         event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
         processedEvent = ir.process(event);
         assertNull(processedEvent);
 
         // This will process, because the message  is not a duplicate
-        okMessage = new DefaultMuleMessage("Not OK", muleContext);
+        okMessage = new DefaultMuleMessage("Not OK");
         event = new DefaultMuleEvent(okMessage, getTestFlow(), session);
         processedEvent = ir.process(event);
         assertNotNull(processedEvent);

@@ -14,9 +14,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 
+import org.mockito.Mockito;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.runtime.api.metadata.DataType;
@@ -27,6 +29,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -44,15 +47,15 @@ import org.apache.commons.httpclient.Header;
 import org.junit.Test;
 
 @SmallTest
-public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
+public class MuleMessageToHttpResponseTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
     public void testSetCookieOnOutbound() throws Exception
     {
-        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
         MuleMessage msg = createMockMessage();
 
+        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
         Cookie[] cookiesOutbound = new Cookie[2];
         cookiesOutbound[0] = new Cookie("domain", "name-out-1", "value-out-1");
         cookiesOutbound[1] = new Cookie("domain", "name-out-2", "value-out-2");
@@ -78,10 +81,10 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
     @Test
     public void testSetDateOnOutbound() throws Exception
     {
-        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
         MuleMessage msg =
                 createMockMessage();
 
+        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
         HttpResponse response = transformer.createResponse(null, UTF_8, msg);
         Header[] headers = response.getHeaders();
 
@@ -111,11 +114,10 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
     private MuleMessage createMockMessage() throws TransformerException
     {
         MuleMessage msg = mock(MuleMessage.class);
-        MuleContext muleContext = mock(MuleContext.class);
+        muleContext = spy(muleContext);
         TransformationService transformationService = mock(TransformationService.class);
         DataType objectDataType = DataType.OBJECT;
         when(msg.getDataType()).thenReturn(objectDataType);
-        when(msg.getMuleContext()).thenReturn(muleContext);
         when(muleContext.getTransformationService()).thenReturn(transformationService);
         doReturn(new DefaultMuleMessage((OutputHandler) (event, out) ->
         {
@@ -126,18 +128,19 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
     @Test
     public void testContentTypeOnOutbound() throws Exception
     {
-        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
         final String contentType = "text/xml";
         final String wrongContentType = "text/json";
         Map<String, Serializable> outboundProperties =  new HashMap<>();
         outboundProperties.put(HEADER_CONTENT_TYPE, wrongContentType);
-        MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-        MutableMuleMessage msg = new DefaultMuleMessage(null, outboundProperties, muleContext);
+        muleContext = spy(muleContext);
+        MutableMuleMessage msg = new DefaultMuleMessage(null, outboundProperties);
         //Making sure that the outbound property overrides both invocation and inbound
         msg.setOutboundProperty(HEADER_CONTENT_TYPE, wrongContentType);
         msg.setInboundProperty(HEADER_CONTENT_TYPE, wrongContentType);
         
         msg.setOutboundProperty(HEADER_CONTENT_TYPE, contentType);
+
+        MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
 
         HttpResponse response = transformer.createResponse(null, UTF_8, msg);
         Header[] headers = response.getHeaders();
@@ -157,6 +160,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
     private MuleMessageToHttpResponse getMuleMessageToHttpResponse() throws Exception
     {
         MuleMessageToHttpResponse transformer = new MuleMessageToHttpResponse();
+        transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;
     }

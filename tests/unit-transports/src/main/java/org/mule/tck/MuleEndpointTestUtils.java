@@ -358,7 +358,7 @@ public final class MuleEndpointTestUtils
             throws Exception
     {
         final MuleSession session = getTestSession(flowConstruct, context);
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data, context), mep, flowConstruct, session);
+        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data), mep, flowConstruct, session);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("test1", mep, context, null));
         return event;
     }
@@ -371,7 +371,7 @@ public final class MuleEndpointTestUtils
             throws Exception
     {
         final MuleSession session = getTestSession(flowConstruct, context);
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data, context), flowConstruct, session);
+        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data), flowConstruct, session);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("test1", MessageExchangePattern.REQUEST_RESPONSE, context, null));
         return event;
     }
@@ -394,7 +394,7 @@ public final class MuleEndpointTestUtils
         final MuleSession session = getTestSession(flowConstruct, context);
 
         final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
-        final MuleMessage message = factory.create(data, endpoint.getEncoding(), context);
+        final MuleMessage message = factory.create(data, endpoint.getEncoding());
 
         final DefaultMuleEvent event = new DefaultMuleEvent(message, flowConstruct, session);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);

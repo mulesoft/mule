@@ -8,6 +8,7 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -61,7 +62,7 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
     {
         latch = new Latch();
         Component.latch = latch;
-        PersistentObjectStore.addEvents(muleContext);
+        PersistentObjectStore.addEvents();
         muleContext.start();
         MuleClient client = muleContext.getClient();
         MuleMessage result = flowRunner("input").withPayload("Hello").run().getMessage();
@@ -72,14 +73,14 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
     /** A store that "persists" events using keys that are not QueueEntry's */
     public static class PersistentObjectStore implements ListableObjectStore<Serializable>
     {
-        private static Map<Serializable, Serializable> events = new HashMap<Serializable, Serializable>();
+        private static Map<Serializable, Serializable> events = new HashMap<>();
 
-        static void addEvents(MuleContext context)
+        static void addEvents() throws Exception
         {
             for (String str : new String[] {"A", "B", "C"})
             {
-                MuleMessage msg = new DefaultMuleMessage(str, context);
-                MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, null, new DefaultMuleSession());
+                MuleMessage msg = new DefaultMuleMessage(str);
+                MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, getTestFlow(), new DefaultMuleSession());
                 events.put(AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey(event), event);
             }
         }
@@ -99,7 +100,7 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
         @Override
         public synchronized List<Serializable> allKeys() throws ObjectStoreException
         {
-            return new ArrayList<Serializable>(events.keySet());
+            return new ArrayList<>(events.keySet());
         }
 
         @Override
@@ -141,7 +142,7 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
 
     public static class Component implements Callable
     {
-        private static Set<String> payloads = new HashSet<String>();
+        private static Set<String> payloads = new HashSet<>();
         private static Latch latch;
         private static Object lock = new Object();
 

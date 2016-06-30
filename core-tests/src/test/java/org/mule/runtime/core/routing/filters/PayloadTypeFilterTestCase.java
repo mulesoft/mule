@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.routing.filters;
 
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class PayloadTypeFilterTestCase extends AbstractMuleContextTestCase
+import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+public class PayloadTypeFilterTestCase extends AbstractMuleTestCase
 {
 
     @Test
@@ -24,13 +24,13 @@ public class PayloadTypeFilterTestCase extends AbstractMuleContextTestCase
     {
         PayloadTypeFilter filter = new PayloadTypeFilter();
         assertNull(filter.getExpectedType());
-        assertFalse(filter.accept(new DefaultMuleMessage("test", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("test")));
 
         filter.setExpectedType(String.class);
-        assertTrue(filter.accept(new DefaultMuleMessage("test", muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage("test")));
 
         filter.setExpectedType(null);
-        assertFalse(filter.accept(new DefaultMuleMessage("test", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("test")));
     }
 
     @Test
@@ -38,12 +38,12 @@ public class PayloadTypeFilterTestCase extends AbstractMuleContextTestCase
     {
         PayloadTypeFilter filter = new PayloadTypeFilter(Exception.class);
         assertNotNull(filter.getExpectedType());
-        assertTrue(filter.accept(new DefaultMuleMessage(new Exception("test"), muleContext)));
-        assertTrue(!filter.accept(new DefaultMuleMessage("test", muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage(new Exception("test"))));
+        assertTrue(!filter.accept(new DefaultMuleMessage("test")));
 
         filter.setExpectedType(String.class);
-        assertTrue(filter.accept(new DefaultMuleMessage("test", muleContext)));
-        assertTrue(!filter.accept(new DefaultMuleMessage(new Exception("test"), muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage("test")));
+        assertTrue(!filter.accept(new DefaultMuleMessage(new Exception("test"))));
     }
 
 }

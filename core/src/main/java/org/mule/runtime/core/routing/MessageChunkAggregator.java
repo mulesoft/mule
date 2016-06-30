@@ -84,12 +84,11 @@ public class MessageChunkAggregator extends AbstractAggregator
                     {
                         // must deserialize in correct classloader
                         final Object deserialized = muleContext.getObjectSerializer().deserialize(baos.toByteArray());
-                        message = new DefaultMuleMessage(deserialized, firstEvent.getMessage(), muleContext);
+                        message = new DefaultMuleMessage(deserialized, firstEvent.getMessage());
                     }
                     catch (SerializationException e)
                     {
-                        message = new DefaultMuleMessage(baos.toByteArray(), firstEvent.getMessage(),
-                            muleContext);
+                        message = new DefaultMuleMessage(baos.toByteArray(), firstEvent.getMessage());
                     }
 
                     message.setCorrelationGroupSize(-1);

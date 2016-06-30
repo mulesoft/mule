@@ -105,7 +105,7 @@ public class JmsReplyToHandler extends EndpointReplyToHandler
             //This mimics the OBjectToJmsMessage Transformer behaviour without needing an endpoint
             //TODO clean this up, maybe make the transformer available via a utility class, passing in the Session
             Message replyToMessage = JmsMessageUtils.toMessage(payload, session);
-            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), returnMessage);
+            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), returnMessage, muleContext);
             toJmsMessage.setJmsProperties(returnMessage, replyToMessage);
 
             processMessage(replyToMessage, event);

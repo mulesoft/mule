@@ -52,7 +52,7 @@ public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageP
         // add interceptors to handle Mule proxy specific stuff
         client.getInInterceptors().add(new CopyAttachmentInInterceptor());
         client.getInInterceptors().add(new StreamClosingInterceptor());
-        client.getOutInterceptors().add(new OutputPayloadInterceptor());
+        client.getOutInterceptors().add(new OutputPayloadInterceptor(muleContext.getTransformationService()));
         client.getOutInterceptors().add(new CopyAttachmentOutInterceptor());
         
         // Don't close the input because people need to be able to work with the live stream

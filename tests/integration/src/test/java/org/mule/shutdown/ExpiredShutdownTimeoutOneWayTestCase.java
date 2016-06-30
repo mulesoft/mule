@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,7 +61,7 @@ public class ExpiredShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeou
             {
                 try
                 {
-                    MuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, new HashMap(), muleContext);
+                    MuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
                     flowRunner(flowName).withPayload(muleMessage).asynchronously().run();
 
                     MuleMessage response = client.request("test://response", RECEIVE_TIMEOUT);

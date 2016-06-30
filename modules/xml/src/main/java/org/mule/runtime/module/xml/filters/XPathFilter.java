@@ -165,7 +165,7 @@ public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initiali
         }
 
         // TODO MULE-9856 Replace with the builder
-        event.setMessage(new DefaultMuleMessage(node, event.getMessage(), event.getMuleContext()));
+        event.setMessage(new DefaultMuleMessage(node, event.getMessage()));
 
         return accept(node);
     }

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.session;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -27,24 +28,23 @@ public class SerializeOnlySessionHandler extends AbstractSessionHandler
     protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
+    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException
     {
         MuleSession session = null;
         byte[] serializedSession = message.getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
 
         if (serializedSession != null)
         {
-            session = deserialize(message, serializedSession);
+            session = deserialize(message, serializedSession, muleContext);
         }
         return session;
     }
 
     @Override
-    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message) throws MuleException
+    public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException
     {
-        MuleContext muleContext = message.getMuleContext();
-        byte[] serializedSession = muleContext.getObjectSerializer().serialize(
-                removeNonSerializableProperties(session, muleContext));
+        byte[] serializedSession = context.getObjectSerializer().serialize(
+                removeNonSerializableProperties(session, context));
 
         if (logger.isDebugEnabled())
         {

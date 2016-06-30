@@ -15,8 +15,8 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Splits a message that has a map payload invoking the next message processor one
@@ -32,6 +32,7 @@ public class MapSplitter extends AbstractSplitter
 {
     public static String MAP_ENTRY_KEY = "key";
 
+    @Override
     protected List<MuleEvent> splitMessage(MuleEvent event)
     {
         MuleMessage message = event.getMessage();
@@ -41,7 +42,7 @@ public class MapSplitter extends AbstractSplitter
             Set<Map.Entry<?, ?>> set = ((Map) message.getPayload()).entrySet();
             for (Entry<?, ?> entry : set)
             {
-                MuleMessage splitMessage = new DefaultMuleMessage(entry.getValue(), muleContext);
+                MuleMessage splitMessage = new DefaultMuleMessage(entry.getValue());
                 MuleEvent splitEvent = new DefaultMuleEvent(splitMessage, event);
                 // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
                 list.add(splitEvent);

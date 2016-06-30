@@ -262,7 +262,7 @@ public class TestEventBuilder
      */
     public MuleEvent build(MuleContext muleContext, FlowConstruct flow)
     {
-        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext,
+        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments,
                 DataType.builder().fromObject(payload).charset(getDefaultEncoding(muleContext)).build());
         DefaultMuleEvent event = new DefaultMuleEvent(
                 (DefaultMuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern, flow, new DefaultMuleSession(),

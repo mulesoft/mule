@@ -62,7 +62,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
                     Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
                     if (result == null)
                     {
-                        return new DefaultMuleMessage(NullPayload.getInstance(), this.getEndpoint().getMuleContext());
+                        return new DefaultMuleMessage(NullPayload.getInstance());
                     }
 
                     if (result instanceof MutableMuleMessage)
@@ -70,7 +70,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
                         return (MutableMuleMessage) result;
                     }
 
-                    return new DefaultMuleMessage(result, this.getEndpoint().getMuleContext());
+                    return new DefaultMuleMessage(result);
                 }
                 catch (Exception ex)
                 {
@@ -131,7 +131,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
             // so that a protocol class can use the thread local and pick the
             // transformed
             // message.
-            event.setMessage(new DefaultMuleMessage(payload, event.getMessage(), event.getMuleContext()));
+            event.setMessage(new DefaultMuleMessage(payload, event.getMessage()));
             // OptimizedRequestContext.unsafeRewriteEvent(new DefaultMuleMessage(
             // payload));
             write(payload);

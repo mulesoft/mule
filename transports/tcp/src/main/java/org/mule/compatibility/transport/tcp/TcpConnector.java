@@ -247,7 +247,7 @@ public class TcpConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new MessagingException(TransportCoreMessages.failedToGetOutputStream(), message, e);
+            throw new MessagingException(TransportCoreMessages.failedToGetOutputStream(), message, endpoint.getMuleContext(), e);
         }
         if (socket == null)
         {
@@ -259,18 +259,11 @@ public class TcpConnector extends AbstractConnector
         {
             return new CallbackOutputStream(
                     new DataOutputStream(new BufferedOutputStream(socket.getOutputStream())),
-                    new CallbackOutputStream.Callback()
-                    {
-                        @Override
-                        public void onClose() throws Exception
-                        {
-                            releaseSocket(socket, endpoint);
-                        }
-                    });
+                    () -> releaseSocket(socket, endpoint));
         }
         catch (IOException e)
         {
-            throw new MessagingException(TransportCoreMessages.failedToGetOutputStream(), message, e);
+            throw new MessagingException(TransportCoreMessages.failedToGetOutputStream(), message, endpoint.getMuleContext(), e);
         }
     }
 

@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core;
 
+import static org.junit.Assert.assertFalse;
+
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
 
 public class ThreadUnsafeAccessTestCase extends AbstractThreadSafeAccessTestCase
 {
@@ -44,7 +44,7 @@ public class ThreadUnsafeAccessTestCase extends AbstractThreadSafeAccessTestCase
     public void testDisable() throws InterruptedException
     {
         assertFalse(ThreadSafeAccess.AccessControl.isFailOnMessageScribbling());
-        ThreadSafeAccess target = new DefaultMuleMessage(new Object(), muleContext);
+        ThreadSafeAccess target = new DefaultMuleMessage(new Object());
         newThread(target, false, new boolean[]{true, true, false, true});
         newThread(target, false, new boolean[]{false});
         newThread(target, false, new boolean[]{true});

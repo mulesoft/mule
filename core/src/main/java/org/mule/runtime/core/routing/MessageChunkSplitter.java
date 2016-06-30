@@ -80,7 +80,7 @@ public class MessageChunkSplitter extends AbstractSplitter
             System.arraycopy(data, pos, buffer, 0, buffer.length);
             pos += len;
             // TODO MULE-9856 Replace with the builder
-            MutableMuleMessage part = new DefaultMuleMessage(buffer, message, muleContext);
+            MutableMuleMessage part = new DefaultMuleMessage(buffer, message);
             part.setCorrelationId(message.getUniqueId());
             part.setCorrelationGroupSize(parts);
             part.setCorrelationSequence(count);

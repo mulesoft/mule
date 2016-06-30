@@ -82,7 +82,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, RETURNS_DEEP_STUBS.get());
     private ThreadPoolExecutor mockPool = mock(ThreadPoolExecutor.class, RETURNS_DEEP_STUBS.get());
     private ScheduledThreadPoolExecutor mockScheduledPool = mock(ScheduledThreadPoolExecutor.class, RETURNS_DEEP_STUBS.get());
-    private SimpleMemoryObjectStore<MuleEvent> objectStore = new SimpleMemoryObjectStore<MuleEvent>();
+    private SimpleMemoryObjectStore<MuleEvent> objectStore = new SimpleMemoryObjectStore<>();
     private MessageProcessor mockDLQ = mock(MessageProcessor.class);
     private FailCallback failRoute = () -> {};
     private CountDownLatch routeCountDownLatch;
@@ -98,7 +98,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
         when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
         when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
-        final MuleMessage mockMessage = new DefaultMuleMessage("", emptyMap(), mock(MuleContext.class, RETURNS_DEEP_STUBS.get()));
+        final MuleMessage mockMessage = new DefaultMuleMessage("", emptyMap());
         when(mockEvent.getMessage()).thenReturn(mockMessage);
         when(mockEvent.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME)).thenAnswer(new Answer<Object>()
         {
@@ -121,7 +121,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         configureDLQToReleaseLatchWhenExecuted();
         when(muleContext.getTransformationService()).thenReturn(transformationService);
         when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenAnswer(
-                invocation -> new DefaultMuleMessage(invocation.getArguments()[0].toString().getBytes(), muleContext));
+                invocation -> new DefaultMuleMessage(invocation.getArguments()[0].toString().getBytes()));
     }
 
     @Test(expected = InitialisationException.class)

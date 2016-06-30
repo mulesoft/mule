@@ -62,7 +62,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
      */
     protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected List<MessageProcessor> routes = new CopyOnWriteArrayList<MessageProcessor>();
+    protected List<MessageProcessor> routes = new CopyOnWriteArrayList<>();
 
     protected String replyTo = null;
 
@@ -427,7 +427,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
      */
     protected MuleMessage cloneMessage(MuleMessage message)
     {
-        return AbstractRoutingStrategy.cloneMessage(message, muleContext);
+        return AbstractRoutingStrategy.cloneMessage(message);
     }
 
     /**
@@ -439,7 +439,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
      */
     protected MuleMessage cloneMessage(MuleEvent event, MuleMessage message) throws MessagingException
     {
-        return AbstractRoutingStrategy.cloneMessage(event, message, muleContext);
+        return AbstractRoutingStrategy.cloneMessage(event, message);
     }
 
     /**

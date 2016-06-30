@@ -93,7 +93,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
         outboundProperties.put("cookies", (Serializable) cookiesObject);
 
         MuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, outboundProperties, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, outboundProperties);
 
         client.dispatch("vm://vm-in", message);
 

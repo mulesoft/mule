@@ -51,11 +51,11 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
         if (value instanceof MuleMessage)
         {
             MuleMessage outputMessage = (MuleMessage) value;
-            return new DefaultMuleMessage(outputMessage.getPayload(), dataType, resolveAttributes(outputMessage, operationContext), muleContext);
+            return new DefaultMuleMessage(outputMessage.getPayload(), dataType, resolveAttributes(outputMessage, operationContext));
         }
         else
         {
-            return new DefaultMuleMessage(value, dataType, operationContext.getEvent().getMessage().getAttributes(), muleContext);
+            return new DefaultMuleMessage(value, dataType, operationContext.getEvent().getMessage().getAttributes());
         }
     }
 

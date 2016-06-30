@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
@@ -77,7 +78,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         Map<String, Serializable> props = new HashMap<>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
-        return new DefaultMuleMessage(srcData, props, muleContext);
+        return new DefaultMuleMessage(srcData, props);
     }
 
     @Override
@@ -184,7 +185,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         transformer.setXslt(xsl);
 
         // set parameter
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("param1", param);
         transformer.setContextProperties(params);
 
@@ -241,14 +242,14 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         transformer.setXslt(xsl);
 
         // set parameter
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("param1", "#[message.outboundProperties.myproperty]");
         transformer.setContextProperties(params);
 
         // init transformer
         transformer.initialise();
 
-        MutableMuleMessage message = new DefaultMuleMessage(xml, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(xml);
         message.setOutboundProperty("myproperty", param);
         // do transformation
         String transformerResult = (String) transformer.transform(message);

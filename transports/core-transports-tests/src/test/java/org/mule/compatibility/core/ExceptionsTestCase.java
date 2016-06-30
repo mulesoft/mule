@@ -11,20 +11,21 @@ import static org.junit.Assert.assertSame;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class ExceptionsTestCase extends AbstractMuleTestCase
+public class ExceptionsTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
-    public final void testRoutingExceptionNullMessageValidEndpoint() throws MuleException
+    public final void testRoutingExceptionNullMessageValidEndpoint() throws Exception
     {
         OutboundEndpoint endpoint = Mockito.mock(OutboundEndpoint.class);
 
-        RoutingException rex = new RoutingException(null, endpoint);
+        RoutingException rex = new RoutingException(getTestEvent(""), endpoint);
         assertSame(endpoint, rex.getRoute());
     }
 

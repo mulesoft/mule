@@ -33,7 +33,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     public void testSerializablePayload() throws Exception
     {
         // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
         message.setOutboundProperty("foo", "bar");
 
         MuleMessage deserializedMessage = serializationRoundtrip(message);
@@ -50,9 +50,10 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         muleContext.getRegistry().registerTransformer(new NonSerializableToByteArray());
 
         // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage(new NonSerializable(), muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(new NonSerializable());
         message.setOutboundProperty("foo", "bar");
 
+        RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
         MuleMessage deserializedMessage = serializationRoundtrip(message);
 
         assertTrue(deserializedMessage.getPayload() instanceof byte[]);
@@ -64,9 +65,10 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     {
         InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
         // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage(stream, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(stream);
         message.setOutboundProperty("foo", "bar");
 
+        RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
         MuleMessage deserializedMessage = serializationRoundtrip(message);
 
         assertEquals(byte[].class, deserializedMessage.getPayload().getClass());

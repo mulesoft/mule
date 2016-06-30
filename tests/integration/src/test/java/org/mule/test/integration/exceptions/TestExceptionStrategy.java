@@ -21,7 +21,7 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
     public MuleEvent handleException(Exception exception, MuleEvent event)
     {
         MuleEvent result = super.handleException(exception, event);
-        result.setMessage(new DefaultMuleMessage("Ka-boom!", result.getMessage(), event.getMuleContext()));
+        result.setMessage(new DefaultMuleMessage("Ka-boom!", result.getMessage()));
         return result;
     }
 

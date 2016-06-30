@@ -357,7 +357,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
     {
         Map<String, Serializable> props = new HashMap<>();
         props.put("prop1", "value1");
-        return new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
+        return new DefaultMuleMessage(TEST_MESSAGE, props);
     }
 
     protected MuleEvent createTestRequestEvent(InboundEndpoint ep) throws Exception
@@ -369,7 +369,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
     protected MuleEvent createTestResponseEvent(InboundEndpoint ep) throws Exception
     {
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(RESPONSE_MESSAGE, muleContext),
+        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(RESPONSE_MESSAGE),
                 getTestFlow(), getTestSession(null, muleContext));
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, ep);
         return event;

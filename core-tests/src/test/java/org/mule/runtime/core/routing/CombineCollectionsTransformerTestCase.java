@@ -41,11 +41,11 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
         MuleEvent event = getTestEvent("hello");
         
         List list = new ArrayList<>();
-        list.add(new DefaultMuleMessage(Arrays.asList("1", "2", "3"), muleContext));
-        list.add(new DefaultMuleMessage("4", muleContext));
-        list.add(new DefaultMuleMessage(Arrays.asList("5", "6", "7"), muleContext));
+        list.add(new DefaultMuleMessage(Arrays.asList("1", "2", "3")));
+        list.add(new DefaultMuleMessage("4"));
+        list.add(new DefaultMuleMessage(Arrays.asList("5", "6", "7")));
 
-        MuleMessage collection = new DefaultMuleMessage(list, DataType.MULE_MESSAGE_COLLECTION, muleContext);
+        MuleMessage collection = new DefaultMuleMessage(list, DataType.MULE_MESSAGE_COLLECTION);
         event = new DefaultMuleEvent(collection, event);
         
         MuleEvent response = merger.process(event);
@@ -59,7 +59,7 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
     {
         MuleEvent event = getTestEvent("hello");
         
-        ArrayList<Object> payload = new ArrayList<Object>();
+        ArrayList<Object> payload = new ArrayList<>();
         payload.add(Arrays.asList("1", "2", "3"));
         payload.add("4");
         payload.add(Arrays.asList("5", "6", "7"));

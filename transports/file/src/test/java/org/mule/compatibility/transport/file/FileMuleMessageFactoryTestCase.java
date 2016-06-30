@@ -40,7 +40,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
     {
         MuleMessageFactory factory = createMuleMessageFactory();
 
-        MuleMessage message = factory.create(getValidTransportMessage(), encoding, muleContext);
+        MuleMessage message = factory.create(getValidTransportMessage(), encoding);
         assertNotNull(message);
         assertMessageProperties(message);
     }
@@ -51,7 +51,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
         MuleMessageFactory factory = createMuleMessageFactory();
 
         ReceiverFileInputStream stream = new ReceiverFileInputStream(tempFile, false, null);
-        MuleMessage message = factory.create(stream, encoding, muleContext);
+        MuleMessage message = factory.create(stream, encoding);
         assertNotNull(message);
         assertMessageProperties(message);
     }
@@ -63,7 +63,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
         File moveTo = tempFolder.newFile("moveTo.tmp");
         moveTo.deleteOnExit();
         ReceiverFileInputStream mockStream = new ReceiverFileInputStream(tempFile, false, moveTo);
-        MuleMessage message = factory.create(mockStream, encoding, muleContext);
+        MuleMessage message = factory.create(mockStream, encoding);
         assertNotNull(message);
 
         assertTrue(tempFile.exists());
@@ -82,7 +82,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
         file.deleteOnExit();
         ReceiverFileInputStream mockStream = new ReceiverFileInputStream(file, false, null);
 
-        MuleMessage message = factory.create(mockStream, encoding, muleContext);
+        MuleMessage message = factory.create(mockStream, encoding);
         assertThat(message.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
         assertThat(message.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
     }

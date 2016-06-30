@@ -58,7 +58,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
             }
         }
 
-        List<MuleEvent> results = new ArrayList<MuleEvent>(routes.size());
+        List<MuleEvent> results = new ArrayList<>(routes.size());
         try
         {
             for (int i = 0; i < routes.size(); i++)
@@ -99,7 +99,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
         {
             throw new CouldNotRouteOutboundMessageException(event, routes.get(0), e);
         }
-        return resultsHandler.aggregateResults(results, event, muleContext);
+        return resultsHandler.aggregateResults(results, event);
     }
 
 

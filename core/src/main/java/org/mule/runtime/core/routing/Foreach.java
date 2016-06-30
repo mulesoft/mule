@@ -266,7 +266,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                 Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();
                 for (Entry<?, ?> entry : set)
                 {
-                    MuleMessage splitMessage = new DefaultMuleMessage(entry.getValue(), muleContext);
+                    MuleMessage splitMessage = new DefaultMuleMessage(entry.getValue());
                     MuleEvent splitEvent = new DefaultMuleEvent(splitMessage, event);
                     // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
                     list.add(splitEvent);

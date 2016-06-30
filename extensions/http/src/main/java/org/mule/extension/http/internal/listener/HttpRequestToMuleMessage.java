@@ -109,7 +109,7 @@ public class HttpRequestToMuleMessage
 
         HttpRequestAttributes attributes = new HttpRequestAttributesBuilder().setRequestContext(requestContext)
                 .setListenerPath(listenerPath).setParts(parts).build();
-        return new DefaultMuleMessage(payload, dataTypeBuilder.build(), attributes, muleContext);
+        return new DefaultMuleMessage(payload, dataTypeBuilder.build(), attributes);
     }
 
 }

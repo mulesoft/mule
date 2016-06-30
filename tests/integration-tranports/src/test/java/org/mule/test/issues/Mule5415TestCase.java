@@ -42,7 +42,7 @@ public class Mule5415TestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         Map<String, Serializable> properties = new HashMap<>();
         properties.put("Content-Type","application/x-www-form-urlencoded");
-        MuleMessage message = client.send(String.format("http://localhost:%s?param1=1&param2=3", port1.getNumber()), new DefaultMuleMessage("message", properties, muleContext), newOptions().method(POST.name()).build());
+        MuleMessage message = client.send(String.format("http://localhost:%s?param1=1&param2=3", port1.getNumber()), new DefaultMuleMessage("message", properties), newOptions().method(POST.name()).build());
         assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
     }
 }

@@ -7,21 +7,19 @@
 package org.mule.extension.email.api.retriever;
 
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.INBOX_FOLDER;
+
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailPredicateBuilder;
 import org.mule.extension.email.internal.commands.DeleteCommand;
 import org.mule.extension.email.internal.commands.ListCommand;
 import org.mule.extension.email.internal.commands.StoreCommand;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
 import java.util.List;
 import java.util.function.Predicate;
-
-import javax.inject.Inject;
 
 /**
  * A set of operations for all email configurations that aims to retrieve and manage
@@ -31,10 +29,6 @@ import javax.inject.Inject;
  */
 public class RetrieverOperations
 {
-
-    //TODO: DELETE THIS WHEN MULE MESSAGE DOENST REQUIRE THE CONTEXT TO BE BUILT WITH ATTRIBUTES.
-    @Inject
-    private MuleContext context;
 
     private final ListCommand listCommand = new ListCommand();
     private final StoreCommand storeCommand = new StoreCommand();
@@ -56,7 +50,7 @@ public class RetrieverOperations
                                                            @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
                                                            @Optional EmailPredicateBuilder matchWith)
     {
-        return listCommand.list(connection, context, mailboxFolder, config.isEagerlyFetchContent(), buildMatcher(matchWith));
+        return listCommand.list(connection, mailboxFolder, config.isEagerlyFetchContent(), buildMatcher(matchWith));
     }
 
     /**

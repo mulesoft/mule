@@ -10,12 +10,13 @@ import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,13 +29,15 @@ import org.slf4j.LoggerFactory;
  * not "jms.queue".
  */
 
-public class WildcardFilter implements Filter, ObjectFilter
+public class WildcardFilter implements Filter, ObjectFilter, MuleContextAware
 {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected volatile String pattern;
     protected volatile String[] patterns;
     private volatile boolean caseSensitive = true;
+
+    private MuleContext muleContext;
 
     public WildcardFilter()
     {
@@ -51,7 +54,7 @@ public class WildcardFilter implements Filter, ObjectFilter
     {
         try
         {
-            return accept(message.getMuleContext().getTransformationService().transform(message, DataType.STRING).getPayload());
+            return accept(muleContext.getTransformationService().transform(message, DataType.STRING).getPayload());
         }
         catch (Exception e)
         {
@@ -193,5 +196,11 @@ public class WildcardFilter implements Filter, ObjectFilter
     public int hashCode()
     {
         return hash(new Object[]{this.getClass(), pattern, patterns, caseSensitive});
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 }

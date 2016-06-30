@@ -120,7 +120,7 @@ public class FutureMessageResult extends FutureTask
             }
             else
             {
-                result = new DefaultMuleMessage(obj, muleContext);
+                result = new DefaultMuleMessage(obj);
             }
 
             synchronized (this)

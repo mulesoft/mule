@@ -32,7 +32,7 @@ public class MulticastWithXaTestCase extends FunctionalTestCase
     public void testName() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage msg = new DefaultMuleMessage("Hi", muleContext);
+        MuleMessage msg = new DefaultMuleMessage("Hi");
         client.dispatch("jms://Myflow.input?connector=simpleJmsConnector", msg);
         MuleMessage result = client.request("jms://Myflow.finishedOriginal?connector=simpleJmsConnector", 10000);
         assertNotNull(result);

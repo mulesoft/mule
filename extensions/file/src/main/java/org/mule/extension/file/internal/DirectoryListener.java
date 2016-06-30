@@ -349,7 +349,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
             payload = new FileInputStream(path, new NullPathLock());
         }
 
-        message = (MuleMessage) new DefaultMuleMessage(payload, dataType, attributes, muleContext);
+        message = new DefaultMuleMessage(payload, dataType, attributes);
         return message;
     }
 

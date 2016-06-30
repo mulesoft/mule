@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPER
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.functional.functional.FunctionalTestNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -30,6 +31,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,7 +52,7 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements F
 
     private static final String SOAP_RESPONSE = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns1:onReceiveResponse xmlns:ns1=\"http://functional.functional.mule.org/\"><ns1:return xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xsd:string\">Test String Received</ns1:return></ns1:onReceiveResponse></soap:Body></soap:Envelope>";
 
-    private List<MuleMessage> notificationMsgList = new ArrayList<MuleMessage>();
+    private List<MuleMessage> notificationMsgList = new ArrayList<>();
     private Latch latch = new Latch();
 
     @Rule
@@ -81,14 +83,14 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements F
 
         String myProperty = "myProperty";
 
-        HashMap<String, Serializable> props = new HashMap<>();
+        Map<String, Serializable> props = new HashMap<>();
         props.put(MULE_USER_PROPERTY, "alan");
         props.put(MULE_METHOD_PROPERTY, "onReceive");
         props.put(myProperty, myProperty);
 
         MuleMessage reply = muleContext.getClient().send(
                 String.format(endpointAddress),
-                new DefaultMuleMessage(REQUEST_PAYLOAD, props, muleContext), HTTP_REQUEST_OPTIONS);
+                new DefaultMuleMessage(REQUEST_PAYLOAD, props), HTTP_REQUEST_OPTIONS);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

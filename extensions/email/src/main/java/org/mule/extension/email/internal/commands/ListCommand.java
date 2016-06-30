@@ -8,13 +8,13 @@ package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.extension.email.internal.builder.EmailAttributesBuilder.fromMessage;
+
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.retriever.RetrieverConnection;
 import org.mule.extension.email.internal.EmailContentProcessor;
 import org.mule.extension.email.internal.exception.EmailRetrieverException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleContext;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -43,13 +43,11 @@ public final class ListCommand
      * should NOT be read ({@code readContent} = false) the SEEN flag is not going to be set.
      *
      * @param connection  the associated {@link RetrieverConnection}.
-     * @param context     the mule context to create the result message.
      * @param folderName  the name of the folder where the emails are stored.
      * @param readContent if should read the email content or not.
      * @param matcher     a {@link Predicate} of {@link EmailAttributes} used to filter the output list  @return a {@link List} of {@link MuleMessage} carrying all the emails and it's corresponding attributes.
      */
     public List<MuleMessage<String, EmailAttributes>> list(RetrieverConnection connection,
-                                                           MuleContext context,
                                                            String folderName,
                                                            boolean readContent,
                                                            Predicate<EmailAttributes> matcher)
@@ -69,7 +67,7 @@ public final class ListCommand
                         body = EmailContentProcessor.process(m).getBody();
                         attributes = fromMessage(m);
                     }
-                    list.add((MuleMessage) new DefaultMuleMessage(body, null, attributes, context));
+                    list.add(new DefaultMuleMessage(body, null, attributes));
                 }
             }
             return list;

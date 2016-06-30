@@ -54,7 +54,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
     protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<MessageProcessor>();
+    protected List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<>();
 
     protected AtomicBoolean initialised = new AtomicBoolean(false);
 
@@ -214,7 +214,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
                 // Create an ExceptionMessage which contains the original payload, the exception, and some additional context info.
                 ExceptionMessage msg = new ExceptionMessage(event, t, component, endpointUri);
-                MuleMessage exceptionMessage = new DefaultMuleMessage(msg, event.getMessage(), muleContext);
+                MuleMessage exceptionMessage = new DefaultMuleMessage(msg, event.getMessage());
 
                 MulticastingRouter router = buildRouter();
                 router.setRoutes(getMessageProcessors());

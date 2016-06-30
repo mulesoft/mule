@@ -91,7 +91,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
         assertEquals(filter, router.getFilter());
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
 
         assertTrue(router.isMatch(getTestEvent(message)));
 
@@ -128,7 +128,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
         endpoints.add(mockendpoint2);
         router.setRoutes(endpoints);
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
 
         assertTrue(router.isMatch(getTestEvent(message)));
         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
@@ -164,7 +164,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
         router.setRoutes(endpoints);
         router.setEnableCorrelation(CorrelationMode.NEVER);
 
-        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
         message.setOutboundProperty(MULE_CORRELATION_ID_PROPERTY, "MyCustomCorrelationId");
 
         assertTrue(router.isMatch(getTestEvent(message)));

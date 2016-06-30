@@ -8,6 +8,7 @@ package org.mule.runtime.core.el;
 
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -74,6 +75,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
         Apple apple = new Apple();
         FruitCleaner fruitCleaner = new FruitCleaner()
         {
+            @Override
             public void wash(Fruit fruit)
             {
             }
@@ -108,8 +110,8 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
     @Test
     public void enrichFlowVariable() throws Exception
     {
-        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("", muleContext),
-            MessageExchangePattern.ONE_WAY, new Flow("flow", muleContext));
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(""),
+                MessageExchangePattern.ONE_WAY, new Flow("flow", muleContext));
         expressionManager.enrich("flowVars['foo']", event, "bar");
         Assert.assertEquals("bar", event.getFlowVariable("foo"));
         Assert.assertNull(event.getSession().getProperty("foo"));
@@ -118,8 +120,8 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
     @Test
     public void enrichSessionVariable() throws Exception
     {
-        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("", muleContext),
-            MessageExchangePattern.ONE_WAY, new Flow("flow", muleContext));
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(""),
+                MessageExchangePattern.ONE_WAY, new Flow("flow", muleContext));
         expressionManager.enrich("sessionVars['foo']", event, "bar");
         Assert.assertEquals("bar", event.getSession().getProperty("foo"));
         Assert.assertNull(event.getFlowVariable("foo"));

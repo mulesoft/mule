@@ -118,7 +118,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
                     endpointBuilder);
         }
 
-        MutableMuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, outboundEndpoint.getProperties(), muleContext);
+        MutableMuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, outboundEndpoint.getProperties());
         if (etag != null && checkEtag)
         {
             request.setOutboundProperty(HEADER_IF_NONE_MATCH, etag);

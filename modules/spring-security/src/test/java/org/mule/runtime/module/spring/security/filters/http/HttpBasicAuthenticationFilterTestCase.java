@@ -15,6 +15,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -33,7 +34,7 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
     {
         MuleEvent oldEvent = RequestContext.getEvent();
 
-        MuleEvent event = getTestEvent(new DefaultMuleMessage("a", singletonMap(AUTHORIZATION, "Basic a"), null, null, muleContext));
+        MuleEvent event = getTestEvent(new DefaultMuleMessage("a", singletonMap(AUTHORIZATION, "Basic a"), null, null));
         RequestContext.setEvent(event);
 
         HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();
@@ -41,7 +42,7 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
         SecurityManager manager = mock(SecurityManager.class);
         filter.setSecurityManager(manager);
 
-        doThrow(new UnauthorisedException(null, (MuleEvent) null)).when(manager).authenticate(anyObject());
+        doThrow(new UnauthorisedException(null, (MuleEvent) event)).when(manager).authenticate(anyObject());
 
         try
         {

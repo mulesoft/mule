@@ -82,7 +82,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String, Serializable>) null);
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
         registerExceptionNotificationListener();
@@ -96,7 +96,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testExceptionInCxfService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
         registerExceptionNotificationListener();

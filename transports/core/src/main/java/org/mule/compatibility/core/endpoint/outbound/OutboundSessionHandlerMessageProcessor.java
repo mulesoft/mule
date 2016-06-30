@@ -29,7 +29,7 @@ public class OutboundSessionHandlerMessageProcessor implements MessageProcessor
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        sessionHandler.storeSessionInfoToMessage(event.getSession(), event.getMessage());
+        sessionHandler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), event.getMuleContext());
         return event;
     }
 

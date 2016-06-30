@@ -119,7 +119,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     @Test
     public void testRouterMesseageSequence() throws Exception
     {
-        assertRouted(new IteratorMessageSequence<String>(TEST_LIST_MULTIPLE.iterator()), 3, false);
+        assertRouted(new IteratorMessageSequence<>(TEST_LIST_MULTIPLE.iterator()), 3, false);
     }
 
     /**
@@ -131,7 +131,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         Object payload = Collections.emptySet();
         Flow fc = getTestFlow();
         MuleSession session = getTestSession(fc, muleContext);
-        MuleMessage toSplit = new DefaultMuleMessage(payload, new HashMap<>(), new HashMap<>(), null, muleContext);
+        MuleMessage toSplit = new DefaultMuleMessage(payload, new HashMap<>(), new HashMap<>(), null);
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(toSplit, fc, session);
@@ -141,7 +141,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     @Test
     public void testSingleMesseageSequence() throws Exception
     {
-        assertRouted(new IteratorMessageSequence<String>(TEST_LIST_SINGLE.iterator()), 1, false);
+        assertRouted(new IteratorMessageSequence<>(TEST_LIST_SINGLE.iterator()), 1, false);
     }
 
     private void assertRouted(Object payload, int count, boolean counted) throws Exception, MuleException
@@ -164,13 +164,13 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         invocationProps.put("invoke2", 6);
         invocationProps.put("invoke3", session);
 
-        Set<Integer> expectedSequences = new HashSet<Integer>();
+        Set<Integer> expectedSequences = new HashSet<>();
         for (int i = 1; i <= count; i++)
         {
             expectedSequences.add(i);
         }
 
-        MuleMessage toSplit = new DefaultMuleMessage(payload, inboundProps, outboundProps, null, muleContext);
+        MuleMessage toSplit = new DefaultMuleMessage(payload, inboundProps, outboundProps, null);
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
         Grabber grabber = new Grabber();
@@ -184,7 +184,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         List<MuleEvent> splits = grabber.getEvents();
         assertEquals(count, splits.size());
 
-        Set<Object> actualSequences = new HashSet<Object>();
+        Set<Object> actualSequences = new HashSet<>();
         assertSplitParts(count, counted, inboundProps, outboundProps, invocationProps, splits,
             actualSequences);
         assertEquals(expectedSequences, actualSequences);

@@ -99,8 +99,7 @@ public class HttpRequester
         // Create a new muleEvent based on the old and the response so that the auth can use it
         MuleEvent responseEvent = new DefaultMuleEvent(new DefaultMuleMessage(responseMessage.getPayload(),
                 (DataType) responseMessage.getDataType(),
-                responseMessage.getAttributes(),
-                muleEvent.getMuleContext()),
+                responseMessage.getAttributes()),
                                                        muleEvent,
                                                        muleEvent.isSynchronous());
         if (resendRequest(responseEvent, checkRetry, authentication))
@@ -109,7 +108,7 @@ public class HttpRequester
             responseMessage = doRequest(responseEvent, client, requestBuilder, false);
         }
         notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
-        responseValidator.validate(responseMessage);
+        responseValidator.validate(responseMessage, muleEvent.getMuleContext());
         return responseMessage;
     }
 

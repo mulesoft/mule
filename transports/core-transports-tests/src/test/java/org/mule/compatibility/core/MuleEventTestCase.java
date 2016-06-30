@@ -192,6 +192,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase
             payload.append("1234567890");
         }
         MuleEvent testEvent = getTestEvent(new ByteArrayInputStream(payload.toString().getBytes()));
+        RequestContext.setEvent(testEvent);
         byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
         testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);
 

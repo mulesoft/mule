@@ -98,7 +98,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testEmptyHttpResponseBuilder() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
+        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY);
 
         mockParse();
         HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
@@ -112,7 +112,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseBuilderAttributes() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
+        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY);
 
         httpResponseBuilder.setContentType("text/html");
         httpResponseBuilder.setStatus(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR));
@@ -129,7 +129,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseBuilderAttributesWithExpressions() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY, muleContext);
+        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY);
 
         httpResponseBuilder.setStatus(HEADER_STATUS);
         httpResponseBuilder.setContentType(HEADER_CONTENT_TYPE);
@@ -419,7 +419,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         outboundProperties.put(HttpConstants.HEADER_LOCATION, "http://localhost:9090");
 
         mockParse();
-        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY, outboundProperties, muleContext);
+        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY, outboundProperties);
 
         HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
         Header[] resultHeaders = httpResponse.getHeaders();

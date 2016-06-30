@@ -64,7 +64,7 @@ public class TransformerEncodingTestCase extends FunctionalTestCase
 
     private MutableMuleMessage getMuleMessage() throws IOException
     {
-        return new DefaultMuleMessage(Base64.encodeBytes(PAYLOAD.getBytes(UTF_16_LE)), muleContext);
+        return new DefaultMuleMessage(Base64.encodeBytes(PAYLOAD.getBytes(UTF_16_LE)));
     }
 
 }

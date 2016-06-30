@@ -8,6 +8,7 @@ package org.mule.module.socket.api.connection.tcp;
 
 import static java.lang.String.format;
 import static org.mule.module.socket.internal.SocketUtils.configureConnection;
+
 import org.mule.module.socket.api.connection.ConnectionSettings;
 import org.mule.module.socket.api.connection.ListenerConnection;
 import org.mule.module.socket.api.connection.udp.UdpListenerConnection;
@@ -21,7 +22,6 @@ import org.mule.module.socket.internal.worker.TcpWorker;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.Source;
 
@@ -65,11 +65,11 @@ public final class TcpListenerConnection extends AbstractTcpConnection implement
      * @throws IOException         if the socket was close while blocked on {@link DatagramSocket#receive(DatagramPacket)} method.
      */
     @Override
-    public SocketWorker listen(MuleContext muleContext, MessageHandler<InputStream, SocketAttributes> messageHandler) throws IOException, ConnectionException
+    public SocketWorker listen(MessageHandler<InputStream, SocketAttributes> messageHandler) throws IOException, ConnectionException
     {
         Socket newConnection = acceptConnection();
         configureConnection(newConnection, socketProperties);
-        return new TcpWorker(newConnection, protocol, muleContext, messageHandler);
+        return new TcpWorker(newConnection, protocol, messageHandler);
     }
 
     @Override

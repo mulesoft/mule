@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.session;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
@@ -27,14 +28,14 @@ public abstract class AbstractSessionHandler implements SessionHandler
 
     private ObjectSerializerLocator objectSerializerLocator = new FromMessageObjectSerializerLocator();
 
-    protected <T> T deserialize(MuleMessage message, byte[] bytes)
+    protected <T> T deserialize(MuleMessage message, byte[] bytes, MuleContext muleContext)
     {
-        T object = objectSerializerLocator.getObjectSerializer(message).deserialize(bytes, message.getMuleContext().getExecutionClassLoader());
+        T object = objectSerializerLocator.getObjectSerializer(message, muleContext).deserialize(bytes, muleContext.getExecutionClassLoader());
         if (object instanceof DeserializationPostInitialisable)
         {
             try
             {
-                DeserializationPostInitialisable.Implementation.init(object, message.getMuleContext());
+                DeserializationPostInitialisable.Implementation.init(object, muleContext);
             }
             catch (Exception e)
             {
@@ -45,9 +46,9 @@ public abstract class AbstractSessionHandler implements SessionHandler
         return object;
     }
 
-    protected byte[] serialize(MuleMessage message, Object object)
+    protected byte[] serialize(MuleMessage message, Object object, MuleContext muleContext)
     {
-        return objectSerializerLocator.getObjectSerializer(message).serialize(object);
+        return objectSerializerLocator.getObjectSerializer(message, muleContext).serialize(object);
     }
 
     @Inject
@@ -60,7 +61,7 @@ public abstract class AbstractSessionHandler implements SessionHandler
     private interface ObjectSerializerLocator
     {
 
-        ObjectSerializer getObjectSerializer(MuleMessage message);
+        ObjectSerializer getObjectSerializer(MuleMessage message, MuleContext muleContext);
     }
 
     private class FixedObjectSerializerLocator implements ObjectSerializerLocator
@@ -74,7 +75,7 @@ public abstract class AbstractSessionHandler implements SessionHandler
         }
 
         @Override
-        public ObjectSerializer getObjectSerializer(MuleMessage message)
+        public ObjectSerializer getObjectSerializer(MuleMessage message, MuleContext muleContext)
         {
             return objectSerializer;
         }
@@ -84,9 +85,9 @@ public abstract class AbstractSessionHandler implements SessionHandler
     {
 
         @Override
-        public ObjectSerializer getObjectSerializer(MuleMessage message)
+        public ObjectSerializer getObjectSerializer(MuleMessage message, MuleContext muleContext)
         {
-            return message.getMuleContext().getObjectSerializer();
+            return muleContext.getObjectSerializer();
         }
     }
 }

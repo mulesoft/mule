@@ -26,13 +26,13 @@ public interface MuleMessageFactory
      * Creates a {@link MuleMessage} instance from <code>transportMessage</code> by extracting
      * its payload and, if available, any relevant message properties and attachments.
      */
-    MutableMuleMessage create(Object transportMessage, Charset encoding, MuleContext muleContext) throws Exception;
+    MutableMuleMessage create(Object transportMessage, Charset encoding) throws Exception;
 
     /**
      * Creates a {@link MuleMessage} instance by extracting the payload from
      * <code>transportMessage</code>. Additional message properties will be taken from
      * <code>previousMessage</code>.
      */
-    MutableMuleMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding, MuleContext muleContext)
+    MutableMuleMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding)
             throws Exception;
 }

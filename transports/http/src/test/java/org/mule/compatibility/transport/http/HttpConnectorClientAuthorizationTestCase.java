@@ -75,7 +75,7 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
     @Before
     public void setup() throws URISyntaxException {
         uri = new URI(URI_WITHOUT_CREDENTIALS);
-        message = new DefaultMuleMessage(StringUtils.EMPTY, muleContext);
+        message = new DefaultMuleMessage(StringUtils.EMPTY);
         encoding = getDefaultEncoding(muleContext);
         connector = new HttpConnector(muleContext);
         connector.setName("test");
