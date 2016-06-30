@@ -66,10 +66,24 @@
         <httpn:listener config-ref="listenerConfig" path="${filePath}">
             <httpn:response-builder>
                 <httpn:simple-response-builder partsRef="#[parts]"/>
-            </httpn:response-builder>        
+            </httpn:response-builder>
         </httpn:listener>
         <custom-processor
                 class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartsMessageProcessor"/>
+        <echo-component/>
+    </flow>
+
+
+    <flow name="fixedPart">
+        <httpn:listener config-ref="listenerConfig" path="fixedPart">
+            <httpn:response-builder>
+                <httpn:simple-response-builder>
+                    <httpn:parts>
+                        <httpn:part id="field1" data="yes" contentType="text/json"/>
+                    </httpn:parts>
+                </httpn:simple-response-builder>
+            </httpn:response-builder>
+        </httpn:listener>
         <echo-component/>
     </flow>
 

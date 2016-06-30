@@ -43,7 +43,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -128,6 +127,13 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
     }
 
     @Test
+    public void fixedPartContent() throws Exception
+    {
+        String contentLengthValue = getResponseWithExpectedAttachmentFrom("fixedPart", CONTENT_LENGTH);
+        assertThat(contentLengthValue, is(notNullValue()));
+    }
+
+    @Test
     public void respondWithAttachmentsChunked() throws Exception
     {
         String transferEncodingValue = getResponseWithExpectedAttachmentFrom(chunked.getValue(), TRANSFER_ENCODING);
@@ -161,7 +167,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
             httpPost.setEntity(getMultipartEntity(false));
             try (CloseableHttpResponse response = httpClient.execute(httpPost))
             {
-                assertThat(countMatches(IOUtils.toString(response.getEntity().getContent()),CONTENT_TYPE), is(1));
+                assertThat(countMatches(IOUtils.toString(response.getEntity().getContent()), CONTENT_TYPE), is(1));
             }
         }
     }
@@ -279,6 +285,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
 
     public static class CreatePartMessageProcessor implements MessageProcessor
     {
+
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
@@ -293,6 +300,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
 
     public static class CreatePartsMessageProcessor implements MessageProcessor
     {
+
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
@@ -311,6 +319,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
 
     public static class ConvertPartsMessageProcessor implements MessageProcessor
     {
+
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
@@ -326,9 +335,9 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
                                                     filename = dataHandler.getName();
                                                 }
                                                 parts.add(new org.mule.extension.http.api.HttpPart(id,
-                                                                       dataHandler.getContent(),
-                                                                       DataType.builder().mediaType(dataHandler.getContentType()).build().getMediaType(),
-                                                                       filename));
+                                                                                                   dataHandler.getContent(),
+                                                                                                   DataType.builder().mediaType(dataHandler.getContentType()).build().getMediaType(),
+                                                                                                   filename));
                                             }
                                             catch (IOException e)
                                             {

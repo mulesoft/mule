@@ -22,7 +22,7 @@ public interface ReadCommand
 {
 
     /**
-     * Reads files under the considerations of {@link FileSystem#read(MuleMessage, String, boolean)}
+     * Reads files under the considerations of {@link FileSystem#read(FileConnectorConfig, MuleMessage, String, boolean)}
      *
      * @param config   the config that is parameterizing this operation
      * @param message  the incoming MuleMessage

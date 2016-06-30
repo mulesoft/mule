@@ -14,15 +14,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +43,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase
     @Mock
     private MuleContext muleContext;
 
-    private CachedConnectionHandler<Apple, Banana> managedConnection;
+    private CachedConnectionHandler<Banana> managedConnection;
 
     @Before
     public void before() throws Exception

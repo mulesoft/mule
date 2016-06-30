@@ -37,7 +37,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isMultiLevelMetadataKeyId;
-
 import org.mule.api.MuleVersion;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -70,6 +69,7 @@ import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
@@ -110,6 +110,7 @@ import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.NoReferencesModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
@@ -526,7 +527,8 @@ public final class AnnotationsBasedDescriber implements Describer
         return parameter;
     }
 
-    private Set<ParameterDeclarer> declareSingleParameters(Collection<Field> parameterFields, ParameterizedDeclarer parameterizedDeclarer,
+    private Set<ParameterDeclarer> declareSingleParameters(Collection<Field> parameterFields,
+                                                           ParameterizedDeclarer parameterizedDeclarer,
                                                            ModelPropertyContributor... contributors)
     {
         return parameterFields.stream()
@@ -745,6 +747,11 @@ public final class AnnotationsBasedDescriber implements Describer
                 }
 
                 parseMetadataAnnotations(parsedParameter, parameter);
+
+                if (parsedParameter.isAnnotationPresent(NoRef.class))
+                {
+                    parameter.withModelProperty(new NoReferencesModelProperty());
+                }
             }
 
             if (parsedParameter.isAnnotationPresent(Connection.class))

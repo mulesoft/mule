@@ -15,6 +15,7 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class SocketOperations
      */
     @MetadataScope(outputResolver = SocketMetadataResolver.class, keysResolver = SocketMetadataResolver.class)
     public MuleMessage<?, ?> send(@Connection RequesterConnection connection,
-                                  @Optional(defaultValue = "#[payload]") Object data,
+                                  @Optional(defaultValue = "#[payload]") @NoRef Object data,
                                   String hasResponse, // TODO Add metadata https://www.mulesoft.org/jira/browse/MULE-9894
                                   @Optional(defaultValue = "UTF-8") String encoding, //TODO support encoding MULE-9900
                                   MuleMessage<?, ?> muleMessage) throws ConnectionException, IOException
