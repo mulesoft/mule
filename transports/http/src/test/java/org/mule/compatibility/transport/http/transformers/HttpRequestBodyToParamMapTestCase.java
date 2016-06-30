@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -43,7 +44,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
+public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCase
 {
 
     @Mock(answer = RETURNS_DEEP_STUBS)
@@ -59,31 +60,31 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void validGet() throws TransformerException
+    public void validGet() throws Exception
     {
         MuleMessage msg = createMessage(METHOD_GET, DEFAULT_CONTENT_TYPE);
-        verifyTransformation(transform(new DefaultMuleEvent(msg, (FlowConstruct) null)));
+        verifyTransformation(transform(new DefaultMuleEvent(msg, getTestFlow())));
     }
 
     @Test
-    public void validPost() throws TransformerException
+    public void validPost() throws Exception
     {
         MuleMessage msg = createMessage(METHOD_POST, FORM_URLENCODED_CONTENT_TYPE);
-        verifyTransformation(transform(new DefaultMuleEvent(msg, (FlowConstruct) null)));
+        verifyTransformation(transform(new DefaultMuleEvent(msg, getTestFlow())));
     }
 
     @Test
-    public void validPut() throws TransformerException
+    public void validPut() throws Exception
     {
         MuleMessage msg = createMessage(METHOD_PUT, FORM_URLENCODED_CONTENT_TYPE);
-        verifyTransformation(transform(new DefaultMuleEvent(msg, (FlowConstruct) null)));
+        verifyTransformation(transform(new DefaultMuleEvent(msg, getTestFlow())));
     }
 
     @Test(expected = TransformerException.class)
-    public void invalidContentType() throws TransformerException
+    public void invalidContentType() throws Exception
     {
         MuleMessage msg = createMessage(METHOD_POST, "application/json");
-        transform(new DefaultMuleEvent(msg, (FlowConstruct) null));
+        transform(new DefaultMuleEvent(msg, getTestFlow()));
     }
 
     private Object transform(MuleEvent event) throws TransformerException

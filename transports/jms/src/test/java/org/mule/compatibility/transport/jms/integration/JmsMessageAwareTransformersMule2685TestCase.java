@@ -6,11 +6,15 @@
  */
 package org.mule.compatibility.transport.jms.integration;
 
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.mockito.internal.matchers.InstanceOf;
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -24,6 +28,8 @@ import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.hamcrest.core.IsInstanceOf;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +74,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
         MuleMessage message = getTestMuleMessage("This is a test TextMessage");
 
         SetTestRecipientsTransformer trans = new SetTestRecipientsTransformer();
+        trans.setMuleContext(muleContext);
         MuleMessage result1 = (MuleMessage) trans.transform(message);
 
         // Check that transformer 1 set message property ok.
@@ -75,11 +82,12 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
                      result1.getOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY));
 
         AbstractJmsTransformer trans2 = new SessionEnabledObjectToJMSMessage(session);
+        trans2.setMuleContext(muleContext);
         Message result2 = (Message) trans2.transform(result1);
 
         // Test to see that ObjectToJMSMessage transformer transformed to JMS message
         // correctly
-        assertTrue("Transformed object should be a TextMessage", result2 instanceof TextMessage);
+        assertThat(result2, instanceOf(TextMessage.class));
         assertEquals("This is a test TextMessage", ((TextMessage) result2).getText());
 
         // Check to see if after the ObjectToJMSMessage transformer these properties

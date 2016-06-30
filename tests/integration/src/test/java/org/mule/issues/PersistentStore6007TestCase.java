@@ -75,12 +75,12 @@ public class PersistentStore6007TestCase extends FunctionalTestCase
     {
         private static Map<Serializable, Serializable> events = new HashMap<>();
 
-        static void addEvents()
+        static void addEvents() throws Exception
         {
             for (String str : new String[] {"A", "B", "C"})
             {
                 MuleMessage msg = new DefaultMuleMessage(str);
-                MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, null, new DefaultMuleSession());
+                MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, getTestFlow(), new DefaultMuleSession());
                 events.put(AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey(event), event);
             }
         }

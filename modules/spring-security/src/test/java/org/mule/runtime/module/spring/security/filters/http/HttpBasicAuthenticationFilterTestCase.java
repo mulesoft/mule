@@ -42,7 +42,7 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
         SecurityManager manager = mock(SecurityManager.class);
         filter.setSecurityManager(manager);
 
-        doThrow(new UnauthorisedException(null, (MuleEvent) null)).when(manager).authenticate(anyObject());
+        doThrow(new UnauthorisedException(null, (MuleEvent) event)).when(manager).authenticate(anyObject());
 
         try
         {

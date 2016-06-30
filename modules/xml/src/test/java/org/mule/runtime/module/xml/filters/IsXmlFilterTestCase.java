@@ -11,6 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.xml.filters.IsXmlFilter;
@@ -63,7 +65,7 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testFilterNull() throws Exception
     {
-        assertFalse(filter.accept(new DefaultMuleMessage(null)));
+        assertFalse(filter.accept(new DefaultMuleMessage(NullPayload.getInstance())));
     }
 
     @Test
