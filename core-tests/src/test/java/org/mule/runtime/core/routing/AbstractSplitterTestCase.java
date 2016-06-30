@@ -51,7 +51,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase
         fruitBowl.addFruit(banana);
         fruitBowl.addFruit(orange);
 
-        MuleEvent inEvent = new DefaultMuleEvent(new DefaultMuleMessage(fruitBowl, muleContext),
+        MuleEvent inEvent = new DefaultMuleEvent(new DefaultMuleMessage(fruitBowl),
             getTestEvent(""));
 
         MuleEvent resultEvent = splitter.process(inEvent);
@@ -83,7 +83,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase
         fruitBowl.addFruit(banana);
         fruitBowl.addFruit(orange);
 
-        MuleEvent inEvent = new DefaultMuleEvent(new DefaultMuleMessage(fruitBowl, muleContext),
+        MuleEvent inEvent = new DefaultMuleEvent(new DefaultMuleMessage(fruitBowl),
                 getTestEvent(""));
 
         MuleEvent resultEvent = splitter.process(inEvent);
@@ -93,7 +93,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase
 
     private static class MultipleEventSensingMessageProcessor implements MessageProcessor
     {
-        List<MuleEvent> events = new ArrayList<MuleEvent>();
+        List<MuleEvent> events = new ArrayList<>();
 
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
@@ -112,7 +112,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase
             List<MuleEvent> parts = new ArrayList<>();
             for (Fruit fruit : bowl.getFruit())
             {
-                parts.add(new DefaultMuleEvent(new DefaultMuleMessage(fruit, muleContext), event));
+                parts.add(new DefaultMuleEvent(new DefaultMuleMessage(fruit), event));
             }
             return parts;
         }

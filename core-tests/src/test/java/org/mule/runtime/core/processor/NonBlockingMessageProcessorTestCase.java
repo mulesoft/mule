@@ -11,13 +11,14 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+
+import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
-import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.construct.Flow;
@@ -66,7 +67,7 @@ public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTest
     {
         Flow flow = MuleTestUtils.getTestFlow(muleContext);
         flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, muleContext),
+        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE),
                                                  MessageExchangePattern.REQUEST_RESPONSE,
                                                  new SensingNullReplyToHandler(), flow);
     }
@@ -79,6 +80,7 @@ public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTest
             return event;
         }
 
+        @Override
         public void processNonBlocking(final MuleEvent event, CompletionHandler completionHandler)
         {
         }

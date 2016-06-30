@@ -32,6 +32,7 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.WORKSTATION_DEBUG;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -100,7 +101,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         requester.setPath("/");
         requester.setRequestBuilder(createRequestBuilder());
 
-        message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        message = new DefaultMuleMessage(TEST_MESSAGE);
         event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, mock(Flow.class));
     }
 

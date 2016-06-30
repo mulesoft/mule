@@ -8,6 +8,7 @@ package org.mule.module.socket.internal.worker;
 
 import static java.lang.String.format;
 import static org.mule.module.socket.internal.SocketUtils.createMuleMessage;
+
 import org.mule.module.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.module.socket.api.protocol.TcpProtocol;
 import org.mule.module.socket.api.source.ImmutableSocketAttributes;
@@ -51,10 +52,10 @@ public final class TcpWorker extends SocketWorker
     private boolean dataInWorkFinished = false;
     private AtomicBoolean moreMessages = new AtomicBoolean(true); // can be set on completion's callback
 
-    public TcpWorker(Socket socket, TcpProtocol protocol, MuleContext muleContext,
+    public TcpWorker(Socket socket, TcpProtocol protocol,
                      MessageHandler<InputStream, SocketAttributes> messageHandler) throws IOException
     {
-        super(muleContext, messageHandler);
+        super(messageHandler);
         this.socket = socket;
         this.protocol = protocol;
 
@@ -169,7 +170,7 @@ public final class TcpWorker extends SocketWorker
             }
 
             SocketAttributes attributes = new ImmutableSocketAttributes(socket);
-            messageHandler.handle(createMuleMessage(content, attributes, muleContext), new CompletionHandler<MuleEvent, Exception, MuleEvent>()
+            messageHandler.handle(createMuleMessage(content, attributes), new CompletionHandler<MuleEvent, Exception, MuleEvent>()
             {
                 @Override
                 public void onCompletion(MuleEvent muleEvent, ExceptionCallback<MuleEvent, Exception> exceptionCallback)

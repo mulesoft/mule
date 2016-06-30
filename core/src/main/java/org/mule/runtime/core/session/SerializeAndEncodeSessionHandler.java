@@ -28,7 +28,7 @@ import java.io.IOException;
 public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandler
 {
     @Override
-    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
+    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException
     {
         MuleSession session = null;
         String serializedEncodedSession = message.getInboundProperty(MULE_SESSION_PROPERTY);
@@ -38,7 +38,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
             byte[] serializedSession = Base64.decodeWithoutUnzipping(serializedEncodedSession);
             if (serializedSession != null)
             {
-                session = deserialize(message, serializedSession);
+                session = deserialize(message, serializedSession, muleContext);
             }
         }
         return session;
@@ -48,7 +48,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
     public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException
     {        
         session = removeNonSerializableProperties(session, context);
-        byte[] serializedSession = serialize(message, session);
+        byte[] serializedSession = serialize(message, session, context);
 
         String serializedEncodedSession;
         try

@@ -75,7 +75,7 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String, Serializable>) null);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -86,7 +86,7 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfSimpleService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testSimpleServiceWithFault", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -97,7 +97,7 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase
     @Test
     public void testExceptionThrownInTransformer() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -108,7 +108,7 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase
     @Test
     public void testUnwrapException() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);

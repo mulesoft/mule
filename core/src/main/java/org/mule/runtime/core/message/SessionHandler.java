@@ -20,6 +20,6 @@ public interface SessionHandler
 
     MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException;
 
-    MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException;
+    MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException;
 
 }

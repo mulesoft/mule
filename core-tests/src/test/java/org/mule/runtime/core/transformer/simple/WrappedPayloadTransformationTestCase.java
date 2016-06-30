@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class WrappedPayloadTransformationTestCase extends HexStringByteArrayTransformersTestCase
 {
@@ -20,7 +20,7 @@ public class WrappedPayloadTransformationTestCase extends HexStringByteArrayTran
     @Test
     public void testPayloadWrappedInMuleMessage() throws TransformerException
     {
-        Object wrappedPayload = new DefaultMuleMessage(this.getResultData(), muleContext);
+        Object wrappedPayload = new DefaultMuleMessage(this.getResultData());
         assertEquals(this.getTestData(), this.getRoundTripTransformer().transform(wrappedPayload));
     }
 

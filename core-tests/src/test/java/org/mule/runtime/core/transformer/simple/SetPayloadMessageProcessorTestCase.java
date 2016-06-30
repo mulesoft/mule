@@ -27,10 +27,9 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.metadata.TypedValue;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +37,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
+public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
 
     private static final String PLAIN_TEXT = "This is a plain text";
@@ -52,7 +51,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
     private ExpressionManager expressionManager;
 
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
         setPayloadMessageProcessor = new SetPayloadMessageProcessor();
         muleContext = mock(MuleContext.class);
@@ -64,8 +63,8 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase
         when(expressionManager.parse(anyString(), any(MuleEvent.class))).thenAnswer(
                 invocation -> (String) invocation.getArguments()[0]);
 
-        muleMessage = new DefaultMuleMessage("", muleContext);
-        muleEvent = new DefaultMuleEvent(muleMessage, (FlowConstruct) null);
+        muleMessage = new DefaultMuleMessage("");
+        muleEvent = new DefaultMuleEvent(muleMessage, getTestFlow());
     }
 
     @Test

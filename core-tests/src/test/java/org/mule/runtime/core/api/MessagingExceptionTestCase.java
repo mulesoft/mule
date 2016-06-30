@@ -350,7 +350,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
         when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
         MuleMessage muleMessage = MuleMessage.builder().payload(payload).build();
 
-        when(transformationService.transform(muleMessage, DataType.STRING)).thenReturn(new DefaultMuleMessage(value, muleContext));
+        when(transformationService.transform(muleMessage, DataType.STRING)).thenReturn(new DefaultMuleMessage(value));
         when(testEvent.getMessage()).thenReturn(muleMessage);
         when(testEvent.getMuleContext()).thenReturn(mockContext);
         MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);

@@ -13,7 +13,6 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
@@ -59,14 +58,12 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
      *
      * @param results
      * @param previous
-     * @param muleContext
      * @return
      */
     @Override
     @SuppressWarnings(value = {"unchecked"})
     public MuleEvent aggregateResults(final List<MuleEvent> results,
-                                      final MuleEvent previous,
-                                      MuleContext muleContext)
+                                      final MuleEvent previous)
     {
         if (results == null)
         {
@@ -83,7 +80,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             {
                 if (returnCollectionWithSingleResult)
                 {
-                    return createMessageCollectionWithSingleMessage(event,muleContext);
+                    return createMessageCollectionWithSingleMessage(event);
                 }
                 else
                 {
@@ -114,28 +111,27 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
             }
             else
             {
-                return createMessageCollection(nonNullResults, previous, muleContext);
+                return createMessageCollection(nonNullResults, previous);
             }
         }
     }
 
-    private MuleEvent createMessageCollectionWithSingleMessage(MuleEvent event, MuleContext muleContext)
+    private MuleEvent createMessageCollectionWithSingleMessage(MuleEvent event)
     {
-        MuleMessage coll = new DefaultMuleMessage(singletonList(event.getMessage()), muleContext);
+        MuleMessage coll = new DefaultMuleMessage(singletonList(event.getMessage()));
         event.setMessage(coll);
         return OptimizedRequestContext.unsafeSetEvent(event);
     }
 
     private MuleEvent createMessageCollection(final List<MuleEvent> nonNullResults,
-                                              final MuleEvent previous,
-                                              MuleContext muleContext)
+                                              final MuleEvent previous)
     {
         List list = new ArrayList<>();
         for (MuleEvent event : nonNullResults)
         {
             list.add(event.getMessage());
         }
-        MutableMuleMessage coll = new DefaultMuleMessage(list, muleContext);
+        MutableMuleMessage coll = new DefaultMuleMessage(list);
         coll.propagateRootId(previous.getMessage());
         MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
         for (String name : previous.getFlowVariableNames())

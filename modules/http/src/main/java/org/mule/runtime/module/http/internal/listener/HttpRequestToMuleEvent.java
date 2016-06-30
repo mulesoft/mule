@@ -134,7 +134,7 @@ public class HttpRequestToMuleEvent
             }
         }
 
-        final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext, dataTypeBuilder.build());
+        final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, dataTypeBuilder.build());
         return new DefaultMuleEvent(
                 defaultMuleMessage,
                 resolveUri(requestContext),

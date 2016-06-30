@@ -42,25 +42,23 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     @Before
     public void initialise() throws MuleException 
     {
-        processedEvents = new ArrayList<MuleEvent>();
+        processedEvents = new ArrayList<>();
         simpleForeach = createForeach(getSimpleMessageProcessors());
         nestedForeach = createForeach(getNestedMessageProcessors());
     }
 
     private List<MessageProcessor> getSimpleMessageProcessors()
     {
-        List<MessageProcessor> lmp = new ArrayList<MessageProcessor>();
-        lmp.add(new MessageProcessor() {
-            @Override
-            public MuleEvent process(MuleEvent event) {
-                String payload = event.getMessage().getPayload().toString();
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setPayload(payload + ":foo");
-                    return msg;
-                }));
-                processedEvents.add(event);
-                return event;
-            }
+        List<MessageProcessor> lmp = new ArrayList<>();
+        lmp.add(event ->
+        {
+            String payload = event.getMessage().getPayload().toString();
+            event.setMessage(event.getMessage().transform(msg -> {
+                msg.setPayload(payload + ":foo");
+                return msg;
+            }));
+            processedEvents.add(event);
+            return event;
         });
         lmp.add(new TestMessageProcessor("zas"));
         return lmp;
@@ -68,7 +66,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
 
     private List<MessageProcessor> getNestedMessageProcessors() throws MuleException
     {
-        List<MessageProcessor> lmp = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> lmp = new ArrayList<>();
         Foreach internalForeach = new Foreach();
         internalForeach.setMessageProcessors(getSimpleMessageProcessors());
         lmp.add(internalForeach);
@@ -88,7 +86,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     @Test
     public void arrayListPayload() throws Exception
     {
-        List<String> arrayList = new ArrayList<String>();
+        List<String> arrayList = new ArrayList<>();
         arrayList.add("bar");
         arrayList.add("zip");
         simpleForeach.process(getTestEvent(arrayList));
@@ -111,9 +109,9 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     public void muleMessageCollectionPayload() throws Exception
     {
         List<MuleMessage> list = new ArrayList<>();
-        list.add(new DefaultMuleMessage("bar", muleContext));
-        list.add(new DefaultMuleMessage("zip", muleContext));
-        MuleMessage msgCollection = new DefaultMuleMessage(list, muleContext);
+        list.add(new DefaultMuleMessage("bar"));
+        list.add(new DefaultMuleMessage("zip"));
+        MuleMessage msgCollection = new DefaultMuleMessage(list);
         simpleForeach.process(getTestEvent(msgCollection));
 
         assertSimpleProcessedMessages();
@@ -141,9 +139,9 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     public void nestedArrayListPayload() throws Exception
     {
         List<List<String>> payload = new ArrayList<>();
-        List<String> elem1 = new ArrayList<String>();
-        List<String> elem2 = new ArrayList<String>();
-        List<String> elem3 = new ArrayList<String>();
+        List<String> elem1 = new ArrayList<>();
+        List<String> elem2 = new ArrayList<>();
+        List<String> elem3 = new ArrayList<>();
         elem1.add("a1");
         elem1.add("a2");
         elem1.add("a3");
@@ -181,17 +179,17 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
         List<MuleMessage> list1 = new ArrayList<>();
         List<MuleMessage> list2 = new ArrayList<>();
 
-        list1.add(new DefaultMuleMessage("a1", muleContext));
-        list1.add(new DefaultMuleMessage("a2", muleContext));
-        list1.add(new DefaultMuleMessage("a3", muleContext));
+        list1.add(new DefaultMuleMessage("a1"));
+        list1.add(new DefaultMuleMessage("a2"));
+        list1.add(new DefaultMuleMessage("a3"));
 
-        list2.add(new DefaultMuleMessage("b1", muleContext));
-        list2.add(new DefaultMuleMessage("b2", muleContext));
-        list2.add(new DefaultMuleMessage("c1", muleContext));
+        list2.add(new DefaultMuleMessage("b1"));
+        list2.add(new DefaultMuleMessage("b2"));
+        list2.add(new DefaultMuleMessage("c1"));
 
-        parentList.add(new DefaultMuleMessage(list1, muleContext));
-        parentList.add(new DefaultMuleMessage(list2, muleContext));
-        MuleMessage parentCollection = new DefaultMuleMessage(parentList, muleContext);
+        parentList.add(new DefaultMuleMessage(list1));
+        parentList.add(new DefaultMuleMessage(list2));
+        MuleMessage parentCollection = new DefaultMuleMessage(parentList);
 
         nestedForeach.process(getTestEvent(parentCollection));
         assertNestedProcessedMessages();
@@ -284,7 +282,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
 
     public class DummySimpleIterableClass implements Iterable<String>
     {
-        public List<String> strings = new ArrayList<String>();
+        public List<String> strings = new ArrayList<>();
         public DummySimpleIterableClass()
         {
             strings.add("bar");
@@ -299,15 +297,15 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
 
     private class DummyNestedIterableClass implements Iterable<DummySimpleIterableClass>
     {
-        private List<DummySimpleIterableClass> iterables = new ArrayList<DummySimpleIterableClass>();
+        private List<DummySimpleIterableClass> iterables = new ArrayList<>();
         public DummyNestedIterableClass()
         {
             DummySimpleIterableClass dsi1 = new DummySimpleIterableClass();
-            dsi1.strings = new ArrayList<String>();
+            dsi1.strings = new ArrayList<>();
             dsi1.strings.add("a1");
             dsi1.strings.add("a2");
             DummySimpleIterableClass dsi2 = new DummySimpleIterableClass();
-            dsi2.strings = new ArrayList<String>();
+            dsi2.strings = new ArrayList<>();
             dsi2.strings.add("a3");
             dsi2.strings.add("b1");
             dsi2.strings.add("b2");

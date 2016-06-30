@@ -28,14 +28,14 @@ public class SerializeOnlySessionHandler extends AbstractSessionHandler
     protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
+    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException
     {
         MuleSession session = null;
         byte[] serializedSession = message.getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
 
         if (serializedSession != null)
         {
-            session = deserialize(message, serializedSession);
+            session = deserialize(message, serializedSession, muleContext);
         }
         return session;
     }

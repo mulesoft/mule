@@ -9,10 +9,11 @@ package org.mule.runtime.module.cxf.functional;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.cxf.example.HelloWorld;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.Serializable;
@@ -49,7 +50,7 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
     @Test
     public void testReceivesComponentExceptionMessage() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
 
         MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
 
@@ -60,6 +61,7 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase
     public static class HelloWorldImpl implements HelloWorld
     {
 
+        @Override
         public String sayHi(String text)
         {
             throw new RuntimeException(ERROR_MESSAGE);

@@ -64,14 +64,14 @@ public class DefaultLocalMuleClient implements MuleClient
     public void dispatch(String url, Object payload, Map<String, Serializable> messageProperties)
         throws MuleException
     {
-        dispatch(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
+        dispatch(url, new DefaultMuleMessage(payload, messageProperties));
     }
 
     @Override
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties)
         throws MuleException
     {
-        return send(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
+        return send(url, new DefaultMuleMessage(payload, messageProperties));
     }
 
     @Override
@@ -111,7 +111,7 @@ public class DefaultLocalMuleClient implements MuleClient
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout)
         throws MuleException
     {
-        return send(url, new DefaultMuleMessage(payload, messageProperties, muleContext), timeout);
+        return send(url, new DefaultMuleMessage(payload, messageProperties), timeout);
 
     }
 
@@ -156,7 +156,7 @@ public class DefaultLocalMuleClient implements MuleClient
         final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, MessageExchangePattern.ONE_WAY);
         if (connectorMessageProcessor != null)
         {
-            final MuleEvent event = connectorMessageProcessor.process(createOneWayMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), muleContext)));
+            final MuleEvent event = connectorMessageProcessor.process(createOneWayMuleEvent(new DefaultMuleMessage(NullPayload.getInstance())));
 
             return event == null || event instanceof VoidMuleEvent ? null : event.getMessage();
         }

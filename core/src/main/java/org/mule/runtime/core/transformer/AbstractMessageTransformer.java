@@ -132,7 +132,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
         }
         else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform())
         {
-            message = new DefaultMuleMessage(src, muleContext);
+            message = new DefaultMuleMessage(src);
         }
         else
         {

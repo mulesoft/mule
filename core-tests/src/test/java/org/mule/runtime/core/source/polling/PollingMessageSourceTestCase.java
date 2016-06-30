@@ -10,15 +10,12 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
@@ -51,7 +48,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     {
 
         PollingMessageSource pollingMessageSource = createMessageSource(event -> new DefaultMuleEvent(
-                new DefaultMuleMessage(NullPayload.getInstance(), muleContext), event));
+                new DefaultMuleMessage(NullPayload.getInstance()), event));
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);
@@ -66,7 +63,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     {
 
         PollingMessageSource pollingMessageSource = createMessageSource(event ->
-            new DefaultMuleEvent(new DefaultMuleMessage("", muleContext), event));
+        new DefaultMuleEvent(new DefaultMuleMessage(""), event));
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);
@@ -100,11 +97,10 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     }
 
     private PollingMessageSource createMessageSource(MessageProcessor processor)
-        throws MuleException
+            throws Exception
     {
-        FlowConstruct flowConstruct = mock(FlowConstruct.class);
         PollingMessageSource pollingMessageSource = new PollingMessageSource(muleContext, processor, new NullOverride(), schedulerFactory());
-        pollingMessageSource.setFlowConstruct(flowConstruct);
+        pollingMessageSource.setFlowConstruct(getTestFlow());
         pollingMessageSource.initialise();
         return pollingMessageSource;
     }

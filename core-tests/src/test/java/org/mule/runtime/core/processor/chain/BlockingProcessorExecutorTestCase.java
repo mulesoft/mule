@@ -13,27 +13,23 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.ProcessorExecutor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.BlockingProcessorExecutor;
 import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
@@ -45,17 +41,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
+public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCase
 {
-
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    protected MuleContext muleContext;
 
     @Mock
     protected MuleEvent event;
@@ -74,7 +65,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
     protected List<MessageProcessor> processors = new ArrayList<>();
 
     @Before
-    public void before() throws MessagingException
+    public void before() throws Exception
     {
         processors.add(processor1);
         processors.add(processor2);
@@ -82,22 +73,15 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
 
         OptimizedRequestContext.unsafeSetEvent(event);
         
-        when(event.getFlowConstruct()).thenReturn(mock(Flow.class));
-        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        when(event.getFlowConstruct()).thenReturn(getTestFlow());
+        MuleMessage message = new DefaultMuleMessage("");
         when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
         when(event.getMessage()).thenReturn(message);
         when(event.getMuleContext()).thenReturn(muleContext);
         when(executionTemplate.execute(any(MessageProcessor.class), any(MuleEvent.class)))
-                .thenAnswer(new Answer<MuleEvent>()
-                {
-                    @Override
-                    public MuleEvent answer(InvocationOnMock invocation) throws Throwable
-                    {
-                        return ((MessageProcessor) invocation.getArguments()[0]).process((MuleEvent) invocation
-                                .getArguments()[1]);
-                    }
-                });
-        when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
+                .thenAnswer(invocation -> ((MessageProcessor) invocation.getArguments()[0]).process((MuleEvent) invocation
+                        .getArguments()[1]));
+        muleContext.setTransformationService(new TransformationService(muleContext));
     }
 
     @Test
@@ -110,14 +94,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleTestCase
     @Test
     public void executeRequestResponseNullResponse() throws MuleException
     {
-        processors.add(new MessageProcessor()
-        {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return null;
-            }
-        });
+        processors.add(event -> null);
         setupRequestResponseEvent();
         assertThat(createProcessorExecutor(processors).execute(), is(nullValue()));
     }

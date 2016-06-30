@@ -16,10 +16,10 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -51,13 +51,14 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     private SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
 
     @Override
-    public void before() throws MessagingException
+    public void before() throws Exception
     {
         super.before();
         when(event.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
         when(event.isSynchronous()).thenReturn(false);
         when(event.isAllowNonBlocking()).thenReturn(true);
         Pipeline mockFlow = mock(Flow.class);
+        when(mockFlow.getMuleContext()).thenReturn(muleContext);
         when(mockFlow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
         when(event.getFlowConstruct()).thenReturn(mockFlow);
     }
@@ -106,14 +107,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     @Test
     public void executeRequestResponseNonBlockingNullResponse() throws MuleException, InterruptedException
     {
-        processors.add(new MessageProcessor()
-        {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return null;
-            }
-        });
+        processors.add(event -> null);
         setupNonBlockingRequestResponseEvent();
         createProcessorExecutor(processors).execute();
         assertThat(nullReplyToHandler.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS), is(true));
@@ -124,14 +118,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     public void executeRequestResponseNonBlockingVoidResponse() throws MuleException, InterruptedException
     {
         final MuleEvent voidResult = VoidMuleEvent.getInstance();
-        processors.add(new MessageProcessor()
-        {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return voidResult;
-            }
-        });
+        processors.add(event -> voidResult);
         setupNonBlockingRequestResponseEvent();
         MuleEvent request = event;
         createProcessorExecutor(processors).execute();
@@ -140,6 +127,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
         assertThat(nullReplyToHandler.event, CoreMatchers.<MuleEvent>not(VoidMuleEvent.getInstance()));
     }
 
+    @Override
     @Test
     public void executeOneWay() throws MuleException, InterruptedException
     {

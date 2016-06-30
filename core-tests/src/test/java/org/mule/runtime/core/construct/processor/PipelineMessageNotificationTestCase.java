@@ -102,7 +102,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setMessageSource(source);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request"),
                 REQUEST_RESPONSE, pipeline);
 
         source.trigger(event);
@@ -140,7 +140,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.initialise();
 
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request"),
                 REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
         source.trigger(event);
@@ -168,7 +168,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.setMessageSource(source);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request"),
                                      ONE_WAY, pipeline);
 
         source.trigger(event);
@@ -195,12 +195,12 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new ExceptionThrowingMessageProcessor());
         pipeline.setMessageProcessors(processors);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request"),
                                      REQUEST_RESPONSE, pipeline);
 
         try
@@ -226,7 +226,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new ExceptionThrowingMessageProcessor());
         processors.add(new SensingNullMessageProcessor());
         pipeline.setMessageProcessors(processors);
@@ -234,7 +234,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.initialise();
 
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request"),
                                      REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
         try
@@ -264,7 +264,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()));
         processors.add(new SensingNullMessageProcessor());
         pipeline.setMessageProcessors(processors);
@@ -272,7 +272,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.initialise();
 
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request"),
                                      REQUEST_RESPONSE, nullReplyToHandler, pipeline);
 
         try
@@ -305,12 +305,12 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()));
         pipeline.setMessageProcessors(processors);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request"),
                                      REQUEST_RESPONSE, pipeline);
 
         try
@@ -338,12 +338,12 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         TriggerableMessageSource source = new TriggerableMessageSource();
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(new ExceptionThrowingMessageProcessor());
         pipeline.setMessageProcessors(processors);
         pipeline.initialise();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request"),
                                      ONE_WAY, pipeline);
 
         try
@@ -370,7 +370,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         final CountDownLatch latch = new CountDownLatch(1);
         pipeline.setMessageSource(source);
         pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-        List<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> processors = new ArrayList<>();
         processors.add(event ->
         {
             latch.countDown();
@@ -380,7 +380,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase
         pipeline.initialise();
         pipeline.start();
 
-        event = new DefaultMuleEvent(new DefaultMuleMessage("request", muleContext),
+        event = new DefaultMuleEvent(new DefaultMuleMessage("request"),
                                      ONE_WAY, pipeline);
 
         source.trigger(event);

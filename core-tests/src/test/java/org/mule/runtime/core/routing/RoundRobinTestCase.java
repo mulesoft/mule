@@ -11,6 +11,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -46,13 +47,13 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
     {
         RoundRobin rr = new RoundRobin();
         MuleSession session = getTestSession(null, muleContext);
-        List<TestProcessor> routes = new ArrayList<TestProcessor>(NUMBER_OF_ROUTES);
+        List<TestProcessor> routes = new ArrayList<>(NUMBER_OF_ROUTES);
         for (int i = 0; i < NUMBER_OF_ROUTES; i++)
         {
             routes.add(new TestProcessor());
         }
         rr.setRoutes(new ArrayList<MessageProcessor>(routes));
-        List<Thread> threads = new ArrayList<Thread>(NUMBER_OF_ROUTES);
+        List<Thread> threads = new ArrayList<>(NUMBER_OF_ROUTES);
         for (int i = 0; i < NUMBER_OF_ROUTES; i++)
         {
             threads.add(new Thread(new TestDriver(session, rr, NUMBER_OF_MESSAGES, getTestFlow())));
@@ -82,9 +83,9 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
         routes.add(route2);
         roundRobin.setRoutes(new ArrayList<>(routes));
 
-        DefaultMuleMessage message = new DefaultMuleMessage(Collections.singletonList(TEST_MESSAGE), muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage(Collections.singletonList(TEST_MESSAGE));
 
-        roundRobin.process(new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, null, (MuleSession) null));
+        roundRobin.process(new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, getTestFlow(), (MuleSession) null));
 
         verify(route1).process(any(MuleEvent.class));
         verify(route2, never()).process(any(MuleEvent.class));
@@ -110,8 +111,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
         {
             for (int i = 0; i < numMessages; i++)
             {
-                MuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE + messageNumber.getAndIncrement(),
-                    muleContext);
+                MuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE + messageNumber.getAndIncrement());
                 MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE,
                     flowConstruct, session);
                 try
@@ -129,7 +129,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
     static class TestProcessor implements MessageProcessor
     {
         private int count;
-        private List<Object> payloads = new ArrayList<Object>();
+        private List<Object> payloads = new ArrayList<>();
 
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException

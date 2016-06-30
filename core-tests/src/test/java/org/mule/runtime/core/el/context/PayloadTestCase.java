@@ -12,6 +12,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -54,7 +55,7 @@ public class PayloadTestCase extends AbstractELTestCase
     @Test
     public void assignPayload() throws Exception
     {
-        message = new DefaultMuleMessage("", muleContext);
+        message = new DefaultMuleMessage("");
         when(event.getMessage()).thenReturn(message);
         evaluate("payload = 'foo'", event);
         assertEquals("foo", message.getPayload());

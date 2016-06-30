@@ -52,7 +52,7 @@ import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.filters.AcceptAllFilter;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.tck.SensingNullReplyToHandler;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
@@ -75,7 +75,7 @@ import org.mockito.Mockito;
 @RunWith(Parameterized.class)
 @SmallTest
 @SuppressWarnings("deprecation")
-public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
+public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTestCase
 {
 
     protected MuleContext muleContext;
@@ -952,8 +952,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload() + "MessageProcessor",
-                                                               event.getMuleContext()), event);
+            return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload() + "MessageProcessor"), event);
         }
     }
 
@@ -964,8 +963,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             return processNext(new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload() +
-                                                                           "InterceptingMessageProcessor", event
-                    .getMuleContext()), event));
+                                                                           "InterceptingMessageProcessor"),
+                    event));
         }
     }
 
@@ -1050,7 +1049,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         {
             this.event = event;
             MuleEvent result = new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload()
-                                                                           + appendString, muleContext),
+                                                                           + appendString),
                                                     event);
             this.resultEvent = result;
             return result;
@@ -1135,16 +1134,16 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
             MuleEvent intermediateEvent = new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage()
                                                                                               .getPayload() +
-                                                                                      "before" + appendString,
-                                                                                      DefaultMessageProcessorChainTestCase.this.muleContext), event);
+                                                                                      "before" + appendString),
+                    event);
             MuleEvent result = processNext(intermediateEvent);
             if (result != null && !result.equals(VoidMuleEvent.getInstance()) && !result.equals
                     (NonBlockingVoidMuleEvent.getInstance()))
             {
                 return new DefaultMuleEvent(new DefaultMuleMessage(result.getMessage()
-                                                                           .getPayload() + "after" + appendString,
-                                                                   DefaultMessageProcessorChainTestCase.this
-                                                                           .muleContext), result);
+                                                                         .getPayload()
+                                                                   + "after" + appendString),
+                        result);
             }
             else
             {
@@ -1245,7 +1244,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     protected MuleEvent getTestEventUsingFlow(Object data) throws Exception
     {
         MuleEvent event = mock(MuleEvent.class);
-        MuleMessage message = new DefaultMuleMessage(data, muleContext);
+        MuleMessage message = new DefaultMuleMessage(data);
         when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
         when(event.getMessage()).thenReturn(message);
         when(event.getExchangePattern()).thenReturn(exchangePattern);
@@ -1253,6 +1252,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         Pipeline mockFlow = mock(Flow.class);
         when(mockFlow.getProcessingStrategy()).thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new
                 DefaultFlowProcessingStrategy());
+        when(mockFlow.getMuleContext()).thenReturn(muleContext);
         when(event.getFlowConstruct()).thenReturn(mockFlow);
         when(event.getSession()).thenReturn(mock(MuleSession.class));
         when(event.isSynchronous()).thenReturn(synchronous);

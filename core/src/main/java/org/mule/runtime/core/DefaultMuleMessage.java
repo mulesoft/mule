@@ -107,8 +107,6 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
      */
     private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
-    private transient MuleContext muleContext;
-
     // these are transient because serialisation generates a new instance
     // so we allow mutation again (and we can't serialize threads anyway)
     private transient AtomicReference<Thread> ownerThread = null;
@@ -169,17 +167,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
      */
     public <T> DefaultMuleMessage(T value)
     {
-        this(value, (DataType<T>) null, null, null);
-    }
-
-    /**
-     * @deprecated this is a temporal workaround because the message requires the mule context. As the message
-     * refactor progresses, {@link DefaultMuleMessage(T, DataType)} should be use instead
-     */
-    @Deprecated
-    public <T> DefaultMuleMessage(T value, MuleContext muleContext)
-    {
-        this(value, (DataType<T>) null, null, muleContext);
+        this(value, (DataType<T>) null, null);
     }
 
     /**
@@ -191,7 +179,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
      */
     public <T> DefaultMuleMessage(T value, DataType<T> dataType)
     {
-        this(value, dataType, null, null);
+        this(value, dataType, null);
     }
 
     /**
@@ -204,17 +192,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
      */
     public <T> DefaultMuleMessage(T value, Serializable attributes)
     {
-        this(value, (DataType<T>) null, attributes, null);
-    }
-
-    /**
-     * @deprecated this is a temporal workaround because the message requires the mule context. As the message
-     * refactor progresses, {@link DefaultMuleMessage(T, DataType)} should be use instead
-     */
-    @Deprecated
-    public <T> DefaultMuleMessage(T value, DataType<T> dataType, MuleContext muleContext)
-    {
-        this(value, dataType, null, muleContext);
+        this(value, (DataType<T>) null, attributes);
     }
 
     /**
@@ -228,21 +206,10 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
      */
     public <T> DefaultMuleMessage(T value, DataType<T> dataType, Serializable attributes)
     {
-        this(value, dataType, attributes, null);
-    }
-
-    /**
-     * @deprecated this is a temporal workaround because the message requires the mule context. As the message
-     * refactor progresses, {@link DefaultMuleMessage(T, DataType, Serializable)} should be use instead
-     */
-    @Deprecated
-    public <T> DefaultMuleMessage(T value, DataType<T> dataType, Serializable attributes, MuleContext muleContext)
-    {
         typedValue = new TypedValue(resolveValue(value), resolveDataType(value, dataType));
         id = UUID.getUUID();
         rootId = id;
         this.attributes = attributes;
-        setMuleContext(muleContext);
 
         if (value instanceof MuleMessage)
         {
@@ -253,35 +220,32 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
 
     public DefaultMuleMessage(MuleMessage message)
     {
-        this(message.getPayload(), message, message.getMuleContext(), getCloningMessageDataType(message));
+        this(message.getPayload(), message, getCloningMessageDataType(message));
     }
 
-    public DefaultMuleMessage(Object message, Map<String, Serializable> outboundProperties, MuleContext muleContext)
+    public DefaultMuleMessage(Object message, Map<String, Serializable> outboundProperties)
     {
-        this(message, outboundProperties, null, muleContext);
+        this(message, outboundProperties, null);
     }
 
-    public DefaultMuleMessage(Object message, Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments, MuleContext muleContext)
+    public DefaultMuleMessage(Object message, Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments)
     {
-        this(message, null, outboundProperties, attachments, muleContext);
+        this(message, null, outboundProperties, attachments);
+    }
+
+    public DefaultMuleMessage(Object message, Map<String, Serializable> inboundProperties,
+            Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments)
+    {
+        this(message, inboundProperties, outboundProperties, attachments, createDefaultDataType(message));
     }
 
     public DefaultMuleMessage(Object message, Map<String, Serializable> inboundProperties,
                               Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments,
-                              MuleContext muleContext)
-    {
-        this(message, inboundProperties, outboundProperties, attachments, muleContext, createDefaultDataType(message));
-    }
-
-    public DefaultMuleMessage(Object message, Map<String, Serializable> inboundProperties,
-                              Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments,
-                              MuleContext muleContext, DataType dataType)
+            DataType dataType)
     {
         typedValue = new TypedValue(resolveValue(message), dataType);
         id =  UUID.getUUID();
         rootId = id;
-
-        setMuleContext(muleContext);
 
         if (message instanceof MuleMessage)
         {
@@ -313,17 +277,16 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
         return dataType != null ? dataType : createDefaultDataType(value);
     }
 
-    public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext)
+    public DefaultMuleMessage(Object message, MuleMessage previous)
     {
-        this(message, previous, muleContext, getMessageDataType(previous, message));
+        this(message, previous, getMessageDataType(previous, message));
     }
 
-    public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext, DataType<?> dataType)
+    public DefaultMuleMessage(Object message, MuleMessage previous, DataType<?> dataType)
     {
         typedValue = new TypedValue(resolveValue(message), dataType);
         id = previous.getUniqueId();
         rootId = previous.getMessageRootId();
-        setMuleContext(muleContext);
 
         if(message instanceof MuleMessage)
         {
@@ -383,21 +346,6 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
         Class<?> type = payload == null ? Object.class : payload.getClass();
         return DataType.builder().type(type).build();
     }
-
-    public void setMuleContext(MuleContext context)
-    {
-        muleContext = context;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
-
 
     /**
      * Checks if the payload has been consumed for this message. This only applies to Streaming payload types
@@ -1071,7 +1019,6 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
      */
     public void initAfterDeserialisation(MuleContext context) throws MuleException
     {
-        this.muleContext = context;
         if (this.inboundAttachments == null)
         {
             this.inboundAttachments = new HashMap<>();
@@ -1139,7 +1086,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
      */
     private MuleMessage copyToInbound(DefaultMuleMessage currentMessage, Object payload) throws Exception
     {
-        DefaultMuleMessage newMessage = new DefaultMuleMessage(payload, currentMessage, currentMessage.getMuleContext());
+        DefaultMuleMessage newMessage = new DefaultMuleMessage(payload, currentMessage);
 
         // Copy message, but put all outbound properties and attachments on inbound scope.
         // We ignore inbound and invocation scopes since the VM receiver needs to behave the

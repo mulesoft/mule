@@ -37,7 +37,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
         props.put("object", new Apple());
         props.put("number", 1);
         props.put("string", "hello");
-        testObject = new DefaultMuleMessage("test", props, muleContext);
+        testObject = new DefaultMuleMessage("test", props);
         
         RequestContext.setEvent(
                 new DefaultMuleEvent(testObject, getTestFlow(), MuleTestUtils.getTestSession(muleContext)));

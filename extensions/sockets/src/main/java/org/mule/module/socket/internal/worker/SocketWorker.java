@@ -7,7 +7,6 @@
 package org.mule.module.socket.internal.worker;
 
 import org.mule.module.socket.api.source.SocketAttributes;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 
@@ -18,12 +17,10 @@ import javax.resource.spi.work.Work;
 public abstract class SocketWorker implements Disposable, Work
 {
 
-    protected final MuleContext muleContext;
     protected final MessageHandler<InputStream, SocketAttributes> messageHandler;
 
-    protected SocketWorker(MuleContext muleContext, MessageHandler<InputStream, SocketAttributes> messageHandler)
+    protected SocketWorker(MessageHandler<InputStream, SocketAttributes> messageHandler)
     {
-        this.muleContext = muleContext;
         this.messageHandler = messageHandler;
     }
 }

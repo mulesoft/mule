@@ -19,7 +19,7 @@ public class NullSessionHandler implements SessionHandler
 {
 
     @Override
-    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
+    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException
     {
         return null;
     }

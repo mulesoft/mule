@@ -9,9 +9,10 @@ package org.mule.runtime.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.mule.runtime.module.ws.functional.SoapFaultCodeMatcher.hasFaultCode;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.module.ws.consumer.SoapFaultException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -44,7 +45,7 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
 
     protected void assertValidResponse(String flowName, Map<String, Serializable> properties) throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST, properties, muleContext);
+        MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST, properties);
         assertValidResponse(flowName, request);
     }
 
@@ -68,7 +69,7 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
     {
         expectedException.expect(SoapFaultException.class);
         expectedException.expect(hasFaultCode(expectedFaultCode));
-        flowRunner(flowName).withPayload(new DefaultMuleMessage(message, properties, muleContext)).run().getMessage();
+        flowRunner(flowName).withPayload(new DefaultMuleMessage(message, properties)).run().getMessage();
     }
 
 }

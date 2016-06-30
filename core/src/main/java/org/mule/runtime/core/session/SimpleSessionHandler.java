@@ -28,7 +28,7 @@ public class SimpleSessionHandler implements SessionHandler
     protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
+    public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException
     {
         return message.getInboundProperty(MULE_SESSION_PROPERTY);
     }

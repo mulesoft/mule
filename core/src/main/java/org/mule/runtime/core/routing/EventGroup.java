@@ -413,7 +413,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
                 List<MuleMessage> messageList =  Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
                 MuleEvent lastEvent = retrieveLastStoredEvent();
-                DefaultMuleEvent muleEvent = new DefaultMuleEvent(new DefaultMuleMessage(messageList, DataType.fromType(List.class), muleContext),
+                DefaultMuleEvent muleEvent = new DefaultMuleEvent(new DefaultMuleMessage(messageList, DataType.fromType(List.class)),
                                                                   lastEvent, getMergedSession());
                 if (getCommonRootId() != null)
                 {

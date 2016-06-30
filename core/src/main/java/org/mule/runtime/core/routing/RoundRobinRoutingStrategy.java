@@ -30,7 +30,7 @@ public class RoundRobinRoutingStrategy extends AbstractRoutingStrategy
 {
 
     private final IdentifiableDynamicRouteResolver identifiableDynamicRouteResolver;
-    private Map<String, Short> roundRobinState = new HashMap<String, Short>();
+    private Map<String, Short> roundRobinState = new HashMap<>();
 
     public RoundRobinRoutingStrategy(final MuleContext muleContext, final IdentifiableDynamicRouteResolver identifiableDynamicRouteResolver)
     {
@@ -77,6 +77,6 @@ public class RoundRobinRoutingStrategy extends AbstractRoutingStrategy
 
     private MuleEvent cloneEventForRouting(MuleEvent event, MessageProcessor mp) throws MessagingException
     {
-        return createEventToRoute(event, cloneMessage(event, event.getMessage(), getMuleContext()), mp);
+        return createEventToRoute(event, cloneMessage(event, event.getMessage()), mp);
     }
 }

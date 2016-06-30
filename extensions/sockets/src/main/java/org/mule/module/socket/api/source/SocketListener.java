@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+
 import org.mule.module.socket.api.config.ListenerConfig;
 import org.mule.module.socket.api.connection.ListenerConnection;
 import org.mule.module.socket.internal.worker.SocketWorker;
@@ -217,7 +218,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
 
             try
             {
-                SocketWorker worker = connection.listen(muleContext, sourceContext.getMessageHandler());
+                SocketWorker worker = connection.listen(sourceContext.getMessageHandler());
                 workManager.scheduleWork(worker, WorkManager.INDEFINITE, null, socketWorkListener);
             }
             catch (ConnectionException e)

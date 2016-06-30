@@ -67,7 +67,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
 
     private void setMapPayloadWithTokenRequestParameters(final MuleEvent event) throws MuleException
     {
-        final HashMap<String, String> formData = new HashMap<String, String>();
+        final HashMap<String, String> formData = new HashMap<>();
         formData.put(OAuthConstants.GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
         String clientId = applicationCredentials.getClientId();
         String clientSecret = applicationCredentials.getClientSecret();
@@ -96,7 +96,8 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     {
         try
         {
-            final DefaultMuleEvent accessTokenEvent = new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), getMuleContext()), MessageExchangePattern.REQUEST_RESPONSE, new Flow("test", getMuleContext()));
+            final DefaultMuleEvent accessTokenEvent =
+                    new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance()), MessageExchangePattern.REQUEST_RESPONSE, new Flow("test", getMuleContext()));
             setMapPayloadWithTokenRequestParameters(accessTokenEvent);
             final MuleEvent response;
             response = invokeTokenUrl(accessTokenEvent);

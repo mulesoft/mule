@@ -62,7 +62,7 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
         Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(
                 invocation -> (String) invocation.getArguments()[0]);
 
-        muleMessage = new DefaultMuleMessage("", PROPERTY_DATA_TYPE, mockMuleContext);
+        muleMessage = new DefaultMuleMessage("", PROPERTY_DATA_TYPE);
     }
 
     @Test

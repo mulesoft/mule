@@ -8,10 +8,9 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -42,18 +41,15 @@ public class ConsumableFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testRejectsConsumablePayload() throws Exception
     {
-
-        MuleContext context = mock(MuleContext.class, RETURNS_DEEP_STUBS);
         InputStream is = new ByteArrayInputStream("TEST".getBytes());
-        MuleMessage message = new DefaultMuleMessage(is, context);
+        MuleMessage message = new DefaultMuleMessage(is);
         assertFalse("Should reject consumable payload", filter.accept(message));
     }
 
     @Test
     public void testAcceptsNonConsumablePayload() throws Exception
     {
-        MuleContext context = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-        MuleMessage message = new DefaultMuleMessage("TEST", context);
+        MuleMessage message = new DefaultMuleMessage("TEST");
         assertTrue("Should accept non consumable payload", filter.accept(message));
     }
 }

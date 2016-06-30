@@ -72,16 +72,16 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
                     IOUtils.copy(transformerInputs.getReader(), jsonWriter);
                 }
                 jsonString = jsonWriter.toString();
-                msg = new DefaultMuleMessage(jsonString, msg, msg.getMuleContext());
+                msg = new DefaultMuleMessage(jsonString, msg);
                 event.setMessage(msg);
             }
             String xmlString = (String) jToX.transform(msg.getPayload(), msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
             // TODO MULE-9856 Replace with the builder
-            MuleMessage xmlMessage = new DefaultMuleMessage(xmlString, msg, msg.getMuleContext());
+            MuleMessage xmlMessage = new DefaultMuleMessage(xmlString, msg);
             boolean accepted = super.accept(new DefaultMuleEvent(xmlMessage, event.getFlowConstruct()));
             if (jsonString != null)
             {
-                msg = new DefaultMuleMessage(jsonString, msg, event.getMuleContext());
+                msg = new DefaultMuleMessage(jsonString, msg);
                 event.setMessage(msg);
             }
             return accepted;

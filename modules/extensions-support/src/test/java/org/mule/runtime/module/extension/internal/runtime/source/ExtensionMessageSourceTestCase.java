@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static java.nio.charset.Charset.defaultCharset;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -36,7 +35,6 @@ import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionE
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -156,7 +154,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
         spyInjector(muleContext);
         when(threadingProfile.createWorkManager(anyString(), eq(muleContext.getConfiguration().getShutdownTimeout()))).thenReturn(workManager);
         when(sourceFactory.createSource()).thenReturn(source);
-        when(muleMessage.getMuleContext()).thenReturn(muleContext);
         when(sourceModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
         when(sourceModel.getName()).thenReturn(SOURCE_NAME);
         when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());

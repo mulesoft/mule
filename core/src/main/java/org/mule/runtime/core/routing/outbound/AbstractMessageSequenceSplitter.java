@@ -57,7 +57,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             MessageSequence<?> seq = splitMessageIntoSequence(event);
             if (!seq.isEmpty())
             {
-                MuleEvent aggregatedResults = resultsHandler.aggregateResults(processParts(seq, event), event, muleContext);
+                MuleEvent aggregatedResults = resultsHandler.aggregateResults(processParts(seq, event), event);
                 if (aggregatedResults instanceof VoidMuleEvent)
                 {
                     return null;
@@ -101,7 +101,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             messageInfoMapping = originalEvent.getFlowConstruct().getMessageInfoMapping();
         }
         String correlationId = messageInfoMapping.getCorrelationId(originalEvent);
-        List<MuleEvent> resultEvents = new ArrayList<MuleEvent>();
+        List<MuleEvent> resultEvents = new ArrayList<>();
         int correlationSequence = 0;
         MessageSequence<?> messageSequence = seq;
         if (batchSize > 1)
@@ -165,7 +165,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         }
         else
         {
-            MuleMessage message = new DefaultMuleMessage(payload, originalEvent.getMessage(), muleContext);
+            MuleMessage message = new DefaultMuleMessage(payload, originalEvent.getMessage());
             return new DefaultMuleEvent(message, originalEvent);
         }
     }

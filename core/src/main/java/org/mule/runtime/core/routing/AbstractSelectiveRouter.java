@@ -44,7 +44,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
         implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, MessageProcessorContainer
 {
 
-    private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<MessageProcessorFilterPair>();
+    private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<>();
     private MessageProcessor defaultProcessor;
     private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     private RouterStatistics routerStatistics;
@@ -60,16 +60,19 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
         routerStatistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         synchronized (conditionalMessageProcessors)
@@ -93,6 +96,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
         initialised.set(true);
     }
 
+    @Override
     public void start() throws MuleException
     {
         synchronized (conditionalMessageProcessors)
@@ -111,6 +115,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         synchronized (conditionalMessageProcessors)
@@ -127,6 +132,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
         }
     }
 
+    @Override
     public void dispose()
     {
         synchronized (conditionalMessageProcessors)
@@ -141,6 +147,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
         }
     }
 
+    @Override
     public void addRoute(MessageProcessor processor, Filter filter)
     {
         synchronized (conditionalMessageProcessors)
@@ -150,40 +157,38 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
         }
     }
 
+    @Override
     public void removeRoute(MessageProcessor processor)
     {
-        updateRoute(processor, new RoutesUpdater()
+        updateRoute(processor, (RoutesUpdater) index ->
         {
-            public void updateAt(int index)
-            {
-                MessageProcessorFilterPair removedPair = conditionalMessageProcessors.remove(index);
+            MessageProcessorFilterPair removedPair = conditionalMessageProcessors.remove(index);
 
-                transitionLifecycleManagedObjectForRemoval(removedPair);
-            }
+            transitionLifecycleManagedObjectForRemoval(removedPair);
         });
     }
 
+    @Override
     public void updateRoute(final MessageProcessor processor, final Filter filter)
     {
-        updateRoute(processor, new RoutesUpdater()
+        updateRoute(processor, (RoutesUpdater) index ->
         {
-            public void updateAt(int index)
-            {
-                MessageProcessorFilterPair addedPair = new MessageProcessorFilterPair(processor, filter);
+            MessageProcessorFilterPair addedPair = new MessageProcessorFilterPair(processor, filter);
 
-                MessageProcessorFilterPair removedPair = conditionalMessageProcessors.set(index,
-                                                                                          transitionLifecycleManagedObjectForAddition(addedPair));
+            MessageProcessorFilterPair removedPair = conditionalMessageProcessors.set(index,
+                                                                                      transitionLifecycleManagedObjectForAddition(addedPair));
 
-                transitionLifecycleManagedObjectForRemoval(removedPair);
-            }
+            transitionLifecycleManagedObjectForRemoval(removedPair);
         });
     }
 
+    @Override
     public void setDefaultRoute(MessageProcessor processor)
     {
         defaultProcessor = processor;
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         Collection<MessageProcessor> selectedProcessors = selectProcessors(event);
@@ -286,14 +291,14 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
     private MuleEvent routeWithProcessors(Collection<MessageProcessor> processors, MuleEvent event)
             throws MuleException
     {
-        List<MuleEvent> results = new ArrayList<MuleEvent>();
+        List<MuleEvent> results = new ArrayList<>();
 
         for (MessageProcessor processor : processors)
         {
             processEventWithProcessor(event, processor, results);
         }
 
-        return resultsHandler.aggregateResults(results, event, event.getMuleContext());
+        return resultsHandler.aggregateResults(results, event);
     }
 
     private void processEventWithProcessor(MuleEvent event,
@@ -338,6 +343,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
         return routerStatistics;
     }
 
+    @Override
     public void setRouterStatistics(RouterStatistics routerStatistics)
     {
         this.routerStatistics = routerStatistics;
@@ -346,7 +352,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject
     @Override
     public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> messageProcessors = new ArrayList<>();
         for (MessageProcessorFilterPair cmp : conditionalMessageProcessors)
         {
             messageProcessors.add(cmp.getMessageProcessor());

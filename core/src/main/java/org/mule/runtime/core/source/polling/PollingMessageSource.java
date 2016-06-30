@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.source.polling;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -34,11 +35,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.StringUtils;
-
-import java.io.Serializable;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -210,7 +207,7 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
      */
     public void poll() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY);
         pollWith(request);
     }
 

@@ -16,6 +16,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -98,7 +99,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         else if (file.isDirectory())
         {
             // Return a 302 with the new location
-            MutableMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance() , event.getMuleContext());
+            MutableMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
             message.setOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(MOVED_TEMPORARILY.getStatusCode()));
             message.setOutboundProperty(CONTENT_LENGTH, 0);
             message.setOutboundProperty(LOCATION, event.getMessage().getInboundProperty(HTTP_REQUEST_PATH_PROPERTY) + "/");
@@ -121,7 +122,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
                 mimetype = DEFAULT_MIME_TYPE;
             }
 
-            MutableMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance() , event.getMuleContext());
+            MutableMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
             message.setOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(OK.getStatusCode()));
             message.setOutboundProperty(CONTENT_TYPE, mimetype);
             message.setOutboundProperty(CONTENT_LENGTH, buffer.length);

@@ -117,14 +117,6 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
      */
     ExceptionPayload getExceptionPayload();
 
-    /**
-     * Avoid getting access to the MuleContext through the message.
-     * You can get access to the MuleContext by making your class implement
-     * {@link org.mule.runtime.core.api.context.MuleContextAware}
-     */
-    @Deprecated
-    MuleContext getMuleContext();
-
     interface PayloadBuilder<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message
             .MuleMessage.PayloadBuilder<PAYLOAD, ATTRIBUTES>
     {

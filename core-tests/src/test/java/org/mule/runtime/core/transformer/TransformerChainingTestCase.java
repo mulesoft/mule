@@ -10,38 +10,31 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class TransformerChainingTestCase extends AbstractMuleTestCase
+public class TransformerChainingTestCase extends AbstractMuleContextTestCase
 {
 
-    private MuleContext muleContext = mock(MuleContext.class);
-    private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     private TransformationService transformationService;
 
     @Before
     public void setUp() throws Exception
     {
-        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
         transformationService = new TransformationService(muleContext);
     }
 
@@ -51,9 +44,9 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        MuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
+        MuleMessage message = new DefaultMuleMessage(new Integer(0));
         Transformer messageTransformer = new TransformerChain(validTransformer);
-        message = transformationService.applyTransformers(message, null, messageTransformer);
+        message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -66,9 +59,9 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
         Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer);
-        message = (DefaultMuleMessage) transformationService.applyTransformers(message, null, singletonList(messageTransformer));
+        message = (DefaultMuleMessage) transformationService.applyTransformers(message, getTestEvent(0), singletonList(messageTransformer));
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -81,9 +74,9 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        MuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
+        MuleMessage message = new DefaultMuleMessage(new Integer(0));
         Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer, validTransformer);
-        message = transformationService.applyTransformers(message, null, messageTransformer);
+        message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -100,9 +93,9 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
 
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
         Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
-        transformationService.applyTransformers(message, null, messageTransformer);
+        transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
     }
 
     @Test
@@ -115,12 +108,12 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
         Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
         
         try
         {
-            transformationService.applyTransformers(message, null, messageTransformer);
+            transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
             fail("Transformer chain is expected to fail because of invalid transformer within chain.");
         }
         catch (MuleException tfe)
@@ -139,12 +132,12 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
 
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0), muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
         Transformer messageTransformer = new TransformerChain(validTransformer, invalidTransformer);
 
         try
         {
-            transformationService.applyTransformers(message, null, messageTransformer);
+            transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
             fail("Transformer chain is expected to fail because of invalid transformer within chain.");
         }
         catch (MuleException tfe)

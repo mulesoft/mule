@@ -73,7 +73,7 @@ public class CxfBackToBlockingTestCase extends FunctionalTestCase
         Map<String, Serializable> props = new HashMap<>();
         props.put("Content-Type", "application/soap+xml");
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", new DefaultMuleMessage(xml, props, muleContext), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", new DefaultMuleMessage(xml, props), HTTP_REQUEST_OPTIONS);
         assertTrue(getPayloadAsString(result).contains("Hello!"));
         String ct = result.getInboundProperty(CONTENT_TYPE, "");
         assertEquals("text/xml; charset=UTF-8", ct);

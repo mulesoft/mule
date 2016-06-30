@@ -99,8 +99,7 @@ public class HttpRequester
         // Create a new muleEvent based on the old and the response so that the auth can use it
         MuleEvent responseEvent = new DefaultMuleEvent(new DefaultMuleMessage(responseMessage.getPayload(),
                 (DataType) responseMessage.getDataType(),
-                responseMessage.getAttributes(),
-                muleEvent.getMuleContext()),
+                responseMessage.getAttributes()),
                                                        muleEvent,
                                                        muleEvent.isSynchronous());
         if (resendRequest(responseEvent, checkRetry, authentication))

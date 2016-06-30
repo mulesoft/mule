@@ -99,7 +99,7 @@ public class TransformationService
     {
         checkNotNull(message, "Message cannot be null");
         checkNotNull(outputDataType, "DataType cannot be null");
-        return new DefaultMuleMessage(getPayload(message, outputDataType, resolveEncoding(message)), message, muleContext);
+        return new DefaultMuleMessage(getPayload(message, outputDataType, resolveEncoding(message)), message);
     }
 
     /**
@@ -254,13 +254,13 @@ public class TransformationService
                 // Only copy the payload and properties of mule message transformer result if the message is a different
                 // instance
                 MuleMessage transformResult = (MuleMessage) result;
-                return new DefaultMuleMessage(result, transformResult, muleContext, transformResult.getDataType());
+                return new DefaultMuleMessage(result, transformResult, transformResult.getDataType());
             }
             return (MuleMessage) result;
         }
         else
         {
-            return new DefaultMuleMessage(result, message, muleContext, mergeDataType(message, transformer.getReturnDataType(), result != null ? result.getClass() : null));
+            return new DefaultMuleMessage(result, message, mergeDataType(message, transformer.getReturnDataType(), result != null ? result.getClass() : null));
         }
     }
 

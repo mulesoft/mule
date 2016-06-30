@@ -50,6 +50,7 @@ public class ExpressionSplitter extends AbstractSplitter
         this.config = config;
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         expressionManager = muleContext.getExpressionManager();
@@ -71,7 +72,7 @@ public class ExpressionSplitter extends AbstractSplitter
             List<MuleEvent> messages = new ArrayList<>();
             for (Object object : (Collection<?>) result)
             {
-                messages.add(new DefaultMuleEvent(new DefaultMuleMessage(object, muleContext), event));
+                messages.add(new DefaultMuleEvent(new DefaultMuleMessage(object), event));
             }
             return messages;
         }
@@ -81,7 +82,7 @@ public class ExpressionSplitter extends AbstractSplitter
             Set<Map.Entry<?, ?>> set = ((Map) result).entrySet();
             for (Entry<?, ?> entry : set)
             {
-                MuleMessage message = new DefaultMuleMessage(entry.getValue(), muleContext);
+                MuleMessage message = new DefaultMuleMessage(entry.getValue());
                 MuleEvent newEvent = new DefaultMuleEvent(message, event);
                 newEvent.setFlowVariable(MapSplitter.MAP_ENTRY_KEY, entry.getKey());
                 list.add(newEvent);
@@ -98,18 +99,18 @@ public class ExpressionSplitter extends AbstractSplitter
             List<MuleEvent> messages = new ArrayList<>(nodeList.getLength());
             for (int i = 0; i < nodeList.getLength(); i++)
             {
-                messages.add(new DefaultMuleEvent(new DefaultMuleMessage(nodeList.item(i), muleContext), event));
+                messages.add(new DefaultMuleEvent(new DefaultMuleMessage(nodeList.item(i)), event));
             }
             return messages;
         }
         else if (result == null)
         {
-            return new ArrayList<MuleEvent>();
+            return new ArrayList<>();
         }
         else
         {
             logger.info("The expression does not evaluate to a type that can be split: " + result.getClass().getName());
-            return Collections.<MuleEvent> singletonList(new DefaultMuleEvent(new DefaultMuleMessage(result, muleContext), event));
+            return Collections.<MuleEvent> singletonList(new DefaultMuleEvent(new DefaultMuleMessage(result), event));
         }
     }
 

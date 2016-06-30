@@ -15,7 +15,6 @@ import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -30,8 +29,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
 
 
 @Alias("ListenPayments")
@@ -56,14 +53,10 @@ public class HeisenbergSource extends Source<Void, Serializable> implements Init
     @Optional(defaultValue = "1")
     private int corePoolSize;
 
-    @Inject
-    private MuleContext muleContext;
-
     @Override
     public void initialise() throws InitialisationException
     {
         checkArgument(heisenberg != null, "config not injected");
-        checkArgument(muleContext != null, "dependencies not injected");
         connection.verifyLifecycle(1, 1, 0, 0);
     }
 
@@ -126,7 +119,7 @@ public class HeisenbergSource extends Source<Void, Serializable> implements Init
         }
 
         String payload = String.format("Meth Batch %d. If found by DEA contact %s", ++initialBatchNumber, connection.getSaulPhoneNumber());
-        return new DefaultMuleMessage(payload, null, DataType.STRING, muleContext);
+        return new DefaultMuleMessage(payload, DataType.STRING);
     }
 
 

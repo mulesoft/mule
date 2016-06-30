@@ -27,9 +27,9 @@ public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunction
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedInboundProperty() throws Exception
     {
-        Map<String, Serializable> properties = new HashMap<String, Serializable>();
+        Map<String, Serializable> properties = new HashMap<>();
         properties.put("pathInboundProperty", "services/Test");
-        assertValidResponse("clientInboundProperty", new DefaultMuleMessage(ECHO_REQUEST, properties, null, null, muleContext));
+        assertValidResponse("clientInboundProperty", new DefaultMuleMessage(ECHO_REQUEST, properties, null, null));
     }
 
     @Test

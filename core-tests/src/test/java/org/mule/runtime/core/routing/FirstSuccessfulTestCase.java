@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -21,8 +22,8 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -77,14 +78,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
     @Test
     public void testRouteReturnsNullEvent() throws Exception
     {
-        MessageProcessor nullReturningMp = new MessageProcessor()
-        {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return null;
-            }
-        };
+        MessageProcessor nullReturningMp = event -> null;
         FirstSuccessful fs = createFirstSuccessfulRouter(nullReturningMp);
         fs.initialise();
 
@@ -94,14 +88,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
     @Test
     public void testRouteReturnsNullMessage() throws Exception
     {
-        MessageProcessor nullEventMp = new MessageProcessor()
-        {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                return new DefaultMuleEvent(null, event);
-            }
-        };
+        MessageProcessor nullEventMp = event -> new DefaultMuleEvent(null, event);
         FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
         fs.initialise();
 
@@ -119,14 +106,10 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
     @Test
     public void testProcessingIsForcedOnSameThread() throws Exception
     {
-        MessageProcessor checkForceSyncFlag = new MessageProcessor()
+        MessageProcessor checkForceSyncFlag = event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                assertTrue(event.isSynchronous());
-                return event;
-            }
+            assertTrue(event.isSynchronous());
+            return event;
         };
         FirstSuccessful router = createFirstSuccessfulRouter(checkForceSyncFlag);
         router.initialise();
@@ -149,7 +132,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
 
     private String getPayload(MessageProcessor mp, MuleSession session, String message) throws Exception
     {
-        MuleMessage msg = new DefaultMuleMessage(message, muleContext);
+        MuleMessage msg = new DefaultMuleMessage(message);
         try
         {
             MuleEvent event = mp.process(new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE,
@@ -193,12 +176,12 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
                 }
                 else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0)
                 {
-                    msg = new DefaultMuleMessage(null, muleContext);
+                    msg = new DefaultMuleMessage(null);
                     msg.setExceptionPayload(new DefaultExceptionPayload(new Exception()));
                 }
                 else
                 {
-                    msg = new DefaultMuleMessage("No " + rejectIfMatches, muleContext);
+                    msg = new DefaultMuleMessage("No " + rejectIfMatches);
                 }
                 return new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, event.getFlowConstruct(),
                     event.getSession());

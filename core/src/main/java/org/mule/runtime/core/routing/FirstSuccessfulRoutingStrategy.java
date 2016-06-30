@@ -28,7 +28,6 @@ import java.util.List;
 public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
 {
     protected ExpressionFilter failureExpressionFilter;
-    private final MuleContext muleContext;
 
     /**
      * @param muleContext
@@ -37,7 +36,6 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
     public FirstSuccessfulRoutingStrategy(final MuleContext muleContext, final String failureExpression)
     {
         super(muleContext);
-        this.muleContext = muleContext;
         if (failureExpression != null)
         {
             failureExpressionFilter = new ExpressionFilter(failureExpression);
@@ -100,7 +98,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
 
     private MuleEvent cloneEventForRoutinng(MuleEvent event, MessageProcessor mp) throws MessagingException
     {
-        return createEventToRoute(event, cloneMessage(event, event.getMessage(), muleContext), mp);
+        return createEventToRoute(event, cloneMessage(event, event.getMessage()), mp);
     }
 
 }

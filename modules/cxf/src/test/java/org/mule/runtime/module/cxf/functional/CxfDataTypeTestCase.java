@@ -53,7 +53,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     @Test
     public void testCxfService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
         MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
@@ -68,7 +68,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     @Test
     public void testCxfProxy() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String,Serializable>) null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
         MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello-proxy", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
@@ -80,7 +80,8 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
         Map<String, Serializable> props = new HashMap<>();
         props.put("Content-Type", "application/soap+xml");
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo", new DefaultMuleMessage(xml, props, muleContext), newOptions().method(POST.name()).disableStatusCodeValidation().build());
+        MuleMessage result =
+                client.send("http://localhost:" + dynamicPort.getNumber() + "/echo", new DefaultMuleMessage(xml, props), newOptions().method(POST.name()).disableStatusCodeValidation().build());
         Assert.assertThat(getPayloadAsString(result), not(containsString("Fault")));
     }
 

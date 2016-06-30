@@ -49,7 +49,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
                 "} \n</cd-listings>");
         transformer.setReturnDataType(DataType.STRING);
 
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("title", "#[message.outboundProperties.ListTitle]");
         params.put("rating", "#[message.outboundProperties.ListRating]");
         transformer.setContextProperties(params);
@@ -78,7 +78,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
         Map<String, Serializable> props = new HashMap<>(2);
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
-        return new DefaultMuleMessage(srcData, props, muleContext);
+        return new DefaultMuleMessage(srcData, props);
     }
 
     @Override

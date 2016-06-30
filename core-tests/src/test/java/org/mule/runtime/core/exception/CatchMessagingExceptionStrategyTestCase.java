@@ -19,6 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -36,7 +37,7 @@ import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullReplyToHandler;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Before;
@@ -48,7 +49,7 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContextTestCase
+public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCase
 {
 
     private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
@@ -103,7 +104,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
     @Test
     public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception
     {
-        MuleMessage message = spy(new DefaultMuleMessage("", muleContext));
+        MuleMessage message = spy(new DefaultMuleMessage(""));
         when(mockMuleEvent.getMessage()).thenReturn(message);
 
         catchMessagingExceptionStrategy.setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
@@ -160,7 +161,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
     {
         Flow flow = MuleTestUtils.getTestFlow(muleContext);
         flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, muleContext), REQUEST_RESPONSE,
+        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE), REQUEST_RESPONSE,
                                     new SensingNullReplyToHandler(), flow);
     }
 

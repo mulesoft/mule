@@ -116,7 +116,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             FlowConstruct flowConstruct,
                             MuleSession session)
     {
-        this(message, exchangePattern, flowConstruct, session, message.getMuleContext()
+        this(message, exchangePattern, flowConstruct, session, flowConstruct.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, null);
     }
@@ -128,7 +128,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             MessageExchangePattern exchangePattern,
                             FlowConstruct flowConstruct)
     {
-        this(message, exchangePattern, flowConstruct, new DefaultMuleSession(), message.getMuleContext()
+        this(message, exchangePattern, flowConstruct, new DefaultMuleSession(), flowConstruct.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, null);
     }
@@ -142,7 +142,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             ReplyToHandler replyToHandler,
                             FlowConstruct flowConstruct)
     {
-        this(message, URI.create("none"), exchangePattern, flowConstruct, new DefaultMuleSession(), message
+        this(message, URI.create("none"), exchangePattern, flowConstruct, new DefaultMuleSession(), flowConstruct
                 .getMuleContext()
                 .getConfiguration()
                 .getDefaultResponseTimeout(), null, null, replyToHandler);
@@ -158,7 +158,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             MuleSession session,
                             OutputStream outputStream)
     {
-        this(message, exchangePattern, flowConstruct, session, message.getMuleContext()
+        this(message, exchangePattern, flowConstruct, session, flowConstruct.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, outputStream);
     }
@@ -188,7 +188,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             FlowConstruct flowConstruct,
                             MuleSession session)
     {
-        this(message, messageSourceURI, exchangePattern, flowConstruct, session, message.getMuleContext()
+        this(message, messageSourceURI, exchangePattern, flowConstruct, session, flowConstruct.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, null);
     }
@@ -204,7 +204,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             MuleSession session,
                             OutputStream outputStream)
     {
-        this(message, messageSourceURI, exchangePattern, flowConstruct, session, message.getMuleContext()
+        this(message, messageSourceURI, exchangePattern, flowConstruct, session, flowConstruct.getMuleContext()
             .getConfiguration()
             .getDefaultResponseTimeout(), null, outputStream);
     }
@@ -222,7 +222,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             OutputStream outputStream,
                             ReplyToHandler replyToHandler)
     {
-        this.id = generateEventId(message.getMuleContext());
+        this.id = generateEventId(flowConstruct.getMuleContext());
         this.flowConstruct = flowConstruct;
         this.session = session;
         setMessage(message);
@@ -278,7 +278,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             Object replyToDestination,
                             OutputStream outputStream)
     {
-        this.id = generateEventId(message.getMuleContext());
+        this.id = generateEventId(flowConstruct.getMuleContext());
         this.flowConstruct = flowConstruct;
         this.session = session;
         setMessage(message);
@@ -467,7 +467,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             Object replyToDestination,
                             ReplyToHandler replyToHandler)
     {
-        this.id = generateEventId(message.getMuleContext());
+        this.id = generateEventId(flowConstruct.getMuleContext());
         this.flowConstruct = flowConstruct;
         this.session = session;
         setMessage(message);
@@ -502,7 +502,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
                             Object replyToDestination,
                             ReplyToHandler replyToHandler)
     {
-        this.id = generateEventId(message.getMuleContext());
+        this.id = generateEventId(flowConstruct.getMuleContext());
         this.flowConstruct = flowConstruct;
         this.session = session;
         setMessage(message);
@@ -768,7 +768,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         }
         if (timeout == TIMEOUT_NOT_SET_VALUE)
         {
-            return message.getMuleContext().getConfiguration().getDefaultResponseTimeout();
+            return flowConstruct.getMuleContext().getConfiguration().getDefaultResponseTimeout();
         }
         else
         {
@@ -851,7 +851,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public MuleContext getMuleContext()
     {
-        return message.getMuleContext();
+        return flowConstruct.getMuleContext();
     }
 
     @Override

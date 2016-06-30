@@ -15,8 +15,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -25,15 +27,14 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.tck.NonSerializableObject;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
+import org.mule.tck.NonSerializableObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,7 +70,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         MuleConfiguration mockConfig = mock(MuleConfiguration.class);
         when(mockConfig.getWorkingDirectory()).thenReturn(persistenceFolder.getAbsolutePath());
 
-        mockMuleContext = mock(MuleContext.class);
+        mockMuleContext = spy(muleContext);
         when(mockMuleContext.getConfiguration()).thenReturn(mockConfig);
         when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
         addJavaSerializerToMockMuleContext(mockMuleContext);
@@ -79,7 +80,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     public QueuePersistenceObjectStore<Serializable> getObjectStore() throws ObjectStoreException
     {
         QueuePersistenceObjectStore<Serializable> store =
-            new QueuePersistenceObjectStore<Serializable>(mockMuleContext);
+            new QueuePersistenceObjectStore<>(mockMuleContext);
         store.open();
         return store;
     }
@@ -87,7 +88,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     @Override
     public Serializable getStorableValue()
     {
-        return new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        return new DefaultMuleMessage(TEST_MESSAGE);
     }
 
     @Override
@@ -105,7 +106,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         when(mockContext.getConfiguration()).thenThrow(muleRuntimeException);
 
         QueuePersistenceObjectStore<Serializable> store =
-            new QueuePersistenceObjectStore<Serializable>(mockContext);
+            new QueuePersistenceObjectStore<>(mockContext);
 
         try
         {
@@ -122,7 +123,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     public void testAllKeysOnNotYetOpenedStore() throws ObjectStoreException
     {
         QueuePersistenceObjectStore<Serializable> store =
-            new QueuePersistenceObjectStore<Serializable>(mockMuleContext);
+            new QueuePersistenceObjectStore<>(mockMuleContext);
 
         List<Serializable> allKeys = store.allKeys();
         assertEquals(0, allKeys.size());
@@ -178,8 +179,8 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         QueuePersistenceObjectStore<Serializable> store = getObjectStore(); 
         String id = UUID.getUUID();
         QueueKey key = new QueueKey(QUEUE_NAME, id);
-        MuleMessage msg = new DefaultMuleMessage("Hello", mockMuleContext);
-        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, (FlowConstruct) null);
+        MuleMessage msg = new DefaultMuleMessage("Hello");
+        MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
         monitored.store(key, event);
@@ -189,7 +190,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         MuleEvent newEvent = (MuleEvent) item;
         MuleMessage newMessage = newEvent.getMessage();
         assertNotNull(newMessage);
-        assertEquals(mockMuleContext, newMessage.getMuleContext());
+        assertEquals(muleContext, newEvent.getMuleContext());
         assertEquals("Hello", newMessage.getPayload());
     }
 

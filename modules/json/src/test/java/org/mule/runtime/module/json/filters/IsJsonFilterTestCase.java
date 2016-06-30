@@ -30,19 +30,19 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase
     @Test
     public void testFilterFalse() throws Exception
     {
-        assertFalse(filter.accept(new DefaultMuleMessage("This is definitely not JSON.", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("This is definitely not JSON.")));
     }
 
     @Test
     public void testFilterFalse2() throws Exception
     {
-        assertFalse(filter.accept(new DefaultMuleMessage("{name=\"This may be JSON\",bool:}", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("{name=\"This may be JSON\",bool:}")));
     }
     
     @Test
     public void testFilterFalse3() throws Exception
     {
-        assertFalse(filter.accept(new DefaultMuleMessage("[name=\"This may be JSON\",bool:]", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("[name=\"This may be JSON\",bool:]")));
     }
     
     @Test
@@ -50,19 +50,19 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase
     {
         assertTrue(filter.accept(new DefaultMuleMessage("{\n" +
                 "        \"in_reply_to_user_id\":null,\n" +
-                "        \"text\":\"test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492\"}", muleContext)));
+                                                        "        \"text\":\"test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492\"}")));
     }
     
     @Test
     public void testFilterNull() throws Exception
     {
-        assertFalse(filter.accept(new DefaultMuleMessage(null, muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage(null)));
     }
 
     @Test
     public void testFilterWithObject() throws Exception
     {
-        assertFalse(filter.accept(new DefaultMuleMessage(new Object(), muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage(new Object())));
     }
 
 }
