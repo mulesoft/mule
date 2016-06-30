@@ -9,9 +9,10 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
-import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
+import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.acceptsReferences;
+import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -56,6 +57,7 @@ public class TopLevelParameterParser extends ExtensionDefinitionParser
         {
             final MetadataType fieldType = objectField.getValue();
             final String parameterName = objectField.getKey().getName().getLocalPart();
+            final boolean acceptsReferences = acceptsReferences(objectField);
             final Object defaultValue = getDefaultValue(fieldType).orElse(null);
             final ExpressionSupport expressionSupport = getExpressionSupport(fieldType);
 
@@ -71,7 +73,7 @@ public class TopLevelParameterParser extends ExtensionDefinitionParser
                 @Override
                 public void visitObject(ObjectType objectType)
                 {
-                    parseObjectParameter(parameterName, parameterName, objectType, defaultValue, expressionSupport, false);
+                    parseObjectParameter(parameterName, parameterName, objectType, defaultValue, expressionSupport, false, acceptsReferences);
                 }
 
                 @Override

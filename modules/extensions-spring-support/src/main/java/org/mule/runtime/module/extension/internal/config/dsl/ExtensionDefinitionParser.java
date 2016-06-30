@@ -603,7 +603,7 @@ public abstract class ExtensionDefinitionParser
         parseObjectParameter(key, name, type, defaultValue, expressionSupport, required, true);
     }
 
-    private void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue, ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences)
+    protected void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue, ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences)
     {
         parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, acceptsReferences);
 

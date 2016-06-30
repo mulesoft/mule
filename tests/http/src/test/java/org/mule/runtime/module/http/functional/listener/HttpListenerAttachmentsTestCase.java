@@ -43,7 +43,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -124,6 +123,28 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
     public void respondWithAttachmentsContentLength() throws Exception
     {
         String contentLengthValue = getResponseWithExpectedAttachmentFrom(contentLength.getValue(), CONTENT_LENGTH);
+        assertThat(contentLengthValue, is(notNullValue()));
+    }
+
+    @Test
+    public void fixedPartContent() throws Exception {
+        //try (CloseableHttpClient httpClient = HttpClients.createDefault())
+        //{
+        //    HttpGet httpGet = new HttpGet(getUrl("fixedPart"));
+        //    try (CloseableHttpResponse response = httpClient.execute(httpGet))
+        //    {
+        //        final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
+        //        final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
+        //        assertThat(parts.size(), is(1));
+        //
+        //        Map<String, Part> partsAsMap = convertPartsToMap(parts);
+        //        assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), notNullValue());
+        //        assertThat(IOUtils.toString(partsAsMap.get(TEXT_BODY_FIELD_NAME).getInputStream()), is(TEXT_BODY_FIELD_VALUE));
+        //        return response.getFirstHeader(requiredHeader).getValue();
+        //    }
+        //}
+
+        String contentLengthValue = getResponseWithExpectedAttachmentFrom("fixedPart", CONTENT_LENGTH);
         assertThat(contentLengthValue, is(notNullValue()));
     }
 
