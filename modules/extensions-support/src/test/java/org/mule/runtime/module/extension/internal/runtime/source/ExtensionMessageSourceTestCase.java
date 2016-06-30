@@ -163,6 +163,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase
 
         muleContext.getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
 
+        when(flowConstruct.getMuleContext()).thenReturn(muleContext);
+
         when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
         when(configurationModel.getSourceModel(SOURCE_NAME)).thenReturn(Optional.of(sourceModel));
         when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(Optional.of(configurationProvider));

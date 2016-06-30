@@ -23,7 +23,7 @@ public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestC
 
     protected void doTest(String flowName, Object payload, String result, Map properties) throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(payload, properties, null, null, muleContext);
+        MuleMessage message = new DefaultMuleMessage(payload, properties, null, null);
         MuleMessage response = flowRunner(flowName).withPayload(message).run().getMessage();
         assertEquals(result, getPayloadAsString(response));
     }

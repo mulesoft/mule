@@ -53,7 +53,7 @@ public class TestAggregator extends AbstractAggregator
                 }
 
                 logger.debug("event payload is: " + buffer.toString());
-                return new DefaultMuleEvent(new DefaultMuleMessage(buffer.toString(), muleContext), events.getMessageCollectionEvent());
+                return new DefaultMuleEvent(new DefaultMuleMessage(buffer.toString()), events.getMessageCollectionEvent());
             }
         };
     }

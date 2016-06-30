@@ -29,23 +29,23 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
     }
 
     @Override
-    public MutableMuleMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding, MuleContext muleContext) throws Exception
+    public MutableMuleMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding) throws Exception
     {
-        return doCreate(transportMessage, previousMessage, encoding, muleContext);
+        return doCreate(transportMessage, previousMessage, encoding);
     }
 
     @Override
-    public MutableMuleMessage create(Object transportMessage, Charset encoding, MuleContext muleContext) throws Exception
+    public MutableMuleMessage create(Object transportMessage, Charset encoding) throws Exception
     {
-        return doCreate(transportMessage, null, encoding, muleContext);
+        return doCreate(transportMessage, null, encoding);
     }
 
-    private MutableMuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, Charset encoding, MuleContext muleContext)
+    private MutableMuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, Charset encoding)
             throws Exception
     {
         if (transportMessage == null)
         {
-            return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+            return new DefaultMuleMessage(NullPayload.getInstance());
         }
 
         if (!isTransportMessageTypeSupported(transportMessage))
@@ -58,11 +58,11 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
         MutableMuleMessage message;
         if (previousMessage != null)
         {
-            message = new DefaultMuleMessage(payload, previousMessage, muleContext, dataType);
+            message = new DefaultMuleMessage(payload, previousMessage, dataType);
         }
         else
         {
-            message = new DefaultMuleMessage(payload, dataType, muleContext);
+            message = new DefaultMuleMessage(payload, dataType);
         }
 
         message = addProperties(message, transportMessage);

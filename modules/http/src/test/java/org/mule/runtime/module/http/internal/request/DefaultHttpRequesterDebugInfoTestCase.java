@@ -93,7 +93,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
     private DefaultMuleEvent event;
 
     @Before
-    public void setup()
+    public void setup() throws Exception
     {
         requester.setMuleContext(muleContext);
         config.setMuleContext(muleContext);
@@ -102,7 +102,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         requester.setRequestBuilder(createRequestBuilder());
 
         message = new DefaultMuleMessage(TEST_MESSAGE);
-        event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, mock(Flow.class));
+        event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, getTestFlow());
     }
 
     @Test

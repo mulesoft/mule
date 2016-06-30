@@ -126,7 +126,7 @@ public abstract class AbstractReceiverWorker implements Work
                             {
                                 handler = new SerializeAndEncodeSessionHandler();
                             }
-                            MuleSession session = handler.retrieveSessionInfoFromMessage(muleMessage);
+                            MuleSession session = handler.retrieveSessionInfoFromMessage(muleMessage, endpoint.getMuleContext());
 
                             MuleEvent resultEvent1;
                             if (session != null)

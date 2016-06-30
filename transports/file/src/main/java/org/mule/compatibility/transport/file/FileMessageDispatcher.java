@@ -53,7 +53,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     {
         Object data = event.getMessage().getPayload();
         // Wrap the transformed message before passing it to the filename parser
-        MuleMessage message = new DefaultMuleMessage(data, event.getMessage(), event.getMuleContext());
+        MuleMessage message = new DefaultMuleMessage(data, event.getMessage());
 
         FileOutputStream fos = (FileOutputStream) connector.getOutputStream(getEndpoint(), event);
         try
@@ -167,7 +167,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     protected MutableMuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
+        return new DefaultMuleMessage(NullPayload.getInstance());
     }
 
     @Override

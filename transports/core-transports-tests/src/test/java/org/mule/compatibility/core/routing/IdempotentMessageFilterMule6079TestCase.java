@@ -79,7 +79,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         @Override
         public void run()
         {
-            MutableMuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
+            MutableMuleMessage okMessage = new DefaultMuleMessage("OK");
             okMessage.setOutboundProperty("id", "1");
             DefaultMuleEvent newEvent = new DefaultMuleEvent(okMessage, flow, session);
             DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, inboundEndpoint);

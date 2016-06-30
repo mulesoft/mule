@@ -49,7 +49,6 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase
     public void initialise()
     {
         when(mockEvent.getMessage()).thenReturn(muleMessage);
-        when(muleMessage.getMuleContext()).thenReturn(muleContext);
         expressionManager = mock(DefaultExpressionManager.class);
         when(expressionManager.isValidExpression(anyString())).thenReturn(true);
         when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(MuleEvent.class), anyBoolean(), anyBoolean()))

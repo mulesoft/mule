@@ -109,7 +109,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit
         {
             // we've got an out of band WS-RM message or a message from a standalone client
             MuleContext muleContext = configuration.getMuleContext();
-            MuleMessage muleMsg = new DefaultMuleMessage(handler, muleContext);
+            MuleMessage muleMsg = new DefaultMuleMessage(handler);
 
             String url = setupURL(message);
 

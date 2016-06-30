@@ -95,7 +95,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload", event.getMuleContext()));
+            event.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload"));
             return event;
 
         }
@@ -106,7 +106,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload", eventContext.getMuleContext()));
+            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload"));
             return eventContext.getMessage();
         }
     }
@@ -116,7 +116,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            eventContext.sendEvent(new DefaultMuleMessage("payload", eventContext.getMuleContext()), getUrl("innerrequestresponsetest"));
+            eventContext.sendEvent(new DefaultMuleMessage("payload"), getUrl("innerrequestresponsetest"));
             return eventContext.getMessage();
         }
     }

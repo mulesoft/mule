@@ -27,45 +27,43 @@ import org.junit.Test;
 public class IsXmlFilterTestCase extends AbstractMuleTestCase
 {
     private IsXmlFilter filter;
-    private MuleContext muleContext;
 
     @Before
     public void setUp()
     {
         filter = new IsXmlFilter();
-        muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     }
 
     @Test
     public void testFilterFalse() throws Exception
     {
-        assertFalse(filter.accept(new DefaultMuleMessage("This is definitely not XML.", muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage("This is definitely not XML.")));
     }
 
     @Test
     public void testFilterFalse2() throws Exception
     {
         assertFalse(filter.accept(new DefaultMuleMessage(
-            "<line>This is almost XML</line><line>This is almost XML</line>", muleContext)));
+            "<line>This is almost XML</line><line>This is almost XML</line>")));
     }
 
     @Test
     public void testFilterTrue() throws Exception
     {
-        assertTrue(filter.accept(new DefaultMuleMessage("<msg attrib=\"att1\">This is some nice XML!</msg>", muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage("<msg attrib=\"att1\">This is some nice XML!</msg>")));
     }
 
     @Test
     public void testFilterBytes() throws Exception
     {
         byte[] bytes = "<msg attrib=\"att1\">This is some nice XML!</msg>".getBytes();
-        assertTrue(filter.accept(new DefaultMuleMessage(bytes, muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage(bytes)));
     }
 
     @Test
     public void testFilterNull() throws Exception
     {
-        assertFalse(filter.accept(new DefaultMuleMessage(null, muleContext)));
+        assertFalse(filter.accept(new DefaultMuleMessage(null)));
     }
 
     @Test
@@ -74,7 +72,7 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase
         InputStream is = IOUtils.getResourceAsStream("cdcatalog.xml", getClass());
         assertNotNull("Test resource not found.", is);
         final String xml = IOUtils.toString(is);
-        assertTrue(filter.accept(new DefaultMuleMessage(xml, muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage(xml)));
     }
 
     @Test
@@ -83,7 +81,7 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase
         InputStream is = IOUtils.getResourceAsStream("cdcatalog.html", getClass());
         assertNotNull("Test resource not found.", is);
         final String html = IOUtils.toString(is);
-        assertTrue(filter.accept(new DefaultMuleMessage(html, muleContext)));
+        assertTrue(filter.accept(new DefaultMuleMessage(html)));
     }
 
     @Test
@@ -92,7 +90,7 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase
         List<?> list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
         for (Object message : list)
         {
-            assertTrue(filter.accept(new DefaultMuleMessage(message, muleContext)));
+            assertTrue(filter.accept(new DefaultMuleMessage(message)));
         }
     }
 }

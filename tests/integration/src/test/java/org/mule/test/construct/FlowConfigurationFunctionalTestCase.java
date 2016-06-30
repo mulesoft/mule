@@ -471,7 +471,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testInvoke2() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("0", Collections.singletonMap("one", "header1val"), null, null, muleContext);
+        MuleMessage message = new DefaultMuleMessage("0", Collections.singletonMap("one", "header1val"), null, null);
         final MuleMessage response = flowRunner("invoke2").withPayload(message).run().getMessage();
         assertEquals("header1valrecieved", getPayloadAsString(response));
     }
@@ -665,7 +665,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.setMessage(new DefaultMuleMessage(currentThread(), event.getMessage(), event.getMuleContext()));
+            event.setMessage(new DefaultMuleMessage(currentThread(), event.getMessage()));
             return event;
         }
     }

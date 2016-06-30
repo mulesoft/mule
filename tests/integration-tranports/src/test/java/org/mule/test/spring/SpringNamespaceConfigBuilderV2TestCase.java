@@ -69,7 +69,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         Map props = new HashMap();
         props.put("id", "myID123");
         props.put("correlation", "myCorrelationID456");
-        MuleMessage msg = new DefaultMuleMessage("foo", props, muleContext);
+        MuleMessage msg = new DefaultMuleMessage("foo", props);
         MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         assertEquals("myID123", mapping.getMessageId(event));

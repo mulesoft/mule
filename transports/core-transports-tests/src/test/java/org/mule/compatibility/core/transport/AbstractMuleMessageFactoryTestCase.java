@@ -49,7 +49,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
     {
         MuleMessageFactory factory = createMuleMessageFactory();
         
-        MuleMessage message = factory.create(null, encoding, muleContext);
+        MuleMessage message = factory.create(null, encoding);
         assertNotNull(message);
         assertEquals(NullPayload.getInstance(), message.getPayload());
     }
@@ -60,7 +60,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
         MuleMessageFactory factory = createMuleMessageFactory();
     
         Object payload = getValidTransportMessage();
-        MuleMessage message = factory.create(payload, encoding, muleContext);
+        MuleMessage message = factory.create(payload, encoding);
         assertNotNull(message);
         assertEquals(payload, message.getPayload());
     }
@@ -78,7 +78,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
         Object invalidPayload = getUnsupportedTransportMessage();
         try
         {
-            factory.create(invalidPayload, encoding, muleContext);
+            factory.create(invalidPayload, encoding);
             fail("Creating a MuleMessageFactory from an invalid transport message must fail"); 
         }
         catch (MessageTypeNotSupportedException mtnse)

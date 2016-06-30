@@ -48,7 +48,7 @@ public class SharedInterceptorStackTestCase extends FunctionalTestCase
         {
             MuleMessage message = event.getMessage();
             String payload = message.getPayload().toString();
-            event.setMessage(new DefaultMuleMessage(payload + " CustomInterceptor", event.getMessage(), event.getMuleContext()));
+            event.setMessage(new DefaultMuleMessage(payload + " CustomInterceptor", event.getMessage()));
             return processNext(event);
         }
     }

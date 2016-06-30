@@ -95,7 +95,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     public void onMessage(MuleMessage message) throws MuleException
     {
         // Rewrite the message to treat it as a new message
-        MutableMuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, endpoint.getMuleContext());
+        MutableMuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message);
         routeMessage(newMessage);
     }
 
@@ -104,11 +104,9 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         //TODO remove code to change message MuleContext once MULE-7357 gets fixed
-        MuleContext originaMuleContext = message.getMuleContext();
         try
         {
             Thread.currentThread().setContextClassLoader(endpoint.getMuleContext().getExecutionClassLoader());
-            ((DefaultMuleMessage)message).setMuleContext(originaMuleContext);
             ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
             MuleEvent resultEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>()
             {
@@ -131,7 +129,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             if (resultEvent != null)
             {
                 DefaultMuleMessage resultMessage = (DefaultMuleMessage) resultEvent.getMessage();
-                resultMessage.setMuleContext(originaMuleContext);
                 return resultMessage;
             }
             else
@@ -156,7 +153,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
         finally
         {
-            ((DefaultMuleMessage) message).setMuleContext(originaMuleContext);
             message.release();
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
@@ -177,10 +173,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             }
 
             List<MuleMessage> messages = new ArrayList<MuleMessage>(1);
-            if (message instanceof DefaultMuleMessage)
-            {
-                ((DefaultMuleMessage) message).setMuleContext(endpoint.getMuleContext());
-            }
             messages.add(message);
             return messages;
         }
@@ -206,11 +198,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
         if (message != null)
         {
-            // keep first dequeued message
-            if (message instanceof DefaultMuleMessage)
-            {
-                ((DefaultMuleMessage) message).setMuleContext(endpoint.getMuleContext());
-            }
             messages.add(message);
 
             // keep batching if more events are available
@@ -219,7 +206,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                 message = getMessage(queue, 0);
                 if (message != null)
                 {
-                    messages.add(new DefaultMuleMessage(message, endpoint.getMuleContext()));
+                    messages.add(new DefaultMuleMessage(message));
                 }
             }
         }

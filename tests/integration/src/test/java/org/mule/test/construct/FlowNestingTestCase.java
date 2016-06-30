@@ -42,7 +42,7 @@ public class FlowNestingTestCase extends FunctionalTestCase
         inboundProperties.put("Currency", "MyCurrency");
         inboundProperties.put("AcquirerCountry", "MyCountry");
         inboundProperties.put("Amount", "4999");
-        MuleMessage request = new DefaultMuleMessage(new Orange(), inboundProperties, null, null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(new Orange(), inboundProperties, null, null);
 
         MuleClient client = muleContext.getClient();
         
@@ -58,7 +58,7 @@ public class FlowNestingTestCase extends FunctionalTestCase
         inboundProperties.put("Currency", "MyCurrency");
         inboundProperties.put("AcquirerCountry", "MyCountry");
         inboundProperties.put("Amount", "4999");
-        MuleMessage request = new DefaultMuleMessage(new Apple(), inboundProperties, null, null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(new Apple(), inboundProperties, null, null);
                
         MuleClient client = muleContext.getClient();
         
@@ -73,7 +73,7 @@ public class FlowNestingTestCase extends FunctionalTestCase
         Map<String, Serializable> inboundProperties = new HashMap<>();
         inboundProperties.put("AcquirerCountry", "MyCountry");
         inboundProperties.put("Amount", "4999");
-        MuleMessage request = new DefaultMuleMessage(new Apple(), inboundProperties, null, null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(new Apple(), inboundProperties, null, null);
                
         MuleClient client = muleContext.getClient();
         
@@ -89,7 +89,7 @@ public class FlowNestingTestCase extends FunctionalTestCase
         Map<String, Serializable> inboundProperties = new HashMap<>();
         inboundProperties.put("AcquirerCountry", "MyCountry");
         inboundProperties.put("Amount", "5000");
-        MuleMessage request = new DefaultMuleMessage(new Apple(), inboundProperties, null, null, muleContext);
+        MuleMessage request = new DefaultMuleMessage(new Apple(), inboundProperties, null, null);
                
         MuleClient client = muleContext.getClient();
         

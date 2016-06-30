@@ -28,7 +28,7 @@ public class TestClusterizableMessageSource implements ClusterizableMessageSourc
     @Override
     public void start() throws MuleException
     {
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage("TEST", context);
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage("TEST");
         DefaultMuleEvent defaultMuleEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.ONE_WAY, flowConstruct);
         listener.process(defaultMuleEvent);
     }

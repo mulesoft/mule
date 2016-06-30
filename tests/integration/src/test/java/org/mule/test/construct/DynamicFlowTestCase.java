@@ -228,7 +228,7 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             steps.append("P");
-            event.setMessage(new DefaultMuleMessage(event.getMessage().getPayload() + "(pre)", event.getMessage(), event.getMuleContext()));
+            event.setMessage(new DefaultMuleMessage(event.getMessage().getPayload() + "(pre)", event.getMessage()));
             return event;
         }
 
@@ -260,7 +260,7 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.setMessage(new DefaultMuleMessage(event.getMessage().getPayload() + "(pre)", event.getMessage(), event.getMuleContext()));
+            event.setMessage(new DefaultMuleMessage(event.getMessage().getPayload() + "(pre)", event.getMessage()));
             return event;
         }
 

@@ -83,7 +83,7 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
 
     private DefaultMuleMessage getTestMessage()
     {
-        return new DefaultMuleMessage(getPayload(), muleContext);
+        return new DefaultMuleMessage(getPayload());
     }
 
     @Test

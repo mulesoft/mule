@@ -285,7 +285,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
                 ros = new ResponseOutputStream(outputStream);
             }
         }
-        MuleSession session = connector.getSessionHandler().retrieveSessionInfoFromMessage(message);
+        MuleSession session = connector.getSessionHandler().retrieveSessionInfoFromMessage(message, flowConstruct.getMuleContext());
 
         if (session == null)
         {

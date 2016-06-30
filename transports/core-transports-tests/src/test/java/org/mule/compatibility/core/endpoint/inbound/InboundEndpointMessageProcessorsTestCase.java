@@ -73,7 +73,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
     {
         Map<String, Serializable> props = new HashMap<>();
         props.put("prop1", "value1");
-        return new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
+        return new DefaultMuleMessage(TEST_MESSAGE, props);
     }
 
     protected MuleEvent createTestRequestEvent(InboundEndpoint endpoint) throws Exception

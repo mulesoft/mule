@@ -43,7 +43,7 @@ public class NotSharedHttpConnectorInDomain extends DomainFunctionalTestCase
     public void sendMessageToNotSharedConnectorInDomain() throws Exception {
         String url = String.format("http://localhost:%d/test", dynamicPort.getNumber());
         MuleContext muleContext = getMuleContextForApp(APP);
-        muleContext.getClient().send(url, new DefaultMuleMessage("", muleContext));
+        muleContext.getClient().send(url, new DefaultMuleMessage(""));
 
         assertThat(muleContext.getClient().request("test://in", 5000), is(notNullValue()));
     }

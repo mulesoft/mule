@@ -137,7 +137,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
 
     protected MutableMuleMessage createMuleMessage()
     {
-        return new DefaultMuleMessage(payload, muleContext);
+        return new DefaultMuleMessage(payload);
     }
 
     protected MuleMessage createMuleMessageWithProperties(int numProperties)

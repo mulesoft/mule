@@ -79,7 +79,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
         {
             Object payloadBeforeException = event.getMessage().getPayload();
             MuleEvent resultEvent = super.handleException(e, event);
-            resultEvent.setMessage(new DefaultMuleMessage(payloadBeforeException, event.getMessage(), event.getMuleContext()));
+            resultEvent.setMessage(new DefaultMuleMessage(payloadBeforeException, event.getMessage()));
             return resultEvent;
         }
     }

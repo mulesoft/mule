@@ -158,7 +158,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
             eventFromMainFlow = RequestContext.getEvent();
             messageFromMainFlow = eventFromMainFlow.getMessage();
 
-            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload", eventContext.getMuleContext()));
+            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload"));
 
             throw new Exception("expected exception!");
         }
@@ -172,7 +172,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
             eventFromMainFlow = RequestContext.getEvent();
             messageFromMainFlow = eventFromMainFlow.getMessage();
 
-            eventContext.sendEvent(new DefaultMuleMessage("payload", eventContext.getMuleContext()),
+            eventContext.sendEvent(new DefaultMuleMessage("payload"),
                                    getUrl("innerrequestresponsetest"));
 
             throw new Exception("expected exception!");
@@ -188,7 +188,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
             messageFromMainFlow = eventFromMainFlow.getMessage();
 
             event.getMuleContext().getClient().dispatch(getUrl("innertest"),
-                                                        new DefaultMuleMessage("payload", event.getMuleContext()));
+                                                        new DefaultMuleMessage("payload"));
 
             throw new DefaultMuleException("expected exception!");
         }

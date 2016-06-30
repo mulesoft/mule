@@ -51,7 +51,7 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
         {
             try
             {
-                event.setMessage(new DefaultMuleMessage(letter, event.getMessage(), event.getMuleContext()));
+                event.setMessage(new DefaultMuleMessage(letter, event.getMessage()));
                 return event;
             }
             catch (Exception e)

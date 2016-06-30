@@ -9,6 +9,7 @@ package org.mule.test.core.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.EncryptionStrategy;
@@ -78,6 +79,6 @@ public class MultiuserSecurityTestCase extends FunctionalTestCase
         Map<String, Serializable> props = new HashMap<>();
         props.put(MULE_USER_PROPERTY, MuleCredentials.createHeader(user, user, "PBE", strategy));
 
-        return flowRunner("testService").withPayload(new DefaultMuleMessage(data, props, null, null, muleContext)).run().getMessage();
+        return flowRunner("testService").withPayload(new DefaultMuleMessage(data, props, null, null)).run().getMessage();
     }
 }

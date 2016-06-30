@@ -85,7 +85,7 @@ public class TlsSharedContextTestCase extends DomainFunctionalTestCase
     private void testMuleClient(HttpRequestOptions operationOptions) throws Exception
     {
         MuleContext context = getMuleContextForApp(SECOND_APP);
-        MuleMessage response = context.getClient().send(String.format("https://localhost:%s/helloAll", port3.getValue()), new DefaultMuleMessage(DATA, context), operationOptions);
+        MuleMessage response = context.getClient().send(String.format("https://localhost:%s/helloAll", port3.getValue()), new DefaultMuleMessage(DATA), operationOptions);
         assertThat(getPayloadAsString(response, context), is("hello all"));
     }
 

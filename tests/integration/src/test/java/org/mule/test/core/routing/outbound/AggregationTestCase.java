@@ -10,6 +10,8 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -19,7 +21,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.routing.SimpleCollectionAggregator;
@@ -110,7 +111,7 @@ public class AggregationTestCase extends FunctionalTestCase
         @Override
         public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
         {
-            List<MuleEvent> eventList = new ArrayList<MuleEvent>();
+            List<MuleEvent> eventList = new ArrayList<>();
             Iterator<MuleEvent> iter = null;
             FlowConstruct fc = null;
             try
@@ -128,7 +129,7 @@ public class AggregationTestCase extends FunctionalTestCase
                 fc = event.getFlowConstruct();
             }
 
-            MuleMessage msg = new DefaultMuleMessage(eventList, muleContext);
+            MuleMessage msg = new DefaultMuleMessage(eventList);
             return new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, fc);
         }
     }

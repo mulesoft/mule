@@ -58,7 +58,7 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase
         });
 
         MuleClient client = muleContext.getClient();
-        MutableMuleMessage msg = new DefaultMuleMessage("test", muleContext);
+        MutableMuleMessage msg = new DefaultMuleMessage("test");
         msg.addOutboundAttachment("attach1", new DataHandler(new StringDataSource("foo", "attach1")));
 
         MuleMessage result = client.send("endpoint1", msg);

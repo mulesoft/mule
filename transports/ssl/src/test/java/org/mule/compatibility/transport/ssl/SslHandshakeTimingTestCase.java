@@ -45,7 +45,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
         // run into a timeout
         try
         {
-            MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+            MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
             callPreRoute(receiver, message);
             fail();
         }
@@ -61,7 +61,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
     {
         SslMessageReceiver receiver = setupMockSslMessageReciever();
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
         receiver.handshakeCompleted(new MockHandshakeCompletedEvent());
         callPreRoute(receiver, message);
 

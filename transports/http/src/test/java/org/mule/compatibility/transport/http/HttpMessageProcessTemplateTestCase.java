@@ -71,7 +71,7 @@ public class HttpMessageProcessTemplateTestCase
     @Before
     public void prepare() throws MuleException
     {
-        message = new DefaultMuleMessage(PAYLOAD, context);
+        message = new DefaultMuleMessage(PAYLOAD);
         message.setInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY, ROOT_MESSAGE_ID);
         message.setInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, "/");
 

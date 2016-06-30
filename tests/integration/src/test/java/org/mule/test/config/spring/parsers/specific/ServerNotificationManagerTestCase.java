@@ -10,6 +10,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -22,8 +24,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.util.Collection;
 
@@ -149,6 +149,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
             return called;
         }
 
+        @Override
         public void onNotification(ServerNotification notification)
         {
             called = true;
@@ -166,6 +167,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
             return called;
         }
 
+        @Override
         public void onNotification(ServerNotification notification)
         {
             called = true;
@@ -183,6 +185,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
             return called;
         }
 
+        @Override
         public void onNotification(SecurityNotification notification)
         {
             called = true;
@@ -207,7 +210,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         {
             super(
                 new UnauthorisedException(CoreMessages.createStaticMessage("dummy"), new DefaultMuleEvent(
-                    new DefaultMuleMessage(NullPayload.getInstance(), muleContext), MessageExchangePattern.REQUEST_RESPONSE,
+                            new DefaultMuleMessage(NullPayload.getInstance()), MessageExchangePattern.REQUEST_RESPONSE,
                     getTestFlow(), getTestSession(null, muleContext))), 0);
         }
 

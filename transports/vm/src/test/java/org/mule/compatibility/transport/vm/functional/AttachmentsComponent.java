@@ -47,7 +47,7 @@ public class AttachmentsComponent implements Callable
             throw new IllegalArgumentException("payload is incorrect");
         }
         // Lets return an image
-        MutableMuleMessage result = new DefaultMuleMessage("here is one for you!", eventContext.getMuleContext());
+        MutableMuleMessage result = new DefaultMuleMessage("here is one for you!");
         FileDataSource ds = new FileDataSource(
             new File("transports/vm/src/test/resources/test.gif").getAbsoluteFile());
         result.addOutboundAttachment("mule", new DataHandler(ds));

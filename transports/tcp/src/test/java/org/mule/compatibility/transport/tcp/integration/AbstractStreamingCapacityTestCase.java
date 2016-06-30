@@ -85,7 +85,7 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         // dynamically get the endpoint to send to
         client.dispatch(
                 ((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("testComponent")).getMessageSource()).getAddress(),
-            new DefaultMuleMessage(stream, muleContext));
+            new DefaultMuleMessage(stream));
 
         // if we assume 1MB/sec then we need at least...
         long pause = Math.max(size / ONE_MB, 60 * 10) + 10;

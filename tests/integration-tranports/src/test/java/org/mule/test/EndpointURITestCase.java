@@ -64,7 +64,7 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase
             inbound.put("prop1", "apple");
             inbound.put("prop2", "orange");
             inbound.put("prop3", "banana");
-            message = new DefaultMuleMessage("Hello, world", inbound, null, null, muleContext);
+            message = new DefaultMuleMessage("Hello, world", inbound, null, null);
         }
 
         public EndpointUri(String uri, String resultUri)

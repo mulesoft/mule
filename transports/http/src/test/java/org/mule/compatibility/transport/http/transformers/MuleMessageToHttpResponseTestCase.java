@@ -115,7 +115,6 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         TransformationService transformationService = mock(TransformationService.class);
         DataType objectDataType = DataType.OBJECT;
         when(msg.getDataType()).thenReturn(objectDataType);
-        when(msg.getMuleContext()).thenReturn(muleContext);
         when(muleContext.getTransformationService()).thenReturn(transformationService);
         doReturn(new DefaultMuleMessage((OutputHandler) (event, out) ->
         {
@@ -132,7 +131,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleTestCase
         Map<String, Serializable> outboundProperties =  new HashMap<>();
         outboundProperties.put(HEADER_CONTENT_TYPE, wrongContentType);
         MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-        MutableMuleMessage msg = new DefaultMuleMessage(null, outboundProperties, muleContext);
+        MutableMuleMessage msg = new DefaultMuleMessage(null, outboundProperties);
         //Making sure that the outbound property overrides both invocation and inbound
         msg.setOutboundProperty(HEADER_CONTENT_TYPE, wrongContentType);
         msg.setInboundProperty(HEADER_CONTENT_TYPE, wrongContentType);

@@ -77,6 +77,6 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
         }
         // Set Mule Properties
 
-        return new DefaultMuleMessage(msg, headerProps, muleContext);
+        return new DefaultMuleMessage(msg, headerProps);
     }
 }

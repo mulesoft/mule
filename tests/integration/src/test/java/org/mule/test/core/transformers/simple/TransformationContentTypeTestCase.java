@@ -37,7 +37,7 @@ public class TransformationContentTypeTestCase extends FunctionalTestCase
         String inputMessage = "ABCDEF";
         byte[] array = (byte[]) trans.transform(inputMessage);
 
-        MuleMessage message = new DefaultMuleMessage(inputMessage, muleContext);
+        MuleMessage message = new DefaultMuleMessage(inputMessage);
         List<Transformer> transformers = Arrays.asList(new Transformer[] {trans});
         message = muleContext.getTransformationService().applyTransformers(message, null, transformers);
         assertThat(message.getDataType().getMediaType().getPrimaryType(), is("text"));

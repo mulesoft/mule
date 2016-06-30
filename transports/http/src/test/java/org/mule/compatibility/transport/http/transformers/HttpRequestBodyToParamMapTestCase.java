@@ -113,7 +113,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleTestCase
         {
             payload = "http://localhost/?" + payload;
         }
-        return new DefaultMuleMessage(payload, inboundProperties, null, null, muleContext);
+        return new DefaultMuleMessage(payload, inboundProperties, null, null);
     }
 
 }

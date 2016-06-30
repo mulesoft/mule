@@ -37,7 +37,7 @@ public class FormTransformerTestCase extends AbstractMuleContextEndpointTestCase
     @Test
     public void testFormTransformer() throws TransformerException
     {
-        MuleMessage msg = new DefaultMuleMessage("test1=value1&test2=value2&test3", muleContext);
+        MuleMessage msg = new DefaultMuleMessage("test1=value1&test2=value2&test3");
         Object result = transformer.transform(msg);
         assertTrue(result instanceof Map);
         
@@ -50,7 +50,7 @@ public class FormTransformerTestCase extends AbstractMuleContextEndpointTestCase
     @Test
     public void testMultipleValues() throws TransformerException
     {
-        MuleMessage msg = new DefaultMuleMessage("test1=value1&test1=value2", muleContext);
+        MuleMessage msg = new DefaultMuleMessage("test1=value1&test1=value2");
         Object result = transformer.transform(msg);
         assertTrue(result instanceof Map);
         

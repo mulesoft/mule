@@ -114,7 +114,7 @@ public class ForeachTestCase extends FunctionalTestCase
         names.add("visitante");
         Map<String, Serializable> props = new HashMap<>();
         props.put("names", names);
-        MuleMessage message = new DefaultMuleMessage("message payload", props, muleContext);
+        MuleMessage message = new DefaultMuleMessage("message payload", props);
 
         MuleMessage result = flowRunner("minimal-config-expression").withPayload("message payload")
                                                                     .withInboundProperties(props)
@@ -199,12 +199,12 @@ public class ForeachTestCase extends FunctionalTestCase
         List<MuleMessage> list = new ArrayList<>();
         for (int i = 0; i < 10; i++)
         {
-            MutableMuleMessage msg = new DefaultMuleMessage("message-" + i, muleContext);
+            MutableMuleMessage msg = new DefaultMuleMessage("message-" + i);
             msg.setOutboundProperty("out", "out" + (i + 1));
             list.add(msg);
         }
 
-        MuleMessage msgCollection = new DefaultMuleMessage(list, muleContext);
+        MuleMessage msgCollection = new DefaultMuleMessage(list);
         MuleMessage result = flowRunner("message-collection-config").withPayload(msgCollection).run().getMessage();
         assertThat(result.getOutboundProperty("totalMessages"), is(10));
         assertThat(result.getPayload(), is(msgCollection.getPayload()));
@@ -217,7 +217,7 @@ public class ForeachTestCase extends FunctionalTestCase
         List<MuleMessage> list = new ArrayList<>();
         for (int i = 0; i < 10; i++)
         {
-            MuleMessage msg = new DefaultMuleMessage("message-" + i, Collections.singletonMap("out", "out" + (i+1)), null, null, muleContext);
+            MuleMessage msg = new DefaultMuleMessage("message-" + i, Collections.singletonMap("out", "out" + (i+1)), null, null);
             list.add(msg);
         }
         final String flowName = "message-collection-config-one-way";
@@ -249,7 +249,7 @@ public class ForeachTestCase extends FunctionalTestCase
         names.add("Rachmaninoff");
         Map<String, Serializable> props = new HashMap<>();
         props.put("names", names);
-        MuleMessage message = new DefaultMuleMessage("message payload", props, muleContext);
+        MuleMessage message = new DefaultMuleMessage("message payload", props);
 
         MuleMessage result = flowRunner("map-expression-config").withPayload("message payload")
                                                                 .withInboundProperties(props)

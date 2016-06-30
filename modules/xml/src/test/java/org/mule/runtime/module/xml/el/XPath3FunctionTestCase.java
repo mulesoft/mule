@@ -167,7 +167,7 @@ public class XPath3FunctionTestCase extends AbstractELTestCase
 
     private void evaluateFooFromPayload(Object payload) throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(payload, muleContext);
+        MuleMessage message = new DefaultMuleMessage(payload);
         MuleEvent event = new DefaultMuleEvent(message, getTestEvent(""));
 
         assertThat((String) doEvaluate("xpath3('/root/@foo')", event), equalTo(BAR));

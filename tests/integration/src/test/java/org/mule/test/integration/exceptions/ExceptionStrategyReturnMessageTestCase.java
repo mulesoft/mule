@@ -62,7 +62,7 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
         public MuleEvent handleException(Exception exception, MuleEvent event)
         {
             MuleEvent result = super.handleException(exception, event);
-            event.setMessage(new DefaultMuleMessage("Ka-boom!", event.getMessage(), event.getMuleContext()));
+            event.setMessage(new DefaultMuleMessage("Ka-boom!", event.getMessage()));
             if (exception instanceof MessagingException)
             {
                 ((MessagingException)exception).setHandled(true);

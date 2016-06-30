@@ -54,7 +54,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
         MockSslSocket socket = new MockSslSocket();
         HttpMessageProcessTemplate messageProcessTemplate = messageReceiver.createMessageProcessTemplate(new HttpServerConnection(socket, messageReceiver.getEndpoint().getEncoding(), (HttpConnector) messageReceiver.getConnector()));
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
         messageProcessTemplate.beforeRouteEvent(getTestEvent(message));
     }
 
@@ -70,7 +70,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
 
         invokeHandshakeCompleted(serverConnection, socket);
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
         messageContext.acquireMessage();
         serverConnection.readRequest();
         MuleEvent muleEvent = messageContext.beforeRouteEvent(getTestEvent(message));

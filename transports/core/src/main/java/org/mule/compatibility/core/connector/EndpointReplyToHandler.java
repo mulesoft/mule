@@ -58,7 +58,7 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler
         String replyToEndpoint = replyTo.toString();
 
         // Create a new copy of the message so that response MessageProcessors don't end up screwing up the reply
-        returnMessage = new DefaultMuleMessage(returnMessage.getPayload(), returnMessage, muleContext);
+        returnMessage = new DefaultMuleMessage(returnMessage.getPayload(), returnMessage);
 
         // Create the replyTo event asynchronous
         MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, event);

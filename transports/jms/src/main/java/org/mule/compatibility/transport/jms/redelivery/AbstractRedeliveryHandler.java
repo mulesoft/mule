@@ -42,11 +42,11 @@ public abstract class AbstractRedeliveryHandler implements RedeliveryHandler
     {
         try
         {
-            return connector.createMuleMessageFactory().create(message, getDefaultEncoding(muleContext), muleContext);
+            return connector.createMuleMessageFactory().create(message, getDefaultEncoding(muleContext));
         }
         catch (Exception e)
         {
-            return new DefaultMuleMessage(message, muleContext);
+            return new DefaultMuleMessage(message);
         }
     }
 }

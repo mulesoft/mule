@@ -242,7 +242,7 @@ public class MuleClient implements Disposable
      */
     public void dispatch(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException
     {
-        dispatch(url, new DefaultMuleMessage(payload, messageProperties, muleContext));
+        dispatch(url, new DefaultMuleMessage(payload, messageProperties));
     }
 
     /**
@@ -312,7 +312,7 @@ public class MuleClient implements Disposable
                                          final Map<String, Serializable> messageProperties,
                                          final int timeout) throws MuleException
     {
-        return sendAsync(url, new DefaultMuleMessage(payload, messageProperties, muleContext), timeout);
+        return sendAsync(url, new DefaultMuleMessage(payload, messageProperties), timeout);
     }
 
     /**
@@ -413,7 +413,7 @@ public class MuleClient implements Disposable
             messageProperties = new HashMap<>(messageProperties);
             messageProperties.put(MULE_REMOTE_SYNC_PROPERTY, "true");
         }
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
         return send(url, message, timeout);
     }
 
@@ -444,7 +444,7 @@ public class MuleClient implements Disposable
         }
         else
         {
-            return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
+            return new DefaultMuleMessage(NullPayload.getInstance());
         }
     }
 
@@ -591,7 +591,7 @@ public class MuleClient implements Disposable
             messageProperties = new HashMap<>();
         }
         messageProperties.put(MULE_REMOTE_SYNC_PROPERTY, "false");
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
 
         OutboundEndpoint endpoint =
             getOutboundEndpoint(url, REQUEST_RESPONSE, null);

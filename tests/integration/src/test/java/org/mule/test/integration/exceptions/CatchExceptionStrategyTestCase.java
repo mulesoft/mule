@@ -131,7 +131,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
             NewsResponse newsResponse = new NewsResponse();
             newsResponse.setUserId(newsRequest.getUserId());
             newsResponse.setTitle("News title");
-            event.setMessage(new DefaultMuleMessage(newsResponse, event.getMessage(), event.getMuleContext()));
+            event.setMessage(new DefaultMuleMessage(newsResponse, event.getMessage()));
             return event;
         }
     }

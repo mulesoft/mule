@@ -65,7 +65,7 @@ public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutd
             {
                 try
                 {
-                    DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE, new HashMap<String, Serializable>(), muleContext);
+                    DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
                     MuleMessage result = client.send(url, muleMessage, HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation().method(POST.name()).build());
                     results[0] = result.getExceptionPayload().getException() instanceof DispatchException;
                 }

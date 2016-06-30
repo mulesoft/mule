@@ -75,7 +75,7 @@ public class HttpMultipartMuleMessageFactoryTestCase extends AbstractMuleMessage
         HttpMuleMessageFactory factory = (HttpMuleMessageFactory) createMuleMessageFactory();
         factory.setExchangePattern(MessageExchangePattern.ONE_WAY);
         HttpRequest request = createMultiPartHttpRequest(MULTIPART_MESSAGE);
-        MuleMessage message = factory.create(request, encoding, muleContext);
+        MuleMessage message = factory.create(request, encoding);
         assertNotNull(message);
         assertTrue(message.getPayload() instanceof InputStream);
     }
@@ -86,7 +86,7 @@ public class HttpMultipartMuleMessageFactoryTestCase extends AbstractMuleMessage
         HttpMuleMessageFactory factory = (HttpMuleMessageFactory) createMuleMessageFactory();
         factory.setExchangePattern(MessageExchangePattern.ONE_WAY);
         HttpRequest request = createMultiPartHttpRequest(MULTIPART_MESSAGE_NO_PAYLOAD);
-        MuleMessage message = factory.create(request, encoding, muleContext);
+        MuleMessage message = factory.create(request, encoding);
         assertNotNull(message);
         assertTrue(message.getPayload() instanceof NullPayload);
     }

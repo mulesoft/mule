@@ -130,7 +130,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
             resultMessage.setMessageRootId(requestEvent.getMessage().getMessageRootId());
 
             MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
-                    resultMessage);
+                    resultMessage, requestEvent.getMuleContext());
             requestEvent.getSession().merge(storedSession);
             MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, requestEvent);
             unsafeSetEvent(resultEvent);

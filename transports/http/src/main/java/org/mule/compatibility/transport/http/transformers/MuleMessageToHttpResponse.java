@@ -123,7 +123,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
                             // so we don't end up with a chunked response
                             len = event.getMessageAsBytes().length;
 
-                            response.setBody(event.getMessage());
+                            response.setBody(event.getMessage(), muleContext);
 
                             Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
                             response.setHeader(header);
@@ -165,7 +165,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             if ("HEAD".equalsIgnoreCase(method))
             {
                 // this is a head request, we don't want to send the actual content
-                response.setBody((MuleMessage) null);
+                response.setBody((MuleMessage) null, muleContext);
             }
             return response;
         }
@@ -312,7 +312,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
 
         try
         {
-            response.setBody(msg);
+            response.setBody(msg, muleContext);
         }
         catch (Exception e)
         {

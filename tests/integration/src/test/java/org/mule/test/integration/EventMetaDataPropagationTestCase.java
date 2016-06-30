@@ -63,7 +63,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
                 props.put("integerParam", 12345);
                 props.put("longParam", (long) 123456789);
                 props.put("booleanParam", Boolean.TRUE);
-                MutableMuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props, muleContext);
+                MutableMuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props);
                 msg.addOutboundAttachment("test1", new DataHandler(new DataSource()
                 {
                     @Override

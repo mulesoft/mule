@@ -114,7 +114,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
             // If the payload is already HttpResponse then it already has the body set
             if(!(message.getPayload() instanceof HttpResponse))
             {
-                response.setBody(message);
+                response.setBody(message, muleContext);
             }
         }
         catch(Exception e)

@@ -16,11 +16,16 @@ import static org.springframework.util.ReflectionUtils.setField;
 
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.routing.MessageInfoMapping;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -290,7 +295,46 @@ public class MuleExtensionUtils
 
     public static MuleEvent getInitialiserEvent(MuleContext muleContext)
     {
-        return new DefaultMuleEvent(new DefaultMuleMessage(null), REQUEST_RESPONSE, (FlowConstruct) null);
+        return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance()), REQUEST_RESPONSE, new FlowConstruct()
+        {
+            // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
+            
+            @Override
+            public MuleContext getMuleContext()
+            {
+                return muleContext;
+            }
+
+            @Override
+            public String getName()
+            {
+                return "InitialiserEventFlow";
+            }
+
+            @Override
+            public LifecycleState getLifecycleState()
+            {
+                return null;
+            }
+
+            @Override
+            public MessagingExceptionHandler getExceptionListener()
+            {
+                return null;
+            }
+
+            @Override
+            public FlowConstructStatistics getStatistics()
+            {
+                return null;
+            }
+
+            @Override
+            public MessageInfoMapping getMessageInfoMapping()
+            {
+                return null;
+            }
+        });
     }
 
     /**
