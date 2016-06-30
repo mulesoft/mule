@@ -21,19 +21,34 @@ public class ListConnector
 {
 
     @Parameter
-    private List<Object> requiredListDefaults;
+    private List<Object> requiredListObjectsDefaults;
 
     @Parameter
     @Expression(ExpressionSupport.NOT_SUPPORTED)
-    private List<Object> requiredListNoExpressions;
+    private List<Object> requiredListObjectsNoExpressions;
 
     @Parameter
     @Expression(ExpressionSupport.REQUIRED)
-    private List<Object> requiredListExpressionRequireds;
+    private List<Object> requiredListObjectsExpressionRequireds;
 
     @Parameter
     @Expression(ExpressionSupport.SUPPORTED)
-    private List<Object> requiredListExpressionSupporteds;
+    private List<Object> requiredListObjectsExpressionSupporteds;
+
+    @Parameter
+    private List<Account> requiredListDefaults;
+
+    @Parameter
+    @Expression(ExpressionSupport.NOT_SUPPORTED)
+    private List<Account> requiredListNoExpressions;
+
+    @Parameter
+    @Expression(ExpressionSupport.REQUIRED)
+    private List<Account> requiredListExpressionRequireds;
+
+    @Parameter
+    @Expression(ExpressionSupport.SUPPORTED)
+    private List<Account> requiredListExpressionSupporteds;
 
     @Parameter
     @Optional
