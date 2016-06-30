@@ -125,7 +125,7 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
         <N> Builder<N, ATTRIBUTES> payload(N payload);
 
         @Override
-        <N extends Collection<E>, E> CollectionBuilder<N, ATTRIBUTES> collectionPayload(N payload, Class<E> aClass);
+        <N extends Collection<E>, E> CollectionBuilder<N, ATTRIBUTES> collectionPayload(N payload, Class<E> itemType);
     }
 
     interface Builder<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message.MuleMessage
@@ -224,6 +224,13 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
          * @return
          */
         <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, DataType<T> dataType);
+
+        /**
+         * @param key
+         * @param value
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> addInboundAttachement(String key, DataHandler value);
 
         /**
          * @param key

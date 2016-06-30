@@ -7,6 +7,7 @@
 package org.mule.runtime.core;
 
 import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
@@ -214,6 +215,13 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
             dataType)
     {
         outboundProperties.put(key, new TypedValue(value, dataType));
+        return this;
+    }
+
+    @Override
+    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addInboundAttachement(String key, DataHandler value)
+    {
+        inboundAttachments.put(key, value);
         return this;
     }
 
