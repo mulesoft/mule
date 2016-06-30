@@ -23,7 +23,7 @@ public interface EventedFileAttributes extends FileAttributes
 {
 
     /**
-     * @return The {@link FileEventType} upon which {@code this} instance was created
+     * @return The name of the {@link FileEventType} upon which {@code this} instance was created
      */
-    FileEventType getEventType();
+    String getEventType();
 }

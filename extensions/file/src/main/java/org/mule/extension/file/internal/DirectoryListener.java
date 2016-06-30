@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
@@ -338,13 +339,13 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
         DataType dataType = DataType.fromType(NullPayload.class);
         MuleMessage<InputStream, ListenerFileAttributes> message;
 
-        if (attributes.getEventType() == FileEventType.DELETE)
+        if (attributes.getEventType().equals(DELETE.name()))
         {
             attributes = new DeletedFileAttributes(path);
         }
         else if (!attributes.isDirectory())
         {
-            dataType = fileSystem.getFileMessageDataType(DataType.INPUT_STREAM, attributes);
+            dataType = fileSystem.getFileMessageDataType(INPUT_STREAM, attributes);
             payload = new FileInputStream(path, new NullPathLock());
         }
 

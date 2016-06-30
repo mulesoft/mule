@@ -35,8 +35,8 @@ public class ListenerFileAttributes extends LocalFileAttributes implements Event
      * {@inheritDoc}
      */
     @Override
-    public FileEventType getEventType()
+    public String getEventType()
     {
-        return eventType;
+        return eventType.name();
     }
 }
