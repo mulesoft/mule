@@ -127,23 +127,8 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
     }
 
     @Test
-    public void fixedPartContent() throws Exception {
-        //try (CloseableHttpClient httpClient = HttpClients.createDefault())
-        //{
-        //    HttpGet httpGet = new HttpGet(getUrl("fixedPart"));
-        //    try (CloseableHttpResponse response = httpClient.execute(httpGet))
-        //    {
-        //        final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
-        //        final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
-        //        assertThat(parts.size(), is(1));
-        //
-        //        Map<String, Part> partsAsMap = convertPartsToMap(parts);
-        //        assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), notNullValue());
-        //        assertThat(IOUtils.toString(partsAsMap.get(TEXT_BODY_FIELD_NAME).getInputStream()), is(TEXT_BODY_FIELD_VALUE));
-        //        return response.getFirstHeader(requiredHeader).getValue();
-        //    }
-        //}
-
+    public void fixedPartContent() throws Exception
+    {
         String contentLengthValue = getResponseWithExpectedAttachmentFrom("fixedPart", CONTENT_LENGTH);
         assertThat(contentLengthValue, is(notNullValue()));
     }
@@ -182,7 +167,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
             httpPost.setEntity(getMultipartEntity(false));
             try (CloseableHttpResponse response = httpClient.execute(httpPost))
             {
-                assertThat(countMatches(IOUtils.toString(response.getEntity().getContent()),CONTENT_TYPE), is(1));
+                assertThat(countMatches(IOUtils.toString(response.getEntity().getContent()), CONTENT_TYPE), is(1));
             }
         }
     }
@@ -300,6 +285,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
 
     public static class CreatePartMessageProcessor implements MessageProcessor
     {
+
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
@@ -314,6 +300,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
 
     public static class CreatePartsMessageProcessor implements MessageProcessor
     {
+
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
@@ -332,6 +319,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
 
     public static class ConvertPartsMessageProcessor implements MessageProcessor
     {
+
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
@@ -347,9 +335,9 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase
                                                     filename = dataHandler.getName();
                                                 }
                                                 parts.add(new org.mule.extension.http.api.HttpPart(id,
-                                                                       dataHandler.getContent(),
-                                                                       DataType.builder().mediaType(dataHandler.getContentType()).build().getMediaType(),
-                                                                       filename));
+                                                                                                   dataHandler.getContent(),
+                                                                                                   DataType.builder().mediaType(dataHandler.getContentType()).build().getMediaType(),
+                                                                                                   filename));
                                             }
                                             catch (IOException e)
                                             {

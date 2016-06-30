@@ -84,8 +84,6 @@
                 </httpn:simple-response-builder>
             </httpn:response-builder>
         </httpn:listener>
-        <custom-processor
-                class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartMessageProcessor"/>
         <echo-component/>
     </flow>
 
