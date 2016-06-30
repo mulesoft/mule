@@ -24,7 +24,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Xmx512m -XX:MaxPermSize=128m</argLine>
+                    <!-- TODO: We should be able to remove the PermGen config after we fix MULE-10010 -->
+                    <argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
                 </configuration>
             </plugin>
 		</plugins>
