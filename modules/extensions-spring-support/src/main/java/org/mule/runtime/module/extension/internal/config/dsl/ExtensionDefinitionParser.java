@@ -473,7 +473,7 @@ public abstract class ExtensionDefinitionParser
                 {
                     if (conversionService.canConvert(value.getClass(), expectedClass))
                     {
-                        resolverValueHolder.set(new StaticValueResolver(conversionService.convert(value, expectedClass)));
+                        resolverValueHolder.set(new StaticValueResolver(convertSimpleValue(value, expectedClass, parameterName)));
                     }
                     else
                     {
@@ -757,7 +757,22 @@ public abstract class ExtensionDefinitionParser
 
     private String getChildKey(String key)
     {
-        return String.format("%s%s%s", CHILD_ELEMENT_KEY_PREFIX, key, CHILD_ELEMENT_KEY_SUFFIX);
+        return format("%s%s%s", CHILD_ELEMENT_KEY_PREFIX, key, CHILD_ELEMENT_KEY_SUFFIX);
+    }
+
+    private Object convertSimpleValue(Object value, Class<Object> expectedClass, String parameterName)
+    {
+        try
+        {
+            return conversionService.convert(value, expectedClass);
+        }
+        catch (Exception e)
+        {
+            throw new IllegalArgumentException(format("Could not transform simple value '%s' to type '%s' in parameter '%s'",
+                                                      value,
+                                                      expectedClass.getSimpleName(),
+                                                      parameterName));
+        }
     }
 }
 
