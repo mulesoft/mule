@@ -853,8 +853,8 @@ public final class SchemaBuilder
             {
                 MetadataType genericType = arrayType.getType();
                 final boolean supportsChildElement = shouldGenerateDataTypeChildElements(genericType, expressionSupport);
-                forceOptional = supportsChildElement || shouldForceOptional(genericType);
 
+                forceOptional = !getType(genericType).equals(Object.class) && (supportsChildElement || shouldForceOptional(genericType));
                 defaultVisit(arrayType);
                 if (supportsChildElement)
                 {
@@ -924,7 +924,8 @@ public final class SchemaBuilder
             @Override
             protected void defaultVisit(MetadataType metadataType)
             {
-                extensionType.getAttributeOrAttributeGroup().add(createAttribute(name, description, metadataType, defaultValue, isRequired(forceOptional, required), expressionSupport));
+                extensionType.getAttributeOrAttributeGroup().add(createAttribute(name, description, metadataType, defaultValue,
+                                                                                 isRequired(forceOptional, required), expressionSupport));
             }
 
             private boolean shouldForceOptional(MetadataType type)
@@ -949,8 +950,9 @@ public final class SchemaBuilder
         boolean isPrimitive = clazz.isPrimitive() || ClassUtils.isPrimitiveWrapper(clazz);
 
         return !isExpressionRequired &&
-               (isPrimitive || !subTypesMapping.getSubTypes(metadataType).isEmpty() ||
-                (isPojo && isInstantiableWithParameters(clazz)) || (!isPojo && isInstantiable(clazz)));
+               (isPrimitive || !subTypesMapping.getSubTypes(metadataType).isEmpty()
+                               || (isPojo && isInstantiableWithParameters(clazz))
+                               || (!isPojo && isInstantiable(clazz)));
     }
 
     private void addImportedTypeRef(Class<?> extensionType, String name, String description, MetadataType metadataType, ExplicitGroup all)
