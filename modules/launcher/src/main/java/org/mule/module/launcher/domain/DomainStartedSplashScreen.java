@@ -10,9 +10,13 @@ import static org.mule.module.launcher.MuleFoldersUtil.getDomainLibFolder;
 import org.mule.module.launcher.artifact.ArtifactStartedSplashScreen;
 import org.mule.module.launcher.descriptor.DomainDescriptor;
 
-public class DomainStartedSplashScreen extends ArtifactStartedSplashScreen
+/**
+ * Splash screen specific for {@link Domain} startup.
+ */
+public class DomainStartedSplashScreen extends ArtifactStartedSplashScreen<DomainDescriptor>
 {
-    public void doBody(DomainDescriptor descriptor)
+    @Override
+    protected void createMessage(DomainDescriptor descriptor)
     {
         doBody(String.format("Started domain '%s'", descriptor.getName()));
         if (RUNTIME_VERBOSE_PROPERTY.isEnabled())
@@ -22,7 +26,7 @@ public class DomainStartedSplashScreen extends ArtifactStartedSplashScreen
         }
     }
 
-    protected void listLibraries(DomainDescriptor descriptor)
+    private void listLibraries(DomainDescriptor descriptor)
     {
         listItems(getLibraries(getDomainLibFolder(descriptor.getName())), "Domain libraries: ");
     }

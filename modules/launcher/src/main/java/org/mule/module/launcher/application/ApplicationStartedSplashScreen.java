@@ -13,9 +13,14 @@ import org.mule.module.launcher.plugin.PluginDescriptor;
 
 import java.util.Set;
 
-public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen
+/**
+ * Splash screen specific for {@link Application} startup based on it's {@link ApplicationDescriptor}.
+ */
+public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<ApplicationDescriptor>
 {
-    public void doBody(ApplicationDescriptor descriptor)
+
+    @Override
+    protected void createMessage(ApplicationDescriptor descriptor)
     {
         doBody(String.format("Started app '%s'", descriptor.getName()));
         if (RUNTIME_VERBOSE_PROPERTY.isEnabled())
@@ -43,5 +48,4 @@ public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen
     {
         listItems(getLibraries(getAppLibFolder(descriptor.getName())), "Application libraries:");
     }
-
 }

@@ -266,7 +266,7 @@ public class DefaultMuleDomain implements Domain
             {
                 Thread.currentThread().setContextClassLoader(null);
                 DomainStartedSplashScreen splashScreen = new DomainStartedSplashScreen();
-                splashScreen.doBody(descriptor);
+                splashScreen.createMessage(descriptor);
                 deployLogger.info(splashScreen.toString());
             }
             finally

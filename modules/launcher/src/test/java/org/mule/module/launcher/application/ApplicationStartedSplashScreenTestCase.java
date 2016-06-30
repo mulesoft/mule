@@ -63,7 +63,7 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
     @Override
     protected void setUpSplashScreen()
     {
-        splashScreen.doBody(descriptor);
+        splashScreen.createMessage(descriptor);
     }
 
     @Override

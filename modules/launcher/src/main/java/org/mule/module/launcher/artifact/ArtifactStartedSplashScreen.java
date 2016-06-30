@@ -15,8 +15,15 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ArtifactStartedSplashScreen extends SplashScreen
+/**
+ * Base splash screen to log messages when an {@link Artifact} is started based on it's {@link ArtifactDescriptor}.
+ *
+ * @param <D> the type of {@link ArtifactDescriptor}
+ */
+public abstract class ArtifactStartedSplashScreen<D extends ArtifactDescriptor> extends SplashScreen
 {
+    protected abstract void createMessage(D descriptor);
+
     protected void listOverrides(ArtifactDescriptor descriptor)
     {
         listItems(descriptor.getLoaderOverride(), "Class loader overrides:");

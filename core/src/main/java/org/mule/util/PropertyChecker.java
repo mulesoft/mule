@@ -19,11 +19,22 @@ public class PropertyChecker
     private final String defaultValue;
     private Boolean override;
 
+    /**
+     * Similar to {@link PropertyChecker#PropertyChecker(String, String)} only the default value is {@code false}.
+     *
+     * @param propertyName the name of the system property
+     */
     public PropertyChecker(String propertyName)
     {
         this(propertyName, FALSE.toString());
     }
 
+    /**
+     * Creates a {@link PropertyChecker} with a custom default value.
+     *
+     * @param propertyName the name of the system property
+     * @param defaultValue the default value to use in case the property is not set
+     */
     public PropertyChecker(String propertyName, String defaultValue)
     {
         this.propertyName = propertyName;

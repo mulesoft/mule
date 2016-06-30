@@ -72,7 +72,7 @@ public class DomainStartedSplashScreenTestCase extends AbstractSplashScreenTestC
     @Override
     protected void setUpSplashScreen()
     {
-        splashScreen.doBody(descriptor);
+        splashScreen.createMessage(descriptor);
     }
 
     private static String getDomainPathFor(String fileName)

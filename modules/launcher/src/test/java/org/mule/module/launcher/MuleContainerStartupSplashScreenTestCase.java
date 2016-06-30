@@ -7,7 +7,7 @@
 package org.mule.module.launcher;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.not;
 import static org.mule.util.FileUtils.newFile;
 
 import java.io.File;
@@ -18,8 +18,12 @@ import org.junit.BeforeClass;
 
 public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScreenTestCase<MuleContainerStartupSplashScreen>
 {
-    public static final String FIRST_PATCH = "SE-4242-3.8.0.jar";
-    public static final String SECOND_PATCH = "SE-9999-3.7.3.jar";
+    private static final String FIRST_PATCH = "SE-4242-3.8.0.jar";
+    private static final String SECOND_PATCH = "SE-9999-3.7.3.jar";
+    private static final String COMPLEX_LOG_PART = "* Applied patches:                                                   *\n" +
+                                                   "*  - " + FIRST_PATCH + "                                               *\n" +
+                                                   "*  - " + SECOND_PATCH + "                                               *\n" +
+                                                   "* Mule system properties:                                            *\n";
 
     @BeforeClass
     public static void setUpPatches()
@@ -46,16 +50,12 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
     @Override
     protected Matcher<String> getSimpleLogMatcher()
     {
-        return endsWith(")                         *\n" +
-                        "**********************************************************************");
+        return not(containsString(COMPLEX_LOG_PART));
     }
 
     @Override
     protected Matcher<String> getComplexLogMatcher()
     {
-        return containsString("* Applied patches:                                                   *\n" +
-                              "*  - " + FIRST_PATCH + "                                               *\n" +
-                              "*  - " + SECOND_PATCH + "                                               *\n" +
-                              "* Mule system properties:                                            *\n");
+        return containsString(COMPLEX_LOG_PART);
     }
 }
