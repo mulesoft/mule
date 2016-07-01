@@ -11,7 +11,7 @@
         <jms:inbound-endpoint ref="in"/>
         <test:assert expression="#[message.dataType.getType().getName() == 'org.apache.activemq.command.ActiveMQTextMessage']"></test:assert>
         <jms:jmsmessage-to-object-transformer/>
-        <test:assert expression="#[message.dataType.getType().getName() == 'java.lang.Object']"></test:assert>
+        <test:assert expression="#[message.dataType.getType().getName() == 'java.lang.String']"></test:assert>
     </flow>
 
 </mule>

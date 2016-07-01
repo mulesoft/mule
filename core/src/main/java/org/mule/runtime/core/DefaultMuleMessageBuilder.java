@@ -108,8 +108,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     {
         if (dataType instanceof DefaultCollectionDataType)
         {
-            dataType = ((DataTypeBuilder.DataTypeCollectionTypeBuilder) DataType.builder(this.dataType))
-                    .itemMediaType(mediaType).build();
+            dataType = ((DataTypeBuilder.DataTypeCollectionTypeBuilder) DataType.builder(this.dataType)).itemMediaType(mediaType).build();
         }
         else
         {
@@ -182,6 +181,13 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
+    public <T extends Serializable> MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, MediaType mediaType)
+    {
+        inboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
+        return this;
+    }
+
+    @Override
     public <T extends Serializable> MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, DataType<T>
             dataType)
     {
@@ -193,6 +199,13 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, Serializable value)
     {
         outboundProperties.put(key, new TypedValue(value, DataType.fromObject(value)));
+        return this;
+    }
+
+    @Override
+    public <T extends Serializable> MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, MediaType mediaType)
+    {
+        outboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
         return this;
     }
 
@@ -215,7 +228,6 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> inboundProperties(Map<String, Serializable> inboundProperties)
     {
         this.inboundProperties.clear();
-        ;
         inboundProperties.forEach((s, serializable) -> addInboundProperty(s, serializable));
         return this;
     }

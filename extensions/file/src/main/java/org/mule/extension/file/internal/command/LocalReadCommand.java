@@ -10,7 +10,7 @@ import org.mule.extension.file.api.FileInputStream;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.api.LocalFileSystem;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.ReadCommand;
@@ -60,9 +60,9 @@ public final class LocalReadCommand extends LocalFileCommand implements ReadComm
             pathLock = new NullPathLock();
         }
 
+        InputStream payload = new FileInputStream(path, pathLock);
         FileAttributes fileAttributes = new LocalFileAttributes(path);
-        return new DefaultMuleMessage(new FileInputStream(path, pathLock),
-                                      fileSystem.getFileMessageDataType(message.getDataType(), fileAttributes),
-                                      fileAttributes).asNewMessage();
+        MediaType fileMediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), fileAttributes);
+        return MuleMessage.builder().payload(payload).mediaType(fileMediaType).attributes(fileAttributes).build();
     }
 }

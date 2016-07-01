@@ -1067,7 +1067,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @Override
     public void setFlowVariable(String key, Object value)
     {
-        setFlowVariable(key, value, DataType.fromObject(value));
+        setFlowVariable(key, value, value != null ? DataType.fromObject(value) : DataType.OBJECT);
     }
 
     @Override

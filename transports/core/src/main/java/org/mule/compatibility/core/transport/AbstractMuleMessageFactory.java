@@ -10,10 +10,12 @@ import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedExceptio
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.nio.charset.Charset;
 
@@ -54,7 +56,13 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
         }
 
         Object payload = extractPayload(transportMessage, encoding);
-        final DataType dataType = DataType.builder().type((Class) (payload == null ? Object.class : payload.getClass())).mediaType(getMimeType(transportMessage)).charset(encoding).build();
+        DataTypeParamsBuilder dataTypeBuilder = DataType.builder().type((Class) (payload == null ? Object.class : payload.getClass())).charset(encoding);
+        String mimeType = getMimeType(transportMessage);
+        if (StringUtils.isNotEmpty(mimeType))
+        {
+            dataTypeBuilder = dataTypeBuilder.mediaType(mimeType);
+        }
+        final DataType dataType = dataTypeBuilder.build();
         MutableMuleMessage message;
         if (previousMessage != null)
         {

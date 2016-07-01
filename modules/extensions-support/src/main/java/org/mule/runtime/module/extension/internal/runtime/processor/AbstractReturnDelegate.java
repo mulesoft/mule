@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.processor;
 
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
-
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 
 /**
  * Base class for {@link ReturnDelegate} implementations.
@@ -80,10 +81,16 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
             return null;
         }
 
-        DataTypeParamsBuilder dataTypeBuilder = null;
+        Charset existingEncoding = getDefaultEncoding(muleContext);
+        DataTypeParamsBuilder dataTypeBuilder;
         if (value instanceof MuleMessage)
         {
-            dataTypeBuilder = DataType.builder(((MuleMessage) value).getDataType());
+            DataType dataType = ((MuleMessage) value).getDataType();
+            if (dataType.getMediaType().getCharset().isPresent())
+            {
+                existingEncoding = dataType.getMediaType().getCharset().get();
+            }
+            dataTypeBuilder = DataType.builder(dataType);
         }
         else
         {
@@ -93,14 +100,19 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
         String mimeType = operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class);
         String encoding = operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class);
 
-        final DataType dataType = dataTypeBuilder.mediaType(mimeType).charset(encoding).build();
-        if (dataType.getMediaType().getCharset().isPresent())
+        if (isNotEmpty(mimeType))
         {
-            return dataType;
+            dataTypeBuilder = dataTypeBuilder.mediaType(mimeType);
+        }
+
+        if (isNotEmpty(encoding))
+        {
+            dataTypeBuilder = dataTypeBuilder.charset(encoding);
         }
         else
         {
-            return DataType.builder(dataType).charset(getDefaultEncoding(muleContext)).build();
+            dataTypeBuilder = dataTypeBuilder.charset(existingEncoding);
         }
+        return dataTypeBuilder.build();
     }
 }

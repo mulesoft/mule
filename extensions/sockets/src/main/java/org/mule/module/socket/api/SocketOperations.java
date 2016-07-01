@@ -12,7 +12,6 @@ import org.mule.module.socket.internal.metadata.SocketMetadataResolver;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NoRef;
@@ -53,7 +52,7 @@ public class SocketOperations
         client.write(data);
 
         return Boolean.valueOf(hasResponse) ?
-               new DefaultMuleMessage(client.read(), client.getAttributes()) :
+               MuleMessage.builder().payload(client.read()).attributes(client.getAttributes()).build() :
                muleMessage;
     }
 }

@@ -6,11 +6,12 @@
  */
 package org.mule.functional.junit4;
 
+import static java.util.Objects.requireNonNull;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -41,7 +42,7 @@ import org.mockito.Mockito;
 public class TestEventBuilder
 {
 
-    private Object payload;
+    private Object payload = NullPayload.getInstance();
     private Serializable attributes;
     private Map<String, Serializable> inboundProperties = new HashMap<>();
     private Map<String, Serializable> outboundProperties = new HashMap<>();
@@ -67,6 +68,7 @@ public class TestEventBuilder
      */
     public TestEventBuilder withPayload(Object payload)
     {
+        requireNonNull(payload);
         this.payload = payload;
 
         return this;

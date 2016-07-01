@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.config.bootstrap;
 
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.registry.ObjectProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -19,6 +21,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SimpleRegistry;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Map;
 
@@ -42,7 +45,12 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap
         }
         if (returnClass != null)
         {
-            trans.setReturnDataType(DataType.builder().type(returnClass).mediaType(bootstrapProperty.getMimeType()).build());
+            DataTypeParamsBuilder builder = DataType.builder().type(returnClass);
+            if(isNotEmpty(bootstrapProperty.getMimeType()))
+            {
+                builder = builder.mediaType(bootstrapProperty.getMimeType());
+            }
+            trans.setReturnDataType(builder.build());
         }
         if (bootstrapProperty.getName() != null)
         {

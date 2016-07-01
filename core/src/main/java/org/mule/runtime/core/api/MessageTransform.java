@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api;
 
-import org.mule.runtime.core.DefaultMuleMessage;
-
 import java.util.function.Function;
 
 /**
@@ -18,9 +16,6 @@ public interface MessageTransform
 {
 
     @Deprecated
-    default MuleMessage transform(Function<MutableMuleMessage, MuleMessage> transform)
-    {
-        MutableMuleMessage copy = new DefaultMuleMessage(this);
-        return transform.apply(copy);
-    }
+    MuleMessage transform(Function<MutableMuleMessage, MuleMessage> transform);
+
 }

@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.spring.factories.BootstrapObjectFactoryBean;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.MuleException;
@@ -92,8 +94,12 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
 
         if (returnClass != null)
         {
-            returnType = DataType.builder().type(returnClass).mediaType(bootstrapProperty.getMimeType()).build();
-            builder.addPropertyValue("returnDataType", returnType);
+            DataTypeParamsBuilder dataTypeBuilder = DataType.builder().type(returnClass);
+            if(isNotEmpty(bootstrapProperty.getMimeType()))
+            {
+                dataTypeBuilder = dataTypeBuilder.mediaType(bootstrapProperty.getMimeType());
+            }
+            builder.addPropertyValue("returnDataType", dataTypeBuilder.build());
         }
 
         String name = bootstrapProperty.getName();

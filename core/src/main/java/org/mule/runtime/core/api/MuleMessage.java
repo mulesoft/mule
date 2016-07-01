@@ -184,12 +184,21 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
         /**
          * @param key
          * @param value
+         * @param mediaType
+         * @param <T>
+         * @return
+         */
+        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, MediaType mediaType);
+
+        /**
+         * @param key
+         * @param value
          * @param dataType
          * @param <T>
          * @return
          */
-        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, DataType<T>
-                dataType);
+        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, DataType<T> dataType);
+
 
         /**
          * @param key
@@ -201,12 +210,20 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
         /**
          * @param key
          * @param value
+         * @param mediaType
+         * @param <T>
+         * @return
+         */
+        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, MediaType mediaType);
+
+        /**
+         * @param key
+         * @param value
          * @param dataType
          * @param <T>
          * @return
          */
-        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, DataType<T>
-                dataType);
+        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, DataType<T> dataType);
 
         /**
          * @param key

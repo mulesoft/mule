@@ -79,7 +79,8 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
     @Override
     public void setInboundProperty(String key, Serializable value)
     {
-        setInboundProperty(key, value, DataType.fromObject(value));
+        setInboundProperty(key, value, value != null ? DataType.fromObject(value) : DataType.builder().type
+                (Serializable.class).build());
     }
 
     @Override

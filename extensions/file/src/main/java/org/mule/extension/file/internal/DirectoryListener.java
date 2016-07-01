@@ -14,13 +14,12 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
-import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileConnector;
 import org.mule.extension.file.api.FileEventType;
@@ -29,6 +28,7 @@ import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -336,7 +336,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     private MuleMessage<InputStream, ListenerFileAttributes> createMessage(Path path, ListenerFileAttributes attributes)
     {
         Object payload = NullPayload.getInstance();
-        DataType dataType = DataType.fromType(NullPayload.class);
+        MediaType mediaType = MediaType.ANY;
         MuleMessage<InputStream, ListenerFileAttributes> message;
 
         if (attributes.getEventType().equals(DELETE.name()))
@@ -345,11 +345,12 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
         }
         else if (!attributes.isDirectory())
         {
-            dataType = fileSystem.getFileMessageDataType(INPUT_STREAM, attributes);
+            mediaType = fileSystem.getFileMessageMediaType(mediaType, attributes);
             payload = new FileInputStream(path, new NullPathLock());
         }
 
-        message = new DefaultMuleMessage(payload, dataType, attributes);
+        message = (MuleMessage) new DefaultMuleMessage(payload, DataType.builder().fromObject(payload).mediaType
+                (mediaType).build(), attributes);
         return message;
     }
 
@@ -448,7 +449,8 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
             throw new MuleRuntimeException(createStaticMessage("Could not create watcher service"), e);
         }
 
-        TreeNode directoryNode = fileSystem.list(config, directoryPath.toString(), false, new DefaultMuleMessage(""), new NullFilePayloadPredicate());
+        TreeNode directoryNode = fileSystem.list(config, directoryPath.toString(), false, MuleMessage.builder().payload
+                (EMPTY).build(), new NullFilePayloadPredicate());
         final Path rootPath = Paths.get(directoryNode.getAttributes().getPath());
         registerPath(rootPath);
 

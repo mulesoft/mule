@@ -144,7 +144,6 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
         final String expression = "#[validator.isNotNull(payload)]";
         assertValid(expression, getTestEvent(""));
 
-        assertInvalid(expression, getTestEvent(null));
         assertInvalid(expression, getTestEvent(NullPayload.getInstance()));
     }
 
@@ -152,7 +151,6 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
     public void isNull() throws Exception
     {
         final String expression = "#[validator.isNull(payload)]";
-        assertValid(expression, getTestEvent(null));
         assertValid(expression, getTestEvent(NullPayload.getInstance()));
 
         assertInvalid(expression, getTestEvent(""));

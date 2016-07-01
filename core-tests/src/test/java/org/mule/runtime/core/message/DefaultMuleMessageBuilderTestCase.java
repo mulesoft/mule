@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.message;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -20,6 +21,8 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
+import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.DefaultMuleMessageBuilder;
 import org.mule.runtime.core.api.MuleMessage;
@@ -52,17 +55,19 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     private static final String PROPERTY_KEY = "propertyKey";
     private static final Serializable PROPERTY_VALUE = "propertyValue";
     private static final Object REPLY_TO = new Orange();
+    private static final MediaType HTML_STRING_UTF8 = HTML.withCharset(UTF_8);
 
     @Test
     public void createNewAPIMessageViaMessageInterface()
     {
         org.mule.runtime.api.message.MuleMessage<String, Apple> message;
-        message = org.mule.runtime.api.message.MuleMessage.builder().payload(TEST_PAYLOAD).attributes(TEST_ATTR)
-                .build();
+        message = org.mule.runtime.api.message.MuleMessage.builder().payload(TEST_PAYLOAD).mediaType(HTML_STRING_UTF8)
+                .attributes(TEST_ATTR).build();
 
         assertThat(message, instanceOf(DefaultMuleMessage.class));
         assertThat(message.getPayload(), is(TEST_PAYLOAD));
-        assertThat(message.getDataType(), is(STRING));
+        assertThat(message.getDataType().getType(), equalTo(String.class));
+        assertThat(message.getDataType().getMediaType(), is(HTML_STRING_UTF8));
         assertThat(message.getAttributes(), is(TEST_ATTR));
     }
 
@@ -269,6 +274,13 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
         DefaultMuleMessageBuilder builder = new DefaultMuleMessageBuilder();
         thrown.expect(NullPointerException.class);
         builder.payload(null);
+    }
+
+    @Test
+    public void nullPayloadPayload()
+    {
+        MuleMessage<Object, ?> message = new DefaultMuleMessageBuilder().payload(NullPayload.getInstance()).build();
+        assertThat(message.getDataType().getType(), equalTo(Object.class));
     }
 
     @Test

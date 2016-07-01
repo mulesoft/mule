@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
@@ -35,9 +36,9 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     private final Class<String> type = String.class;
 
     @Test
-    public void createsDataTypeForNullObject() throws Exception
+    public void createsDataTypeForNullPayload() throws Exception
     {
-        DataType<?> dataType = DataType.fromObject(null);
+        DataType<?> dataType = DataType.fromObject(NullPayload.getInstance());
 
         assertThat(dataType, like(Object.class, MediaType.ANY, null));
     }
