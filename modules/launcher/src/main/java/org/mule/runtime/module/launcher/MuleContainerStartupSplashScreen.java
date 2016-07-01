@@ -7,6 +7,7 @@
 package org.mule.runtime.module.launcher;
 
 import static java.util.Arrays.asList;
+import static java.util.Arrays.sort;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getUserLibFolder;
 import org.mule.runtime.core.api.MuleContext;
@@ -92,6 +93,7 @@ public class MuleContainerStartupSplashScreen extends SplashScreen
         if (patchesDirectory != null && patchesDirectory.exists())
         {
             String[] patches = patchesDirectory.list((dir, name) -> name.startsWith("SE-"));
+            sort(patches);
             listItems(asList(patches), "Applied patches:");
         }
     }
