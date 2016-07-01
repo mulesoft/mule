@@ -51,11 +51,7 @@ public class TransformerObjectFactory implements ObjectFactory<Transformer>
             {
                 builder.mediaType(mimeType);
             }
-            if (isNotEmpty(encoding))
-            {
-                builder.charset(encoding);
-            }
-            transformerInstance.setReturnDataType(builder.build());
+            transformerInstance.setReturnDataType(builder.charset(encoding).build());
         }
         transformerInstance.setIgnoreBadInput(ignoreBadInput);
         transformerInstance.setName(name);

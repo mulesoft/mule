@@ -72,11 +72,7 @@ final class DataTypeFactoryBean implements FactoryBean<DataType>
         {
             builder.mediaType(mimeType);
         }
-        if (isNotEmpty(encoding))
-        {
-            builder.charset(encoding);
-        }
-        return builder.build();
+        return builder.charset(encoding).build();
     }
 
     @Override
