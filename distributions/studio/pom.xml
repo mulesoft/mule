@@ -170,6 +170,12 @@
             <classifier>jdk14</classifier>
         </dependency>
         <dependency>
+            <groupId>org.mule.distributions</groupId>
+            <artifactId>${communityArtifact}</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
             <groupId>javax.script</groupId>
             <artifactId>js-engine</artifactId>
             <version>1.1</version>
