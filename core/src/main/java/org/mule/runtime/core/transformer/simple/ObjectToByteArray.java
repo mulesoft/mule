@@ -18,9 +18,9 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
- * <code>ObjectToByteArray</code> converts serilaizable object to a byte array but
- * treats <code>java.lang.String</code> differently by converting to bytes using
- * the <code>String.getBytrs()</code> method.
+ * <code>ObjectToByteArray</code> converts serilaizable object to a byte array but treats
+ * <code>java.lang.String</code> differently by converting to bytes using the
+ * <code>String.getBytes()</code> method.
  */
 public class ObjectToByteArray extends SerializableToByteArray
 {
