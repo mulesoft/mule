@@ -23,12 +23,12 @@ import org.apache.commons.dbutils.handlers.MapListHandler;
 public class DbTestUtil
 {
 
-    public static List<Map<String, String>> selectData(String query, DataSource dataSource) throws SQLException
+    public static <T> List<Map<String, T>> selectData(String query, DataSource dataSource) throws SQLException
     {
         QueryRunner qr = new QueryRunner(dataSource);
 
         @SuppressWarnings({"unchecked"})
-        List<Map<String, String>> result = (List<Map<String, String>>) qr.query(query, new MapListHandler());
+        List<Map<String, T>> result = (List<Map<String, T>>) qr.query(query, new MapListHandler());
 
         return result;
     }

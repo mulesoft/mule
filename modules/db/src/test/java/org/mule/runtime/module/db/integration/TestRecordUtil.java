@@ -20,6 +20,9 @@ import org.mule.runtime.module.db.integration.model.Field;
 import org.mule.runtime.module.db.integration.model.Record;
 import org.mule.runtime.module.db.integration.model.XmlField;
 
+import java.sql.SQLException;
+import java.sql.Struct;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,8 +52,50 @@ public class TestRecordUtil
 
         for (int i = 0, recordsLength = records.length; i < recordsLength; i++)
         {
-            Record actualRecord = new Record(resultList.get(i));
+            Record actualRecord = createRecord(resultList.get(i));
             assertRecord(records[i], actualRecord);
+        }
+    }
+
+    private static Record createRecord(Map<String, Object> fields)
+    {
+        Map<String, Object> recordFields = new HashMap<>();
+        for (String fieldName : fields.keySet())
+        {
+            Object fieldValue = fields.get(fieldName);
+            if (fieldValue instanceof Object[] && ((Object[]) fieldValue).length > 0)
+            {
+                final Object[] arrayValue = (Object[]) fieldValue;
+                if (arrayValue[0] instanceof Struct)
+                {
+                    fieldValue = convertStructToObjectArray((Struct) arrayValue[0]);
+                }
+            }
+            else if (fieldValue instanceof Struct)
+            {
+                fieldValue = convertStructToObjectArray((Struct) fieldValue);
+            }
+            recordFields.put(fieldName, fieldValue);
+        }
+
+        return new Record(recordFields);
+    }
+
+    private static Object[] convertStructToObjectArray(Struct value)
+    {
+        try
+        {
+            final Object[] attributes = value.getAttributes();
+            Object[] arrayFieldValue = new Object[attributes.length];
+            for (int i = 0; i < attributes.length; i++)
+            {
+                arrayFieldValue[i] = attributes[i];
+            }
+            return arrayFieldValue;
+        }
+        catch (SQLException e)
+        {
+            throw new IllegalArgumentException("Cannot transform Struct to Object[]");
         }
     }
 

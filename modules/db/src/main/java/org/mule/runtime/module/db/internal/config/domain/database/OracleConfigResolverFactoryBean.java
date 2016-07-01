@@ -19,7 +19,7 @@ public class OracleConfigResolverFactoryBean extends AbstractVendorConfigResolve
     private static final String DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
     private static final String ORACLE_URL_PREFIX = "jdbc:oracle:thin:@";
 
-    protected OracleConfigResolverFactoryBean()
+    public OracleConfigResolverFactoryBean()
     {
         super(ORACLE_URL_PREFIX, new OracleDbConfigFactory());
         setDriverClassName(DRIVER_CLASS_NAME);

@@ -24,7 +24,7 @@ import org.junit.Test;
 public class SimpleConnectionFactoryTestCase extends AbstractMuleTestCase
 {
 
-    private final SimpleConnectionFactory connectionFactory = new SimpleConnectionFactory();
+    private final SimpleConnectionFactory connectionFactory = new SimpleConnectionFactory(null);
     private final DataSource dataSource = mock(DataSource.class);
 
     @Test

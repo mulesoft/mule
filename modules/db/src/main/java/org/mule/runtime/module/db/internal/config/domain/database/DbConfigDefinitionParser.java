@@ -7,12 +7,17 @@
 
 package org.mule.runtime.module.db.internal.config.domain.database;
 
+import static org.springframework.util.xml.DomUtils.getChildElementByTagName;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.db.internal.domain.type.ArrayResolvedDbType;
 import org.mule.runtime.module.db.internal.domain.type.DbType;
+import org.mule.runtime.module.db.internal.domain.type.MappedStructResolvedDbType;
 import org.mule.runtime.module.db.internal.domain.type.ResolvedDbType;
 
 import java.sql.Connection;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -81,9 +86,9 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
 
     private void parseCustomDataTypes(Element element, BeanDefinitionBuilder builder)
     {
-        List<DbType> vendorDbTypes = new ArrayList<DbType>();
+        List<DbType> customDbTypes = new ArrayList<DbType>();
 
-        Element vendorTypes = DomUtils.getChildElementByTagName(element, DATA_TYPES_ELEMENT);
+        Element vendorTypes = getChildElementByTagName(element, DATA_TYPES_ELEMENT);
 
         if (vendorTypes != null)
         {
@@ -91,18 +96,46 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
             {
                 String name = dataType.getAttribute(TYPE_NAME_ATTIRBUTE);
                 int id = Integer.valueOf(dataType.getAttribute(TYPE_ID_ATTRIBUTE));
-                vendorDbTypes.add(new ResolvedDbType(id, name));
+                if (id == Types.ARRAY)
+                {
+                    customDbTypes.add(new ArrayResolvedDbType(id, name));
+                }
+                else if (id == Types.STRUCT)
+                {
+                    final String className = dataType.getAttribute("className");
+                    if (!StringUtils.isEmpty(className))
+                    {
+                        Class<?> mappedClass;
+                        try
+                        {
+                            mappedClass = Class.forName(className);
+                        }
+                        catch (ClassNotFoundException e)
+                        {
+                            throw new IllegalArgumentException("Cannot find mapped class: " + className);
+                        }
+                        customDbTypes.add(new MappedStructResolvedDbType(id, name, mappedClass));
+                    }
+                    else
+                    {
+                        customDbTypes.add(new ResolvedDbType(id, name));
+                    }
+                }
+                else
+                {
+                    customDbTypes.add(new ResolvedDbType(id, name));
+                }
             }
         }
 
-        builder.addPropertyValue("customDataTypes", vendorDbTypes);
+        builder.addPropertyValue("customDataTypes", customDbTypes);
     }
 
     private void parseConnectionProperties(Element element, BeanDefinitionBuilder builder)
     {
         Map<String, String> propertiesMap = new LinkedHashMap<String, String>();
 
-        Element properties = DomUtils.getChildElementByTagName(element, CONNECTION_PROPERTIES_ELEMENT_NAME);
+        Element properties = getChildElementByTagName(element, CONNECTION_PROPERTIES_ELEMENT_NAME);
 
         if (properties != null)
         {

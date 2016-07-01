@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.db.integration.matcher;
 
+import static org.mule.runtime.module.db.integration.model.FieldUtils.getValueAsString;
 import org.mule.runtime.module.db.integration.model.Field;
 import org.mule.runtime.module.db.integration.model.Record;
 
@@ -33,12 +34,18 @@ public class FieldMatcher extends TypeSafeMatcher<Record>
 
     public void describeTo(Description description)
     {
-        description.appendText("Does not contains a field with name = " + field.getName() + " with value = " + field.getValue());
+        description.appendText("Does not contains a field with name = " + field.getName() + " with value = " + getValueAsString(field.getValue()));
     }
 
     @Factory
     public static Matcher<Record> containsField(Field field)
     {
         return new FieldMatcher(field);
+    }
+
+    @Override
+    public void describeMismatch(Object item, Description description)
+    {
+        description.appendText("was ").appendValue(getValueAsString(item));
     }
 }

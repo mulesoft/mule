@@ -21,12 +21,14 @@ import org.mule.runtime.module.db.internal.domain.type.CompositeDbTypeManager;
 import org.mule.runtime.module.db.internal.domain.type.DbType;
 import org.mule.runtime.module.db.internal.domain.type.DbTypeManager;
 import org.mule.runtime.module.db.internal.domain.type.JdbcTypes;
+import org.mule.runtime.module.db.internal.domain.type.MappedStructResolvedDbType;
 import org.mule.runtime.module.db.internal.domain.type.MetadataDbTypeManager;
 import org.mule.runtime.module.db.internal.domain.type.StaticDbTypeManager;
 
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,7 +75,7 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
     {
         ConnectionFactory connectionFactory;
 
-        SimpleConnectionFactory simpleConnectionFactory = new SimpleConnectionFactory();
+        SimpleConnectionFactory simpleConnectionFactory = new SimpleConnectionFactory(createTypeMapping());
         if (retryPolicyTemplate == null)
         {
             connectionFactory = simpleConnectionFactory;
@@ -88,6 +90,25 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
         DbConnectionFactory dbConnectionFactory = new TransactionalDbConnectionFactory(new TransactionCoordinationDbTransactionManager(), dbTypeManager, connectionFactory, dataSource);
 
         return doCreateDbConfig(dataSource, dbTypeManager, dbConnectionFactory, name);
+    }
+
+    private Map<String, Class<?>> createTypeMapping()
+    {
+        final Map<String, Class<?>> typeMapping = new HashMap<>();
+
+        for (DbType dbType : customDataTypes)
+        {
+            if (dbType instanceof MappedStructResolvedDbType)
+            {
+                final MappedStructResolvedDbType structDbType = (MappedStructResolvedDbType) dbType;
+                if (structDbType.getMappedClass() != null)
+                {
+                    typeMapping.put(structDbType.getName(), structDbType.getMappedClass());
+                }
+            }
+        }
+
+        return typeMapping;
     }
 
     protected DbConfig doCreateDbConfig(DataSource datasource, DbTypeManager dbTypeManager, DbConnectionFactory dbConnectionFactory, String name)

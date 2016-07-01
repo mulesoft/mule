@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.db.integration.model;
 
+import static org.mule.runtime.module.db.integration.model.RegionManager.NORTHWEST_MANAGER;
+import static org.mule.runtime.module.db.integration.model.RegionManager.SOUTHWEST_MANAGER;
 import org.mule.common.metadata.datatype.DataType;
 
 import java.sql.Connection;
@@ -24,10 +26,14 @@ public abstract class AbstractTestDatabase
 
     public static final Planet[] PLANET_TEST_VALUES = {Planet.VENUS, Planet.EARTH, Planet.MARS};
     public static final Alien[] ALIEN_TEST_VALUES = {Alien.MONGUITO, Alien.ET};
+    public static final Contact[] CONTACT_TEST_VALUES = {Contact.CONTACT1, Contact.CONTACT2};
+    public static final Region[] REGION_TEST_VALUES = {Region.NORTHWEST, Region.SOUTHWEST};
+    public static final RegionManager[] REGION_MANAGER_TEST_VALUES = {SOUTHWEST_MANAGER, NORTHWEST_MANAGER};
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractTestDatabase.class);
     public static final String NO_SQLXML_SUPPORT_ERROR = "Database does not support SQLXML type";
     public static final String NO_RESULSET_FROM_FUNCTION_SUPPORT_ERROR = "Database does not support returning a resultset from a function";
+    public static final String NO_UDT_SUPPORT_ERROR = "Database does not support User Defined Data Types";
 
     public void deletePlanetTable(Connection connection) throws SQLException
     {
@@ -62,12 +68,14 @@ public abstract class AbstractTestDatabase
 
     public void executeUpdate(Connection connection, String updateSql) throws SQLException
     {
-        QueryRunner qr = new QueryRunner();
-        int updated = qr.update(connection, updateSql);
-
-        if (logger.isDebugEnabled())
+        try (Statement statement = connection.createStatement())
         {
-            logger.debug(updated + " rows updated");
+            int updated = statement.executeUpdate(updateSql);
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(updated + " rows updated");
+            }
         }
     }
 
@@ -102,7 +110,25 @@ public abstract class AbstractTestDatabase
                 createAlienTestTable(connection);
             }
 
+            if (supportsSimpleUdt())
+            {
+                createContactDetailsType(connection);
+                createRegionManagersTestTable(connection);
+
+                if (supportsArraysUdt())
+                {
+                    createContactsTestTable(connection);
+                    createRegionsTestTable(connection);
+                }
+            }
+
             connection.commit();
+        }
+        catch (SQLException e)
+        {
+            logger.info("Error creating test database", e);
+            connection.rollback();
+            throw e;
         }
         finally
         {
@@ -111,6 +137,164 @@ public abstract class AbstractTestDatabase
                 connection.close();
             }
         }
+    }
+
+    protected boolean supportsArraysUdt()
+    {
+        return false;
+    }
+
+    protected boolean supportsSimpleUdt()
+    {
+        return false;
+    }
+
+    protected void  createZipArrayType(Connection connection) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    protected void createContactDetailsType(Connection connection) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    protected void createContactDetailsArrayType(Connection connection) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    private void createContactsTestTable(Connection connection) throws SQLException
+    {
+        try
+        {
+            deleteContactsTable(connection);
+        }
+        catch (Exception e)
+        {
+            createContactDetailsArrayType(connection);
+            createContactsTable(connection);
+        }
+
+        populateContactsTable(connection, CONTACT_TEST_VALUES);
+    }
+
+    private void populateContactsTable(Connection connection, Contact[] contacts) throws SQLException
+    {
+        QueryRunner qr = new QueryRunner();
+
+        for (Contact contact : contacts)
+        {
+            int updated = qr.update(connection, getInsertContactSql(contact));
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(updated + " rows updated");
+            }
+        }
+    }
+
+    protected String getInsertContactSql(Contact contact)
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    protected void createContactsTable(Connection connection) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    protected void deleteContactsTable(Connection connection) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    protected void createRegionsTestTable(Connection connection) throws SQLException
+    {
+        try
+        {
+            deleteRegionsTable(connection);
+        }
+        catch (Exception e)
+        {
+            createZipArrayType(connection);
+            createRegionsTable(connection);
+        }
+
+        populateRegionsTable(connection, REGION_TEST_VALUES);
+    }
+
+    private void createRegionManagersTestTable(Connection connection) throws SQLException
+    {
+        try
+        {
+            deleteRegionManagersTable(connection);
+        }
+        catch (Exception e)
+        {
+            createRegionManagersTable(connection);
+        }
+        populateRegionManagersTable(connection, REGION_MANAGER_TEST_VALUES);
+    }
+
+    private void populateRegionsTable(Connection connection, Region[] regions) throws SQLException
+    {
+        QueryRunner qr = new QueryRunner();
+
+        for (Region region : regions)
+        {
+            int updated = qr.update(connection, getInsertRegionSql(region));
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(updated + " rows updated");
+            }
+        }
+    }
+
+    protected String getInsertRegionSql(Region region)
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    protected void createRegionsTable(Connection connection) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    protected void deleteRegionsTable(Connection connection) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    protected void deleteRegionManagersTable(Connection connection) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    protected void createRegionManagersTable(Connection connection) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    private void populateRegionManagersTable(Connection connection, RegionManager[] managers) throws SQLException
+    {
+        QueryRunner qr = new QueryRunner();
+
+        for (RegionManager regionManager : managers)
+        {
+            int updated = qr.update(connection, getInsertRegionManagerSql(regionManager));
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(updated + " rows updated");
+            }
+        }
+    }
+
+    protected String getInsertRegionManagerSql(RegionManager regionManager)
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
     }
 
     private void createAlienTestTable(Connection connection) throws SQLException
@@ -226,6 +410,21 @@ public abstract class AbstractTestDatabase
     public void createStoredProcedureUpdateAlienDescription(DataSource dataSource) throws SQLException
     {
         throw new UnsupportedOperationException(NO_SQLXML_SUPPORT_ERROR);
+    }
+
+    public void createStoredProcedureGetZipCodes(DataSource dataSource) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    public void createStoredProcedureGetContactDetails(DataSource dataSource) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+    }
+
+    public void createStoredProcedureGetManagerDetails(DataSource dataSource) throws SQLException
+    {
+        throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
     }
 
     public DataType getIdFieldInputMetaDataType()
