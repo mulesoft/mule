@@ -8,15 +8,36 @@ package org.mule.test.tck;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
+
 import org.mule.MessageExchangePattern;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.processor.TestNonBlockingProcessor;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.functional.ResponseAssertionMessageProcessor;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageProcessorTestCase
 {
+
+    private TestNonBlockingProcessor testNonBlockingProcessor;
+
+    @Before
+    public void before() throws InitialisationException
+    {
+        testNonBlockingProcessor = new TestNonBlockingProcessor();
+        testNonBlockingProcessor.initialise();
+    }
+
+    @After
+    public void after()
+    {
+        testNonBlockingProcessor.dispose();
+    }
+
+    @Override
     protected ResponseAssertionMessageProcessor createAssertionMessageProcessor()
     {
         ResponseAssertionMessageProcessor mp = new ResponseAssertionMessageProcessor();
@@ -31,7 +52,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
         when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
 
         ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
-        asp.setListener(new TestNonBlockingProcessor());
+        asp.setListener(testNonBlockingProcessor);
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.setResponseExpression(TRUE_EXPRESSION);
@@ -53,7 +74,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
         when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
 
         ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
-        asp.setListener(new TestNonBlockingProcessor());
+        asp.setListener(testNonBlockingProcessor);
         asp.setFlowConstruct(flowConstruct);
         asp.setExpression(TRUE_EXPRESSION);
         asp.setResponseExpression(TRUE_EXPRESSION);

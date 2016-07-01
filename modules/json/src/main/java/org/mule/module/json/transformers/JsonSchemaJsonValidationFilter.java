@@ -15,12 +15,6 @@ import org.mule.module.json.JsonData;
 import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
 import org.mule.util.IOUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jackson.JsonLoader;
-import com.github.fge.jsonschema.core.report.ProcessingReport;
-import com.github.fge.jsonschema.main.JsonSchema;
-import com.github.fge.jsonschema.main.JsonSchemaFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,6 +31,12 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jackson.JsonLoader;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchema;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 /**
  * @deprecated This class is deprecated and will be removed in Mule 4.0. Use {@link ValidateJsonSchemaMessageProcessor} instead
@@ -121,6 +121,8 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter
         {
             InputStream inputStream = IOUtils.getResourceAsStream(schemaLocations, getClass());
             InputStreamReader reader = new InputStreamReader(inputStream);
+            // TODO https://github.com/fge/msg-simple/issues/1
+            // There is way currently to destroy threads created by this component
             JsonNode jsonNode = JsonLoader.fromReader(reader);
             JsonSchemaFactory schemaFactory = JsonSchemaFactory.byDefault();
             jsonSchema = schemaFactory.getJsonSchema(jsonNode);

@@ -8,11 +8,16 @@ package org.mule.properties;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -21,6 +26,23 @@ import org.junit.runners.Parameterized;
 public class InvalidSetVariableTestCase extends AbstractMuleTestCase
 {
     private String muleConfigPath;
+
+    private MuleContext context;
+
+    @Before
+    public void before() throws InitialisationException, ConfigurationException
+    {
+        context = new DefaultMuleContextFactory().createMuleContext();
+    }
+
+    @After
+    public void after()
+    {
+        if (context != null)
+        {
+            context.dispose();
+        }
+    }
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
@@ -35,7 +57,6 @@ public class InvalidSetVariableTestCase extends AbstractMuleTestCase
     @Test(expected = ConfigurationException.class)
     public void emptyVariableNameValidatedBySchema() throws Exception
     {
-        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(muleConfigPath);
         builder.configure(context);
     }

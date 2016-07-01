@@ -6,11 +6,15 @@
  */
 package org.mule.module.cxf.employee;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 
 import java.util.Arrays;
@@ -46,18 +50,19 @@ public class MtomClientTestCase extends AbstractServiceAndFlowTestCase
         final EmployeeDirectoryImpl svc = (EmployeeDirectoryImpl) getComponent("employeeDirectoryService");
 
         Prober prober = new PollingProber(6000, 500);
-        prober.check(new Probe()
+        prober.check(new JUnitProbe()
         {
             @Override
-            public boolean isSatisfied()
+            protected boolean test() throws Exception
             {
-                return (svc.getInvocationCount() == 1);
+                assertThat(svc.getInvocationCount(), is(greaterThanOrEqualTo(1)));
+                return true;
             }
 
             @Override
             public String describeFailure()
             {
-                return "Expected invocation count was 1 but actual one was " + svc.getInvocationCount();
+                return "Expected invocation count to be at least 1.";
             }
         });
 

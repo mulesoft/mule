@@ -6,6 +6,12 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.api.MuleContext;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
@@ -35,20 +41,24 @@ import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory;
 
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class ComponentDefinitionParserServiceTestCase extends AbstractMuleTestCase
 {
 
     private MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     private MuleContext muleContext;
+
+    @After
+    public void after()
+    {
+        if (muleContext != null)
+        {
+            muleContext.dispose();
+        }
+    }
 
     @Test
     public void testDefaultJavaComponentShortcut() throws Exception

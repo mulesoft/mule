@@ -11,19 +11,23 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  *  Test implementation of {@link org.mule.processor.NonBlockingMessageProcessor} that simply uses a @{link Executor} to
  *  invoke the {@link org.mule.api.transport.ReplyToHandler} in another thread.
  */
-public class TestNonBlockingProcessor implements NonBlockingMessageProcessor
+public class TestNonBlockingProcessor implements NonBlockingMessageProcessor, Initialisable, Disposable
 {
 
-    private static Executor executor = Executors.newCachedThreadPool();
+    private ExecutorService executor;
 
+    @Override
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
         if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
@@ -56,4 +60,15 @@ public class TestNonBlockingProcessor implements NonBlockingMessageProcessor
         }
     }
 
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        executor = Executors.newCachedThreadPool();
+    }
+
+    @Override
+    public void dispose()
+    {
+        executor.shutdown();
+    }
 }

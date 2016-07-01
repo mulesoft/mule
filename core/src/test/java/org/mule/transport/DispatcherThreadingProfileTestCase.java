@@ -25,7 +25,6 @@ import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
@@ -43,7 +42,6 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
     public static int SERIAL_WAIT_TIME = (DELAY_TIME * 2) + DELAY_TIME / 4;
     public static int LONGER_WAIT_TIME = DELAY_TIME * 5;
     private CountDownLatch latch;
-    private AtomicInteger counter = new AtomicInteger();
 
     public DispatcherThreadingProfileTestCase()
     {
@@ -54,7 +52,6 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
     protected void doTearDown() throws Exception
     {
         super.doTearDown();
-        counter.set(0);
     }
 
     @Test
@@ -116,16 +113,13 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         createTestConnectorWithSingleDispatcherThread(ThreadingProfile.WHEN_EXHAUSTED_WAIT);
         dispatchTwoAsyncEvents();
 
-        // The job that executes finishes shortly after DELAY_TIME
-        assertTrue(latch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
-
         // Wait even longer and ensure the other message isn't executed.
         new PollingProber(LONGER_WAIT_TIME, 50).check(new JUnitProbe()
         {
             @Override
             protected boolean test() throws Exception
             {
-                assertEquals(1, counter.get());
+                assertEquals(0L, latch.getCount());
                 return true;
             }
         });
@@ -140,16 +134,13 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         createTestConnectorWithSingleDispatcherThread(ThreadingProfile.WHEN_EXHAUSTED_ABORT);
         dispatchTwoAsyncEvents();
 
-        // The job that executes finishes shortly after DELAY_TIME
-        assertTrue(latch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
-
         // Wait even longer and ensure the other message isn't executed.
         new PollingProber(LONGER_WAIT_TIME, 50).check(new JUnitProbe()
         {
             @Override
             protected boolean test() throws Exception
             {
-                assertEquals(1, counter.get());
+                assertEquals(0L, latch.getCount());
                 return true;
             }
         });
@@ -164,16 +155,13 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         createTestConnectorWithSingleDispatcherThread(ThreadingProfile.WHEN_EXHAUSTED_DISCARD);
         dispatchTwoAsyncEvents();
 
-        // The job that executes finishes shortly after DELAY_TIME
-        assertTrue(latch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
-
         // Wait even longer and ensure the other message isn't executed.
         new PollingProber(LONGER_WAIT_TIME, 50).check(new JUnitProbe()
         {
             @Override
             protected boolean test() throws Exception
             {
-                assertEquals(1, counter.get());
+                assertEquals(0L, latch.getCount());
                 return true;
             }
         });
@@ -198,13 +186,12 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         dispatchTwoAsyncEvents();
         dispatchTwoAsyncEvents();
 
-        assertTrue(latch.await(SERIAL_WAIT_TIME, TimeUnit.MILLISECONDS));
         new PollingProber(LONGER_WAIT_TIME, 50).check(new JUnitProbe()
         {
             @Override
             protected boolean test() throws Exception
             {
-                assertEquals(3, counter.get());
+                assertEquals(0L, latch.getCount());
                 return true;
             }
         });
@@ -249,8 +236,6 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
         protected void doDispatch(MuleEvent event) throws Exception
         {
             super.doDispatch(event);
-            Thread.sleep(DELAY_TIME);
-            counter.incrementAndGet();
             latch.countDown();
         }
     }

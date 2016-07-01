@@ -6,18 +6,19 @@
  */
 package org.mule.transport;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.config.ImmutableThreadingProfile;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.util.concurrent.Latch;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class DispatcherPoolTestCase extends AbstractMuleContextTestCase
 {
@@ -64,14 +65,19 @@ public class DispatcherPoolTestCase extends AbstractMuleContextTestCase
 
         final OutboundEndpoint endpoint = getTestOutboundEndpoint("test", "test://test");
 
+        final Latch dispatcherBorrowedLatch = new Latch();
+        final Latch assertedLatch = new Latch();
+
         new Thread(new Runnable()
         {
+            @Override
             public void run()
             {
                 try
                 {
                     MessageDispatcher messageDispatcher = (MessageDispatcher) connector.dispatchers.borrowObject(endpoint);
-                    Thread.sleep(50);
+                    dispatcherBorrowedLatch.countDown();
+                    assertedLatch.await();
                     connector.dispatchers.returnObject(endpoint, messageDispatcher);
                 }
                 catch (Exception e)
@@ -81,8 +87,9 @@ public class DispatcherPoolTestCase extends AbstractMuleContextTestCase
 
             }
         }).start();
-        Thread.sleep(10);
+        dispatcherBorrowedLatch.await();
         assertEquals(1, connector.dispatchers.getNumActive());
+        assertedLatch.countDown();
         connector.dispatchers.borrowObject(endpoint);
         assertEquals(1, connector.dispatchers.getNumActive());
 
@@ -99,14 +106,19 @@ public class DispatcherPoolTestCase extends AbstractMuleContextTestCase
 
         final OutboundEndpoint endpoint = getTestOutboundEndpoint("test", "test://test");
 
+        final Latch dispatcherBorrowedLatch = new Latch();
+        final Latch assertedLatch = new Latch();
+
         new Thread(new Runnable()
         {
+            @Override
             public void run()
             {
                 try
                 {
                     MessageDispatcher messageDispatcher = (MessageDispatcher) connector.dispatchers.borrowObject(endpoint);
-                    Thread.sleep(200);
+                    dispatcherBorrowedLatch.countDown();
+                    assertedLatch.await();
                     connector.dispatchers.returnObject(endpoint, messageDispatcher);
                 }
                 catch (Exception e)
@@ -116,7 +128,7 @@ public class DispatcherPoolTestCase extends AbstractMuleContextTestCase
 
             }
         }).start();
-        Thread.sleep(10);
+        dispatcherBorrowedLatch.await();
         assertEquals(1, connector.dispatchers.getNumActive());
         try
         {
@@ -127,6 +139,7 @@ public class DispatcherPoolTestCase extends AbstractMuleContextTestCase
         {
             assertEquals(1, connector.dispatchers.getNumActive());
         }
+        assertedLatch.countDown();
     }
 
     @Test

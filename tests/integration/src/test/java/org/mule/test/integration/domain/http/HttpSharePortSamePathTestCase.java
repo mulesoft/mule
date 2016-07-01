@@ -6,71 +6,56 @@
  */
 package org.mule.test.integration.domain.http;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transport.ConnectorException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.ApplicationContextBuilder;
 import org.mule.tck.junit4.DomainContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.rules.ExpectedException;
 
-@RunWith(Parameterized.class)
 public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
 {
-
-    private final String domainConfig;
-    private final String appConfig;
-    private final Class expectedExceptionType;
 
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
     @Rule
     public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
 
-    public HttpSharePortSamePathTestCase(String domainConfig, String appConfig, Class expectedExceptionType)
-    {
-        this.domainConfig = domainConfig;
-        this.appConfig = appConfig;
-        this.expectedExceptionType = expectedExceptionType;
-    }
+    @Rule
+    public ExpectedException expected = ExpectedException.none();
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> parameters()
+    private MuleContext domainContext;
+    private MuleContext firstAppContext;
+
+    @After
+    public void after()
     {
-        return Arrays.asList(new Object[][] {
-                {"domain/http/transport/http-shared-connector.xml", "domain/http/transport/http-hello-mule-app.xml", ConnectorException.class},
-                {"domain/http/http-shared-listener-config.xml", "domain/http/http-hello-mule-app.xml", InitialisationException.class}});
+        if (firstAppContext != null)
+        {
+            firstAppContext.dispose();
+        }
+        if (domainContext != null)
+        {
+            domainContext.dispose();
+        }
     }
 
     @Test
     public void samePathDefinedInTwoAppsWithinSameDomain() throws Exception
     {
-        MuleContext domainContext = new DomainContextBuilder().setDomainConfig(domainConfig).build();
-        MuleContext firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {appConfig}).setDomainContext(domainContext).build();
+        domainContext = new DomainContextBuilder().setDomainConfig("domain/http/http-shared-listener-config.xml").build();
+        firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
         ApplicationContextBuilder secondApp = new ApplicationContextBuilder();
-        try
-        {
-            secondApp.setApplicationResources(new String[] {appConfig}).setDomainContext(domainContext).build();
-            fail("Second app context start should fail");
-        }
-        catch (Exception e)
-        {
-            assertThat(e.getCause(), IsInstanceOf.instanceOf(expectedExceptionType));
-        }
-        firstAppContext.dispose();
+
+        expected.expectCause(IsInstanceOf.<InitialisationException> instanceOf(InitialisationException.class));
+        secondApp.setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
     }
 
     public SystemProperty getEndpointSchemeSystemProperty()

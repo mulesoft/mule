@@ -11,8 +11,9 @@ import org.mule.api.CompletionHandler;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.processor.TestNonBlockingProcessor;
@@ -24,18 +25,26 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     {
         super(endpoint);
     }
-    private MessageProcessor nonBlockingProcessor = new TestNonBlockingProcessor();
+
+    private TestNonBlockingProcessor nonBlockingProcessor = new TestNonBlockingProcessor();
 
     @Override
     protected void doInitialise()
     {
-        // template method
+        try
+        {
+            nonBlockingProcessor.initialise();
+        }
+        catch (InitialisationException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
     }
 
     @Override
     protected void doDispose()
     {
-        // template method
+        nonBlockingProcessor.dispose();
     }
 
     @Override

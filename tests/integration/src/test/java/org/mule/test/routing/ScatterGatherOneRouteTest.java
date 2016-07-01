@@ -15,19 +15,36 @@ import org.mule.context.DefaultMuleContextFactory;
 import org.mule.routing.ScatterGatherRouter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import com.yourkit.util.Asserts;
-
 import java.util.Collections;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+
+import com.yourkit.util.Asserts;
 
 public class ScatterGatherOneRouteTest extends AbstractMuleTestCase
 {
+    private MuleContext context;
+
+    @Before
+    public void before() throws InitialisationException, ConfigurationException
+    {
+        context = new DefaultMuleContextFactory().createMuleContext();
+    }
+
+    @After
+    public void after()
+    {
+        if (context != null)
+        {
+            context.dispose();
+        }
+    }
 
     @Test(expected = ConfigurationException.class)
     public void oneRouteOnXml() throws Exception
     {
-        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("scatter-gather-one-route-test.xml");
         builder.configure(context);
     }
