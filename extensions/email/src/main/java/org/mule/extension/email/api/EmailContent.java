@@ -8,13 +8,10 @@ package org.mule.extension.email.api;
 
 
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT_PLAIN;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.UTF_8;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-
-import java.nio.charset.Charset;
 
 /**
  * Represents and enables the construction of the content of an email
@@ -30,18 +27,18 @@ public class EmailContent
     }
 
 
-    public EmailContent(String body)
+    public EmailContent(String body, String charset)
     {
         this.body = body;
         this.contentType = TEXT_PLAIN;
-        this.charset = UTF_8;
+        this.charset = charset;
     }
 
-    public EmailContent(String body, MediaType contentType, Charset charset)
+    public EmailContent(String body, MediaType contentType, String charset)
     {
         this.body = body;
         this.contentType = contentType.toString();
-        this.charset = charset.name();
+        this.charset = charset;
     }
 
     /**
@@ -63,10 +60,10 @@ public class EmailContent
     /**
      * The character encoding of the body.
      * <p>
-     * The default value is "UTF-8"
+     * If is not specified
      */
     @Parameter
-    @Optional(defaultValue = UTF_8)
+    @Optional
     private String charset;
 
     /**
@@ -89,8 +86,8 @@ public class EmailContent
     /**
      * @return the charset of the body.
      */
-    public Charset getCharset()
+    public String getCharset()
     {
-        return Charset.forName(charset);
+        return charset;
     }
 }

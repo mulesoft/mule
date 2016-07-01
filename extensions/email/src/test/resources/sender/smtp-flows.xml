@@ -59,7 +59,7 @@
     <flow name="sendEncodedMessage">
         <email:send config-ref="config" subject="Email Subject">
             <email:content>
-                <email:email-content body="#[payload]" charset="iso-8859-1"/>
+                <email:email-content body="#[payload]" charset="#[flowVars.encoding]"/>
             </email:content>
             <email:to-addresses>
                 <email:to-address value="pablo.musumeci@mulesoft.com"/>

@@ -8,12 +8,12 @@ package org.mule.extension.email.internal.util;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 
 import java.util.List;
 import java.util.Map;
@@ -48,14 +48,9 @@ public final class EmailConnectorUtils
     public static final String TEXT = "text/*";
 
     /**
-     * Default email content encoding
-     */
-    public static final String UTF_8 = "UTF-8";
-
-    /**
      * Default email content type
      */
-    public static final String TEXT_PLAIN= "text/plain";
+    public static final String TEXT_PLAIN = "text/plain";
 
     /**
      * Default port value for SMTP servers.

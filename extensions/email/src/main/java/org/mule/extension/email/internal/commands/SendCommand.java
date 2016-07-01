@@ -49,6 +49,7 @@ public final class SendCommand
                      String subject,
                      List<String> toAddresses,
                      String fromAddress,
+                     String defaultEncoding,
                      List<String> ccAddresses,
                      List<String> bccAddresses,
                      Map<String, String> headers,
@@ -63,8 +64,8 @@ public final class SendCommand
                     .cc(ccAddresses)
                     .bcc(bccAddresses)
                     .withSubject(subject)
-                                            .withAttachments(attachments != null ? attachments : new ArrayList<>())
-                    .withContent(content.getBody(), content.getContentType(), content.getCharset())
+                    .withAttachments(attachments != null ? attachments : new ArrayList<>())
+                    .withContent(content.getBody(), content.getContentType(), content.getCharset() == null ? defaultEncoding : content.getCharset())
                     .withHeaders(headers)
                     .build();
 
