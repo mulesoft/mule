@@ -56,11 +56,12 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void startsMulecoreExtensionManager() throws Exception
+    public void startsMuleCoreExtensionManager() throws Exception
     {
         container.start(false);
 
         verify(coreExtensionManager).setDeploymentService(deploymentService);
+        verify(coreExtensionManager).setRepositoryService(repositoryService);
         verify(coreExtensionManager).initialise();
         verify(coreExtensionManager).start();
     }

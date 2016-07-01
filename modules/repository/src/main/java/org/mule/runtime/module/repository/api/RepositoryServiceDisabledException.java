@@ -14,6 +14,9 @@ package org.mule.runtime.module.repository.api;
 public class RepositoryServiceDisabledException extends RuntimeException
 {
 
+    /**
+     * {@inheritDoc}
+     */
     public RepositoryServiceDisabledException(String message)
     {
         super(message);

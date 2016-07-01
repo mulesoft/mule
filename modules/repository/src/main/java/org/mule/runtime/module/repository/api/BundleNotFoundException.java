@@ -14,6 +14,9 @@ package org.mule.runtime.module.repository.api;
 public class BundleNotFoundException extends RuntimeException
 {
 
+    /**
+     * {@inheritDoc}
+     */
     public BundleNotFoundException(String message, Throwable cause)
     {
         super(message, cause);

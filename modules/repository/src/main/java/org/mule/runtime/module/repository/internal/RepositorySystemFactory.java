@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.repository.interal;
+package org.mule.runtime.module.repository.internal;
 
 import org.eclipse.aether.RepositorySystem;
 

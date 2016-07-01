@@ -4,19 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+package org.mule.runtime.module.repository.internal;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.module.repository.interal.DefaultRepositoryService.MULE_REPOSITORY_FOLDER_PROPERTY;
-import static org.mule.runtime.module.repository.interal.DefaultRepositoryService.MULE_REMOTE_REPOSITORIES_PROPERTY;
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REPOSITORY_FOLDER_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import org.mule.runtime.module.repository.api.BundleDescriptor;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
 import org.mule.runtime.module.repository.api.RepositoryConnectionException;
+import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceDisabledException;
-import org.mule.runtime.module.repository.interal.DefaultRepositoryService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -44,8 +45,8 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase
     @Test
     public void existingResourceFromMaven() throws Exception
     {
-        executeTestWithTemporaryRepo(() -> {
-            DefaultRepositoryService defaultRepositoryService = new DefaultRepositoryService();
+        executeTestWithDefaultRemoteRepo(() -> {
+            RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
             File bundleFile = defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
             assertThat(bundleFile, notNullValue());
             assertThat(bundleFile.exists(), is(true));
@@ -56,8 +57,8 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase
     @Test
     public void noExistentResource() throws Exception
     {
-        executeTestWithTemporaryRepo(() -> {
-            DefaultRepositoryService defaultRepositoryService = new DefaultRepositoryService();
+        executeTestWithDefaultRemoteRepo(() -> {
+            RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
             expectedException.expect(BundleNotFoundException.class);
             defaultRepositoryService.lookupBundle(new BundleDescriptor.Builder()
                                                           .setGroupId("no")
@@ -71,41 +72,39 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase
     @Test
     public void invalidExternalRepository() throws Exception
     {
-        executeTestWithTemporaryRepo(() -> {
-            testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, "http://doesnotexists/repo", () -> {
-                DefaultRepositoryService defaultRepositoryService = new DefaultRepositoryService();
-                expectedException.expect(RepositoryConnectionException.class);
-                defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
-            });
+        executeTestWithCustomRepoRepo("http://doesnotexists/repo", () -> {
+            RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
+            expectedException.expect(RepositoryConnectionException.class);
+            defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
         });
     }
 
     @Test
     public void noRepositoryConfigured() throws Exception
     {
-        testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, "", () -> {
-            executeTestWithTemporaryRepo(() -> {
-                DefaultRepositoryService defaultRepositoryService = new DefaultRepositoryService();
-                expectedException.expect(RepositoryServiceDisabledException.class);
-                defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
-            });
+        executeTestWithCustomRepoRepo(null, () -> {
+            RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
+            expectedException.expect(RepositoryServiceDisabledException.class);
+            defaultRepositoryService.lookupBundle(VALIDA_BUNDLE);
         });
-
     }
 
-    private void executeTestWithTemporaryRepo(TestTask test) throws Exception
+    private void executeTestWithDefaultRemoteRepo(TestTask test) throws Exception
+    {
+
+        testWithSystemProperty(MULE_REPOSITORY_FOLDER_PROPERTY, temporaryFolder.getRoot().getAbsolutePath(), () -> {
+            testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, "http://central.maven.org/maven2/", () -> {
+                test.execute();
+            });
+        });
+    }
+
+    private void executeTestWithCustomRepoRepo(String repositoryUrl, TestTask test) throws Exception
     {
         testWithSystemProperty(MULE_REPOSITORY_FOLDER_PROPERTY, temporaryFolder.getRoot().getAbsolutePath(), () -> {
-            if (System.getProperty(MULE_REMOTE_REPOSITORIES_PROPERTY) == null)
-            {
-                testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, "http://central.maven.org/maven2/", () -> {
-                    test.execute();
-                });
-            }
-            else
-            {
+            testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, repositoryUrl, () -> {
                 test.execute();
-            }
+            });
         });
     }
 

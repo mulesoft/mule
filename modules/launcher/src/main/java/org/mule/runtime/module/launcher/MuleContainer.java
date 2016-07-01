@@ -25,7 +25,8 @@ import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerSe
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
-import org.mule.runtime.module.repository.interal.DefaultRepositoryService;
+import org.mule.runtime.module.repository.internal.DefaultRepositoryService;
+import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class MuleContainer
         final ArtifactClassLoader containerClassLoader = containerClassLoaderFactory.createContainerClassLoader(getClass().getClassLoader());
 
         this.deploymentService = new MuleDeploymentService(containerClassLoader);
-        this.repositoryService = new DefaultRepositoryService();
+        this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
         this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(new ClasspathMuleCoreExtensionDiscoverer(containerClassLoader), new ReflectionMuleCoreExtensionDependencyResolver());
 
         init(args);
