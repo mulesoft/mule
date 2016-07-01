@@ -80,6 +80,10 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
                 {
                     parameterField.set(group, operationContext.getParameter(getAlias(parameterField)));
                 }
+                else
+                {
+                    parameterField.set(group, null);
+                }
             }
 
             for (Map.Entry<Field, ParameterGroupArgumentResolver<?>> childGroup : childGroups.entrySet())
