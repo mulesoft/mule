@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.FactoryBean;
@@ -67,10 +67,14 @@ final class DataTypeFactoryBean implements FactoryBean<DataType>
     @Override
     public DataType getObject() throws Exception
     {
-        DataTypeParamsBuilder<?> builder = DataType.builder().type(type).charset(encoding);
-        if (StringUtils.isNotEmpty(mimeType))
+        DataTypeParamsBuilder<?> builder = DataType.builder().type(type);
+        if (isNotEmpty(mimeType))
         {
-            builder = builder.mediaType(mimeType);
+            builder.mediaType(mimeType);
+        }
+        if (isNotEmpty(encoding))
+        {
+            builder.charset(encoding);
         }
         return builder.build();
     }

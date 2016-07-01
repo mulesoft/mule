@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
@@ -16,7 +17,6 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 /**
  * {@link ObjectFactory} for transformer in Mules.
@@ -46,10 +46,14 @@ public class TransformerObjectFactory implements ObjectFactory<Transformer>
         AbstractTransformer transformerInstance = createInstance();
         if (returnClass != null || mimeType != null)
         {
-            DataTypeParamsBuilder builder = DataType.builder().type(getReturnType()).charset(encoding);
-            if(StringUtils.isNotEmpty(mimeType))
+            DataTypeParamsBuilder builder = DataType.builder().type(getReturnType());
+            if (isNotEmpty(mimeType))
             {
-                builder = builder.mediaType(mimeType);
+                builder.mediaType(mimeType);
+            }
+            if (isNotEmpty(encoding))
+            {
+                builder.charset(encoding);
             }
             transformerInstance.setReturnDataType(builder.build());
         }
