@@ -8,12 +8,12 @@
 package org.mule.module.db.integration.storedprocedure;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.module.db.integration.TestDbConfig.getOracleResource;
 import static org.mule.module.db.integration.model.Contact.CONTACT1;
 import static org.mule.module.db.integration.model.Region.SOUTHWEST;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.OracleTestDatabase;
 
@@ -39,7 +39,7 @@ public class StoredProcedureJavaArrayUdtTestCase extends AbstractDbIntegrationTe
     {
         List<Object[]> params = new LinkedList<>();
 
-        if (!TestDbConfig.getOracleResource().isEmpty())
+        if (!getOracleResource().isEmpty())
         {
             params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
         }

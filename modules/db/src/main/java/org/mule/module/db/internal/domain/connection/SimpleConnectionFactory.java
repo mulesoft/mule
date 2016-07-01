@@ -8,7 +8,6 @@
 package org.mule.module.db.internal.domain.connection;
 
 import java.sql.Connection;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -41,14 +40,7 @@ public class SimpleConnectionFactory extends AbstractConnectionFactory
 
             if (typeMapping != null && !typeMapping.isEmpty())
             {
-                try
-                {
-                    connection.setTypeMap(typeMapping);
-                }
-                catch (SQLFeatureNotSupportedException e)
-                {
-                    logger.warn("DataSource does not support custom type mappings - " + dataSource);
-                }
+                connection.setTypeMap(typeMapping);
             }
         }
         catch (Exception e)

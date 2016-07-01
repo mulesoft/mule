@@ -7,6 +7,7 @@
 
 package org.mule.module.db.integration.select;
 
+import static org.mule.module.db.integration.TestDbConfig.getOracleResource;
 import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.module.db.integration.model.Contact.CONTACT1;
 import static org.mule.module.db.integration.model.Contact.CONTACT2;
@@ -15,7 +16,6 @@ import static org.mule.module.db.integration.model.Region.SOUTHWEST;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.model.Field;
 import org.mule.module.db.integration.model.OracleTestDatabase;
@@ -39,7 +39,7 @@ public class SelectJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase
     {
         List<Object[]> params = new LinkedList<>();
 
-        if (!TestDbConfig.getOracleResource().isEmpty())
+        if (!getOracleResource().isEmpty())
         {
             params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
         }

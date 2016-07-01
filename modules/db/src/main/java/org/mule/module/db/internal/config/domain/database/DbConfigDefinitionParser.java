@@ -7,12 +7,13 @@
 
 package org.mule.module.db.internal.config.domain.database;
 
+import static org.springframework.util.xml.DomUtils.getChildElementByTagName;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.module.db.internal.domain.type.ArrayResolvedDbType;
 import org.mule.module.db.internal.domain.type.DbType;
+import org.mule.module.db.internal.domain.type.MappedStructResolvedDbType;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
-import org.mule.module.db.internal.domain.type.StructResolvedDbType;
 
 import java.sql.Connection;
 import java.sql.Types;
@@ -87,7 +88,7 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
     {
         List<DbType> customDbTypes = new ArrayList<DbType>();
 
-        Element customTypes = DomUtils.getChildElementByTagName(element, DATA_TYPES_ELEMENT);
+        Element customTypes = getChildElementByTagName(element, DATA_TYPES_ELEMENT);
 
         if (customTypes != null)
         {
@@ -101,10 +102,10 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
                 }
                 else if (id == Types.STRUCT)
                 {
-                    Class<?> mappedClass = null;
                     final String className = dataType.getAttribute("className");
                     if (!StringUtils.isEmpty(className))
                     {
+                        Class<?> mappedClass;
                         try
                         {
                             mappedClass = Class.forName(className);
@@ -113,8 +114,12 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
                         {
                             throw new IllegalArgumentException("Cannot find mapped class: " + className);
                         }
+                        customDbTypes.add(new MappedStructResolvedDbType(id, name, mappedClass));
                     }
-                    customDbTypes.add(new StructResolvedDbType(id, name,  mappedClass));
+                    else
+                    {
+                        customDbTypes.add(new ResolvedDbType(id, name));
+                    }
                 }
                 else
                 {
@@ -130,7 +135,7 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
     {
         Map<String, String> propertiesMap = new LinkedHashMap<String, String>();
 
-        Element properties = DomUtils.getChildElementByTagName(element, CONNECTION_PROPERTIES_ELEMENT_NAME);
+        Element properties = getChildElementByTagName(element, CONNECTION_PROPERTIES_ELEMENT_NAME);
 
         if (properties != null)
         {

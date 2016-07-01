@@ -21,9 +21,9 @@ import org.mule.module.db.internal.domain.type.CompositeDbTypeManager;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.module.db.internal.domain.type.JdbcTypes;
+import org.mule.module.db.internal.domain.type.MappedStructResolvedDbType;
 import org.mule.module.db.internal.domain.type.MetadataDbTypeManager;
 import org.mule.module.db.internal.domain.type.StaticDbTypeManager;
-import org.mule.module.db.internal.domain.type.StructResolvedDbType;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -98,9 +98,9 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
 
         for (DbType dbType : customDataTypes)
         {
-            if (dbType instanceof StructResolvedDbType)
+            if (dbType instanceof MappedStructResolvedDbType)
             {
-                final StructResolvedDbType structDbType = (StructResolvedDbType) dbType;
+                final MappedStructResolvedDbType structDbType = (MappedStructResolvedDbType) dbType;
                 if (structDbType.getMappedClass() != null)
                 {
                     typeMapping.put(structDbType.getName(), structDbType.getMappedClass());
