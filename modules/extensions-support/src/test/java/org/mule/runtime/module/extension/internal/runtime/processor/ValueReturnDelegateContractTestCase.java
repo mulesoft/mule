@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.processor;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
@@ -54,7 +54,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     {
         delegate = createReturnDelegate();
         when(operationContext.getEvent()).thenReturn(event);
-        when(event.getMessage()).thenReturn(new DefaultMuleMessage("", DataType.STRING, attributes));
+        when(event.getMessage()).thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes(attributes).build());
     }
 
     @Test
@@ -73,15 +73,15 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     public void operationReturnsMuleMessageButKeepsAttributes() throws Exception
     {
         Object payload = new Object();
-        DataType dataType = DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build();
+        MediaType mediaType = ANY.withCharset(getDefaultEncoding(muleContext));
 
-        delegate.asReturnValue(new DefaultMuleMessage(payload, dataType), operationContext);
+        delegate.asReturnValue(MuleMessage.builder().payload(payload).mediaType(mediaType).build(), operationContext);
 
         MuleMessage message = getOutputMessage();
 
         assertThat(message.getPayload(), is(sameInstance(payload)));
         assertThat(message.getAttributes(), is(sameInstance(attributes)));
-        assertThat(message.getDataType(), is(sameInstance(dataType)));
+        assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
     }
 
     @Test
@@ -89,7 +89,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     {
         Object payload = "hello world!";
 
-        delegate.asReturnValue(new DefaultMuleMessage(payload), operationContext);
+        delegate.asReturnValue(MuleMessage.builder().payload(payload).build(), operationContext);
 
         MuleMessage message = getOutputMessage();
 
@@ -104,7 +104,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
         Object payload = "hello world!";
         Serializable newAttributes = mock(Serializable.class);
 
-        delegate.asReturnValue(new DefaultMuleMessage(payload, newAttributes), operationContext);
+        delegate.asReturnValue(MuleMessage.builder().payload(payload).attributes(newAttributes).build(), operationContext);
 
         MuleMessage message = getOutputMessage();
 

@@ -247,12 +247,12 @@ public interface FileSystem
      * <p>
      * As for the {@link MediaType#getCharset()}, the {@code dataType} one is respected
      *
-     * @param originalDataType the original {@link DataType} that the {@link MuleMessage} had before
+     * @param originalMediaType the original {@link MediaType} that the {@link MuleMessage} had before
      *            executing the operation
      * @param attributes the {@link FileAttributes} of the file being processed
      * @return a {@link DataType} the resulting {@link DataType}.
      */
-    DataType<InputStream> getFileMessageDataType(DataType<?> originalDataType, FileAttributes attributes);
+    MediaType getFileMessageMediaType(MediaType originalMediaType, FileAttributes attributes);
 
     /**
      * Verify that the given {@code path} is not locked

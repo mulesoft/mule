@@ -11,26 +11,21 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
-
-import org.mockito.Mockito;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
@@ -119,9 +114,9 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleContextTestCa
         DataType objectDataType = DataType.OBJECT;
         when(msg.getDataType()).thenReturn(objectDataType);
         when(muleContext.getTransformationService()).thenReturn(transformationService);
-        doReturn(new DefaultMuleMessage((OutputHandler) (event, out) ->
+        doReturn(MuleMessage.builder().payload((OutputHandler) (event, out) ->
         {
-        })).when(transformationService).transform(any(MuleMessage.class), any(DataType.class));
+        }).build()).when(transformationService).transform(any(MuleMessage.class), any(DataType.class));
         return msg;
     }
 

@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -60,7 +61,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
         builder.setStatusCode(200);
         builder.setReasonPhrase("OK");
         httpResponse = builder.build();
-        event = getTestEvent(null);
+        event = getTestEvent(NullPayload.getInstance());
     }
 
     @Test

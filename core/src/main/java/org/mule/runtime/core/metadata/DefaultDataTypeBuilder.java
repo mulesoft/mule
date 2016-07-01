@@ -7,10 +7,11 @@
 package org.mule.runtime.core.metadata;
 
 import static com.google.common.cache.CacheBuilder.newBuilder;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionType;
-
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
@@ -30,7 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.activation.MimeTypeParseException;
 
 /**
  * Provides a way to build immutable {@link DataType} objects.
@@ -50,13 +50,9 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         }
     });
 
-    private static final String CHARSET_PARAM = "charset";
-
     private Class<T> type = (Class<T>) Object.class;
     private DataTypeBuilder<?> itemTypeBuilder;
-    private String mediaPrimaryType = MediaType.ANY.getPrimaryType();
-    private String mediaSubType = MediaType.ANY.getSubType();
-    private Charset charset = null;
+    private MediaType mediaType = MediaType.ANY;
 
     private boolean built = false;
 
@@ -76,13 +72,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         {
             this.type = dataType.getType();
         }
-
-        this.mediaPrimaryType = dataType.getMediaType().getPrimaryType();
-        this.mediaSubType = dataType.getMediaType().getSubType();
-        dataType.getMediaType().getCharset().ifPresent(charset ->
-        {
-            this.charset = charset;
-        });
+        this.mediaType = dataType.getMediaType();
     }
 
     /**
@@ -208,7 +198,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * Sets the given types for the {@link DefaultCollectionDataType} to be built. See
      * {@link DefaultCollectionDataType#getType()} and {@link DefaultCollectionDataType#getItemDataType()}.
      * 
-     * @param itemTypeBuilder the java type to set.
+     * @param itemType the java type to set.
      * @return this builder.
      * @throws IllegalArgumentException if the given collectionType is not a descendant of {@link Collection}.
      */
@@ -241,51 +231,20 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     @Override
     public DataTypeBuilder<T> mediaType(String mediaType)
     {
+        requireNonNull(mediaType);
         validateAlreadyBuilt();
 
-        if (!StringUtils.isEmpty(mediaType))
-        {
-            try
-            {
-                mimeType(new javax.activation.MimeType(mediaType));
-            }
-            catch (MimeTypeParseException e)
-            {
-                throw new IllegalArgumentException("MediaType cannot be parsed: " + mediaType);
-            }
-        }
-        return this;
-    }
-
-    private DataTypeBuilder<T> mimeType(javax.activation.MimeType mimeType)
-    {
-        if (mimeType != null)
-        {
-            this.mediaPrimaryType = mimeType.getPrimaryType();
-            this.mediaSubType = mimeType.getSubType();
-
-            if (charset == null && mimeType.getParameter(CHARSET_PARAM) != null)
-            {
-                doCharset(Charset.forName(mimeType.getParameter(CHARSET_PARAM)));
-            }
-
-            // TODO MULE-9995 What obout other parameters in the MimeType?
-        }
-
+        this.mediaType = MediaType.parse(mediaType);
         return this;
     }
 
     @Override
-    public DataTypeBuilder<T> mediaType(MediaType mimeType)
+    public DataTypeBuilder<T> mediaType(MediaType mediaType)
     {
+        requireNonNull(mediaType);
         validateAlreadyBuilt();
 
-        if (mimeType != null)
-        {
-            this.mediaPrimaryType = mimeType.getPrimaryType();
-            this.mediaSubType = mimeType.getSubType();
-        }
-
+        this.mediaType = mediaType;
         return this;
     }
 
@@ -295,7 +254,6 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         validateAlreadyBuilt();
 
         itemTypeBuilder.mediaType(itemMimeType);
-
         return this;
     }
 
@@ -305,13 +263,12 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         validateAlreadyBuilt();
 
         itemTypeBuilder.mediaType(itemMediaType);
-
         return this;
     }
 
     /**
      * Sets the given charset. See {@link MediaType#getCharset()}.
-     * 
+     *
      * @param charset the encoding to set.
      * @return this builder.
      */
@@ -320,11 +277,14 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         validateAlreadyBuilt();
 
-        if (StringUtils.isNotEmpty(charset))
+        if(StringUtils.isNotEmpty(charset))
         {
-            doCharset(Charset.forName(charset));
+            mediaType = mediaType.withCharset(Charset.forName(charset));
         }
-
+        else
+        {
+            mediaType = mediaType.withCharset(null);
+        }
         return this;
     }
 
@@ -333,24 +293,20 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         validateAlreadyBuilt();
 
-        doCharset(charset);
-
+        mediaType = mediaType.withCharset(charset);
         return this;
-    }
-
-    protected void doCharset(Charset charset)
-    {
-        this.charset = charset;
     }
 
     @Override
     public DataTypeParamsBuilder<T> fromObject(T value)
     {
+        requireNonNull(value);
         validateAlreadyBuilt();
 
-        if(value == null)
+        // TODO MULE-9985 Remove use of NullPayload
+        if(value == NullPayload.getInstance())
         {
-            return (DataTypeBuilder<T>) type(Object.class).mediaType(MediaType.ANY);
+            return (DataTypeBuilder<T>) type(Object.class);
         }
         else
         {
@@ -396,11 +352,11 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     {
         if (Collection.class.isAssignableFrom(type))
         {
-            return new DefaultCollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, MediaType.create(mediaPrimaryType, mediaSubType, charset));
+            return new DefaultCollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType);
         }
         else
         {
-            return new SimpleDataType<>(type, MediaType.create(mediaPrimaryType, mediaSubType, charset));
+            return new SimpleDataType<>(type, mediaType);
         }
     }
 
@@ -420,7 +376,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     @Override
     public int hashCode()
     {
-        return Objects.hash(type, itemTypeBuilder, mediaPrimaryType, mediaSubType, charset);
+        return Objects.hash(type, itemTypeBuilder, mediaType);
     }
 
     @Override
@@ -442,8 +398,6 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
 
         return Objects.equals(type, other.type)
                && Objects.equals(itemTypeBuilder, other.itemTypeBuilder)
-               && Objects.equals(mediaPrimaryType, other.mediaPrimaryType)
-               && Objects.equals(mediaSubType, other.mediaSubType)
-               && Objects.equals(charset, other.charset);
+               && Objects.equals(mediaType, other.mediaType);
     }
 }

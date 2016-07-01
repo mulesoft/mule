@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
 
 /**
  * {@link ObjectFactory} for transformer in Mules.
@@ -45,7 +46,12 @@ public class TransformerObjectFactory implements ObjectFactory<Transformer>
         AbstractTransformer transformerInstance = createInstance();
         if (returnClass != null || mimeType != null)
         {
-            transformerInstance.setReturnDataType(((DataTypeParamsBuilder<?>) DataType.builder().type(getReturnType()).mediaType(mimeType).charset(encoding)).build());
+            DataTypeParamsBuilder builder = DataType.builder().type(getReturnType()).charset(encoding);
+            if(StringUtils.isNotEmpty(mimeType))
+            {
+                builder = builder.mediaType(mimeType);
+            }
+            transformerInstance.setReturnDataType(builder.build());
         }
         transformerInstance.setIgnoreBadInput(ignoreBadInput);
         transformerInstance.setName(name);

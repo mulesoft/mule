@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.file.api;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.io.InputStream;
@@ -65,7 +64,7 @@ public class TreeNode implements Serializable, Iterable
         public static Builder forDirectory(FileAttributes attributes)
         {
             Builder builder = new Builder();
-            builder.message = new DefaultMuleMessage(NullPayload.getInstance(), DataType.OBJECT, attributes).asNewMessage();
+            builder.message = MuleMessage.builder().payload(NullPayload.getInstance()).attributes(attributes).build();
 
             return builder;
         }

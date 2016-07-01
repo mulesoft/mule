@@ -183,19 +183,6 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
     }
 
     /**
-     * Creates a new message instance with the given value and attributes object
-     *
-     * @param value  the value (or payload) of the message being created.
-     * @param attributes a connector specific object that contains additional attributes related to the message value or
-     *                   it's source.
-     * @param <T> the type of the value
-     */
-    public <T> DefaultMuleMessage(T value, Serializable attributes)
-    {
-        this(value, (DataType<T>) null, attributes);
-    }
-
-    /**
      * Creates a new message instance with the given value, data type and attributes object
      *
      * @param value  the value (or payload) of the message being created.
@@ -234,14 +221,14 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
     }
 
     public DefaultMuleMessage(Object message, Map<String, Serializable> inboundProperties,
-            Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments)
+                              Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments)
     {
         this(message, inboundProperties, outboundProperties, attachments, createDefaultDataType(message));
     }
 
     public DefaultMuleMessage(Object message, Map<String, Serializable> inboundProperties,
                               Map<String, Serializable> outboundProperties, Map<String, DataHandler> attachments,
-            DataType dataType)
+                              DataType dataType)
     {
         typedValue = new TypedValue(resolveValue(message), dataType);
         id =  UUID.getUUID();
@@ -848,7 +835,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
                 else
                 {
                     throw newException("Only owner thread can write to message: "
-                            + ownerThread.get() + "/" + Thread.currentThread());
+                                       + ownerThread.get() + "/" + Thread.currentThread());
                 }
             }
         }

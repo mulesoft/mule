@@ -272,7 +272,7 @@ public class TransformationService
                 message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
         // In case if the transformed dataType is an Object type we could keep the original type if it is compatible/assignable (String->Object we want to keep String as transformed DataType)
         Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataType.builder().type(payloadTransformedClass).mediaType(mimeType).build())
-                ? original.getType() : transformed.getType();
+                ? original.getType() : payloadTransformedClass != null ? payloadTransformedClass : transformed.getType();
 
         return DataType.builder().type(type).mediaType(mimeType).charset(encoding).build();
     }

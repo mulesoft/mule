@@ -19,8 +19,6 @@ import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.context.MessageContext;
@@ -232,7 +230,11 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
 
     public static void onMessage(MessageContext messageContext)
     {
-        MuleMessage message = new DefaultMuleMessage(messageContext.getPayload(), (DataType<Object>) messageContext.getDataType(), messageContext.getAttributes());
+        Object payload = messageContext.getPayload() != null ? messageContext.getPayload() : NullPayload.getInstance();
+        MuleMessage message = MuleMessage.builder().payload(payload)
+                                                   .mediaType(messageContext.getDataType().getMediaType())
+                                                   .attributes(messageContext.getAttributes())
+                                                   .build();
         receivedMessages.add(message);
     }
 }

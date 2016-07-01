@@ -106,7 +106,8 @@ public class HttpResponseToMuleMessage
         HttpResponseAttributes responseAttributes = createAttributes(response, parts);
 
         dataType = DataType.builder(dataType).charset(encoding).build();
-        MuleMessage responseMessage = new DefaultMuleMessage(payload, dataType, responseAttributes);
+        MuleMessage responseMessage = MuleMessage.builder().payload(payload).mediaType(dataType.getMediaType())
+                .attributes(responseAttributes).build();
 
         String requestMessageId = muleEvent.getMessage().getUniqueId();
         String requestMessageRootId = muleEvent.getMessage().getMessageRootId();

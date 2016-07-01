@@ -15,8 +15,6 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.socket.api.SocketsExtension;
 import org.mule.module.socket.api.source.SocketAttributes;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.ValueHolder;
@@ -109,7 +107,8 @@ public abstract class SocketExtensionTestCase extends ExtensionFunctionalTestCas
 
     public static void onIncomingConnection(MessageContext messageContext)
     {
-        MuleMessage message = new DefaultMuleMessage(messageContext.getPayload(), (DataType<Object>) messageContext.getDataType(), messageContext.getAttributes());
+        MuleMessage message = MuleMessage.builder().payload(messageContext.getPayload()).mediaType(messageContext
+                                                                                                           .getDataType().getMediaType()).attributes(messageContext.getAttributes()).build();
         receivedMessages.add(message);
     }
 

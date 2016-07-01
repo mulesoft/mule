@@ -16,6 +16,7 @@ import static org.mockito.Mockito.RETURNS_DEFAULTS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.getTestEvent;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -69,7 +70,7 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
     public void testAcceptMessage() throws Exception
     {
         final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        MuleEvent event = getTestEvent(null, muleContext);
+        MuleEvent event = getTestEvent(NullPayload.getInstance(), muleContext);
         XPathFilter filter = new XPathFilter()
         {
             @Override

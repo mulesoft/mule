@@ -10,6 +10,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
+import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.FactoryBean;
@@ -66,7 +67,12 @@ final class DataTypeFactoryBean implements FactoryBean<DataType>
     @Override
     public DataType getObject() throws Exception
     {
-        return ((DataTypeParamsBuilder<?>) DataType.builder().type(type).mediaType(mimeType).charset(encoding)).build();
+        DataTypeParamsBuilder<?> builder = DataType.builder().type(type).charset(encoding);
+        if (StringUtils.isNotEmpty(mimeType))
+        {
+            builder = builder.mediaType(mimeType);
+        }
+        return builder.build();
     }
 
     @Override

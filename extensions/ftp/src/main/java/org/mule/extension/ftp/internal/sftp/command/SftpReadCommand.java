@@ -13,7 +13,7 @@ import org.mule.extension.ftp.internal.sftp.SftpInputStream;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.ReadCommand;
@@ -67,9 +67,9 @@ public final class SftpReadCommand extends SftpCommand implements ReadCommand
 
         try
         {
-            return new DefaultMuleMessage(SftpInputStream.newInstance((FtpConnector) config, attributes, pathLock),
-                                          fileSystem.getFileMessageDataType(message.getDataType(), attributes),
-                                          attributes).asNewMessage();
+            InputStream payload = SftpInputStream.newInstance((FtpConnector) config, attributes, pathLock);
+            MediaType mediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), attributes);
+            return MuleMessage.builder().payload(payload).mediaType(mediaType).attributes((FileAttributes) attributes).build();
         }
         catch (ConnectionException e)
         {

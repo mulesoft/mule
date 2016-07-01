@@ -6,13 +6,13 @@
  */
 package org.mule.compatibility.transport.http.functional;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.DELETE;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.GET;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.construct.Flow;
@@ -57,7 +57,7 @@ public class HttpUndefinedMethodsBodyTestCase extends FunctionalTestCase
     @Test
     public void noBody() throws Exception
     {
-        sendRequestAndAssertMethod(null, "/");
+        sendRequestAndAssertMethod(EMPTY, "/");
     }
 
     private void sendRequestAndAssertMethod(String payload, String expectedContent) throws Exception
