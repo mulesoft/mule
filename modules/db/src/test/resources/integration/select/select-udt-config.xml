@@ -5,6 +5,11 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <db:oracle-config name="dbConfig" host="172.16.20.66" port="1521" instance="XE" user="pocholo"
-                      password="password"/>
+    <flow name="returnsUDT">
+        <inbound-endpoint address="vm://returnsUDT" exchange-pattern="request-response"/>
+
+        <db:select>
+            <db:parameterized-query>select * from REGION_MANAGERS</db:parameterized-query>
+        </db:select>
+    </flow>
 </mule>

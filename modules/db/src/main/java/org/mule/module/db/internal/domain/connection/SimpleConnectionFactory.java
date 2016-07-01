@@ -8,14 +8,27 @@
 package org.mule.module.db.internal.domain.connection;
 
 import java.sql.Connection;
+import java.util.Map;
 
 import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates a {@link Connection} from a {@link DataSource}
  */
 public class SimpleConnectionFactory extends AbstractConnectionFactory
 {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private Map<String, Class<?>> typeMapping;
+
+    public SimpleConnectionFactory(Map<String, Class<?>> typeMapping)
+    {
+        this.typeMapping = typeMapping;
+    }
 
     @Override
     protected Connection doCreateConnection(DataSource dataSource)
@@ -24,6 +37,11 @@ public class SimpleConnectionFactory extends AbstractConnectionFactory
         try
         {
             connection = dataSource.getConnection();
+
+            if (typeMapping != null && !typeMapping.isEmpty())
+            {
+                connection.setTypeMap(typeMapping);
+            }
         }
         catch (Exception e)
         {

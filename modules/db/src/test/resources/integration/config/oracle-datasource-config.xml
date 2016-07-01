@@ -9,7 +9,7 @@
 
     <spring:bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
         <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-        <spring:property name="url" value="jdbc:oracle:thin:pocholo/password@172.16.28.128:1521:XE"/>
+        <spring:property name="url" value="jdbc:oracle:thin:pocholo/password@172.16.20.66:1521:XE"/>
     </spring:bean>
 
     <db:oracle-config name="dbConfig" dataSource-ref="jdbcDataSource"/>
