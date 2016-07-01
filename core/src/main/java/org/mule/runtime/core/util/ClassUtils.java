@@ -7,8 +7,10 @@
 package org.mule.runtime.core.util;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.core.util.ExceptionUtils.tryExpecting;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
@@ -42,7 +44,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
+import java.util.concurrent.Callable;
 
 /**
  * Extend the Apache Commons ClassUtils to provide additional functionality.
@@ -165,7 +167,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * </ul>
      * Search stops as soon as any of the mentioned classLoaders has found a matching resource.
      *
-     * @param resourceName resource being searched. Non empty.
+     * @param resourceName        resource being searched. Non empty.
      * @param fallbackClassLoader classloader used to fallback the search. Non null.
      * @return a non null {@link Enumeration} containing the found resources. Can be empty.
      */
@@ -1199,32 +1201,6 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     /**
-     * Executes the given {@code supplier} using the given {@code classLoader}
-     * as the current {@link Thread}'s context classloader.
-     * <p>
-     * This method guarantees that whatever the outcome, the thread's context classloader
-     * is set back to the value that it had before executing this method
-     *
-     * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
-     * @param supplier    a {@link Supplier}
-     * @return the value that the {@code supplier} produced
-     */
-    public static <T> T withContextClassLoader(ClassLoader classLoader, Supplier<T> supplier)
-    {
-        final Thread currentThread = Thread.currentThread();
-        final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-        currentThread.setContextClassLoader(classLoader);
-        try
-        {
-            return supplier.get();
-        }
-        finally
-        {
-            currentThread.setContextClassLoader(currentClassLoader);
-        }
-    }
-
-    /**
      * Executes the given {@code runnable} using the given {@code classLoader}
      * as the current {@link Thread}'s context classloader.
      * <p>
@@ -1236,9 +1212,75 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      */
     public static void withContextClassLoader(ClassLoader classLoader, Runnable runnable)
     {
-        withContextClassLoader(classLoader, () -> {
-            runnable.run();
-            return null;
+        try
+        {
+            withContextClassLoader(classLoader, () -> {
+                runnable.run();
+                return null;
+            });
+        }
+        catch (Exception e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+    }
+
+    /**
+     * Executes the given {@code callable} using the given {@code classLoader}
+     * as the current {@link Thread}'s context classloader.
+     * <p>
+     * This method guarantees that whatever the outcome, the thread's context classloader
+     * is set back to the value that it had before executing this method
+     *
+     * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
+     * @param callable    a {@link Callable}
+     * @return the value that the {@code callable} produced
+     */
+    public static <T> T withContextClassLoader(ClassLoader classLoader, Callable<T> callable)
+    {
+        return withContextClassLoader(classLoader, callable, RuntimeException.class, e -> {
+            throw new MuleRuntimeException(e);
         });
+    }
+
+    /**
+     * Executes the given {@code callable} using the given {@code classLoader}
+     * as the current {@link Thread}'s context classloader.
+     * <p>
+     * This method guarantees that whatever the outcome, the thread's context classloader
+     * is set back to the value that it had before executing this method.
+     * <p>
+     * This method also accounts for the possibility of the {@code callable} to throw
+     * and exception of type {@code expectedExceptionType}. If that happens, then
+     * the exception is re-thrown. If the {@code callable} throws a {@link RuntimeException}
+     * of a different type, it is also re-thrown. Finally, if an exception of any other
+     * type is found, then it is handled delegating into the {@code exceptionHandler} which
+     * might in turn throw another exception of {@code expectedExceptionType} or return a value
+     *
+     * @param classLoader           the context {@link ClassLoader} on which the {@code runnable} should be executed
+     * @param callable              a {@link Callable}
+     * @param expectedExceptionType the type of exception which is expected to be thrown
+     * @param exceptionHandler      a {@link ExceptionHandler} in case an unexpected exception is found instead
+     * @param <T>                   the generic type of the return value
+     * @param <E>                   the generic type of the expected exception
+     * @return a value returned by either the {@code callable} or the {@code exceptionHandler}
+     * @throws E if the expected exception is actually thrown
+     */
+    public static <T, E extends Exception> T withContextClassLoader(ClassLoader classLoader,
+                                                                    Callable<T> callable,
+                                                                    Class<E> expectedExceptionType,
+                                                                    ExceptionHandler<T, E> exceptionHandler) throws E
+    {
+        final Thread currentThread = Thread.currentThread();
+        final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+        currentThread.setContextClassLoader(classLoader);
+        try
+        {
+            return tryExpecting(expectedExceptionType, callable, exceptionHandler);
+        }
+        finally
+        {
+            currentThread.setContextClassLoader(currentClassLoader);
+        }
     }
 }

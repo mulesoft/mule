@@ -8,12 +8,14 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -23,7 +25,6 @@ import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.util.List;
 import java.util.Map;
@@ -93,15 +94,10 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
     @Override
     public ConfigurationInstance<T> get(Object muleEvent)
     {
-        try
-        {
+        return withContextClassLoader(getExtensionClassLoader(), () -> {
             ResolverSetResult result = resolverSet.resolve((MuleEvent) muleEvent);
             return getConfiguration(result, (MuleEvent) muleEvent);
-        }
-        catch (Exception e)
-        {
-            throw new MuleRuntimeException(e);
-        }
+        });
     }
 
     private ConfigurationInstance<T> getConfiguration(ResolverSetResult resolverSetResult, MuleEvent event) throws Exception
@@ -167,15 +163,19 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
     {
         try
         {
-            if (lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME))
-            {
-                initialiseIfNeeded(configuration, true, muleContext);
-            }
+            withContextClassLoader(getExtensionClassLoader(), () -> {
+                if (lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME))
+                {
+                    initialiseIfNeeded(configuration, true, muleContext);
+                }
 
-            if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME))
-            {
-                startConfig(configuration);
-            }
+                if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME))
+                {
+                    startConfig(configuration);
+                }
+
+                return null;
+            });
         }
         catch (Exception e)
         {

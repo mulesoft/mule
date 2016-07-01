@@ -11,7 +11,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -85,11 +87,18 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        ConfigurationInstance<Object> configuration = getConfiguration(event);
-        OperationContextAdapter operationContext = createOperationContext(configuration, event);
-        Object result = executeOperation(operationContext, event);
+        return withContextClassLoader(
+                getExtensionClassLoader(), () -> {
+                    ConfigurationInstance<Object> configuration = getConfiguration(event);
+                    OperationContextAdapter operationContext = createOperationContext(configuration, event);
+                    Object result = executeOperation(operationContext, event);
 
-        return returnDelegate.asReturnValue(result, operationContext);
+                    return returnDelegate.asReturnValue(result, operationContext);
+                },
+                MuleException.class,
+                e -> {
+                    throw new DefaultMuleException(e);
+                });
     }
 
     private Object executeOperation(OperationContext operationContext, MuleEvent event) throws MuleException
@@ -142,19 +151,19 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
     }
 
     @Override
-    public void start() throws MuleException
+    public void doStart() throws MuleException
     {
         startIfNeeded(operationExecutor);
     }
 
     @Override
-    public void stop() throws MuleException
+    public void doStop() throws MuleException
     {
         stopIfNeeded(operationExecutor);
     }
 
     @Override
-    public void dispose()
+    public void doDispose()
     {
         disposeIfNeeded(operationExecutor, LOGGER);
     }

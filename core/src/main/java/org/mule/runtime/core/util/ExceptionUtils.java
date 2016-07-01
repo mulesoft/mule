@@ -15,6 +15,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 /**
  * Mule exception utilities.
@@ -102,7 +103,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
      * Introspects the {@link Throwable} parameter to obtain the first {@link Throwable} of
      * type {@code throwableType} in the exception chain and return the cause of it.
      *
-     * @param throwable the last throwable on the exception chain.
+     * @param throwable     the last throwable on the exception chain.
      * @param throwableType the type of the throwable that the cause is wanted.
      * @return the cause of the first {@link Throwable} of type {@code throwableType}.
      */
@@ -122,7 +123,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
      * If the throwable parameter has a cause of itself,
      * then an empty value will be returned.
      *
-     * @param throwable the last throwable on the exception chain.
+     * @param throwable     the last throwable on the exception chain.
      * @param throwableType the type of the throwable is wanted to find.
      * @return the cause of the first {@link Throwable} of type {@code throwableType}.
      */
@@ -135,5 +136,46 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
         }
 
         return (Optional<T>) stream(getThrowables(throwable)).filter(throwableType::isInstance).findFirst();
+    }
+
+    /**
+     * Executes the given {@code callable} knowing that it might throw an {@link Exception} of
+     * type {@code expectedExceptionType}. If that happens, then it will re throw such exception.
+     * <p>
+     * If the {@code callable} throws a {@link RuntimeException} of a different type, then it
+     * is also re-thrown. Finally, if an exception of any different type is thrown, then it
+     * is handled by delegating into the {@code exceptionHandler}, which might in turn also
+     * throw an exception or handle it returning a value.
+     *
+     * @param expectedExceptionType the type of exception which is expected to be thrown
+     * @param callable              the delegate to be executed
+     * @param exceptionHandler      a {@link ExceptionHandler} in case an unexpected exception is found instead
+     * @param <T>                   the generic type of the return value
+     * @param <E>                   the generic type of the expected exception
+     * @return a value returned by either the {@code callable} or the {@code exceptionHandler}
+     * @throws E if the expected exception is actually thrown
+     */
+    public static <T, E extends Exception> T tryExpecting(Class<E> expectedExceptionType,
+                                                          Callable<T> callable,
+                                                          ExceptionHandler<T, E> exceptionHandler) throws E
+    {
+        try
+        {
+            return callable.call();
+        }
+        catch (Exception e)
+        {
+            if (expectedExceptionType.isInstance(e))
+            {
+                throw (E) e;
+            }
+
+            if (e instanceof RuntimeException)
+            {
+                throw (RuntimeException) e;
+            }
+
+            return exceptionHandler.handle(e);
+        }
     }
 }

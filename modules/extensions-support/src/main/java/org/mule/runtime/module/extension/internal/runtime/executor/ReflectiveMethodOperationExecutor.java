@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -57,6 +58,7 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
     private final Method operationMethod;
     private final Object executorDelegate;
     private final ArgumentResolverDelegate argumentResolverDelegate;
+    private final ClassLoader extensionClassLoader;
 
     private MuleContext muleContext;
 
@@ -65,6 +67,7 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
         this.operationMethod = operationMethod;
         this.executorDelegate = executorDelegate;
         argumentResolverDelegate = isEmpty(operationMethod.getParameterTypes()) ? NO_ARGS_DELEGATE : new MethodArgumentResolverDelegate(operationMethod);
+        extensionClassLoader = operationMethod.getDeclaringClass().getClassLoader();
     }
 
     /**
@@ -73,14 +76,13 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
     @Override
     public Object execute(OperationContext operationContext) throws Exception
     {
-        return invokeMethod(operationMethod, executorDelegate, getParameterValues(operationContext, operationMethod.getParameterTypes()));
+        return withContextClassLoader(extensionClassLoader, () -> invokeMethod(operationMethod, executorDelegate, getParameterValues(operationContext, operationMethod.getParameterTypes())));
     }
 
     private Object[] getParameterValues(OperationContext operationContext, Class<?>[] parameterTypes)
     {
         return argumentResolverDelegate.resolve(operationContext, parameterTypes);
     }
-
 
     @Override
     public void initialise() throws InitialisationException
