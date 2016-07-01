@@ -14,6 +14,8 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.launcher.DeploymentListener;
 import org.mule.runtime.module.launcher.DeploymentService;
 import org.mule.runtime.module.launcher.DeploymentServiceAware;
+import org.mule.runtime.module.launcher.RepositoryServiceAware;
+import org.mule.runtime.module.repository.api.RepositoryService;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +32,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     private final MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver;
     private List<MuleCoreExtension> coreExtensions = new LinkedList<>();
     private DeploymentService deploymentService;
+    private RepositoryService repositoryService;
     private List<MuleCoreExtension> orderedCoreExtensions;
 
     public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer, MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver)
@@ -116,6 +119,11 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
                 ((DeploymentServiceAware) extension).setDeploymentService(deploymentService);
             }
 
+            if (extension instanceof RepositoryServiceAware)
+            {
+                ((RepositoryServiceAware) extension).setRepositoryService(repositoryService);
+            }
+
             if (extension instanceof DeploymentListener)
             {
                 deploymentService.addDeploymentListener((DeploymentListener) extension);
@@ -134,5 +142,11 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     public void setDeploymentService(DeploymentService deploymentService)
     {
         this.deploymentService = deploymentService;
+    }
+
+    @Override
+    public void setRepositoryService(RepositoryService repositoryService)
+    {
+        this.repositoryService = repositoryService;
     }
 }
