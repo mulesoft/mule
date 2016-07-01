@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.processor;
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -97,22 +97,20 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
             dataTypeBuilder = DataType.builder().type((Class) (value != null ? value.getClass() : Object.class));
         }
 
-        String mimeType = operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class);
-        String encoding = operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class);
-
-        if (isNotEmpty(mimeType))
+        if (operationContext.hasParameter(MIME_TYPE_PARAMETER_NAME))
         {
-            dataTypeBuilder = dataTypeBuilder.mediaType(mimeType);
+            dataTypeBuilder = dataTypeBuilder.mediaType(operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class));
         }
 
-        if (isNotEmpty(encoding))
+        if (operationContext.hasParameter(ENCODING_PARAMETER_NAME))
         {
-            dataTypeBuilder = dataTypeBuilder.charset(encoding);
+            dataTypeBuilder = dataTypeBuilder.charset(operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class));
         }
         else
         {
             dataTypeBuilder = dataTypeBuilder.charset(existingEncoding);
         }
+
         return dataTypeBuilder.build();
     }
 }

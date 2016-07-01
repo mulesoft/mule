@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -25,6 +26,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -79,13 +81,22 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     @Test
     public void getParameter()
     {
+        assertThat(operationContext.hasParameter(PARAM_NAME), is(true));
         assertThat(operationContext.getParameter(PARAM_NAME), is(VALUE));
     }
 
     @Test
     public void getTypeSafeParameter()
     {
+        assertThat(operationContext.hasParameter(PARAM_NAME), is(true));
         assertThat(operationContext.getTypeSafeParameter(PARAM_NAME, String.class), is(VALUE));
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void getNonExistantTypeSafeParameter()
+    {
+        assertThat(operationContext.hasParameter(PARAM_NAME + "_"), is(false));
+        operationContext.getTypeSafeParameter(PARAM_NAME + "_", String.class);
     }
 
     @Test(expected = IllegalArgumentException.class)

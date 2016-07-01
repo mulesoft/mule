@@ -33,6 +33,7 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
+
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MediaType;
@@ -280,7 +281,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         assertThat(message.getPayload(), is(sameInstance(payload)));
         assertThat(message.getAttributes(), is(sameInstance(attributes)));
-        assertThat(message.getDataType().getMediaType(), is(sameInstance(mediaType)));
+        assertThat(message.getDataType().getMediaType(), is(mediaType));
     }
 
     @Test
