@@ -14,10 +14,10 @@ import java.sql.Struct;
 /**
  * Defines a structured data type for {@link Struct} mapped to a Java class.
  */
-public class MappedStructResolvedDbType<T extends Class<?>> extends ResolvedDbType
+public class MappedStructResolvedDbType<T> extends ResolvedDbType
 {
 
-    private final T mappedClass;
+    private final Class<T> mappedClass;
 
     /**
      * Creates a new instance
@@ -26,13 +26,13 @@ public class MappedStructResolvedDbType<T extends Class<?>> extends ResolvedDbTy
      * @param name        type name. Non Empty.
      * @param mappedClass class used to map values of this type from the database to Java representations.
      */
-    public MappedStructResolvedDbType(int id, String name, T mappedClass)
+    public MappedStructResolvedDbType(int id, String name, Class<T> mappedClass)
     {
         super(id, name);
         this.mappedClass = mappedClass;
     }
 
-    public T getMappedClass()
+    public Class<T> getMappedClass()
     {
         return mappedClass;
     }
