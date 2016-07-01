@@ -6,15 +6,23 @@
  */
 package org.mule.runtime.module.xml.transformers.xml.xquery;
 
+import static java.lang.Runtime.getRuntime;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.transformer.XQueryTransformer;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -22,9 +30,10 @@ import org.junit.Test;
 
 public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCase
 {
+    private static final int TIMEOUT_MILLIS = 30000;
     private String srcData;
     private String resultData;
-    private ConcurrentLinkedQueue<Object> actualResults = new ConcurrentLinkedQueue<Object>();
+    private ConcurrentLinkedQueue<Object> actualResults = new ConcurrentLinkedQueue<>();
 
     @Override
     protected void doSetUp() throws Exception
@@ -45,22 +54,18 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
         return transformer;
     }
 
-    int running = 0;
-
-    public synchronized void signalStarted()
-    {
-        ++running;
-    }
+    private CountDownLatch latch = new CountDownLatch(getParallelThreadCount());
 
     public synchronized void signalDone()
     {
-        if (--running == 0) this.notify();
+        latch.countDown();
     }
 
     @Test
     public void testParallelTransformation() throws Exception
     {
         final Transformer transformer = getTransformer();
+        final Flow testFlow = getTestFlow(muleContext);
 
         long startTime = System.currentTimeMillis();
 
@@ -70,7 +75,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
             {
                 try
                 {
-                    RequestContext.setEvent(getTestEvent("test"));
+                    RequestContext.setEvent(MuleTestUtils.getTestEvent("test", testFlow, MessageExchangePattern.REQUEST_RESPONSE, muleContext));
                 }
                 catch (Exception e1)
                 {
@@ -78,7 +83,6 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
                     return;
                 }
 
-                signalStarted();
                 for (int j = 0; j < getCallsPerThread(); ++j)
                 {
                     try
@@ -94,10 +98,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
             }).start();
         }
 
-        synchronized (this)
-        {
-            this.wait();
-        }
+        assertTrue(latch.await(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS));
 
         long endTime = System.currentTimeMillis();
 
@@ -134,7 +135,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
 
     private int getParallelThreadCount()
     {
-        return 20;
+        return getRuntime().availableProcessors();
     }
 
     private int getCallsPerThread()

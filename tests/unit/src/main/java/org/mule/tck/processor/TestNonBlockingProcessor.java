@@ -11,43 +11,40 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.ThreadSafeAccess;
+import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  *  Test implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that simply uses a @{link Executor} to
  *  invoke the {@link org.mule.runtime.core.api.connector.ReplyToHandler} in another thread.
  */
-public class TestNonBlockingProcessor implements NonBlockingMessageProcessor
+public class TestNonBlockingProcessor implements NonBlockingMessageProcessor, Disposable
 {
 
-    private static Executor executor = Executors.newCachedThreadPool();
+    private static ExecutorService executor = Executors.newCachedThreadPool();
 
     @Override
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
         if (event.isAllowNonBlocking() && event.getReplyToHandler() != null)
         {
-            executor.execute(new Runnable()
+            executor.execute(() ->
             {
-                @Override
-                public void run()
+                ((ThreadSafeAccess)event).resetAccessControl();
+                try
                 {
-                    ((ThreadSafeAccess)event).resetAccessControl();
-                    try
-                    {
-                        event.getReplyToHandler().processReplyTo(event, null, null);
-                    }
-                    catch (MessagingException e)
-                    {
-                        event.getReplyToHandler().processExceptionReplyTo(e, null);
-                    }
-                    catch (MuleException e)
-                    {
-                        event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, e), null);
-                    }
+                    event.getReplyToHandler().processReplyTo(event, null, null);
+                }
+                catch (MessagingException e1)
+                {
+                    event.getReplyToHandler().processExceptionReplyTo(e1, null);
+                }
+                catch (MuleException e2)
+                {
+                    event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, e2), null);
                 }
             });
             return NonBlockingVoidMuleEvent.getInstance();
@@ -58,4 +55,9 @@ public class TestNonBlockingProcessor implements NonBlockingMessageProcessor
         }
     }
 
+    @Override
+    public void dispose()
+    {
+        executor.shutdown();
+    }
 }

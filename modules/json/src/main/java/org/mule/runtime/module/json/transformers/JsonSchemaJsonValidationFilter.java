@@ -130,6 +130,8 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter
         {
             InputStream inputStream = IOUtils.getResourceAsStream(schemaLocations, getClass());
             InputStreamReader reader = new InputStreamReader(inputStream);
+            // TODO https://github.com/fge/msg-simple/issues/1
+            // There is way currently to destroy threads created by this component
             JsonNode jsonNode = JsonLoader.fromReader(reader);
             JsonSchemaFactory schemaFactory = JsonSchemaFactory.byDefault();
             jsonSchema = schemaFactory.getJsonSchema(jsonNode);
