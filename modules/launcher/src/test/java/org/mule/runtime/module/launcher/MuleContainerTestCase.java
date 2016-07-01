@@ -16,6 +16,7 @@ import static org.mule.runtime.module.launcher.MuleFoldersUtil.getExecutionFolde
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
+import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
@@ -41,24 +42,26 @@ public class MuleContainerTestCase extends AbstractMuleTestCase
 
     private MuleCoreExtensionManagerServer coreExtensionManager;
 
-    private DeploymentService deploymentService;
+    private DeploymentService deploymentService = mock(DeploymentService.class);
+
+    private RepositoryService repositoryService = mock(RepositoryService.class);
 
     @Before
     public void setUp() throws Exception
     {
         coreExtensionManager = mock(MuleCoreExtensionManagerServer.class);
-        deploymentService = mock(DeploymentService.class);
 
-        container = new MuleContainer(deploymentService, coreExtensionManager);
+        container = new MuleContainer(deploymentService, repositoryService, coreExtensionManager);
         FileUtils.deleteDirectory(getExecutionFolder());
     }
 
     @Test
-    public void startsMulecoreExtensionManager() throws Exception
+    public void startsMuleCoreExtensionManager() throws Exception
     {
         container.start(false);
 
         verify(coreExtensionManager).setDeploymentService(deploymentService);
+        verify(coreExtensionManager).setRepositoryService(repositoryService);
         verify(coreExtensionManager).initialise();
         verify(coreExtensionManager).start();
     }

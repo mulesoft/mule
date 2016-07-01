@@ -9,11 +9,12 @@ package org.mule.runtime.module.launcher.coreextension;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.module.launcher.DeploymentServiceAware;
+import org.mule.runtime.module.launcher.RepositoryServiceAware;
 
 /**
  * Manages lifecycle and dependency injection for {@link MuleCoreExtension}
  */
-public interface MuleCoreExtensionManagerServer extends Lifecycle, DeploymentServiceAware
+public interface MuleCoreExtensionManagerServer extends Lifecycle, DeploymentServiceAware, RepositoryServiceAware
 {
 
 }
