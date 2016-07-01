@@ -12,6 +12,8 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 
 import java.util.concurrent.ExecutorService;
@@ -21,10 +23,10 @@ import java.util.concurrent.Executors;
  *  Test implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that simply uses a @{link Executor} to
  *  invoke the {@link org.mule.runtime.core.api.connector.ReplyToHandler} in another thread.
  */
-public class TestNonBlockingProcessor implements NonBlockingMessageProcessor, Disposable
+public class TestNonBlockingProcessor implements NonBlockingMessageProcessor, Initialisable, Disposable
 {
 
-    private static ExecutorService executor = Executors.newCachedThreadPool();
+    private ExecutorService executor;
 
     @Override
     public MuleEvent process(final MuleEvent event) throws MuleException
@@ -53,6 +55,12 @@ public class TestNonBlockingProcessor implements NonBlockingMessageProcessor, Di
         {
             return event;
         }
+    }
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        executor = Executors.newCachedThreadPool();
     }
 
     @Override
