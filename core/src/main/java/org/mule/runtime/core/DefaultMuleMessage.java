@@ -8,6 +8,7 @@ package org.mule.runtime.core;
 
 import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
@@ -24,7 +25,6 @@ import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.MutableMuleMessage;
@@ -41,7 +41,6 @@ import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.UUID;
-import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -72,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * <code>DefaultMuleMessage</code> is a wrapper that contains a payload and properties
  * associated with the payload.
  */
-public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess, DeserializationPostInitialisable
+public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess
 {
     private static final String NOT_SET = "<not set>";
 
@@ -123,7 +122,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
                        Object replyTo, ExceptionPayload exceptionPayload)
     {
         this.id = id;
-        this.rootId = rootId;
+        this.rootId = rootId != null ? rootId : id;
         this.typedValue = typedValue;
         this.attributes = attributes;
         this.properties.inboundMap.putAll(inboundProperties);
@@ -973,7 +972,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
         Map<String, DataHandler> toReturn;
         if (attachments == null)
         {
-            toReturn = null;
+            toReturn = emptyMap();
         }
         else
         {
@@ -993,30 +992,6 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
         typedValue = new TypedValue(deserializeValue(in), (DataType<?>) in.readObject());
         inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
         outboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
-    }
-
-    /**
-     * Invoked after deserialization. This is called when the marker interface
-     * {@link org.mule.runtime.core.util.store.DeserializationPostInitialisable} is used. This will get invoked
-     * after the object has been deserialized passing in the current mulecontext when using either
-     * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
-     * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat} or the
-     * {@link org.mule.runtime.core.transformer.simple.ByteArrayToSerializable} transformer.
-     *
-     * @param context the current muleContext instance
-     * @throws MuleException if there is an error initializing
-     */
-    public void initAfterDeserialisation(MuleContext context) throws MuleException
-    {
-        if (this.inboundAttachments == null)
-        {
-            this.inboundAttachments = new HashMap<>();
-        }
-
-        if (this.outboundAttachments == null)
-        {
-            this.outboundAttachments = new HashMap<>();
-        }
     }
 
     @Override

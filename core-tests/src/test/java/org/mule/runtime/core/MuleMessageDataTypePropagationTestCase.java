@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -31,6 +32,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RET
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.MuleTestUtils.getTestEvent;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -215,6 +217,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         when(transformer.isSourceDataTypeSupported(org.mockito.Matchers.<DataType<?>>any())).thenReturn(true);
         DataType outputDataType = DataType.builder().type(Integer.class).mediaType(APPLICATION_XML).build();
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.transform(anyString())).thenReturn(1);
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 

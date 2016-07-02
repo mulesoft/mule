@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.client;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -64,14 +65,22 @@ public class DefaultLocalMuleClient implements MuleClient
     public void dispatch(String url, Object payload, Map<String, Serializable> messageProperties)
         throws MuleException
     {
-        dispatch(url, new DefaultMuleMessage(payload, messageProperties));
+        dispatch(url, MuleMessage.builder()
+                                 .payload(payload)
+                                 .outboundProperties(messageProperties != null ? messageProperties : emptyMap())
+                                 .replyTo(messageProperties.getOrDefault(MULE_REPLY_TO_PROPERTY, null))
+                                 .build());
     }
 
     @Override
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties)
         throws MuleException
     {
-        return send(url, new DefaultMuleMessage(payload, messageProperties));
+        return send(url, MuleMessage.builder()
+                                    .payload(payload)
+                                    .outboundProperties(messageProperties != null ? messageProperties : emptyMap())
+                                    .replyTo(messageProperties.getOrDefault(MULE_REPLY_TO_PROPERTY, null))
+                                    .build());
     }
 
     @Override
@@ -111,7 +120,12 @@ public class DefaultLocalMuleClient implements MuleClient
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout)
         throws MuleException
     {
-        return send(url, new DefaultMuleMessage(payload, messageProperties), timeout);
+        return send(url, MuleMessage.builder()
+                                    .payload(payload)
+                                    .outboundProperties(messageProperties != null ? messageProperties : emptyMap())
+                                    .replyTo(messageProperties.getOrDefault(MULE_REPLY_TO_PROPERTY, null))
+                                    .build(),
+                timeout);
 
     }
 
@@ -156,7 +170,7 @@ public class DefaultLocalMuleClient implements MuleClient
         final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, MessageExchangePattern.ONE_WAY);
         if (connectorMessageProcessor != null)
         {
-            final MuleEvent event = connectorMessageProcessor.process(createOneWayMuleEvent(new DefaultMuleMessage(NullPayload.getInstance())));
+            final MuleEvent event = connectorMessageProcessor.process(createOneWayMuleEvent(MuleMessage.builder().payload(NullPayload.getInstance()).build()));
 
             return event == null || event instanceof VoidMuleEvent ? null : event.getMessage();
         }

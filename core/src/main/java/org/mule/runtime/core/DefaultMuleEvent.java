@@ -811,9 +811,8 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     @SuppressWarnings({"unused"})
     private void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
-        if (message instanceof DefaultMuleMessage)
+        if (message instanceof MuleMessage)
         {
-            ((DefaultMuleMessage) message).initAfterDeserialisation(muleContext);
             setMessage(message);
         }
         if (replyToHandler instanceof DefaultReplyToHandler)
@@ -1128,11 +1127,9 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.credentials = credentials;
         if (!message.getDataType().getMediaType().getCharset().isPresent() && encoding != null)
         {
-            this.message = message.transform(msg ->
-            {
-                ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).charset(encoding).build());
-                return msg;
-            });
+            this.message = MuleMessage.builder(message)
+                                      .mediaType(DataType.builder(message.getDataType()).charset(encoding).build().getMediaType())
+                                      .build();
         }
         this.exchangePattern = exchangePattern;
         this.messageSourceName = name;

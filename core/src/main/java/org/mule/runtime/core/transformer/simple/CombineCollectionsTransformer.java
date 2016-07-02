@@ -8,8 +8,8 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
 
+import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -37,8 +37,10 @@ public class CombineCollectionsTransformer implements MessageProcessor
         MuleMessage msg = event.getMessage();
 
         List<Object> payload = new ArrayList<>();
+        Class<?> itemType = Object.class;
         if (msg.getDataType().isCompatibleWith(MULE_MESSAGE_COLLECTION))
         {
+            itemType = ((CollectionDataType) MULE_MESSAGE_COLLECTION).getItemDataType().getType();
             for (MuleMessage child : (Collection<MuleMessage>) msg.getPayload())
             {
                 Object childPayload = child.getPayload();
@@ -58,10 +60,11 @@ public class CombineCollectionsTransformer implements MessageProcessor
         }
         else
         {
+            itemType = msg.getPayload().getClass();
             payload.add(msg.getPayload());
         }
 
-        MuleMessage listMessage = new DefaultMuleMessage(payload, msg);
+        MuleMessage listMessage = MuleMessage.builder(msg).collectionPayload(payload, itemType).build();
         return new DefaultMuleEvent(listMessage, event);
     }
 

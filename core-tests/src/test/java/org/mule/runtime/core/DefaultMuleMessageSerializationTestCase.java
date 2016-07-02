@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -78,10 +77,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
 
     private MuleMessage serializationRoundtrip(MuleMessage message) throws Exception
     {
-        byte[] serialized = SerializationUtils.serialize(message);
-        MuleMessage deserializedMessage = (MuleMessage) SerializationUtils.deserialize(serialized);
-        DeserializationPostInitialisable.Implementation.init(deserializedMessage, muleContext);
-        return deserializedMessage;
+        return (MuleMessage) SerializationUtils.deserialize(SerializationUtils.serialize(message));
     }
 
     static class NonSerializable

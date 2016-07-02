@@ -7,9 +7,11 @@
 package org.mule.runtime.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
@@ -99,7 +101,8 @@ public class TransformationService
     {
         checkNotNull(message, "Message cannot be null");
         checkNotNull(outputDataType, "DataType cannot be null");
-        return new DefaultMuleMessage(getPayload(message, outputDataType, resolveEncoding(message)), message);
+
+        return MuleMessage.builder(message).payload(getPayload(message, outputDataType, resolveEncoding(message))).build();
     }
 
     /**
@@ -249,32 +252,25 @@ public class TransformationService
 
         if (result instanceof MuleMessage)
         {
-            if (!result.equals(message))
-            {
-                // Only copy the payload and properties of mule message transformer result if the message is a different
-                // instance
-                MuleMessage transformResult = (MuleMessage) result;
-                return new DefaultMuleMessage(result, transformResult, transformResult.getDataType());
-            }
             return (MuleMessage) result;
         }
         else
         {
-            return new DefaultMuleMessage(result, message, mergeDataType(message, transformer.getReturnDataType(), result != null ? result.getClass() : null));
+            return MuleMessage.builder(message)
+                              .payload(result != null ? result : NullPayload.getInstance())
+                              .mediaType(mergeMediaType(message, transformer.getReturnDataType()))
+                              .build();
         }
     }
 
-    private DataType<?> mergeDataType(MuleMessage message, DataType<?> transformed, Class<?> payloadTransformedClass)
+    private MediaType mergeMediaType(MuleMessage message, DataType<?> transformed)
     {
         DataType<?> original = message.getDataType();
-        MediaType mimeType = transformed.getMediaType() == null || MediaType.ANY.matches(transformed.getMediaType()) ? original.getMediaType() : transformed.getMediaType();
+        MediaType mimeType = ANY.matches(transformed.getMediaType()) ? original.getMediaType() : transformed.getMediaType();
         Charset encoding = transformed.getMediaType().getCharset().orElse(
                 message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
-        // In case if the transformed dataType is an Object type we could keep the original type if it is compatible/assignable (String->Object we want to keep String as transformed DataType)
-        Class<?> type = payloadTransformedClass != null && transformed.getType() == Object.class && original.isCompatibleWith(DataType.builder().type(payloadTransformedClass).mediaType(mimeType).build())
-                ? original.getType() : payloadTransformedClass != null ? payloadTransformedClass : transformed.getType();
 
-        return DataType.builder().type(type).mediaType(mimeType).charset(encoding).build();
+        return DataType.builder().mediaType(mimeType).charset(encoding).build().getMediaType();
     }
 
     /**

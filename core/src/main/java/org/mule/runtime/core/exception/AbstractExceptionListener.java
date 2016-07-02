@@ -7,7 +7,6 @@
 package org.mule.runtime.core.exception;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -214,7 +213,8 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
                 // Create an ExceptionMessage which contains the original payload, the exception, and some additional context info.
                 ExceptionMessage msg = new ExceptionMessage(event, t, component, endpointUri);
-                MuleMessage exceptionMessage = new DefaultMuleMessage(msg, event.getMessage());
+
+                MuleMessage exceptionMessage = MuleMessage.builder(event.getMessage()).payload(msg).build();
 
                 MulticastingRouter router = buildRouter();
                 router.setRoutes(getMessageProcessors());
