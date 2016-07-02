@@ -7,7 +7,6 @@
 package org.mule.runtime.core.processor.chain;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NestedProcessor;
@@ -71,10 +70,7 @@ public class NestedProcessorChain implements NestedProcessor
     @Override
     public Object process(Object payload) throws Exception
     {
-        MuleMessage muleMessage;
-        muleMessage = new DefaultMuleMessage(payload);
-        MuleEvent muleEvent;
-        muleEvent = new DefaultMuleEvent(muleMessage, event);
+        MuleEvent muleEvent = new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), event);
         return chain.process(muleEvent).getMessage().getPayload();
     }
 
@@ -95,10 +91,7 @@ public class NestedProcessorChain implements NestedProcessor
     @Override
     public Object process(Object payload, Map<String, Object> properties) throws Exception
     {
-        MuleMessage muleMessage;
-        muleMessage = new DefaultMuleMessage(payload);
-        MuleEvent muleEvent;
-        muleEvent = new DefaultMuleEvent(muleMessage, event);
+        MuleEvent muleEvent = new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), event);
         for (String property : properties.keySet())
         {
             muleEvent.setFlowVariable(property, properties.get(property));

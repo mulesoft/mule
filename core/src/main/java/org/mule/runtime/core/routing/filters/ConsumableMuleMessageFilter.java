@@ -8,16 +8,14 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
  * Filters messages that have a consumable payload.
  * <p/>
- * The filter accepts only {@link DefaultMuleMessage} instances that
- * have a no consumable payload. Check is done using
- * {@link org.mule.runtime.core.DefaultMuleMessage#isConsumable()} method.
+ * The filter accepts only {@link MuleMessage} instances that have a no consumable payload. Check is done using
+ * {@link org.mule.runtime.core.util.ClassUtils#isConsumable()} method.
  */
 public class ConsumableMuleMessageFilter implements Filter
 {
@@ -25,14 +23,6 @@ public class ConsumableMuleMessageFilter implements Filter
     @Override
     public boolean accept(MuleMessage message)
     {
-
-        if (message instanceof DefaultMuleMessage)
-        {
-            return !isConsumable(message.getPayload().getClass());
-        }
-        else
-        {
-            return false;
-        }
+        return !isConsumable(message.getPayload().getClass());
     }
 }

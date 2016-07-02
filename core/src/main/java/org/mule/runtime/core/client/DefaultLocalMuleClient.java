@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.client;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
@@ -20,6 +19,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.client.OperationOptions;
@@ -55,7 +55,8 @@ public class DefaultLocalMuleClient implements MuleClient
             this.connectorOperatorLocator = muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
             if (this.connectorOperatorLocator == null)
             {
-                throw new MuleRuntimeException(CoreMessages.createStaticMessage("Could not find required %s in the registry under key %s", ConnectorOperationLocator.class.getName(), OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR));
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage("Could not find required %s in the registry under key %s", ConnectorOperationLocator.class.getName(),
+                        OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR));
             }
         }
         return connectorOperatorLocator;
@@ -63,24 +64,16 @@ public class DefaultLocalMuleClient implements MuleClient
 
     @Override
     public void dispatch(String url, Object payload, Map<String, Serializable> messageProperties)
-        throws MuleException
+            throws MuleException
     {
-        dispatch(url, MuleMessage.builder()
-                                 .payload(payload)
-                                 .outboundProperties(messageProperties != null ? messageProperties : emptyMap())
-                                 .replyTo(messageProperties.getOrDefault(MULE_REPLY_TO_PROPERTY, null))
-                                 .build());
+        dispatch(url, createMessage(payload, messageProperties));
     }
 
     @Override
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties)
-        throws MuleException
+            throws MuleException
     {
-        return send(url, MuleMessage.builder()
-                                    .payload(payload)
-                                    .outboundProperties(messageProperties != null ? messageProperties : emptyMap())
-                                    .replyTo(messageProperties.getOrDefault(MULE_REPLY_TO_PROPERTY, null))
-                                    .build());
+        return send(url, createMessage(payload, messageProperties));
     }
 
     @Override
@@ -118,14 +111,9 @@ public class DefaultLocalMuleClient implements MuleClient
 
     @Override
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout)
-        throws MuleException
+            throws MuleException
     {
-        return send(url, MuleMessage.builder()
-                                    .payload(payload)
-                                    .outboundProperties(messageProperties != null ? messageProperties : emptyMap())
-                                    .replyTo(messageProperties.getOrDefault(MULE_REPLY_TO_PROPERTY, null))
-                                    .build(),
-                timeout);
+        return send(url, createMessage(payload, messageProperties), timeout);
 
     }
 
@@ -133,6 +121,22 @@ public class DefaultLocalMuleClient implements MuleClient
     public MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException
     {
         return send(url, message, newOptions().outbound().responseTimeout(timeout).build());
+    }
+
+    protected MuleMessage<Object, Serializable> createMessage(Object payload, Map<String, Serializable> messageProperties)
+    {
+        final Builder<Object, Serializable> builder = MuleMessage.builder().payload(payload);
+        if (messageProperties != null)
+        {
+            builder.outboundProperties(messageProperties);
+
+            if (messageProperties.containsKey(MULE_REPLY_TO_PROPERTY))
+            {
+                builder.replyTo(messageProperties.get(MULE_REPLY_TO_PROPERTY));
+            }
+        }
+
+        return builder.build();
     }
 
     @Override

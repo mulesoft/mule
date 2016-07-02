@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing.outbound;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -165,8 +164,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         }
         else
         {
-            MuleMessage message = new DefaultMuleMessage(payload, originalEvent.getMessage());
-            return new DefaultMuleEvent(message, originalEvent);
+            return new DefaultMuleEvent(MuleMessage.builder(originalEvent.getMessage()).payload(payload).build(), originalEvent);
         }
     }
 

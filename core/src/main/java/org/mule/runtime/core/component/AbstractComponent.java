@@ -13,7 +13,6 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.MuleContext;
@@ -179,7 +178,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         {
             final MuleMessage emptyMessage = MuleMessage.builder()
                                                         .payload(NullPayload.getInstance())
-                                                        .rootId(((DefaultMuleMessage) event.getMessage()).getMessageRootId())
+                                                        .rootId(event.getMessage().getMessageRootId())
                                                         .build();
             return new DefaultMuleEvent(emptyMessage, event);
         }

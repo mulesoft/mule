@@ -21,7 +21,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_SYNC_PR
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
@@ -29,9 +29,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
 
-import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +43,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase
     public static final String PROPERTY_VALUE = "foo";
 
     private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    private final MutableMuleMessage muleMessage = new DefaultMuleMessage("test-data", (Map<String, Serializable>) null);
+    private MuleMessage muleMessage = MuleMessage.builder().payload("test-data").build();
     private DefaultMuleEvent muleEvent;
 
     @Before
@@ -144,7 +142,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase
         Flow flow = mock(Flow.class);
         when(flow.isSynchronous()).thenReturn(false);
         when(flow.getMuleContext()).thenReturn(muleContext);
-        muleMessage.setInboundProperty(MULE_FORCE_SYNC_PROPERTY, true);
+        muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(MULE_FORCE_SYNC_PROPERTY, true).build();
         DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, REQUEST_RESPONSE, flow);
         assertThat(event.isSynchronous(), equalTo(true));
         assertThat(event.isTransacted(), equalTo(false));
@@ -156,7 +154,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase
         Flow flow = mock(Flow.class);
         when(flow.isSynchronous()).thenReturn(false);
         when(flow.getMuleContext()).thenReturn(muleContext);
-        muleMessage.setInboundProperty(MULE_FORCE_SYNC_PROPERTY, true);
+        muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(MULE_FORCE_SYNC_PROPERTY, true).build();
         DefaultMuleEvent event = new DefaultMuleEvent(muleMessage, ONE_WAY, flow);
         assertThat(event.isSynchronous(), equalTo(true));
         assertThat(event.isTransacted(), equalTo(false));

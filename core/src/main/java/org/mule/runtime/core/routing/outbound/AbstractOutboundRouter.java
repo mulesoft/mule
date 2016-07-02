@@ -423,14 +423,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
 
     /**
-     * Create a fresh copy of a message.
-     */
-    protected MuleMessage cloneMessage(MuleMessage message)
-    {
-        return AbstractRoutingStrategy.cloneMessage(message);
-    }
-
-    /**
      * Creates a fresh copy of a {@link MuleMessage} ensuring that the payload can be cloned (i.e. is not consumable).
      *
      * @param event The {@link MuleEvent} to clone the message from.

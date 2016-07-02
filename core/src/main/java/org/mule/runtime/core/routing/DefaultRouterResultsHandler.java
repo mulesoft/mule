@@ -10,12 +10,10 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 
 import java.util.ArrayList;
@@ -118,7 +116,9 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
 
     private MuleEvent createMessageCollectionWithSingleMessage(MuleEvent event)
     {
-        MuleMessage coll = new DefaultMuleMessage(singletonList(event.getMessage()));
+        final MuleMessage coll = MuleMessage.builder()
+                                            .collectionPayload(singletonList(event.getMessage()), MuleMessage.class)
+                                            .build();
         event.setMessage(coll);
         return OptimizedRequestContext.unsafeSetEvent(event);
     }
@@ -126,13 +126,15 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler
     private MuleEvent createMessageCollection(final List<MuleEvent> nonNullResults,
                                               final MuleEvent previous)
     {
-        List list = new ArrayList<>();
+        List<MuleMessage> list = new ArrayList<>();
         for (MuleEvent event : nonNullResults)
         {
             list.add(event.getMessage());
         }
-        MutableMuleMessage coll = new DefaultMuleMessage(list);
-        coll.propagateRootId(previous.getMessage());
+        final MuleMessage coll = MuleMessage.builder()
+                                            .collectionPayload(list, MuleMessage.class)
+                                            .rootId(previous.getMessage().getMessageRootId())
+                                            .build();
         MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
         for (String name : previous.getFlowVariableNames())
         {

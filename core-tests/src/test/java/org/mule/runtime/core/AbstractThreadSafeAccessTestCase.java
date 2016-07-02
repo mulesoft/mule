@@ -12,14 +12,11 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.Map;
-
 public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleContextTestCase
 {
     protected ThreadSafeAccess dummyEvent() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null);
-        return new DefaultMuleEvent(message, getTestFlow());
+        return new DefaultMuleEvent(MuleMessage.builder().payload(new Object()).build(), getTestFlow());
     }
 
     protected void resetAccessControl(ThreadSafeAccess target) throws InterruptedException

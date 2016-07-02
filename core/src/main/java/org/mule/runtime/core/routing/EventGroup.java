@@ -8,14 +8,13 @@ package org.mule.runtime.core.routing;
 
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.CollectionBuilder;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -410,18 +409,14 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
                 MuleEvent[] muleEvents = toArray(true);
 
-                List<MuleMessage> messageList =  Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
+                List<MuleMessage> messageList = Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
-                MuleEvent lastEvent = retrieveLastStoredEvent();
-                DefaultMuleEvent muleEvent = new DefaultMuleEvent(new DefaultMuleMessage(messageList, DataType.fromType(List.class)),
-                                                                  lastEvent, getMergedSession());
+                final CollectionBuilder<List<MuleMessage>, Serializable> builder = MuleMessage.builder().collectionPayload(messageList, MuleMessage.class);
                 if (getCommonRootId() != null)
                 {
-                    muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
-                        msg.setMessageRootId(commonRootId);
-                        return msg;
-                    }));
+                    builder.rootId(getCommonRootId());
                 }
+                DefaultMuleEvent muleEvent = new DefaultMuleEvent(builder.build(), retrieveLastStoredEvent(), getMergedSession());
                 return muleEvent;
             }
             else

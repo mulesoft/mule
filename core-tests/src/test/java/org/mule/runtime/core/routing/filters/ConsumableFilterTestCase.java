@@ -8,7 +8,6 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
@@ -29,13 +28,6 @@ public class ConsumableFilterTestCase extends AbstractMuleTestCase
     public void setUp() throws Exception
     {
         filter = new ConsumableMuleMessageFilter();
-    }
-
-    @Test
-    public void testRejectsNonDefaultMuleMessageInstances() throws Exception
-    {
-        MuleMessage message = mock(MuleMessage.class);
-        assertFalse("Should reject non DefaultMuleMessage instances", filter.accept(message));
     }
 
     @Test

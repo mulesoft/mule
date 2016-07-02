@@ -230,14 +230,28 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
          * @param value
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> addInboundAttachement(String key, DataHandler value);
+        Builder<PAYLOAD, ATTRIBUTES> addInboundAttachment(String key, DataHandler value);
 
         /**
          * @param key
          * @param value
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> addOutboundAttachement(String key, DataHandler value);
+        Builder<PAYLOAD, ATTRIBUTES> addOutboundAttachment(String key, DataHandler value);
+
+        /**
+         * @param key
+         * @param value
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> removeInboundAttachment(String key);
+
+        /**
+         * @param key
+         * @param value
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> removeOutboundAttachment(String key);
 
         /**
          * @param inboundProperties
@@ -255,13 +269,13 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
          * @param inboundAttachments
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> inboundAttachements(Map<String, DataHandler> inboundAttachments);
+        Builder<PAYLOAD, ATTRIBUTES> inboundAttachments(Map<String, DataHandler> inboundAttachments);
 
         /**
          * @param outbundAttachments
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> outboundAttachements(Map<String, DataHandler> outbundAttachments);
+        Builder<PAYLOAD, ATTRIBUTES> outboundAttachments(Map<String, DataHandler> outbundAttachments);
 
         @Override
         MuleMessage<PAYLOAD, ATTRIBUTES> build();

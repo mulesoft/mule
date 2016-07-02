@@ -13,6 +13,7 @@ import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleMessage.CollectionBuilder;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.metadata.TypedValue;
@@ -44,8 +45,8 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     private String id;
     private String rootId;
     private String correlationId;
-    private int correlationSequence;
-    private int correlationGroupSize;
+    private int correlationSequence = -1;
+    private int correlationGroupSize = -1;
     private Object replyTo;
     private ExceptionPayload exceptionPayload;
 
@@ -219,16 +220,30 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addInboundAttachement(String key, DataHandler value)
+    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addInboundAttachment(String key, DataHandler value)
     {
         inboundAttachments.put(key, value);
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addOutboundAttachement(String key, DataHandler value)
+    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addOutboundAttachment(String key, DataHandler value)
     {
         outboundAttachments.put(key, value);
+        return this;
+    }
+
+    @Override
+    public Builder<PAYLOAD, ATTRIBUTES> removeInboundAttachment(String key)
+    {
+        inboundAttachments.remove(key);
+        return this;
+    }
+
+    @Override
+    public Builder<PAYLOAD, ATTRIBUTES> removeOutboundAttachment(String key)
+    {
+        outboundAttachments.remove(key);
         return this;
     }
 
@@ -249,14 +264,14 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> inboundAttachements(Map<String, DataHandler> inboundAttachments)
+    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> inboundAttachments(Map<String, DataHandler> inboundAttachments)
     {
         this.inboundAttachments = inboundAttachments;
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> outboundAttachements(Map<String, DataHandler> outbundAttachments)
+    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> outboundAttachments(Map<String, DataHandler> outbundAttachments)
     {
         this.outboundAttachments = outbundAttachments;
         return this;

@@ -472,7 +472,14 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess
     public void setCorrelationSequence(int sequence)
     {
         assertAccess(WRITE);
-        setOutboundProperty(MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
+        if (sequence >= 0)
+        {
+            setOutboundProperty(MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
+        }
+        else
+        {
+            removeOutboundProperty(MULE_CORRELATION_SEQUENCE_PROPERTY);
+        }
     }
 
     /**
@@ -494,7 +501,14 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess
     public void setCorrelationGroupSize(int size)
     {
         assertAccess(WRITE);
-        setOutboundProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
+        if (size >= 0)
+        {
+            setOutboundProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
+        }
+        else
+        {
+            removeOutboundProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY);
+        }
     }
 
     /**

@@ -11,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -31,10 +30,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     @Test
     public void testSerializablePayload() throws Exception
     {
-        // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
-        message.setOutboundProperty("foo", "bar");
-
+        final MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
         MuleMessage deserializedMessage = serializationRoundtrip(message);
 
         assertEquals(TEST_MESSAGE, deserializedMessage.getPayload());
@@ -48,9 +44,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         // will be used during Serialization
         muleContext.getRegistry().registerTransformer(new NonSerializableToByteArray());
 
-        // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage(new NonSerializable());
-        message.setOutboundProperty("foo", "bar");
+        final MuleMessage message = MuleMessage.builder().payload(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 
         RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
         MuleMessage deserializedMessage = serializationRoundtrip(message);
@@ -63,10 +57,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     public void testStreamPayloadSerialization() throws Exception
     {
         InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
-        // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage(stream);
-        message.setOutboundProperty("foo", "bar");
-
+        final MuleMessage message = MuleMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
         RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
         MuleMessage deserializedMessage = serializationRoundtrip(message);
 

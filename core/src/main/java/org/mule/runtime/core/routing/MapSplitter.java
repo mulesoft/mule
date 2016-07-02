@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -42,8 +41,7 @@ public class MapSplitter extends AbstractSplitter
             Set<Map.Entry<?, ?>> set = ((Map) message.getPayload()).entrySet();
             for (Entry<?, ?> entry : set)
             {
-                MuleMessage splitMessage = new DefaultMuleMessage(entry.getValue());
-                MuleEvent splitEvent = new DefaultMuleEvent(splitMessage, event);
+                MuleEvent splitEvent = new DefaultMuleEvent(MuleMessage.builder().payload(entry.getValue()).build(), event);
                 // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
                 list.add(splitEvent);
             }

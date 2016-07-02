@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -143,14 +142,6 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
         return new DefaultMuleEvent(message, routedEvent, true);
     }
 
-    /**
-     * Create a fresh copy of a message.
-     */
-    public static MuleMessage cloneMessage(MuleMessage message)
-    {
-        return new DefaultMuleMessage(message.getPayload(), message);
-    }
-
     protected MuleContext getMuleContext()
     {
         return muleContext;
@@ -201,7 +192,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
     public static MuleMessage cloneMessage(MuleEvent event, MuleMessage message) throws MessagingException
     {
         assertNonConsumableMessage(event, message);
-        return cloneMessage(message);
+        return message;
     }
 
     /**

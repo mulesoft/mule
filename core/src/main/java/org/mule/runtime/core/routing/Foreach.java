@@ -10,7 +10,6 @@ import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -266,8 +265,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                 Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();
                 for (Entry<?, ?> entry : set)
                 {
-                    MuleMessage splitMessage = new DefaultMuleMessage(entry.getValue());
-                    MuleEvent splitEvent = new DefaultMuleEvent(splitMessage, event);
+                    MuleEvent splitEvent = new DefaultMuleEvent(MuleMessage.builder().payload(entry.getValue()).build(), event);
                     // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
                     list.add(splitEvent);
                 }
