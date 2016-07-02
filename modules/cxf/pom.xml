@@ -81,6 +81,7 @@
                     <!-- TODO: Remove the fork configuration after we fix SAML tests (MULE-10022) -->
                     <forkCount>2</forkCount>
                     <reuseForks>true</reuseForks>
+                    <argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
                 </configuration>
             </plugin>
         </plugins>
