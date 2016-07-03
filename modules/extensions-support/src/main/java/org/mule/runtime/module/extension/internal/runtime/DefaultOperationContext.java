@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -14,6 +15,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Default implementation of {@link OperationContextAdapter} which
@@ -34,10 +36,10 @@ public class DefaultOperationContext implements OperationContextAdapter
     /**
      * Creates a new instance with the given state
      *
-     * @param configuration  the {@link ConfigurationInstance} that the operation will use
-     * @param parameters     the parameters that the operation will use
+     * @param configuration the {@link ConfigurationInstance} that the operation will use
+     * @param parameters the parameters that the operation will use
      * @param operationModel a {@link RuntimeOperationModel} for the operation being executed
-     * @param event          the current {@link MuleEvent}
+     * @param event the current {@link MuleEvent}
      */
     public DefaultOperationContext(ConfigurationInstance<Object> configuration, ResolverSetResult parameters, RuntimeOperationModel operationModel, MuleEvent event)
     {
@@ -45,19 +47,13 @@ public class DefaultOperationContext implements OperationContextAdapter
         this.event = event;
         this.operationModel = operationModel;
 
-        Map<String, Object> parameterMap = parameters.asMap();
-        this.parameters = new HashMap<>(parameterMap.size());
-        parameters.asMap().entrySet().forEach(parameter -> setParameter(parameter));
-    }
-
-    private void setParameter(Map.Entry<String, Object> parameter)
-    {
-        this.parameters.put(parameter.getKey(), parameter.getValue());
+        this.parameters = new HashMap<>(parameters.asMap());
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public <C> ConfigurationInstance<C> getConfiguration()
     {
         return (ConfigurationInstance<C>) configuration;
@@ -67,9 +63,25 @@ public class DefaultOperationContext implements OperationContextAdapter
      * {@inheritDoc}
      */
     @Override
+    public boolean hasParameter(String parameterName)
+    {
+        return parameters.containsKey(parameterName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public <T> T getParameter(String parameterName)
     {
-        return (T) parameters.get(parameterName);
+        if (hasParameter(parameterName))
+        {
+            return (T) parameters.get(parameterName);
+        }
+        else
+        {
+            throw new NoSuchElementException(parameterName);
+        }
     }
 
     /**

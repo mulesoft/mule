@@ -34,6 +34,13 @@ public class ByParameterNameArgumentResolver<T> implements ArgumentResolver<T>
     @Override
     public T resolve(OperationContext operationContext)
     {
-        return (T) operationContext.getParameter(parameterName);
+        if (operationContext.hasParameter(parameterName))
+        {
+            return (T) operationContext.getParameter(parameterName);
+        }
+        else
+        {
+            return null;
+        }
     }
 }
