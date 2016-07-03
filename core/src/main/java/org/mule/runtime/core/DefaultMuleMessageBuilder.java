@@ -86,6 +86,19 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
         this.payload = message.getPayload();
         this.dataType = message.getDataType();
         this.attributes = message.getAttributes();
+
+        if (message instanceof MuleMessage)
+        {
+            MuleMessage previous = (MuleMessage) message;
+            for (String name : previous.getInboundAttachmentNames())
+            {
+                addInboundAttachment(name, previous.getInboundAttachment(name));
+            }
+            for (String name : previous.getOutboundAttachmentNames())
+            {
+                addOutboundAttachment(name, previous.getOutboundAttachment(name));
+            }
+        }
     }
 
     @Override

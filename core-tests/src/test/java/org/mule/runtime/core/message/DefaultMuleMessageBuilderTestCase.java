@@ -21,6 +21,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -199,7 +200,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
-        assertThat(message.getOutboundPropertyNames().size(), equalTo(3));
+        assertThat(message.getOutboundPropertyNames().size(), equalTo(1));
         assertThat(message.getOutboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -213,7 +214,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(copy.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(copy.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
-        assertThat(copy.getOutboundPropertyNames().size(), equalTo(3));
+        assertThat(copy.getOutboundPropertyNames().size(), equalTo(1));
         assertThat(copy.getOutboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -249,7 +250,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
-        assertThat(message.getOutboundPropertyNames().size(), equalTo(3));
+        assertThat(message.getOutboundPropertyNames().size(), equalTo(1));
         assertThat(message.getOutboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -261,7 +262,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(HTML_STRING));
-        assertThat(message.getOutboundPropertyNames().size(), equalTo(3));
+        assertThat(message.getOutboundPropertyNames().size(), equalTo(1));
         assertThat(message.getOutboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -286,8 +287,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void mutatePayloadSameTypeConserveTypeAndMimeType()
     {
-        MuleMessage<String, Apple> message = createTestMessage();
-        MuleMessage<Boolean, Apple> copy = new DefaultMuleMessageBuilder(message).payload(NEW_PAYLOAD).build();
+        MuleMessage message = createTestMessage();
+        MuleMessage copy = new DefaultMuleMessageBuilder(message).payload(NEW_PAYLOAD).build();
 
         assertThat(copy.getPayload(), equalTo(NEW_PAYLOAD));
         assertThat(copy.getDataType().getType(), equalTo(String.class));
@@ -297,7 +298,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void mutatePayloadDifferentTypeUpdateTypeAndConserveMimeType()
     {
-        MuleMessage<Boolean, Apple> copy = new DefaultMuleMessageBuilder(createTestMessage()).payload(1).build();
+        MuleMessage copy = new DefaultMuleMessageBuilder(createTestMessage()).payload(1).build();
 
         assertThat(copy.getPayload(), equalTo(1));
         assertThat(copy.getDataType().getType(), equalTo(Integer.class));
@@ -309,8 +310,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     {
         Long payload = new Long(1);
         DataHandler dataHandler = new DataHandler(payload, XML.toString());
-        MuleMessage<Boolean, Apple> copy = new DefaultMuleMessageBuilder(createTestMessage()).payload(dataHandler)
-                .build();
+        MuleMessage copy = new DefaultMuleMessageBuilder(createTestMessage()).payload(dataHandler).build();
 
         assertThat(copy.getPayload(), is(dataHandler));
         assertThat(copy.getDataType().getType(), equalTo(DataHandler.class));
