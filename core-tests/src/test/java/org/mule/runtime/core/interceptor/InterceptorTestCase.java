@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.component.AbstractComponent;
@@ -45,7 +46,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         Flow flow = createUninitializedFlow();
         TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
-        List<Interceptor> interceptors = new ArrayList<Interceptor>();
+        List<Interceptor> interceptors = new ArrayList<>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         component.setInterceptors(interceptors);
         flow.initialise();
@@ -62,7 +63,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         Flow flow = createUninitializedFlow();
         TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
-        List<Interceptor> interceptors = new ArrayList<Interceptor>();
+        List<Interceptor> interceptors = new ArrayList<>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
         interceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
@@ -81,8 +82,8 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         Flow flow = createUninitializedFlow();
         TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
-        List<Interceptor> interceptors = new ArrayList<Interceptor>();
-        List<Interceptor> stackInterceptors = new ArrayList<Interceptor>();
+        List<Interceptor> interceptors = new ArrayList<>();
+        List<Interceptor> stackInterceptors = new ArrayList<>();
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new InterceptorStack(stackInterceptors));
         component.setInterceptors(interceptors);
@@ -100,9 +101,9 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         Flow flow = createUninitializedFlow();
         TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
-        List<Interceptor> interceptors = new ArrayList<Interceptor>();
+        List<Interceptor> interceptors = new ArrayList<>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
-        List<Interceptor> stackInterceptors = new ArrayList<Interceptor>();
+        List<Interceptor> stackInterceptors = new ArrayList<>();
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
         interceptors.add(new InterceptorStack(stackInterceptors));
@@ -121,11 +122,11 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         Flow flow = createUninitializedFlow();
         TestComponent component = (TestComponent) flow.getMessageProcessors().get(0);
 
-        List<Interceptor> interceptors = new ArrayList<Interceptor>();
+        List<Interceptor> interceptors = new ArrayList<>();
         interceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         interceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
         interceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
-        List<Interceptor> stackInterceptors = new ArrayList<Interceptor>();
+        List<Interceptor> stackInterceptors = new ArrayList<>();
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_ONE));
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_TWO));
         stackInterceptors.add(new TestInterceptor(INTERCEPTOR_THREE));
@@ -155,36 +156,32 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase
         @Override
         public MuleEvent after(MuleEvent event)
         {
-            event.setMessage(event.getMessage().transform(msg ->
+            try
             {
-                try
-                {
-                    msg.setPayload(getPayloadAsString(msg) + name + AFTER);
-                }
-                catch (Exception e)
-                {
-                    fail(e.getMessage());
-                }
-                return msg;
-            }));
+                event.setMessage(MuleMessage.builder(event.getMessage())
+                                            .payload(getPayloadAsString(event.getMessage()) + name + AFTER)
+                                            .build());
+            }
+            catch (Exception e)
+            {
+                fail(e.getMessage());
+            }
             return event;
         }
 
         @Override
         public MuleEvent before(MuleEvent event)
         {
-            event.setMessage(event.getMessage().transform(msg ->
+            try
             {
-                try
-                {
-                    msg.setPayload(getPayloadAsString(msg) + name + BEFORE);
-                }
-                catch (Exception e)
-                {
-                    fail(e.getMessage());
-                }
-                return msg;
-            }));
+                event.setMessage(MuleMessage.builder(event.getMessage())
+                                            .payload(getPayloadAsString(event.getMessage()) + name + BEFORE)
+                                            .build());
+            }
+            catch (Exception e)
+            {
+                fail(e.getMessage());
+            }
             return event;
         }
 

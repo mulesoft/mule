@@ -179,10 +179,8 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     private Serializable removeProperty(MuleEvent event)
     {
         final AtomicReference<Serializable> outbound = new AtomicReference<>();
-        event.setMessage(event.getMessage().transform(msg -> {
-            outbound.set(msg.removeOutboundProperty(MULE_SESSION_PROPERTY));
-            return msg;
-        }));
+        outbound.set(event.getMessage().getOutboundProperty(MULE_SESSION_PROPERTY));
+        event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(MULE_SESSION_PROPERTY).build());
 
         final Object invocation = event.getFlowVariable(MULE_SESSION_PROPERTY);
         event.removeFlowVariable(MULE_SESSION_PROPERTY);

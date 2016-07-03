@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -77,12 +76,9 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         assertTrue(filter.accept(event));
     }
 
-    private MutableMuleMessage removeProperty(MuleMessage message)
+    private MuleMessage removeProperty(MuleMessage message)
     {
-        return (MutableMuleMessage) message.transform(msg -> {
-            msg.removeOutboundProperty("foo");
-            return msg;
-        });
+        return MuleMessage.builder(message).removeOutboundProperty("foo").build();
     }
 
     @Test

@@ -19,6 +19,7 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -54,11 +55,10 @@ public class PayloadExpressionDataTypeResolverTestCase extends AbstractMuleConte
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
 
-        testEvent.setMessage(testEvent.getMessage().transform(msg -> {
-            msg.setPayload(TEST_MESSAGE, expectedDataType);
-            return msg;
-        }));
-
+        testEvent.setMessage(MuleMessage.builder(testEvent.getMessage())
+                                        .payload(TEST_MESSAGE)
+                                        .mediaType(expectedDataType.getMediaType())
+                                        .build());
         assertThat(dataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
     }
 }

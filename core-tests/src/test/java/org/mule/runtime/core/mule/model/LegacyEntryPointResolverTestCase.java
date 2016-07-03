@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
@@ -153,10 +154,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
         final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
 
         MuleEvent event = RequestContext.getEventContext().getEvent();
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(propertyName, methodName);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
 
         resolverSet.invoke(new FruitBowl(), RequestContext.getEventContext());
         // fail("Should have failed to find an entrypoint.");
@@ -176,10 +174,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
 
         // those are usually set on the endpoint and copied over to the message
         MuleEvent event = RequestContext.getEventContext().getEvent();
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(METHOD_PROPERTY_NAME, INVALID_METHOD_NAME);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(METHOD_PROPERTY_NAME, INVALID_METHOD_NAME).build());
 
         Apple apple = new Apple();
         apple.setAppleCleaner(new FruitCleaner()
@@ -215,10 +210,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
         final String methodName = "nosuchmethod";
         final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
         MuleEvent event = RequestContext.getEventContext().getEvent();
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(propertyName, methodName);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
 
         try
         {
@@ -281,10 +273,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
         final String methodName = "setFruit";
         final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
         MuleEvent event = RequestContext.getEventContext().getEvent();
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(propertyName, methodName);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
 
         FruitBowl bowl = new FruitBowl();
         assertFalse(bowl.hasApple());

@@ -176,11 +176,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContext
     {
         return event ->
         {
-            event.setMessage(event.getMessage().transform(msg ->
-            {
-                msg.setPayload(appendText);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(appendText).build());
             return event;
         };
     }

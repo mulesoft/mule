@@ -61,10 +61,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
     public void testFailureExpression() throws Exception
     {
         MessageProcessor intSetter = event -> {
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setPayload(Integer.valueOf(1));
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(Integer.valueOf(1)).build());
             return event;
         };
 
