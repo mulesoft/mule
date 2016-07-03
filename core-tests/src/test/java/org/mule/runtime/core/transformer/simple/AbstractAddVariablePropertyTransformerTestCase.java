@@ -77,7 +77,7 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
         when(mockExpressionManager.evaluateTyped(eq(EXPRESSION), any(MuleEvent.class))).thenReturn(typedValue);
         addVariableTransformer.setMuleContext(mockMuleContext);
 
-        message = new DefaultMuleMessage("");
+        message = MuleMessage.builder().payload("").build();
         event = new DefaultMuleEvent(message, getTestFlow(), mockSession);
     }
 

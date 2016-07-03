@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -41,9 +42,9 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
         MuleEvent event = getTestEvent("hello");
         
         List list = new ArrayList<>();
-        list.add(new DefaultMuleMessage(Arrays.asList("1", "2", "3")));
-        list.add(new DefaultMuleMessage("4"));
-        list.add(new DefaultMuleMessage(Arrays.asList("5", "6", "7")));
+        list.add(MuleMessage.builder().collectionPayload(asList("1", "2", "3"), String.class).build());
+        list.add(MuleMessage.builder().payload("4").build());
+        list.add(MuleMessage.builder().collectionPayload(asList("5", "6", "7"), String.class).build());
 
         MuleMessage collection = new DefaultMuleMessage(list, DataType.MULE_MESSAGE_COLLECTION);
         event = new DefaultMuleEvent(collection, event);

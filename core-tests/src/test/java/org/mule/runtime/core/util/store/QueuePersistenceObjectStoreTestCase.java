@@ -88,7 +88,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     @Override
     public Serializable getStorableValue()
     {
-        return new DefaultMuleMessage(TEST_MESSAGE);
+        return MuleMessage.builder().payload(TEST_MESSAGE).build();
     }
 
     @Override
@@ -179,7 +179,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         QueuePersistenceObjectStore<Serializable> store = getObjectStore(); 
         String id = UUID.getUUID();
         QueueKey key = new QueueKey(QUEUE_NAME, id);
-        MuleMessage msg = new DefaultMuleMessage("Hello");
+        MuleMessage msg = MuleMessage.builder().payload("Hello").build();
         MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);

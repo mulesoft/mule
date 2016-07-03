@@ -7,7 +7,6 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -37,7 +36,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
         props.put("object", new Apple());
         props.put("number", 1);
         props.put("string", "hello");
-        testObject = new DefaultMuleMessage("test", props);
+        testObject = MuleMessage.builder().payload("test").outboundProperties(props).build();
         
         RequestContext.setEvent(
                 new DefaultMuleEvent(testObject, getTestFlow(), MuleTestUtils.getTestSession(muleContext)));

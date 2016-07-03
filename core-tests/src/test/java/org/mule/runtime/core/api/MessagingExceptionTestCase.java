@@ -23,7 +23,6 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.MessagingException.PAYLOAD_INFO_KEY;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
@@ -350,7 +349,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase
         when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
         MuleMessage muleMessage = MuleMessage.builder().payload(payload).build();
 
-        when(transformationService.transform(muleMessage, DataType.STRING)).thenReturn(new DefaultMuleMessage(value));
+        when(transformationService.transform(muleMessage, DataType.STRING)).thenReturn(MuleMessage.builder().payload(value).build());
         when(testEvent.getMessage()).thenReturn(muleMessage);
         when(testEvent.getMuleContext()).thenReturn(mockContext);
         MessagingException e = new MessagingException(MessageFactory.createStaticMessage(message), testEvent);

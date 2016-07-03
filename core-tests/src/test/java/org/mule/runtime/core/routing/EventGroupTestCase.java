@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
@@ -201,7 +201,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         assertTrue(es.contains("events=1"));
         assertTrue(es.endsWith("[" + firstId + "]}"));
 
-        MuleEvent secondEvent = new DefaultMuleEvent(new DefaultMuleMessage("foo2"),
+        MuleEvent secondEvent = new DefaultMuleEvent(MuleMessage.builder().payload("foo2").build(),
             getTestEvent("foo2"));
         String secondId = secondEvent.getMessage().getUniqueId();
         eg.addEvent(secondEvent);

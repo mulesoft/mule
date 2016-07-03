@@ -13,7 +13,6 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -44,7 +43,7 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        MuleMessage message = new DefaultMuleMessage(new Integer(0));
+        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
         Transformer messageTransformer = new TransformerChain(validTransformer);
         message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
 
@@ -59,9 +58,9 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
         Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer);
-        message = (DefaultMuleMessage) transformationService.applyTransformers(message, getTestEvent(0), singletonList(messageTransformer));
+        message = transformationService.applyTransformers(message, getTestEvent(0), singletonList(messageTransformer));
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
@@ -74,7 +73,7 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        MuleMessage message = new DefaultMuleMessage(new Integer(0));
+        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
         Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer, validTransformer);
         message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
 
@@ -93,7 +92,7 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
 
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
         Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
         transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
     }
@@ -108,7 +107,7 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
         
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
         Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
         
         try
@@ -132,7 +131,7 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
         assertNotNull(validTransformer);
 
-        DefaultMuleMessage message = new DefaultMuleMessage(new Integer(0));
+        MuleMessage message = MuleMessage.builder().payload(new Integer(0)).build();
         Transformer messageTransformer = new TransformerChain(validTransformer, invalidTransformer);
 
         try

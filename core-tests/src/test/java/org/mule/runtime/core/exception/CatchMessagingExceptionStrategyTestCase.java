@@ -22,7 +22,6 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
@@ -104,7 +103,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCas
     @Test
     public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception
     {
-        MuleMessage message = spy(new DefaultMuleMessage(""));
+        MuleMessage message = spy(MuleMessage.builder().payload("").build());
         when(mockMuleEvent.getMessage()).thenReturn(message);
 
         catchMessagingExceptionStrategy.setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
@@ -161,7 +160,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCas
     {
         Flow flow = MuleTestUtils.getTestFlow(muleContext);
         flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE), REQUEST_RESPONSE,
+        return new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(), REQUEST_RESPONSE,
                                     new SensingNullReplyToHandler(), flow);
     }
 

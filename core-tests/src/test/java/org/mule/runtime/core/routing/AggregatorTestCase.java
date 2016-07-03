@@ -11,12 +11,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
@@ -45,12 +44,12 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
         router.setMuleContext(muleContext);
         router.setFlowConstruct(flow);
         router.initialise();
-        MutableMuleMessage message1 = new DefaultMuleMessage("test event A");
-        MutableMuleMessage message2 = new DefaultMuleMessage("test event B");
-        MutableMuleMessage message3 = new DefaultMuleMessage("test event C");
-        message1.setCorrelationId(message1.getUniqueId());
-        message2.setCorrelationId(message1.getUniqueId());
-        message3.setCorrelationId(message1.getUniqueId());
+        MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
+        MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
+        MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
+        message1 = MuleMessage.builder(message1).correlationId(message1.getUniqueId()).build();
+        message2 = MuleMessage.builder(message2).correlationId(message1.getUniqueId()).build();
+        message3 = MuleMessage.builder(message3).correlationId(message1.getUniqueId()).build();
 
         MuleEvent event1 = new DefaultMuleEvent(message1, flow, session);
         MuleEvent event2 = new DefaultMuleEvent(message2, flow, session);
@@ -130,7 +129,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
                         throw new AggregationException(events, next, e); 
                     }
 
-                    return new DefaultMuleEvent(new DefaultMuleMessage(newPayload.toString()),
+                    return new DefaultMuleEvent(MuleMessage.builder().payload(newPayload.toString()).build(),
                         events.getMessageCollectionEvent());
                 }
             };

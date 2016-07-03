@@ -13,7 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -53,10 +52,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
         lmp.add(event ->
         {
             String payload = event.getMessage().getPayload().toString();
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setPayload(payload + ":foo");
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload + ":foo").build());
             processedEvents.add(event);
             return event;
         });
@@ -109,9 +105,9 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
     public void muleMessageCollectionPayload() throws Exception
     {
         List<MuleMessage> list = new ArrayList<>();
-        list.add(new DefaultMuleMessage("bar"));
-        list.add(new DefaultMuleMessage("zip"));
-        MuleMessage msgCollection = new DefaultMuleMessage(list);
+        list.add(MuleMessage.builder().payload("bar").build());
+        list.add(MuleMessage.builder().payload("zip").build());
+        MuleMessage msgCollection = MuleMessage.builder().payload(list).build();
         simpleForeach.process(getTestEvent(msgCollection));
 
         assertSimpleProcessedMessages();
@@ -179,17 +175,17 @@ public class ForeachTestCase extends AbstractMuleContextTestCase
         List<MuleMessage> list1 = new ArrayList<>();
         List<MuleMessage> list2 = new ArrayList<>();
 
-        list1.add(new DefaultMuleMessage("a1"));
-        list1.add(new DefaultMuleMessage("a2"));
-        list1.add(new DefaultMuleMessage("a3"));
+        list1.add(MuleMessage.builder().payload("a1").build());
+        list1.add(MuleMessage.builder().payload("a2").build());
+        list1.add(MuleMessage.builder().payload("a3").build());
 
-        list2.add(new DefaultMuleMessage("b1"));
-        list2.add(new DefaultMuleMessage("b2"));
-        list2.add(new DefaultMuleMessage("c1"));
+        list2.add(MuleMessage.builder().payload("b1").build());
+        list2.add(MuleMessage.builder().payload("b2").build());
+        list2.add(MuleMessage.builder().payload("c1").build());
 
-        parentList.add(new DefaultMuleMessage(list1));
-        parentList.add(new DefaultMuleMessage(list2));
-        MuleMessage parentCollection = new DefaultMuleMessage(parentList);
+        parentList.add(MuleMessage.builder().payload(list1).build());
+        parentList.add(MuleMessage.builder().payload(list2).build());
+        MuleMessage parentCollection = MuleMessage.builder().payload(parentList).build();
 
         nestedForeach.process(getTestEvent(parentCollection));
         assertNestedProcessedMessages();

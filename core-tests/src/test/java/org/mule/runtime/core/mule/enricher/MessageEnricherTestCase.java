@@ -23,7 +23,6 @@ import static org.mule.runtime.api.metadata.MediaType.JSON;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.RequestContext;
@@ -363,7 +362,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 
         Flow flow = mock(Flow.class);
         when(flow.getMuleContext()).thenReturn(muleContext);
-        MuleEvent in = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE),
+        MuleEvent in = new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(),
                 MessageExchangePattern.REQUEST_RESPONSE, flow);
         MuleEvent out = enricher.process(in);
 
@@ -440,7 +439,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
         when(flow.getMuleContext()).thenReturn(muleContext);
 
-        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE),
+        return new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(),
                                                   MessageExchangePattern.REQUEST_RESPONSE, nullReplyToHandler,
                                                   flow);
     }

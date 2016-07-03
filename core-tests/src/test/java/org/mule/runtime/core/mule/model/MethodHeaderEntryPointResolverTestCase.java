@@ -11,8 +11,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.message.NullPayload.getInstance;
 
 import org.mule.runtime.core.DefaultMuleEventContext;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -123,7 +123,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
 
     private MuleEventContext createMuleEventContext(Object payload, Map<String, Serializable> inboundProperties) throws Exception
     {
-        return new DefaultMuleEventContext(getTestEvent(new DefaultMuleMessage(payload, inboundProperties, null, null)));
+        return new DefaultMuleEventContext(getTestEvent(MuleMessage.builder().payload(payload).inboundProperties(inboundProperties).build()));
     }
 
     public static class TestFruitCleaner

@@ -11,8 +11,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -132,7 +132,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
 
     private String getPayload(MessageProcessor mp, MuleSession session, String message) throws Exception
     {
-        MuleMessage msg = new DefaultMuleMessage(message);
+        MuleMessage msg = MuleMessage.builder().payload(message).build();
         try
         {
             MuleEvent event = mp.process(new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE,
@@ -168,7 +168,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
         {
             try
             {
-                DefaultMuleMessage msg;
+                MuleMessage msg;
                 String payload = event.getMessageAsString();
                 if (payload.indexOf(rejectIfMatches) >= 0)
                 {
@@ -176,12 +176,11 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
                 }
                 else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0)
                 {
-                    msg = new DefaultMuleMessage(null);
-                    msg.setExceptionPayload(new DefaultExceptionPayload(new Exception()));
+                    msg = MuleMessage.builder().payload(NullPayload.getInstance()).exceptionPayload(new DefaultExceptionPayload(new Exception())).build();
                 }
                 else
                 {
-                    msg = new DefaultMuleMessage("No " + rejectIfMatches);
+                    msg = MuleMessage.builder().payload("No " + rejectIfMatches).build();
                 }
                 return new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, event.getFlowConstruct(),
                     event.getSession());

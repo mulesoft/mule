@@ -13,7 +13,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -83,7 +82,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
         routes.add(route2);
         roundRobin.setRoutes(new ArrayList<>(routes));
 
-        DefaultMuleMessage message = new DefaultMuleMessage(Collections.singletonList(TEST_MESSAGE));
+        MuleMessage message = MuleMessage.builder().payload(Collections.singletonList(TEST_MESSAGE)).build();
 
         roundRobin.process(new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, getTestFlow(), (MuleSession) null));
 
@@ -111,7 +110,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
         {
             for (int i = 0; i < numMessages; i++)
             {
-                MuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE + messageNumber.getAndIncrement());
+                MuleMessage msg = MuleMessage.builder().payload(TEST_MESSAGE + messageNumber.getAndIncrement()).build();
                 MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE,
                     flowConstruct, session);
                 try

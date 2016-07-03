@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
@@ -47,7 +47,7 @@ public class BeanBuilderTestCase extends AbstractTransformerTestCase
         Map props = new HashMap();
         props.put("segments", "14");
         props.put("radius", "5.43");
-        return new DefaultMuleMessage("Juicy", props);
+        return MuleMessage.builder().payload("Juicy").outboundProperties(props).build();
     }
 
     @Override

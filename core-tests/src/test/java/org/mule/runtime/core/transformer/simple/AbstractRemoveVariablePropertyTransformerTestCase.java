@@ -66,7 +66,7 @@ public abstract class AbstractRemoveVariablePropertyTransformerTestCase extends 
         when(mockExpressionManager.evaluate(EXPRESSION, event)).thenReturn(EXPRESSION_VALUE);
         removeVariableTransformer.setMuleContext(mockMuleContext);
 
-        message = new DefaultMuleMessage("");
+        message = MuleMessage.builder().payload("").build();
         event = new DefaultMuleEvent(message, getTestFlow(), mockSession);
     }
 
