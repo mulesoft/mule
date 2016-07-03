@@ -64,9 +64,8 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
         {
             logger.debug("Adding serialized and base64-encoded Session header to message: " + serializedEncodedSession);
         }
-        return message.transform(msg -> {
-            msg.setOutboundProperty(MULE_SESSION_PROPERTY, serializedEncodedSession);
-            return msg;
-        });
+        return MuleMessage.builder(message)
+                          .addOutboundProperty(MULE_SESSION_PROPERTY, serializedEncodedSession)
+                          .build();
     }
 }

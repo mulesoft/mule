@@ -7,7 +7,7 @@
 package org.mule.runtime.core.el.context;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.util.Set;
 
@@ -31,33 +31,13 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
     @Override
     public void doPut(String key, DataHandler value)
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            try
-            {
-                msg.addOutboundAttachment(key, value);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundAttachment(key, value).build());
     }
 
     @Override
     public void doRemove(String key)
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            try
-            {
-                msg.removeOutboundAttachment(key);
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundAttachment(key).build());
     }
 
     @Override
@@ -69,10 +49,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
     @Override
     public void clear()
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.clearAttachments();
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).clearOutbloundAttachments().build());
     }
 
 }

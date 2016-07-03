@@ -78,10 +78,7 @@ public class MessageContext
 
     public void setReplyTo(String replyTo)
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setReplyTo(replyTo);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).replyTo(replyTo).build());
     }
 
     public DataType<?> getDataType()

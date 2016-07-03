@@ -50,10 +50,9 @@ public class SerializeOnlySessionHandler extends AbstractSessionHandler
         {
             logger.debug("Adding serialized Session header to message: " + serializedSession);
         }
-        return message.transform(msg -> {
-            msg.setOutboundProperty(MULE_SESSION_PROPERTY, serializedSession);
-            return msg;
-        });
+        return MuleMessage.builder(message)
+                          .addOutboundProperty(MULE_SESSION_PROPERTY, serializedSession)
+                          .build();
     }
     
     protected MuleSession removeNonSerializableProperties(final MuleSession session,

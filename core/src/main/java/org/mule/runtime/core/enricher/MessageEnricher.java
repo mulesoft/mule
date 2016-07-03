@@ -62,7 +62,7 @@ import java.util.List;
 public class MessageEnricher extends AbstractMessageProcessorOwner implements NonBlockingMessageProcessor
 {
 
-    private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<EnrichExpressionPair>();
+    private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<>();
 
     private MessageProcessor enrichmentProcessor;
 
@@ -97,11 +97,10 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
         }
         else
         {
-            final TypedValue finalTypedValue = typedValue;
-            currentEvent.setMessage(currentEvent.getMessage().transform(msg -> {
-                    msg.setPayload(finalTypedValue.getValue(), finalTypedValue.getDataType());
-                    return msg;
-            }));
+            currentEvent.setMessage(MuleMessage.builder(currentEvent.getMessage())
+                                               .payload(typedValue.getValue())
+                                               .mediaType(typedValue.getDataType().getMediaType())
+                                               .build());
         }
     }
 

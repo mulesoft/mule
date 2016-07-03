@@ -9,7 +9,6 @@ package org.mule.runtime.core.transformer.simple;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -48,17 +47,9 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
                 {
                     wildcardAttributeEvaluator.processValues(message.getOutboundAttachmentNames(),matchedValue ->
                     {
-                        event.setMessage(event.getMessage().transform(msg -> {
-                            try
-                            {
-                                msg.removeOutboundAttachment(matchedValue);
-                            }
-                            catch (Exception e)
-                            {
-                                throw new MuleRuntimeException(e);
-                            }
-                            return msg;
-                        }));
+                        event.setMessage(MuleMessage.builder(event.getMessage())
+                                                    .removeOutboundAttachment(matchedValue)
+                                                    .build());
                     });
                 }
                 catch (Exception e)
@@ -71,17 +62,9 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
                 Object keyValue = nameEvaluator.resolveValue(event);
                 if (keyValue != null)
                 {
-                    event.setMessage(event.getMessage().transform(msg -> {
-                        try
-                        {
-                            msg.removeOutboundAttachment(keyValue.toString());
-                        }
-                        catch (Exception e)
-                        {
-                            throw new MuleRuntimeException(e);
-                        }
-                        return msg;
-                    }));
+                    event.setMessage(MuleMessage.builder(event.getMessage())
+                                                .removeOutboundAttachment(keyValue.toString())
+                                                .build());
                 }
                 else
                 {

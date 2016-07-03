@@ -88,16 +88,17 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
         {
             return VoidMuleEvent.getInstance();
         }
-        if (untilSuccessfulConfiguration.getAckExpression() == null)
+        final String ackExpression = getUntilSuccessfulConfiguration().getAckExpression();
+        if (ackExpression == null)
         {
             return event;
         }
 
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setPayload(getUntilSuccessfulConfiguration().getMuleContext().getExpressionManager()
-                                   .evaluate(getUntilSuccessfulConfiguration().getAckExpression(), event));
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .payload(getUntilSuccessfulConfiguration().getMuleContext()
+                                                                              .getExpressionManager()
+                                                                              .evaluate(ackExpression, event))
+                .build());
         return event;
     }
 

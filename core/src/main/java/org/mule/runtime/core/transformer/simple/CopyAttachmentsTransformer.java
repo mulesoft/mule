@@ -8,7 +8,8 @@ package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -16,8 +17,6 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
 import java.nio.charset.Charset;
-
-import javax.activation.DataHandler;
 
 public class CopyAttachmentsTransformer extends AbstractMessageTransformer
 {
@@ -40,26 +39,17 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
     {
+        final MuleMessage message = event.getMessage();
         try
         {
             if (wildcardAttachmentNameEvaluator.hasWildcards())
             {
                 try
                 {
-                    wildcardAttachmentNameEvaluator.processValues(event.getMessage().getInboundAttachmentNames(), matchedValue ->
-                    {
-                        event.setMessage(event.getMessage().transform(msg -> {
-                            try
-                            {
-                                msg.addOutboundAttachment(matchedValue,msg.getInboundAttachment(matchedValue));
-                            }
-                            catch (Exception e)
-                            {
-                                throw new MuleRuntimeException(e);
-                            }
-                            return msg;
-                        }));
-                    });
+                    final Builder builder = MuleMessage.builder(message);
+                    wildcardAttachmentNameEvaluator.processValues(message.getInboundAttachmentNames(),
+                            matchedValue -> builder.addOutboundAttachment(matchedValue, message.getInboundAttachment(matchedValue)));
+                    event.setMessage(builder.build());
                 }
                 catch (Exception e)
                 {
@@ -69,25 +59,16 @@ public class CopyAttachmentsTransformer extends AbstractMessageTransformer
             else
             {
                 String attachmentName = attachmentNameEvaluator.resolveValue(event).toString();
-                DataHandler inboundAttachment = event.getMessage().getInboundAttachment(attachmentName);
-                event.setMessage(event.getMessage().transform(msg -> {
-                    try
-                    {
-                        msg.addOutboundAttachment(attachmentName, inboundAttachment);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new MuleRuntimeException(e);
-                    }
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(message)
+                                            .addOutboundAttachment(attachmentName, message.getInboundAttachment(attachmentName))
+                                            .build());
             }
         }
         catch (Exception e)
         {
             throw new TransformerException(this,e);
         }
-        return event.getMessage();
+        return message;
     }
 
     @Override

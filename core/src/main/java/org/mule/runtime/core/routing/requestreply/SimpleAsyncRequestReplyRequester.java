@@ -7,9 +7,11 @@
 package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -35,12 +37,11 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
 
     protected void setAsyncReplyProperties(MuleEvent event) throws MuleException
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setReplyTo(getReplyTo());
-            msg.setOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, event.getFlowConstruct().getName());
-            msg.setCorrelationId(event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event));
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .replyTo(getReplyTo())
+                                    .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, event.getFlowConstruct().getName())
+                                    .correlationId(event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event))
+                                    .build());
     }
 
     protected String getReplyTo()

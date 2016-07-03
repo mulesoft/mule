@@ -10,8 +10,9 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -241,16 +242,14 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 {
                     // create the response event
                     MuleEvent returnEvent = callback.aggregateEvents(group);
-                    EventGroup finalGroup = group;
-                    returnEvent.setMessage(returnEvent.getMessage().transform(msg -> {
-                        msg.setCorrelationId(groupId);
-                        String rootId = finalGroup.getCommonRootId();
-                        if (rootId != null)
-                        {
-                            msg.setMessageRootId(rootId);
-                        }
-                        return msg;
-                    }));
+                    final Builder builder = MuleMessage.builder(returnEvent.getMessage()).correlationId(groupId);
+                    String rootId = group.getCommonRootId();
+                    if (rootId != null)
+                    {
+                        builder.rootId(rootId);
+                    }
+
+                    returnEvent.setMessage(builder.build());
 
                     // remove the eventGroup as no further message will be received
                     // for this group once we aggregate
@@ -404,10 +403,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 {
                     MuleEvent newEvent = callback.aggregateEvents(group);
                     group.clear();
-                    newEvent.setMessage(newEvent.getMessage().transform(msg -> {
-                        msg.setCorrelationId(group.getGroupId().toString());
-                        return msg;
-                    }));
+                    newEvent.setMessage(MuleMessage.builder(newEvent.getMessage())
+                                                   .correlationId(group.getGroupId().toString())
+                                                   .build());
 
                     if (!correlatorStore.contains((Serializable) group.getGroupId(), getExpiredAndDispatchedPartitionKey()))
                     {
@@ -518,7 +516,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 return;
             }
 
-            List<EventGroup> expired = new ArrayList<EventGroup>(1);
+            List<EventGroup> expired = new ArrayList<>(1);
             try
             {
                 for (Serializable o : (List<Serializable>) correlatorStore.allKeys(getEventGroupsPartitionKey()))
@@ -540,14 +538,10 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 ExecutionTemplate<MuleEvent> executionTemplate = ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate(muleContext, flowConstruct.getExceptionListener());
                 try
                 {
-                    executionTemplate.execute(new ExecutionCallback<MuleEvent>()
+                    executionTemplate.execute(() ->
                     {
-                        @Override
-                        public MuleEvent process() throws Exception
-                        {
-                            handleGroupExpiry(group);
-                            return null;
-                        }
+                        handleGroupExpiry(group);
+                        return null;
                     });
                 }
                 catch (MessagingException e)

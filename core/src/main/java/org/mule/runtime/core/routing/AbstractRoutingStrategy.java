@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -157,17 +158,16 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
      */
     public static MuleMessage propagateMagicProperties(MuleMessage in)
     {
-        return in.transform(msg -> {
-            for (String name : magicProperties)
+        final Builder builder = MuleMessage.builder(in);
+        for (String name : magicProperties)
+        {
+            Serializable value = in.getInboundProperty(name);
+            if (value != null)
             {
-                Serializable value = in.getInboundProperty(name);
-                if (value != null)
-                {
-                    msg.setOutboundProperty(name, value);
-                }
+                builder.addOutboundProperty(name, value);
             }
-            return msg;
-        });
+        }
+        return builder.build();
     }
 
     /**

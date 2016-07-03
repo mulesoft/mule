@@ -199,7 +199,6 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
          */
         <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, DataType<T> dataType);
 
-
         /**
          * @param key
          * @param value
@@ -224,6 +223,17 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
          * @return
          */
         <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, DataType<T> dataType);
+
+        /**
+         * @param key
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> removeOutboundProperty(String key);
+
+        /**
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> clearOutboundProperties();
 
         /**
          * @param key
@@ -252,6 +262,13 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
          * @return
          */
         Builder<PAYLOAD, ATTRIBUTES> removeOutboundAttachment(String key);
+
+        /**
+         * Removes all outbound attachments on this message builder.
+         * 
+         * @return
+         */
+        Builder<PAYLOAD, ATTRIBUTES> clearOutbloundAttachments();
 
         /**
          * @param inboundProperties

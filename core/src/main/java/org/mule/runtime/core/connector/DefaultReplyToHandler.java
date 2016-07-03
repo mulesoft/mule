@@ -68,11 +68,10 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
         // anyway as it should never be true from a replyTo dispatch
         event.removeFlowVariable(MULE_REMOTE_SYNC_PROPERTY);
 
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.removeOutboundProperty(MULE_REPLY_TO_PROPERTY);
-            msg.removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .removeOutboundProperty(MULE_REPLY_TO_PROPERTY)
+                                    .removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY)
+                                    .build());
 
         //TODO See MULE-9307 - re-add behaviour to process reply to destination dispatching with new connectors
     }
@@ -122,7 +121,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
-        serializedData = new HashMap<String, Object>();
+        serializedData = new HashMap<>();
 
         serializedData.put("connectorName", in.readObject());
         serializedData.put("connectorType", in.readObject());

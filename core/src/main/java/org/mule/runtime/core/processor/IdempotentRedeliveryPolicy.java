@@ -7,8 +7,10 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -113,14 +115,10 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
 
     protected Factory internalObjectStoreFactory()
     {
-        return new Factory()
+        return () ->
         {
-            @Override
-            public Object create()
-            {
-                ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
-                return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, -1, 60 * 5 * 1000, 6000);
-            }
+            ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
+            return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, -1, 60 * 5 * 1000, 6000);
         };
     }
 
@@ -287,10 +285,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy
             if (payload instanceof InputStream)
             {
                 // We've consumed the stream.
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setPayload(bytes);
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage()).payload(bytes).build());
             }
             MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
             byte[] digestedBytes = md.digest(bytes);
