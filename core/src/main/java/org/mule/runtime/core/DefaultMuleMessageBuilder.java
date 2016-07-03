@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleMessage.CollectionBuilder;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.util.UUID;
 
 import java.io.Serializable;
@@ -56,8 +57,8 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     private Object replyTo;
     private ExceptionPayload exceptionPayload;
 
-    private Map<String, TypedValue<Serializable>> inboundProperties = new HashMap<>();
-    private Map<String, TypedValue<Serializable>> outboundProperties = new HashMap<>();
+    private Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
+    private Map<String, TypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
     private Map<String, DataHandler> inboundAttachments = new HashMap<>();
     private Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
@@ -360,7 +361,8 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
         // updates dataType when encoding is updated using a property instead of using #setEncoding
         if (MULE_ENCODING_PROPERTY.equals(key))
         {
-            dataType = DataType.builder().type(dataType.getType()).charset((String) value).build();
+            final Class type = dataType != null ? dataType.getType() : Object.class;
+            dataType = DataType.builder().type(type).charset((String) value).build();
         }
         else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
         {
@@ -383,7 +385,8 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
                     builder.charset(encoding);
                 }
             }
-            dataType = builder.type(dataType.getType()).build();
+            final Class type = dataType != null ? dataType.getType() : Object.class;
+            dataType = builder.type(type).build();
         }
         else if (MULE_CORRELATION_ID_PROPERTY.equalsIgnoreCase(key))
         {
@@ -391,7 +394,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
         }
         else if ("MULE_REPLYTO".equalsIgnoreCase(key))
         {
-            replyTo = value.toString();
+            replyTo = value;
         }
     }
 

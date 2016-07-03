@@ -19,7 +19,7 @@ public class RemovePropertyTransformer extends AbstractRemoveVariablePropertyTra
     protected void removeProperty(MuleEvent event, String propertyName)
     {
         event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .removeOutboundAttachment(propertyName)
+                                    .removeOutboundProperty(propertyName)
                                     .build());
     }
 

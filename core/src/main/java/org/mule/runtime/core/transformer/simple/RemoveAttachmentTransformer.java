@@ -9,6 +9,7 @@ package org.mule.runtime.core.transformer.simple;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -43,19 +44,10 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer
         {
             if (wildcardAttributeEvaluator.hasWildcards())
             {
-                try
-                {
-                    wildcardAttributeEvaluator.processValues(message.getOutboundAttachmentNames(),matchedValue ->
-                    {
-                        event.setMessage(MuleMessage.builder(event.getMessage())
-                                                    .removeOutboundAttachment(matchedValue)
-                                                    .build());
-                    });
-                }
-                catch (Exception e)
-                {
-                    throw new TransformerException(this,e);
-                }
+                final Builder builder = MuleMessage.builder(event.getMessage());
+                wildcardAttributeEvaluator.processValues(message.getOutboundAttachmentNames(),
+                        matchedValue -> builder.removeOutboundAttachment(matchedValue));
+                event.setMessage(builder.build());
             }
             else
             {

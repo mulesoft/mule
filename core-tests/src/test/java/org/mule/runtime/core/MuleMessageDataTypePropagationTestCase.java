@@ -39,7 +39,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -99,7 +98,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = MuleMessage.builder().payload(TEST).addInboundProperty(MULE_ENCODING_PROPERTY,
                                                                                      CUSTOM_ENCODING.name()).build();
-        assertEmptyDataType(message);
+        assertCustomEncoding(message);
     }
 
     @Test
@@ -108,14 +107,14 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         MuleMessage muleMessage = MuleMessage.builder().payload(TEST).addOutboundProperty(MULE_ENCODING_PROPERTY,
                                                                                           CUSTOM_ENCODING.name())
                 .build();
-        assertEmptyDataType(muleMessage);
+        assertCustomEncoding(muleMessage);
     }
 
     @Test
     public void doesNotUseContentTyperomInboundProperty() throws Exception
     {
         MuleMessage message = MuleMessage.builder().payload(TEST).addInboundProperty(CONTENT_TYPE_PROPERTY,
-                                                                                     STRING.toString()).build();
+                STRING.getMediaType().toString()).build();
         assertEmptyDataType(message);
     }
 
@@ -123,7 +122,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void doesNotUseContentTypeFromOutboundProperty() throws Exception
     {
         MuleMessage muleMessage = MuleMessage.builder().payload(TEST).addOutboundProperty(CONTENT_TYPE_PROPERTY,
-                                                                                          STRING.toString()).build();
+                STRING.getMediaType().toString()).build();
         assertEmptyDataType(muleMessage);
     }
 
@@ -390,10 +389,9 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         assertThat(muleMessage.getDataType().getMediaType().getCharset().isPresent(), is(false));
     }
 
-    private void assertDefaultDataType(MutableMuleMessage muleMessage)
+    private void assertCustomEncoding(MuleMessage muleMessage)
     {
-        muleMessage.setOutboundProperty(MULE_ENCODING_PROPERTY, getDefaultEncoding(muleContext).name());
-        assertDataType(muleMessage, String.class, ANY, DEFAULT_ENCODING);
+        assertThat(muleMessage.getDataType().getMediaType().getCharset().get(), is(CUSTOM_ENCODING));
     }
 
     private void assertDataType(MuleMessage muleMessage, Class type, MediaType mimeType, Charset encoding)
