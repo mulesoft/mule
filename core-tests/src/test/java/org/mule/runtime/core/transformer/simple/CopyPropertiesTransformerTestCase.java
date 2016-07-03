@@ -21,7 +21,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -44,7 +43,7 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
     public static final Charset ENCODING = US_ASCII;
     public static final String INBOUND_PROPERTY_KEY = "propKey";
     public static final DataType PROPERTY_DATA_TYPE = DataType.STRING;
-    private static final Serializable PROPERTY_VALUE = StringUtils.EMPTY;
+    private static final Serializable PROPERTY_VALUE = "propValue";
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext mockMuleContext;
@@ -92,6 +91,7 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
 
         muleMessage = MuleMessage.builder(muleMessage)
                                  .addInboundProperty("MULE_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
+                                 .addInboundProperty("MULE_CORRELATION_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
                                  .addInboundProperty("MULE_GROUP_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
                                  .addInboundProperty("SomeVar", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
                                  .build();
@@ -100,6 +100,7 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
 
         assertThat(transformed.getOutboundProperty("SomeVar"), is(nullValue()));
         assertThat(transformed.getOutboundProperty("MULE_ID"), is(PROPERTY_VALUE));
+        assertThat(transformed.getOutboundProperty("MULE_CORRELATION_ID"), is(PROPERTY_VALUE));
         assertThat(transformed.getOutboundProperty("MULE_GROUP_ID"), is(PROPERTY_VALUE));
     }
 

@@ -171,7 +171,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
 
         if (event.isAllowNonBlocking())
         {
-            assertThat(executor.execute(), CoreMatchers.<MuleEvent>equalTo(NonBlockingVoidMuleEvent.getInstance()));
+            assertThat(executor.execute(), equalTo(NonBlockingVoidMuleEvent.getInstance()));
         }
         else
         {

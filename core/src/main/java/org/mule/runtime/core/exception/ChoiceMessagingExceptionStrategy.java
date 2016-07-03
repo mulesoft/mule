@@ -8,6 +8,7 @@ package org.mule.runtime.core.exception;
 
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -36,11 +37,13 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
 
     protected String globalName;
 
+    @Override
     public String getGlobalName()
     {
         return globalName;
     }
 
+    @Override
     public void setGlobalName(String globalName)
     {
         this.globalName = globalName;
@@ -49,19 +52,17 @@ public class ChoiceMessagingExceptionStrategy extends AbstractMuleObjectOwner<Me
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event)
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setExceptionPayload(new DefaultExceptionPayload(exception));
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .exceptionPayload(new DefaultExceptionPayload(exception))
+                                    .build());
 
         for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners)
         {
             if (exceptionListener.accept(event))
             {
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setExceptionPayload(null);
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage())
+                                            .exceptionPayload(null)
+                                            .build());
                 return exceptionListener.handleException(exception, event);
             }
         }

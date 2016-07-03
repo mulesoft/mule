@@ -129,9 +129,9 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess
         this.properties.outboundMap.putAll(outboundProperties);
         this.inboundAttachments = inboundAttachments;
         this.outboundAttachments = outboundAttachments;
-        this.setCorrelationId(corealationId);
-        this.setCorrelationGroupSize(setCorrelationGroupSize);
-        this.setCorrelationSequence(setCorrelationSequence);
+        setCorrelationId(corealationId);
+        setCorrelationGroupSize(setCorrelationGroupSize);
+        setCorrelationSequence(setCorrelationSequence);
         setReplyTo(replyTo);
         this.exceptionPayload = exceptionPayload;
     }

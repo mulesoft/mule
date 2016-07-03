@@ -8,33 +8,29 @@ package org.mule.runtime.core.execution;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
-import org.mule.tck.testmodels.mule.TestTransaction;
-import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.runtime.core.transaction.IllegalTransactionStateException;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transaction.TransactionTemplateTestUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.mule.TestTransaction;
+import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
@@ -45,9 +41,7 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.internal.verification.VerificationModeFactory;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -68,6 +62,12 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     protected MuleEvent mockEvent;
     @Mock
     protected MessagingExceptionHandler mockMessagingExceptionHandler;
+
+    @Before
+    public void prepareEvent()
+    {
+        when(mockEvent.getMessage()).thenReturn(MuleMessage.builder().payload("").build());
+    }
 
     @Before
     public void unbindTransaction() throws Exception
@@ -166,14 +166,10 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
         config.setInteractWithExternal(true);
         mockExternalTransactionFactory = mock(ExternalTransactionAwareTransactionFactory.class);
         config.setFactory(mockExternalTransactionFactory);
-        when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenAnswer(new Answer<Object>()
+        when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenAnswer(invocationOnMock ->
         {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-                return mockTransaction;
-            }
+            TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+            return mockTransaction;
         });
         mockTransaction.setXA(true);
         ExecutionTemplate executionTemplate = createExecutionTemplate(config);

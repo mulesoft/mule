@@ -9,6 +9,7 @@ package org.mule.runtime.core.exception;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -23,7 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RedeliveryExceeded implements FlowConstructAware, Initialisable
 {
-    private List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<MessageProcessor>();
+    private List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<>();
     private MessageProcessorChain configuredMessageProcessors;
     private FlowConstruct flowConstruct;
 
@@ -67,10 +68,9 @@ public class RedeliveryExceeded implements FlowConstructAware, Initialisable
         }
         if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setExceptionPayload(null);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .exceptionPayload(null)
+                                        .build());
         }
         return result;
     }
