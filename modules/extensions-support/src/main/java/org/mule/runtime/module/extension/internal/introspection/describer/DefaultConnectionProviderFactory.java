@@ -18,7 +18,6 @@ import org.mule.runtime.module.extension.internal.exception.IllegalConnectionPro
 
 /**
  * Creates instances of {@link ConnectionProvider} based on a {@link #providerClass}
- * * @param <Config>     the generic type for the configuration objects that the created {@link ConnectionProvider providers} accept
  *
  * @param <Connection> the generic type for the connections that the created  {@link ConnectionProvider providers} produce
  * @since 4.0
