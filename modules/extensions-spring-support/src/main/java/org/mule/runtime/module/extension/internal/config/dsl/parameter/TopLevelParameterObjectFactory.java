@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByAlias;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.model.ObjectType;
@@ -34,29 +35,37 @@ import java.lang.reflect.Field;
 public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> implements MuleContextAware
 {
 
-    private final ObjectBuilder builder;
-    private final Class<Object> objectClass;
+    private ObjectBuilder builder;
+    private Class<Object> objectClass;
+    private final ClassLoader classLoader;
     private MuleContext muleContext;
 
-    public TopLevelParameterObjectFactory(ObjectType type)
+    public TopLevelParameterObjectFactory(ObjectType type, ClassLoader classLoader)
     {
-        objectClass = getType(type);
-        builder = new DefaultObjectBuilder(objectClass);
+        this.classLoader = classLoader;
+        withContextClassLoader(classLoader, () -> {
+            objectClass = getType(type);
+            builder = new DefaultObjectBuilder(objectClass);
+        });
     }
 
     @Override
     public Object getObject() throws Exception
     {
-        getParameters().forEach((key, value) -> {
-            Field field = getFieldByAlias(objectClass, key);
-            if (field != null)
-            {
-                builder.addPropertyResolver(field, toValueResolver(value));
-            }
-        });
+        return withContextClassLoader(classLoader, () -> {
+            getParameters().forEach((key, value) -> {
+                Field field = getFieldByAlias(objectClass, key);
+                if (field != null)
+                {
+                    builder.addPropertyResolver(field, toValueResolver(value));
+                }
+            });
 
-        ValueResolver<Object> resolver = new ObjectBuilderValueResolver<>(builder);
-        return resolver.isDynamic() ? resolver : resolver.resolve(getInitialiserEvent(muleContext));
+            ValueResolver<Object> resolver = new ObjectBuilderValueResolver<>(builder);
+            return resolver.isDynamic() ? resolver : resolver.resolve(getInitialiserEvent(muleContext));
+        }, Exception.class, exception -> {
+            throw exception;
+        });
     }
 
     @Override

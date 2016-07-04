@@ -338,6 +338,7 @@ public abstract class ExtensionDefinitionParser
                                               .withTypeDefinition(fromType(ValueResolver.class))
                                               .withObjectFactoryType(TopLevelParameterObjectFactory.class)
                                               .withConstructorParameterDefinition(fromFixedValue(arrayType.getType()).build())
+                                              .withConstructorParameterDefinition(fromFixedValue(getContextClassLoader()).build())
                                               .build());
                     }
                 });
@@ -421,7 +422,7 @@ public abstract class ExtensionDefinitionParser
             {
                 try
                 {
-                    new TopLevelParameterParser(baseDefinitionBuilder.copy(), objectType).parse().forEach(definition -> addDefinition(definition));
+                    new TopLevelParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader()).parse().forEach(definition -> addDefinition(definition));
                 }
                 catch (ConfigurationException e)
                 {
@@ -429,6 +430,11 @@ public abstract class ExtensionDefinitionParser
                 }
             }
         });
+    }
+
+    private ClassLoader getContextClassLoader()
+    {
+        return Thread.currentThread().getContextClassLoader();
     }
 
     private ValueResolver<?> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue, ExpressionSupport expressionSupport, boolean required)

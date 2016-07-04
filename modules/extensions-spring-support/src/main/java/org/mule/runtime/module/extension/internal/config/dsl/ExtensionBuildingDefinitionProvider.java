@@ -149,7 +149,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
         Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
         SubTypesMappingContainer typeMapping = new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : emptyMap());
 
-        withContextClassLoader(getClassLoader(extensionModel), () -> {
+        final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+        withContextClassLoader(extensionClassLoader, () -> {
             new IdempotentExtensionWalker()
             {
                 @Override
@@ -179,12 +180,12 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                 @Override
                 public void onParameter(ParameterModel model)
                 {
-                    typeMapping.getSubTypes(model.getType()).forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder));
-                    registerTopLevelParameter(model.getType(), definitionBuilder);
+                    typeMapping.getSubTypes(model.getType()).forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder, extensionClassLoader));
+                    registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader);
                 }
             }.walk(extensionModel);
 
-            registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder);
+            registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader);
         });
     }
 
@@ -200,7 +201,9 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
         }
     }
 
-    private void registerTopLevelParameter(final MetadataType parameterType, Builder definitionBuilder)
+    private void registerTopLevelParameter(final MetadataType parameterType,
+                                           Builder definitionBuilder,
+                                           ClassLoader extensionClassLoader)
     {
         parameterType.accept(new MetadataTypeVisitor()
         {
@@ -209,7 +212,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
             {
                 if (isInstantiable(getType(objectType)))
                 {
-                    parseWith(new TopLevelParameterParser(definitionBuilder, objectType));
+                    parseWith(new TopLevelParameterParser(definitionBuilder, objectType, extensionClassLoader));
                 }
             }
 
@@ -217,7 +220,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
             public void visitArrayType(ArrayType arrayType)
             {
 
-                registerTopLevelParameter(arrayType.getType(), definitionBuilder.copy());
+                registerTopLevelParameter(arrayType.getType(), definitionBuilder.copy(), extensionClassLoader);
             }
 
             @Override
@@ -225,12 +228,12 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
             {
                 MetadataType keyType = dictionaryType.getKeyType();
                 keyType.accept(this);
-                registerTopLevelParameter(keyType, definitionBuilder.copy());
+                registerTopLevelParameter(keyType, definitionBuilder.copy(), extensionClassLoader);
             }
         });
     }
 
-    private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel, Builder definitionBuilder)
+    private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel, Builder definitionBuilder, ClassLoader extensionClassLoader)
     {
         //TODO MDM-7 replace isInstantiableWithParameters
         final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getClassLoader(extensionModel));
@@ -238,6 +241,6 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                 .ifPresent(exportedTypes -> exportedTypes.stream()
                         .filter(IntrospectionUtils::isInstantiableWithParameters)
                         .map(type -> getMetadataType(type, typeLoader))
-                        .forEach(exportedType -> registerTopLevelParameter(exportedType, definitionBuilder)));
+                        .forEach(exportedType -> registerTopLevelParameter(exportedType, definitionBuilder, extensionClassLoader)));
     }
 }
