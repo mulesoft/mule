@@ -26,7 +26,7 @@ import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.config.spring.dsl.processor.ApplicationConfig;
+import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
@@ -53,6 +53,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.BeansException;
@@ -92,6 +93,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
 
     private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry = new ComponentBuildingDefinitionRegistry();
     private final OptionalObjectsController optionalObjectsController;
+    private final Map<String, String> artifactProperties;
     private ApplicationModel applicationModel;
     private MuleContext muleContext;
     private Resource[] artifactConfigResources;
@@ -109,20 +111,31 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
      *
      * @param muleContext               the {@link MuleContext} that own this context
      * @param springResources           the configuration resources to use for mule configuration
-     * @param springResources           the configuration resources to use for spring beans
      * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null}
+     * @param artifactProperties        external configuration values that can be used in the {@code springResources}
      * @see org.mule.runtime.config.spring.SpringRegistry
      * @since 3.7.0
      */
-    public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController)
+    public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController, Map<String, String> artifactProperties)
             throws BeansException
     {
-        this(muleContext, convert(artifactConfigResources), convert(springResources), optionalObjectsController);
+        this(muleContext, convert(artifactConfigResources), convert(springResources), optionalObjectsController, artifactProperties);
     }
 
-    public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources, Resource[] springResources) throws BeansException
+    /**
+     * Parses configuration files creating a spring ApplicationContext which is used
+     * as a parent registry using the SpringRegistry registry implementation to wraps
+     * the spring ApplicationContext
+     *
+     * @param muleContext               the {@link MuleContext} that own this context
+     * @param springResources           the configuration resources to use for mule configuration
+     * @param artifactProperties        external configuration values that can be used in the {@code springResources}
+     * @see org.mule.runtime.config.spring.SpringRegistry
+     * @since 4.0
+     */
+    public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources, Resource[] springResources, Map<String, String> artifactProperties) throws BeansException
     {
-        this(muleContext, artifactConfigResources, springResources, new DefaultOptionalObjectsController());
+        this(muleContext, artifactConfigResources, springResources, new DefaultOptionalObjectsController(), artifactProperties);
     }
 
     /**
@@ -136,13 +149,14 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
      * @see org.mule.runtime.config.spring.SpringRegistry
      * @since 3.7.0
      */
-    public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources, Resource[] springResources, OptionalObjectsController optionalObjectsController) throws BeansException
+    public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources, Resource[] springResources, OptionalObjectsController optionalObjectsController, Map<String, String> artifactProperties) throws BeansException
     {
         checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
         this.muleContext = muleContext;
         this.artifactConfigResources = artifactConfigResources;
         this.springResources = springResources;
         this.optionalObjectsController = optionalObjectsController;
+        this.artifactProperties = artifactProperties;
 
         serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class).forEach(componentBuildingDefinitionProvider -> {
             componentBuildingDefinitionProvider.init(muleContext);
@@ -180,7 +194,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     {
         try
         {
-            ApplicationConfig.Builder applicationConfigBuilder = new ApplicationConfig.Builder();
+            ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
+            applicationConfigBuilder.setApplicationProperties(this.artifactProperties);
             for (Resource springResource : artifactConfigResources)
             {
                 Document document = getXmlDocument(springResource);

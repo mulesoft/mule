@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -34,7 +35,7 @@ public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        muleContext = new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(new String[] {}));
+        muleContext = new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(new String[] {}, emptyMap()));
         muleContext.start();
         muleContext.getRegistry().lookupByType(Calendar.class);
     }

@@ -12,6 +12,8 @@ import org.mule.runtime.config.spring.processors.ContextExclusiveInjectorProcess
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.config.ConfigResource;
 
+import java.util.Map;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -25,9 +27,9 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 final class MuleDomainContext extends MuleArtifactContext
 {
 
-    MuleDomainContext(MuleContext muleContext, ConfigResource[] applicationConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController) throws BeansException
+    MuleDomainContext(MuleContext muleContext, ConfigResource[] applicationConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController, Map<String, String> artifactProperties) throws BeansException
     {
-        super(muleContext, applicationConfigResources, springResources, optionalObjectsController);
+        super(muleContext, applicationConfigResources, springResources, optionalObjectsController, artifactProperties);
     }
 
     @Override

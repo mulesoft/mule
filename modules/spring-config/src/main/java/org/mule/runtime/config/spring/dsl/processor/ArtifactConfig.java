@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.dsl.processor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents the application configuration files that describe the integrations. It does not include resource files or application descriptors.
@@ -17,17 +18,18 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class ApplicationConfig
+public class ArtifactConfig
 {
 
-    private String applicationName;
+    private String artifactName;
     private List<ConfigFile> configFiles = new ArrayList<>();
+    private Map<String, String> applicationProperties;
 
-    private ApplicationConfig()
+    private ArtifactConfig()
     {}
 
-    public String getApplicationName() {
-        return applicationName;
+    public String getArtifactName() {
+        return artifactName;
     }
 
     public List<ConfigFile> getConfigFiles() {
@@ -35,17 +37,25 @@ public class ApplicationConfig
     }
 
     /**
-     * Builder for {@link org.mule.runtime.config.spring.dsl.processor.ApplicationConfig} instances.
+     * @return properties associated to the configuration.
+     */
+    public Map<String, String> getApplicationProperties()
+    {
+        return applicationProperties;
+    }
+
+    /**
+     * Builder for {@link ArtifactConfig} instances.
      */
     public static class Builder {
-        private ApplicationConfig applicationConfig = new ApplicationConfig();
+        private ArtifactConfig applicationConfig = new ArtifactConfig();
 
         /**
-         * @param applicationName the application name
+         * @param applicationName the artifact name
          * @return the builder
          */
         public Builder setApplicationName(String applicationName) {
-            this.applicationConfig.applicationName = applicationName;
+            this.applicationConfig.artifactName = applicationName;
             return this;
         }
 
@@ -58,9 +68,18 @@ public class ApplicationConfig
             return this;
         }
 
-        public ApplicationConfig build() {
-            return this.applicationConfig;
+        /**
+         * @param applicationProperties properties associated to the configuration.
+         * @return the builder
+         */
+        public Builder setApplicationProperties(Map<String, String> applicationProperties)
+        {
+            this.applicationConfig.applicationProperties = applicationProperties;
+            return this;
         }
 
+        public ArtifactConfig build() {
+            return this.applicationConfig;
+        }
     }
 }

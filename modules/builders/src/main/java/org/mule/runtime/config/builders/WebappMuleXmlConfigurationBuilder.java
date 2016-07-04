@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.builders;
 
+import static java.util.Collections.emptyMap;
 import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.runtime.config.spring.OptionalObjectsController;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
@@ -57,14 +58,14 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String configResources)
         throws ConfigurationException
     {
-        super(configResources);
+        super(configResources, emptyMap());
         context = servletContext;
     }
 
     public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String[] configResources)
         throws ConfigurationException
     {
-        super(configResources);
+        super(configResources, emptyMap());
         context = servletContext;
     }
 
@@ -101,7 +102,7 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     {
         Resource[] springServletContextResources = preProcessResources(springResources);
         Resource[] artifactConfigServletContextResources = preProcessResources(artifactConfigResources);
-        return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, springServletContextResources);
+        return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, springServletContextResources, emptyMap());
     }
 
     private Resource[] preProcessResources(ConfigResource[] configResources)

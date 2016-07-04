@@ -6,13 +6,13 @@
  */
 package org.mule.functional.junit4;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
-
+import org.mule.runtime.config.spring.SpringXmlDomainConfigurationBuilder;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.config.spring.SpringXmlDomainConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 
@@ -53,6 +53,6 @@ public class DomainContextBuilder
 
     protected ConfigurationBuilder getDomainBuilder(String configResource) throws Exception
     {
-        return new SpringXmlDomainConfigurationBuilder(configResource);
+        return new SpringXmlDomainConfigurationBuilder(configResource, emptyMap());
     }
 }

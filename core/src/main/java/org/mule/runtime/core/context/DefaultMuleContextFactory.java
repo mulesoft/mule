@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.context;
 
+import static java.util.Collections.emptyMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -154,7 +155,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
 
                 // Automatically resolve Configuration to be used and delegate configuration
                 // to it.
-                new AutoConfigurationBuilder(configResources).configure(muleContext);
+                new AutoConfigurationBuilder(configResources, emptyMap()).configure(muleContext);
 
                 notifyMuleContextConfiguration(muleContext);
             }
