@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import org.mule.runtime.core.routing.AbstractMessageSequence;
+import org.mule.runtime.core.routing.MessageSequence;
+
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.commons.lang.Validate;
-import org.mule.runtime.core.routing.AbstractMessageSequence;
-import org.mule.runtime.core.routing.MessageSequence;
 
 /**
  * A {@link MessageSequence} that retrieves elements from a {@link Collection}. Its
@@ -33,16 +34,19 @@ public final class CollectionMessageSequence<T> extends AbstractMessageSequence<
         this.remaining = collection.size();
     }
 
-    public int size()
+    @Override
+    public Integer size()
     {
         return remaining;
     }
 
+    @Override
     public boolean hasNext()
     {
         return iter.hasNext();
     }
 
+    @Override
     public T next()
     {
         T next = iter.next();

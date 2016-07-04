@@ -34,7 +34,7 @@ public class PartitionedMessageSequence<Q> implements MessageSequence<Collection
     }
 
     @Override
-    public int size()
+    public Integer size()
     {
         return (delegate.size() / groupSize) + ((delegate.size() % groupSize) > 0 ? 1 : 0);
     }
@@ -52,7 +52,7 @@ public class PartitionedMessageSequence<Q> implements MessageSequence<Collection
         {
             throw new NoSuchElementException();
         }
-        Collection<Q> batch = new ArrayList<Q>();
+        Collection<Q> batch = new ArrayList<>();
         int i = groupSize;
         while (i > 0 && delegate.hasNext())
         {

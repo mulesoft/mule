@@ -6,6 +6,12 @@
  */
 package org.mule.compatibility.transport.http.components;
 
+import static java.lang.String.valueOf;
+import static org.mule.compatibility.transport.http.HttpConstants.CUSTOM_HEADER_PREFIX;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
+
 import org.mule.compatibility.transport.http.CacheControlHeader;
 import org.mule.compatibility.transport.http.CookieHelper;
 import org.mule.compatibility.transport.http.CookieWrapper;
@@ -45,8 +51,8 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponseBuilder.class);
 
-    private Map<String, String> headers = new HashMap<String, String>();
-    private List<CookieWrapper> cookies = new ArrayList<CookieWrapper>();
+    private Map<String, String> headers = new HashMap<>();
+    private List<CookieWrapper> cookies = new ArrayList<>();
     private String contentType;
     private String status;
     private String version;
@@ -56,7 +62,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     private SimpleDateFormat expiresHeaderFormatter;
     private SimpleDateFormat dateFormatter;
 
-    private List<MessageProcessor> ownedMessageProcessor = new ArrayList<MessageProcessor>();
+    private List<MessageProcessor> ownedMessageProcessor = new ArrayList<>();
 
     @Override
     public void initialise() throws InitialisationException
@@ -137,12 +143,15 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     {
         if(message.getCorrelationId() != null)
         {
-            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_ID_PROPERTY,
-                    message.getCorrelationId()));
-            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-                    String.valueOf(message.getCorrelationGroupSize())));
-            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
-                    String.valueOf(message.getCorrelationSequence())));
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, message.getCorrelationId()));
+            if (message.getCorrelationGroupSize() != null)
+            {
+                response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_GROUP_SIZE_PROPERTY, valueOf(message.getCorrelationGroupSize())));
+            }
+            if (message.getCorrelationSequence() != null)
+            {
+                response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_SEQUENCE_PROPERTY, valueOf(message.getCorrelationSequence())));
+            }
         }
     }
 

@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_S
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.util.ObjectUtils.getInt;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -120,7 +121,7 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
                        Map<String, TypedValue<Serializable>> inboundProperties,
                        Map<String, TypedValue<Serializable>> outboundProperties,
                        Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
-                       String corealationId, int setCorrelationGroupSize, int setCorrelationSequence,
+                       String corealationId, Integer correlationGroupSize, Integer correlationSequence,
                        Object replyTo, ExceptionPayload exceptionPayload)
     {
         this.id = id;
@@ -132,8 +133,8 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
         this.inboundAttachments = inboundAttachments;
         this.outboundAttachments = outboundAttachments;
         setCorrelationId(corealationId);
-        setCorrelationGroupSize(setCorrelationGroupSize);
-        setCorrelationSequence(setCorrelationSequence);
+        setCorrelationGroupSize(correlationGroupSize);
+        setCorrelationSequence(correlationSequence);
         setReplyTo(replyTo);
         this.exceptionPayload = exceptionPayload;
     }
@@ -459,22 +460,22 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
      * {@inheritDoc}
      */
     @Override
-    public int getCorrelationSequence()
+    public Integer getCorrelationSequence()
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Object correlationSequence = findProperty(MULE_CORRELATION_SEQUENCE_PROPERTY);
-        return ObjectUtils.getInt(correlationSequence, -1);
+        final int correlationSequence = getInt(findProperty(MULE_CORRELATION_SEQUENCE_PROPERTY), -1);
+        return correlationSequence < 0 ? null : correlationSequence;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setCorrelationSequence(int sequence)
+    public void setCorrelationSequence(Integer sequence)
     {
         assertAccess(WRITE);
-        if (sequence >= 0)
+        if (sequence != null)
         {
             setOutboundProperty(MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
         }
@@ -488,22 +489,22 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
      * {@inheritDoc}
      */
     @Override
-    public int getCorrelationGroupSize()
+    public Integer getCorrelationGroupSize()
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Object correlationGroupSize = findProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-        return ObjectUtils.getInt(correlationGroupSize, -1);
+        final int correlationGroupSize = getInt(findProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY), -1);
+        return correlationGroupSize < 0 ? null : correlationGroupSize;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setCorrelationGroupSize(int size)
+    public void setCorrelationGroupSize(Integer size)
     {
         assertAccess(WRITE);
-        if (size >= 0)
+        if (size != null)
         {
             setOutboundProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
         }

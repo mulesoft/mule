@@ -84,19 +84,19 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
     String getCorrelationId();
 
     /**
-     * Gets the sequence or ordering number for this message in the the correlation
-     * group (as defined by the correlationId)
+     * Gets the sequence or ordering number for this message in the the correlation group (as defined by the
+     * correlationId)
      *
-     * @return the sequence number or -1 if the sequence is not important
+     * @return the sequence number or null if the sequence is not important
      */
-    int getCorrelationSequence();
+    Integer getCorrelationSequence();
 
     /**
      * Determines how many messages are in the correlation group
      *
-     * @return total messages in this group or -1 if the size is not known
+     * @return total messages in this group or null if the size is not known
      */
-    int getCorrelationGroupSize();
+    Integer getCorrelationGroupSize();
 
     /**
      * Returns a replyTo address for this message. This is useful in an asynchronous
@@ -148,13 +148,13 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
          * @param correlationSequence
          * @return this builder.
          */
-        Builder<PAYLOAD, ATTRIBUTES> correlationSequence(int correlationSequence);
+        Builder<PAYLOAD, ATTRIBUTES> correlationSequence(Integer correlationSequence);
 
         /**
          * @param correlationGroupSize
          * @return this builder.
          */
-        Builder<PAYLOAD, ATTRIBUTES> correlationGroupSize(int correlationGroupSize);
+        Builder<PAYLOAD, ATTRIBUTES> correlationGroupSize(Integer correlationGroupSize);
 
         /**
          * @param exceptionPayload
@@ -268,7 +268,7 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
          * 
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> clearOutbloundAttachments();
+        Builder<PAYLOAD, ATTRIBUTES> clearOutboundAttachments();
 
         /**
          * @param inboundProperties

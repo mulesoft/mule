@@ -88,8 +88,8 @@ public class MessageChunkAggregator extends AbstractAggregator
                         builder.payload(baos.toByteArray());
                     }
 
-                    builder.correlationGroupSize(-1);
-                    builder.correlationSequence(-1);
+                    builder.correlationGroupSize(null);
+                    builder.correlationSequence(null);
 
                     return new DefaultMuleEvent(builder.build(), firstEvent, getMergedSession(events.toArray()));
                 }

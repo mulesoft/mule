@@ -112,7 +112,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         {
             messageSequence = new PartitionedMessageSequence(seq, batchSize);
         }
-        int count = messageSequence.size();
+        Integer count = messageSequence.size();
         for (; messageSequence.hasNext();)
         {
             MuleEvent event = createEvent(messageSequence.next(), originalEvent);

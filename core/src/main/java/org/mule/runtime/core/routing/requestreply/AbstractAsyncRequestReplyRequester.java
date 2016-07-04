@@ -62,10 +62,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     protected FlowConstruct flowConstruct;
     private final MessageProcessor internalAsyncReplyMessageProcessor = new InternalAsyncReplyMessageProcessor();
     private AsyncReplyMonitoringThread replyThread;
-    protected final Map<String, Latch> locks = new ConcurrentHashMap<String, Latch>();
+    protected final Map<String, Latch> locks = new ConcurrentHashMap<>();
     private String storePrefix = "";
 
-    protected final ConcurrentMap<String, MuleEvent> responseEvents = new ConcurrentHashMap<String, MuleEvent>();
+    protected final ConcurrentMap<String, MuleEvent> responseEvents = new ConcurrentHashMap<>();
     protected final Object processedLock = new Object();
     // @GuardedBy processedLock
     protected final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
@@ -187,7 +187,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         // TODO add logic to use also seqNo when present so it works with split
         // messages
         String correlationId = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event);
-        if (event.getMessage().getCorrelationSequence() > 0)
+        if (event.getMessage().getCorrelationSequence() != null)
         {
             correlationId += event.getMessage().getCorrelationSequence();
         }

@@ -49,7 +49,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
     @Override
     public void clear()
     {
-        event.setMessage(MuleMessage.builder(event.getMessage()).clearOutbloundAttachments().build());
+        event.setMessage(MuleMessage.builder(event.getMessage()).clearOutboundAttachments().build());
     }
 
 }

@@ -61,12 +61,12 @@ public class MessageContext
         return event.getMessage().getCorrelationId();
     }
 
-    public int getCorrelationSequence()
+    public Integer getCorrelationSequence()
     {
         return event.getMessage().getCorrelationSequence();
     }
 
-    public int getCorrelationGroupSize()
+    public Integer getCorrelationGroupSize()
     {
         return event.getMessage().getCorrelationGroupSize();
     }

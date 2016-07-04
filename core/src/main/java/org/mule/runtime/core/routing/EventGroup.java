@@ -52,7 +52,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     private final String storePrefix;
     private final String eventsPartitionKey;
     private final long created;
-    private final int expectedSize;
+    private final Integer expectedSize;
     transient private MuleContext muleContext;
     private String commonRootId = null;
     private static boolean hasNoCommonRootId = false;
@@ -68,7 +68,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     public EventGroup(Object groupId,
             MuleContext muleContext,
-            int expectedSize,
+            Integer expectedSize,
             String storePrefix)
     {
         super();
@@ -325,12 +325,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     }
 
     /**
-     * Returns the number of events that this EventGroup is expecting before
-     * correlation can proceed.
+     * Returns the number of events that this EventGroup is expecting before correlation can proceed.
      *
-     * @return expected number of events or -1 if no expected size was specified.
+     * @return expected number of events or null if no expected size was specified.
      */
-    public int expectedSize()
+    public Integer expectedSize()
     {
         return expectedSize;
     }

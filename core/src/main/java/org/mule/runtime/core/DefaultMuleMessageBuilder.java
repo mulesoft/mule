@@ -52,8 +52,8 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     private String id;
     private String rootId;
     private String correlationId;
-    private int correlationSequence = -1;
-    private int correlationGroupSize = -1;
+    private Integer correlationSequence;
+    private Integer correlationGroupSize;
     private Object replyTo;
     private ExceptionPayload exceptionPayload;
 
@@ -169,14 +169,14 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> correlationSequence(int correlationSequence)
+    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> correlationSequence(Integer correlationSequence)
     {
         this.correlationSequence = correlationSequence;
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> correlationGroupSize(int correlationGroupSize)
+    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> correlationGroupSize(Integer correlationGroupSize)
     {
         this.correlationGroupSize = correlationGroupSize;
         return this;
@@ -296,7 +296,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public Builder<PAYLOAD, ATTRIBUTES> clearOutbloundAttachments()
+    public Builder<PAYLOAD, ATTRIBUTES> clearOutboundAttachments()
     {
         outboundAttachments.clear();
         return this;
