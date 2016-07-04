@@ -10,9 +10,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
@@ -45,8 +43,8 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
         list.add(MuleMessage.builder().collectionPayload(asList("1", "2", "3"), String.class).build());
         list.add(MuleMessage.builder().payload("4").build());
         list.add(MuleMessage.builder().collectionPayload(asList("5", "6", "7"), String.class).build());
+        MuleMessage collection = MuleMessage.builder().collectionPayload(list, MuleMessage.class).build();
 
-        MuleMessage collection = new DefaultMuleMessage(list, DataType.MULE_MESSAGE_COLLECTION);
         event = new DefaultMuleEvent(collection, event);
         
         MuleEvent response = merger.process(event);
@@ -60,7 +58,7 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
     {
         MuleEvent event = getTestEvent("hello");
         
-        ArrayList<Object> payload = new ArrayList<>();
+        List<Object> payload = new ArrayList<>();
         payload.add(Arrays.asList("1", "2", "3"));
         payload.add("4");
         payload.add(Arrays.asList("5", "6", "7"));

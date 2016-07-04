@@ -8,7 +8,6 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
 
-import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -38,9 +37,9 @@ public class CombineCollectionsTransformer implements MessageProcessor
 
         List<Object> payload = new ArrayList<>();
         Class<?> itemType = Object.class;
-        if (msg.getDataType().isCompatibleWith(MULE_MESSAGE_COLLECTION))
+        if (MULE_MESSAGE_COLLECTION.isCompatibleWith(msg.getDataType()))
         {
-            itemType = ((CollectionDataType) MULE_MESSAGE_COLLECTION).getItemDataType().getType();
+            itemType = MuleMessage.class;
             for (MuleMessage child : (Collection<MuleMessage>) msg.getPayload())
             {
                 Object childPayload = child.getPayload();
