@@ -6,10 +6,11 @@
  */
 package org.mule.test.integration.resolvers;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleMessage;
+
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.util.Map;
 
@@ -18,13 +19,12 @@ public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestC
 
     protected void doTest(String flowName, Object payload, String result) throws Exception
     {
-        doTest(flowName, payload, result, null);
+        doTest(flowName, payload, result, emptyMap());
     }
 
     protected void doTest(String flowName, Object payload, String result, Map properties) throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(payload, properties, null, null);
-        MuleMessage response = flowRunner(flowName).withPayload(message).run().getMessage();
+        MuleMessage response = flowRunner(flowName).withPayload(payload).withInboundProperties(properties).run().getMessage();
         assertEquals(result, getPayloadAsString(response));
     }
 }

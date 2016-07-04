@@ -6,9 +6,9 @@
  */
 package org.mule.test.integration.interceptor;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
@@ -19,7 +19,7 @@ public class MyCustomInterceptor extends AbstractInterceptingMessageProcessor im
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         String payload = (String)event.getMessage().getPayload();
-        event.setMessage(new DefaultMuleMessage(payload + "!", event.getMessage()));
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload + "!").build());
         return processNext(event);
     }
 

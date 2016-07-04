@@ -6,11 +6,11 @@
  */
 package org.mule.test.routing;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.routing.IdentifiableDynamicRouteResolver;
 
@@ -22,7 +22,7 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
 
     private final String ID_EXPRESSION = "#[flowVars['id']]";
 
-    static List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
+    static List<MessageProcessor> routes = new ArrayList<>();
 
     @Override
     public List<MessageProcessor> resolveRoutes(MuleEvent event)
@@ -51,7 +51,7 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
         {
             try
             {
-                event.setMessage(new DefaultMuleMessage(letter, event.getMessage()));
+                event.setMessage(MuleMessage.builder(event.getMessage()).payload(letter).build());
                 return event;
             }
             catch (Exception e)

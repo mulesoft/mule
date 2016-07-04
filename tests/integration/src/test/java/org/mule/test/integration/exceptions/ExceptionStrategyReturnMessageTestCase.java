@@ -10,14 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 
 import org.junit.Test;
 
@@ -34,7 +33,7 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
     {
         try
         {
-            flowRunner("InputService2").withPayload(getTestMuleMessage("Test Message")).run();
+            flowRunner("InputService2").withPayload("Test Message").run();
         }
         catch(ComponentException e)
         {
@@ -62,7 +61,7 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
         public MuleEvent handleException(Exception exception, MuleEvent event)
         {
             MuleEvent result = super.handleException(exception, event);
-            event.setMessage(new DefaultMuleMessage("Ka-boom!", event.getMessage()));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload("Ka-boom!").build());
             if (exception instanceof MessagingException)
             {
                 ((MessagingException)exception).setHandled(true);

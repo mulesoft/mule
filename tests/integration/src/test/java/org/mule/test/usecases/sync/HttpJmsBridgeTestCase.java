@@ -6,16 +6,16 @@
  */
 package org.mule.test.usecases.sync;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.Serializable;
@@ -47,7 +47,7 @@ public class HttpJmsBridgeTestCase extends FunctionalTestCase
         final String customHeader = "X-Custom-Header";
         headers.put(customHeader, "value");
 
-        client.dispatch(String.format("http://localhost:%d/in", httpPort.getNumber()), new DefaultMuleMessage(payload, headers), newOptions().method(POST.name()).build());
+        client.dispatch(format("http://localhost:%d/in", httpPort.getNumber()), MuleMessage.builder().payload(payload).outboundProperties(headers).build(), newOptions().method(POST.name()).build());
 
         MuleMessage msg = client.request("test://out", RECEIVE_TIMEOUT);
         assertNotNull(msg);

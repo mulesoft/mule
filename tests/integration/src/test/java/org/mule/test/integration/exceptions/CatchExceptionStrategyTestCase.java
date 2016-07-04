@@ -11,7 +11,6 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -131,7 +130,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
             NewsResponse newsResponse = new NewsResponse();
             newsResponse.setUserId(newsRequest.getUserId());
             newsResponse.setTitle("News title");
-            event.setMessage(new DefaultMuleMessage(newsResponse, event.getMessage()));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(newsResponse).build());
             return event;
         }
     }

@@ -8,13 +8,13 @@ package org.mule.runtime.module.spring.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -73,9 +73,8 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
 
     private MuleMessage createRequestMessage(String user, String password)
     {
-
         String header = MuleCredentials.createHeader(user, password.toCharArray());
-        return MuleMessage.builder(getTestMuleMessage()).addOutboundProperty(MuleProperties.MULE_USER_PROPERTY, header).build();
+        return MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty(MULE_USER_PROPERTY, header).build();
     }
 
     private String getUrl()

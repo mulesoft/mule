@@ -11,7 +11,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -158,7 +157,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
             eventFromMainFlow = RequestContext.getEvent();
             messageFromMainFlow = eventFromMainFlow.getMessage();
 
-            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload"));
+            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
 
             throw new Exception("expected exception!");
         }
@@ -172,7 +171,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
             eventFromMainFlow = RequestContext.getEvent();
             messageFromMainFlow = eventFromMainFlow.getMessage();
 
-            eventContext.sendEvent(new DefaultMuleMessage("payload"),
+            eventContext.sendEvent(MuleMessage.builder().payload("payload").build(),
                                    getUrl("innerrequestresponsetest"));
 
             throw new Exception("expected exception!");
@@ -188,7 +187,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestC
             messageFromMainFlow = eventFromMainFlow.getMessage();
 
             event.getMuleContext().getClient().dispatch(getUrl("innertest"),
-                                                        new DefaultMuleMessage("payload"));
+                    MuleMessage.builder().payload("payload").build());
 
             throw new DefaultMuleException("expected exception!");
         }

@@ -6,31 +6,27 @@
  */
 package org.mule.test.routing;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
 
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.functional.FlowAssert;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +38,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 public class ForeachTestCase extends FunctionalTestCase
 {
@@ -65,7 +64,7 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void defaultConfiguration() throws Exception
     {
-        final Collection<String> payload = new ArrayList<String>();
+        final Collection<String> payload = new ArrayList<>();
         payload.add("julio");
         payload.add("sosa");
 
@@ -87,7 +86,7 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void defaultConfigurationPlusMP() throws Exception
     {
-        final Collection<String> payload = new ArrayList<String>();
+        final Collection<String> payload = new ArrayList<>();
         payload.add("syd");
         payload.add("barrett");
 
@@ -114,7 +113,7 @@ public class ForeachTestCase extends FunctionalTestCase
         names.add("visitante");
         Map<String, Serializable> props = new HashMap<>();
         props.put("names", names);
-        MuleMessage message = new DefaultMuleMessage("message payload", props);
+        // MuleMessage message = MuleMessage.builder().payload("message payload", props).build();
 
         MuleMessage result = flowRunner("minimal-config-expression").withPayload("message payload")
                                                                     .withInboundProperties(props)
@@ -122,7 +121,7 @@ public class ForeachTestCase extends FunctionalTestCase
                                                                     .getMessage();
 
         assertThat(result.getPayload(), instanceOf(String.class));
-        assertThat(((Collection<?>) message.getOutboundProperty("names")), hasSize(names.size()));
+        assertThat(((Collection<?>) result.getOutboundProperty("names")), hasSize(names.size()));
 
         MuleMessage out = client.request("test://out", getTestTimeoutSecs());
         assertThat(out.getPayload(), instanceOf(String.class));
@@ -136,7 +135,7 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void partitionedConfiguration() throws Exception
     {
-        final Collection<String> payload = new ArrayList<String>();
+        final Collection<String> payload = new ArrayList<>();
         payload.add("gulp");
         payload.add("oktubre");
         payload.add("un baion");
@@ -163,7 +162,7 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void rootMessageConfiguration() throws Exception
     {
-        final Collection<String> payload = new ArrayList<String>();
+        final Collection<String> payload = new ArrayList<>();
         payload.add("pyotr");
         payload.add("ilych");
 
@@ -179,7 +178,7 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void counterConfiguration() throws Exception
     {
-        final Collection<String> payload = new ArrayList<String>();
+        final Collection<String> payload = new ArrayList<>();
         payload.add("wolfgang");
         payload.add("amadeus");
         payload.add("mozart");
@@ -199,12 +198,10 @@ public class ForeachTestCase extends FunctionalTestCase
         List<MuleMessage> list = new ArrayList<>();
         for (int i = 0; i < 10; i++)
         {
-            MutableMuleMessage msg = new DefaultMuleMessage("message-" + i);
-            msg.setOutboundProperty("out", "out" + (i + 1));
-            list.add(msg);
+            list.add(MuleMessage.builder().payload("message-" + i).addOutboundProperty("out", "out" + (i + 1)).build());
         }
 
-        MuleMessage msgCollection = new DefaultMuleMessage(list);
+        MuleMessage msgCollection = MuleMessage.builder().payload(list).build();
         MuleMessage result = flowRunner("message-collection-config").withPayload(msgCollection).run().getMessage();
         assertThat(result.getOutboundProperty("totalMessages"), is(10));
         assertThat(result.getPayload(), is(msgCollection.getPayload()));
@@ -217,8 +214,7 @@ public class ForeachTestCase extends FunctionalTestCase
         List<MuleMessage> list = new ArrayList<>();
         for (int i = 0; i < 10; i++)
         {
-            MuleMessage msg = new DefaultMuleMessage("message-" + i, Collections.singletonMap("out", "out" + (i+1)), null, null);
-            list.add(msg);
+            list.add(MuleMessage.builder().payload("message-" + i).inboundProperties(singletonMap("out", "out" + (i + 1))).build());
         }
         final String flowName = "message-collection-config-one-way";
         flowRunner(flowName).withPayload(list).run();
@@ -228,7 +224,7 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void mapPayload() throws Exception
     {
-        final Map<String, String> payload = new HashMap<String, String>();
+        final Map<String, String> payload = new HashMap<>();
         payload.put("name", "david");
         payload.put("surname", "bowie");
 
@@ -249,7 +245,7 @@ public class ForeachTestCase extends FunctionalTestCase
         names.add("Rachmaninoff");
         Map<String, Serializable> props = new HashMap<>();
         props.put("names", names);
-        MuleMessage message = new DefaultMuleMessage("message payload", props);
+        // MuleMessage message = MuleMessage.builder().payload("message payload", props).build();
 
         MuleMessage result = flowRunner("map-expression-config").withPayload("message payload")
                                                                 .withInboundProperties(props)
@@ -257,7 +253,7 @@ public class ForeachTestCase extends FunctionalTestCase
                                                                 .getMessage();
 
         assertThat(result.getPayload(), instanceOf(String.class));
-        assertThat(((Collection<?>) message.getOutboundProperty("names")), hasSize(names.size()));
+        assertThat(((Collection<?>) result.getOutboundProperty("names")), hasSize(names.size()));
         assertThat(result.getOutboundProperty("totalMessages"), is(names.size()));
     }
 
@@ -321,7 +317,7 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void twoOneAfterAnother() throws Exception
     {
-        final Collection<String> payload = new ArrayList<String>();
+        final Collection<String> payload = new ArrayList<>();
         payload.add("rosa");
         payload.add("maria");
         payload.add("florencia");
@@ -385,9 +381,9 @@ public class ForeachTestCase extends FunctionalTestCase
     private List<List<String>> createNestedPayload()
     {
         final List<List<String>> payload = new ArrayList<>();
-        final List<String> elem1 = new ArrayList<String>();
-        final List<String> elem2 = new ArrayList<String>();
-        final List<String> elem3 = new ArrayList<String>();
+        final List<String> elem1 = new ArrayList<>();
+        final List<String> elem2 = new ArrayList<>();
+        final List<String> elem3 = new ArrayList<>();
         elem1.add("a1");
         elem1.add("a2");
         elem1.add("a3");
@@ -435,7 +431,7 @@ public class ForeachTestCase extends FunctionalTestCase
     {
         runFlow("mvel-map");
 
-        Map<String,String> m = new HashMap<String, String>();
+        Map<String,String> m = new HashMap<>();
         m.put("key1", "val1");
         m.put("key2", "val2");
 
@@ -455,7 +451,7 @@ public class ForeachTestCase extends FunctionalTestCase
     {
         runFlow("mvel-collection");
 
-        Map<String,String> m = new HashMap<String, String>();
+        Map<String,String> m = new HashMap<>();
         m.put("key1", "val1");
         m.put("key2", "val2");
 
@@ -499,7 +495,7 @@ public class ForeachTestCase extends FunctionalTestCase
     public void foreachWithAsync() throws Exception
     {
         final int size = 20;
-        List<String> list = new ArrayList<String>(size);
+        List<String> list = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++)
         {

@@ -6,6 +6,7 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static java.lang.String.format;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
@@ -13,8 +14,6 @@ import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -118,8 +117,7 @@ public class HeisenbergSource extends Source<Void, Serializable> implements Init
             sourceContext.getExceptionCallback().onException(new RuntimeException(INITIAL_BATCH_NUMBER_ERROR_MESSAGE));
         }
 
-        String payload = String.format("Meth Batch %d. If found by DEA contact %s", ++initialBatchNumber, connection.getSaulPhoneNumber());
-        return new DefaultMuleMessage(payload, DataType.STRING);
+        return MuleMessage.builder().payload(format("Meth Batch %d. If found by DEA contact %s", ++initialBatchNumber, connection.getSaulPhoneNumber())).build();
     }
 
 

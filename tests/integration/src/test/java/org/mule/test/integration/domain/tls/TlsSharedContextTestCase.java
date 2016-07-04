@@ -6,16 +6,16 @@
  */
 package org.mule.test.integration.domain.tls;
 
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.functional.junit4.DomainFunctionalTestCase;
+import org.mule.functional.junit4.FlowRunner;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.functional.junit4.DomainFunctionalTestCase;
-import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
@@ -85,7 +85,7 @@ public class TlsSharedContextTestCase extends DomainFunctionalTestCase
     private void testMuleClient(HttpRequestOptions operationOptions) throws Exception
     {
         MuleContext context = getMuleContextForApp(SECOND_APP);
-        MuleMessage response = context.getClient().send(String.format("https://localhost:%s/helloAll", port3.getValue()), new DefaultMuleMessage(DATA), operationOptions);
+        MuleMessage response = context.getClient().send(format("https://localhost:%s/helloAll", port3.getValue()), MuleMessage.builder().payload(DATA).build(), operationOptions);
         assertThat(getPayloadAsString(response, context), is("hello all"));
     }
 

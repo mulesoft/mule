@@ -10,16 +10,15 @@ import static java.util.Objects.requireNonNull;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -264,16 +263,20 @@ public class TestEventBuilder
      */
     public MuleEvent build(MuleContext muleContext, FlowConstruct flow)
     {
-        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments,
-                DataType.builder().fromObject(payload).charset(getDefaultEncoding(muleContext)).build());
-        DefaultMuleEvent event = new DefaultMuleEvent(
-                (DefaultMuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern, flow, new DefaultMuleSession(),
-                muleContext.getConfiguration().getDefaultResponseTimeout(), null, null, transacted, null, replyToHandler);
-
+        final Builder messageBuilder = MuleMessage.builder()
+                                                  .payload(payload)
+                                                  .inboundProperties(inboundProperties)
+                                                  .outboundProperties(outboundProperties)
+                                                  .inboundAttachments(inboundAttachments);
         if (attributes != null)
         {
-            ((DefaultMuleMessage) event.getMessage()).setAttributes(attributes);
+            messageBuilder.attributes(attributes);
         }
+        final MuleMessage muleMessage = messageBuilder.build();
+
+        DefaultMuleEvent event = new DefaultMuleEvent(
+                (MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern, flow, new DefaultMuleSession(),
+                muleContext.getConfiguration().getDefaultResponseTimeout(), null, null, transacted, null, replyToHandler);
 
         for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet())
         {

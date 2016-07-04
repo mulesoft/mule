@@ -8,8 +8,9 @@ package org.mule.test.integration.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.runtime.core.api.MuleMessage;
+
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ public class FlowBridgingTestCase extends FunctionalTestCase
     @Test
     public void testSynchronousBridging() throws Exception
     {
-        MuleMessage result = flowRunner("bridge").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+        MuleMessage result = flowRunner("bridge").withPayload(TEST_PAYLOAD).run().getMessage();
         assertNotNull(result);
         assertEquals("Received: test", getPayloadAsString(result));
     }

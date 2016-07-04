@@ -6,21 +6,15 @@
  */
 package org.mule.test.integration.resolvers;
 
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
-import org.mule.runtime.core.model.resolvers.EntryPointNotFoundException;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.model.resolvers.EntryPointNotFoundException;
 
 import org.junit.Test;
 
@@ -50,12 +44,9 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
     @Test
     public void testBadMethodName() throws Exception
     {
-        Map<String, Serializable> properties = new HashMap<>();
-        properties.put("method", "foo");
-        MuleMessage send = new DefaultMuleMessage("hello", properties, null, null);
         try
         {
-            flowRunner("Service").withPayload(send).run().getMessage();
+            flowRunner("Service").withPayload("hello").withInboundProperty("method", "foo").run().getMessage();
         }
         catch (Exception e)
         {
@@ -66,8 +57,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
     @Test
     public void testValidCallToReverse() throws Exception
     {
-        MuleMessage msg = new DefaultMuleMessage("hello", singletonMap("method", "reverseString"), null, null);
-        MuleMessage message = flowRunner("Service").withPayload(msg).run().getMessage();
+        MuleMessage message = flowRunner("Service").withPayload("hello").withInboundProperty("method", "reverseString").run().getMessage();
         assertNotNull(message);
         assertEquals("olleh", getPayloadAsString(message));
     }
@@ -75,9 +65,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
     @Test
     public void testValidCallToUpperCase() throws Exception
     {
-        MutableMuleMessage msg = new DefaultMuleMessage("hello", singletonMap("method", "upperCaseString"), null, null);
-        msg.setOutboundProperty("method", "upperCaseString");
-        MuleMessage message = flowRunner("Service").withPayload(msg).run().getMessage();
+        MuleMessage message = flowRunner("Service").withPayload("hello").withInboundProperty("method", "upperCaseString").run().getMessage();
         assertNotNull(message);
         assertEquals("HELLO", getPayloadAsString(message));
     }
