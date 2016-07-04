@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Collections.emptyMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.config.ConfigResource;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.context.ApplicationContext;
@@ -25,12 +27,11 @@ public class SpringXmlDomainConfigurationBuilder extends SpringXmlConfigurationB
      * configuration file and a set of external properties to configure a domain artifact.
      *
      * @param configResources the domain config file reference
-     * @param artifactProperties the external properties that can be referenced from the domain config file
      * @throws ConfigurationException
      */
-    public SpringXmlDomainConfigurationBuilder(String configResources, Map<String, String> artifactProperties) throws ConfigurationException
+    public SpringXmlDomainConfigurationBuilder(String configResources) throws ConfigurationException
     {
-        super(configResources, artifactProperties);
+        super(configResources, emptyMap());
         setUseMinimalConfigResource(true);
     }
 
