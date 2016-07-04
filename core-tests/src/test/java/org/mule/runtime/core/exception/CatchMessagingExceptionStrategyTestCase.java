@@ -7,7 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -19,12 +19,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -37,7 +34,7 @@ import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullReplyToHandler;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Before;
@@ -49,16 +46,16 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCase
+public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleContextTestCase
 {
 
     private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
     @Mock
     private Exception mockException;
-    @Mock(answer = RETURNS_DEEP_STUBS)
+
     private MuleEvent mockMuleEvent;
-    @Mock(answer = RETURNS_DEEP_STUBS)
-    private MuleMessage mockMuleMessage;
+
+    private MuleMessage muleMessage = MuleMessage.builder().payload("").build();
     @Mock
     private StreamCloserService mockStreamCloserService;
     @Spy
@@ -80,7 +77,8 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCas
         catchMessagingExceptionStrategy = new CatchMessagingExceptionStrategy();
         catchMessagingExceptionStrategy.setMuleContext(mockMuleContext);
         when(mockMuleContext.getStreamCloserService()).thenReturn(mockStreamCloserService);
-        when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
+
+        mockMuleEvent = new DefaultMuleEvent(muleMessage, getTestFlow());
     }
 
     @Test
@@ -91,7 +89,6 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCas
         MuleEvent resultEvent = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
         assertThat(resultEvent, is(mockMuleEvent));
 
-        assertThat(resultEvent.getMessage().getExceptionPayload(), instanceOf(ExceptionPayload.class));
         verify(mockTransaction, times(0)).setRollbackOnly();
         verify(mockTransaction, times(0)).commit();
         verify(mockTransaction, times(0)).rollback();
@@ -104,12 +101,12 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCas
     @Test
     public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception
     {
-        MuleMessage message = spy(new DefaultMuleMessage(""));
-        when(mockMuleEvent.getMessage()).thenReturn(message);
+        mockMuleEvent = spy(mockMuleEvent);
 
         catchMessagingExceptionStrategy.setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
         catchMessagingExceptionStrategy.initialise();
-        catchMessagingExceptionStrategy.handleException(mockException,mockMuleEvent);
+        final MuleEvent result = catchMessagingExceptionStrategy.handleException(mockException,mockMuleEvent);
+
         verify(mockMuleEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>()
         {
             @Override
@@ -118,22 +115,16 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCas
                 return ((MuleMessage) argument).getPayload().equals("A");
             }
         }));
-        verify(mockMuleEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>()
-        {
-            @Override
-            public boolean matches(Object argument)
-            {
-                return ((MuleMessage) argument).getPayload().equals("B");
-            }
-        }));
+        assertThat(result.getMessage().getPayload(), is("B"));
+        assertThat(result.getMessage().getExceptionPayload(), is(nullValue()));
     }
 
     @Test
     public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception
     {
-        MuleEvent lastEventCreated = mock(MuleEvent.class, RETURNS_DEEP_STUBS.get());
+        MuleEvent lastEventCreated = new DefaultMuleEvent(muleMessage, getTestFlow());
         catchMessagingExceptionStrategy.setMessageProcessors(
-                asList(createChagingEventMessageProcessor(mock(MuleEvent.class, RETURNS_DEEP_STUBS.get())), createChagingEventMessageProcessor(lastEventCreated)));
+                asList(createChagingEventMessageProcessor(new DefaultMuleEvent(muleMessage, getTestFlow())), createChagingEventMessageProcessor(lastEventCreated)));
         catchMessagingExceptionStrategy.initialise();
         MuleEvent exceptionHandlingResult = catchMessagingExceptionStrategy.handleException(mockException, mockMuleEvent);
         assertThat(exceptionHandlingResult.getId(), is(lastEventCreated.getId()));
@@ -147,9 +138,12 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCas
     @Test
     public void testMessageToStringNotCalledOnFailure() throws Exception
     {
-        MuleEvent lastEventCreated = mock(MuleEvent.class, RETURNS_DEEP_STUBS.get());
+        mockMuleEvent.setMessage(spy(muleMessage));
+        mockMuleEvent = spy(mockMuleEvent);
+
+        MuleEvent lastEventCreated = new DefaultMuleEvent(muleMessage, getTestFlow());
         catchMessagingExceptionStrategy.setMessageProcessors(
-                asList(createFailingEventMessageProcessor(mock(MuleEvent.class, RETURNS_DEEP_STUBS.get())), createFailingEventMessageProcessor(lastEventCreated)));
+                asList(createFailingEventMessageProcessor(new DefaultMuleEvent(muleMessage, getTestFlow())), createFailingEventMessageProcessor(lastEventCreated)));
         catchMessagingExceptionStrategy.initialise();
 
         when(mockMuleEvent.getMessage().toString()).thenThrow(new RuntimeException("MuleMessage.toString() should not be called"));
@@ -161,7 +155,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCas
     {
         Flow flow = MuleTestUtils.getTestFlow(muleContext);
         flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
-        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE), REQUEST_RESPONSE,
+        return new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).build(), REQUEST_RESPONSE,
                                     new SensingNullReplyToHandler(), flow);
     }
 
@@ -182,11 +176,7 @@ public class CatchMessagingExceptionStrategyTestCase extends AbstractMuleTestCas
     {
         return event ->
         {
-            event.setMessage(event.getMessage().transform(msg ->
-            {
-                msg.setPayload(appendText);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(appendText).build());
             return event;
         };
     }

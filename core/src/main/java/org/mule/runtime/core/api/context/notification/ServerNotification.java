@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.ClassUtils;
@@ -66,9 +64,9 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
     protected int action = NULL_ACTION;
 
-    private static Map<Integer, String> actionIdToName = new ConcurrentHashMap<Integer, String>();
+    private static Map<Integer, String> actionIdToName = new ConcurrentHashMap<>();
 
-    private static Map<String, Integer> actionNameToId = new ConcurrentHashMap<String, Integer>();
+    private static Map<String, Integer> actionNameToId = new ConcurrentHashMap<>();
 
     /**
      * The resourceIdentifier is used when firing inbound server notifications such
@@ -108,15 +106,6 @@ public abstract class ServerNotification extends EventObject implements MuleCont
                              conf.getDomainId(),
                              context.getClusterId(),
                              conf.getId());
-    }
-
-    protected static MuleMessage cloneMessage(MuleMessage message)
-    {
-        if (message == null)
-        {
-            return null;
-        }
-        return new DefaultMuleMessage(message);
     }
 
     public int getAction()

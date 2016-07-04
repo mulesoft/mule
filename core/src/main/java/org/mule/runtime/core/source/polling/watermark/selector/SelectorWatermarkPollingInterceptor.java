@@ -8,12 +8,13 @@
 package org.mule.runtime.core.source.polling.watermark.selector;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.streaming.ProvidesTotalHint;
 import org.mule.runtime.core.source.polling.watermark.Watermark;
 import org.mule.runtime.core.source.polling.watermark.WatermarkPollingInterceptor;
+import org.mule.runtime.core.streaming.ProvidesTotalHint;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -79,10 +80,9 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         }
         else if (payload instanceof Iterator)
         {
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setPayload(new SelectorIteratorProxy<>((Iterator<Object>) payload, selector));
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .payload(new SelectorIteratorProxy<>((Iterator<Object>) payload, selector))
+                                        .build());
         }
         else
         {

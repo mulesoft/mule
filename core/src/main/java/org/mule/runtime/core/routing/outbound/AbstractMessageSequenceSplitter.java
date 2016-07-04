@@ -6,14 +6,18 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static org.mule.runtime.core.routing.CorrelationMode.ALWAYS;
+import static org.mule.runtime.core.routing.CorrelationMode.IF_NOT_SET;
+import static org.mule.runtime.core.routing.CorrelationMode.NEVER;
+
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.MessageInfoMapping;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
@@ -108,7 +112,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         {
             messageSequence = new PartitionedMessageSequence(seq, batchSize);
         }
-        int count = messageSequence.size();
+        Integer count = messageSequence.size();
         for (; messageSequence.hasNext();)
         {
             MuleEvent event = createEvent(messageSequence.next(), originalEvent);
@@ -119,26 +123,23 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                 originalEvent.setFlowVariable(counterVariableName, correlationSequence);
             }
 
-            int finalCorrelationSequence = correlationSequence;
-            event.setMessage(event.getMessage().transform(msg -> {
-                if (enableCorrelation != CorrelationMode.NEVER)
+            final Builder builder = MuleMessage.builder(event.getMessage());
+            if (enableCorrelation != NEVER)
+            {
+                boolean correlationSet = event.getMessage().getCorrelationId() != null;
+                if ((!correlationSet && (enableCorrelation == IF_NOT_SET)) || (enableCorrelation == ALWAYS))
                 {
-                    boolean correlationSet = event.getMessage().getCorrelationId() != null;
-                    if ((!correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
-                        || (enableCorrelation == CorrelationMode.ALWAYS))
-                    {
-                        msg.setCorrelationId(correlationId);
-                    }
-
-                    // take correlation group size from the message properties, set by
-                    // concrete
-                    // message splitter implementations
-                    msg.setCorrelationGroupSize(count);
-                    msg.setCorrelationSequence(finalCorrelationSequence);
+                    builder.correlationId(correlationId);
                 }
-                msg.propagateRootId(originalEvent.getMessage());
-                return msg;
-            }));
+
+                // take correlation group size from the message properties, set by concrete message splitter
+                // implementations
+                builder.correlationGroupSize(count);
+                builder.correlationSequence(correlationSequence);
+            }
+            builder.rootId(originalEvent.getMessage().getMessageRootId());
+
+            event.setMessage(builder.build());
 
             MuleEvent resultEvent = processNext(RequestContext.setEvent(event));
             if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent))
@@ -165,8 +166,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
         }
         else
         {
-            MuleMessage message = new DefaultMuleMessage(payload, originalEvent.getMessage());
-            return new DefaultMuleEvent(message, originalEvent);
+            return new DefaultMuleEvent(MuleMessage.builder(originalEvent.getMessage()).payload(payload).build(), originalEvent);
         }
     }
 

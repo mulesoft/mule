@@ -7,10 +7,10 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
@@ -74,27 +74,24 @@ public class MessageChunkAggregator extends AbstractAggregator
                         baos.write(event.getMessageAsBytes());
                     }
 
-                    // TODO MULE-9856 Replace with the builder
-                    MutableMuleMessage message;
+                    final Builder builder = MuleMessage.builder(firstEvent.getMessage());
 
                     // try to deserialize message, since ChunkingRouter might have
                     // serialized
                     // the object...
                     try
                     {
-                        // must deserialize in correct classloader
-                        final Object deserialized = muleContext.getObjectSerializer().deserialize(baos.toByteArray());
-                        message = new DefaultMuleMessage(deserialized, firstEvent.getMessage());
+                        builder.payload(muleContext.getObjectSerializer().deserialize(baos.toByteArray()));
                     }
                     catch (SerializationException e)
                     {
-                        message = new DefaultMuleMessage(baos.toByteArray(), firstEvent.getMessage());
+                        builder.payload(baos.toByteArray());
                     }
 
-                    message.setCorrelationGroupSize(-1);
-                    message.setCorrelationSequence(-1);
+                    builder.correlationGroupSize(null);
+                    builder.correlationSequence(null);
 
-                    return new DefaultMuleEvent(message, firstEvent, getMergedSession(events.toArray()));
+                    return new DefaultMuleEvent(builder.build(), firstEvent, getMergedSession(events.toArray()));
                 }
                 catch (Exception e)
                 {

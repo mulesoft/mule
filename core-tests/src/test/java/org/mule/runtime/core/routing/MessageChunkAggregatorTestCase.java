@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -41,13 +40,12 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
         router.setFlowConstruct(flow);
         router.initialise();
 
-        DefaultMuleMessage message1 = new DefaultMuleMessage("test event A");
-        DefaultMuleMessage message2 = new DefaultMuleMessage("test event B");
-        DefaultMuleMessage message3 = new DefaultMuleMessage("test event C");
-        message1.setCorrelationId(message1.getUniqueId());
-        message2.setCorrelationId(message1.getUniqueId());
-        message3.setCorrelationId(message1.getUniqueId());
-        message1.setCorrelationGroupSize(3);
+        MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
+        MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
+        MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
+        message1 = MuleMessage.builder(message1).correlationId(message1.getUniqueId()).correlationGroupSize(3).build();
+        message2 = MuleMessage.builder(message2).correlationId(message1.getUniqueId()).build();
+        message3 = MuleMessage.builder(message3).correlationId(message1.getUniqueId()).build();
 
         MuleEvent event1 = new DefaultMuleEvent(message1, getTestFlow(), session);
         MuleEvent event2 = new DefaultMuleEvent(message2, getTestFlow(), session);

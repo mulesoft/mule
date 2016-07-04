@@ -6,20 +6,19 @@
  */
 package org.mule.runtime.core.component;
 
+import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -33,7 +32,6 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.context.notification.ComponentMessageNotification;
@@ -44,7 +42,6 @@ import org.mule.runtime.core.transformer.TransformerTemplate;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -173,15 +170,16 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
             final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
             template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
             event.setMessage(
-                    muleContext.getTransformationService().applyTransformers(event.getMessage(), event, Collections
-                            .<Transformer>singletonList
-                    (template)));
+                    muleContext.getTransformationService()
+                               .applyTransformers(event.getMessage(), event, singletonList(template)));
             return event;
         }
         else
         {
-            MutableMuleMessage emptyMessage = new DefaultMuleMessage(NullPayload.getInstance());
-            emptyMessage.propagateRootId(event.getMessage());
+            final MuleMessage emptyMessage = MuleMessage.builder()
+                                                        .payload(NullPayload.getInstance())
+                                                        .rootId(event.getMessage().getMessageRootId())
+                                                        .build();
             return new DefaultMuleEvent(emptyMessage, event);
         }
     }

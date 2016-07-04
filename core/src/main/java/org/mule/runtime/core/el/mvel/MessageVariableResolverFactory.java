@@ -9,7 +9,6 @@ package org.mule.runtime.core.el.mvel;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -79,7 +78,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
             {
                 return new MuleVariableResolver<>(PAYLOAD, new MessageContext(
                         event, muleContext).getPayload(), null,
-                    (name1, value, newValue) -> event.setMessage(new DefaultMuleMessage(newValue, event.getMessage())));
+                        (name1, value, newValue) -> event.setMessage(MuleMessage.builder(event.getMessage()).payload(newValue).build()));
             }
             else if (FLOW_VARS.equals(name))
             {

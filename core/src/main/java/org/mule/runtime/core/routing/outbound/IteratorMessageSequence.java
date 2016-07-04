@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import org.mule.runtime.core.routing.AbstractMessageSequence;
+import org.mule.runtime.core.routing.MessageSequence;
+
 import java.util.Iterator;
 
 import org.apache.commons.lang.Validate;
-import org.mule.runtime.core.routing.AbstractMessageSequence;
-import org.mule.runtime.core.routing.MessageSequence;
 
 /**
  * A {@link MessageSequence} that delegates its {@link #hasNext()} and
@@ -29,16 +30,19 @@ public final class IteratorMessageSequence<T> extends AbstractMessageSequence<T>
         this.iter = iter;
     }
 
-    public int size()
+    @Override
+    public Integer size()
     {
         return UNKNOWN_SIZE;
     }
 
+    @Override
     public boolean hasNext()
     {
         return iter.hasNext();
     }
 
+    @Override
     public T next()
     {
         return iter.next();

@@ -7,7 +7,6 @@
 package org.mule.runtime.core.exception;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -214,7 +213,8 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
                 // Create an ExceptionMessage which contains the original payload, the exception, and some additional context info.
                 ExceptionMessage msg = new ExceptionMessage(event, t, component, endpointUri);
-                MuleMessage exceptionMessage = new DefaultMuleMessage(msg, event.getMessage());
+
+                MuleMessage exceptionMessage = MuleMessage.builder(event.getMessage()).payload(msg).build();
 
                 MulticastingRouter router = buildRouter();
                 router.setRoutes(getMessageProcessors());
@@ -303,8 +303,8 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         MuleMessage logMessage = event.getMessage();
         String logUniqueId = StringUtils.defaultString(logMessage.getUniqueId(), NOT_SET);
         String correlationId = StringUtils.defaultString(logMessage.getCorrelationId(), NOT_SET);
-        int correlationGroupSize = logMessage.getCorrelationGroupSize();
-        int correlationGroupSeq = logMessage.getCorrelationSequence();
+        Integer correlationGroupSize = logMessage.getCorrelationGroupSize();
+        Integer correlationGroupSeq = logMessage.getCorrelationSequence();
 
         String printableLogMessage = MessageFormat.format("Message identification summary here: " +
                 "id={0} correlationId={1}, correlationGroup={2}, correlationSeq={3}",

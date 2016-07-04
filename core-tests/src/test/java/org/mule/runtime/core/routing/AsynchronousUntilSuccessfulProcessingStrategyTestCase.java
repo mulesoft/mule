@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import static java.util.Collections.emptyMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -29,7 +28,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -98,7 +96,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
         when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
         when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
-        final MuleMessage mockMessage = new DefaultMuleMessage("", emptyMap());
+        final MuleMessage mockMessage = MuleMessage.builder().payload("").build();
         when(mockEvent.getMessage()).thenReturn(mockMessage);
         when(mockEvent.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME)).thenAnswer(new Answer<Object>()
         {
@@ -121,7 +119,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         configureDLQToReleaseLatchWhenExecuted();
         when(muleContext.getTransformationService()).thenReturn(transformationService);
         when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenAnswer(
-                invocation -> new DefaultMuleMessage(invocation.getArguments()[0].toString().getBytes()));
+                invocation -> MuleMessage.builder().payload(invocation.getArguments()[0].toString().getBytes()).build());
     }
 
     @Test(expected = InitialisationException.class)

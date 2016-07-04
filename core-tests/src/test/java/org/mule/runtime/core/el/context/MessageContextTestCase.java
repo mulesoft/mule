@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -144,7 +143,7 @@ public class MessageContextTestCase extends AbstractELTestCase
     @Test
     public void assignPayload() throws Exception
     {
-        message = new DefaultMuleMessage("");
+        message = MuleMessage.builder().payload("").build();
         evaluate("message.payload = 'foo'", event);
         assertEquals("foo", event.getMessage().getPayload());
     }

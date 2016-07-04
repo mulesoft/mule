@@ -8,7 +8,6 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
@@ -32,24 +31,17 @@ public class ConsumableFilterTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testRejectsNonDefaultMuleMessageInstances() throws Exception
-    {
-        MuleMessage message = mock(MuleMessage.class);
-        assertFalse("Should reject non DefaultMuleMessage instances", filter.accept(message));
-    }
-
-    @Test
     public void testRejectsConsumablePayload() throws Exception
     {
         InputStream is = new ByteArrayInputStream("TEST".getBytes());
-        MuleMessage message = new DefaultMuleMessage(is);
+        MuleMessage message = MuleMessage.builder().payload(is).build();
         assertFalse("Should reject consumable payload", filter.accept(message));
     }
 
     @Test
     public void testAcceptsNonConsumablePayload() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("TEST");
+        MuleMessage message = MuleMessage.builder().payload("TEST").build();
         assertTrue("Should accept non consumable payload", filter.accept(message));
     }
 }

@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
-import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
@@ -97,7 +96,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     /**
      * The routes that the message will be sent to
      */
-    private List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
+    private List<MessageProcessor> routes = new ArrayList<>();
 
     /**
      * Whether or not {@link #initialise()} was already successfully executed
@@ -153,7 +152,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     private MuleEvent processResponses(MuleEvent event, List<ProcessingMuleEventWork> works)
         throws MuleException
     {
-        List<MuleEvent> responses = new ArrayList<MuleEvent>(works.size());
+        List<MuleEvent> responses = new ArrayList<>(works.size());
 
         long remainingTimeout = timeout;
         for (int routeIndex = 0; routeIndex < works.size(); routeIndex++)
@@ -209,11 +208,9 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
                 if (response.getMessage().getExceptionPayload() == null)
                 {
-                    Exception finalException = exception;
-                    event.setMessage(event.getMessage().transform(msg -> {
-                        msg.setExceptionPayload(new DefaultExceptionPayload(finalException));
-                        return msg;
-                    }));
+                    event.setMessage(MuleMessage.builder(event.getMessage())
+                                                .exceptionPayload(new DefaultExceptionPayload(exception))
+                                                .build());
                 }
             }
             else
@@ -239,7 +236,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
     private List<ProcessingMuleEventWork> executeWork(MuleEvent event) throws MuleException
     {
-        List<ProcessingMuleEventWork> works = new ArrayList<ProcessingMuleEventWork>(routes.size());
+        List<ProcessingMuleEventWork> works = new ArrayList<>(routes.size());
         try
         {
             for (final MessageProcessor route : routes)
@@ -354,7 +351,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     private void buildRouteChains() throws MuleException
     {
         Preconditions.checkState(routes.size() > 1, "At least 2 routes are required for ScatterGather");
-        routeChains = new ArrayList<MessageProcessor>(routes.size());
+        routeChains = new ArrayList<>(routes.size());
         for (MessageProcessor route : routes)
         {
             if (route instanceof MessageProcessorChain)

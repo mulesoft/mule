@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
-import org.mule.runtime.core.DefaultMuleMessage;
+
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -88,16 +88,17 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
         {
             return VoidMuleEvent.getInstance();
         }
-        if (untilSuccessfulConfiguration.getAckExpression() == null)
+        final String ackExpression = getUntilSuccessfulConfiguration().getAckExpression();
+        if (ackExpression == null)
         {
             return event;
         }
 
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setPayload(getUntilSuccessfulConfiguration().getMuleContext().getExpressionManager()
-                                   .evaluate(getUntilSuccessfulConfiguration().getAckExpression(), event));
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .payload(getUntilSuccessfulConfiguration().getMuleContext()
+                                                                              .getExpressionManager()
+                                                                              .evaluate(ackExpression, event))
+                .build());
         return event;
     }
 
@@ -123,7 +124,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
         try
         {
             final MuleMessage message = event.getMessage();
-            if (message instanceof DefaultMuleMessage)
+            if (message instanceof MuleMessage)
             {
                 if (isConsumable(message.getPayload().getClass()))
                 {

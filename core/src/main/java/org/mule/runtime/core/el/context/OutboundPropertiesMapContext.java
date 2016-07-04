@@ -7,6 +7,7 @@
 package org.mule.runtime.core.el.context;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -31,19 +32,13 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable>
     @Override
     public void doPut(String key, Serializable value)
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(key, value);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(key, value).build());
     }
 
     @Override
     public void doRemove(String key)
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.removeOutboundProperty(key);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(key).build());
     }
 
     @Override
@@ -55,16 +50,13 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable>
     @Override
     public void clear()
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.clearOutboundProperties();
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).clearOutboundProperties().build());
     }
 
     @Override
     public String toString()
     {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         for (String key : event.getMessage().getOutboundPropertyNames())
         {
             Object value = event.getMessage().getOutboundProperty(key);

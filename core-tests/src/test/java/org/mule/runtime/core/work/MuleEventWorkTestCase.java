@@ -11,10 +11,12 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -38,11 +40,10 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase
         super.doSetUp();
         // Create a dummy event and give it some properties
         originalEvent = getTestEvent("test");
-        originalEvent.setMessage(originalEvent.getMessage().transform(msg -> {
-            msg.setOutboundProperty("test", "val");
-            msg.setOutboundProperty("test2", "val2");
-            return msg;
-        }));
+        originalEvent.setMessage(MuleMessage.builder(originalEvent.getMessage())
+                                            .addOutboundProperty("test", "val")
+                                            .addOutboundProperty("test2", "val2")
+                                            .build());
         OptimizedRequestContext.unsafeSetEvent(originalEvent);
     }
 

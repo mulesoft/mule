@@ -9,13 +9,13 @@ package org.mule.runtime.core.routing;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -38,7 +38,10 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
 
     /**
      * These properties are automatically propagated by Mule from inbound to outbound
+     * 
+     * TODO MULE-9858
      */
+    @Deprecated
     protected static List<String> magicProperties = Arrays.asList(
             MuleProperties.MULE_CORRELATION_ID_PROPERTY, MuleProperties.MULE_CORRELATION_ID_PROPERTY,
             MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
@@ -143,40 +146,34 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
         return new DefaultMuleEvent(message, routedEvent, true);
     }
 
-    /**
-     * Create a fresh copy of a message.
-     */
-    public static MuleMessage cloneMessage(MuleMessage message)
-    {
-        return new DefaultMuleMessage(message.getPayload(), message);
-    }
-
     protected MuleContext getMuleContext()
     {
         return muleContext;
     }
 
     /**
-     * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and
-     * out params can be the same message object when not dealing with replies.
+     * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and out
+     * params can be the same message object when not dealing with replies.
      *
      * @see #magicProperties
      *
-     * This method is mostly used by routers that dispatch the same message to several routes
+     *      This method is mostly used by routers that dispatch the same message to several routes
+     * 
+     * @deprecated TODO MULE-9858
      */
+    @Deprecated
     public static MuleMessage propagateMagicProperties(MuleMessage in)
     {
-        return in.transform(msg -> {
-            for (String name : magicProperties)
+        final Builder builder = MuleMessage.builder(in);
+        for (String name : magicProperties)
+        {
+            Serializable value = in.getInboundProperty(name);
+            if (value != null)
             {
-                Serializable value = in.getInboundProperty(name);
-                if (value != null)
-                {
-                    msg.setOutboundProperty(name, value);
-                }
+                builder.addOutboundProperty(name, value);
             }
-            return msg;
-        });
+        }
+        return builder.build();
     }
 
     /**
@@ -201,7 +198,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
     public static MuleMessage cloneMessage(MuleEvent event, MuleMessage message) throws MessagingException
     {
         assertNonConsumableMessage(event, message);
-        return cloneMessage(message);
+        return message;
     }
 
     /**

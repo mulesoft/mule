@@ -10,10 +10,10 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -110,7 +110,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
     @Test
     public void enrichFlowVariable() throws Exception
     {
-        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(""),
+        MuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload("").build(),
                 MessageExchangePattern.ONE_WAY, new Flow("flow", muleContext));
         expressionManager.enrich("flowVars['foo']", event, "bar");
         Assert.assertEquals("bar", event.getFlowVariable("foo"));
@@ -120,7 +120,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
     @Test
     public void enrichSessionVariable() throws Exception
     {
-        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(""),
+        MuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload("").build(),
                 MessageExchangePattern.ONE_WAY, new Flow("flow", muleContext));
         expressionManager.enrich("sessionVars['foo']", event, "bar");
         Assert.assertEquals("bar", event.getSession().getProperty("foo"));

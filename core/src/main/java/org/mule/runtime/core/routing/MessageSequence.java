@@ -16,7 +16,7 @@ import java.util.Iterator;
  */
 public interface MessageSequence<T> extends Iterator<T>
 {
-    int UNKNOWN_SIZE = -1;
+    Integer UNKNOWN_SIZE = null;
 
     /**
      * If the sequence is empty
@@ -31,7 +31,7 @@ public interface MessageSequence<T> extends Iterator<T>
      * @return The estimated size of the sequence, or {@link #UNKNOWN_SIZE},
      *         if it is unknown
      */
-    int size();
+    Integer size();
 
     /**
      * Whether this sequence has more elements.

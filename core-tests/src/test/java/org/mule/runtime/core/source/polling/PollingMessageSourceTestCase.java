@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
@@ -48,7 +48,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     {
 
         PollingMessageSource pollingMessageSource = createMessageSource(event -> new DefaultMuleEvent(
-                new DefaultMuleMessage(NullPayload.getInstance()), event));
+                MuleMessage.builder().payload(NullPayload.getInstance()).build(), event));
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);
@@ -63,7 +63,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     {
 
         PollingMessageSource pollingMessageSource = createMessageSource(event ->
-        new DefaultMuleEvent(new DefaultMuleMessage(""), event));
+        new DefaultMuleEvent(MuleMessage.builder().payload("").build(), event));
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);

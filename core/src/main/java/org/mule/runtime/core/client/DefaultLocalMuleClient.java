@@ -7,11 +7,11 @@
 package org.mule.runtime.core.client;
 
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.client.OperationOptions;
@@ -54,7 +55,8 @@ public class DefaultLocalMuleClient implements MuleClient
             this.connectorOperatorLocator = muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
             if (this.connectorOperatorLocator == null)
             {
-                throw new MuleRuntimeException(CoreMessages.createStaticMessage("Could not find required %s in the registry under key %s", ConnectorOperationLocator.class.getName(), OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR));
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage("Could not find required %s in the registry under key %s", ConnectorOperationLocator.class.getName(),
+                        OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR));
             }
         }
         return connectorOperatorLocator;
@@ -62,16 +64,16 @@ public class DefaultLocalMuleClient implements MuleClient
 
     @Override
     public void dispatch(String url, Object payload, Map<String, Serializable> messageProperties)
-        throws MuleException
+            throws MuleException
     {
-        dispatch(url, new DefaultMuleMessage(payload, messageProperties));
+        dispatch(url, createMessage(payload, messageProperties));
     }
 
     @Override
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties)
-        throws MuleException
+            throws MuleException
     {
-        return send(url, new DefaultMuleMessage(payload, messageProperties));
+        return send(url, createMessage(payload, messageProperties));
     }
 
     @Override
@@ -109,9 +111,9 @@ public class DefaultLocalMuleClient implements MuleClient
 
     @Override
     public MuleMessage send(String url, Object payload, Map<String, Serializable> messageProperties, long timeout)
-        throws MuleException
+            throws MuleException
     {
-        return send(url, new DefaultMuleMessage(payload, messageProperties), timeout);
+        return send(url, createMessage(payload, messageProperties), timeout);
 
     }
 
@@ -119,6 +121,22 @@ public class DefaultLocalMuleClient implements MuleClient
     public MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException
     {
         return send(url, message, newOptions().outbound().responseTimeout(timeout).build());
+    }
+
+    protected MuleMessage<Object, Serializable> createMessage(Object payload, Map<String, Serializable> messageProperties)
+    {
+        final Builder<Object, Serializable> builder = MuleMessage.builder().payload(payload != null ? payload : NullPayload.getInstance());
+        if (messageProperties != null)
+        {
+            builder.outboundProperties(messageProperties);
+
+            if (messageProperties.containsKey(MULE_REPLY_TO_PROPERTY))
+            {
+                builder.replyTo(messageProperties.get(MULE_REPLY_TO_PROPERTY));
+            }
+        }
+
+        return builder.build();
     }
 
     @Override
@@ -156,7 +174,7 @@ public class DefaultLocalMuleClient implements MuleClient
         final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, MessageExchangePattern.ONE_WAY);
         if (connectorMessageProcessor != null)
         {
-            final MuleEvent event = connectorMessageProcessor.process(createOneWayMuleEvent(new DefaultMuleMessage(NullPayload.getInstance())));
+            final MuleEvent event = connectorMessageProcessor.process(createOneWayMuleEvent(MuleMessage.builder().payload(NullPayload.getInstance()).build()));
 
             return event == null || event instanceof VoidMuleEvent ? null : event.getMessage();
         }

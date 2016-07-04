@@ -64,8 +64,7 @@ public class MulticastingRoutingStrategy extends AbstractRoutingStrategy
             for (int i = 0; i < messageProcessors.size(); i++)
             {
                 MessageProcessor mp = messageProcessors.get(i);
-                MuleMessage clonedMessage = cloneMessage(message);
-                clonedMessage = AbstractRoutingStrategy.propagateMagicProperties(clonedMessage);
+                MuleMessage clonedMessage = propagateMagicProperties(message);
                 MuleEvent result = sendRequest(event, clonedMessage, mp, true);
                 if (result != null && !VoidMuleEvent.getInstance().equals(result))
                 {

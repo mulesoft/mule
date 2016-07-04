@@ -10,7 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Date;
@@ -63,13 +65,12 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
     public void testParsing() throws Exception
     {
         MuleEvent event = getTestEvent("test");
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty("user", "vasya");
-            msg.setOutboundProperty("password", "pupkin");
-            msg.setOutboundProperty("host", "example.com");
-            msg.setOutboundProperty("port", "12345");
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .addOutboundProperty("user", "vasya")
+                                    .addOutboundProperty("password", "pupkin")
+                                    .addOutboundProperty("host", "example.com")
+                                    .addOutboundProperty("port", "12345")
+                                    .build());
 
         String result = muleContext.getExpressionManager().parse(
             "http://#[message.outboundProperties.user]:#[message.outboundProperties.password]@#[message.outboundProperties.host]:#[message.outboundProperties.port]/foo/bar", event);
@@ -81,13 +82,12 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
     public void testBooleanEvaluation() throws Exception
     {
         MuleEvent event = getTestEvent("test");
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty("user", "vasya");
-            msg.setOutboundProperty("password", "pupkin");
-            msg.setOutboundProperty("host", "example.com");
-            msg.setOutboundProperty("port", "12345");
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .addOutboundProperty("user", "vasya")
+                                    .addOutboundProperty("password", "pupkin")
+                                    .addOutboundProperty("host", "example.com")
+                                    .addOutboundProperty("port", "12345")
+                                    .build());
 
         // Non-boolean string value
         assertFalse(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.user", event));

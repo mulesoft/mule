@@ -8,6 +8,7 @@ package org.mule.runtime.core.lifecycle;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -36,6 +37,7 @@ public class LifecycleTrackerProcessor extends AbstractLifecycleTracker
         getTracker().add("springDestroy");
     }
 
+    @Override
     public void setFlowConstruct(final FlowConstruct flowConstruct)
     {
         getTracker().add("setService");
@@ -52,12 +54,12 @@ public class LifecycleTrackerProcessor extends AbstractLifecycleTracker
         return Mockito.mock(ComponentStatistics.class);
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString());
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .addOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString())
+                                    .build());
         event.setFlowVariable(FLOW_CONSRUCT_PROPERTY, flowConstruct);
         return event;
     }

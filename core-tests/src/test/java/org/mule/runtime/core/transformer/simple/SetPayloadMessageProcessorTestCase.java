@@ -63,7 +63,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
         when(expressionManager.parse(anyString(), any(MuleEvent.class))).thenAnswer(
                 invocation -> (String) invocation.getArguments()[0]);
 
-        muleMessage = new DefaultMuleMessage("");
+        muleMessage = MuleMessage.builder().payload("").build();
         muleEvent = new DefaultMuleEvent(muleMessage, getTestFlow());
     }
 

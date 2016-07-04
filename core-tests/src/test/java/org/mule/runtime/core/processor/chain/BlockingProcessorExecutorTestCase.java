@@ -16,7 +16,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
@@ -74,7 +73,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
         OptimizedRequestContext.unsafeSetEvent(event);
         
         when(event.getFlowConstruct()).thenReturn(getTestFlow());
-        MuleMessage message = new DefaultMuleMessage("");
+        MuleMessage message = MuleMessage.builder().payload("").build();
         when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
         when(event.getMessage()).thenReturn(message);
         when(event.getMuleContext()).thenReturn(muleContext);

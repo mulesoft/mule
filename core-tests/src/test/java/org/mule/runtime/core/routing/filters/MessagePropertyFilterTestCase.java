@@ -9,11 +9,9 @@ package org.mule.runtime.core.routing.filters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
@@ -27,28 +25,29 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilter() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
         assertTrue(!filter.accept(message));
-        message.setOutboundProperty("foo", "bar");
+
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
     @Test
     public void testMessagePropertyFilterInboundScope() throws Exception
     {
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
         MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=bar");
         assertEquals("inbound", filter.getScope());
 
         assertFalse(filter.accept(message));
-        message.setInboundProperty("foo", "bar");
+        message = MuleMessage.builder(message).addInboundProperty("foo", "bar").build();
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
     @Test
     public void testMessagePropertyFilterWithURL() throws Exception
     {
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
         MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=http://foo.com");
         assertEquals("inbound", filter.getScope());
 
@@ -56,7 +55,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
 
         Map inboundProps = new HashMap();
         inboundProps.put("foo", "http://foo.com");
-        message = new DefaultMuleMessage("blah", inboundProps, null, null);
+        message = MuleMessage.builder().payload("blah").inboundProperties(inboundProps).build();
         assertTrue("Filter didn't accept the message", filter.accept(message));
 
         // Checking here that a ':' in the value doesn't throw things off
@@ -65,7 +64,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertEquals("outbound", filter.getScope());
 
         assertFalse(filter.accept(message));
-        message.setOutboundProperty("bar", "http://bar.com");
+        message = MuleMessage.builder(message).addOutboundProperty("bar", "http://bar.com").build();
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
@@ -73,12 +72,12 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterWithNot() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=bar");
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
 
         assertTrue("Filter didn't accept the message", filter.accept(message));
-        message.setOutboundProperty("foo", "bar");
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
         assertFalse(filter.accept(message));
-        message.setOutboundProperty("foo", "car");
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "car").build();
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
@@ -86,12 +85,12 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterWithNotNull() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
 
         assertFalse(filter.accept(message));
-        removeProperty(message, "foo");
+        message = removeProperty(message, "foo");
         assertFalse(filter.accept(message));
-        message.setOutboundProperty("foo", "car");
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "car").build();
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
@@ -99,8 +98,8 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterWithCaseSensitivity() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=Bar");
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
-        message.setOutboundProperty("foo", "bar");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
         assertFalse(filter.accept(message));
         filter.setCaseSensitive(false);
         assertTrue("Filter didn't accept the message", filter.accept(message));
@@ -110,8 +109,8 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterWithWildcard() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=B*");
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
-        message.setOutboundProperty("foo", "bar");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
         assertFalse(filter.accept(message));
         filter.setCaseSensitive(false);
         assertTrue("Filter didn't accept the message", filter.accept(message));
@@ -126,36 +125,36 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept((MuleMessage) null));
 
         filter = new MessagePropertyFilter("foo = bar");
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
-        message.setOutboundProperty("foo", "bar");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
         assertTrue("Filter didn't accept the message", filter.accept(message));
         filter.setCaseSensitive(false);
 
         filter = new MessagePropertyFilter("foo2 =null");
-        removeProperty(message, "foo2");
+        message = removeProperty(message, "foo2");
         assertTrue("Filter didn't accept the message", filter.accept(message));
 
         filter = new MessagePropertyFilter("foo2 =");
-        message.setOutboundProperty("foo2", "");
+        message = MuleMessage.builder(message).addOutboundProperty("foo2", "").build();
         assertTrue("Filter didn't accept the message", filter.accept(message));
 
-        removeProperty(message, "foo2");
+        message = removeProperty(message, "foo2");
         assertFalse(filter.accept(message));
     }
 
-    private void removeProperty(MutableMuleMessage message, String property)
+    private MuleMessage removeProperty(MuleMessage message, String property)
     {
-        message.removeOutboundProperty(property);
+        return MuleMessage.builder(message).removeOutboundProperty(property).build();
     }
 
     @Test
     public void testMessagePropertyFilterPropertyExists() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
 
         assertFalse(filter.accept(message));
-        message.setOutboundProperty("foo", "car");
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "car").build();
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
@@ -163,9 +162,9 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyWithEnum() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=ONE_WAY");
-        MutableMuleMessage message = new DefaultMuleMessage("");
+        MuleMessage message = MuleMessage.builder().payload("").build();
         assertFalse(filter.accept(message));
-        message.setOutboundProperty("foo", MessageExchangePattern.ONE_WAY);
+        message = MuleMessage.builder(message).addOutboundProperty("foo", ONE_WAY).build();
         assertTrue(filter.accept(message));
     }
 }

@@ -9,7 +9,8 @@ package org.mule.runtime.core.util;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.ExceptionUtils.tryExpecting;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.core.DefaultMuleMessage;
+
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
@@ -93,7 +94,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     {
         try
         {
-            consumableClasses.add(ClassUtils.loadClass(className, DefaultMuleMessage.class));
+            consumableClasses.add(ClassUtils.loadClass(className, MuleMessage.class));
         }
         catch (ClassNotFoundException e)
         {
@@ -530,13 +531,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             methodName = "set" + methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
         }
 
-        Method methods[] = bean.getClass().getMethods();
-
-        for (int i = 0; i < methods.length; i++)
+        for (Method method : bean.getClass().getMethods())
         {
-            if (methods[i].getName().equals(methodName))
+            if (method.getName().equals(methodName))
             {
-                return methods[i].getParameterTypes();
+                return method.getParameterTypes();
             }
         }
 
@@ -560,18 +559,17 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static Method getMethod(Class clazz, String name, Class[] parameterTypes, boolean acceptNulls)
     {
-        Method[] methods = clazz.getMethods();
-        for (int i = 0; i < methods.length; i++)
+        for (Method method : clazz.getMethods())
         {
-            if (methods[i].getName().equals(name))
+            if (method.getName().equals(name))
             {
                 if (parameterTypes == null)
                 {
-                    return methods[i];
+                    return method;
                 }
-                else if (compare(methods[i].getParameterTypes(), parameterTypes, true, acceptNulls))
+                else if (compare(method.getParameterTypes(), parameterTypes, true, acceptNulls))
                 {
-                    return methods[i];
+                    return method;
                 }
             }
         }
@@ -593,10 +591,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      */
     public static Constructor getConstructor(Class clazz, Class[] paramTypes, boolean exactMatch)
     {
-        Constructor[] ctors = clazz.getConstructors();
-        for (int i = 0; i < ctors.length; i++)
+        for (Constructor ctor : clazz.getConstructors())
         {
-            Class[] types = ctors[i].getParameterTypes();
+            Class[] types = ctor.getParameterTypes();
             if (types.length == paramTypes.length)
             {
                 int matchCount = 0;
@@ -627,7 +624,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 }
                 if (matchCount == types.length)
                 {
-                    return ctors[i];
+                    return ctor;
                 }
             }
         }
@@ -686,10 +683,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             ignoredMethodNames = Collections.emptySet();
         }
 
-        Method[] methods = implementation.getMethods();
-        for (int i = 0; i < methods.length; i++)
+        for (Method method : implementation.getMethods())
         {
-            Method method = methods[i];
             //supporting wildcards
             if (filter != null && filter.accept(method.getName()))
             {
@@ -734,10 +729,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             ignoredMethodNames = Collections.emptySet();
         }
 
-        Method[] methods = implementation.getMethods();
-        for (int i = 0; i < methods.length; i++)
+        for (Method method : implementation.getMethods())
         {
-            Method method = methods[i];
             Class returns = method.getReturnType();
 
             if (compare(new Class[] {returns}, new Class[] {returnType}, matchOnObject))
@@ -1013,9 +1006,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     public static int hash(Object[] state)
     {
         int hash = 0;
-        for (int i = 0; i < state.length; ++i)
+        for (Object element : state)
         {
-            hash = hash * 31 + (null == state[i] ? 0 : state[i].hashCode());
+            hash = hash * 31 + (null == element ? 0 : element.hashCode());
         }
         return hash;
     }

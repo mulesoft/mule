@@ -12,16 +12,18 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -33,8 +35,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends AbstractMuleContextTestCase
 {
@@ -125,15 +125,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     public void successfulExecution() throws Exception
     {
         SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-        when(mockRoute.process(event)).thenAnswer(new Answer<MuleEvent>()
-        {
-
-            @Override
-            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
-            {
-                return (MuleEvent) invocation.getArguments()[0];
-            }
-        });
+        when(mockRoute.process(event)).thenAnswer(invocation -> (MuleEvent) invocation.getArguments()[0]);
         MuleEvent response = processingStrategy.route(event);
         assertThat(response, is(event));
         verify(mockRoute).process(event);
@@ -145,19 +137,12 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     {
         when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
         SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-        when(mockRoute.process(any(MuleEvent.class))).then(new Answer<MuleEvent>()
+        when(mockRoute.process(any(MuleEvent.class))).then(invocation ->
         {
-            @Override
-            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
-            {
-                MuleEvent argEvent = (MuleEvent) invocation.getArguments()[0];
-                assertThat(argEvent.getMessageAsString(), is(TEST_DATA));
-                argEvent.setMessage(argEvent.getMessage().transform(msg -> {
-                    msg.setPayload(PROCESSED_DATA);
-                    return msg;
-                }));
-                return argEvent;
-            }
+            MuleEvent argEvent = (MuleEvent) invocation.getArguments()[0];
+            assertThat(argEvent.getMessageAsString(), is(TEST_DATA));
+            argEvent.setMessage(MuleMessage.builder(argEvent.getMessage()).payload(PROCESSED_DATA).build());
+            return argEvent;
         });
         try
         {
@@ -180,15 +165,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
         when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
         when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager().evaluate(ackExpression, event)).thenReturn(expressionEvalutaionResult);
         SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-        when(mockRoute.process(any(MuleEvent.class))).thenAnswer(new Answer<MuleEvent>()
-        {
-
-            @Override
-            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
-            {
-                return (MuleEvent) invocation.getArguments()[0];
-            }
-        });
+        when(mockRoute.process(any(MuleEvent.class))).thenAnswer(invocation -> (MuleEvent) invocation.getArguments()[0]);
         MuleEvent response = processingStrategy.route(event);
         assertThat(response.getMessage().getPayload(), equalTo(expressionEvalutaionResult));
         verify(mockRoute).process(any(MuleEvent.class));

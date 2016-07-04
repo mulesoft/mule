@@ -6,6 +6,13 @@
  */
 package org.mule.compatibility.transport.http.transformers;
 
+import static java.lang.String.valueOf;
+import static org.mule.compatibility.transport.http.HttpConstants.CUSTOM_HEADER_PREFIX;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
+
 import org.mule.compatibility.transport.http.CookieHelper;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
@@ -295,18 +302,19 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
 
         if (msg.getCorrelationId() != null)
         {
-            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_ID_PROPERTY,
-                    msg.getCorrelationId()));
-            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX
-                    + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-                    String.valueOf(msg.getCorrelationGroupSize())));
-            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX
-                    + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
-                    String.valueOf(msg.getCorrelationSequence())));
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, msg.getCorrelationId()));
+            if (msg.getCorrelationGroupSize() != null)
+            {
+                response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_GROUP_SIZE_PROPERTY, valueOf(msg.getCorrelationGroupSize())));
+            }
+            if (msg.getCorrelationSequence() != null)
+            {
+                response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_SEQUENCE_PROPERTY, valueOf(msg.getCorrelationSequence())));
+            }
         }
         if (msg.getReplyTo() != null)
         {
-            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_REPLY_TO_PROPERTY,
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_REPLY_TO_PROPERTY,
                     msg.getReplyTo().toString()));
         }
 

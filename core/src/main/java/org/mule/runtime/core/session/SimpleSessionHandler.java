@@ -36,10 +36,9 @@ public class SimpleSessionHandler implements SessionHandler
     @Override
     public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException
     {
-        return message.transform(msg -> {
-            msg.setOutboundProperty(MULE_SESSION_PROPERTY, session);
-            return msg;
-        });
+        return MuleMessage.builder(message)
+                          .addOutboundProperty(MULE_SESSION_PROPERTY, session)
+                          .build();
     }
     
 }

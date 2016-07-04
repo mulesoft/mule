@@ -8,6 +8,7 @@ package org.mule.runtime.core.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MessagingException;
@@ -31,10 +32,7 @@ public class ExceptionTestCase extends AbstractELTestCase
     {
         MuleEvent event = getTestEvent("");
         RuntimeException rte = new RuntimeException();
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setExceptionPayload(new DefaultExceptionPayload(rte));
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(rte)).build());
         assertEquals(rte, evaluate("exception", event));
     }
 
@@ -42,10 +40,7 @@ public class ExceptionTestCase extends AbstractELTestCase
     public void assignException() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(new RuntimeException())).build());
         assertImmutableVariable("exception='other'", event);
     }
 
@@ -57,10 +52,7 @@ public class ExceptionTestCase extends AbstractELTestCase
         MessagingException me = new MessagingException(CoreMessages.createStaticMessage(""),
             new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestFlow()),
             new IllegalAccessException());
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setExceptionPayload(new DefaultExceptionPayload(me));
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(me)).build());
         assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", event));
     }
 }

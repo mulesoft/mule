@@ -9,7 +9,6 @@ package org.mule.runtime.core.registry;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
@@ -106,7 +105,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
     private class DummyEvent implements MuleEvent, ThreadSafeAccess
     {
 
-        private MuleMessage message = new DefaultMuleMessage("");
+        private MuleMessage message = MuleMessage.builder().payload("").build();
 
         @Override
         public MuleMessage getMessage()

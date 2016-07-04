@@ -12,7 +12,6 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -316,7 +315,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
         }
         else
         {
-            return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance()), event);
+            return new DefaultMuleEvent(MuleMessage.builder().payload(NullPayload.getInstance()).build(), event);
         }
     }
 

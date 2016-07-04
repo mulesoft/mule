@@ -8,9 +8,9 @@ package org.mule.runtime.core.el.context;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.io.Serializable;
@@ -61,12 +61,12 @@ public class MessageContext
         return event.getMessage().getCorrelationId();
     }
 
-    public int getCorrelationSequence()
+    public Integer getCorrelationSequence()
     {
         return event.getMessage().getCorrelationSequence();
     }
 
-    public int getCorrelationGroupSize()
+    public Integer getCorrelationGroupSize()
     {
         return event.getMessage().getCorrelationGroupSize();
     }
@@ -78,10 +78,7 @@ public class MessageContext
 
     public void setReplyTo(String replyTo)
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setReplyTo(replyTo);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).replyTo(replyTo).build());
     }
 
     public DataType<?> getDataType()
@@ -132,7 +129,7 @@ public class MessageContext
 
     public void setPayload(Object payload)
     {
-        event.setMessage(new DefaultMuleMessage(payload, event.getMessage()));
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).build());
     }
 
     public Map<String, Serializable> getInboundProperties()

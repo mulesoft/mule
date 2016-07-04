@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.tck.MuleTestUtils;
@@ -32,7 +33,7 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
 
     protected List<MessageProcessor> getMessageProcessorsList()
     {
-        List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> messageProcessors = new ArrayList<>();
         messageProcessors.add(new LetterMessageProcessor(LETTER_A));
         messageProcessors.add(new LetterMessageProcessor(LETTER_B));
         messageProcessors.add(new LetterMessageProcessor(LETTER_C));
@@ -41,15 +42,11 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
 
     protected List<MessageProcessor> getMessageProcessorsListWithFailingMessageProcessor()
     {
-        List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> messageProcessors = new ArrayList<>();
         messageProcessors.add(new LetterMessageProcessor(LETTER_A));
-        messageProcessors.add(new MessageProcessor()
+        messageProcessors.add(event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                throw new DefaultMuleException(CoreMessages.createStaticMessage(EXCEPTION_MESSAGE));
-            }
+            throw new DefaultMuleException(CoreMessages.createStaticMessage(EXCEPTION_MESSAGE));
         });
         messageProcessors.add(new LetterMessageProcessor(LETTER_B));
         return messageProcessors;
@@ -77,14 +74,7 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
 
     protected DynamicRouteResolver getDynamicRouteResolver()
     {
-        return new DynamicRouteResolver()
-        {
-            @Override
-            public List<MessageProcessor> resolveRoutes(MuleEvent event) throws MessagingException
-            {
-                return getMessageProcessorsList();
-            }
-        };
+        return event -> getMessageProcessorsList();
     }
 
     protected MuleEvent getEvent() throws Exception
@@ -113,10 +103,7 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
         {
             try
             {
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setPayload(letter);
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage()).payload(letter).build());
                 return event;
             }
             catch (Exception e)

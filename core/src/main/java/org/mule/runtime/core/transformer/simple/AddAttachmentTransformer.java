@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.mule.runtime.core.util.IOUtils.toDataHandler;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -62,17 +64,9 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer
                 else
                 {
                     MediaType contentType = DataType.builder().mediaType(contentTypeEvaluator.resolveStringValue(event)).build().getMediaType();
-                    event.setMessage(event.getMessage().transform(msg -> {
-                        try
-                        {
-                            msg.addOutboundAttachment(key,value,contentType);
-                        }
-                        catch (Exception e)
-                        {
-                            throw new MuleRuntimeException(e);
-                        }
-                        return msg;
-                    }));
+                    event.setMessage(MuleMessage.builder(event.getMessage())
+                                                .addOutboundAttachment(key, toDataHandler(key, value, contentType))
+                                                .build());
                 }
             }
             

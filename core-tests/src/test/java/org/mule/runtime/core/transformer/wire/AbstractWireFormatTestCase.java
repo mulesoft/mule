@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.core.transformer.simple.ObjectToString;
@@ -36,7 +35,7 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleContextTest
         // Create message to send over wire
         Map<String, Serializable> messageProerties = new HashMap<>();
         messageProerties.put("key1", "val1");
-        MuleMessage inMessage = new DefaultMuleMessage("testMessage", messageProerties);
+        MuleMessage inMessage = MuleMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
 
         Object outMessage = readWrite(inMessage);
 

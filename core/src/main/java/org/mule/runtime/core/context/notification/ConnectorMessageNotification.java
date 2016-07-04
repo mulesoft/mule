@@ -58,7 +58,7 @@ public class ConnectorMessageNotification extends ServerNotification implements 
         FlowConstruct flowConstruct,
         int action)
     {
-        super(cloneMessage(resource), action, flowConstruct != null ? flowConstruct.getName() : null);
+        super(resource, action, flowConstruct != null ? flowConstruct.getName() : null);
         this.component = component;
         this.endpoint = endpoint;
         this.flowConstruct = flowConstruct;

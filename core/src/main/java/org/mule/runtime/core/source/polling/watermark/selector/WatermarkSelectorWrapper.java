@@ -9,6 +9,7 @@ package org.mule.runtime.core.source.polling.watermark.selector;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.source.polling.watermark.WatermarkUtils;
 
 import java.io.NotSerializableException;
@@ -36,10 +37,9 @@ public class WatermarkSelectorWrapper extends WatermarkSelector
     @Override
     public void acceptValue(Object value)
     {
-        muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
-            msg.setPayload(value);
-            return msg;
-        }));
+        muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage())
+                                        .payload(value)
+                                        .build());
         try
         {
             Serializable evaluated = WatermarkUtils.evaluate(this.selectorExpression, muleEvent);

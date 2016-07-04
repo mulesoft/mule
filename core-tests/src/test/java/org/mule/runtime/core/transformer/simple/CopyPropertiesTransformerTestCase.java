@@ -15,15 +15,12 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -46,12 +43,12 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
     public static final Charset ENCODING = US_ASCII;
     public static final String INBOUND_PROPERTY_KEY = "propKey";
     public static final DataType PROPERTY_DATA_TYPE = DataType.STRING;
-    private static final Serializable PROPERTY_VALUE = StringUtils.EMPTY;
+    private static final Serializable PROPERTY_VALUE = "propValue";
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext mockMuleContext;
 
-    private MutableMuleMessage muleMessage;
+    private MuleMessage muleMessage;
     @Mock
     private ExpressionManager mockExpressionManager;
 
@@ -62,14 +59,14 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
         Mockito.when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(
                 invocation -> (String) invocation.getArguments()[0]);
 
-        muleMessage = new DefaultMuleMessage("", PROPERTY_DATA_TYPE);
+        muleMessage = MuleMessage.builder().payload("").mediaType(PROPERTY_DATA_TYPE.getMediaType()).build();
     }
 
     @Test
     public void testCopySingleProperty() throws TransformerException, InitialisationException
     {
         CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
-        muleMessage.setInboundProperty(INBOUND_PROPERTY_KEY, PROPERTY_VALUE, PROPERTY_DATA_TYPE);
+        muleMessage = MuleMessage.builder(muleMessage).addInboundProperty(INBOUND_PROPERTY_KEY, PROPERTY_VALUE, PROPERTY_DATA_TYPE).build();
 
         final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
 
@@ -81,7 +78,6 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
     public void testCopyNonExistentProperty() throws TransformerException, InitialisationException
     {
         CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
-        muleMessage.setInboundProperty(INBOUND_PROPERTY_KEY, null);
 
         final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
 
@@ -93,10 +89,12 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
     {
         CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer("MULE_*");
 
-        muleMessage.setInboundProperty("MULE_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE);
-        muleMessage.setInboundProperty("MULE_CORRELATION_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE);
-        muleMessage.setInboundProperty("MULE_GROUP_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE);
-        muleMessage.setInboundProperty("SomeVar", PROPERTY_VALUE, PROPERTY_DATA_TYPE);
+        muleMessage = MuleMessage.builder(muleMessage)
+                                 .addInboundProperty("MULE_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
+                                 .addInboundProperty("MULE_CORRELATION_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
+                                 .addInboundProperty("MULE_GROUP_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
+                                 .addInboundProperty("SomeVar", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
+                                 .build();
 
         final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
 

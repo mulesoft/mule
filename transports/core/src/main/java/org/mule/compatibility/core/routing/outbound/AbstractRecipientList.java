@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentMap;
 @Deprecated
 public abstract class AbstractRecipientList extends FilteringOutboundRouter
 {
-    private final ConcurrentMap<Object, OutboundEndpoint> recipientCache = new ConcurrentHashMap<Object, OutboundEndpoint>();
+    private final ConcurrentMap<Object, OutboundEndpoint> recipientCache = new ConcurrentHashMap<>();
 
     private Boolean synchronous;
 
@@ -48,11 +48,11 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         MuleMessage message = event.getMessage();
 
         List<Object> recipients = getRecipients(event);
-        List<MuleEvent> results = new ArrayList<MuleEvent>();
+        List<MuleEvent> results = new ArrayList<>();
 
         if (enableCorrelation != CorrelationMode.NEVER)
         {
-            boolean correlationSet = message.getCorrelationGroupSize() != -1;
+            boolean correlationSet = message.getCorrelationGroupSize() != null;
             if (correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
             {
                 logger.debug("CorrelationId is already set, not setting Correlation group size");

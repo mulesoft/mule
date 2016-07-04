@@ -11,10 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -31,10 +29,10 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
     {
         ExpressionFilter filter = new ExpressionFilter("message.outboundProperties['foo']=='bar'");
         filter.setMuleContext(muleContext);
-        // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
         assertTrue(!filter.accept(message));
-        message.setOutboundProperty("foo", "bar");
+
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
         assertTrue(filter.accept(message));
     }
 
@@ -54,13 +52,12 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("message.outboundProperties['foo']!='bar'");
         filter.setMuleContext(muleContext);
 
-        // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
 
         assertTrue(filter.accept(message));
-        message.setOutboundProperty("foo", "bar");
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
         assertTrue(!filter.accept(message));
-        message.setOutboundProperty("foo", "car");
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "car").build();
         assertTrue(filter.accept(message));
     }
 
@@ -79,12 +76,9 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         assertTrue(filter.accept(event));
     }
 
-    private MutableMuleMessage removeProperty(MuleMessage message)
+    private MuleMessage removeProperty(MuleMessage message)
     {
-        return (MutableMuleMessage) message.transform(msg -> {
-            msg.removeOutboundProperty("foo");
-            return msg;
-        });
+        return MuleMessage.builder(message).removeOutboundProperty("foo").build();
     }
 
     @Test
@@ -93,13 +87,12 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("message.outboundProperties['foo']!=null");
         filter.setMuleContext(muleContext);
 
-        // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage("blah");
+        MuleMessage message = MuleMessage.builder().payload("blah").build();
 
         assertTrue(!filter.accept(message));
         message = removeProperty(message);
         assertTrue(!filter.accept(message));
-        message.setOutboundProperty("foo", "car");
+        message = MuleMessage.builder(message).addOutboundProperty("foo", "car").build();
         assertTrue(filter.accept(message));
     }
 
@@ -144,10 +137,10 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
 
         assertNotNull(filter.getExpression());
 
-        assertTrue(filter.accept(new DefaultMuleMessage("The number is 4")));
-        assertFalse(filter.accept(new DefaultMuleMessage("Say again?")));
+        assertTrue(filter.accept(MuleMessage.builder().payload("The number is 4").build()));
+        assertFalse(filter.accept(MuleMessage.builder().payload("Say again?").build()));
 
-        assertFalse(filter.accept(new DefaultMuleMessage("The number is 0")));
+        assertFalse(filter.accept(MuleMessage.builder().payload("The number is 0").build()));
     }
 
     @Test
@@ -156,16 +149,15 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("exception is java.lang.Exception");
         filter.setMuleContext(muleContext);
 
-        // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage m = new DefaultMuleMessage("test");
+        MuleMessage m = MuleMessage.builder().payload("test").build();
         assertTrue(!filter.accept(m));
-        m.setExceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test")));
+        m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test"))).build();
         assertTrue(filter.accept(m));
 
         filter = new ExpressionFilter("exception is java.io.IOException");
         filter.setMuleContext(muleContext);
         assertTrue(!filter.accept(m));
-        m.setExceptionPayload(new DefaultExceptionPayload(new IOException("test")));
+        m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IOException("test"))).build();
         assertTrue(filter.accept(m));
     }
 
@@ -175,16 +167,15 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("exception is java.lang.Exception");
         filter.setMuleContext(muleContext);
 
-        // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage m = new DefaultMuleMessage("test");
+        MuleMessage m = MuleMessage.builder().payload("test").build();
         assertTrue(!filter.accept(m));
-        m.setExceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test")));
+        m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test"))).build();
         assertTrue(filter.accept(m));
 
         filter = new ExpressionFilter("exception is java.io.IOException");
         filter.setMuleContext(muleContext);
         assertTrue(!filter.accept(m));
-        m.setExceptionPayload(new DefaultExceptionPayload(new IOException("test")));
+        m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IOException("test"))).build();
         assertTrue(filter.accept(m));
     }
 
@@ -194,13 +185,13 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
         ExpressionFilter filter = new ExpressionFilter("payload is org.mule.tck.testmodels.fruit.Apple");
         filter.setMuleContext(muleContext);
 
-        assertTrue(filter.accept(new DefaultMuleMessage(new Apple())));
-        assertTrue(!filter.accept(new DefaultMuleMessage("test")));
+        assertTrue(filter.accept(MuleMessage.builder().payload(new Apple()).build()));
+        assertTrue(!filter.accept(MuleMessage.builder().payload("test").build()));
 
         filter = new ExpressionFilter("payload is String");
         filter.setMuleContext(muleContext);
-        assertTrue(filter.accept(new DefaultMuleMessage("test")));
-        assertTrue(!filter.accept(new DefaultMuleMessage(new Exception("test"))));
+        assertTrue(filter.accept(MuleMessage.builder().payload("test").build()));
+        assertTrue(!filter.accept(MuleMessage.builder().payload(new Exception("test")).build()));
     }
 
     @Test
@@ -211,9 +202,9 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
 
         filter.setNullReturnsTrue(true);
 
-        assertTrue(filter.accept(new DefaultMuleMessage("true")));
-        assertTrue(filter.accept(new DefaultMuleMessage("TRUE")));
-        assertTrue(filter.accept(new DefaultMuleMessage("tRuE")));
+        assertTrue(filter.accept(MuleMessage.builder().payload("true").build()));
+        assertTrue(filter.accept(MuleMessage.builder().payload("TRUE").build()));
+        assertTrue(filter.accept(MuleMessage.builder().payload("tRuE").build()));
     }
 
     @Test
@@ -224,9 +215,9 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase
 
         filter.setNullReturnsTrue(false);
 
-        assertFalse(filter.accept(new DefaultMuleMessage("false")));
-        assertFalse(filter.accept(new DefaultMuleMessage("FALSE")));
-        assertFalse(filter.accept(new DefaultMuleMessage("faLSe")));
+        assertFalse(filter.accept(MuleMessage.builder().payload("false").build()));
+        assertFalse(filter.accept(MuleMessage.builder().payload("FALSE").build()));
+        assertFalse(filter.accept(MuleMessage.builder().payload("faLSe").build()));
     }
 
 }

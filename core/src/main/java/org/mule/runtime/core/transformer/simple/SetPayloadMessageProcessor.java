@@ -11,11 +11,13 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -37,34 +39,38 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            if (dataType == null)
+        final Builder builder = MuleMessage.builder(event.getMessage());
+
+        if (dataType == null)
+        {
+            final TypedValue typedValue = resolveTypedValue(event);
+            if (typedValue.getDataType().getMediaType().getCharset().isPresent())
             {
-                final TypedValue typedValue = resolveTypedValue(event);
-                if (typedValue.getDataType().getMediaType().getCharset().isPresent())
-                {
-                    msg.setPayload(typedValue.getValue(), typedValue.getDataType());
-                }
-                else
-                {
-                    msg.setPayload(typedValue.getValue(), DataType.builder(typedValue.getDataType()).charset(getDefaultEncoding(muleContext)).build());
-                }
+                builder.payload(typedValue.getValue() != null ? typedValue.getValue() : NullPayload.getInstance()).mediaType(typedValue.getDataType().getMediaType());
             }
             else
             {
-                Object value = resolveValue(event);
-                if (dataType.getMediaType().getCharset().isPresent())
-                {
-                    msg.setPayload(value, DataType.builder(dataType).type((value == null || value instanceof NullPayload) ? Object.class : value.getClass()).build());
-                }
-                else
-                {
-                    msg.setPayload(value,
-                            DataType.builder(dataType).type((value == null || value instanceof NullPayload) ? Object.class : value.getClass()).charset(getDefaultEncoding(muleContext)).build());
-                }
+                builder.payload(typedValue.getValue() != null ? typedValue.getValue() : NullPayload.getInstance()).mediaType(DataType.builder(typedValue.getDataType())
+                                                                         .charset(getDefaultEncoding(muleContext))
+                                                                         .build()
+                                                                         .getMediaType());
             }
-            return msg;
-        }));
+        }
+        else
+        {
+            Object value = resolveValue(event);
+            final DataTypeParamsBuilder dataTypeBuilder = DataType.builder(dataType).type((value == null || value instanceof NullPayload) ? Object.class : value.getClass());
+            if (dataType.getMediaType().getCharset().isPresent())
+            {
+                builder.payload(value != null ? value : NullPayload.getInstance()).mediaType(dataTypeBuilder.build().getMediaType());
+            }
+            else
+            {
+                builder.payload(value != null ? value : NullPayload.getInstance()).mediaType(dataTypeBuilder.charset(getDefaultEncoding(muleContext)).build().getMediaType());
+            }
+        }
+
+        event.setMessage(builder.build());
         return event;
     }
 

@@ -8,7 +8,6 @@ package org.mule.runtime.core.source.polling;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -207,7 +206,7 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
      */
     public void poll() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY);
+        MuleMessage request = MuleMessage.builder().payload(StringUtils.EMPTY).build();
         pollWith(request);
     }
 

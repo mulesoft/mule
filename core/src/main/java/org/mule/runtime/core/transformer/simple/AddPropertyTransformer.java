@@ -7,8 +7,9 @@
 package org.mule.runtime.core.transformer.simple;
 
 
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.io.Serializable;
 
@@ -18,19 +19,17 @@ public class AddPropertyTransformer extends AbstractAddVariablePropertyTransform
     @Override
     protected void addProperty(MuleEvent event, String propertyName, Serializable value, DataType dataType)
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(propertyName, value, dataType);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .addOutboundProperty(propertyName, value, dataType)
+                                    .build());
     }
 
     @Override
     protected void removeProperty(MuleEvent event, String propertyName)
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.removeOutboundProperty(propertyName);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .removeOutboundProperty(propertyName)
+                                    .build());
     }
 
 }

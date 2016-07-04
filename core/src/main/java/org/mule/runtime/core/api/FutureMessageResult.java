@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 
 import java.util.List;
@@ -120,7 +119,7 @@ public class FutureMessageResult extends FutureTask
             }
             else
             {
-                result = new DefaultMuleMessage(obj);
+                result = MuleMessage.builder().payload(obj).build();
             }
 
             synchronized (this)

@@ -21,7 +21,7 @@ public class ArrayMessageSequence extends AbstractMessageSequence<Object>
     }
 
     @Override
-    public int size()
+    public Integer size()
     {
         return array.length - idx;
     }

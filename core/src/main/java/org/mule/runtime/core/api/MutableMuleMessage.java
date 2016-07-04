@@ -44,19 +44,19 @@ public interface MutableMuleMessage extends MuleMessage, MutableMessagePropertie
     void setCorrelationId(String id);
 
     /**
-     * Gets the sequence or ordering number for this message in the the correlation
-     * group (as defined by the correlationId)
+     * Gets the sequence or ordering number for this message in the the correlation group (as defined by the
+     * correlationId)
      *
-     * @param sequence the sequence number or -1 if the sequence is not important
+     * @param sequence the sequence number or null if the sequence is not important
      */
-    void setCorrelationSequence(int sequence);
+    void setCorrelationSequence(Integer sequence);
 
     /**
      * Determines how many messages are in the correlation group
      *
-     * @param size the total messages in this group or -1 if the size is not known
+     * @param size the total messages in this group or null if the size is not known
      */
-    void setCorrelationGroupSize(int size);
+    void setCorrelationGroupSize(Integer size);
 
     /**
      * Sets a replyTo address for this message. This is useful in an asynchronous

@@ -90,9 +90,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         verify(resTransformer, times(1)).process(any(MuleEvent.class));
         
         assertMessageSentSame(true);
-
-        assertSame(responseMessage, result.getMessage());
-
         assertEqualMessages(responseMessage, result.getMessage());
     }
 
@@ -195,9 +192,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         MuleEvent result = endpoint.process(testOutboundEvent);
 
         assertMessageSentSame(true);
-
-        assertSame(responseMessage, result.getMessage());
-
         assertEqualMessages(responseMessage, result.getMessage());
     }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.core.transformer.simple;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -42,12 +43,12 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
         MuleMessage message = event.getMessage();
         if (wildcardPropertyNameEvaluator.hasWildcards())
         {
-            wildcardPropertyNameEvaluator.processValues(message.getInboundPropertyNames(), matchedValue -> event.setMessage(
-                    event.getMessage().transform(msg ->
-                    {
-                        msg.copyProperty(matchedValue);
-                        return msg;
-                    })));
+            final Builder builder = MuleMessage.builder(message);
+            wildcardPropertyNameEvaluator.processValues(message.getInboundPropertyNames(),
+                    matchedValue -> builder.addOutboundProperty(matchedValue,
+                            message.getInboundProperty(matchedValue),
+                            message.getInboundPropertyDataType(matchedValue)));
+            event.setMessage(builder.build());
         }
         else
         {
@@ -58,11 +59,11 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer
                 Serializable propertyValue = message.getInboundProperty(propertyName);
                 if (propertyValue != null)
                 {
-                    event.setMessage(event.getMessage().transform(msg ->
-                    {
-                        msg.copyProperty(propertyName);
-                        return msg;
-                    }));
+                    event.setMessage(MuleMessage.builder(message)
+                                                .addOutboundProperty(propertyName,
+                                                        propertyValue,
+                                                        message.getInboundPropertyDataType(propertyName))
+                                                .build());
                 }
                 else
                 {

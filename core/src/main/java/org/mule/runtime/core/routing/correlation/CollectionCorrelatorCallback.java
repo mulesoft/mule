@@ -84,9 +84,9 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     @Override
     public boolean shouldAggregateEvents(EventGroup events)
     {
-        int size = events.expectedSize();
+        Integer size = events.expectedSize();
 
-        if (size == -1)
+        if (size == null)
         {
             logger.warn("Correlation Group Size not set, but correlation aggregator is being used."
                         + " Message is being forwarded as is");

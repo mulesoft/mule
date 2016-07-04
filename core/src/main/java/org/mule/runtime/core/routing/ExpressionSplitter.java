@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionManager;
@@ -72,7 +71,7 @@ public class ExpressionSplitter extends AbstractSplitter
             List<MuleEvent> messages = new ArrayList<>();
             for (Object object : (Collection<?>) result)
             {
-                messages.add(new DefaultMuleEvent(new DefaultMuleMessage(object), event));
+                messages.add(new DefaultMuleEvent(MuleMessage.builder().payload(object).build(), event));
             }
             return messages;
         }
@@ -82,8 +81,7 @@ public class ExpressionSplitter extends AbstractSplitter
             Set<Map.Entry<?, ?>> set = ((Map) result).entrySet();
             for (Entry<?, ?> entry : set)
             {
-                MuleMessage message = new DefaultMuleMessage(entry.getValue());
-                MuleEvent newEvent = new DefaultMuleEvent(message, event);
+                MuleEvent newEvent = new DefaultMuleEvent(MuleMessage.builder().payload(entry.getValue()).build(), event);
                 newEvent.setFlowVariable(MapSplitter.MAP_ENTRY_KEY, entry.getKey());
                 list.add(newEvent);
             }
@@ -99,7 +97,7 @@ public class ExpressionSplitter extends AbstractSplitter
             List<MuleEvent> messages = new ArrayList<>(nodeList.getLength());
             for (int i = 0; i < nodeList.getLength(); i++)
             {
-                messages.add(new DefaultMuleEvent(new DefaultMuleMessage(nodeList.item(i)), event));
+                messages.add(new DefaultMuleEvent(MuleMessage.builder().payload(nodeList.item(i)).build(), event));
             }
             return messages;
         }
@@ -110,7 +108,7 @@ public class ExpressionSplitter extends AbstractSplitter
         else
         {
             logger.info("The expression does not evaluate to a type that can be split: " + result.getClass().getName());
-            return Collections.<MuleEvent> singletonList(new DefaultMuleEvent(new DefaultMuleMessage(result), event));
+            return Collections.<MuleEvent> singletonList(new DefaultMuleEvent(MuleMessage.builder().payload(result).build(), event));
         }
     }
 

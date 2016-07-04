@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -70,11 +71,9 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
             fireNotification(exception);
             logException(exception, request);
             processStatistics(request);
-            request.setMessage(request.getMessage().transform(msg ->
-            {
-                msg.setExceptionPayload(new DefaultExceptionPayload(exception));
-                return msg;
-            }));
+            request.setMessage(MuleMessage.builder(request.getMessage())
+                                          .exceptionPayload(new DefaultExceptionPayload(exception))
+                                          .build());
 
             markExceptionAsHandledIfRequired(exception);
             return beforeRouting(exception, request);
@@ -119,11 +118,9 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
                 //Do nothing
             }
 
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setExceptionPayload(new DefaultExceptionPayload(exception));
-                return msg;
-            }));
-
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .exceptionPayload(new DefaultExceptionPayload(exception))
+                                        .build());
             return event;
         }
 
@@ -166,10 +163,9 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
     {
         if (this.handleException)
         {
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setExceptionPayload(null);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .exceptionPayload(null)
+                                        .build());
         }
     }
 
@@ -188,10 +184,9 @@ public abstract class TemplateMessagingExceptionStrategy extends AbstractExcepti
         {
             try
             {
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setExceptionPayload(new DefaultExceptionPayload(t));
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage())
+                                            .exceptionPayload(new DefaultExceptionPayload(t))
+                                            .build());
                 MuleEvent result = configuredMessageProcessors.process(event);
                 return result;
             }

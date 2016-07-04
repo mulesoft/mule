@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
@@ -40,6 +41,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         setMuleContext(muleContext);
     }
 
+    @Override
     public MuleEvent handleException(Exception ex, MuleEvent event)
     {
         try
@@ -60,11 +62,10 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
             {
                 RequestContext.setExceptionPayload(exceptionPayload);
             }
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setPayload(NullPayload.getInstance());
-                msg.setExceptionPayload(exceptionPayload);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .payload(NullPayload.getInstance())
+                                        .exceptionPayload(exceptionPayload)
+                                        .build());
             return event;
         }
         finally
@@ -141,6 +142,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
      * @deprecated Override doHandleException(Exception e, MuleEvent event) instead
      */
     // Left this here for backwards-compatibility, remove in the next major version.
+    @Deprecated
     protected void defaultHandler(Throwable t)
     {
         // empty

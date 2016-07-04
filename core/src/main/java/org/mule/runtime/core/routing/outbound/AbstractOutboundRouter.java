@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -181,13 +183,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         MuleMessage message = event.getMessage();
         if (replyTo != null)
         {
-            // if replyTo is set we'll probably want the correlationId set as
-            // well
-            event.setMessage(message.transform(msg -> {
-                msg.setReplyTo(replyTo);
-                msg.setOutboundProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName());
-                return msg;
-            }));
+            // if replyTo is set we'll probably want the correlationId set as well
+            event.setMessage(MuleMessage.builder(message)
+                                        .replyTo(replyTo)
+                                        .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, service.getName())
+                                        .build());
         }
         if (enableCorrelation != CorrelationMode.NEVER)
         {
@@ -231,10 +231,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                 buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
                 logger.debug(buf.toString());
             }
-            event.setMessage(message.transform(msg -> {
-                msg.setCorrelationId(correlation);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(message).correlationId(correlation).build());
         }
     }
 
@@ -423,14 +420,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
 
     /**
-     * Create a fresh copy of a message.
-     */
-    protected MuleMessage cloneMessage(MuleMessage message)
-    {
-        return AbstractRoutingStrategy.cloneMessage(message);
-    }
-
-    /**
      * Creates a fresh copy of a {@link MuleMessage} ensuring that the payload can be cloned (i.e. is not consumable).
      *
      * @param event The {@link MuleEvent} to clone the message from.
@@ -443,9 +432,12 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
 
     /**
-     * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and
-     * out params can be the same message object when not dealing with replies.
+     * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and out
+     * params can be the same message object when not dealing with replies.
+     * 
+     * @deprecated TODO MULE-9858
      */
+    @Deprecated
     protected MuleMessage propagateMagicProperties(MuleMessage in)
     {
         return AbstractRoutingStrategy.propagateMagicProperties(in);

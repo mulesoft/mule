@@ -8,12 +8,11 @@ package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NameableObject;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
@@ -99,8 +98,11 @@ public class MessageProcessorNotification extends ServerNotification implements 
         }
         else if (rootId != null && flowConstruct != null)
         {
-            MutableMuleMessage msg = new DefaultMuleMessage(NullPayload.getInstance());
-            msg.setMessageRootId(rootId);
+            final MuleMessage msg = MuleMessage.builder()
+                                               .payload(NullPayload.getInstance())
+                                               .rootId(rootId)
+                                               .build();
+
             return new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, flowConstruct);
         }
         else

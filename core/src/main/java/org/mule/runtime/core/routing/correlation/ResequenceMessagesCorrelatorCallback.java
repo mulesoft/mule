@@ -7,9 +7,9 @@
 package org.mule.runtime.core.routing.correlation;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.AggregationException;
@@ -72,7 +72,7 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
                 results[i] = (MuleEvent)((ThreadSafeAccess)results[i]).newThreadCopy();
             }
         }
-        return new DefaultMuleEvent(new DefaultMuleMessage(results), results[0]);
+        return new DefaultMuleEvent(MuleMessage.builder().payload(results).build(), results[0]);
     }
 
 }

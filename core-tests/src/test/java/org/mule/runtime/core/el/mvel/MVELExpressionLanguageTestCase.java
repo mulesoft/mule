@@ -25,8 +25,8 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.optimizers.OptimizerFactory;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -258,14 +258,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         mvel.setAliases(Collections.singletonMap("app", "'other1'"));
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("app", "otherb");
-        muleContext.getRegistry().registerObject("foo", new ExpressionLanguageExtension()
-        {
-            @Override
-            public void configureContext(ExpressionLanguageContext context)
-            {
-                context.addVariable("app", "otherc");
-            }
-        });
+        muleContext.getRegistry().registerObject("foo", (ExpressionLanguageExtension) context -> context.addVariable("app", "otherc"));
         mvel.initialise();
         assertEquals(AppContext.class, evaluate("app", event).getClass());
     }
@@ -276,14 +269,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         mvel.setAliases(Collections.singletonMap("message", "'other1'"));
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("message", "other2");
-        muleContext.getRegistry().registerObject("foo", new ExpressionLanguageExtension()
-        {
-            @Override
-            public void configureContext(ExpressionLanguageContext context)
-            {
-                context.addVariable("message", "other3");
-            }
-        });
+        muleContext.getRegistry().registerObject("foo", (ExpressionLanguageExtension) context -> context.addVariable("message", "other3"));
         mvel.initialise();
         assertEquals(MessageContext.class, evaluate("message", event).getClass());
     }
@@ -294,14 +280,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         MuleEvent event = getTestEvent("");
         event.setFlowVariable("foo", "other");
-        muleContext.getRegistry().registerObject("key", new ExpressionLanguageExtension()
-        {
-            @Override
-            public void configureContext(ExpressionLanguageContext context)
-            {
-                context.addVariable("foo", "bar");
-            }
-        });
+        muleContext.getRegistry().registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "bar"));
         mvel.initialise();
         assertEquals("bar", evaluate("foo", event));
     }
@@ -310,14 +289,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     public void aliasTakesPrecedenceOverAutoResolved() throws RegistrationException, InitialisationException
     {
         mvel.setAliases(Collections.singletonMap("foo", "'bar'"));
-        muleContext.getRegistry().registerObject("key", new ExpressionLanguageExtension()
-        {
-            @Override
-            public void configureContext(ExpressionLanguageContext context)
-            {
-                context.addVariable("foo", "other");
-            }
-        });
+        muleContext.getRegistry().registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "other"));
         mvel.initialise();
         assertEquals("bar", evaluate("foo"));
     }
@@ -636,13 +608,13 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
         assert classLoader != null;
         String path = packageName.replace('.', '/');
         Enumeration<URL> resources = classLoader.getResources(path);
-        List<File> dirs = new ArrayList<File>();
+        List<File> dirs = new ArrayList<>();
         while (resources.hasMoreElements())
         {
             URL resource = resources.nextElement();
             dirs.add(new File(resource.getFile()));
         }
-        ArrayList<Class> classes = new ArrayList<Class>();
+        ArrayList<Class> classes = new ArrayList<>();
         for (File directory : dirs)
         {
             classes.addAll(findClasses(directory, packageName));
@@ -660,7 +632,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
      */
     private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException
     {
-        List<Class> classes = new ArrayList<Class>();
+        List<Class> classes = new ArrayList<>();
         if (!directory.exists())
         {
             return classes;
@@ -682,10 +654,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     {
         MuleEvent event = getTestEvent(new String[]{"1", "2"});
         assertEquals("1", mvel.evaluate("payload[0]", event));
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setPayload(singletonList("1"));
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(singletonList("1")).build());
         assertEquals("1", mvel.evaluate("payload[0]", event));
     }
 

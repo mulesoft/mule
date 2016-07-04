@@ -26,7 +26,7 @@ public class NodeListMessageSequence extends AbstractMessageSequence<Node>
     }
 
     @Override
-    public int size()
+    public Integer size()
     {
         return nodeList.getLength();
     }

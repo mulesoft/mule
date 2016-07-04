@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.HTML_STRING;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -21,6 +21,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessage;
@@ -43,6 +44,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 /**
  *
  */
@@ -54,6 +57,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     private static final Banana TEST_ATTR_2 = new Banana();
     private static final String PROPERTY_KEY = "propertyKey";
     private static final Serializable PROPERTY_VALUE = "propertyValue";
+    private static final String ATTACHMENT_KEY = "attachmentKey";
+    private static final String ATTACHMENT_VALUE = "attachmentValue";
     private static final Object REPLY_TO = new Orange();
     private static final MediaType HTML_STRING_UTF8 = HTML.withCharset(UTF_8);
 
@@ -153,6 +158,13 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void testOnlyPayload()
+    {
+        MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
+        assertThat(message.getPayload(), is(TEST_PAYLOAD));
+    }
+
+    @Test
     public void messageAttributes()
     {
         assertTestMessage(createTestMessage());
@@ -173,7 +185,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
-        assertThat(message.getInboundPropertyNames().size(), equalTo(1));
+        assertThat(message.getInboundPropertyNames(), hasSize(1));
         assertThat(message.getInboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -186,7 +198,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(copy.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(copy.getInboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
-        assertThat(copy.getInboundPropertyNames().size(), equalTo(1));
+        assertThat(copy.getInboundPropertyNames(), hasSize(1));
         assertThat(copy.getInboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -199,7 +211,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
-        assertThat(message.getOutboundPropertyNames().size(), equalTo(3));
+        assertThat(message.getOutboundPropertyNames(), hasSize(1));
         assertThat(message.getOutboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -213,7 +225,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(copy.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(copy.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
-        assertThat(copy.getOutboundPropertyNames().size(), equalTo(3));
+        assertThat(copy.getOutboundPropertyNames(), hasSize(1));
         assertThat(copy.getOutboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -225,7 +237,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
-        assertThat(message.getInboundPropertyNames().size(), equalTo(1));
+        assertThat(message.getInboundPropertyNames(), hasSize(1));
         assertThat(message.getInboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -237,7 +249,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(HTML_STRING));
-        assertThat(message.getInboundPropertyNames().size(), equalTo(1));
+        assertThat(message.getInboundPropertyNames(), hasSize(1));
         assertThat(message.getInboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -249,7 +261,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
-        assertThat(message.getOutboundPropertyNames().size(), equalTo(3));
+        assertThat(message.getOutboundPropertyNames(), hasSize(1));
         assertThat(message.getOutboundPropertyNames(), hasItem(PROPERTY_KEY));
     }
 
@@ -261,8 +273,87 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
         assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
         assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(HTML_STRING));
-        assertThat(message.getOutboundPropertyNames().size(), equalTo(3));
+        assertThat(message.getOutboundPropertyNames(), hasSize(1));
         assertThat(message.getOutboundPropertyNames(), hasItem(PROPERTY_KEY));
+    }
+
+    @Test
+    public void inboundAttachmentMap()
+    {
+        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
+        Map<String, DataHandler> inboundAttachments = singletonMap(ATTACHMENT_KEY, attachmentValue);
+        MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).inboundAttachments(inboundAttachments).build();
+
+        assertThat(message.getInboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
+        assertThat(message.getInboundAttachmentNames(), hasSize(1));
+        assertThat(message.getInboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
+    }
+
+    @Test
+    public void inboundAttachmentMapCopy()
+    {
+        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
+        Map<String, DataHandler> inboundAttachments = singletonMap(ATTACHMENT_KEY, attachmentValue);
+        MuleMessage copy = new DefaultMuleMessageBuilder(new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
+                                                                                        .inboundAttachments(inboundAttachments)
+                                                                                        .build()).build();
+
+        assertThat(copy.getInboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
+        assertThat(copy.getInboundAttachmentNames(), hasSize(1));
+        assertThat(copy.getInboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
+    }
+
+    @Test
+    public void outboundAttachmentMap()
+    {
+        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
+        Map<String, DataHandler> outboundAttachments = singletonMap(ATTACHMENT_KEY, attachmentValue);
+        MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).outboundAttachments(outboundAttachments).build();
+
+        assertThat(message.getOutboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
+        assertThat(message.getOutboundAttachmentNames(), hasSize(1));
+        assertThat(message.getOutboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
+    }
+
+    @Test
+    public void outboundAttachmentMapCopy()
+    {
+        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
+        Map<String, DataHandler> outboundAttachments = singletonMap(ATTACHMENT_KEY, attachmentValue);
+        MuleMessage copy = new DefaultMuleMessageBuilder(new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
+                                                                                        .outboundAttachments(outboundAttachments)
+                                                                                        .build())
+                                                                                                 .build();
+
+        assertThat(copy.getOutboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
+        assertThat(copy.getOutboundAttachmentNames(), hasSize(1));
+        assertThat(copy.getOutboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
+    }
+
+    @Test
+    public void inboundAttachment()
+    {
+        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
+        MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
+                                                             .addInboundAttachment(ATTACHMENT_KEY, attachmentValue)
+                                                             .build();
+
+        assertThat(message.getInboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
+        assertThat(message.getInboundAttachmentNames(), hasSize(1));
+        assertThat(message.getInboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
+    }
+
+    @Test
+    public void outboundAttachment()
+    {
+        final DataHandler attachmentValue = new DataHandler(ATTACHMENT_VALUE, TEXT.toString());
+        MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
+                                                             .addOutboundAttachment(ATTACHMENT_KEY, attachmentValue)
+                                                             .build();
+
+        assertThat(message.getOutboundAttachment(ATTACHMENT_KEY), equalTo(attachmentValue));
+        assertThat(message.getOutboundAttachmentNames(), hasSize(1));
+        assertThat(message.getOutboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
     }
 
     @Rule
@@ -286,8 +377,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void mutatePayloadSameTypeConserveTypeAndMimeType()
     {
-        MuleMessage<String, Apple> message = createTestMessage();
-        MuleMessage<Boolean, Apple> copy = new DefaultMuleMessageBuilder(message).payload(NEW_PAYLOAD).build();
+        MuleMessage message = createTestMessage();
+        MuleMessage copy = new DefaultMuleMessageBuilder(message).payload(NEW_PAYLOAD).build();
 
         assertThat(copy.getPayload(), equalTo(NEW_PAYLOAD));
         assertThat(copy.getDataType().getType(), equalTo(String.class));
@@ -297,7 +388,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void mutatePayloadDifferentTypeUpdateTypeAndConserveMimeType()
     {
-        MuleMessage<Boolean, Apple> copy = new DefaultMuleMessageBuilder(createTestMessage()).payload(1).build();
+        MuleMessage copy = new DefaultMuleMessageBuilder(createTestMessage()).payload(1).build();
 
         assertThat(copy.getPayload(), equalTo(1));
         assertThat(copy.getDataType().getType(), equalTo(Integer.class));
@@ -309,8 +400,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     {
         Long payload = new Long(1);
         DataHandler dataHandler = new DataHandler(payload, XML.toString());
-        MuleMessage<Boolean, Apple> copy = new DefaultMuleMessageBuilder(createTestMessage()).payload(dataHandler)
-                .build();
+        MuleMessage copy = new DefaultMuleMessageBuilder(createTestMessage()).payload(dataHandler).build();
 
         assertThat(copy.getPayload(), is(dataHandler));
         assertThat(copy.getDataType().getType(), equalTo(DataHandler.class));

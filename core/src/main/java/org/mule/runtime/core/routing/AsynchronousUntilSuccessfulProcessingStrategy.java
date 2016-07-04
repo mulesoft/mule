@@ -10,7 +10,6 @@ import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTE
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -246,10 +245,9 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
         try
         {
-            mutableEvent.setMessage(mutableEvent.getMessage().transform(msg -> {
-                msg.setExceptionPayload(new DefaultExceptionPayload(buildRetryPolicyExhaustedException(lastException)));
-                return msg;
-            }));
+            mutableEvent.setMessage(MuleMessage.builder(mutableEvent.getMessage())
+                                               .exceptionPayload(new DefaultExceptionPayload(buildRetryPolicyExhaustedException(lastException)))
+                                               .build());
 
             getUntilSuccessfulConfiguration().getDlqMP().process(mutableEvent);
         }
@@ -314,9 +312,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
     protected MuleEvent threadSafeCopy(final MuleEvent event)
     {
-        final MuleMessage message = new DefaultMuleMessage(event.getMessage().getPayload(), event.getMessage());
-
-        return new DefaultMuleEvent(message, event);
+        return new DefaultMuleEvent(event.getMessage(), event);
     }
 
     @Override

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 
 public class CatchMessagingExceptionStrategy extends TemplateMessagingExceptionStrategy
 {
@@ -18,10 +19,9 @@ public class CatchMessagingExceptionStrategy extends TemplateMessagingExceptionS
     @Override
     protected void nullifyExceptionPayloadIfRequired(MuleEvent event)
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setExceptionPayload(null);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .exceptionPayload(null)
+                                    .build());
     }
 
     @Override

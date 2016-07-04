@@ -14,12 +14,10 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -62,13 +60,12 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         router.setFlowConstruct(flow);
         router.initialise();
 
-        MutableMuleMessage message1 = new DefaultMuleMessage("test event A");
-        MutableMuleMessage message2 = new DefaultMuleMessage("test event B");
-        MutableMuleMessage message3 = new DefaultMuleMessage("test event C");
-        message1.setCorrelationId(message1.getUniqueId());
-        message2.setCorrelationId(message1.getUniqueId());
-        message3.setCorrelationId(message1.getUniqueId());
-        message1.setCorrelationGroupSize(3);
+        MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
+        MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
+        MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
+        message1 = MuleMessage.builder(message1).correlationId(message1.getUniqueId()).correlationGroupSize(3).build();
+        message2 = MuleMessage.builder(message2).correlationId(message1.getUniqueId()).build();
+        message3 = MuleMessage.builder(message1).correlationId(message1.getUniqueId()).build();
 
         MuleEvent event1 = new DefaultMuleEvent(message1, flow, session1);
         MuleEvent event2 = new DefaultMuleEvent(message2, flow, session2);
@@ -114,9 +111,8 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         router.setFlowConstruct(flow);
         router.initialise();
 
-        MutableMuleMessage message1 = new DefaultMuleMessage("test event A");
-        message1.setCorrelationId(message1.getUniqueId());
-        message1.setCorrelationGroupSize(1);
+        MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
+        message1 = MuleMessage.builder(message1).correlationId(message1.getUniqueId()).correlationGroupSize(1).build();
 
         MuleEvent event1 = new DefaultMuleEvent(message1, flow);
 
@@ -144,23 +140,27 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
         router.setFlowConstruct(flow);
         router.initialise();
 
-        MuleMessage message1 = new DefaultMuleMessage("test event A");
-        MuleMessage message2 = new DefaultMuleMessage("test event B");
-        MuleMessage message3 = new DefaultMuleMessage("test event C");
-        MuleMessage message4 = new DefaultMuleMessage("test event D");
+        MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
+        MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
+        MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
+        MuleMessage message4 = MuleMessage.builder().payload("test event D").build();
         List<MuleMessage> list = new ArrayList<>();
         List<MuleMessage> list2 = new ArrayList<>();
         list.add(message1);
         list.add(message2);
         list2.add(message3);
         list2.add(message4);
-        MutableMuleMessage messageCollection1 = new DefaultMuleMessage(list);
-        MutableMuleMessage messageCollection2 = new DefaultMuleMessage(list2);
+        MuleMessage messageCollection1 = MuleMessage.builder().payload(list).build();
+        MuleMessage messageCollection2 = MuleMessage.builder().payload(list2).build();
 
-        messageCollection1.setCorrelationGroupSize(2);
-        messageCollection1.setCorrelationId(messageCollection1.getUniqueId());
-        messageCollection2.setCorrelationGroupSize(2);
-        messageCollection2.setCorrelationId(messageCollection1.getUniqueId());
+        messageCollection1 = MuleMessage.builder(messageCollection1)
+                                        .correlationGroupSize(2)
+                                        .correlationId(messageCollection1.getUniqueId())
+                                        .build();
+        messageCollection2 = MuleMessage.builder(messageCollection2)
+                                        .correlationGroupSize(2)
+                                        .correlationId(messageCollection1.getUniqueId())
+                                        .build();
 
         MuleEvent event1 = new DefaultMuleEvent(messageCollection1, flow);
         MuleEvent event2 = new DefaultMuleEvent(messageCollection2, flow);

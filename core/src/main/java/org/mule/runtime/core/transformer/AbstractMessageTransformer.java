@@ -9,7 +9,6 @@ package org.mule.runtime.core.transformer;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -34,7 +33,6 @@ import java.nio.charset.Charset;
  * src object not the message payload.
  *
  * @see org.mule.runtime.core.api.MuleMessage
- * @see org.mule.runtime.core.DefaultMuleMessage
  */
 
 public abstract class AbstractMessageTransformer extends AbstractTransformer implements MessageTransformer
@@ -132,7 +130,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
         }
         else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform())
         {
-            message = new DefaultMuleMessage(src);
+            message = MuleMessage.builder().payload(src).build();
         }
         else
         {

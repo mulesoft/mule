@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -31,13 +32,13 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RET
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.MuleTestUtils.getTestEvent;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -97,7 +98,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = MuleMessage.builder().payload(TEST).addInboundProperty(MULE_ENCODING_PROPERTY,
                                                                                      CUSTOM_ENCODING.name()).build();
-        assertEmptyDataType(message);
+        assertCustomEncoding(message);
     }
 
     @Test
@@ -106,14 +107,14 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         MuleMessage muleMessage = MuleMessage.builder().payload(TEST).addOutboundProperty(MULE_ENCODING_PROPERTY,
                                                                                           CUSTOM_ENCODING.name())
                 .build();
-        assertEmptyDataType(muleMessage);
+        assertCustomEncoding(muleMessage);
     }
 
     @Test
     public void doesNotUseContentTyperomInboundProperty() throws Exception
     {
         MuleMessage message = MuleMessage.builder().payload(TEST).addInboundProperty(CONTENT_TYPE_PROPERTY,
-                                                                                     STRING.toString()).build();
+                STRING.getMediaType().toString()).build();
         assertEmptyDataType(message);
     }
 
@@ -121,7 +122,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     public void doesNotUseContentTypeFromOutboundProperty() throws Exception
     {
         MuleMessage muleMessage = MuleMessage.builder().payload(TEST).addOutboundProperty(CONTENT_TYPE_PROPERTY,
-                                                                                          STRING.toString()).build();
+                STRING.getMediaType().toString()).build();
         assertEmptyDataType(muleMessage);
     }
 
@@ -215,6 +216,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         when(transformer.isSourceDataTypeSupported(org.mockito.Matchers.<DataType<?>>any())).thenReturn(true);
         DataType outputDataType = DataType.builder().type(Integer.class).mediaType(APPLICATION_XML).build();
         when(transformer.getReturnDataType()).thenReturn(outputDataType);
+        when(transformer.transform(anyString())).thenReturn(1);
 
         MuleEvent muleEvent = mock(MuleEvent.class);
 
@@ -387,10 +389,9 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
         assertThat(muleMessage.getDataType().getMediaType().getCharset().isPresent(), is(false));
     }
 
-    private void assertDefaultDataType(MutableMuleMessage muleMessage)
+    private void assertCustomEncoding(MuleMessage muleMessage)
     {
-        muleMessage.setOutboundProperty(MULE_ENCODING_PROPERTY, getDefaultEncoding(muleContext).name());
-        assertDataType(muleMessage, String.class, ANY, DEFAULT_ENCODING);
+        assertThat(muleMessage.getDataType().getMediaType().getCharset().get(), is(CUSTOM_ENCODING));
     }
 
     private void assertDataType(MuleMessage muleMessage, Class type, MediaType mimeType, Charset encoding)

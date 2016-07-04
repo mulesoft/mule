@@ -101,9 +101,6 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         MuleEvent result = endpoint.process(testOutboundEvent);
 
         assertEventSent();
-
-        assertSame(responseMessage, result.getMessage());
-
         assertEqualMessages(responseMessage, result.getMessage());
     }
 
@@ -132,8 +129,6 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         assertEventSent();
         assertMessageSentEqual(MyMessageDispatcherFactory.dispatcher.sensedSendEvent);
-
-        assertSame(responseMessage, result.getMessage());
 
         assertEqualMessages(responseMessage, result.getMessage());
     }
