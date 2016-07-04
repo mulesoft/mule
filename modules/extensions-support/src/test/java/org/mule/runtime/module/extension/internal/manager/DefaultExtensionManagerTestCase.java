@@ -24,6 +24,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
@@ -46,7 +48,6 @@ import org.mule.runtime.extension.api.runtime.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
-import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -138,6 +139,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         this.extensionsManager = extensionsManager;
 
         when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
+        mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
+
         when(extensionModel1.getConfigurationModels()).thenReturn(asList(extension1ConfigurationModel));
         when(extensionModel2.getName()).thenReturn(EXTENSION2_NAME);
         when(extensionModel3WithRepeatedName.getName()).thenReturn(EXTENSION2_NAME);
@@ -148,6 +151,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
 
         when(extensionModel1.getVersion()).thenReturn(EXTENSION1_VERSION);
         when(extensionModel2.getVersion()).thenReturn(EXTENSION2_VERSION);
+        mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
         when(extensionModel3WithRepeatedName.getVersion()).thenReturn(EXTENSION2_VERSION);
 
         when(extension1ConfigurationModel.getName()).thenReturn(EXTENSION1_CONFIG_NAME);
@@ -180,7 +184,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         classLoader = getClass().getClassLoader();
         registerExtensions(extensionModel1, extensionModel2, extensionModel3WithRepeatedName);
 
-        ExtensionsTestUtils.stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
+        stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
     }
 
     private void registerExtensions(RuntimeExtensionModel... extensionModels)

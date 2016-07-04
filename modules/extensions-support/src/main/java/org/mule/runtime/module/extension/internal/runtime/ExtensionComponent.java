@@ -21,13 +21,15 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
@@ -49,6 +51,9 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor}
  * and {@link ExtensionMessageSource}.
@@ -57,8 +62,10 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public abstract class ExtensionComponent implements MuleContextAware, MetadataAware, FlowConstructAware, Initialisable
+public abstract class ExtensionComponent implements MuleContextAware, MetadataAware, FlowConstructAware, Lifecycle
 {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
 
     private final TemplateParser expressionParser = createMuleStyleParser();
     private final RuntimeExtensionModel extensionModel;
@@ -94,15 +101,74 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
     @Override
     public final void initialise() throws InitialisationException
     {
-        validateConfigurationProviderIsNotExpression();
-        Optional<ConfigurationProvider<Object>> provider = findConfigurationProvider();
+        withContextClassLoader(getExtensionClassLoader(), () -> {
+            validateConfigurationProviderIsNotExpression();
+            Optional<ConfigurationProvider<Object>> provider = findConfigurationProvider();
 
-        if (provider.isPresent())
+            if (provider.isPresent())
+            {
+                validateOperationConfiguration(provider.get());
+            }
+
+            doInitialise();
+            return null;
+        }, InitialisationException.class, e -> {
+            throw new InitialisationException(e, this);
+        });
+    }
+
+    /**
+     * Delegates into {@link #doStart()} making sure that it executes
+     * using the extension's class loader
+     *
+     * @throws MuleException if the phase couldn't be applied
+     */
+    @Override
+    public final void start() throws MuleException
+    {
+        withContextClassLoader(getExtensionClassLoader(), () -> {
+            doStart();
+            return null;
+        }, MuleException.class, e -> {
+            throw new DefaultMuleException(e);
+        });
+    }
+
+    /**
+     * Delegates into {@link #doStop()} making sure that it executes
+     * using the extension's class loader
+     *
+     * @throws MuleException if the phase couldn't be applied
+     */
+    @Override
+    public final void stop() throws MuleException
+    {
+        withContextClassLoader(getExtensionClassLoader(), () -> {
+            doStop();
+            return null;
+        }, MuleException.class, e -> {
+            throw new DefaultMuleException(e);
+        });
+    }
+
+    /**
+     * Delegates into {@link #doDispose()} making sure that it executes
+     * using the extension's class loader
+     */
+    @Override
+    public final void dispose()
+    {
+        try
         {
-            validateOperationConfiguration(provider.get());
+            withContextClassLoader(getExtensionClassLoader(), () -> {
+                doDispose();
+                return null;
+            });
         }
-
-        doInitialise();
+        catch (Exception e)
+        {
+            LOGGER.warn("Exception found trying to dispose component", e);
+        }
     }
 
     /**
@@ -112,6 +178,28 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
      * @throws InitialisationException if a fatal error occurs causing the Mule instance to shutdown
      */
     protected abstract void doInitialise() throws InitialisationException;
+
+    /**
+     * Implementors will use this method to perform their own starting
+     * logic
+     *
+     * @throws MuleException if the component could not start
+     */
+    protected abstract void doStart() throws MuleException;
+
+    /**
+     * Implementors will use this method to perform their own stopping
+     * logic
+     *
+     * @throws MuleException if the component could not stop
+     */
+    protected abstract void doStop() throws MuleException;
+
+    /**
+     * Implementors will use this method to perform their own disposing
+     * logic
+     */
+    protected abstract void doDispose();
 
     /**
      * Validates that the configuration returned by the {@code configurationProvider}
@@ -196,6 +284,11 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
         return getConfigurationProviderByModel()
                 .map(provider -> provider.get(event))
                 .orElseGet(() -> extensionManager.getConfiguration(extensionModel, event));
+    }
+
+    protected ClassLoader getExtensionClassLoader()
+    {
+        return getClassLoader(extensionModel);
     }
 
     private Optional<ConfigurationProvider<Object>> findConfigurationProvider()

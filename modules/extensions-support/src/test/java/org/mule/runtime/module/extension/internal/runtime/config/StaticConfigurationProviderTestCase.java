@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -70,6 +71,7 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
         when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
         when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
 
+        mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
         when(operationContext.getEvent()).thenReturn(event);
 
         Map<String, ValueResolver> parameters = new HashMap<>();

@@ -70,8 +70,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExtensionMessageSource extends ExtensionComponent implements MessageSource,
         MessageHandler<Object, Serializable>,
-        ExceptionCallback<Void, Throwable>,
-        Lifecycle
+        ExceptionCallback<Void, Throwable>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionMessageSource.class);
@@ -165,7 +164,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     }
 
     @Override
-    public void start() throws MuleException
+    public void doStart() throws MuleException
     {
         if (workManager == null)
         {
@@ -177,7 +176,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     }
 
     @Override
-    public void stop() throws MuleException
+    public void doStop() throws MuleException
     {
         try
         {
@@ -190,7 +189,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     }
 
     @Override
-    public void dispose()
+    public void doDispose()
     {
         disposeSource();
     }

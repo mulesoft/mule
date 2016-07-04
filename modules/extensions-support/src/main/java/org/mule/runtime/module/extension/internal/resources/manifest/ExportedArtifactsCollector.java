@@ -19,12 +19,7 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.connection.HasConnectionProviderModels;
-import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.operation.HasOperationModels;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -33,7 +28,6 @@ import org.mule.runtime.extension.api.introspection.property.ExportModelProperty
 import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
-import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -148,12 +142,6 @@ final class ExportedArtifactsCollector
         new ExtensionWalker()
         {
             @Override
-            public void onConfiguration(ConfigurationModel model)
-            {
-                collectImplementingClass(model);
-            }
-
-            @Override
             public void onParameter(ParameterizedModel owner, ParameterModel model)
             {
                 getParameterClass(model).ifPresent(exportedClasses::add);
@@ -162,23 +150,15 @@ final class ExportedArtifactsCollector
             @Override
             public void onOperation(HasOperationModels owner, OperationModel model)
             {
-                collectImplementingClass(model);
                 collectReturnTypes(model);
             }
 
             @Override
             public void onSource(HasSourceModels owner, SourceModel model)
             {
-                collectImplementingClass(model);
                 collectReturnTypes(model);
             }
 
-            @Override
-            public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model)
-            {
-                collectImplementingClass(model);
-                exportedClasses.add(((RuntimeConnectionProviderModel) model).getConnectionType());
-            }
         }.walk(extensionModel);
     }
 
@@ -225,12 +205,5 @@ final class ExportedArtifactsCollector
         });
 
         return Optional.ofNullable(clazz.get());
-    }
-
-    private void collectImplementingClass(EnrichableModel model)
-    {
-        model.getModelProperty(ImplementingTypeModelProperty.class)
-                .map(ImplementingTypeModelProperty::getType)
-                .ifPresent(exportedClasses::add);
     }
 }

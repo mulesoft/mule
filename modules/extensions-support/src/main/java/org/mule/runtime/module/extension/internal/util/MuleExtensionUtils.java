@@ -10,10 +10,10 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.springframework.util.ReflectionUtils.setField;
-
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.message.NullPayload;
@@ -64,6 +64,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 /**
  * Utilities for handling {@link ExtensionModel extensions}
@@ -298,7 +299,7 @@ public class MuleExtensionUtils
         return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance()), REQUEST_RESPONSE, new FlowConstruct()
         {
             // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
-            
+
             @Override
             public MuleContext getMuleContext()
             {
@@ -362,6 +363,21 @@ public class MuleExtensionUtils
         return extensionModel.getModelProperty(ClassLoaderModelProperty.class)
                 .map(ClassLoaderModelProperty::getClassLoader)
                 .orElseThrow(() -> noClassLoaderException(extensionModel.getName()));
+    }
+
+    /**
+     * Executes the given {@code callable} using the {@link ClassLoader} associated to the
+     * {@code extensionModel}
+     *
+     * @param extensionModel a {@link ExtensionModel}
+     * @param callable       a {@link Callable}
+     * @param <T>            the generic type of the {@code callable}'s return type
+     * @return the value returned by the {@code callable}
+     * @throws Exception if the {@code callable} fails to execute
+     */
+    public static <T> T withExtensionClassLoader(ExtensionModel extensionModel, Callable<T> callable) throws Exception
+    {
+        return withContextClassLoader(getClassLoader(extensionModel), callable);
     }
 
     public static void injectConfigName(EnrichableModel model, Object target, String configName)

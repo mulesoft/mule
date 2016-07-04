@@ -25,7 +25,8 @@ import org.junit.Test;
 public class DefaultConnectionProviderFactoryTestCase extends AbstractMuleTestCase
 {
 
-    private ConnectionProviderFactory factory = new DefaultConnectionProviderFactory<>(SimplePetStoreConnectionProvider.class);
+    private ConnectionProviderFactory factory = new DefaultConnectionProviderFactory<>(SimplePetStoreConnectionProvider.class,
+                                                                                       SimplePetStoreConnectionProvider.class.getClassLoader());
 
     @Test
     public void getObjectType()
@@ -48,12 +49,12 @@ public class DefaultConnectionProviderFactoryTestCase extends AbstractMuleTestCa
     @Test(expected = IllegalModelDefinitionException.class)
     public void notProviderClass()
     {
-        new DefaultConnectionProviderFactory<>(Object.class);
+        new DefaultConnectionProviderFactory<>(Object.class, getClass().getClassLoader());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void notInstantiable()
     {
-        new DefaultConnectionProviderFactory<>(ConnectionProvider.class);
+        new DefaultConnectionProviderFactory<>(ConnectionProvider.class, ConnectionProvider.class.getClassLoader());
     }
 }

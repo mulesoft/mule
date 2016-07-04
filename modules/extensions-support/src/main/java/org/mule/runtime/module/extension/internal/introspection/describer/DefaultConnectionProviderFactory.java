@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -14,28 +15,31 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderFactory;
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
 
+
 /**
  * Creates instances of {@link ConnectionProvider} based on a {@link #providerClass}
- * * @param <Config>     the generic type for the configuration objects that the created {@link ConnectionProvider providers} accept
  *
  * @param <Connection> the generic type for the connections that the created  {@link ConnectionProvider providers} produce
  * @since 4.0
  */
-final class DefaultConnectionProviderFactory<Config, Connection> implements ConnectionProviderFactory<Connection>
+final class DefaultConnectionProviderFactory<Connection> implements ConnectionProviderFactory<Connection>
 {
 
     private final Class<? extends ConnectionProvider> providerClass;
+    private final ClassLoader extensionClassLoader;
 
     /**
      * Creates a new instance which creates {@link ConnectionProvider} instances of the given
      * {@code providerClass}
      *
-     * @param providerClass the {@link Class} of the created {@link ConnectionProvider providers}
+     * @param providerClass        the {@link Class} of the created {@link ConnectionProvider providers}
+     * @param extensionClassLoader the {@link ClassLoader} on which the extension is loaded
      * @throws IllegalModelDefinitionException if {@code providerClass} doesn't implement the {@link ConnectionProvider} interface
      * @throws IllegalArgumentException        if {@code providerClass} is not an instantiable type
      */
-    DefaultConnectionProviderFactory(Class<?> providerClass)
+    DefaultConnectionProviderFactory(Class<?> providerClass, ClassLoader extensionClassLoader)
     {
+        this.extensionClassLoader = extensionClassLoader;
         if (!ConnectionProvider.class.isAssignableFrom(providerClass))
         {
             throw new IllegalConnectionProviderModelDefinitionException(String.format(
@@ -55,7 +59,7 @@ final class DefaultConnectionProviderFactory<Config, Connection> implements Conn
     {
         try
         {
-            return (ConnectionProvider) providerClass.newInstance();
+            return (ConnectionProvider) withContextClassLoader(extensionClassLoader, providerClass::newInstance);
         }
         catch (Exception e)
         {

@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -65,8 +66,11 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
         when(configurationModel.getInterceptorFactories()).thenReturn(ImmutableList.of());
         when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
         when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
-        when(configurationModel.getExtensionModel().getSourceModels()).thenReturn(ImmutableList.of());
-        when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(ImmutableList.of());
+        when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
+
+        mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
+        when(extensionModel.getSourceModels()).thenReturn(ImmutableList.of());
+        when(extensionModel.getOperationModels()).thenReturn(ImmutableList.of());
 
         when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
 

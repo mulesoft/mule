@@ -313,7 +313,7 @@ public final class AnnotationsBasedDescriber implements Describer
             configurationDeclarer = declaration.withConfig(Extension.DEFAULT_CONFIG_NAME).describedAs(Extension.DEFAULT_CONFIG_DESCRIPTION);
         }
 
-        configurationDeclarer.createdWith(new TypeAwareConfigurationFactory(configurationType))
+        configurationDeclarer.createdWith(new TypeAwareConfigurationFactory(configurationType, extensionType.getClassLoader()))
                 .withModelProperty(new ImplementingTypeModelProperty(configurationType));
 
         declareAnnotatedParameters(configurationType, configurationDeclarer);
@@ -686,7 +686,7 @@ public final class AnnotationsBasedDescriber implements Describer
 
         providerDeclarer = declarer.withConnectionProvider(name)
                 .describedAs(description)
-                .createdWith(new DefaultConnectionProviderFactory<>(providerClass))
+                .createdWith(new DefaultConnectionProviderFactory<>(providerClass, extensionType.getClassLoader()))
                 .whichGivesConnectionsOfType(providerGenerics.get(0))
                 .withModelProperty(new ImplementingTypeModelProperty(providerClass));
 
