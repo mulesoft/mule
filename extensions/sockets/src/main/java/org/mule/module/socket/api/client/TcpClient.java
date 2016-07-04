@@ -6,9 +6,9 @@
  */
 package org.mule.module.socket.api.client;
 
-import org.mule.module.socket.api.protocol.TcpProtocol;
-import org.mule.module.socket.api.source.ImmutableSocketAttributes;
-import org.mule.module.socket.api.source.SocketAttributes;
+import org.mule.module.socket.api.socket.tcp.TcpProtocol;
+import org.mule.module.socket.api.ImmutableSocketAttributes;
+import org.mule.module.socket.api.SocketAttributes;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -8,7 +8,7 @@ package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.api.ftp.FtpFileSystem;
+import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
 import org.mule.extension.ftp.internal.FtpCopyDelegate;
 import org.mule.runtime.api.message.MuleEvent;

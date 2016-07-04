@@ -6,6 +6,8 @@
  */
 package org.mule.extension.validation.internal;
 
+import org.mule.extension.validation.api.ValidationExtension;
+import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;

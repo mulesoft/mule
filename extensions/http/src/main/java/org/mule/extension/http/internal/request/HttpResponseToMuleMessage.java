@@ -14,7 +14,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.buildContentTypeDataType;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.request.HttpRequesterConfig;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;

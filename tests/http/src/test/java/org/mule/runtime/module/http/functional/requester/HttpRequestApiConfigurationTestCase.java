@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
-import org.mule.extension.http.api.request.HttpRequesterConfig;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 
 import org.junit.Test;

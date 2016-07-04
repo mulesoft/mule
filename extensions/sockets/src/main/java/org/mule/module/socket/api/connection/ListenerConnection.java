@@ -6,9 +6,9 @@
  */
 package org.mule.module.socket.api.connection;
 
-import org.mule.module.socket.api.source.SocketAttributes;
+import org.mule.module.socket.api.SocketAttributes;
 import org.mule.module.socket.api.source.SocketListener;
-import org.mule.module.socket.internal.worker.SocketWorker;
+import org.mule.module.socket.api.worker.SocketWorker;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.extension.api.runtime.MessageHandler;

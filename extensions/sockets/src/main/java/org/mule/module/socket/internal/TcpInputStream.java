@@ -6,8 +6,8 @@
  */
 package org.mule.module.socket.internal;
 
-import org.mule.module.socket.api.protocol.TcpProtocol;
-import org.mule.module.socket.internal.worker.TcpWorker;
+import org.mule.module.socket.api.socket.tcp.TcpProtocol;
+import org.mule.module.socket.api.worker.TcpWorker;
 
 import java.io.InputStream;
 

@@ -9,7 +9,7 @@ package org.mule.module.socket.api.client;
 
 import org.mule.module.socket.api.exceptions.ReadingTimeoutException;
 import org.mule.module.socket.api.socket.SocketProperties;
-import org.mule.module.socket.api.source.SocketAttributes;
+import org.mule.module.socket.api.SocketAttributes;
 
 import java.io.IOException;
 import java.io.InputStream;

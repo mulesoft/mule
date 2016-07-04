@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file.internal.command;
 
-import org.mule.extension.file.api.LocalFileSystem;
+import org.mule.extension.file.internal.LocalFileSystem;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.MoveCommand;

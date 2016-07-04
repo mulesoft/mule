@@ -15,7 +15,7 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.setUpServer;
-import org.mule.extension.email.api.EmailConnector;
+import org.mule.extension.email.internal.EmailConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 

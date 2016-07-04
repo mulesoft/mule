@@ -6,7 +6,7 @@
  */
 package org.mule.extension.validation;
 
-import org.mule.extension.validation.internal.validator.NumberType;
+import org.mule.extension.validation.api.NumberType;
 import org.mule.functional.junit4.FlowRunner;
 
 import java.util.Arrays;

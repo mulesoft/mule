@@ -17,7 +17,7 @@ import static org.mule.runtime.module.extension.file.api.FileWriteMode.OVERWRITE
 import org.mule.extension.AbstractFtpTestHarness;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.internal.sftp.SftpFileAttributes;
+import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClientFactory;
 import org.mule.functional.util.sftp.SftpServer;

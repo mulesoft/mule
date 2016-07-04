@@ -8,8 +8,8 @@ package org.mule.extension.ftp.internal.sftp.command;
 
 import static org.mule.runtime.module.extension.file.api.TreeNode.Builder.forDirectory;
 import static org.mule.runtime.module.extension.file.api.TreeNode.Builder.forFile;
-import org.mule.extension.ftp.api.sftp.SftpFileSystem;
-import org.mule.extension.ftp.internal.sftp.SftpFileAttributes;
+import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
+import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.module.extension.file.api.FileAttributes;

@@ -13,7 +13,7 @@ import static org.mule.extension.validation.ValidationTestCase.INVALID_URL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
 
-import org.mule.extension.validation.internal.validator.NumberType;
+import org.mule.extension.validation.api.NumberType;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;

@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.validation.api.ValidationException;
-import org.mule.extension.validation.internal.ValidationExtension;
+import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MessagingException;
 

@@ -7,16 +7,16 @@
 package org.mule.module.socket.api.provider.tcp;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.module.socket.api.connection.ConnectionSettings;
+import org.mule.module.socket.api.ConnectionSettings;
 import org.mule.module.socket.api.connection.tcp.TcpListenerConnection;
-import org.mule.module.socket.api.protocol.SafeProtocol;
-import org.mule.module.socket.api.protocol.TcpProtocol;
+import org.mule.module.socket.api.connection.tcp.protocol.SafeProtocol;
+import org.mule.module.socket.api.socket.tcp.TcpProtocol;
 import org.mule.module.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.module.socket.api.source.SocketListener;
 import org.mule.module.socket.internal.SocketUtils;
-import org.mule.module.socket.internal.socket.factory.SimpleServerSocketFactory;
-import org.mule.module.socket.internal.socket.factory.SslServerSocketFactory;
-import org.mule.module.socket.internal.socket.factory.TcpServerSocketFactory;
+import org.mule.module.socket.api.socket.factory.SimpleServerSocketFactory;
+import org.mule.module.socket.api.socket.factory.SslServerSocketFactory;
+import org.mule.module.socket.api.socket.factory.TcpServerSocketFactory;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;

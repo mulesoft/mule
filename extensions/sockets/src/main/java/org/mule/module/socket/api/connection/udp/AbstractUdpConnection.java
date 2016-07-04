@@ -8,7 +8,7 @@ package org.mule.module.socket.api.connection.udp;
 
 import static java.lang.String.format;
 import org.mule.module.socket.api.connection.AbstractSocketConnection;
-import org.mule.module.socket.api.connection.ConnectionSettings;
+import org.mule.module.socket.api.ConnectionSettings;
 import org.mule.module.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionExceptionCode;

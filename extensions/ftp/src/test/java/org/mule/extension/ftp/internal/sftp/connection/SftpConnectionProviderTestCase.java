@@ -18,7 +18,7 @@ import static org.mule.extension.ftp.internal.sftp.connection.SftpClient.PREFERR
 import static org.mule.extension.ftp.internal.sftp.connection.SftpClient.STRICT_HOST_KEY_CHECKING;
 import static org.mule.functional.util.sftp.SftpServer.PASSWORD;
 import static org.mule.functional.util.sftp.SftpServer.USERNAME;
-import org.mule.extension.ftp.api.FtpConnector;
+import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

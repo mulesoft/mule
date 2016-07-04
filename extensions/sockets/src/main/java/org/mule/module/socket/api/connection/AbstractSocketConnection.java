@@ -6,6 +6,8 @@
  */
 package org.mule.module.socket.api.connection;
 
+import org.mule.module.socket.api.ConnectionSettings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

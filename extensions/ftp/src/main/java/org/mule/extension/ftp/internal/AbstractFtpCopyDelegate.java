@@ -7,8 +7,7 @@
 package org.mule.extension.ftp.internal;
 
 import static java.lang.String.format;
-import org.mule.extension.ftp.api.FtpConnector;
-import org.mule.extension.ftp.api.ftp.FtpFileSystem;
+import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;

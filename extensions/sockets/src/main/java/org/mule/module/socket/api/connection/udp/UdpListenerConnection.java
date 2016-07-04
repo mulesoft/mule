@@ -9,13 +9,13 @@ package org.mule.module.socket.api.connection.udp;
 import static org.mule.module.socket.internal.SocketUtils.configureConnection;
 import static org.mule.module.socket.internal.SocketUtils.createPacket;
 
-import org.mule.module.socket.api.connection.ConnectionSettings;
+import org.mule.module.socket.api.ConnectionSettings;
 import org.mule.module.socket.api.connection.ListenerConnection;
 import org.mule.module.socket.api.exceptions.ReadingTimeoutException;
 import org.mule.module.socket.api.socket.udp.UdpSocketProperties;
-import org.mule.module.socket.api.source.SocketAttributes;
-import org.mule.module.socket.internal.worker.SocketWorker;
-import org.mule.module.socket.internal.worker.UdpWorker;
+import org.mule.module.socket.api.SocketAttributes;
+import org.mule.module.socket.api.worker.SocketWorker;
+import org.mule.module.socket.api.worker.UdpWorker;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.Source;

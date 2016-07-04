@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import org.mule.extension.socket.SocketExtensionTestCase;
-import org.mule.module.socket.api.source.SocketAttributes;
+import org.mule.module.socket.api.SocketAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;

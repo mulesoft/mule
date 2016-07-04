@@ -8,7 +8,7 @@ package org.mule.module.socket.api;
 
 import org.mule.module.socket.api.client.SocketClient;
 import org.mule.module.socket.api.connection.RequesterConnection;
-import org.mule.module.socket.internal.metadata.SocketMetadataResolver;
+import org.mule.module.socket.api.metadata.SocketMetadataResolver;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;

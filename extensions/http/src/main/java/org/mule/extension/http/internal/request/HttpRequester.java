@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
-import org.mule.extension.http.api.request.HttpRequesterConfig;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;

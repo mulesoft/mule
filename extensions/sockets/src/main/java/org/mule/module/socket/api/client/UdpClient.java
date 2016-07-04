@@ -9,11 +9,11 @@ package org.mule.module.socket.api.client;
 import static java.util.Arrays.copyOf;
 import static org.mule.module.socket.internal.SocketUtils.createPacket;
 import static org.mule.module.socket.internal.SocketUtils.getUdpAllowedByteArray;
-import org.mule.module.socket.api.connection.ConnectionSettings;
+import org.mule.module.socket.api.ConnectionSettings;
 import org.mule.module.socket.api.exceptions.ReadingTimeoutException;
 import org.mule.module.socket.api.socket.udp.UdpSocketProperties;
-import org.mule.module.socket.api.source.ImmutableSocketAttributes;
-import org.mule.module.socket.api.source.SocketAttributes;
+import org.mule.module.socket.api.ImmutableSocketAttributes;
+import org.mule.module.socket.api.SocketAttributes;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 
 import java.io.ByteArrayInputStream;

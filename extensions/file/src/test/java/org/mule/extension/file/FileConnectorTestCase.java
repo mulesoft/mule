@@ -9,7 +9,7 @@ package org.mule.extension.file;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import org.mule.extension.file.api.FileConnector;
+import org.mule.extension.file.internal.FileConnector;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.MuleMessage;

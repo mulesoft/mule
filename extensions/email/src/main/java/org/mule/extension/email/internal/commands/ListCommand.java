@@ -10,7 +10,7 @@ import static javax.mail.Folder.READ_ONLY;
 import static org.mule.extension.email.internal.builder.EmailAttributesBuilder.fromMessage;
 
 import org.mule.extension.email.api.EmailAttributes;
-import org.mule.extension.email.api.retriever.RetrieverConnection;
+import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.internal.EmailContentProcessor;
 import org.mule.extension.email.internal.exception.EmailRetrieverException;
 import org.mule.runtime.api.message.MuleMessage;

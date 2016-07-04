@@ -19,7 +19,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.request.HttpRequesterProvider;
+import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;

@@ -7,7 +7,6 @@
 package org.mule.extension.email.internal;
 
 import static java.lang.String.format;
-import org.mule.extension.email.api.EmailConnector;
 
 import java.net.Socket;
 
