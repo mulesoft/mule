@@ -15,7 +15,6 @@ import static org.mule.extension.email.internal.util.EmailConnectorUtils.MULTIPA
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.toAddressArray;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
-
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.extension.email.internal.util.EmailConnectorUtils;
@@ -53,7 +52,7 @@ public final class MessageBuilder
     private Map<String, DataHandler> attachments;
     private String content = "";
     private MediaType contentType;
-    private Charset charset;
+    private String charset;
 
     private MessageBuilder(Session s) throws MessagingException
     {
@@ -250,7 +249,7 @@ public final class MessageBuilder
      * @return this {@link MessageBuilder}
      * @throws MessagingException
      */
-    public MessageBuilder withContent(String content, MediaType contentType, Charset charset) throws MessagingException
+    public MessageBuilder withContent(String content, MediaType contentType, String charset) throws MessagingException
     {
         this.content = content;
         this.contentType = contentType;
@@ -335,7 +334,7 @@ public final class MessageBuilder
     {
         if (charset != null)
         {
-            return DataType.builder().mediaType(contentType).charset(charset).build().getMediaType();
+            return DataType.builder().mediaType(contentType).charset(Charset.forName(charset)).build().getMediaType();
         }
         return contentType;
     }

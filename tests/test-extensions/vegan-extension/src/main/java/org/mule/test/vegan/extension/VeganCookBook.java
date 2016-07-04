@@ -6,13 +6,27 @@
  */
 package org.mule.test.vegan.extension;
 
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
+
 import java.util.List;
 
 public class VeganCookBook
 {
+    @Parameter
+    @Optional
     List<String> recipes;
 
+    @Parameter
+    @Optional
     Integer numberOfPages;
+
+    @Parameter
+    @Expression(ExpressionSupport.NOT_SUPPORTED)
+    @Optional(defaultValue = "Enemies of Bondiola")
+    String editorial;
 
     public List<String> getRecipes()
     {
@@ -32,5 +46,10 @@ public class VeganCookBook
     public void setNumberOfPages(Integer numberOfPages)
     {
         this.numberOfPages = numberOfPages;
+    }
+
+    public String getEditorial()
+    {
+        return editorial;
     }
 }

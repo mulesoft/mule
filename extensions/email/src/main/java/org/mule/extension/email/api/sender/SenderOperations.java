@@ -73,6 +73,7 @@ public class SenderOperations
                            subject,
                            toAddresses,
                            configuration.getFrom(),
+                           configuration.getDefaultEncoding(),
                            ccAddresses != null ? ccAddresses : new ArrayList<>(),
                            bccAddresses != null ? bccAddresses : new ArrayList<>(),
                            headers != null ? headers : new HashMap<>(),
@@ -110,6 +111,7 @@ public class SenderOperations
                                content,
                                subject,
                                configuration.getFrom(),
+                               configuration.getDefaultEncoding(),
                                toAddresses,
                                ccAddresses,
                                bccAddresses,
@@ -146,6 +148,7 @@ public class SenderOperations
                              content,
                              subject,
                              configuration.getFrom(),
+                             configuration.getDefaultEncoding(),
                              headers,
                              replyToAll);
     }

@@ -6,15 +6,12 @@
  */
 package org.mule.extension.email.api;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.mule.runtime.api.metadata.MediaType.TEXT;
 
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT_PLAIN;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-
-import java.nio.charset.Charset;
 
 /**
  * Represents and enables the construction of the content of an email
@@ -29,10 +26,19 @@ public class EmailContent
     {
     }
 
-    public EmailContent(String body, String contentType)
+
+    public EmailContent(String body, String charset)
     {
         this.body = body;
-        this.contentType = contentType;
+        this.contentType = TEXT_PLAIN;
+        this.charset = charset;
+    }
+
+    public EmailContent(String body, MediaType contentType, String charset)
+    {
+        this.body = body;
+        this.contentType = contentType.toString();
+        this.charset = charset;
     }
 
     /**
@@ -48,16 +54,16 @@ public class EmailContent
      * The default value is "text/plain"
      */
     @Parameter
-    @Optional(defaultValue = "text/plain")
+    @Optional(defaultValue = TEXT_PLAIN)
     private String contentType;
 
     /**
      * The character encoding of the body.
      * <p>
-     * The default value is "UTF-8"
+     * If is not specified
      */
     @Parameter
-    @Optional(defaultValue = "UTF-8")
+    @Optional
     private String charset;
 
     /**
@@ -74,16 +80,14 @@ public class EmailContent
      */
     public MediaType getContentType()
     {
-        // TODO: remove if when MULE-9960 is fixed since default values are not being injected properly.
-        return contentType == null ? TEXT : DataType.builder().mediaType(contentType).build().getMediaType();
+        return DataType.builder().mediaType(contentType).build().getMediaType();
     }
 
     /**
      * @return the charset of the body.
      */
-    public Charset getCharset()
+    public String getCharset()
     {
-        // TODO: remove if when MULE-9960 is fixed since default values are not being injected properly.
-        return charset != null ? Charset.forName(charset) : UTF_8;
+        return charset;
     }
 }

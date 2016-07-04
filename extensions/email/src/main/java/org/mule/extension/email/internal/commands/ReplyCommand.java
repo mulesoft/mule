@@ -54,6 +54,7 @@ public final class ReplyCommand
                       EmailContent content,
                       String subject,
                       String from,
+                      String defaultEncoding,
                       Map<String, String> headers,
                       Boolean replyToAll)
     {
@@ -80,6 +81,6 @@ public final class ReplyCommand
         headers.putAll(attributes.getHeaders());
         List<String> ccAddresses = replyToAll ? attributes.getCcAddresses() : new ArrayList<>();
         List<EmailAttachment> emailAttachments = mapToEmailAttachments(attributes.getAttachments());
-        sendCommand.send(connection, content, subject, replyTo, from, ccAddresses, new ArrayList<>(), headers, emailAttachments);
+        sendCommand.send(connection, content, subject, replyTo, from, defaultEncoding, ccAddresses, new ArrayList<>(), headers, emailAttachments);
     }
 }

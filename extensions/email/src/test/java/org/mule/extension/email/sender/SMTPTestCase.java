@@ -7,9 +7,11 @@
 package org.mule.extension.email.sender;
 
 import static java.lang.String.format;
+import static java.nio.charset.Charset.availableCharsets;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.isA;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.core.Is.is;
@@ -40,6 +42,8 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -174,10 +178,24 @@ public class SMTPTestCase extends EmailConnectorTestCase
     @Test
     public void sendEncodedMessage() throws Exception
     {
-        flowRunner(SEND_ENCODED_MESSAGE).withPayload(WEIRD_CHAR_MESSAGE).run();
+        final String defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
+        Assert.assertThat(defaultEncoding, CoreMatchers.is(notNullValue()));
+
+        final String customEncoding = availableCharsets().keySet().stream()
+                .filter(encoding -> !encoding.equals(defaultEncoding))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(customEncoding, is(notNullValue()));
+
+        flowRunner(SEND_ENCODED_MESSAGE)
+                .withPayload(WEIRD_CHAR_MESSAGE)
+                .withFlowVariable("encoding", customEncoding)
+                .run();
+
         Message[] messages = getReceivedMessagesAndAssertCount(1);
         Object content = ((String) messages[0].getContent()).trim();
-        assertThat(content, is(WEIRD_CHAR_MESSAGE));
+        assertThat(content, is(new String(WEIRD_CHAR_MESSAGE.getBytes(customEncoding), customEncoding)));
     }
 
     private Message[] getReceivedMessagesAndAssertCount(int receivedNumber)

@@ -44,6 +44,7 @@
                 </xs:sequence>
                 <xs:attribute type="mule:expressionInt" use="optional" name="numberOfPages"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="recipes"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" default="Enemies of Bondiola" name="editorial"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
