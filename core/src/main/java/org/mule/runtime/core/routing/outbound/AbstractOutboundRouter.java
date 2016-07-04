@@ -432,9 +432,12 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
 
     /**
-     * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and
-     * out params can be the same message object when not dealing with replies.
+     * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and out
+     * params can be the same message object when not dealing with replies.
+     * 
+     * @deprecated TODO MULE-9858
      */
+    @Deprecated
     protected MuleMessage propagateMagicProperties(MuleMessage in)
     {
         return AbstractRoutingStrategy.propagateMagicProperties(in);

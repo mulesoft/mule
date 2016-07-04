@@ -69,7 +69,6 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     public DefaultMuleMessageBuilder(MuleMessage<PAYLOAD, ATTRIBUTES> message)
     {
         this((org.mule.runtime.api.message.MuleMessage) message);
-        copyMessageAttributes(message);
     }
 
     private void copyMessageAttributes(MuleMessage<PAYLOAD, ATTRIBUTES> message)
@@ -355,6 +354,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
         }
     }
 
+    // TODO MULE-9858 remove this magic properties
     @Deprecated
     private void updateDataTypeWithProperty(String key, Object value)
     {

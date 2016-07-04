@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MutableMessageProperties;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -208,11 +208,8 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     @Test
     public void testLegacyAddingAttachment() throws Exception
     {
-        // TODO MULE-9856 Replace with the builder
-        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
-
         DataHandler handler = new DataHandler("this is the attachment", "text/plain");
-        message.addOutboundAttachment("attachment", handler);
+        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundAttachment("attachment", handler).build();
 
         assertTrue(message.getOutboundAttachmentNames().contains("attachment"));
         assertEquals(handler, message.getOutboundAttachment("attachment"));
@@ -231,8 +228,10 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         message = MuleMessage.builder(message).removeOutboundAttachment("attachment").build();
         assertEquals(0, message.getOutboundAttachmentNames().size());
 
-        //Try with content type set
-        ((MutableMuleMessage) message).addOutboundAttachment("spi-props", IOUtils.getResourceAsUrl("test-spi.properties", getClass()), MediaType.TEXT);
+        message = MuleMessage.builder(message)
+                             .addOutboundAttachment("spi-props", IOUtils.toDataHandler("spi-props", IOUtils.getResourceAsUrl("test-spi.properties", getClass()), MediaType.TEXT))
+                             .build();
+
 
         assertTrue(message.getOutboundAttachmentNames().contains("spi-props"));
         handler = message.getOutboundAttachment("spi-props");
@@ -240,8 +239,9 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         assertEquals(MediaType.TEXT.getSubType(), handler.getContentType().split("/")[1]);
         assertEquals(1, message.getOutboundAttachmentNames().size());
 
-        //Try without content type set
-        ((MutableMuleMessage) message).addOutboundAttachment("dummy", IOUtils.getResourceAsUrl("dummy.xml", getClass()), null);
+        message = MuleMessage.builder(message)
+                             .addOutboundAttachment("dummy", IOUtils.toDataHandler("dummy", IOUtils.getResourceAsUrl("dummy.xml", getClass()), null))
+                             .build();
         handler = message.getOutboundAttachment("dummy");
         assertEquals(MediaType.APPLICATION_XML.getPrimaryType(), handler.getContentType().split("/")[0]);
         assertEquals(MediaType.APPLICATION_XML.getSubType(), handler.getContentType().split("/")[1]);
@@ -302,12 +302,6 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     private MuleMessage createMuleMessage()
     {
         return MuleMessage.builder().payload(TEST_PAYLOAD).attributes(testAttributes).addOutboundProperty("MuleMessage", "MuleMessage").build();
-        // TODO MULE-9856 Replace with the builder
-        // MutableMuleMessage previousMessage = new DefaultMuleMessage(AbstractMuleContextTestCase.TEST_PAYLOAD,
-        // DataType.builder(DataType.STRING).charset(getDefaultEncoding(muleContext)).build(),
-        // testAttributes);
-        // previousMessage.setOutboundProperty("MuleMessage", "MuleMessage");
-        // return previousMessage;
     }
 
     private void assertOutboundMessageProperty(String key, MuleMessage message)
@@ -364,8 +358,8 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     @Test
     public void copyProperty() throws Exception
     {
-        MutableMuleMessage message = (MutableMuleMessage) MuleMessage.builder(createMuleMessage()).addInboundProperty(FOO_PROPERTY, "bar").build();
-        message.copyProperty(FOO_PROPERTY);
+        MuleMessage message = MuleMessage.builder(createMuleMessage()).addInboundProperty(FOO_PROPERTY, "bar").build();
+        ((MutableMessageProperties) message).copyProperty(FOO_PROPERTY);
 
         assertThat(message.getOutboundProperty(FOO_PROPERTY), equalTo("bar"));
     }

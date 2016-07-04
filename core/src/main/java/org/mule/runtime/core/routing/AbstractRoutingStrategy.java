@@ -38,7 +38,10 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
 
     /**
      * These properties are automatically propagated by Mule from inbound to outbound
+     * 
+     * TODO MULE-9858
      */
+    @Deprecated
     protected static List<String> magicProperties = Arrays.asList(
             MuleProperties.MULE_CORRELATION_ID_PROPERTY, MuleProperties.MULE_CORRELATION_ID_PROPERTY,
             MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
@@ -149,13 +152,16 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
     }
 
     /**
-     * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and
-     * out params can be the same message object when not dealing with replies.
+     * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and out
+     * params can be the same message object when not dealing with replies.
      *
      * @see #magicProperties
      *
-     * This method is mostly used by routers that dispatch the same message to several routes
+     *      This method is mostly used by routers that dispatch the same message to several routes
+     * 
+     * @deprecated TODO MULE-9858
      */
+    @Deprecated
     public static MuleMessage propagateMagicProperties(MuleMessage in)
     {
         final Builder builder = MuleMessage.builder(in);

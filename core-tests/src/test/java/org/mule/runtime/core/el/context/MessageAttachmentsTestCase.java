@@ -15,7 +15,6 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 
 import java.util.Collection;
 import java.util.Map;
@@ -111,7 +110,7 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     {
         MuleEvent event = getTestEvent("");
         DataHandler dataHandler = mock(DataHandler.class);
-        ((MutableMuleMessage) event.getMessage()).addOutboundAttachment("foo", dataHandler);
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundAttachment("foo", dataHandler).build());
         assertEquals(dataHandler, evaluate("message.outboundAttachments['foo']", event));
     }
 
@@ -119,7 +118,8 @@ public class MessageAttachmentsTestCase extends AbstractELTestCase
     public void assignValueToOutboundAttachment() throws Exception
     {
         MuleEvent event = getTestEvent("");
-        ((MutableMuleMessage) event.getMessage()).addOutboundAttachment("foo", mock(DataHandler.class));
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundAttachment("foo", mock(DataHandler.class)).build());
+
         evaluate("message.outboundAttachments['foo']=new DataHandler('bar','text/plain')", event);
         assertEquals("bar", event.getMessage().getOutboundAttachment("foo").getContent());
     }
