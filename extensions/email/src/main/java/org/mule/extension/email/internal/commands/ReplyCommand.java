@@ -12,7 +12,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEm
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
-import org.mule.extension.email.api.sender.SenderConnection;
+import org.mule.extension.email.internal.sender.SenderConnection;
 import org.mule.extension.email.internal.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
 

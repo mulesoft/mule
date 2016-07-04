@@ -9,7 +9,7 @@ package org.mule.module.socket.api.connection.udp;
 import static org.mule.module.socket.internal.SocketUtils.configureConnection;
 import org.mule.module.socket.api.client.SocketClient;
 import org.mule.module.socket.api.client.UdpClient;
-import org.mule.module.socket.api.connection.ConnectionSettings;
+import org.mule.module.socket.api.ConnectionSettings;
 import org.mule.module.socket.api.connection.RequesterConnection;
 import org.mule.module.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;

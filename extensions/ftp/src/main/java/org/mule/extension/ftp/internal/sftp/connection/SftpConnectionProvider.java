@@ -6,9 +6,8 @@
  */
 package org.mule.extension.ftp.internal.sftp.connection;
 
-import org.mule.extension.ftp.api.FtpConnector;
+import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.api.sftp.SftpAuthenticationMethod;
-import org.mule.extension.ftp.api.sftp.SftpFileSystem;
 import org.mule.extension.ftp.internal.AbstractFtpConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;

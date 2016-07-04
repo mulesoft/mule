@@ -16,7 +16,7 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
-import org.mule.extension.http.api.request.HttpRequesterConfig;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.message.NullPayload;

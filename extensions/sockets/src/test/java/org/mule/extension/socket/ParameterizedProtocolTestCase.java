@@ -6,10 +6,10 @@
  */
 package org.mule.extension.socket;
 
-import org.mule.module.socket.api.protocol.DirectProtocol;
-import org.mule.module.socket.api.protocol.LengthProtocol;
-import org.mule.module.socket.api.protocol.SafeProtocol;
-import org.mule.module.socket.api.protocol.TcpProtocol;
+import org.mule.module.socket.api.connection.tcp.protocol.DirectProtocol;
+import org.mule.module.socket.api.connection.tcp.protocol.LengthProtocol;
+import org.mule.module.socket.api.connection.tcp.protocol.SafeProtocol;
+import org.mule.module.socket.api.socket.tcp.TcpProtocol;
 
 import java.util.Arrays;
 import java.util.Collection;

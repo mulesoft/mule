@@ -8,9 +8,8 @@ package org.mule.extension.ftp.internal.ftp.connection;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.extension.ftp.api.FtpConnector.FTP_PROTOCOL;
+import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.extension.ftp.api.ftp.FtpFileSystem;
 import org.mule.extension.ftp.api.ftp.FtpTransferMode;
 import org.mule.extension.ftp.internal.ftp.command.FtpCopyCommand;
 import org.mule.extension.ftp.internal.ftp.command.FtpCreateDirectoryCommand;

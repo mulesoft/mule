@@ -7,7 +7,7 @@
 package org.mule.module.socket.api.provider.udp;
 
 import org.mule.module.socket.api.SocketOperations;
-import org.mule.module.socket.api.connection.ConnectionSettings;
+import org.mule.module.socket.api.ConnectionSettings;
 import org.mule.module.socket.api.connection.udp.UdpRequesterConnection;
 import org.mule.module.socket.api.exceptions.UnresolvableHostException;
 import org.mule.module.socket.api.socket.udp.UdpSocketProperties;

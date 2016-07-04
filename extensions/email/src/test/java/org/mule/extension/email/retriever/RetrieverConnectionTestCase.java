@@ -14,15 +14,15 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
-import static org.mule.extension.email.api.AbstractEmailConnection.PASSWORD_NO_USERNAME_ERROR;
-import static org.mule.extension.email.api.AbstractEmailConnection.USERNAME_NO_PASSWORD_ERROR;
+import static org.mule.extension.email.internal.AbstractEmailConnection.PASSWORD_NO_USERNAME_ERROR;
+import static org.mule.extension.email.internal.AbstractEmailConnection.USERNAME_NO_PASSWORD_ERROR;
 import static org.mule.extension.email.internal.EmailProtocol.IMAP;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.INBOX_FOLDER;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
-import org.mule.extension.email.api.retriever.RetrieverConnection;
+import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.internal.exception.EmailConnectionException;
 import org.mule.extension.email.internal.exception.EmailException;
 

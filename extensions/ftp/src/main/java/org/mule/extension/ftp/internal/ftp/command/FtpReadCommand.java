@@ -6,9 +6,9 @@
  */
 package org.mule.extension.ftp.internal.ftp.command;
 
-import org.mule.extension.ftp.api.FtpConnector;
+import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.internal.ftp.ClassicFtpFileAttributes;
+import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.ClassicFtpInputStream;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.api.connection.ConnectionException;

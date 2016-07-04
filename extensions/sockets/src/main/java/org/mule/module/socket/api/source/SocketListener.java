@@ -11,9 +11,10 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
+import org.mule.module.socket.api.SocketAttributes;
 import org.mule.module.socket.api.config.ListenerConfig;
 import org.mule.module.socket.api.connection.ListenerConnection;
-import org.mule.module.socket.internal.worker.SocketWorker;
+import org.mule.module.socket.api.worker.SocketWorker;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;

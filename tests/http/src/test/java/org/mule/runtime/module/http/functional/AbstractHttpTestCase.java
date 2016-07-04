@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.functional;
 
-import org.mule.extension.http.api.HttpConnector;
+import org.mule.extension.http.internal.HttpConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.socket.api.SocketsExtension;
 

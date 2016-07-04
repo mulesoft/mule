@@ -7,7 +7,7 @@
 package org.mule.extension.socket;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.module.socket.api.source.SocketAttributes;
+import org.mule.module.socket.api.SocketAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.io.InputStream;

@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.validation.api.ValidationException;
-import org.mule.extension.validation.internal.ValidationExtension;
+import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.internal.ValidationMessages;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;

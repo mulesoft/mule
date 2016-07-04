@@ -8,7 +8,7 @@ package org.mule.extension.ftp;
 
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
 import org.mule.extension.FtpTestHarness;
-import org.mule.extension.ftp.api.FtpConnector;
+import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;

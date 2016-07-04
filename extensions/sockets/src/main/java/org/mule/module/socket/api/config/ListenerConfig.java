@@ -9,7 +9,7 @@ package org.mule.module.socket.api.config;
 import org.mule.module.socket.api.provider.tcp.TcpListenerProvider;
 import org.mule.module.socket.api.provider.udp.UdpListenerProvider;
 import org.mule.module.socket.api.source.SocketListener;
-import org.mule.module.socket.internal.worker.SocketWorker;
+import org.mule.module.socket.api.worker.SocketWorker;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Parameter;

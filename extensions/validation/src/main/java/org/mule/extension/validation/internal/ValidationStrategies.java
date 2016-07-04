@@ -7,6 +7,7 @@
 package org.mule.extension.validation.internal;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
+import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;

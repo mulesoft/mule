@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
-import static org.mule.extension.validation.internal.ValidationExtension.DEFAULT_LOCALE;
+import static org.mule.extension.validation.api.ValidationExtension.DEFAULT_LOCALE;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
 import org.mule.extension.validation.api.ValidationResult;

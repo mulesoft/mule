@@ -6,7 +6,7 @@
  */
 package org.mule.extension.socket.protocol;
 
-import org.mule.module.socket.api.protocol.AbstractByteProtocol;
+import org.mule.module.socket.api.connection.tcp.protocol.AbstractByteProtocol;
 
 import java.io.IOException;
 import java.io.InputStream;

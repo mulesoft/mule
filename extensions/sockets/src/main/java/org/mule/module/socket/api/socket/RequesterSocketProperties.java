@@ -6,7 +6,7 @@
  */
 package org.mule.module.socket.api.socket;
 
-import org.mule.module.socket.api.connection.ConnectionSettings;
+import org.mule.module.socket.api.ConnectionSettings;
 
 /**
  * Interface for common configuration required on sockets that will send requests.

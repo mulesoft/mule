@@ -23,7 +23,6 @@ import org.mule.runtime.module.http.api.listener.HttpListener;
 import org.mule.runtime.module.http.api.listener.HttpListenerBuilder;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
-import org.mule.runtime.module.http.internal.listener.HttpListenerConnectionManager;
 import org.mule.runtime.module.http.internal.listener.ServerAddress;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

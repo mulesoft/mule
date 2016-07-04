@@ -8,6 +8,7 @@
 package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
+import org.mule.extension.validation.api.NumberType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.extension.validation.api.ValidationResult;

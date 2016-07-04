@@ -11,7 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import org.mule.extension.socket.SocketExtensionTestCase;
-import org.mule.module.socket.api.source.SocketAttributes;
+import org.mule.module.socket.api.SocketAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
 

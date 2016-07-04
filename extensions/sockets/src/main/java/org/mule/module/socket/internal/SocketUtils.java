@@ -13,7 +13,7 @@ import org.mule.module.socket.api.connection.AbstractSocketConnection;
 import org.mule.module.socket.api.exceptions.UnresolvableHostException;
 import org.mule.module.socket.api.socket.tcp.TcpSocketProperties;
 import org.mule.module.socket.api.socket.udp.UdpSocketProperties;
-import org.mule.module.socket.api.source.SocketAttributes;
+import org.mule.module.socket.api.SocketAttributes;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.message.MuleMessage;

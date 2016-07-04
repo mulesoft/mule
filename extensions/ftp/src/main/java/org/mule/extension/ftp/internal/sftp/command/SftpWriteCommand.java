@@ -7,7 +7,7 @@
 package org.mule.extension.ftp.internal.sftp.command;
 
 import static java.lang.String.format;
-import org.mule.extension.ftp.api.sftp.SftpFileSystem;
+import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.MuleContext;

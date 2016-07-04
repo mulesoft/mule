@@ -6,8 +6,10 @@
  */
 package org.mule.extension.validation.internal;
 
+import org.mule.extension.validation.api.ValidationExtension;
+import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
-import org.mule.extension.validation.internal.validator.NumberType;
+import org.mule.extension.validation.api.NumberType;
 import org.mule.extension.validation.internal.validator.NumberValidator;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.StringUtils;

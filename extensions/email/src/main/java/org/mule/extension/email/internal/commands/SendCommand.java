@@ -8,7 +8,7 @@ package org.mule.extension.email.internal.commands;
 
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailContent;
-import org.mule.extension.email.api.sender.SenderConnection;
+import org.mule.extension.email.internal.sender.SenderConnection;
 import org.mule.extension.email.internal.builder.MessageBuilder;
 import org.mule.extension.email.internal.exception.EmailSenderException;
 
