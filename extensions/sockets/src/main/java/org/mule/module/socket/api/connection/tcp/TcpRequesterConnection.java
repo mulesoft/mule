@@ -34,9 +34,9 @@ public class TcpRequesterConnection extends AbstractTcpConnection implements Req
     private final ConnectionSettings localAddressSettings;
     private final SimpleSocketFactory socketFactory;
 
-
-    public TcpRequesterConnection(ConnectionSettings connectionSettings, ConnectionSettings localAddressSettings, TcpProtocol protocol,
-                                  TcpClientSocketProperties socketProperties, SimpleSocketFactory socketFactory) throws ConnectionException
+    public TcpRequesterConnection(ConnectionSettings connectionSettings, ConnectionSettings localAddressSettings,
+                                  TcpProtocol protocol, TcpClientSocketProperties socketProperties,
+                                  SimpleSocketFactory socketFactory) throws ConnectionException
     {
         super(connectionSettings, protocol);
         this.socketProperties = socketProperties;

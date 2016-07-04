@@ -48,9 +48,9 @@ public final class UdpClient implements SocketClient
      * {@inheritDoc}
      */
     @Override
-    public void write(Object data) throws IOException
+    public void write(Object data, String outputEncoding) throws IOException
     {
-        byte[] byteArray = getUdpAllowedByteArray(data, objectSerializer);
+        byte[] byteArray = getUdpAllowedByteArray(data, outputEncoding, objectSerializer);
         DatagramPacket sendPacket = createPacket(byteArray);
         sendPacket.setSocketAddress(socketAddress);
         socket.send(sendPacket);

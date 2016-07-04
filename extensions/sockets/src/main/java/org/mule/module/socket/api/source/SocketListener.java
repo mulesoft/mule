@@ -220,6 +220,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
             try
             {
                 SocketWorker worker = connection.listen(sourceContext.getMessageHandler());
+                worker.setEncoding(config.getDefaultEncoding());
                 workManager.scheduleWork(worker, WorkManager.INDEFINITE, null, socketWorkListener);
             }
             catch (ConnectionException e)

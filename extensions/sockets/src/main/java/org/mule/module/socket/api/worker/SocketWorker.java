@@ -18,9 +18,15 @@ public abstract class SocketWorker implements Disposable, Work
 {
 
     protected final MessageHandler<InputStream, SocketAttributes> messageHandler;
+    protected String encoding;
 
     protected SocketWorker(MessageHandler<InputStream, SocketAttributes> messageHandler)
     {
         this.messageHandler = messageHandler;
+    }
+
+    public void setEncoding(String encoding)
+    {
+        this.encoding = encoding;
     }
 }

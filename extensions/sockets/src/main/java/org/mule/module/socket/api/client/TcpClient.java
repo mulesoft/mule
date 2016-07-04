@@ -41,10 +41,10 @@ public final class TcpClient implements SocketClient
      * {@inheritDoc}
      */
     @Override
-    public void write(Object data) throws IOException
+    public void write(Object data, String outputEncoding) throws IOException
     {
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
-        protocol.write(bufferedOutputStream, data);
+        protocol.write(bufferedOutputStream, data, outputEncoding);
         bufferedOutputStream.flush();
     }
 

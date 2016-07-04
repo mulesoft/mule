@@ -7,6 +7,7 @@
 package org.mule.module.socket.api;
 
 import org.mule.module.socket.api.client.SocketClient;
+import org.mule.module.socket.api.config.RequesterConfig;
 import org.mule.module.socket.api.connection.RequesterConnection;
 import org.mule.module.socket.api.metadata.SocketMetadataResolver;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -16,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
 import java.io.IOException;
 
@@ -34,22 +36,29 @@ public class SocketOperations
      * in which case the operation will return a {@link MuleMessage}
      * with {@link NullPayload} as payload.
      *
-     * @param data        that will be serialized and sent through the socket.
+     * @param content        that will be serialized and sent through the socket.
      * @param hasResponse whether the operation should await for a response or not
+     * @param outputEncoding encoding that will be used to serialize the {@code data} if its type is {@link String}.
      * @param muleMessage if there is no response expected, the outcome of the operation will be
      *                    the same {@link MuleMessage} as the input.
      * @throws ConnectionException if the connection couldn't be established, if the remote host was unavailable.
      */
     @MetadataScope(outputResolver = SocketMetadataResolver.class, keysResolver = SocketMetadataResolver.class)
     public MuleMessage<?, ?> send(@Connection RequesterConnection connection,
-                                  @Optional(defaultValue = "#[payload]") @NoRef Object data,
+                                  @UseConfig RequesterConfig config,
+                                  @Optional(defaultValue = "#[payload]") @NoRef Object content,
+                                  @Optional String outputEncoding,
                                   String hasResponse, // TODO Add metadata https://www.mulesoft.org/jira/browse/MULE-9894
-                                  @Optional(defaultValue = "UTF-8") String encoding, //TODO support encoding MULE-9900
                                   MuleMessage<?, ?> muleMessage) throws ConnectionException, IOException
     {
         SocketClient client = connection.getClient();
 
-        client.write(data);
+        if (outputEncoding == null)
+        {
+            outputEncoding = config.getDefaultEncoding();
+        }
+
+        client.write(content, outputEncoding);
 
         return Boolean.valueOf(hasResponse) ?
                MuleMessage.builder().payload(client.read()).attributes(client.getAttributes()).build() :
