@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.core.transformer.graph;
 
-import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Converter;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,14 +21,14 @@ public class NameConverterFilter implements ConverterFilter
 {
 
     @Override
-    public List<Converter> filter(List<Converter> converters, DataType<?> source, DataType<?> result)
+    public List<Converter> filter(List<Converter> converters, DataType source, DataType result)
     {
         if (converters.size() == 0)
         {
             return Collections.emptyList();
         }
 
-        List<Converter> finteredConverters = new LinkedList<Converter>(converters);
+        List<Converter> finteredConverters = new LinkedList<>(converters);
         sortConvertersByName(finteredConverters);
 
         String firstConverterName= finteredConverters.get(0).getName();
@@ -48,12 +46,6 @@ public class NameConverterFilter implements ConverterFilter
 
     private void sortConvertersByName(List<Converter> converterss)
     {
-        Collections.sort(converterss, new Comparator<Converter>()
-        {
-            public int compare(Converter converter, Converter converter1)
-            {
-                return converter.getName().compareTo(converter1.getName());
-            }
-        });
+        Collections.sort(converterss, (converter, converter1) -> converter.getName().compareTo(converter1.getName()));
     }
 }

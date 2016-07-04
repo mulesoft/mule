@@ -194,7 +194,7 @@ public class CoreMessages extends MessageFactory
             ClassUtils.getSimpleName(returnClass));
     }
 
-    public static Message transformUnexpectedType(DataType<?> dt1, DataType<?> dt2)
+    public static Message transformUnexpectedType(DataType dt1, DataType dt2)
     {
         return factory.createMessage(BUNDLE_PATH, 53, dt1, dt2);
     }
@@ -415,7 +415,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 110, from, to);
     }
 
-    public static Message transformFailed(String from, DataType<?> to)
+    public static Message transformFailed(String from, DataType to)
     {
         return transformFailed(from, to.getClass().getName());
     }
@@ -613,7 +613,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 175, header, value);
     }
 
-    public static Message transformOnObjectNotOfSpecifiedType(DataType<?> resultType, Object expectedType)
+    public static Message transformOnObjectNotOfSpecifiedType(DataType resultType, Object expectedType)
     {
         return factory.createMessage(BUNDLE_PATH, 177, resultType.getType().getName(),
             expectedType.getClass());
@@ -775,7 +775,7 @@ public class CoreMessages extends MessageFactory
                             + StringUtils.defaultString(MuleManifest.getVendorUrl(), notset));
     }
 
-    public static Message noTransformerFoundForMessage(DataType<?> input, DataType<?> output)
+    public static Message noTransformerFoundForMessage(DataType input, DataType output)
     {
         return factory.createMessage(BUNDLE_PATH, 237, input, output);
     }

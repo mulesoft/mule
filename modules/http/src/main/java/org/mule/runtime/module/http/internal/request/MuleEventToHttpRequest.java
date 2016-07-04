@@ -98,10 +98,10 @@ public class MuleEventToHttpRequest
 
         if (!event.getMessage().getOutboundPropertyNames().contains(MuleProperties.CONTENT_TYPE_PROPERTY))
         {
-            DataType<?> dataType = event.getMessage().getDataType();
+            DataType dataType = event.getMessage().getDataType();
             if (!MediaType.ANY.matches(dataType.getMediaType()))
             {
-                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMediaType().toString());
+                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMediaType().toRfcString());
             }
         }
 

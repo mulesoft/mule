@@ -118,7 +118,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCas
         DataType dataType = DataType.builder().type(Integer.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
         MessagePropertiesContext properties = new MessagePropertiesContext();
         properties.setOutboundProperty("Prop", "foo", dataType);
-        DataType<?> actualDataType = properties.getOutboundPropertyDataType("Prop");
+        DataType actualDataType = properties.getOutboundPropertyDataType("Prop");
         assertThat(actualDataType, like(dataType));
     }
 }

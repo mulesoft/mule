@@ -97,10 +97,10 @@ public class SimpleRegistryBootstrapTransformersTest extends AbstractMuleContext
     private static class TestTransformerResolver implements TransformerResolver
     {
 
-        private List<Transformer> transformers = new ArrayList<Transformer>();
+        private List<Transformer> transformers = new ArrayList<>();
 
         @Override
-        public Transformer resolve(DataType<?> source, DataType<?> result) throws ResolverException
+        public Transformer resolve(DataType source, DataType result) throws ResolverException
         {
             return null;
         }

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api;
 
-import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.message.SessionHandler;
 
 import java.io.Serializable;
@@ -80,13 +80,13 @@ public interface MuleSession extends Serializable
      * @param value the value of the session data
      * @param dataType the data type for the property value
      */
-    void setProperty(String key, Serializable value, DataType<?> dataType);
+    void setProperty(String key, Serializable value, DataType dataType);
     
     @Deprecated
     void setProperty(String key, Object value);
 
     @Deprecated
-    void setProperty(String key, Object value, DataType<?> dataType);
+    void setProperty(String key, Object value, DataType dataType);
 
 
     /**
@@ -95,7 +95,7 @@ public interface MuleSession extends Serializable
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
-    <T> T getProperty(String key);
+    Object getProperty(String key);
 
     /**
      * Will retrieve a session scope property and remove it from the session
@@ -127,5 +127,5 @@ public interface MuleSession extends Serializable
      * @param name the name for the session property
      * @return the property data type or null if the property does not exist
      */
-    DataType<?> getPropertyDataType(String name);
+    DataType getPropertyDataType(String name);
 }

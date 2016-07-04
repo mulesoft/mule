@@ -27,9 +27,9 @@ public class CompositeConverterFilter implements ConverterFilter
     }
 
     @Override
-    public List<Converter> filter(List<Converter> converters, DataType<?> source, DataType<?> result)
+    public List<Converter> filter(List<Converter> converters, DataType source, DataType result)
     {
-        List<Converter> filteredTransformers = new LinkedList<Converter>(converters);
+        List<Converter> filteredTransformers = new LinkedList<>(converters);
 
         for (ConverterFilter filter : filters)
         {

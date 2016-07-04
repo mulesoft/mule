@@ -6,9 +6,9 @@
  */
 package org.mule.extension.ftp.internal.ftp.command;
 
-import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
+import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.internal.ftp.ClassicFtpInputStream;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -47,7 +47,7 @@ public final class FtpReadCommand extends ClassicFtpCommand implements ReadComma
      * {@inheritDoc}
      */
     @Override
-    public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage<?, ?> message, String filePath, boolean lock)
+    public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath, boolean lock)
     {
         FtpFileAttributes attributes = getExistingFile(config, filePath);
         if (attributes.isDirectory())
@@ -81,7 +81,7 @@ public final class FtpReadCommand extends ClassicFtpCommand implements ReadComma
         {
             InputStream payload = ClassicFtpInputStream.newInstance((FtpConnector) config, attributes, pathLock);
             MediaType mediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), attributes);
-            return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(mediaType).attributes((FileAttributes) attributes).build();
+            return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(mediaType).attributes(attributes).build();
         }
         catch (ConnectionException e)
         {

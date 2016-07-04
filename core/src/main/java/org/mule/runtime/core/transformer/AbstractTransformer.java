@@ -51,7 +51,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      * The return type that will be returned by the {@link #transform} method is
      * called
      */
-    private volatile DataType<?> returnType = null;
+    private volatile DataType returnType = null;
 
     /**
      * The name that identifies this transformer. If none is set the class name of
@@ -62,7 +62,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     /**
      * A list of supported Class types that the source payload passed into this transformer
      */
-    protected final List<DataType<?>> sourceTypes = new CopyOnWriteArrayList<>();
+    protected final List<DataType> sourceTypes = new CopyOnWriteArrayList<>();
 
     /**
      * Determines whether the transformer will throw an exception if the message
@@ -107,7 +107,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      *
      * @param dataType the source type to allow
      */
-    protected void registerSourceType(DataType<?> dataType)
+    protected void registerSourceType(DataType dataType)
     {
         if (!sourceTypes.contains(dataType))
         {
@@ -125,7 +125,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      *
      * @param dataType the type to remove
      */
-    protected void unregisterSourceType(DataType<?> dataType)
+    protected void unregisterSourceType(DataType dataType)
     {
         sourceTypes.remove(dataType);
     }
@@ -159,7 +159,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     }
 
     @Override
-    public void setReturnDataType(DataType<?> type)
+    public void setReturnDataType(DataType type)
     {
         synchronized (this)
         {
@@ -168,7 +168,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     }
 
     @Override
-    public DataType<?> getReturnDataType()
+    public DataType getReturnDataType()
     {
         if (returnType == null)
         {
@@ -194,7 +194,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     }
 
     @Override
-    public boolean isSourceDataTypeSupported(DataType<?> dataType)
+    public boolean isSourceDataTypeSupported(DataType dataType)
     {
         return isSourceDataTypeSupported(dataType, false);
     }
@@ -207,7 +207,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
      *                   for a compatible data type.
      * @return true if the source type is supported by this transformer, false otherwise
      */
-    public boolean isSourceDataTypeSupported(DataType<?> dataType, boolean exactMatch)
+    public boolean isSourceDataTypeSupported(DataType dataType, boolean exactMatch)
     {
         int numTypes = sourceTypes.size();
 
@@ -216,7 +216,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             return !exactMatch;
         }
 
-        for (DataType<?> sourceType : sourceTypes)
+        for (DataType sourceType : sourceTypes)
         {
             if (exactMatch)
             {
@@ -274,7 +274,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             }
         }
 
-        DataType<?> sourceType = DataType.fromType(payload.getClass());
+        DataType sourceType = DataType.fromType(payload.getClass());
         if (!isSourceDataTypeSupported(sourceType))
         {
             Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),
@@ -341,7 +341,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     }
 
     @Override
-    public List<DataType<?>> getSourceDataTypes()
+    public List<DataType> getSourceDataTypes()
     {
         return Collections.unmodifiableList(sourceTypes);
     }

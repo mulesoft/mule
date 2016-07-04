@@ -88,10 +88,10 @@ public class MuleEventToHttpResponse
         final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
         if (!headers.containsKey(CONTENT_TYPE_PROPERTY))
         {
-            DataType<?> dataType = event.getMessage().getDataType();
+            DataType dataType = event.getMessage().getDataType();
             if (!MediaType.ANY.matches(dataType.getMediaType()))
             {
-                httpResponseHeaderBuilder.addHeader(CONTENT_TYPE_PROPERTY, dataType.getMediaType().toString());
+                httpResponseHeaderBuilder.addHeader(CONTENT_TYPE_PROPERTY, dataType.getMediaType().toRfcString());
             }
         }
 

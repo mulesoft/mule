@@ -11,9 +11,9 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.module.socket.api.SocketsExtension;
-import org.mule.module.socket.api.SocketAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.util.IOUtils;
@@ -50,7 +50,7 @@ public abstract class SocketExtensionTestCase extends ExtensionFunctionalTestCas
      */
     protected static final int REPETITIONS = 3;
 
-    protected static List<MuleMessage<?, SocketAttributes>> receivedMessages;
+    protected static List<MuleMessage> receivedMessages;
 
 
     protected static final String NAME = "Messi";
@@ -65,7 +65,7 @@ public abstract class SocketExtensionTestCase extends ExtensionFunctionalTestCas
     @Rule
     public ExpectedException expectedException = none();
 
-    protected void assertPojo(MuleMessage<?, SocketAttributes> message, TestPojo expectedContent) throws Exception
+    protected void assertPojo(MuleMessage message, TestPojo expectedContent) throws Exception
     {
         if (message.getPayload() == null)
         {
@@ -112,21 +112,21 @@ public abstract class SocketExtensionTestCase extends ExtensionFunctionalTestCas
         receivedMessages.add(message);
     }
 
-    protected void assertEvent(MuleMessage<?, SocketAttributes> message, Object expectedContent) throws Exception
+    protected void assertEvent(MuleMessage message, Object expectedContent) throws Exception
     {
         String payload = IOUtils.toString((InputStream) message.getPayload());
         assertEquals(expectedContent, payload);
     }
 
-    protected Object deserializeMessage(MuleMessage<?, SocketAttributes> message) throws Exception
+    protected Object deserializeMessage(MuleMessage message) throws Exception
     {
         return muleContext.getObjectSerializer().deserialize(IOUtils.toByteArray((InputStream) message.getPayload()));
     }
 
-    protected MuleMessage<?, SocketAttributes> receiveConnection()
+    protected MuleMessage receiveConnection()
     {
         PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-        ValueHolder<MuleMessage<?, SocketAttributes>> messageHolder = new ValueHolder<>();
+        ValueHolder<MuleMessage> messageHolder = new ValueHolder<>();
         prober.check(new JUnitLambdaProbe(() -> {
             if (!receivedMessages.isEmpty())
             {
@@ -156,7 +156,7 @@ public abstract class SocketExtensionTestCase extends ExtensionFunctionalTestCas
         assertByteArray(receiveConnection(), testByteArray);
     }
 
-    protected void assertByteArray(MuleMessage<?, SocketAttributes> message, byte[] testByteArray) throws IOException
+    protected void assertByteArray(MuleMessage message, byte[] testByteArray) throws IOException
     {
         ByteArrayInputStream expectedByteArray = new ByteArrayInputStream(testByteArray);
         DataInputStream expectedData = new DataInputStream(expectedByteArray);

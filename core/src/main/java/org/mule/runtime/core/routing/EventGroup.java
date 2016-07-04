@@ -410,7 +410,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
                 List<MuleMessage> messageList = Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
-                final CollectionBuilder<List<MuleMessage>, Serializable> builder = MuleMessage.builder().collectionPayload(messageList, MuleMessage.class);
+                final CollectionBuilder builder = MuleMessage.builder().collectionPayload(messageList, MuleMessage.class);
                 if (getCommonRootId() != null)
                 {
                     builder.rootId(getCommonRootId());

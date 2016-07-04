@@ -34,7 +34,7 @@ import org.mockito.Mockito;
 public class MuleRegistryHelperTransformerLookupTestCase extends AbstractMuleTestCase
 {
 
-    private static final DataType<Orange> ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
+    private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
 
     private final DefaultRegistryBroker registry = mock(DefaultRegistryBroker.class);
     private final MuleContext muleContext = mock(MuleContext.class);

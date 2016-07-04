@@ -17,5 +17,5 @@ import java.util.List;
  */
 public interface DataTypeConversionResolver
 {
-    Transformer resolve(DataType<?> sourceType, List<DataType<?>> targetDataTypes);
+    Transformer resolve(DataType sourceType, List<DataType> targetDataTypes);
 }

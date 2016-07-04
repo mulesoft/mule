@@ -173,7 +173,7 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase
             }
         };
         
-        DataType<Integer> integerDataType = DataType.fromType(Integer.class);
+        DataType integerDataType = DataType.fromType(Integer.class);
         transformer.registerSourceType(integerDataType);
         transformer.setReturnDataType(DataType.builder(integerDataType).charset(getDefaultEncoding(muleContext)).build());
 

@@ -49,7 +49,7 @@ public interface TransformerResolver
      * @throws ResolverException Only thrown if an exception is thrown during the
      *             search, this exception will just be a wrapper
      */
-    Transformer resolve(DataType<?> source, DataType<?> result) throws ResolverException;
+    Transformer resolve(DataType source, DataType result) throws ResolverException;
 
     /**
      * A callback that is called when a transformer is registered or unregistered

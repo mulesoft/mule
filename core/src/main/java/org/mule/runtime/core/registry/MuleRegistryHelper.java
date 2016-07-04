@@ -76,14 +76,14 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     /**
      * Transformer transformerResolvers are registered on context start, then they are not unregistered.
      */
-    private List<TransformerResolver> transformerResolvers = new ArrayList<TransformerResolver>();
+    private List<TransformerResolver> transformerResolvers = new ArrayList<>();
 
     private final ReadWriteLock transformersLock = new ReentrantReadWriteLock();
 
     /**
      * Transformers are registered on context start, then they are usually not unregistered
      */
-    private Collection<Transformer> transformers = new CopyOnWriteArrayList<Transformer>();
+    private Collection<Transformer> transformers = new CopyOnWriteArrayList<>();
 
     public MuleRegistryHelper(DefaultRegistryBroker registry, MuleContext muleContext)
     {
@@ -380,7 +380,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     @Override
     public Collection<Scheduler> lookupScheduler(Predicate<String> schedulerNamePredicate)
     {
-        Collection<Scheduler> schedulers = new ArrayList<Scheduler>();
+        Collection<Scheduler> schedulers = new ArrayList<>();
         Map<String, Scheduler> registeredSchedulers = lookupByType(Scheduler.class);
         for (Scheduler registeredScheduler : registeredSchedulers.values())
         {
@@ -684,7 +684,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
         return false;
     }
 
-    private String getDataTypeSourceResultPairHash(DataType<?> source, DataType<?> result)
+    private String getDataTypeSourceResultPairHash(DataType source, DataType result)
     {
         return source.getClass().getName() + source.hashCode() + ":" + result.getClass().getName()
                + result.hashCode();

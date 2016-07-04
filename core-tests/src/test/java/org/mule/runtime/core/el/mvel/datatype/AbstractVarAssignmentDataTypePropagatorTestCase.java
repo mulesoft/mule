@@ -52,7 +52,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
     protected void doAssignmentDataTypePropagationTest(String expression) throws Exception
     {
-        DataType<String> expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
+        DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
         MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
 
@@ -80,7 +80,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
         assertThat(getVariableDataType(testEvent), like(Map.class, UNKNOWN, CUSTOM_ENCODING));
     }
 
-    protected abstract DataType<?> getVariableDataType(MuleEvent event);
+    protected abstract DataType getVariableDataType(MuleEvent event);
 
     protected abstract void setVariable(MuleEvent testEvent, Object propertyValue, DataType expectedDataType);
 

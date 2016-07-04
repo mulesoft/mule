@@ -26,9 +26,9 @@ public class TransformationGraphLookupStrategy
 {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private DirectedGraph<DataType<?>, TransformationEdge> graph;
+    private DirectedGraph<DataType, TransformationEdge> graph;
 
-    public TransformationGraphLookupStrategy(DirectedGraph<DataType<?>, TransformationEdge> graph)
+    public TransformationGraphLookupStrategy(DirectedGraph<DataType, TransformationEdge> graph)
     {
         this.graph = graph;
     }
@@ -42,9 +42,9 @@ public class TransformationGraphLookupStrategy
      * @return a list of {@link Converter} that are able to convert from the
      *         source to the target data types.
      */
-    public List<Converter> lookupConverters(DataType<?> source, DataType<?> target)
+    public List<Converter> lookupConverters(DataType source, DataType target)
     {
-        List<Converter> converters = new LinkedList<Converter>();
+        List<Converter> converters = new LinkedList<>();
         if (!graph.containsVertex(source))
         {
             return converters;
@@ -56,7 +56,7 @@ public class TransformationGraphLookupStrategy
             return converters;
         }
 
-        Set<DataType<?>> visited = new HashSet<DataType<?>>();
+        Set<DataType> visited = new HashSet<>();
 
         List<List<TransformationEdge>> transformationPaths = findTransformationPaths(source, target, visited);
 
@@ -67,7 +67,7 @@ public class TransformationGraphLookupStrategy
 
     private List<Converter> createConverters(List<List<TransformationEdge>> transformationPaths)
     {
-        List<Converter> converters = new LinkedList<Converter>();
+        List<Converter> converters = new LinkedList<>();
 
         for (List<TransformationEdge> transformationPath : transformationPaths)
         {
@@ -94,9 +94,9 @@ public class TransformationGraphLookupStrategy
         return converters;
     }
 
-    private List<List<TransformationEdge>> findTransformationPaths(DataType<?> source, DataType<?> target, Set<DataType<?>> visited)
+    private List<List<TransformationEdge>> findTransformationPaths(DataType source, DataType target, Set<DataType> visited)
     {
-        List<List<TransformationEdge>> validTransformationEdges = new LinkedList<List<TransformationEdge>>();
+        List<List<TransformationEdge>> validTransformationEdges = new LinkedList<>();
 
         if (visited.contains(source))
         {
@@ -109,11 +109,11 @@ public class TransformationGraphLookupStrategy
             Set<TransformationEdge> transformationEdges = graph.outgoingEdgesOf(source);
             for (TransformationEdge transformationEdge : transformationEdges)
             {
-                DataType<?> edgeTarget = graph.getEdgeTarget(transformationEdge);
+                DataType edgeTarget = graph.getEdgeTarget(transformationEdge);
 
                 if (edgeTarget.equals(target))
                 {
-                    LinkedList<TransformationEdge> transformationEdges1 = new LinkedList<TransformationEdge>();
+                    LinkedList<TransformationEdge> transformationEdges1 = new LinkedList<>();
                     transformationEdges1.add(transformationEdge);
                     validTransformationEdges.add(transformationEdges1);
                 }

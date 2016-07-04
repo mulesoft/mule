@@ -81,7 +81,7 @@ public class MessageContext
         event.setMessage(MuleMessage.builder(event.getMessage()).replyTo(replyTo).build());
     }
 
-    public DataType<?> getDataType()
+    public DataType getDataType()
     {
         return event.getMessage().getDataType();
     }
@@ -117,14 +117,13 @@ public class MessageContext
      * Obtains the payload of the current message transformed to the given #dataType.
      *
      * @param dataType the DatType to transform the current message payload to
-     * @param <T> the java type the payload is to be transformed to
      * @return the transformed payload
      * @throws TransformerException if there is an error during transformation
      */
-    public <T> T payloadAs(DataType<T> dataType) throws TransformerException
+    public Object payloadAs(DataType dataType) throws TransformerException
     {
         event.setMessage(muleContext.getTransformationService().transform(event.getMessage(), dataType));
-        return (T) event.getMessage().getPayload();
+        return event.getMessage().getPayload();
     }
 
     public void setPayload(Object payload)

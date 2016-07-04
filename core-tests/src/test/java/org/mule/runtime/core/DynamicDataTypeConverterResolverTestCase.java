@@ -40,7 +40,7 @@ public class DynamicDataTypeConverterResolverTestCase extends AbstractMuleTestCa
 
         DynamicDataTypeConversionResolver resolver = new DynamicDataTypeConversionResolver(muleContext);
 
-        List<DataType<?>> targetTypes = new ArrayList<DataType<?>>();
+        List<DataType> targetTypes = new ArrayList<>();
         targetTypes.add(DataType.STRING);
         Transformer resolvedConverter = resolver.resolve(DataType.INPUT_STREAM, targetTypes);
 
@@ -57,7 +57,7 @@ public class DynamicDataTypeConverterResolverTestCase extends AbstractMuleTestCa
 
         DynamicDataTypeConversionResolver resolver = new DynamicDataTypeConversionResolver(muleContext);
 
-        List<DataType<?>> targetTypes = new ArrayList<DataType<?>>();
+        List<DataType> targetTypes = new ArrayList<>();
         targetTypes.add(DataType.INPUT_STREAM);
         targetTypes.add(DataType.STRING);
         Transformer resolvedConverter = resolver.resolve(DataType.BYTE_ARRAY, targetTypes);

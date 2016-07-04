@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROP
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.util.ObjectUtils.getInt;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -153,10 +154,10 @@ public class DefaultMuleMessage implements MuleMessage, DeserializationPostIniti
     @Override
     public String getCorrelationId()
     {
-        String correlationId = getOutboundProperty(MULE_CORRELATION_ID_PROPERTY);
+        String correlationId = (String) getOutboundProperty(MULE_CORRELATION_ID_PROPERTY);
         if (correlationId == null)
         {
-            correlationId = getInboundProperty(MULE_CORRELATION_ID_PROPERTY);
+            correlationId = (String) getInboundProperty(MULE_CORRELATION_ID_PROPERTY);
         }
 
         return correlationId;
@@ -460,7 +461,7 @@ public class DefaultMuleMessage implements MuleMessage, DeserializationPostIniti
     private void readObject(ObjectInputStream in) throws Exception
     {
         in.defaultReadObject();
-        typedValue = new TypedValue(deserializeValue(in), (DataType<?>) in.readObject());
+        typedValue = new TypedValue(deserializeValue(in), (DataType) in.readObject());
         inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
         outboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
     }
@@ -495,9 +496,9 @@ public class DefaultMuleMessage implements MuleMessage, DeserializationPostIniti
      * @return value of the property or null if property is not found in either scope
      */
     @SuppressWarnings("unchecked")
-    private <T> T findProperty(String name)
+    private Serializable findProperty(String name)
     {
-        T result = getOutboundProperty(name);
+        Serializable result = getOutboundProperty(name);
         if (result != null)
         {
             return result;
@@ -515,7 +516,7 @@ public class DefaultMuleMessage implements MuleMessage, DeserializationPostIniti
     }
 
     @Override
-    public DataType<Object> getDataType()
+    public DataType getDataType()
     {
         return typedValue.getDataType();
     }
@@ -537,30 +538,30 @@ public class DefaultMuleMessage implements MuleMessage, DeserializationPostIniti
     }
 
     @Override
-    public <T extends Serializable> T getInboundProperty(String name)
+    public Serializable getInboundProperty(String name)
     {
         return properties.getInboundProperty(name);
     }
 
     @Override
-    public <T extends Serializable> T getInboundProperty(String name, T defaultValue)
+    public Serializable getInboundProperty(String name, Serializable defaultValue)
     {
         return properties.getInboundProperty(name, defaultValue);
     }
 
     @Override
-    public <T extends Serializable> T getOutboundProperty(String name)
+    public Serializable getOutboundProperty(String name)
     {
         return properties.getOutboundProperty(name);
     }
 
     @Override
-    public <T extends Serializable> T getOutboundProperty(String name, T defaultValue)
+    public Serializable getOutboundProperty(String name, Serializable defaultValue)
     {
         return properties.getOutboundProperty(name, defaultValue);
     }
 
-    public <T extends Serializable> void setInboundProperty(String key, T value, DataType<T> dataType)
+    public void setInboundProperty(String key, Serializable value, DataType dataType)
     {
         properties.setInboundProperty(key, value, dataType);
         updateDataTypeWithProperty(key, value);
@@ -572,7 +573,7 @@ public class DefaultMuleMessage implements MuleMessage, DeserializationPostIniti
         updateDataTypeWithProperty(key, value);
     }
 
-    public <T extends Serializable> void setOutboundProperty(String key, T value, DataType<T> dataType)
+    public void setOutboundProperty(String key, Serializable value, DataType dataType)
     {
         properties.setOutboundProperty(key, value, dataType);
         updateDataTypeWithProperty(key, value);
@@ -596,13 +597,13 @@ public class DefaultMuleMessage implements MuleMessage, DeserializationPostIniti
     }
 
     @Override
-    public DataType<? extends Serializable> getInboundPropertyDataType(String name)
+    public DataType getInboundPropertyDataType(String name)
     {
         return properties.getInboundPropertyDataType(name);
     }
 
     @Override
-    public DataType<? extends Serializable> getOutboundPropertyDataType(String name)
+    public DataType getOutboundPropertyDataType(String name)
     {
         return properties.getOutboundPropertyDataType(name);
     }

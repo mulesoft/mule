@@ -31,7 +31,7 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      *         otherwise
      * @since 3.0.0
      */
-    boolean isSourceDataTypeSupported(DataType<?> dataType);
+    boolean isSourceDataTypeSupported(DataType dataType);
 
     /**
      * Returns an unmodifiable list of Source types registered on this transformer
@@ -39,7 +39,7 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      * @return an unmodifiable list of Source types registered on this transformer
      * @since 3.0.0
      */
-    List<DataType<?>> getSourceDataTypes();
+    List<DataType> getSourceDataTypes();
 
     /**
      * Does this transformer allow null input?
@@ -88,7 +88,7 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      * @param type the expected return type for this transformer
      * @since 3.0.0
      */
-    void setReturnDataType(DataType<?> type);
+    void setReturnDataType(DataType type);
 
     /**
      * Specifies the return type of the result after this transformer has been executed. Mule will use this to validate
@@ -98,5 +98,5 @@ public interface Transformer extends MessageProcessor, Initialisable, Disposable
      * @return the excepted return type for this transformer
      * @since 3.0.0
      */
-    DataType<?> getReturnDataType();
+    DataType getReturnDataType();
 }

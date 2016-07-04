@@ -12,9 +12,10 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -62,13 +63,13 @@ public class HttpResponseToMuleMessage
         this.parseResponse = parseResponse;
     }
 
-    public MuleMessage<Object, HttpResponseAttributes> convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException
+    public MuleMessage convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException
     {
         String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
         DataType dataType = muleEvent.getMessage().getDataType();
         if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType()))
         {
-            responseContentType = ((DataType<?>) dataType).getMediaType().toString();
+            responseContentType = dataType.getMediaType().toRfcString();
         }
 
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
@@ -90,7 +91,7 @@ public class HttpResponseToMuleMessage
                     throw new MessagingException(muleEvent, e);
                 }
             }
-            else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toString()))
+            else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()))
             {
                 payload = HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding);
             }

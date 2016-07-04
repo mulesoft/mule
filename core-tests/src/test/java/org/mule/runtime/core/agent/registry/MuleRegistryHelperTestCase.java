@@ -31,9 +31,9 @@ import org.junit.Test;
 public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase
 {
 
-    private static final DataType<Orange> ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
-    private static final DataType<BloodOrange> BLOOD_ORANGE_DATA_TYPE = DataType.fromType(BloodOrange.class);
-    private static final DataType<Fruit> FRUIT_DATA_TYPE = DataType.fromType(Fruit.class);
+    private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
+    private static final DataType BLOOD_ORANGE_DATA_TYPE = DataType.fromType(BloodOrange.class);
+    private static final DataType FRUIT_DATA_TYPE = DataType.fromType(Fruit.class);
 
     private Transformer t1;
     private Transformer t2;

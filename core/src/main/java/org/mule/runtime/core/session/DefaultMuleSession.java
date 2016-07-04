@@ -219,16 +219,16 @@ public final class DefaultMuleSession implements MuleSession
     }
 
     @Override
-    public void setProperty(String key, Serializable value, DataType<?> dataType)
+    public void setProperty(String key, Serializable value, DataType dataType)
     {
         properties.put(key, new TypedValue(value, dataType));
     }
 
     @Override
-    public <T> T getProperty(String key)
+    public Object getProperty(String key)
     {
         TypedValue typedValue = properties.get(key);
-        return typedValue == null ? null : (T) typedValue.getValue();
+        return typedValue == null ? null : typedValue.getValue();
     }
 
     @Override
@@ -271,7 +271,7 @@ public final class DefaultMuleSession implements MuleSession
     }
 
     @Override
-    public DataType<?> getPropertyDataType(String name)
+    public DataType getPropertyDataType(String name)
     {
         TypedValue typedValue = properties.get(name);
 

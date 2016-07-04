@@ -35,7 +35,7 @@ public class DynamicDataTypeConversionResolver implements DataTypeConversionReso
     }
 
     @Override
-    public Transformer resolve(DataType<?> sourceType, List<DataType<?>> targetDataTypes)
+    public Transformer resolve(DataType sourceType, List<DataType> targetDataTypes)
     {
         Transformer transformer = null;
 

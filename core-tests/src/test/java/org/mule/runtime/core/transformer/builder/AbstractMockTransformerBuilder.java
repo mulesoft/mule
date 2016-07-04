@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer.builder;
 
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -17,15 +18,14 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import java.util.Arrays;
 
 import org.mockito.ArgumentMatcher;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 public abstract class AbstractMockTransformerBuilder<T extends AbstractMockTransformerBuilder>
 {
 
     protected String name;
-    protected DataType<?> resultDataType;
-    protected DataType<?>[] sourceDataTypes;
+    protected DataType resultDataType;
+    protected DataType[] sourceDataTypes;
     protected Object value;
 
     public T named(String name)
@@ -34,13 +34,13 @@ public abstract class AbstractMockTransformerBuilder<T extends AbstractMockTrans
         return getThis();
     }
 
-    public T from(DataType<?>... sourceDataTypes)
+    public T from(DataType... sourceDataTypes)
     {
         this.sourceDataTypes = sourceDataTypes;
         return getThis();
     }
 
-    public T to(DataType<?> resultDataType)
+    public T to(DataType resultDataType)
     {
         this.resultDataType = resultDataType;
         return getThis();
@@ -74,7 +74,7 @@ public abstract class AbstractMockTransformerBuilder<T extends AbstractMockTrans
         {
             doReturn(Arrays.asList(sourceDataTypes)).when(transformer).getSourceDataTypes();
 
-            when(transformer.isSourceDataTypeSupported(Matchers.<DataType<?>>argThat(new SupportsSourceDataType()))).thenReturn(true);
+            when(transformer.isSourceDataTypeSupported((DataType) argThat(new SupportsSourceDataType()))).thenReturn(true);
         }
         try
         {
@@ -102,11 +102,12 @@ public abstract class AbstractMockTransformerBuilder<T extends AbstractMockTrans
     class SupportsSourceDataType extends ArgumentMatcher
     {
 
+        @Override
         public boolean matches(Object value)
         {
-            DataType<Object> dataType = (DataType<Object>) value;
+            DataType dataType = (DataType) value;
 
-            for (DataType<?> sourceDataType : sourceDataTypes)
+            for (DataType sourceDataType : sourceDataTypes)
             {
                 if (sourceDataType.isCompatibleWith(dataType))
                 {

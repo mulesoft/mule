@@ -585,7 +585,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             }
             else
             {
-                InputStream is = ctx.transformMessage(DataType.INPUT_STREAM);
+                InputStream is = (InputStream) ctx.transformMessage(DataType.INPUT_STREAM);
                 m.setContent(InputStream.class, is);
             }
         }
@@ -609,7 +609,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
         else
         {
-            is = context.transformMessage(DataType.INPUT_STREAM);
+            is = (InputStream) context.transformMessage(DataType.INPUT_STREAM);
         }
         return is;
     }

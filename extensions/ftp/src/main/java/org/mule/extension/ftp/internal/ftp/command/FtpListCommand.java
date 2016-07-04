@@ -7,6 +7,7 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
+
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.api.message.MuleMessage;
@@ -51,7 +52,7 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
      * {@inheritDoc}
      */
     @Override
-    public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
+    public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher)
     {
         FileAttributes directoryAttributes = getExistingFile(config, directoryPath);
         Path path = Paths.get(directoryAttributes.getPath());

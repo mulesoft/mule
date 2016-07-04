@@ -6,11 +6,11 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
+import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.internal.sftp.SftpInputStream;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MediaType;
@@ -45,7 +45,7 @@ public final class SftpReadCommand extends SftpCommand implements ReadCommand
      * {@inheritDoc}
      */
     @Override
-    public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage<?, ?> message, String filePath, boolean lock)
+    public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath, boolean lock)
     {
         FtpFileAttributes attributes = getExistingFile(config, filePath);
         if (attributes.isDirectory())

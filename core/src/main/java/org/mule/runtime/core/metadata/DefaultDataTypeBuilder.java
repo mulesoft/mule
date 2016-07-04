@@ -11,7 +11,9 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionType;
+
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
@@ -37,7 +39,7 @@ import javax.activation.DataSource;
  *
  * @since 4.0
  */
-public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBuilder.DataTypeCollectionTypeBuilder<T>
+public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.DataTypeCollectionTypeBuilder
 {
     private static ConcurrentHashMap<String, ProxyIndicator> proxyClassCache = new ConcurrentHashMap<>();
 
@@ -50,8 +52,8 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         }
     });
 
-    private Class<T> type = (Class<T>) Object.class;
-    private DataTypeBuilder<?> itemTypeBuilder;
+    private Class<?> type = Object.class;
+    private DataTypeBuilder itemTypeBuilder;
     private MediaType mediaType = MediaType.ANY;
 
     private boolean built = false;
@@ -63,10 +65,10 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
 
     public DefaultDataTypeBuilder(DataType dataType)
     {
-        if (dataType instanceof DefaultCollectionDataType)
+        if (dataType instanceof CollectionDataType)
         {
             this.type = dataType.getType();
-            this.itemTypeBuilder = DataType.builder(((DefaultCollectionDataType) dataType).getItemDataType());
+            this.itemTypeBuilder = DataType.builder(((CollectionDataType) dataType).getItemDataType());
         }
         else
         {
@@ -82,14 +84,14 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * @return this builder.
      */
     @Override
-    public <N> DataTypeParamsBuilder<N> type(Class<N> type)
+    public DataTypeParamsBuilder type(Class<?> type)
     {
         validateAlreadyBuilt();
 
         checkNotNull(type, "'type' cannot be null.");
-        this.type = (Class<T>) handleProxy(type);
+        this.type = handleProxy(type);
 
-        return (DataTypeParamsBuilder<N>) this;
+        return this;
     }
 
     /*
@@ -169,7 +171,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      *             {@link Collection}.
      */
     @Override
-    public <N extends Collection<I>, I> DataTypeCollectionTypeBuilder<N> collectionType(Class<N> collectionType)
+    public DataTypeCollectionTypeBuilder collectionType(Class<? extends Collection> collectionType)
     {
         validateAlreadyBuilt();
 
@@ -179,7 +181,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
             throw new IllegalArgumentException("collectionType " + collectionType.getName() + " is not a Collection type");
         }
 
-        this.type = (Class<T>) handleProxy(collectionType);
+        this.type = handleProxy(collectionType);
 
         if (this.itemTypeBuilder == null)
         {
@@ -191,7 +193,13 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
             this.itemTypeBuilder.type(itemType);
         }
 
-        return (DataTypeCollectionTypeBuilder<N>) this;
+        return asCollectionTypeBuilder();
+    }
+
+    @Override
+    public DataTypeCollectionTypeBuilder asCollectionTypeBuilder()
+    {
+        return this;
     }
 
     /**
@@ -203,7 +211,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * @throws IllegalArgumentException if the given collectionType is not a descendant of {@link Collection}.
      */
     @Override
-    public <I> DataTypeCollectionTypeBuilder<T> itemType(Class<I> itemType)
+    public DataTypeCollectionTypeBuilder itemType(Class<?> itemType)
     {
         validateAlreadyBuilt();
 
@@ -229,7 +237,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * @throws IllegalArgumentException if the given media type string is invalid.
      */
     @Override
-    public DataTypeBuilder<T> mediaType(String mediaType)
+    public DataTypeBuilder mediaType(String mediaType)
     {
         requireNonNull(mediaType);
         validateAlreadyBuilt();
@@ -239,7 +247,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     }
 
     @Override
-    public DataTypeBuilder<T> mediaType(MediaType mediaType)
+    public DataTypeBuilder mediaType(MediaType mediaType)
     {
         requireNonNull(mediaType);
         validateAlreadyBuilt();
@@ -249,7 +257,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     }
 
     @Override
-    public <I> DataTypeCollectionTypeBuilder<T> itemMediaType(String itemMimeType)
+    public DataTypeCollectionTypeBuilder itemMediaType(String itemMimeType)
     {
         validateAlreadyBuilt();
 
@@ -258,7 +266,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     }
 
     @Override
-    public <I> DataTypeCollectionTypeBuilder<T> itemMediaType(MediaType itemMediaType)
+    public DataTypeCollectionTypeBuilder itemMediaType(MediaType itemMediaType)
     {
         validateAlreadyBuilt();
 
@@ -273,7 +281,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * @return this builder.
      */
     @Override
-    public DataTypeBuilder<T> charset(String charset)
+    public DataTypeBuilder charset(String charset)
     {
         validateAlreadyBuilt();
 
@@ -289,7 +297,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     }
 
     @Override
-    public DataTypeBuilder<T> charset(Charset charset)
+    public DataTypeBuilder charset(Charset charset)
     {
         validateAlreadyBuilt();
 
@@ -298,7 +306,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
     }
 
     @Override
-    public DataTypeParamsBuilder<T> fromObject(T value)
+    public DataTypeParamsBuilder fromObject(Object value)
     {
         requireNonNull(value);
         validateAlreadyBuilt();
@@ -306,11 +314,11 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         // TODO MULE-9985 Remove use of NullPayload
         if(value == NullPayload.getInstance())
         {
-            return (DataTypeBuilder<T>) type(Object.class);
+            return type(Object.class);
         }
         else
         {
-            DataTypeBuilder<T> builder = (DataTypeBuilder<T>) type(value.getClass());
+            DataTypeBuilder builder = (DataTypeBuilder) type(value.getClass());
             return getObjectMimeType(value).map(mediaType -> builder.mediaType(mediaType)).orElse(builder);
         }
     }
@@ -337,7 +345,7 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
      * @return a newly built {@link DataType}.
      */
     @Override
-    public DataType<T> build()
+    public DataType build()
     {
         if (built)
         {
@@ -348,15 +356,15 @@ public class DefaultDataTypeBuilder<T> implements DataTypeBuilder<T>, DataTypeBu
         return dataTypeCache.getUnchecked(this);
     }
 
-    protected DataType<T> doBuild()
+    protected DataType doBuild()
     {
         if (Collection.class.isAssignableFrom(type))
         {
-            return new DefaultCollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType);
+            return new DefaultCollectionDataType((Class<? extends Collection>) type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType);
         }
         else
         {
-            return new SimpleDataType<>(type, mediaType);
+            return new SimpleDataType(type, mediaType);
         }
     }
 

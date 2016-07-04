@@ -45,10 +45,10 @@ public class RetrieverOperations
      * @return a {@link List} of {@link MuleMessage} carrying all the emails and it's corresponding attributes.
      */
     //TODO: ADD PAGINATION SUPPORT WHEN AVAILABLE
-    public List<MuleMessage<String, EmailAttributes>> list(@UseConfig RetrieverConfiguration config,
-                                                           @Connection RetrieverConnection connection,
-                                                           @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                                           @Optional EmailPredicateBuilder matchWith)
+    public List<MuleMessage> list(@UseConfig RetrieverConfiguration config,
+                                  @Connection RetrieverConnection connection,
+                                  @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
+                                  @Optional EmailPredicateBuilder matchWith)
     {
         return listCommand.list(connection, mailboxFolder, config.isEagerlyFetchContent(), buildMatcher(matchWith));
     }

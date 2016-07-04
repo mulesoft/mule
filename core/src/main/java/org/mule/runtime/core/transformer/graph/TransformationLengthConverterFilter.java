@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.core.transformer.graph;
 
-import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.transformer.CompositeConverter;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -23,7 +21,7 @@ public class TransformationLengthConverterFilter implements ConverterFilter
 {
 
     @Override
-    public List<Converter> filter(List<Converter> converters, DataType<?> source, DataType<?> result)
+    public List<Converter> filter(List<Converter> converters, DataType source, DataType result)
     {
         if (converters.size() ==0)
         {
@@ -47,15 +45,12 @@ public class TransformationLengthConverterFilter implements ConverterFilter
 
     private void sortByTransformationLength(List<Converter> converterss)
     {
-        Collections.sort(converterss, new Comparator<Converter>()
+        Collections.sort(converterss, (converter, converter1) ->
         {
-            public int compare(Converter converter, Converter converter1)
-            {
-                int length = getTransformationLength(converter);
-                int length1 = getTransformationLength(converter1);
+            int length = getTransformationLength(converter);
+            int length1 = getTransformationLength(converter1);
 
-                return length - length1;
-            }
+            return length - length1;
         });
     }
 

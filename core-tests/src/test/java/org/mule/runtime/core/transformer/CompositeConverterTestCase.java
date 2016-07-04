@@ -55,7 +55,7 @@ public class CompositeConverterTestCase
     @Test
     public void getSourceDataTypes()
     {
-        DataType<?>[] dataTypes = new DataType<?>[] {DataType.STRING};
+        DataType[] dataTypes = new DataType[] {DataType.STRING};
         Converter converter = mock(Converter.class);
         when(converter.getSourceDataTypes()).thenReturn(Arrays.asList(dataTypes));
         CompositeConverter chain = new CompositeConverter(converter);

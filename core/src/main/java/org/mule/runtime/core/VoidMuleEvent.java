@@ -70,7 +70,7 @@ public class VoidMuleEvent implements MuleEvent
     }
 
     @Override
-    public <T> T transformMessage(DataType<T> outputType) throws TransformerException
+    public Object transformMessage(DataType outputType) throws TransformerException
     {
         throw new UnsupportedOperationException();
     }
@@ -209,7 +209,7 @@ public class VoidMuleEvent implements MuleEvent
     }
 
     @Override
-    public DataType<?> getFlowVariableDataType(String key)
+    public DataType getFlowVariableDataType(String key)
     {
         throw new UnsupportedOperationException();
     }

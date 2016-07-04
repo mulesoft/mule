@@ -20,6 +20,7 @@ import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
@@ -333,7 +334,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     {
         Object payload = NullPayload.getInstance();
         MediaType mediaType = MediaType.ANY;
-        MuleMessage<InputStream, ListenerFileAttributes> message;
+        MuleMessage message;
 
         if (attributes.getEventType().equals(DELETE.name()))
         {

@@ -45,8 +45,8 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase
     {
     }
 
-    private DataType<A> dataTypeA = DataType.fromType(A.class);
-    private DataType<B> dataTypeB = DataType.fromType(B.class);
+    private DataType dataTypeA = DataType.fromType(A.class);
+    private DataType dataTypeB = DataType.fromType(B.class);
 
     @Before
     public void setUp() throws Exception
@@ -59,7 +59,7 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase
     {
         MuleRegistry muleRegistry = mock(MuleRegistry.class);
         when(muleContext.getRegistry()).thenReturn(muleRegistry);
-        ArrayList<Transformer> transformers = new ArrayList<Transformer>();
+        ArrayList<Transformer> transformers = new ArrayList<>();
         when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
         TypeBasedTransformerResolver resolver = new TypeBasedTransformerResolver();
         resolver.setMuleContext(muleContext);
@@ -75,7 +75,7 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase
         when(muleContext.getRegistry()).thenReturn(muleRegistry);
         Transformer aToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).build();
 
-        ArrayList<Transformer> transformers = new ArrayList<Transformer>();
+        ArrayList<Transformer> transformers = new ArrayList<>();
         transformers.add(aToBConverter);
         when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);
 
@@ -95,7 +95,7 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase
         Transformer aToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).weighting(1).build();
         Transformer betterAToBConverter = new MockConverterBuilder().from(dataTypeA).to(dataTypeB).weighting(2).build();
 
-        ArrayList<Transformer> transformers = new ArrayList<Transformer>();
+        ArrayList<Transformer> transformers = new ArrayList<>();
         transformers.add(aToBConverter);
         transformers.add(betterAToBConverter);
         when(muleRegistry.lookupTransformers(dataTypeA, dataTypeB)).thenReturn(transformers);

@@ -44,7 +44,7 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
             else
             {
                 byte[] buffer = getStrategy().uncompressByteArray((byte[]) src);
-                DataType<?> returnDataType = getReturnDataType();
+                DataType returnDataType = getReturnDataType();
 
                 // If a return type has been specified, then deserialize the uncompressed byte array.
                 if (DataType.STRING.isCompatibleWith(returnDataType))

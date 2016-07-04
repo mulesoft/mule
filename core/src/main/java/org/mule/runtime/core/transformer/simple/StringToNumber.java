@@ -75,7 +75,7 @@ public class StringToNumber extends AbstractTransformer implements DiscoverableT
     }
 
     @Override
-    public void setReturnDataType(DataType<?> type)
+    public void setReturnDataType(DataType type)
     {
         if (!Number.class.isAssignableFrom(type.getType()))
         {

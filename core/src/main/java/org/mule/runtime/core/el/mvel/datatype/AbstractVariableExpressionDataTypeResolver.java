@@ -7,8 +7,6 @@
 
 package org.mule.runtime.core.el.mvel.datatype;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.compiler.Accessor;
 import org.mule.mvel2.compiler.AccessorNode;
@@ -16,6 +14,8 @@ import org.mule.mvel2.compiler.ExecutableLiteral;
 import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessor;
 import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessorNest;
 import org.mule.mvel2.optimizers.impl.refl.nodes.VariableAccessor;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleEvent;
 
 /**
  * Base class for extracting data type from map variables
@@ -65,6 +65,6 @@ public abstract class AbstractVariableExpressionDataTypeResolver extends Abstrac
         return null;
     }
 
-    protected abstract DataType<?> getVariableDataType(MuleEvent event, String propertyName);
+    protected abstract DataType getVariableDataType(MuleEvent event, String propertyName);
 
 }

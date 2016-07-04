@@ -10,8 +10,6 @@ import org.mule.runtime.api.message.AbstractMuleMessageBuilderFactory;
 import org.mule.runtime.core.DefaultMuleMessageBuilder;
 import org.mule.runtime.core.api.MuleMessage;
 
-import java.io.Serializable;
-
 /**
  *
  */
@@ -26,18 +24,18 @@ public class DefaultMuleMessageBuilderFactory extends AbstractMuleMessageBuilder
     }
 
     @Override
-    public <P, A extends Serializable> MuleMessage.Builder<P, A> create()
+    public MuleMessage.Builder create()
     {
         return new DefaultMuleMessageBuilder();
     }
 
     @Override
-    public <P, A extends Serializable> MuleMessage.Builder<P, A> create(org.mule.runtime.api.message.MuleMessage<P, A> message)
+    public MuleMessage.Builder create(org.mule.runtime.api.message.MuleMessage message)
     {
         return new DefaultMuleMessageBuilder(message);
     }
 
-    public <P, A extends Serializable> MuleMessage.Builder<P, A> create(MuleMessage<P, A> message)
+    public MuleMessage.Builder create(MuleMessage message)
     {
         return new DefaultMuleMessageBuilder(message);
     }

@@ -57,18 +57,18 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase
     {
         muleEvent.setFlowVariable(PROPERTY_NAME, PROPERTY_VALUE);
 
-        DataType<?> dataType = muleEvent.getFlowVariableDataType(PROPERTY_NAME);
+        DataType dataType = muleEvent.getFlowVariableDataType(PROPERTY_NAME);
         assertThat(dataType, DataTypeMatcher.like(String.class, MediaType.ANY, null));
     }
 
     @Test
     public void setFlowVariableCustomDataType() throws Exception
     {
-        DataType<String> dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
+        DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
         muleEvent.setFlowVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 
-        DataType<?> actualDataType = muleEvent.getFlowVariableDataType(PROPERTY_NAME);
+        DataType actualDataType = muleEvent.getFlowVariableDataType(PROPERTY_NAME);
         assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
     }
 
@@ -77,18 +77,18 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase
     {
         muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE);
 
-        DataType<?> dataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
+        DataType dataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
         assertThat(dataType, DataTypeMatcher.like(String.class, MediaType.ANY, null));
     }
 
     @Test
     public void setSessionVariableCustomDataType() throws Exception
     {
-        DataType<String> dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
+        DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
         muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 
-        DataType<?> actualDataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
+        DataType actualDataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
         assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
     }
 

@@ -91,7 +91,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         setMessageProcessors(source.getMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getMessageProcessors());
         setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList() : source.getResponseMessageProcessors());
         setDisableTransportTransformer(source.isDisableTransportTransformer());
-        setMimeType(source.getMimeType() != null ? source.getMimeType().toString() : null);
+        setMimeType(source.getMimeType() != null ? source.getMimeType().toRfcString() : null);
         setRedeliveryPolicy(source.getRedeliveryPolicy());
     }
 }

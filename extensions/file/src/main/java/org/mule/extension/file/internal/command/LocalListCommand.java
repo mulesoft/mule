@@ -39,7 +39,7 @@ public final class LocalListCommand extends LocalFileCommand implements ListComm
      * {@inheritDoc}
      */
     @Override
-    public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
+    public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher)
     {
         Path path = resolveExistingPath(config, directoryPath);
         if (!Files.isDirectory(path))

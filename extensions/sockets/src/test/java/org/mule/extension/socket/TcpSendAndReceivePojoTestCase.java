@@ -7,10 +7,8 @@
 package org.mule.extension.socket;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.module.socket.api.SocketAttributes;
-import org.mule.runtime.api.message.MuleMessage;
 
-import java.io.InputStream;
+import org.mule.runtime.api.message.MuleMessage;
 
 import org.junit.Test;
 
@@ -29,7 +27,7 @@ public class TcpSendAndReceivePojoTestCase extends ParameterizedProtocolTestCase
     @Test
     public void sendAndReceivePojo() throws Exception
     {
-        MuleMessage<InputStream, SocketAttributes> message = (MuleMessage) flowRunner("tcp-send-and-receive")
+        MuleMessage message = flowRunner("tcp-send-and-receive")
                 .withPayload(testPojo)
                 .run().getMessage();
 

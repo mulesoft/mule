@@ -9,12 +9,12 @@ package org.mule.runtime.core.transformer.graph;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.transformer.builder.MockConverterBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +25,12 @@ import org.junit.Test;
 public class NameTransformerFilterTestCase extends AbstractMuleTestCase
 {
     private NameConverterFilter filter = new NameConverterFilter();
-    private static final DataType<?> UNUSED_DATA_TYPE = null;
+    private static final DataType UNUSED_DATA_TYPE = null;
 
     @Test
     public void filtersEmptyList() throws ResolverException
     {
-        List<Converter> availableConverters = new ArrayList<Converter>();
+        List<Converter> availableConverters = new ArrayList<>();
 
         List<Converter> converters = filter.filter(availableConverters, UNUSED_DATA_TYPE, UNUSED_DATA_TYPE);
 
@@ -42,7 +42,7 @@ public class NameTransformerFilterTestCase extends AbstractMuleTestCase
     {
         Converter xmlToString = new MockConverterBuilder().named("xmlToString").build();
 
-        List<Converter> availableConverters = new ArrayList<Converter>();
+        List<Converter> availableConverters = new ArrayList<>();
         availableConverters.add(xmlToString);
         availableConverters.add(xmlToString);
 
@@ -59,7 +59,7 @@ public class NameTransformerFilterTestCase extends AbstractMuleTestCase
         Converter xmlToString = new MockConverterBuilder().named("xmlToString").build();
         Converter stringToJson = new MockConverterBuilder().named("stringToJson").build();
 
-        List<Converter> availableConverters = new ArrayList<Converter>();
+        List<Converter> availableConverters = new ArrayList<>();
         availableConverters.add(stringToJson);
         availableConverters.add(xmlToString);
 
@@ -75,7 +75,7 @@ public class NameTransformerFilterTestCase extends AbstractMuleTestCase
         Converter xmlToString = new MockConverterBuilder().named("xmlToString").build();
         Converter stringToJson = new MockConverterBuilder().named("stringToJson").build();
 
-        List<Converter> availableConverters = new ArrayList<Converter>();
+        List<Converter> availableConverters = new ArrayList<>();
         availableConverters.add(xmlToString);
         availableConverters.add(stringToJson);
 

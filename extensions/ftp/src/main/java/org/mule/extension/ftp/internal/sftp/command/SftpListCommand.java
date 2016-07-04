@@ -8,9 +8,10 @@ package org.mule.extension.ftp.internal.sftp.command;
 
 import static org.mule.runtime.module.extension.file.api.TreeNode.Builder.forDirectory;
 import static org.mule.runtime.module.extension.file.api.TreeNode.Builder.forFile;
-import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
+
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
@@ -46,7 +47,7 @@ public final class SftpListCommand extends SftpCommand implements ListCommand
      * {@inheritDoc}
      */
     @Override
-    public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage<?, ?> message, Predicate<FileAttributes> matcher)
+    public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher)
     {
         FileAttributes directoryAttributes = getExistingFile(config, directoryPath);
         Path path = Paths.get(directoryAttributes.getPath());

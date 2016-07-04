@@ -12,8 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
-import java.io.Serializable;
-
 import org.junit.Test;
 
 public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
@@ -31,11 +29,11 @@ public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        final MuleMessage<String, Serializable> message = MuleMessage.builder()
-                                                                     .payload(TEST_PAYLOAD)
-                                                                     .addOutboundProperty("foo", "fooValue")
-                                                                     .replyTo("jms://reply")
-                                                                     .build();
+        final MuleMessage message = MuleMessage.builder()
+                                               .payload(TEST_PAYLOAD)
+                                               .addOutboundProperty("foo", "fooValue")
+                                               .replyTo("jms://reply")
+                                               .build();
 
         client.dispatch("inbound", message);
         MuleMessage result = client.request("jms://reply", 10000);

@@ -19,8 +19,7 @@ import javax.activation.DataHandler;
 /**
  * MuleMessage
  */
-public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message.MuleMessage<PAYLOAD, ATTRIBUTES>,
-        MessageProperties, MessageAttachments
+public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, MessageProperties, MessageAttachments
 {
 
     /**
@@ -28,7 +27,7 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
      *
      * @return a new {@link Builder}.
      */
-    static <PAYLOAD, ATTRIBUTES extends Serializable> PayloadBuilder<PAYLOAD, ATTRIBUTES> builder()
+    static PayloadBuilder builder()
     {
         return DefaultMuleMessageBuilderFactory.getInstance().create();
     }
@@ -39,15 +38,12 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
      * @param message existing {@link MuleMessage} to use as a template to create a new {@link Builder} instance.
      * @return a new {@link Builder} based on the template {@code message} provided.
      */
-    static <PAYLOAD, ATTRIBUTES extends Serializable> Builder<PAYLOAD, ATTRIBUTES> builder(MuleMessage<PAYLOAD,
-            ATTRIBUTES> message)
+    static Builder builder(MuleMessage message)
     {
         return DefaultMuleMessageBuilderFactory.getInstance().create(message);
     }
 
-    static <PAYLOAD, ATTRIBUTES extends Serializable> Builder<PAYLOAD, ATTRIBUTES> builder(org.mule.runtime.api
-                                                                                                   .message
-                                                                                                   .MuleMessage<PAYLOAD, ATTRIBUTES> message)
+    static Builder builder(org.mule.runtime.api.message.MuleMessage message)
     {
         return DefaultMuleMessageBuilderFactory.getInstance().create(message);
     }
@@ -117,190 +113,183 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
      */
     ExceptionPayload getExceptionPayload();
 
-    interface PayloadBuilder<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message
-            .MuleMessage.PayloadBuilder<PAYLOAD, ATTRIBUTES>
+    interface PayloadBuilder extends org.mule.runtime.api.message.MuleMessage.PayloadBuilder
     {
 
         @Override
-        <N> Builder<N, ATTRIBUTES> payload(N payload);
+        Builder payload(Object payload);
 
         @Override
-        <N extends Collection<E>, E> CollectionBuilder<N, ATTRIBUTES> collectionPayload(N payload, Class<E> itemType);
+        CollectionBuilder collectionPayload(Collection payload, Class<?> itemType);
     }
 
-    interface Builder<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message.MuleMessage
-            .Builder<PAYLOAD, ATTRIBUTES>, PayloadBuilder<PAYLOAD, ATTRIBUTES>
+    interface Builder extends org.mule.runtime.api.message.MuleMessage.Builder, PayloadBuilder
     {
 
         @Override
-        Builder<PAYLOAD, ATTRIBUTES> mediaType(MediaType mediaType);
+        Builder mediaType(MediaType mediaType);
 
         @Override
-        <N extends Serializable> Builder<PAYLOAD, N> attributes(N value);
+        Builder attributes(Serializable value);
 
         /**
          * @param correlationId
          * @return this builder.
          */
-        Builder<PAYLOAD, ATTRIBUTES> correlationId(String correlationId);
+        Builder correlationId(String correlationId);
 
         /**
          * @param correlationSequence
          * @return this builder.
          */
-        Builder<PAYLOAD, ATTRIBUTES> correlationSequence(Integer correlationSequence);
+        Builder correlationSequence(Integer correlationSequence);
 
         /**
          * @param correlationGroupSize
          * @return this builder.
          */
-        Builder<PAYLOAD, ATTRIBUTES> correlationGroupSize(Integer correlationGroupSize);
+        Builder correlationGroupSize(Integer correlationGroupSize);
 
         /**
          * @param exceptionPayload
          * @return this builder.
          */
-        Builder<PAYLOAD, ATTRIBUTES> exceptionPayload(ExceptionPayload exceptionPayload);
+        Builder exceptionPayload(ExceptionPayload exceptionPayload);
 
         /**
          * @param replyTo
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> replyTo(Object replyTo);
+        Builder replyTo(Object replyTo);
 
         /**
          * @param id
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> id(String id);
+        Builder id(String id);
 
         /**
          * @param rootId
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> rootId(String rootId);
+        Builder rootId(String rootId);
 
         /**
          * @param key
          * @param value
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, Serializable value);
-
-        /**
-         * @param key
-         * @param value
-         * @param mediaType
-         * @param <T>
-         * @return
-         */
-        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, MediaType mediaType);
-
-        /**
-         * @param key
-         * @param value
-         * @param dataType
-         * @param <T>
-         * @return
-         */
-        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, DataType<T> dataType);
-
-        /**
-         * @param key
-         * @param value
-         * @return
-         */
-        Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, Serializable value);
+        Builder addInboundProperty(String key, Serializable value);
 
         /**
          * @param key
          * @param value
          * @param mediaType
-         * @param <T>
          * @return
          */
-        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, MediaType mediaType);
+        Builder addInboundProperty(String key, Serializable value, MediaType mediaType);
 
         /**
          * @param key
          * @param value
          * @param dataType
-         * @param <T>
          * @return
          */
-        <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, DataType<T> dataType);
-
-        /**
-         * @param key
-         * @return
-         */
-        Builder<PAYLOAD, ATTRIBUTES> removeInboundProperty(String key);
-
-        /**
-         * @param key
-         * @return
-         */
-        Builder<PAYLOAD, ATTRIBUTES> removeOutboundProperty(String key);
+        Builder addInboundProperty(String key, Serializable value, DataType dataType);
 
         /**
          * @param key
          * @param value
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> addInboundAttachment(String key, DataHandler value);
+        Builder addOutboundProperty(String key, Serializable value);
+
+        /**
+         * @param key
+         * @param value
+         * @param mediaType
+         * @return
+         */
+        Builder addOutboundProperty(String key, Serializable value, MediaType mediaType);
+
+        /**
+         * @param key
+         * @param value
+         * @param dataType
+         * @return
+         */
+        Builder addOutboundProperty(String key, Serializable value, DataType dataType);
+
+        /**
+         * @param key
+         * @return
+         */
+        Builder removeInboundProperty(String key);
+
+        /**
+         * @param key
+         * @return
+         */
+        Builder removeOutboundProperty(String key);
 
         /**
          * @param key
          * @param value
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> addOutboundAttachment(String key, DataHandler value);
+        Builder addInboundAttachment(String key, DataHandler value);
+
+        /**
+         * @param key
+         * @param value
+         * @return
+         */
+        Builder addOutboundAttachment(String key, DataHandler value);
 
         /**
          * @param key
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> removeInboundAttachment(String key);
+        Builder removeInboundAttachment(String key);
 
         /**
          * @param key
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> removeOutboundAttachment(String key);
+        Builder removeOutboundAttachment(String key);
 
         /**
          * @param inboundProperties
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> inboundProperties(Map<String, Serializable> inboundProperties);
+        Builder inboundProperties(Map<String, Serializable> inboundProperties);
 
         /**
          * @param outboundProperties
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> outboundProperties(Map<String, Serializable> outboundProperties);
+        Builder outboundProperties(Map<String, Serializable> outboundProperties);
 
         /**
          * @param inboundAttachments
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> inboundAttachments(Map<String, DataHandler> inboundAttachments);
+        Builder inboundAttachments(Map<String, DataHandler> inboundAttachments);
 
         /**
          * @param outbundAttachments
          * @return
          */
-        Builder<PAYLOAD, ATTRIBUTES> outboundAttachments(Map<String, DataHandler> outbundAttachments);
+        Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);
 
         @Override
-        MuleMessage<PAYLOAD, ATTRIBUTES> build();
+        MuleMessage build();
     }
 
-    interface CollectionBuilder<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message.MuleMessage
-            .CollectionBuilder<PAYLOAD, ATTRIBUTES>, Builder<PAYLOAD, ATTRIBUTES>
+    interface CollectionBuilder extends org.mule.runtime.api.message.MuleMessage.CollectionBuilder, Builder
     {
         @Override
-        CollectionBuilder<PAYLOAD, ATTRIBUTES> itemMediaType(MediaType mediaType);
+        CollectionBuilder itemMediaType(MediaType mediaType);
 
     }
 }

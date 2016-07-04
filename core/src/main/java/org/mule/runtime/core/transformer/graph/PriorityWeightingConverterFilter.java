@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.transformer.graph;
 
-import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.transformer.TransformerWeighting;
 
 import java.util.Collections;
@@ -23,7 +22,7 @@ public class PriorityWeightingConverterFilter implements ConverterFilter
 {
 
     @Override
-    public List<Converter> filter(List<Converter> converters, DataType<?> source, DataType<?> result)
+    public List<Converter> filter(List<Converter> converters, DataType source, DataType result)
     {
         if (converters.size() == 0)
         {
@@ -34,7 +33,7 @@ public class PriorityWeightingConverterFilter implements ConverterFilter
 
         TransformerWeighting transformerWeighting = weightings.get(weightings.size() - 1);
         int index = weightings.size() - 2;
-        List<Converter> heaviestConverter = new LinkedList<Converter>();
+        List<Converter> heaviestConverter = new LinkedList<>();
         heaviestConverter.add((Converter) transformerWeighting.getTransformer());
 
         for (; index > -1; --index)
@@ -54,7 +53,7 @@ public class PriorityWeightingConverterFilter implements ConverterFilter
 
     private List<TransformerWeighting> getTransformerWeightings(List<Converter> converters, Class input, Class output)
     {
-        List<TransformerWeighting> weightings = new LinkedList<TransformerWeighting>();
+        List<TransformerWeighting> weightings = new LinkedList<>();
         for (Converter converter : converters)
         {
             TransformerWeighting current = new TransformerWeighting(input, output, converter);

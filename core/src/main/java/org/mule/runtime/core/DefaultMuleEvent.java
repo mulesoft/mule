@@ -588,7 +588,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     {
         try
         {
-            return transformMessage(DataType.BYTE_ARRAY);
+            return (byte[]) transformMessage(DataType.BYTE_ARRAY);
         }
         catch (Exception e)
         {
@@ -601,11 +601,11 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     @Override
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
-        return transformMessage(DataType.fromType(outputType));
+        return (T) transformMessage(DataType.fromType(outputType));
     }
 
     @Override
-    public <T> T transformMessage(DataType<T> outputType) throws TransformerException
+    public Object transformMessage(DataType outputType) throws TransformerException
     {
         if (outputType == null)
         {
@@ -617,7 +617,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
         {
             setMessage(transformedMessage);
         }
-        return (T) transformedMessage.getPayload();
+        return transformedMessage.getPayload();
     }
 
     /**
@@ -631,8 +631,8 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     @Override
     public String transformMessageToString() throws TransformerException
     {
-        final DataType<String> dataType = DataType.builder(getMessage().getDataType()).type(String.class).build();
-        return transformMessage(dataType);
+        final DataType dataType = DataType.builder(getMessage().getDataType()).type(String.class).build();
+        return (String) transformMessage(dataType);
     }
 
     @Override
@@ -1018,7 +1018,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     }
 
     @Override
-    public DataType<?> getFlowVariableDataType(String key)
+    public DataType getFlowVariableDataType(String key)
     {
         TypedValue typedValue = flowVariables.get(key);
 

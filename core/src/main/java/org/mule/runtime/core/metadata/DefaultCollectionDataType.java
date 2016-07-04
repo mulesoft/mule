@@ -20,20 +20,20 @@ import java.util.Collection;
  *
  * @since 3.0
  */
-public class DefaultCollectionDataType<C extends Collection<T>, T> extends SimpleDataType<C> implements CollectionDataType<C, T>
+public class DefaultCollectionDataType extends SimpleDataType implements CollectionDataType
 {
     private static final long serialVersionUID = 3600944898597616006L;
 
-    private final DataType<T> itemsType;
+    private final DataType itemsType;
 
-    DefaultCollectionDataType(Class<C> collectionType, DataType<T> type, MediaType mimeType)
+    DefaultCollectionDataType(Class<? extends Collection> collectionType, DataType type, MediaType mimeType)
     {
         super(collectionType, mimeType);
         this.itemsType = type;
     }
 
     @Override
-    public DataType<T> getItemDataType()
+    public DataType getItemDataType()
     {
         return itemsType;
     }
@@ -52,7 +52,7 @@ public class DefaultCollectionDataType<C extends Collection<T>, T> extends Simpl
         }
         DefaultCollectionDataType that = (DefaultCollectionDataType) dataType;
 
-        return this.getItemDataType().isCompatibleWith(that.getItemDataType());
+        return getItemDataType().isCompatibleWith(that.getItemDataType());
 
     }
 

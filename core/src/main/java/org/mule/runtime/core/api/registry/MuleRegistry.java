@@ -64,7 +64,7 @@ public interface MuleRegistry extends LifecycleRegistry
      * @return a list of matching transformers. If there were no matches an empty list is returned.
      * @since 3.0.0
      */
-    List<Transformer> lookupTransformers(DataType<?> source, DataType<?> result);
+    List<Transformer> lookupTransformers(DataType source, DataType result);
 
     /**
      * Will find a transformer that is the closest match to the desired input and output.
@@ -75,7 +75,7 @@ public interface MuleRegistry extends LifecycleRegistry
      * @throws TransformerException will be thrown if there is more than one match
      * @since 3.0.0
      */
-    Transformer lookupTransformer(DataType<?> source, DataType<?> result) throws TransformerException;
+    Transformer lookupTransformer(DataType source, DataType result) throws TransformerException;
 
     Collection<FlowConstruct> lookupFlowConstructs();
 

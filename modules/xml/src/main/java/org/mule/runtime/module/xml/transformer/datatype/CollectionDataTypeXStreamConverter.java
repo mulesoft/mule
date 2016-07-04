@@ -12,13 +12,13 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.util.ClassUtils;
 
+import java.util.Collection;
+
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-
-import java.util.Collection;
 
 /**
  * A serializer to handle instances of {@link DefaultCollectionDataType}.
@@ -40,9 +40,9 @@ public class CollectionDataTypeXStreamConverter implements Converter
     {
         final DefaultCollectionDataType dataType = (DefaultCollectionDataType) source;
         writer.addAttribute("type", dataType.getType().getName());
-        writer.addAttribute("mediaType", dataType.getMediaType().toString());
+        writer.addAttribute("mediaType", dataType.getMediaType().toRfcString());
         writer.addAttribute("itemType", dataType.getType().getName());
-        writer.addAttribute("itemMediaType", dataType.getMediaType().toString());
+        writer.addAttribute("itemMediaType", dataType.getMediaType().toRfcString());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class CollectionDataTypeXStreamConverter implements Converter
 
     protected CollectionDataType createDataType(Class<? extends Collection> type, String mimeType, Class<?> itemType, String itemMediaType)
     {
-        return (DefaultCollectionDataType) DataType.builder().collectionType(type).itemType(itemType).itemMediaType(itemMediaType).mediaType(mimeType).build();
+        return (CollectionDataType) DataType.builder().collectionType(type).itemType(itemType).itemMediaType(itemMediaType).mediaType(mimeType).build();
     }
 
 }

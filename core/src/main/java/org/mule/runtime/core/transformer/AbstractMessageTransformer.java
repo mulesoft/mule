@@ -44,7 +44,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
      * @return whether the data type is supported
      */
     @Override
-    public boolean isSourceDataTypeSupported(DataType<?> dataType, boolean exactMatch)
+    public boolean isSourceDataTypeSupported(DataType dataType, boolean exactMatch)
     {
         //TODO RM* This is a bit of hack since we could just register MuleMessage as a supportedType, but this has some
         //funny behaviour in certain ObjectToXml transformers
@@ -95,7 +95,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     @Override
     public final Object transform(Object src, Charset enc, MuleEvent event) throws TransformerMessagingException
     {
-        DataType<?> sourceType = DataType.fromType(src.getClass());
+        DataType sourceType = DataType.fromType(src.getClass());
         if (!isSourceDataTypeSupported(sourceType))
         {
             if (isIgnoreBadInput())
@@ -185,7 +185,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
 
         if (getReturnDataType() != null)
         {
-            DataType<?> dt = DataType.fromType(object.getClass());
+            DataType dt = DataType.fromType(object.getClass());
             if (!getReturnDataType().isCompatibleWith(dt))
             {
                 throw new TransformerMessagingException(
