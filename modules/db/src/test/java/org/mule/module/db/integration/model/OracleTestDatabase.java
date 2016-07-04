@@ -248,4 +248,199 @@ public class OracleTestDatabase extends AbstractTestDatabase
 
         executeDdl(dataSource, sql);
     }
+
+    @Override
+    protected boolean supportsSimpleUdt()
+    {
+        return true;
+    }
+
+    @Override
+    protected boolean supportsArraysUdt()
+    {
+        return true;
+    }
+
+    @Override
+    protected void createZipArrayType(Connection connection) throws SQLException
+    {
+        final String ddl = "CREATE OR REPLACE TYPE ZIPARRAY AS VARRAY(10) OF VARCHAR2(12)";
+        executeDdl(connection, ddl);
+    }
+
+    @Override
+    protected void createContactDetailsType(Connection connection) throws SQLException
+    {
+        final String ddl = "CREATE OR REPLACE TYPE CONTACT_DETAILS AS object(" +
+                           "DESCRIPTION VARCHAR2(12)," +
+                           "PHONE_NUMBER VARCHAR2(12)," +
+                           "EMAIL_ADDRESS VARCHAR2(100))";
+
+        try
+        {
+            executeDdl(connection, ddl);
+        }
+        catch (SQLException e)
+        {
+            // If the type already exists, ignore the error
+            if (!e.getMessage().contains("ORA-02303"))
+            {
+                throw e;
+            }
+        }
+    }
+
+    @Override
+    protected void createContactDetailsArrayType(Connection connection) throws SQLException
+    {
+        final String ddl = "CREATE OR REPLACE TYPE CONTACT_DETAILS_ARRAY AS VARRAY(100) OF CONTACT_DETAILS";
+        executeDdl(connection, ddl);
+    }
+
+    @Override
+    public void createStoredProcedureGetZipCodes(DataSource dataSource) throws SQLException
+    {
+        final String sql = "CREATE OR REPLACE PROCEDURE getZipCodes(pName IN VARCHAR2, pZipCodes OUT ZIPARRAY) " +
+                           "IS " +
+                           "BEGIN " +
+                           "select ZIPS into pZipCodes from REGIONS where REGION_NAME = pName; " +
+                           "END;";
+
+        executeDdl(dataSource, sql);
+    }
+
+    @Override
+    public void createStoredProcedureGetContactDetails(DataSource dataSource) throws SQLException
+    {
+        final String sql = "CREATE OR REPLACE PROCEDURE getContactDetails(pName IN VARCHAR2, pContactDetails OUT CONTACT_DETAILS_ARRAY) " +
+                           "IS " +
+                           "BEGIN " +
+                           "select DETAILS into pContactDetails from CONTACTS where CONTACT_NAME= pName; " +
+                           "END;";
+
+        executeDdl(dataSource, sql);
+    }
+
+    @Override
+    public void createStoredProcedureGetManagerDetails(DataSource dataSource) throws SQLException
+    {
+        final String sql = "CREATE OR REPLACE PROCEDURE getManagerDetails(pName IN VARCHAR2, pDetails OUT CONTACT_DETAILS) " +
+                           "IS " +
+                           "BEGIN " +
+                           "select DETAILS into pDetails from REGION_MANAGERS where REGION_NAME= pName; " +
+                           "END;";
+
+        executeDdl(dataSource, sql);
+    }
+
+    @Override
+    protected String getInsertContactSql(Contact contact)
+    {
+        StringBuilder builder = new StringBuilder("INSERT INTO CONTACTS VALUES ('").append(contact.getName()).append("', CONTACT_DETAILS_ARRAY(");
+
+        boolean first = true;
+        for (ContactDetails contactDetails : contact.getDetails())
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                builder.append(",");
+            }
+            builder.append("CONTACT_DETAILS('" ).append(contactDetails.getDescription()).append("', '").append(contactDetails.getPhoneNumber()).append("', '").append(contactDetails.getEmail()).append("')");
+        }
+        builder.append("))");
+
+        return builder.toString();
+    }
+
+    @Override
+    protected void createContactsTable(Connection connection) throws SQLException
+    {
+        String ddl = "create table CONTACTS " +
+                     "(CONTACT_NAME varchar(32) NOT NULL," +
+                     "DETAILS CONTACT_DETAILS_ARRAY NOT NULL," +
+                     "PRIMARY KEY (CONTACT_NAME))";
+
+        executeDdl(connection, ddl);
+    }
+
+    @Override
+    protected void deleteContactsTable(Connection connection) throws SQLException
+    {
+        executeUpdate(connection, "DELETE FROM CONTACTS");
+    }
+
+    @Override
+    protected String getInsertRegionSql(Region region)
+    {
+        StringBuilder builder = new StringBuilder("INSERT INTO REGIONS VALUES ('").append(region.getName()).append("', ").append(" ZIPARRAY(");
+
+        boolean first = true;
+        for (String zipCode : region.getZips())
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                builder.append(",");
+            }
+            builder.append(zipCode);
+        }
+        builder.append("))");
+
+        return builder.toString();
+    }
+
+    @Override
+    protected void createRegionsTable(Connection connection) throws SQLException
+    {
+        String ddl = "create table REGIONS " +
+                     "(REGION_NAME varchar(32) NOT NULL," +
+                     "ZIPS ZIPARRAY NOT NULL," +
+                     "PRIMARY KEY (REGION_NAME))";
+
+        executeDdl(connection, ddl);
+    }
+
+    @Override
+    protected void deleteRegionsTable(Connection connection) throws SQLException
+    {
+        executeUpdate(connection, "DELETE FROM REGIONS");
+    }
+
+    @Override
+    protected void createRegionManagersTable(Connection connection) throws SQLException
+    {
+        String ddl = "create table REGION_MANAGERS(" +
+                     "REGION_NAME varchar(32) NOT NULL," +
+                     "MANAGER_NAME varchar(32) NOT NULL," +
+                     "DETAILS CONTACT_DETAILS NOT NULL," +
+                     "PRIMARY KEY (REGION_NAME));" ;
+
+        executeDdl(connection, ddl);
+    }
+
+    @Override
+    protected void deleteRegionManagersTable(Connection connection) throws SQLException
+    {
+        executeUpdate(connection, "DELETE FROM REGION_MANAGERS");
+    }
+
+    @Override
+    protected String getInsertRegionManagerSql(RegionManager regionManager)
+    {
+        StringBuilder builder = new StringBuilder("INSERT INTO REGION_MANAGERS VALUES ('").append(regionManager.getRegionName()).append("', '")
+                .append(regionManager.getName()).append("', CONTACT_DETAILS('")
+                .append(regionManager.getContactDetails().getDescription()).append("', '")
+                .append(regionManager.getContactDetails().getPhoneNumber()).append("', '")
+                .append(regionManager.getContactDetails().getEmail())
+                .append("'))");
+
+        return builder.toString();
+    }
 }

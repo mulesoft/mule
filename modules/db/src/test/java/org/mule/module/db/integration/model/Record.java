@@ -69,6 +69,5 @@ public class Record
     public String toString()
     {
         return fields.toString();
-
     }
 }
