@@ -94,9 +94,8 @@ public class HttpRequester
         MuleMessage responseMessage = httpResponseToMuleMessage.convert(muleEvent, response, httpRequest.getUri());
 
         // Create a new muleEvent based on the old and the response so that the auth can use it
-        MuleEvent responseEvent = new DefaultMuleEvent(org.mule.runtime.core.api.MuleMessage.builder().payload
-                (responseMessage.getPayload()).mediaType(responseMessage.getDataType().getMediaType()).attributes
-                (responseMessage.getAttributes()).build(), muleEvent, muleEvent.isSynchronous());
+        MuleEvent responseEvent = new DefaultMuleEvent(org.mule.runtime.core.api.MuleMessage.builder(responseMessage).build(),
+                                                       muleEvent, muleEvent.isSynchronous());
         if (resendRequest(responseEvent, checkRetry, authentication))
         {
             consumePayload(responseEvent);
