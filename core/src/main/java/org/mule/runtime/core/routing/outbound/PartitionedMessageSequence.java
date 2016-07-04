@@ -36,7 +36,7 @@ public class PartitionedMessageSequence<Q> implements MessageSequence<Collection
     @Override
     public Integer size()
     {
-        return (delegate.size() / groupSize) + ((delegate.size() % groupSize) > 0 ? 1 : 0);
+        return delegate.size() == null ? null : (delegate.size() / groupSize) + ((delegate.size() % groupSize) > 0 ? 1 : 0);
     }
 
     @Override
