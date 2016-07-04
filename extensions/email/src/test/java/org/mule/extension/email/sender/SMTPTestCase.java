@@ -186,7 +186,7 @@ public class SMTPTestCase extends EmailConnectorTestCase
                 .findFirst()
                 .orElse(null);
 
-        Assert.assertThat(customEncoding, CoreMatchers.is(notNullValue()));
+        assertThat(customEncoding, is(notNullValue()));
 
         flowRunner(SEND_ENCODED_MESSAGE)
                 .withPayload(WEIRD_CHAR_MESSAGE)

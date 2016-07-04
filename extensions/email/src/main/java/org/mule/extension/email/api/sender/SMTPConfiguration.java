@@ -6,7 +6,6 @@
  */
 package org.mule.extension.email.api.sender;
 
-import org.mule.extension.email.api.EmailContent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -41,7 +40,8 @@ public class SMTPConfiguration implements Initialisable
     private String from;
 
     /**
-     * Default encoding to be used if there is encoding specified in {@link EmailContent#charset}
+     * Default encoding to be used in all the messages. If not specified, it defaults
+     * to the default encoding in the mule configuration
      */
     @Parameter
     @Optional
