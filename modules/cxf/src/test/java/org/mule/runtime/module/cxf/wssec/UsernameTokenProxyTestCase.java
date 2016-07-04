@@ -11,9 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -72,7 +70,7 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
         InputStream stream = getClass().getResourceAsStream(getMessageResource());
         assertNotNull(stream);
 
-        return muleContext.getClient().send(url, new DefaultMuleMessage(stream), HTTP_REQUEST_OPTIONS);
+        return muleContext.getClient().send(url, MuleMessage.builder().payload(stream).build(), HTTP_REQUEST_OPTIONS);
     }
 
     protected String getMessageResource()

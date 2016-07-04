@@ -8,8 +8,6 @@ package org.mule.runtime.module.xml.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
-
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -164,8 +162,7 @@ public class XPathFilter extends AbstractJaxpFilter  implements Filter, Initiali
             return false;
         }
 
-        // TODO MULE-9856 Replace with the builder
-        event.setMessage(new DefaultMuleMessage(node, event.getMessage()));
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(node).build());
 
         return accept(node);
     }

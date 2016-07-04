@@ -9,12 +9,10 @@ package org.mule.runtime.module.db.internal.processor;
 
 import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.runtime.module.db.internal.domain.transaction.TransactionalAction.NOT_SUPPORTED;
-
 import org.mule.common.Result;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.OperationMetaDataEnabled;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -94,10 +92,7 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
 
             if (target == null || "".equals(target) || "#[payload]".equals(target))
             {
-                muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
-                    msg.setPayload(result);
-                    return msg;
-                }));
+                muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(result).build());
             }
             else
             {
@@ -133,8 +128,7 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
         if (!StringUtils.isEmpty(source) && !("#[payload]".equals(source)))
         {
             Object payload = muleContext.getExpressionManager().evaluate(source, muleEvent);
-            MuleMessage itemMessage = new DefaultMuleMessage(payload);
-            eventToUse = new DefaultMuleEvent(itemMessage, muleEvent);
+            eventToUse = new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), muleEvent);
         }
         return eventToUse;
     }

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.cxf;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -232,11 +233,9 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             message = out.toString();
         }
         final String finalCt = ct;
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setPayload(message, DataType.XML_STRING);
-            msg.setOutboundProperty(CONTENT_TYPE, finalCt);
-            return msg;
-        }));
+        MuleMessage resultMessage = MuleMessage.builder(event.getMessage()).payload(message).mediaType(XML)
+                .addOutboundProperty(CONTENT_TYPE, finalCt).build();
+        event.setMessage(resultMessage);
 
         return event;
     }
@@ -284,12 +283,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                         catch (Exception e)
                         {
                             ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
-                            responseEvent.setMessage(responseEvent.getMessage().transform(msg -> {
-                                msg.setExceptionPayload(exceptionPayload);
-                                msg.setOutboundProperty(HTTP_STATUS_PROPERTY, 500);
-                                return msg;
-                            }));
-                            responseEvent.setMessage(returnMessage);
+                            responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage()).exceptionPayload
+                                    (exceptionPayload).addOutboundProperty(HTTP_STATUS_PROPERTY, 500).build());
                             processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
                         }
                     }
@@ -454,42 +449,39 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             return null;
         }
 
-        responseEvent.setMessage(responseEvent.getMessage().transform(msg -> {
-            BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
+        MuleMessage.Builder builder = MuleMessage.builder(responseEvent.getMessage());
+
+        BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
+        if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
+        {
+            // For one-way operations, no envelope should be returned
+            // (http://www.w3.org/TR/soap12-part2/#http-reqbindwaitstate)
+            builder.addOutboundProperty(HTTP_STATUS_PROPERTY, ACCEPTED.getStatusCode());
+            builder.payload(NullPayload.getInstance());
+        }
+        else
+        {
+            builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
+        }
+
+        // Handle a fault if there is one.
+        Message faultMsg = exchange.getOutFaultMessage();
+        if (faultMsg != null)
+        {
             if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
             {
-                // For one-way operations, no envelope should be returned
-                // (http://www.w3.org/TR/soap12-part2/#http-reqbindwaitstate)
-                msg.setOutboundProperty(HTTP_STATUS_PROPERTY, ACCEPTED.getStatusCode());
-                msg.setPayload(NullPayload.getInstance());
+                builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
             }
-            else
+            Exception ex = faultMsg.getContent(Exception.class);
+            if (ex != null)
             {
-                msg.setPayload(getResponseOutputHandler(exchange), DataType.XML_STRING);
+                ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
+                builder.exceptionPayload(exceptionPayload);
+                builder.addOutboundProperty(HTTP_STATUS_PROPERTY, 500);
             }
+        }
 
-            // Handle a fault if there is one.
-            Message faultMsg = exchange.getOutFaultMessage();
-            if (faultMsg != null)
-            {
-                if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
-                {
-                    msg.setPayload(getResponseOutputHandler(exchange), DataType.XML_STRING);
-                }
-                Exception ex = faultMsg.getContent(Exception.class);
-                if (ex != null)
-                {
-                    ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
-                    event.setMessage(event.getMessage().transform(message -> {
-                        msg.setExceptionPayload(exceptionPayload);
-                        return msg;
-                    }));
-                    msg.setOutboundProperty(HTTP_STATUS_PROPERTY, 500);
-                }
-            }
-            return msg;
-        }));
-
+        responseEvent.setMessage(builder.build());
         return responseEvent;
     }
 

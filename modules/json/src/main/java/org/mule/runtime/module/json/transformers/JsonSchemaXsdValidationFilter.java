@@ -7,9 +7,7 @@
 package org.mule.runtime.module.json.transformers;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -72,16 +70,15 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
                     IOUtils.copy(transformerInputs.getReader(), jsonWriter);
                 }
                 jsonString = jsonWriter.toString();
-                msg = new DefaultMuleMessage(jsonString, msg);
+                msg = MuleMessage.builder(msg).payload(jsonString).build();
                 event.setMessage(msg);
             }
             String xmlString = (String) jToX.transform(msg.getPayload(), msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
-            // TODO MULE-9856 Replace with the builder
-            MuleMessage xmlMessage = new DefaultMuleMessage(xmlString, msg);
+            MuleMessage xmlMessage = MuleMessage.builder().payload(xmlString).build();
             boolean accepted = super.accept(new DefaultMuleEvent(xmlMessage, event.getFlowConstruct()));
             if (jsonString != null)
             {
-                msg = new DefaultMuleMessage(jsonString, msg);
+                msg = MuleMessage.builder(msg).payload(jsonString).build();
                 event.setMessage(msg);
             }
             return accepted;

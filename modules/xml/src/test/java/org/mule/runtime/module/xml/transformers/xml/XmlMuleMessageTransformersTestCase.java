@@ -15,10 +15,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
 import org.mule.runtime.module.xml.transformer.XmlToObject;
@@ -38,10 +36,9 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
         ObjectToXml t1 = createObject(ObjectToXml.class);
         t1.setAcceptMuleMessage(true);
 
-        MutableMuleMessage msg = new DefaultMuleMessage("test", (DataType) DataType.builder().charset(UTF_8).build());
-        msg.setCorrelationId("1234");
-        msg.setOutboundProperty("object", new Apple());
-        msg.setOutboundProperty("string", "hello");
+        MuleMessage msg = MuleMessage.builder().payload("test").mediaType(MediaType.ANY.withCharset(UTF_8))
+                .correlationId("1234").addOutboundProperty("object", new Apple()).addOutboundProperty("string",
+                                                                                                      "hello").build();
 
         String xml = (String) t1.transform(msg);
         assertNotNull(xml);
@@ -50,9 +47,9 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
 
         Object result = t2.transform(xml);
         assertNotNull(result);
-        assertThat(result, instanceOf(MutableMuleMessage.class));
+        assertThat(result, instanceOf(MuleMessage.class));
 
-        msg = (MutableMuleMessage) result;
+        msg = (MuleMessage) result;
 
         assertEquals("test", getPayloadAsString(msg));
         assertEquals(new Apple(), msg.getOutboundProperty("object"));

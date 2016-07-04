@@ -9,10 +9,9 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.cxf.builder.WebServiceMessageProcessorBuilder;
@@ -42,7 +41,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         {
             payload = event.getMessage().getPayload();
             assertEquals("echo", payload);
-            event.setMessage(new DefaultMuleMessage("echo", event.getMessage()));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload("echo").build());
             gotEvent = true;
             return event;
         };
@@ -68,7 +67,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         {
             payload = event.getMessage().getPayload();
             assertEquals("echo", payload);
-            event.setMessage(new DefaultMuleMessage("echo", event.getMessage()));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload("echo").build());
             gotEvent = true;
             return null;
         };

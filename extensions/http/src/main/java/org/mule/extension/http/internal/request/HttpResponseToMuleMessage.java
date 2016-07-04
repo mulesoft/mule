@@ -11,8 +11,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
-import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.buildContentTypeDataType;
-
+import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
@@ -20,7 +19,6 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.IOUtils;
@@ -74,7 +72,7 @@ public class HttpResponseToMuleMessage
         }
 
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-        Charset encoding = buildContentTypeDataType(responseContentType, getDefaultEncoding(muleEvent.getMuleContext())).getMediaType().getCharset().get();
+        Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleEvent.getMuleContext())).getCharset().get();
 
         Object payload = responseInputStream;
         Map<String, DataHandler> parts = new HashMap<>();
@@ -106,17 +104,8 @@ public class HttpResponseToMuleMessage
         HttpResponseAttributes responseAttributes = createAttributes(response, parts);
 
         dataType = DataType.builder(dataType).charset(encoding).build();
-        MuleMessage responseMessage = MuleMessage.builder().payload(payload).mediaType(dataType.getMediaType())
+        return MuleMessage.builder(muleEvent.getMessage()).payload(payload).mediaType(dataType.getMediaType())
                 .attributes(responseAttributes).build();
-
-        String requestMessageId = muleEvent.getMessage().getUniqueId();
-        String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
-
-        // Setting uniqueId and rootId in order to correlate messages from request to response generated.
-        ((DefaultMuleMessage) responseMessage).setUniqueId(requestMessageId);
-        ((DefaultMuleMessage) responseMessage).setMessageRootId(requestMessageRootId);
-
-        return responseMessage;
     }
 
     private HttpResponseAttributes createAttributes(HttpResponse response, Map<String, DataHandler> parts)

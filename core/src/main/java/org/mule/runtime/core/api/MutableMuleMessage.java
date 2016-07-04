@@ -8,8 +8,6 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.metadata.DataType;
 
-import java.io.Serializable;
-
 /**
  * TODO MULE-9856 Move to transport specific code
  * 
@@ -112,13 +110,4 @@ public interface MutableMuleMessage extends MuleMessage, MutableMessagePropertie
      */
     MuleMessage createInboundMessage() throws Exception;
 
-    /**
-     * TODO MULE-9856 Replace with the builder
-     * 
-     * Temporary method used to get {@code this} same instance as the new
-     * {@link org.mule.runtime.api.message.MuleMessage} API, supporting generics. This is a temporal, transitional
-     * method which will not survive the immutability refactor
-     */
-    @Deprecated
-    <PAYLOAD, ATTRIBUTES extends Serializable> org.mule.runtime.api.message.MuleMessage<PAYLOAD, ATTRIBUTES> asNewMessage();
 }

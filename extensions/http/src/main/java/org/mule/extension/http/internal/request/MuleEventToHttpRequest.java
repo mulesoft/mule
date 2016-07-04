@@ -25,6 +25,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -156,10 +157,7 @@ public class MuleEventToHttpRequest
         {
             Object newPayload = this.source;
             oldPayload = muleEvent.getMessage().getPayload();
-            muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
-                msg.setPayload(newPayload);
-                return msg;
-            }));
+            muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(newPayload).build());
             customSource = true;
         }
 
@@ -175,10 +173,7 @@ public class MuleEventToHttpRequest
         if (customSource)
         {
             final Object finalOldPayload = oldPayload;
-            muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
-                msg.setPayload(finalOldPayload);
-                return msg;
-            }));
+            muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(finalOldPayload).build());
         }
 
         return entity;

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.spring.security.filters.http;
 
-import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -15,10 +14,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
-
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
@@ -34,7 +32,7 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
     {
         MuleEvent oldEvent = RequestContext.getEvent();
 
-        MuleEvent event = getTestEvent(new DefaultMuleMessage("a", singletonMap(AUTHORIZATION, "Basic a"), null, null));
+        MuleEvent event = getTestEvent(MuleMessage.builder().payload("a").addInboundProperty(AUTHORIZATION, "Basic a").build());
         RequestContext.setEvent(event);
 
         HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();

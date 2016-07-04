@@ -12,8 +12,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
@@ -73,7 +71,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
     @Test
     public void webServiceConsumerMidFlow() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST);
+        MuleMessage request = MuleMessage.builder().payload(ECHO_REQUEST).build();
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/inMidFlow",
                                            request, newOptions().method(POST.name()).disableStatusCodeValidation()
@@ -84,7 +82,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
     @Override
     protected void assertValidResponse(String address, Map<String, Serializable> properties) throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST, properties);
+        MuleMessage request = MuleMessage.builder().payload(ECHO_REQUEST).inboundProperties(properties).build();
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
@@ -93,7 +91,7 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
     @Override
     protected void assertSoapFault(String address, String message, String expectedErrorMessage) throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(message);
+        MuleMessage request = MuleMessage.builder().payload(message).build();
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         String responsePayload = getPayloadAsString(response);

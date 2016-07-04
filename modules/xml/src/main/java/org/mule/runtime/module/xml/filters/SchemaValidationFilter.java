@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.xml.filters;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -140,8 +139,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         {
             if (result != null && result.getNode() != null)
             {
-                // TODO MULE-9856 Replace with the builder
-                event.setMessage(new DefaultMuleMessage(result.getNode(), event.getMessage()));
+                event.setMessage(MuleMessage.builder(event.getMessage()).payload(result.getNode()).build());
             }
         }
         

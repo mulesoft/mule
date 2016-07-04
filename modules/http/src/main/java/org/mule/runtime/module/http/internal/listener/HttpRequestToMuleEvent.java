@@ -15,22 +15,19 @@ import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedB
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
-import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.buildContentTypeDataType;
-
+import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeBuilder;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpHeaders;
-import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
@@ -38,7 +35,6 @@ import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
 
-import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -83,8 +79,7 @@ public class HttpRequestToMuleEvent
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();
         Object payload = NullPayload.getInstance();
 
-        final DataType dataType = buildContentTypeDataType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
-        DataTypeBuilder dataTypeBuilder = DataType.builder(dataType);
+        final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
         if (parseRequest)
         {
             final HttpEntity entity = request.getEntity();
@@ -96,14 +91,13 @@ public class HttpRequestToMuleEvent
                 }
                 else
                 {
-                    if (dataType.getMediaType() != null)
+                    if (mediaType != null)
                     {
-                        if (dataType.getMediaType().matches(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
+                        if (mediaType.matches(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED))
                         {
                             try
                             {
-                                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), dataType.getMediaType().getCharset().get());
-                                dataTypeBuilder.type(ParameterMap.class);
+                                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()), mediaType.getCharset().get());
                             }
                             catch (IllegalArgumentException e)
                             {
@@ -113,13 +107,11 @@ public class HttpRequestToMuleEvent
                         else if (entity instanceof InputStreamHttpEntity)
                         {
                             payload = ((InputStreamHttpEntity) entity).getInputStream();
-                            dataTypeBuilder.type(InputStream.class);
                         }
                     }
                     else if (entity instanceof InputStreamHttpEntity)
                     {
                         payload = ((InputStreamHttpEntity) entity).getInputStream();
-                        dataTypeBuilder.type(InputStream.class);
                     }
                 }
             }
@@ -130,13 +122,14 @@ public class HttpRequestToMuleEvent
             if (inputStreamEntity != null)
             {
                 payload = inputStreamEntity.getInputStream();
-                dataTypeBuilder.type(InputStream.class);
             }
         }
 
-        final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, dataTypeBuilder.build());
+        final MuleMessage message = MuleMessage.builder().payload(payload).mediaType(mediaType).inboundProperties
+                (inboundProperties).outboundProperties(outboundProperties).inboundAttachments(inboundAttachments)
+                .build();
         return new DefaultMuleEvent(
-                defaultMuleMessage,
+                message,
                 resolveUri(requestContext),
                 REQUEST_RESPONSE,
                 flowConstruct,

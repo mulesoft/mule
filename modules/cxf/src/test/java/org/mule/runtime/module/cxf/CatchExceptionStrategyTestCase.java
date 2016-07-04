@@ -16,9 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -32,9 +30,7 @@ import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.Map;
 
 import org.apache.cxf.interceptor.Fault;
 import org.junit.Rule;
@@ -77,7 +73,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String, Serializable>) null);
+        MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -88,7 +84,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfServiceWithCatchExceptionStrategyRethrown() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String, Serializable>) null);
+        MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -99,7 +95,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testExceptionThrownInTransformerWithCatchExceptionStrategy() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
+        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException", request, HTTP_REQUEST_OPTIONS);
         assertNotNull(response);
@@ -148,7 +144,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             String payload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\"><return>Hello Anonymous</return></ns2:sayHiResponse></soap:Body></soap:Envelope>";
-            event.setMessage(new DefaultMuleMessage(payload, event.getMessage()));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).build());
             return event;
         }
     }

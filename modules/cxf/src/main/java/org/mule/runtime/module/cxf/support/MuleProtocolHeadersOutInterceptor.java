@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.H
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.io.Serializable;
@@ -56,25 +56,26 @@ public class MuleProtocolHeadersOutInterceptor
             return;
         }
 
-        event.setMessage(event.getMessage().transform(msg -> {
-            extractAndSetContentType(message, msg);
-            extractAndSet(message, msg, Message.RESPONSE_CODE, HTTP_STATUS_PROPERTY);
-            String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
-            final String finalMethod = method != null ? method : POST.name();
-            msg.setOutboundProperty(HTTP_METHOD_PROPERTY, finalMethod);
+        MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage());
 
-            Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?, ?>) message.get(PROTOCOL_HEADERS));
-            if (reqHeaders != null)
+        extractAndSetContentType(message, messageBuilder);
+        extractAndSet(message, messageBuilder, Message.RESPONSE_CODE, HTTP_STATUS_PROPERTY);
+
+        String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
+        final String finalMethod = method != null ? method : POST.name();
+        messageBuilder.addOutboundProperty(HTTP_METHOD_PROPERTY, finalMethod);
+
+        Map<String, List<String>> reqHeaders = CastUtils.cast((Map<?, ?>) message.get(PROTOCOL_HEADERS));
+        if (reqHeaders != null)
+        {
+            for (Map.Entry<String, List<String>> e : reqHeaders.entrySet())
             {
-                for (Map.Entry<String, List<String>> e : reqHeaders.entrySet())
-                {
-                    String key = e.getKey();
-                    String val = format(e.getValue());
-                    msg.setOutboundProperty(key, val);
-                }
+                String key = e.getKey();
+                String val = format(e.getValue());
+                messageBuilder.addOutboundProperty(key, val);
             }
-            return msg;
-        }));
+        }
+        event.setMessage(messageBuilder.build());
 
         if (!Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE)))
         {
@@ -82,14 +83,14 @@ public class MuleProtocolHeadersOutInterceptor
         }
     }
 
-    private void extractAndSet(Message message, MutableMuleMessage muleMsg, String cxfHeader, String muleHeader)
+    private void extractAndSet(Message message, MuleMessage.Builder builder, String cxfHeader, String muleHeader)
     {
         if(message.get(cxfHeader) instanceof Serializable)
         {
             Serializable val = (Serializable) message.get(cxfHeader);
             if (val != null)
             {
-                muleMsg.setOutboundProperty(muleHeader, val);
+                builder.addOutboundProperty(muleHeader, val);
             }
         }
         else
@@ -98,7 +99,7 @@ public class MuleProtocolHeadersOutInterceptor
         }
     }
 
-    private void extractAndSetContentType(Message message, MutableMuleMessage muleMsg)
+    private void extractAndSetContentType(Message message, MuleMessage.Builder builder)
     {
         String ct = (String) message.get(Message.CONTENT_TYPE);
         if (ct != null)
@@ -108,7 +109,7 @@ public class MuleProtocolHeadersOutInterceptor
             {
                 ct = ct + "; charset=" + encoding;
             }
-            muleMsg.setOutboundProperty(CONTENT_TYPE, ct);
+            builder.addOutboundProperty(CONTENT_TYPE, ct);
         }
     }
 

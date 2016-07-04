@@ -28,6 +28,7 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -149,18 +150,16 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
             final String finalResponseMessage = responseMessage;
             final int finalStatusCodeToReturn = statusCodeToReturn;
             final int finalAuthorizationStatus = authorizationStatus;
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setPayload(finalResponseMessage);
-                msg.setOutboundProperty(HTTP_STATUS_PROPERTY, finalStatusCodeToReturn);
-                String onCompleteRedirectToValue = stateDecoder.decodeOnCompleteRedirectTo();
-                if (!isEmpty(onCompleteRedirectToValue))
-                {
-                    msg.setOutboundProperty(HTTP_STATUS_PROPERTY, MOVED_TEMPORARILY.getStatusCode());
-                    msg.setOutboundProperty(LOCATION, HttpParser.appendQueryParam(onCompleteRedirectToValue, AUTHORIZATION_STATUS_QUERY_PARAM_KEY, String.valueOf(finalAuthorizationStatus)));
-                }
-                return msg;
-            }));
+            MuleMessage.Builder builder = MuleMessage.builder(event.getMessage()).payload(finalResponseMessage)
+                    .addOutboundProperty(HTTP_STATUS_PROPERTY, finalStatusCodeToReturn);
+            String onCompleteRedirectToValue = stateDecoder.decodeOnCompleteRedirectTo();
+            if (!isEmpty(onCompleteRedirectToValue))
+            {
+                builder.addOutboundProperty(HTTP_STATUS_PROPERTY, MOVED_TEMPORARILY.getStatusCode());
+                builder.addOutboundProperty(LOCATION, HttpParser.appendQueryParam(onCompleteRedirectToValue, AUTHORIZATION_STATUS_QUERY_PARAM_KEY, String.valueOf(finalAuthorizationStatus)));
+            }
 
+            event.setMessage(builder.build());
             return event;
         };
     }
@@ -196,10 +195,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
         formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_AUTHENTICATION_CODE);
         formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getRedirectionUrl());
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setPayload(formData);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(formData).build());
     }
 
     private void setMapPayloadWithRefreshTokenRequestParameters(final MuleEvent event, final String refreshToken)
@@ -210,10 +206,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
         formData.put(GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_REFRESH_TOKEN);
         formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getRedirectionUrl());
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setPayload(formData);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(formData).build());
     }
 
     private void logResourceOwnerOAuthContextBeforeUpdate(ResourceOwnerOAuthContext resourceOwnerOAuthContext)
@@ -285,10 +278,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         try
         {
             final MuleEvent muleEvent = DefaultMuleEvent.copy(currentEvent);
-            muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
-                msg.clearOutboundProperties();
-                return msg;
-            }));
+            muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).clearOutboundProperties().build());
             final String userRefreshToken = resourceOwnerOAuthContext.getRefreshToken();
             if (userRefreshToken == null)
             {

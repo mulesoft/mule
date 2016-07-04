@@ -13,6 +13,7 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -100,12 +101,8 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
             realmHeader += "\"" + realm + "\"";
         }
         String finalRealmHeader = realmHeader;
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(WWW_AUTHENTICATE, finalRealmHeader);
-            msg.setOutboundProperty(HTTP_STATUS_PROPERTY, UNAUTHORIZED.getStatusCode());
-            return msg;
-        }));
-
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(WWW_AUTHENTICATE, finalRealmHeader)
+                                 .addOutboundProperty(HTTP_STATUS_PROPERTY, UNAUTHORIZED.getStatusCode()).build());
     }
 
     /**

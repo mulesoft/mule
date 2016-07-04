@@ -10,10 +10,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -53,7 +51,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     @Test
     public void testCxfService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
+        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
         MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
@@ -68,8 +66,8 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     @Test
     public void testCxfProxy() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
-        MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello-proxy", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
+        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello-proxy", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
 
@@ -80,8 +78,9 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
         Map<String, Serializable> props = new HashMap<>();
         props.put("Content-Type", "application/soap+xml");
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        MuleMessage result =
-                client.send("http://localhost:" + dynamicPort.getNumber() + "/echo", new DefaultMuleMessage(xml, props), newOptions().method(POST.name()).disableStatusCodeValidation().build());
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo", MuleMessage.builder
+                ().payload(xml).inboundProperties(props).build(), newOptions().method(POST.name())
+                .disableStatusCodeValidation().build());
         Assert.assertThat(getPayloadAsString(result), not(containsString("Fault")));
     }
 

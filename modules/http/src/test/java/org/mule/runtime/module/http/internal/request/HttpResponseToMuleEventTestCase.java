@@ -7,17 +7,15 @@
 package org.mule.runtime.module.http.internal.request;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.IOUtils;
@@ -75,7 +73,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     @Test
     public void previousInboundPropertiesAreRemoved() throws Exception
     {
-        event = getTestEvent(new DefaultMuleMessage(null, singletonMap("TestInboundProperty", TEST_VALUE), null, null));
+        event = getTestEvent(MuleMessage.builder().payload(NullPayload.getInstance()).addInboundProperty("TestInboundProperty", TEST_VALUE).build());
         httpResponseToMuleEvent.convert(event, httpResponse, null);
         assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
     }

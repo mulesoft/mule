@@ -8,13 +8,11 @@ package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.extension.email.internal.builder.EmailAttributesBuilder.fromMessage;
-
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.internal.EmailContentProcessor;
 import org.mule.extension.email.internal.exception.EmailRetrieverException;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.DefaultMuleMessage;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -67,7 +65,7 @@ public final class ListCommand
                         body = EmailContentProcessor.process(m).getBody();
                         attributes = fromMessage(m);
                     }
-                    list.add(new DefaultMuleMessage(body, null, attributes));
+                    list.add(MuleMessage.builder().payload(body).attributes(attributes).build());
                 }
             }
             return list;

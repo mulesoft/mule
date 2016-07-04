@@ -12,9 +12,7 @@ import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.INP
 import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.PARAM_DEBUG_FIELD_PREFIX;
 import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.PARAM_SET_DEBUG_FIELD_PREFIX;
 import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.QUERY_DEBUG_FIELD;
-
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
@@ -77,7 +75,7 @@ public class PreparedBulkUpdateMessageProcessor extends AbstractBulkUpdateMessag
 
         while (paramsIterator.hasNext())
         {
-            MuleMessage itemMessage = new DefaultMuleMessage(paramsIterator.next());
+            MuleMessage itemMessage = MuleMessage.builder().payload(paramsIterator.next()).build();
             MuleEvent itemEvent = new DefaultMuleEvent(itemMessage, muleEvent);
             List<QueryParamValue> queryParamValues = paramValueResolver.resolveParams(itemEvent, query.getParamValues());
             result.add(queryParamValues);

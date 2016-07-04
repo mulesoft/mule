@@ -223,10 +223,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                                     .setReasonPhrase(messagingException.getMessage());
                             addThrottlingHeaders(failureResponseBuilder);
                             MuleEvent event = messagingException.getEvent();
-                            event.setMessage(event.getMessage().transform(msg -> {
-                                msg.setPayload(messagingException.getMessage());
-                                return msg;
-                            }));
+                            event.setMessage(org.mule.runtime.core.api.MuleMessage.builder(event.getMessage()).payload(messagingException.getMessage()).build());
+
                             HttpResponse response;
                             try
                             {

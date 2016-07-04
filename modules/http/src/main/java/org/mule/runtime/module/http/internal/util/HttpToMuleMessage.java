@@ -10,9 +10,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeBuilder;
+import org.mule.runtime.api.metadata.MediaType;
 
 import java.nio.charset.Charset;
 
@@ -30,15 +28,15 @@ public class HttpToMuleMessage
      *            a {@code charset} parameter.
      * @return
      */
-    public static DataType buildContentTypeDataType(final String contentTypeValue, Charset defaultCharset)
+    public static MediaType getMediaType(final String contentTypeValue, Charset defaultCharset)
     {
-        DataTypeBuilder dataTypeBuilder = DataType.builder();
+        MediaType mediaType = MediaType.ANY;
 
         if (contentTypeValue != null)
         {
             try
             {
-                dataTypeBuilder.mediaType(contentTypeValue);
+                mediaType = MediaType.parse(contentTypeValue);
             }
             catch (IllegalArgumentException e)
             {
@@ -51,18 +49,16 @@ public class HttpToMuleMessage
                 {
                     logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), contentTypeValue, e.getMessage()));
                     logger.warn(format("Using default encoding: %s", defaultCharset().name()));
-                    dataTypeBuilder.charset(defaultCharset());
                 }
             }
         }
-        final DataType dataType = dataTypeBuilder.build();
-        if (!dataType.getMediaType().getCharset().isPresent())
+        if (!mediaType.getCharset().isPresent())
         {
-            return DataType.builder(dataType).charset(defaultCharset).build();
+            return mediaType.withCharset(defaultCharset);
         }
         else
         {
-            return dataType;
+            return mediaType;
         }
     }
 

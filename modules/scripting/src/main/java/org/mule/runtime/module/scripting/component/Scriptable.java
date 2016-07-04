@@ -10,10 +10,8 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.cannotLoadFromClass
 import static org.mule.runtime.core.config.i18n.CoreMessages.propertiesNotSet;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsStream;
-
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEventContext;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -260,7 +258,7 @@ public class Scriptable implements Initialisable, MuleContextAware
         MuleMessage message = event.getMessage();
         if (message == null)
         {
-            message = new DefaultMuleMessage(NullPayload.getInstance());
+            message = MuleMessage.builder().payload(NullPayload.getInstance()).build();
         }
 
         populateVariablesInOrder(bindings, event);

@@ -25,9 +25,7 @@ import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -331,7 +329,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
         return stopRequested.get() || Thread.currentThread().isInterrupted();
     }
 
-    private MuleMessage<InputStream, ListenerFileAttributes> createMessage(Path path, ListenerFileAttributes attributes)
+    private MuleMessage createMessage(Path path, ListenerFileAttributes attributes)
     {
         Object payload = NullPayload.getInstance();
         MediaType mediaType = MediaType.ANY;
@@ -347,9 +345,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
             payload = new FileInputStream(path, new NullPathLock());
         }
 
-        message = (MuleMessage) new DefaultMuleMessage(payload, DataType.builder().fromObject(payload).mediaType
-                (mediaType).build(), attributes);
-        return message;
+        return MuleMessage.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
     }
 
     @Override

@@ -16,11 +16,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPER
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.functional.functional.FunctionalTestNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -90,7 +88,7 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements F
 
         MuleMessage reply = muleContext.getClient().send(
                 String.format(endpointAddress),
-                new DefaultMuleMessage(REQUEST_PAYLOAD, props), HTTP_REQUEST_OPTIONS);
+                MuleMessage.builder().payload(REQUEST_PAYLOAD).outboundProperties(props).build(), HTTP_REQUEST_OPTIONS);
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

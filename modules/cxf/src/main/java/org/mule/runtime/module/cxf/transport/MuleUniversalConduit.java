@@ -7,12 +7,11 @@
 package org.mule.runtime.module.cxf.transport;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -147,7 +146,7 @@ public class MuleUniversalConduit extends AbstractConduit
         if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled)
         {
             // we've got an out of band WS-RM message or a message from a standalone client
-            MuleMessage muleMsg = new DefaultMuleMessage(handler);
+            MuleMessage muleMsg = MuleMessage.builder().payload(handler).build();
             
             String url = setupURL(message);
 
@@ -162,11 +161,7 @@ public class MuleUniversalConduit extends AbstractConduit
         }
         else 
         {
-            event.setMessage(event.getMessage().transform(msg ->
-            {
-                msg.setPayload(handler, DataType.XML_STRING);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(handler).mediaType(XML).build());
         }
 
         if (!decoupled)
@@ -316,7 +311,7 @@ public class MuleUniversalConduit extends AbstractConduit
             // we want to act appropriately. E.g. one way invocations over a proxy
             InputStream is = (InputStream) result.getMuleContext().getTransformationService().transform(result.getMessage(), DataType.INPUT_STREAM).getPayload();
             PushbackInputStream pb = new PushbackInputStream(is);
-            result.setMessage(new DefaultMuleMessage(pb, result.getMessage(), DataType.XML_STRING));
+            result.setMessage(MuleMessage.builder(result.getMessage()).payload(pb).mediaType(XML).build());
 
             int b = pb.read();
             if (b != -1)

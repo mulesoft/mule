@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
+import static java.util.Collections.EMPTY_MAP;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -14,15 +15,14 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
-import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.buildContentTypeDataType;
-
+import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -81,10 +81,10 @@ public class HttpResponseToMuleEvent
         }
 
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-        Charset encoding = buildContentTypeDataType(responseContentType, getDefaultEncoding(muleContext)).getMediaType().getCharset().get();
+        Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleContext)).getCharset().get();
 
         Map<String, Serializable> inboundProperties = getInboundProperties(response);
-        Map<String, DataHandler> inboundAttachments = null;
+        Map<String, DataHandler> inboundAttachments = EMPTY_MAP;
         Object payload = responseInputStream;
 
         if (responseContentType != null && parseResponse.resolveBooleanValue(muleEvent))
@@ -109,12 +109,11 @@ public class HttpResponseToMuleEvent
 
         String requestMessageId = muleEvent.getMessage().getUniqueId();
         String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
-        DefaultMuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
-                null, inboundAttachments, muleEvent.getMessage().getDataType());
 
         // Setting uniqueId and rootId in order to correlate messages from request to response generated.
-        message.setUniqueId(requestMessageId);
-        message.setMessageRootId(requestMessageRootId);
+        MuleMessage message = MuleMessage.builder().payload(muleEvent.getMessage().getPayload()).id(requestMessageId)
+                .rootId(requestMessageRootId).inboundProperties(inboundProperties).inboundAttachments
+                        (inboundAttachments).mediaType(muleEvent.getMessage().getDataType().getMediaType()).build();
 
         muleEvent.setMessage(message);
         setResponsePayload(payload, muleEvent);
@@ -173,10 +172,8 @@ public class HttpResponseToMuleEvent
     {
         if (StringUtils.isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget()) )
         {
-            muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
-                msg.setPayload(payload, muleEvent.getMessage().getDataType());
-                return msg;
-            }));
+            muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage())
+                                         .payload(payload).mediaType(muleEvent.getMessage().getDataType().getMediaType()).build());
         }
         else
         {

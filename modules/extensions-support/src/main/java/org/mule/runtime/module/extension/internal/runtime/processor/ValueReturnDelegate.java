@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.processor;
 
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
@@ -47,6 +48,10 @@ final class ValueReturnDelegate extends AbstractReturnDelegate
     public MuleEvent asReturnValue(Object value, OperationContextAdapter operationContext)
     {
         MuleEvent event = operationContext.getEvent();
+        if (value == null)
+        {
+            value = NullPayload.getInstance();
+        }
         event.setMessage((org.mule.runtime.core.api.MuleMessage) toMessage(value, operationContext));
 
         return event;

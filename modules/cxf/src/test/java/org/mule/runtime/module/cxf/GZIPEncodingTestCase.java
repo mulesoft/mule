@@ -13,9 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_ENCODING;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -80,7 +78,8 @@ public class GZIPEncodingTestCase extends FunctionalTestCase
     {
         Map<String, Serializable> properties = new HashMap<>();
         properties.put(CONTENT_ENCODING, "gzip,deflate");
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy", new DefaultMuleMessage(gzip(getAllRequest), properties), HTTP_REQUEST_OPTIONS);
+        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() +
+                                                            "/proxy", MuleMessage.builder().payload(gzip(getAllRequest)).outboundProperties(properties).build(), HTTP_REQUEST_OPTIONS);
         validateResponse(response);
     }
 

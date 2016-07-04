@@ -10,10 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -78,7 +76,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         Map<String, Serializable> props = new HashMap<>();
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
-        return new DefaultMuleMessage(srcData, props);
+        return MuleMessage.builder().payload(srcData).inboundProperties(props).build();
     }
 
     @Override
@@ -249,8 +247,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         // init transformer
         transformer.initialise();
 
-        MutableMuleMessage message = new DefaultMuleMessage(xml);
-        message.setOutboundProperty("myproperty", param);
+        MuleMessage message = MuleMessage.builder().payload(xml).addOutboundProperty("myproperty", param).build();
         // do transformation
         String transformerResult = (String) transformer.transform(message);
 
