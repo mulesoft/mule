@@ -38,11 +38,13 @@ public class TopLevelParameterParser extends ExtensionDefinitionParser
 {
 
     private final ObjectType type;
+    private final ClassLoader classLoader;
 
-    public TopLevelParameterParser(Builder definition, ObjectType type)
+    public TopLevelParameterParser(Builder definition, ObjectType type, ClassLoader classLoader)
     {
         super(definition);
         this.type = type;
+        this.classLoader = classLoader;
     }
 
     @Override
@@ -51,7 +53,8 @@ public class TopLevelParameterParser extends ExtensionDefinitionParser
         definitionBuilder.withIdentifier(hyphenize(getTopLevelTypeName(type)))
                 .withTypeDefinition(fromType(ValueResolver.class))
                 .withObjectFactoryType(TopLevelParameterObjectFactory.class)
-                .withConstructorParameterDefinition(fromFixedValue(type).build());
+                .withConstructorParameterDefinition(fromFixedValue(type).build())
+                .withConstructorParameterDefinition(fromFixedValue(classLoader).build());
 
         for (ObjectFieldType objectField : type.getFields())
         {
