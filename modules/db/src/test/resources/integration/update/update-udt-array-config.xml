@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="updatesStringArray">
+        <inbound-endpoint address="vm://updatesStringArray" exchange-pattern="request-response"/>
+
+        <transactional>
+            <db:select>
+                <db:parameterized-query>
+                    select ZIPS from REGIONS where REGION_NAME='Northwest'
+                </db:parameterized-query>
+            </db:select>
+            <!-- Sets the SQL array as payload-->
+            <set-payload value="#[payload.get(0)['ZIPS']]"/>
+
+            <db:update>
+                <db:parameterized-query>update REGIONS set ZIPS = #[payload] where REGION_NAME = 'Southwest'
+                </db:parameterized-query>
+            </db:update>
+
+            <db:select>
+                <db:parameterized-query>
+                    select ZIPs from REGIONS where REGION_NAME = 'Southwest'
+                </db:parameterized-query>
+            </db:select>
+
+            <!--Obtains the java array from the array field-->
+            <set-payload value="#[payload.get(0)['ZIPS'].getArray()]"/>
+        </transactional>
+    </flow>
+
+    <flow name="updatesStructArray">
+        <inbound-endpoint address="vm://updatesStructArray" exchange-pattern="request-response"/>
+
+        <transactional>
+            <db:select>
+                <db:parameterized-query>
+                    select DETAILS from CONTACTS where CONTACT_NAME='Contact2'
+                </db:parameterized-query>
+            </db:select>
+            <!-- Sets the SQL array as payload-->
+            <set-payload value="#[payload.get(0)['DETAILS']]"/>
+
+            <db:update>
+                <db:parameterized-query>update contacts set DETAILS = #[payload] where CONTACT_NAME = 'Contact1'
+                </db:parameterized-query>
+            </db:update>
+
+            <db:select>
+                <db:parameterized-query>
+                    select DETAILS from CONTACTS where CONTACT_NAME='Contact1'
+                </db:parameterized-query>
+            </db:select>
+
+             <!--Obtains the java array from the array field-->
+            <set-payload value="#[payload.get(0)['DETAILS'].getArray()]"/>
+        </transactional>
+    </flow>
+</mule>

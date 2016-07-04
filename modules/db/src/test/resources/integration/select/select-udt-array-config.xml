@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="returnsDefaultArray">
+        <inbound-endpoint address="vm://returnsDefaultArray" exchange-pattern="request-response"/>
+
+        <transactional>
+            <db:select>
+                <db:parameterized-query>select * from regions</db:parameterized-query>
+            </db:select>
+
+            <!--Converts SQL ARRAY to Java Array -->
+            <foreach>
+                <expression-component>
+                    payload.put("ZIPS", payload.get("ZIPS").getArray())
+                </expression-component>
+            </foreach>
+        </transactional>
+
+    </flow>
+
+    <flow name="returnsCustomArray">
+        <inbound-endpoint address="vm://returnsCustomArray" exchange-pattern="request-response"/>
+
+        <transactional>
+            <db:select>
+                <db:parameterized-query>select * from contacts</db:parameterized-query>
+            </db:select>
+
+            <!--Converts SQL ARRAY to Java Array -->
+            <foreach>
+                <expression-component>
+                    payload.put("DETAILS", payload.get("DETAILS").getArray())
+                </expression-component>
+            </foreach>
+        </transactional>
+    </flow>
+</mule>

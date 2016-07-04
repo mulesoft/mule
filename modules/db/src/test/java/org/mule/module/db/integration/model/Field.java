@@ -7,6 +7,8 @@
 
 package org.mule.module.db.integration.model;
 
+import static org.mule.module.db.integration.model.FieldUtils.getValueAsString;
+
 public class Field
 {
 
@@ -54,7 +56,22 @@ public class Field
      */
     protected boolean checkEqualValues(Field field)
     {
-        return value.toString().equals(field.value.toString());
+        if (value instanceof Object[] && field.value instanceof Object[])
+        {
+            final Object[] arrayValue = (Object[]) this.value;
+            final Object[] arrayFieldValue = (Object[]) field.value;
+            if (arrayValue.length == arrayFieldValue.length)
+            {
+                final String s1 = getValueAsString(arrayValue);
+                final String s2 = getValueAsString(arrayFieldValue);
+                return s1.equals(s2);
+            }
+            return false;
+        }
+        else
+        {
+            return value.toString().equals(field.value.toString());
+        }
     }
 
     @Override
@@ -66,6 +83,6 @@ public class Field
     @Override
     public String toString()
     {
-        return "{" + name + ", " + value + "}";
+        return "{" + name + ", " + getValueAsString(value) + "}";
     }
 }

@@ -7,12 +7,15 @@
 
 package org.mule.module.db.internal.config.domain.database;
 
+import static org.springframework.util.xml.DomUtils.getChildElementByTagName;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.module.db.internal.domain.type.ArrayResolvedDbType;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
 
 import java.sql.Connection;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -81,28 +84,35 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
 
     private void parseCustomDataTypes(Element element, BeanDefinitionBuilder builder)
     {
-        List<DbType> vendorDbTypes = new ArrayList<DbType>();
+        List<DbType> customDbTypes = new ArrayList<DbType>();
 
-        Element vendorTypes = DomUtils.getChildElementByTagName(element, DATA_TYPES_ELEMENT);
+        Element customTypes = getChildElementByTagName(element, DATA_TYPES_ELEMENT);
 
-        if (vendorTypes != null)
+        if (customTypes != null)
         {
-            for (Element dataType : DomUtils.getChildElementsByTagName(vendorTypes, DATA_TYPE_ELEMENT))
+            for (Element dataType : DomUtils.getChildElementsByTagName(customTypes, DATA_TYPE_ELEMENT))
             {
                 String name = dataType.getAttribute(TYPE_NAME_ATTIRBUTE);
                 int id = Integer.valueOf(dataType.getAttribute(TYPE_ID_ATTRIBUTE));
-                vendorDbTypes.add(new ResolvedDbType(id, name));
+                if (id == Types.ARRAY)
+                {
+                    customDbTypes.add(new ArrayResolvedDbType(id, name));
+                }
+                else
+                {
+                    customDbTypes.add(new ResolvedDbType(id, name));
+                }
             }
         }
 
-        builder.addPropertyValue("customDataTypes", vendorDbTypes);
+        builder.addPropertyValue("customDataTypes", customDbTypes);
     }
 
     private void parseConnectionProperties(Element element, BeanDefinitionBuilder builder)
     {
         Map<String, String> propertiesMap = new LinkedHashMap<String, String>();
 
-        Element properties = DomUtils.getChildElementByTagName(element, CONNECTION_PROPERTIES_ELEMENT_NAME);
+        Element properties = getChildElementByTagName(element, CONNECTION_PROPERTIES_ELEMENT_NAME);
 
         if (properties != null)
         {
