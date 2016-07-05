@@ -10,13 +10,12 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.functional.FlowAssert.verify;
+
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -88,26 +87,29 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
         int correlationGroupSize = 3;
 
         FlowRunner runner = flowRunner("aggregator").withPayload(TEST_MESSAGE).nonBlocking();
-        MutableMuleMessage message1 = (MutableMuleMessage) runner.buildEvent().getMessage();
-        message1.setCorrelationId(correlationId);
-        message1.setCorrelationGroupSize(correlationGroupSize);
-        message1.setCorrelationSequence(1);
+        MuleMessage message1 = MuleMessage.builder(runner.buildEvent().getMessage())
+                                          .correlationId(correlationId)
+                                          .correlationGroupSize(correlationGroupSize)
+                                          .correlationSequence(1)
+                                          .build();
         runner.runNoVerify();
 
         runner.reset();
-        MutableMuleMessage message2 = (MutableMuleMessage) runner.buildEvent().getMessage();
-        message2.setCorrelationId(correlationId);
-        message2.setCorrelationGroupSize(correlationGroupSize);
-        message2.setCorrelationSequence(2);
-        message2.setMessageRootId(message1.getMessageRootId());
+        MuleMessage message2 = MuleMessage.builder(runner.buildEvent().getMessage())
+                                          .correlationId(correlationId)
+                                          .correlationGroupSize(correlationGroupSize)
+                                          .correlationSequence(2)
+                                          .rootId(message1.getMessageRootId())
+                                          .build();
         runner.runNoVerify();
 
         runner.reset();
-        MutableMuleMessage message3 = (MutableMuleMessage) runner.buildEvent().getMessage();
-        message3.setCorrelationId(correlationId);
-        message3.setCorrelationGroupSize(correlationGroupSize);
-        message3.setCorrelationSequence(3);
-        message3.setMessageRootId(message1.getMessageRootId());
+        MuleMessage message3 = MuleMessage.builder(runner.buildEvent().getMessage())
+                                          .correlationId(correlationId)
+                                          .correlationGroupSize(correlationGroupSize)
+                                          .correlationSequence(3)
+                                          .rootId(message1.getMessageRootId())
+                                          .build();
         runner.run();
     }
 
@@ -115,14 +117,7 @@ public class NonBlockingNotSupportedFunctionalTestCase extends FunctionalTestCas
     public void poll() throws Exception
     {
         final Latch latch = new Latch();
-        ((FunctionalTestComponent) getComponent("poll")).setEventCallback(new EventCallback()
-        {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                latch.countDown();
-            }
-        });
+        ((FunctionalTestComponent) getComponent("poll")).setEventCallback((context, component) -> latch.countDown());
         latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
         verify("poll");
     }

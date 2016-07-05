@@ -9,6 +9,7 @@ package org.mule.test.integration.routing;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -81,10 +82,9 @@ public class UntilSuccessfulExceptionStrategyTestCase extends FunctionalTestCase
             {
                 if (!latch.await(TIMEOUT, TimeUnit.SECONDS))
                 {
-                    event.setMessage(event.getMessage().transform(msg -> {
-                        msg.setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
-                        return msg;
-                    }));
+                    event.setMessage(MuleMessage.builder(event.getMessage())
+                                                .exceptionPayload(new DefaultExceptionPayload(new RuntimeException()))
+                                                .build());
                 }
             }
             catch (InterruptedException e)

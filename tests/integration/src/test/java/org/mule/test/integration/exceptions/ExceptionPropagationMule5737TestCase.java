@@ -10,13 +10,14 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.functional.exceptions.FunctionalTestException;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
-import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -103,10 +104,9 @@ public class ExceptionPropagationMule5737TestCase extends FunctionalTestCase
         {
             caught = true;
             MuleEvent resultEvent = super.handleException(e, event);
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setExceptionPayload(null);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .exceptionPayload(null)
+                                        .build());
             ((MessagingException)e).setHandled(true);
             return resultEvent;
         }

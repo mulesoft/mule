@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -314,17 +315,9 @@ public class TestEventBuilder
         @Override
         public void addOutboundTo(MuleEvent event, String key)
         {
-            event.setMessage(event.getMessage().transform(msg -> {
-                try
-                {
-                    msg.addOutboundAttachment(key, dataHandler);
-                }
-                catch (Exception e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .addOutboundAttachment(key, dataHandler)
+                                        .build());
         }
     }
 
@@ -343,17 +336,16 @@ public class TestEventBuilder
         @Override
         public void addOutboundTo(MuleEvent event, String key)
         {
-            event.setMessage(event.getMessage().transform(msg -> {
-                try
-                {
-                    msg.addOutboundAttachment(key, object, contentType);
-                }
-                catch (Exception e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-                return msg;
-            }));
+            try
+            {
+                event.setMessage(MuleMessage.builder(event.getMessage())
+                                            .addOutboundAttachment(key, IOUtils.toDataHandler(key, object, contentType))
+                                            .build());
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
         }
     }
 }
