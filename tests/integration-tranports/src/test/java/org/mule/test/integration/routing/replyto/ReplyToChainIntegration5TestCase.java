@@ -42,8 +42,7 @@ public class ReplyToChainIntegration5TestCase extends FunctionalTestCase
         final Latch flowExecutedLatch = new Latch();
         FunctionalTestComponent ftc = getFunctionalTestComponent("replierService");
         ftc.setEventCallback((context, component) -> flowExecutedLatch.release());
-        MutableMuleMessage muleMessage = new DefaultMuleMessage(TEST_PAYLOAD);
-        muleMessage.setOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response");
+        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
         client.dispatch("jms://jmsIn1", muleMessage);
         flowExecutedLatch.await(TIMEOUT, MILLISECONDS);
         MuleMessage response = client.request("jms://response", TIMEOUT);
