@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core;
 
+import static java.util.Collections.emptyMap;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -376,7 +377,7 @@ public class MuleServer implements Runnable
         try
         {
             return (ConfigurationBuilder) ClassUtils.instanciateClass(getConfigBuilderClassName(),
-                    new Object[]{ configurationResources }, MuleServer.class);
+                    new Object[]{ configurationResources , emptyMap()}, MuleServer.class);
         }
         catch (Exception e)
         {
