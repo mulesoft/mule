@@ -67,11 +67,7 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase
         @Override
         public MuleEvent handleException(Exception ex, MuleEvent event)
         {
-            event.setMessage(event.getMessage().transform(msg ->
-            {
-                msg.setOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_FORBIDDEN));
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_FORBIDDEN)).build());
             return event;
         }
     }

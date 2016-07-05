@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
-
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.AbstractEndpointBuilder;
@@ -50,12 +49,10 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
         });
 
         MuleEvent event = createTestOutboundEvent();
-        event.setMessage(event.getMessage().transform(msg ->
-        {
-            msg.setOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL);
-            msg.setOutboundProperty(MULE_CORRELATION_ID_PROPERTY, MULE_CORRELATION_ID_VAL);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                             .addOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL)
+                                             .addOutboundProperty(MULE_CORRELATION_ID_PROPERTY, MULE_CORRELATION_ID_VAL)
+                                             .build());
 
         MuleEvent result = mp.process(event);
 

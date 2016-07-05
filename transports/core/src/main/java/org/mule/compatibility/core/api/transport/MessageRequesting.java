@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.api.transport;
 
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 
 /**
  * Defines generic methods for receiving events. The exact behaviour of the action is defined by the implementing class.
@@ -33,6 +33,6 @@ public interface MessageRequesting
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal causes an exception
      */
-    MutableMuleMessage request(long timeout) throws Exception;
+    MuleMessage request(long timeout) throws Exception;
 
 }

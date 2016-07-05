@@ -8,14 +8,12 @@ package org.mule.compatibility.core.transport;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.execution.FlowProcessingPhaseTemplate;
@@ -98,13 +96,16 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
      */
     public abstract Object acquireMessage() throws MuleException;
 
-    protected void propagateRootMessageIdProperty(MutableMuleMessage message)
+    protected MuleMessage propagateRootMessageIdProperty(MuleMessage message)
     {
         String rootId = message.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
         if (rootId != null)
         {
-            message.setMessageRootId(rootId);
-            message.removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
+            return MuleMessage.builder(message).rootId(rootId).removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY).build();
+        }
+        else
+        {
+            return message;
         }
     }
 
@@ -119,17 +120,18 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     {
     }
 
-    protected void warnIfMuleClientSendUsed(MutableMuleMessage message)
+    protected MuleMessage warnIfMuleClientSendUsed(MuleMessage message)
     {
-        final Object remoteSyncProperty = message.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+        MuleMessage.Builder messageBuilder = MuleMessage.builder(message);
+        final Object remoteSyncProperty = message.getInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+        messageBuilder.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
         if (ObjectUtils.getBoolean(remoteSyncProperty, false) && !messageReceiver.getEndpoint().getExchangePattern().hasResponse())
         {
             logger.warn("MuleClient.send() was used but inbound endpoint "
                         + messageReceiver.getEndpoint().getEndpointURI().getUri().toString()
                         + " is not 'request-response'.  No response will be returned.");
         }
-
-        message.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+        return messageBuilder.build();
     }
 
     protected MuleEvent createEventFromMuleMessage(MuleMessage muleMessage) throws MuleException
@@ -147,11 +149,11 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
         return null;
     }
 
-    protected MutableMuleMessage createMessageFromSource(Object message) throws MuleException
+    protected MuleMessage createMessageFromSource(Object message) throws MuleException
     {
-        MutableMuleMessage muleMessage = messageReceiver.createMuleMessage(message, messageReceiver.getEndpoint().getEncoding());
-        warnIfMuleClientSendUsed(muleMessage);
-        propagateRootMessageIdProperty(muleMessage);
+        MuleMessage muleMessage = messageReceiver.createMuleMessage(message, messageReceiver.getEndpoint().getEncoding());
+        muleMessage = warnIfMuleClientSendUsed(muleMessage);
+        muleMessage = propagateRootMessageIdProperty(muleMessage);
         return muleMessage;
     }
 

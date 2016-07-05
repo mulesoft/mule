@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -180,26 +179,26 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     }
 
     @Override
-    public final MuleEvent routeMessage(MutableMuleMessage message) throws MuleException
+    public final MuleEvent routeMessage(MuleMessage message) throws MuleException
     {
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
         return routeMessage(message, tx, null);
     }
 
     @Override
-    public final MuleEvent routeMessage(MutableMuleMessage message, Transaction trans) throws MuleException
+    public final MuleEvent routeMessage(MuleMessage message, Transaction trans) throws MuleException
     {
         return routeMessage(message, trans, null);
     }
 
     @Override
-    public final MuleEvent routeMessage(MutableMuleMessage message, Transaction trans, OutputStream outputStream)
+    public final MuleEvent routeMessage(MuleMessage message, Transaction trans, OutputStream outputStream)
             throws MuleException
     {
         return routeMessage(message, new DefaultMuleSession(), trans, outputStream);
     }
 
-    public final MuleEvent routeMessage(MutableMuleMessage message,
+    public final MuleEvent routeMessage(MuleMessage message,
                                         MuleSession session,
                                         Transaction trans,
                                         OutputStream outputStream) throws MuleException
@@ -207,11 +206,11 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         return routeMessage(message, session, outputStream);
     }
 
-    public final MuleEvent routeMessage(MutableMuleMessage message, MuleSession session, OutputStream outputStream)
+    public final MuleEvent routeMessage(MuleMessage message, MuleSession session, OutputStream outputStream)
         throws MuleException
     {
-        warnIfMuleClientSendUsed(message);
-        propagateRootMessageIdProperty(message);
+        message = warnIfMuleClientSendUsed(message);
+        message = propagateRootMessageIdProperty(message);
 
         MuleEvent muleEvent = createMuleEvent(message, outputStream);
 
@@ -223,27 +222,31 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         return routeEvent(muleEvent);
     }
 
-    protected void propagateRootMessageIdProperty(MutableMuleMessage message)
+    protected MuleMessage propagateRootMessageIdProperty(MuleMessage message)
     {
         String rootId = message.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
         if (rootId != null)
         {
-            message.setMessageRootId(rootId);
-            message.removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
+            return MuleMessage.builder(message).rootId(rootId).removeInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY).build();
+        }
+        else
+        {
+            return message;
         }
     }
 
-    protected void warnIfMuleClientSendUsed(MutableMuleMessage message)
+    protected MuleMessage warnIfMuleClientSendUsed(MuleMessage message)
     {
-        final Object remoteSyncProperty = message.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+        MuleMessage.Builder messageBuilder = MuleMessage.builder(message);
+        final Object remoteSyncProperty = message.getInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+        messageBuilder.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
         if (ObjectUtils.getBoolean(remoteSyncProperty, false) && !endpoint.getExchangePattern().hasResponse())
         {
             logger.warn("MuleClient.send() was used but inbound endpoint "
                         + endpoint.getEndpointURI().getUri().toString()
                         + " is not 'request-response'.  No response will be returned.");
         }
-
-        message.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
+        return messageBuilder.build();
     }
 
     protected void applyInboundTransformers(MuleEvent event) throws MuleException
@@ -257,7 +260,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         event.setMessage(getTransformationService().applyTransformers(event.getMessage(), event, defaultResponseTransformers));
     }
 
-    protected MuleMessage handleUnacceptedFilter(MutableMuleMessage message)
+    protected MuleMessage handleUnacceptedFilter(MuleMessage message)
     {
         if (logger.isDebugEnabled())
         {
@@ -294,11 +297,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         final Object replyToFromMessage = message.getReplyTo();
         if (replyToFromMessage != null)
         {
-            message = message.transform(msg ->
-            {
-                msg.setReplyTo(null);
-                return msg;
-            });
+            message = MuleMessage.builder(message).replyTo(null).build();
             DefaultMuleEvent newEvent = new DefaultMuleEvent(message, flowConstruct, session, replyToHandler, replyToFromMessage, ros);
             DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
             event = newEvent;
@@ -504,7 +503,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
             && resultEvent.getMessage().getExceptionPayload() != null
             && resultEvent.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException)
         {
-            handleUnacceptedFilter((MutableMuleMessage) muleEvent.getMessage());
+            handleUnacceptedFilter(muleEvent.getMessage());
             return muleEvent;
         }
 

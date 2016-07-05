@@ -15,7 +15,6 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_ETAG;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_IF_NONE_MATCH;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_NOT_MODIFIED;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -25,11 +24,10 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.util.MapUtils;
@@ -118,20 +116,22 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
                     endpointBuilder);
         }
 
-        MutableMuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, outboundEndpoint.getProperties());
+        MuleMessage.Builder requestBuider = MuleMessage.builder()
+                .payload(StringUtils.EMPTY)
+                .inboundProperties(outboundEndpoint.getProperties());
         if (etag != null && checkEtag)
         {
-            request.setOutboundProperty(HEADER_IF_NONE_MATCH, etag);
+            requestBuider.addOutboundProperty(HEADER_IF_NONE_MATCH, etag);
         }
-        request.setOutboundProperty(HTTP_METHOD_PROPERTY, "GET");
+        requestBuider.addOutboundProperty(HTTP_METHOD_PROPERTY, "GET");
 
-        MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint.getExchangePattern(), flowConstruct);
+        MuleEvent event = new DefaultMuleEvent(requestBuider.build(), outboundEndpoint.getExchangePattern(), flowConstruct);
 
         MuleEvent result = outboundEndpoint.process(event);
-        MutableMuleMessage message = null;
+        MuleMessage message = null;
         if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
-            message = (MutableMuleMessage) result.getMessage();
+            message = result.getMessage();
         }
 
         final int contentLength = message.getOutboundProperty(HEADER_CONTENT_LENGTH, -1);

@@ -8,9 +8,8 @@ package org.mule.compatibility.transport.tcp;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -50,7 +49,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
     }
 
     @Override
-    protected synchronized MutableMuleMessage doSend(MuleEvent event) throws Exception
+    protected synchronized MuleMessage doSend(MuleEvent event) throws Exception
     {
         try
         {
@@ -62,15 +61,15 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
                     Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
                     if (result == null)
                     {
-                        return new DefaultMuleMessage(NullPayload.getInstance());
+                        return MuleMessage.builder().payload(NullPayload.getInstance()).build();
                     }
 
-                    if (result instanceof MutableMuleMessage)
+                    if (result instanceof MuleMessage)
                     {
-                        return (MutableMuleMessage) result;
+                        return (MuleMessage) result;
                     }
 
-                    return new DefaultMuleMessage(result);
+                    return MuleMessage.builder().payload(result).build();
                 }
                 catch (Exception ex)
                 {
@@ -84,7 +83,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
             }
             else
             {
-                return (MutableMuleMessage) event.getMessage();
+                return event.getMessage();
             }
         }
         finally
@@ -131,7 +130,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
             // so that a protocol class can use the thread local and pick the
             // transformed
             // message.
-            event.setMessage(new DefaultMuleMessage(payload, event.getMessage()));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).build());
             // OptimizedRequestContext.unsafeRewriteEvent(new DefaultMuleMessage(
             // payload));
             write(payload);

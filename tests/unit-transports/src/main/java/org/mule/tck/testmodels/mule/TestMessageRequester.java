@@ -8,7 +8,7 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 
 /**
  * TODO
@@ -21,7 +21,7 @@ public class TestMessageRequester extends AbstractMessageRequester
     }
 
     @Override
-    protected MutableMuleMessage doRequest(long timeout) throws Exception
+    protected MuleMessage doRequest(long timeout) throws Exception
     {
         return null;
     }

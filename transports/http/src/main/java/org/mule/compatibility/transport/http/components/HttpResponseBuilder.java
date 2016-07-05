@@ -90,10 +90,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
         setDateHeader(httpResponse, new Date());
         setBody(httpResponse, message, event);
 
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setPayload(httpResponse);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(httpResponse).build());
         return event;
     }
 

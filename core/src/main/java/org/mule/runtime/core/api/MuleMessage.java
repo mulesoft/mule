@@ -234,6 +234,12 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
          * @param key
          * @return
          */
+        Builder<PAYLOAD, ATTRIBUTES> removeInboundProperty(String key);
+
+        /**
+         * @param key
+         * @return
+         */
         Builder<PAYLOAD, ATTRIBUTES> removeOutboundProperty(String key);
 
         /**

@@ -11,7 +11,7 @@ import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.compatibility.transport.http.transformers.HttpClientMethodResponseToObject;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -65,7 +65,7 @@ public class HttpClientMessageRequester extends AbstractMessageRequester
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
     @Override
-    protected MutableMuleMessage doRequest(long timeout) throws Exception
+    protected MuleMessage doRequest(long timeout) throws Exception
     {
         HttpMethod httpMethod = new GetMethod(endpoint.getEndpointURI().getAddress());
         connector.setupClientAuthorization(null, httpMethod, client, endpoint);
@@ -78,7 +78,7 @@ public class HttpClientMessageRequester extends AbstractMessageRequester
 
             if (httpMethod.getStatusCode() == HttpStatus.SC_OK)
             {
-                MutableMuleMessage res = (MutableMuleMessage) receiveTransformer.transform(httpMethod);
+                MuleMessage res = (MuleMessage) receiveTransformer.transform(httpMethod);
                 if (StringUtils.EMPTY.equals(res.getPayload()))
                 {
                     releaseConn = true;

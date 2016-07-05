@@ -19,10 +19,9 @@ import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -107,10 +106,12 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         {
             // Return a 302 with the new location
             // Return a 302 with the new location
-            MutableMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
-            message.setOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_MOVED_TEMPORARILY));
-            message.setOutboundProperty(HEADER_CONTENT_LENGTH, 0);
-            message.setOutboundProperty(HEADER_LOCATION, event.getMessage().getInboundProperty(HTTP_REQUEST_PATH_PROPERTY) + "/");
+            MuleMessage message = MuleMessage.builder()
+                    .payload(NullPayload.getInstance())
+                    .addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_MOVED_TEMPORARILY))
+                    .addOutboundProperty(HEADER_CONTENT_LENGTH, 0)
+                    .addOutboundProperty(HEADER_LOCATION, event.getMessage().getInboundProperty(HTTP_REQUEST_PATH_PROPERTY) + "/")
+                    .build();
             resultEvent = new DefaultMuleEvent(message, event);
             return resultEvent;
         }
@@ -131,10 +132,12 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
                 mimetype = DEFAULT_MIME_TYPE;
             }
 
-            MutableMuleMessage message = new DefaultMuleMessage(buffer);
-            message.setOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_OK));
-            message.setOutboundProperty(HEADER_CONTENT_TYPE, mimetype);
-            message.setOutboundProperty(HEADER_CONTENT_LENGTH, buffer.length);
+            MuleMessage message = MuleMessage.builder()
+                    .payload(buffer)
+                    .addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_OK))
+                    .addOutboundProperty(HEADER_CONTENT_TYPE, mimetype)
+                    .addOutboundProperty(HEADER_CONTENT_LENGTH, buffer.length)
+                    .build();
             resultEvent = new DefaultMuleEvent(message, event);
         }
         catch (IOException e)

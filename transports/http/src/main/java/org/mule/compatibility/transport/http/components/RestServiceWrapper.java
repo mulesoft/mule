@@ -17,7 +17,6 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -190,11 +189,7 @@ public class RestServiceWrapper extends AbstractComponent
         {
             if (event.getMessage().getOutboundProperty(HEADER_CONTENT_TYPE) == null)
             {
-                event.setMessage(event.getMessage().transform(msg ->
-                {
-                    msg.setOutboundProperty(HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE);
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE).build());
             }
 
             StringBuilder requestBodyBuffer = new StringBuilder();
@@ -206,11 +201,7 @@ public class RestServiceWrapper extends AbstractComponent
         tempUrl = urlBuffer.toString();
         logger.info("Invoking REST service: " + tempUrl);
 
-        event.setMessage(event.getMessage().transform(msg ->
-        {
-            msg.setOutboundProperty(HTTP_METHOD_PROPERTY, httpMethod);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HTTP_METHOD_PROPERTY, httpMethod).build());
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
         endpointBuilder.setExchangePattern(REQUEST_RESPONSE);
@@ -218,7 +209,7 @@ public class RestServiceWrapper extends AbstractComponent
 
         MuleEventContext eventContext = new DefaultMuleEventContext(event);
         MuleEvent result = new DefaultMuleEvent(eventContext.sendEvent(
-                new DefaultMuleMessage(requestBody, event.getMessage()), outboundEndpoint.getEndpointURI().toString()), flowConstruct);
+                MuleMessage.builder(event.getMessage()).payload(requestBody).build(), outboundEndpoint.getEndpointURI().toString()), flowConstruct);
 
         if (isErrorPayload(result))
         {

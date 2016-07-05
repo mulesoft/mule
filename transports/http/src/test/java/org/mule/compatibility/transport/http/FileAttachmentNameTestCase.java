@@ -9,12 +9,9 @@ package org.mule.compatibility.transport.http;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -45,9 +42,7 @@ public class FileAttachmentNameTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         DataHandler dataHandler = new DataHandler(new ByteArrayDataSource(TEST_MESSAGE.getBytes(), MediaType.XML, "testAttachment.txt"));
-        MutableMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE);
-        msg.addOutboundAttachment("testAttachment", dataHandler);
-
+        MuleMessage msg = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundAttachment("testAttachment", dataHandler).build();
         MuleMessage response = client.send("http://localhost:" + httpPort.getValue() + "/testInput", msg);
 
         assertThat(getPayloadAsString(response), equalTo("testAttachment:testAttachment.txt"));

@@ -16,8 +16,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.mule.runtime.core.DefaultMuleMessage;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_X_FORWARDED_FOR;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -66,17 +65,18 @@ public class HttpMessageProcessTemplateTestCase
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     MuleContext context;
 
-    DefaultMuleMessage message;
+    MuleMessage message;
 
     @Before
     public void prepare() throws MuleException
     {
-        message = new DefaultMuleMessage(PAYLOAD);
-        message.setInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY, ROOT_MESSAGE_ID);
-        message.setInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, "/");
+        message = MuleMessage.builder().payload(PAYLOAD)
+                .addInboundProperty(MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY, ROOT_MESSAGE_ID)
+                .addInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, "/")
+                .build();
 
         when(messageReceiver.getEndpoint().getEncoding()).thenReturn(ENCODING);
-        when(messageReceiver.createMuleMessage(any(), any())).thenReturn(message);
+        when(messageReceiver.createMuleMessage(any(), any())).thenAnswer(invocation -> message);
         when(messageReceiver.getEndpoint().getEndpointURI().getAddress()).thenReturn("http://127.0.0.1/");
     }
 
@@ -100,7 +100,7 @@ public class HttpMessageProcessTemplateTestCase
         when(httpServerConnection.getRemoteClientAddress()).thenReturn(PROXY_1_ADDRESS);
 
         HttpMessageProcessTemplate template = new HttpMessageProcessTemplate(messageReceiver, httpServerConnection);
-        message.setInboundProperty(HttpConstants.HEADER_X_FORWARDED_FOR, CLIENT_ONLY_X_FORWARDED_FOR);
+        message = MuleMessage.builder(message).addInboundProperty(HEADER_X_FORWARDED_FOR, CLIENT_ONLY_X_FORWARDED_FOR).build();
 
         MuleMessage retMessage = template.createMessageFromSource(PAYLOAD);
         assertThat(retMessage, is(notNullValue()));
@@ -115,7 +115,7 @@ public class HttpMessageProcessTemplateTestCase
         when(httpServerConnection.getRemoteClientAddress()).thenReturn(PROXY_1_ADDRESS);
 
         HttpMessageProcessTemplate template = new HttpMessageProcessTemplate(messageReceiver, httpServerConnection);
-        message.setInboundProperty(HttpConstants.HEADER_X_FORWARDED_FOR, ONE_PROXY_X_FORWARDED_FOR);
+        message = MuleMessage.builder(message).addInboundProperty(HEADER_X_FORWARDED_FOR, ONE_PROXY_X_FORWARDED_FOR).build();
 
         MuleMessage retMessage = template.createMessageFromSource(PAYLOAD);
         assertThat(retMessage, is(notNullValue()));
@@ -130,7 +130,7 @@ public class HttpMessageProcessTemplateTestCase
         when(httpServerConnection.getRemoteClientAddress()).thenReturn(PROXY_2_ADDRESS);
 
         HttpMessageProcessTemplate template = new HttpMessageProcessTemplate(messageReceiver, httpServerConnection);
-        message.setInboundProperty(HttpConstants.HEADER_X_FORWARDED_FOR, TWO_PROXY_X_FORWARDED_FOR);
+        message = MuleMessage.builder(message).addInboundProperty(HEADER_X_FORWARDED_FOR, TWO_PROXY_X_FORWARDED_FOR).build();
 
         MuleMessage retMessage = template.createMessageFromSource(PAYLOAD);
         assertThat(retMessage, is(notNullValue()));

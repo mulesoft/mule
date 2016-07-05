@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ORIGINATING_E
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
@@ -43,10 +44,7 @@ public class InboundEndpointPropertyMessageProcessor implements MessageProcessor
             inboundEndpoint = endpoint.getEndpointURI().getUri().toString();
         }
         String finalInboundEndpoint = inboundEndpoint;
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setInboundProperty(MULE_ORIGINATING_ENDPOINT_PROPERTY, finalInboundEndpoint);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).addInboundProperty(MULE_ORIGINATING_ENDPOINT_PROPERTY, finalInboundEndpoint).build());
         return event;
     }
 

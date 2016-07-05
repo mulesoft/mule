@@ -6,7 +6,6 @@
  */
 package org.mule.compatibility.core.connector;
 
-import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
@@ -15,7 +14,6 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.transport.service.TransportFactory;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -58,7 +56,7 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler
         String replyToEndpoint = replyTo.toString();
 
         // Create a new copy of the message so that response MessageProcessors don't end up screwing up the reply
-        returnMessage = new DefaultMuleMessage(returnMessage.getPayload(), returnMessage);
+        returnMessage = MuleMessage.builder(returnMessage).payload(returnMessage.getPayload()).build();
 
         // Create the replyTo event asynchronous
         MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, event);
@@ -73,10 +71,7 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler
             Serializable propertyValue = event.getMessage().getInboundProperty(propertyName);
             if (propertyValue != null)
             {
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setOutboundProperty(propertyName, propertyValue);
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, propertyValue).build());
             }
         }
 

@@ -22,7 +22,6 @@ import org.mule.compatibility.transport.http.CookieWrapper;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -98,7 +97,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testEmptyHttpResponseBuilder() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY);
+        mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).build();
 
         mockParse();
         HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
@@ -112,7 +111,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseBuilderAttributes() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY);
+        mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).build();
 
         httpResponseBuilder.setContentType("text/html");
         httpResponseBuilder.setStatus(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR));
@@ -129,7 +128,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseBuilderAttributesWithExpressions() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY);
+        mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).build();
 
         httpResponseBuilder.setStatus(HEADER_STATUS);
         httpResponseBuilder.setContentType(HEADER_CONTENT_TYPE);
@@ -419,7 +418,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         outboundProperties.put(HttpConstants.HEADER_LOCATION, "http://localhost:9090");
 
         mockParse();
-        mockMuleMessage = new DefaultMuleMessage(HTTP_BODY, outboundProperties);
+        mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).outboundProperties(outboundProperties).build();
 
         HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
         Header[] resultHeaders = httpResponse.getHeaders();

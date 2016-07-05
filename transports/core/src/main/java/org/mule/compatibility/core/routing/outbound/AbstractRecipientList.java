@@ -11,7 +11,6 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -60,10 +59,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             else
             {
                 // the correlationId will be set by the AbstractOutboundRouter
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setCorrelationGroupSize(recipients.size());
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage()).correlationGroupSize(recipients.size()).build());
             }
         }
 
@@ -72,7 +68,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         {
             // Make a copy of the message. Question is do we do a proper clone? in
             // which case there would potentially be multiple messages with the same id...
-            MuleMessage request = new DefaultMuleMessage(message.getPayload(), message);
+            MuleMessage request = MuleMessage.builder(message).payload(message.getPayload()).build();
             try
             {
                 endpoint = getRecipientEndpoint(request, recipient);

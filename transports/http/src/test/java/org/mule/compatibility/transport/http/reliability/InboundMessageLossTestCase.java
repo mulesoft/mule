@@ -13,9 +13,9 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
@@ -134,7 +134,7 @@ public class InboundMessageLossTestCase extends FunctionalTestCase
         {
             doHandleException(ex, event);
             ((MessagingException)ex).setHandled(true);
-            return new DefaultMuleEvent(new DefaultMuleMessage("Success!"), event);
+            return new DefaultMuleEvent(MuleMessage.builder().payload("Success!").build(), event);
         }
     }
 
@@ -147,9 +147,10 @@ public class InboundMessageLossTestCase extends FunctionalTestCase
         public MuleEvent handleException(Exception ex, MuleEvent event)
         {
             doHandleException(ex, event);
-            DefaultMuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
-            message.setExceptionPayload(
-                new DefaultExceptionPayload(new MessagingException(event, new RuntimeException("Bad news!"))));
+            MuleMessage message = MuleMessage.builder()
+                    .payload(NullPayload.getInstance())
+                    .exceptionPayload(new DefaultExceptionPayload(new MessagingException(event, new RuntimeException("Bad news!"))))
+                    .build();
             return new DefaultMuleEvent(message, event);
         }
     }

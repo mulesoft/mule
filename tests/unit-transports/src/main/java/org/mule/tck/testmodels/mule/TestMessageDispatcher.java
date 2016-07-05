@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -69,7 +68,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
-    protected void doSendNonBlocking(MuleEvent event, final CompletionHandler<MutableMuleMessage, Exception, Void> completionHandler)
+    protected void doSendNonBlocking(MuleEvent event, final CompletionHandler<MuleMessage, Exception, Void> completionHandler)
     {
         if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail"))
         {
@@ -79,7 +78,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         {
             try
             {
-                final MutableMuleMessage response = (MutableMuleMessage) event.getMessage();
+                final MuleMessage response = event.getMessage();
                 event = new DefaultMuleEvent(event, new ReplyToHandler()
                 {
                     @Override

@@ -16,7 +16,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
@@ -206,7 +206,7 @@ public abstract class InboundEndpointWrapper implements InboundEndpoint
     }
 
     @Override
-    public MutableMuleMessage request(long timeout) throws Exception
+    public MuleMessage request(long timeout) throws Exception
     {
         return delegate.request(timeout);
     }

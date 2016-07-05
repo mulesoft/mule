@@ -7,7 +7,6 @@
 package org.mule.compatibility.core.transport;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
@@ -16,7 +15,6 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -436,7 +434,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
      * The payload of the new message will be taken from <code>transportMessage</code>, all
      * message properties will be copied from <code>previousMessage</code>.
      */
-    public MutableMuleMessage createMuleMessage(Object transportMessage, MuleMessage previousMessage,
+    public MuleMessage createMuleMessage(Object transportMessage, MuleMessage previousMessage,
                                                 Charset encoding)
             throws MuleException
     {
@@ -454,7 +452,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
      * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance.
      * This is the designated way to build {@link MuleMessage}s from the transport specific message.
      */
-    public MutableMuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException
+    public MuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException
     {
         try
         {
@@ -472,7 +470,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
      *
      * @see MuleConfiguration#getDefaultEncoding()
      */
-    public MutableMuleMessage createMuleMessage(Object transportMessage) throws MuleException
+    public MuleMessage createMuleMessage(Object transportMessage) throws MuleException
     {
         Charset encoding = getDefaultEncoding(endpoint.getMuleContext());
         return createMuleMessage(transportMessage, encoding);
@@ -483,7 +481,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
      * Rather than passing in a transport message instance, {@link NullPayload} is used instead.
      * Uses the default encoding.
      */
-    protected MutableMuleMessage createNullMuleMessage() throws MuleException
+    protected MuleMessage createNullMuleMessage() throws MuleException
     {
         return createMuleMessage(null);
     }

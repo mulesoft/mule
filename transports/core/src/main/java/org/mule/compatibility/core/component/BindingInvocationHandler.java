@@ -10,10 +10,8 @@ import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -110,15 +108,15 @@ public class BindingInvocationHandler implements InvocationHandler
     {
         if (args == null)
         {
-            return new DefaultMuleMessage(NullPayload.getInstance());
+            return MuleMessage.builder().payload(NullPayload.getInstance()).build();
         }
         else if (args.length == 1)
         {
-            return new DefaultMuleMessage(args[0]);
+            return MuleMessage.builder().payload(args[0]).build();
         }
         else
         {
-            return new DefaultMuleMessage(args);
+            return MuleMessage.builder().payload(args).build();
         }
     }
 

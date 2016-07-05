@@ -10,6 +10,7 @@ import static org.apache.commons.httpclient.HttpVersion.HTTP_1_1;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_CONTEXT_PATH_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_CONTEXT_URI_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_RELATIVE_PATH_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PATH_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConstants.CRLF;
@@ -36,7 +37,6 @@ import org.mule.compatibility.core.transport.AbstractTransportMessageProcessTemp
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -44,7 +44,6 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.execution.EndPhaseTemplate;
 import org.mule.runtime.core.execution.RequestResponseFlowProcessingPhaseTemplate;
@@ -116,7 +115,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             }
             else
             {
-                response = transformResponse(returnMessage);
+                response = transformResponse(tempResponse);
             }
 
             response.setupKeepAliveFromRequestVersion(request.getRequestLine().getHttpVersion());
@@ -268,7 +267,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
                 {
                     HttpResponse expected = new HttpResponse();
                     expected.setStatusLine(requestLine.getHttpVersion(), SC_CONTINUE);
-                    final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected), getFlowConstruct());
+                    final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(expected).build(), getFlowConstruct());
                     DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
 
                     RequestContext.setEvent(event);
@@ -301,7 +300,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         }
         else
         {
-            message = new DefaultMuleMessage(response);
+            message = MuleMessage.builder().payload(response).build();
         }
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class
@@ -311,9 +310,11 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     }
 
     @Override
-    protected MutableMuleMessage createMessageFromSource(Object message) throws MuleException
+    protected MuleMessage createMessageFromSource(Object message) throws MuleException
     {
-        MutableMuleMessage muleMessage = super.createMessageFromSource(message);
+        MuleMessage muleMessage = super.createMessageFromSource(message);
+        MuleMessage.Builder messageBuilder = MuleMessage.builder(muleMessage);
+
         String path = muleMessage.getInboundProperty(HTTP_REQUEST_PROPERTY);
         int i = path.indexOf('?');
         if (i > -1)
@@ -321,7 +322,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             path = path.substring(0, i);
         }
 
-        muleMessage.setInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path);
+        messageBuilder.addInboundProperty(HTTP_REQUEST_PATH_PROPERTY, path);
 
         if (logger.isDebugEnabled())
         {
@@ -334,14 +335,15 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         // the response only needs to be transformed explicitly if
         // A) the request was not served or B) a null result was returned
         String contextPath = HttpConnector.normalizeUrl(getInboundEndpoint().getEndpointURI().getPath());
-        muleMessage.setInboundProperty(HTTP_CONTEXT_PATH_PROPERTY, contextPath);
+        messageBuilder.addInboundProperty(HTTP_CONTEXT_PATH_PROPERTY, contextPath);
 
-        muleMessage.setInboundProperty(HTTP_CONTEXT_URI_PROPERTY, getInboundEndpoint().getEndpointURI().getAddress());
+        messageBuilder.addInboundProperty(HTTP_CONTEXT_URI_PROPERTY, getInboundEndpoint().getEndpointURI().getAddress());
 
-        muleMessage.setInboundProperty(HTTP_RELATIVE_PATH_PROPERTY, processRelativePath(contextPath, path));
+        messageBuilder.addInboundProperty(HTTP_RELATIVE_PATH_PROPERTY, processRelativePath(contextPath, path));
 
-        processRemoteAddresses(muleMessage);
-        return muleMessage;
+        processRemoteAddresses(messageBuilder, muleMessage);
+
+        return messageBuilder.build();
     }
 
     /**
@@ -350,31 +352,32 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
      * also set the <code>MULE_PROXY_ADDRESS</code> property. If a proxy address is not passed in
      * <code>X-Forwarded-For</code>, the connection address will be set as <code>MULE_PROXY_ADDRESS</code>.
      *
-     * @param muleMessage MuleMessage to be enriched
+     * @param muleMessageBuilder MuleMessageBuilder to be enriched
+     * @param original original message
      * @see <a href="https://en.wikipedia.org/wiki/X-Forwarded-For">https://en.wikipedia.org/wiki/X-Forwarded-For</a>
      */
-    protected void processRemoteAddresses(MutableMuleMessage muleMessage)
+    protected void processRemoteAddresses(MuleMessage.Builder muleMessageBuilder, MuleMessage original)
     {
-        String xForwardedFor = muleMessage.getInboundProperty(HEADER_X_FORWARDED_FOR);
+        String xForwardedFor = original.getInboundProperty(HEADER_X_FORWARDED_FOR);
 
         if (StringUtils.isEmpty(xForwardedFor))
         {
-            muleMessage.setInboundProperty(MULE_REMOTE_CLIENT_ADDRESS, httpServerConnection.getRemoteClientAddress());
+            muleMessageBuilder.addInboundProperty(MULE_REMOTE_CLIENT_ADDRESS, httpServerConnection.getRemoteClientAddress());
             return;
         }
 
         String[] xForwardedForItems = StringUtils.splitAndTrim(xForwardedFor, ",");
         if (!ArrayUtils.isEmpty(xForwardedForItems))
         {
-            muleMessage.setInboundProperty(MULE_REMOTE_CLIENT_ADDRESS, xForwardedForItems[0]);
+            muleMessageBuilder.addInboundProperty(MULE_REMOTE_CLIENT_ADDRESS, xForwardedForItems[0]);
             if (xForwardedForItems.length > 1)
             {
-                muleMessage.setInboundProperty(MULE_PROXY_ADDRESS, xForwardedForItems[xForwardedForItems.length-1]);
+                muleMessageBuilder.addInboundProperty(MULE_PROXY_ADDRESS, xForwardedForItems[xForwardedForItems.length-1]);
             }
             else
             {
                 // If only one address has been passed, we can assume the connection address is a proxy
-                muleMessage.setInboundProperty(MULE_PROXY_ADDRESS, httpServerConnection.getRemoteClientAddress());
+                muleMessageBuilder.addInboundProperty(MULE_PROXY_ADDRESS, httpServerConnection.getRemoteClientAddress());
             }
         }
     }
@@ -503,10 +506,12 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     private void sendFailureResponseToClient(MessagingException exception, int httpStatus) throws IOException, MuleException
     {
         MuleEvent response = exception.getEvent();
-        MutableMuleMessage message = (MutableMuleMessage) response.getMessage();
-        message.setPayload(exception.getMessage());
+        MuleMessage message = response.getMessage();
         httpStatus = message.getOutboundProperty(HTTP_STATUS_PROPERTY) != null ? Integer.valueOf(response.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY).toString()) : httpStatus;
-        message.setOutboundProperty(HTTP_STATUS_PROPERTY, httpStatus);
+
+        response.setMessage(MuleMessage.builder(response.getMessage())
+                                    .payload(exception.getMessage())
+                                    .addOutboundProperty(HTTP_STATUS_PROPERTY, httpStatus).build());
         HttpResponse httpResponse = transformResponse(response.getMessage());
         httpServerConnection.writeResponse(httpResponse, getThrottlingHeaders());
     }

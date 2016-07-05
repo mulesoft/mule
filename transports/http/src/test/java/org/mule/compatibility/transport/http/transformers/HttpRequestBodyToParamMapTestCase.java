@@ -18,18 +18,14 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
@@ -114,7 +110,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
         {
             payload = "http://localhost/?" + payload;
         }
-        return new DefaultMuleMessage(payload, inboundProperties, null, null);
+        return MuleMessage.builder().payload(payload).inboundProperties(inboundProperties).build();
     }
 
 }

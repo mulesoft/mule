@@ -6,15 +6,15 @@
  */
 package org.mule.compatibility.transport.http.servlet;
 
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -38,13 +38,13 @@ public class MuleHttpServletResponse implements HttpServletResponse
     { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"};
 
     private MuleEvent event;
-    private MutableMuleMessage message;
+    private MuleMessage message;
 
     public MuleHttpServletResponse(MuleEvent event)
     {
         super();
         this.event = event;
-        this.message = (MutableMuleMessage) event.getMessage();
+        this.message = event.getMessage();
     }
     
     @Override
@@ -74,11 +74,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
     @Override
     public void setCharacterEncoding(String charset)
     {
-        message = (MutableMuleMessage) message.transform(msg ->
-        {
-            ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).charset(charset).build());
-            return new DefaultMuleMessage(msg);
-        });
+        message = MuleMessage.builder(message).mediaType(message.getDataType().getMediaType().withCharset(Charset.forName(charset))).build();
     }
 
     @Override
@@ -90,7 +86,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
     @Override
     public void setContentType(String type)
     {
-        message.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, type);
+        message = MuleMessage.builder(message).addOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, type).build();
     }
 
     @Override
@@ -152,7 +148,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
             list.add(internal);
             internalCookies = list.toArray(new org.apache.commons.httpclient.Cookie[list.size()]);
         }
-        message.setOutboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY, internalCookies);
+        message = MuleMessage.builder(message).addOutboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY, internalCookies).build();
     }
 
     private org.apache.commons.httpclient.Cookie toHttpClientCookie(Cookie cookie)
@@ -224,7 +220,7 @@ public class MuleHttpServletResponse implements HttpServletResponse
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(date);
         formatDate(buf, calendar, false);
-        message.setOutboundProperty(name, buf.toString());
+        message = MuleMessage.builder(message).addOutboundProperty(name, buf.toString()).build();
     }
 
     @Override
@@ -296,37 +292,37 @@ public class MuleHttpServletResponse implements HttpServletResponse
     @Override
     public void setHeader(String name, String value)
     {
-        message.setOutboundProperty(name, value);
+        message = MuleMessage.builder(message).addOutboundProperty(name, value).build();
     }
 
     @Override
     public void addHeader(String name, String value)
     {
-        message.setOutboundProperty(name, value);
+        message = MuleMessage.builder(message).addOutboundProperty(name, value).build();
     }
 
     @Override
     public void setIntHeader(String name, int value)
     {
-        message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, value);
+        message = MuleMessage.builder(message).addOutboundProperty(HTTP_STATUS_PROPERTY, value).build();
     }
 
     @Override
     public void addIntHeader(String name, int value)
     {
-        message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, value);
+        message = MuleMessage.builder(message).addOutboundProperty(HTTP_STATUS_PROPERTY, value).build();
     }
 
     @Override
     public void setStatus(int sc)
     {
-        message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, sc);
+        message = MuleMessage.builder(message).addOutboundProperty(HTTP_STATUS_PROPERTY, sc).build();
     }
 
     @Override
     public void setStatus(int sc, String sm)
     {
-        message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, sc);
+        message = MuleMessage.builder(message).addOutboundProperty(HTTP_STATUS_PROPERTY, sc).build();
     }
 
     @Override

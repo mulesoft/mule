@@ -18,11 +18,10 @@ import static org.mockito.Mockito.when;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -128,12 +127,14 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleContextTestCa
         Map<String, Serializable> outboundProperties =  new HashMap<>();
         outboundProperties.put(HEADER_CONTENT_TYPE, wrongContentType);
         muleContext = spy(muleContext);
-        MutableMuleMessage msg = new DefaultMuleMessage(null, outboundProperties);
         //Making sure that the outbound property overrides both invocation and inbound
-        msg.setOutboundProperty(HEADER_CONTENT_TYPE, wrongContentType);
-        msg.setInboundProperty(HEADER_CONTENT_TYPE, wrongContentType);
-        
-        msg.setOutboundProperty(HEADER_CONTENT_TYPE, contentType);
+        MuleMessage msg = MuleMessage.builder()
+                .payload(NullPayload.getInstance())
+                .outboundProperties(outboundProperties)
+                .addOutboundProperty(HEADER_CONTENT_TYPE, wrongContentType)
+                .addInboundProperty(HEADER_CONTENT_TYPE, wrongContentType)
+                .addOutboundProperty(HEADER_CONTENT_TYPE, contentType)
+                .build();
 
         MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
 

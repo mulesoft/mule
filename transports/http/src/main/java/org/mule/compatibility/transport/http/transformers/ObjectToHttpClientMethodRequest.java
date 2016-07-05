@@ -132,10 +132,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
 
             // Allow the user to set HttpMethodParams as an object on the message
             final HttpMethodParams params = msg.getOutboundProperty(HTTP_PARAMS_PROPERTY);
-            event.setMessage(event.getMessage().transform(message -> {
-                message.removeOutboundProperty(HTTP_PARAMS_PROPERTY);
-                return message;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(HTTP_PARAMS_PROPERTY).build());
 
             if (params != null)
             {

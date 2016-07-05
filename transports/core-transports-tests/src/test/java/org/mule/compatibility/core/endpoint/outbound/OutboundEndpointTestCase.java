@@ -25,7 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
@@ -44,7 +43,6 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
@@ -324,10 +322,9 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
                 REQUEST_RESPONSE, null);
         testOutboundEvent = createTestOutboundEvent();
-        testOutboundEvent.setMessage(testOutboundEvent.getMessage().transform(msg -> {
-            msg.setOutboundProperty(MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
-            return msg;
-        }));
+        testOutboundEvent.setMessage(MuleMessage.builder(testOutboundEvent.getMessage())
+                                             .addOutboundProperty(MULE_EVENT_TIMEOUT_PROPERTY, testTimeout)
+                                             .build());
 
         endpoint.process(testOutboundEvent);
 
@@ -456,7 +453,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         }
 
         @Override
-        protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MutableMuleMessage, Exception, Void> completionHandler)
+        protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MuleMessage, Exception, Void> completionHandler)
         {
             sensedSendEvent = event;
             latch.countDown();

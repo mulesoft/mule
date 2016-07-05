@@ -9,13 +9,12 @@ package org.mule.compatibility.transport.tcp.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
 
@@ -85,7 +84,7 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         // dynamically get the endpoint to send to
         client.dispatch(
                 ((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("testComponent")).getMessageSource()).getAddress(),
-            new DefaultMuleMessage(stream));
+                MuleMessage.builder().payload(stream).build());
 
         // if we assume 1MB/sec then we need at least...
         long pause = Math.max(size / ONE_MB, 60 * 10) + 10;

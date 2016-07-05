@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.module.client;
 
+import static java.util.Collections.EMPTY_MAP;
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
@@ -23,7 +24,6 @@ import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilde
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.FutureMessageResult;
@@ -46,6 +46,7 @@ import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -242,7 +243,11 @@ public class MuleClient implements Disposable
      */
     public void dispatch(String url, Object payload, Map<String, Serializable> messageProperties) throws MuleException
     {
-        dispatch(url, new DefaultMuleMessage(payload, messageProperties));
+        if(messageProperties == null)
+        {
+            messageProperties = EMPTY_MAP;
+        }
+        dispatch(url, MuleMessage.builder().payload(payload).outboundProperties(messageProperties).build());
     }
 
     /**
@@ -312,7 +317,12 @@ public class MuleClient implements Disposable
                                          final Map<String, Serializable> messageProperties,
                                          final int timeout) throws MuleException
     {
-        return sendAsync(url, new DefaultMuleMessage(payload, messageProperties), timeout);
+        Map<String, Serializable> outboundProperties = messageProperties;
+        if (messageProperties == null)
+        {
+            outboundProperties = EMPTY_MAP;
+        }
+        return sendAsync(url, MuleMessage.builder().payload(payload).outboundProperties(outboundProperties).build(), timeout);
     }
 
     /**
@@ -413,7 +423,7 @@ public class MuleClient implements Disposable
             messageProperties = new HashMap<>(messageProperties);
             messageProperties.put(MULE_REMOTE_SYNC_PROPERTY, "true");
         }
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        MuleMessage message = MuleMessage.builder().payload(payload).outboundProperties(messageProperties).build();
         return send(url, message, timeout);
     }
 
@@ -444,7 +454,7 @@ public class MuleClient implements Disposable
         }
         else
         {
-            return new DefaultMuleMessage(NullPayload.getInstance());
+            return MuleMessage.builder().payload(NullPayload.getInstance()).build();
         }
     }
 
@@ -512,10 +522,7 @@ public class MuleClient implements Disposable
     {
         if (user != null)
         {
-            message = message.transform(msg -> {
-                msg.setOutboundProperty(MULE_USER_PROPERTY, createHeader(user.getUsername(), user.getPassword()));
-                return msg;
-            });
+            message = MuleMessage.builder(message).addOutboundProperty(MULE_USER_PROPERTY, createHeader(user.getUsername(), user.getPassword())).build();
         }
         return new DefaultMuleEvent(message, exchangePattern, new MuleClientFlowConstruct(muleContext));
     }
@@ -591,7 +598,11 @@ public class MuleClient implements Disposable
             messageProperties = new HashMap<>();
         }
         messageProperties.put(MULE_REMOTE_SYNC_PROPERTY, "false");
-        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        if (messageProperties == null)
+        {
+            messageProperties = EMPTY_MAP;
+        }
+        MuleMessage message = MuleMessage.builder().payload(payload).outboundProperties(messageProperties).build();
 
         OutboundEndpoint endpoint =
             getOutboundEndpoint(url, REQUEST_RESPONSE, null);

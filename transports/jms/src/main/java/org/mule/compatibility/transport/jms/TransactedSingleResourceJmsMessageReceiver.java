@@ -16,8 +16,8 @@ import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -273,7 +273,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                         redeliveryHandler.handleRedelivery(message, receiver.getEndpoint(), receiver.getFlowConstruct());
                     }
 
-                    MutableMuleMessage messageToRoute = createMuleMessage(message, encoding);
+                    MuleMessage messageToRoute = createMuleMessage(message, encoding);
                     return routeMessage(messageToRoute);
                 }
             };
@@ -281,7 +281,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
         else
         {
-            MutableMuleMessage messageToRoute = createMuleMessage(message, encoding);
+            MuleMessage messageToRoute = createMuleMessage(message, encoding);
             routeMessage(messageToRoute);
         }
     }
