@@ -13,20 +13,16 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.io.Serializable;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -35,7 +31,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase
 {
 
     private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    private final DefaultMuleMessage muleMessage = new DefaultMuleMessage("test-data", (Map<String, Serializable>) null);
+    private final MuleMessage muleMessage = MuleMessage.builder().payload("test-data").build();
 
     @Test
     public void transactedRequestResponse() throws Exception

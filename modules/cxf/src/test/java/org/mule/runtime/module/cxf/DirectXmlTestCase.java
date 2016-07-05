@@ -8,8 +8,9 @@ package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleMessage;
+
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.xml.stax.StaxSource;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -55,14 +56,14 @@ public class DirectXmlTestCase extends FunctionalTestCase
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         assertNotNull(xml);
 
-        MuleMessage result = flowRunner("echoWithTransform").withPayload(getTestMuleMessage(xml)).run().getMessage();
+        MuleMessage result = flowRunner("echoWithTransform").withPayload(xml).run().getMessage();
         String resultStr = getPayloadAsString(result);
         assertTrue("echoResponse not found in result: " + resultStr, resultStr.indexOf("echoResponse") != -1);
     }
 
     private void test(Object xml) throws Exception
     {
-        MuleMessage result = flowRunner("echoService").withPayload(getTestMuleMessage(xml)).run().getMessage();
+        MuleMessage result = flowRunner("echoService").withPayload(xml).run().getMessage();
         assertTrue(getPayloadAsString(result).indexOf("echoResponse") != -1);
     }
 

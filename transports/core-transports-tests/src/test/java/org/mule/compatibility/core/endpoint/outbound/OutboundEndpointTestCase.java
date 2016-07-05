@@ -441,7 +441,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         }
 
         @Override
-        protected MutableMuleMessage doSend(MuleEvent event) throws Exception
+        protected MuleMessage doSend(MuleEvent event) throws Exception
         {
             sensedSendEvent = event;
             latch.countDown();

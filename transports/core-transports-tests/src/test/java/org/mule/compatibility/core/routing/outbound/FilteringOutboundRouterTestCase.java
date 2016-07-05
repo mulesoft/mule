@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -59,7 +58,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router.setMuleContext(muleContext);
         router.setFilter(filter);
-        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> endpoints = new ArrayList<>();
         endpoints.add(mockEndpoint);
         router.setRoutes(endpoints);
 
@@ -67,7 +66,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
         assertTrue(router.isUseTemplates());
         assertEquals(filter, router.getFilter());
 
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = MuleMessage.builder().payload("test event").build();
 
         assertTrue(router.isMatch(getTestEvent(message)));
 
@@ -76,7 +75,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
         router.route(new OutboundRoutingTestEvent(message, session, muleContext));
 
         //Test with transform
-        message = new DefaultMuleMessage(new Exception("test event"));
+        message = MuleMessage.builder().payload(new Exception("test event")).build();
 
         assertTrue(!router.isMatch(getTestEvent(message)));
 
@@ -108,7 +107,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
         router.setMuleContext(muleContext);
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router.setFilter(filter);
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<OutboundEndpoint> endpoints = new ArrayList<>();
         endpoints.add(mockEndpoint);
         router.setRoutes(new ArrayList<MessageProcessor>(endpoints));
 
@@ -116,7 +115,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
         assertTrue(router.isUseTemplates());
         assertEquals(filter, router.getFilter());
 
-        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage message = MuleMessage.builder().payload("test event").build();
         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
         when(mockEndpoint.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
 
@@ -136,7 +135,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
         router.setMuleContext(muleContext);
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router.setFilter(filter);
-        List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();
+        List<OutboundEndpoint> endpoints = new ArrayList<>();
         endpoints.add(endpoint1);
         router.setRoutes(new ArrayList<MessageProcessor>(endpoints));
 
@@ -145,7 +144,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
 
         Map<String, Serializable> m = new HashMap<>();
         m.put("barValue", "bar");
-        MuleMessage message = new DefaultMuleMessage("test event", m);
+        MuleMessage message = MuleMessage.builder().payload("test event").outboundProperties(m).build();
         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         assertTrue(router.isMatch(getTestEvent(message)));

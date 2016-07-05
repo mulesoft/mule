@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -108,7 +109,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     {
         expectedException.expect(MessagingException.class);
         expectedException.expectMessage("Failed to build message");
-        flowRunner("FlowWithClientAndTransformerExceptionDefaultException").withPayload(getTestMuleMessage("hello")).run();
+        flowRunner("FlowWithClientAndTransformerExceptionDefaultException").withPayload("hello").run();
     }
 
     @Test
@@ -116,7 +117,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     {
         expectedException.expectCause(instanceOf(Fault.class));
         expectedException.expectMessage("Failed to route event");
-        flowRunner("FlowWithClientWithFaultDefaultException").withPayload(getTestMuleMessage("hello")).run();
+        flowRunner("FlowWithClientWithFaultDefaultException").withPayload("hello").run();
     }
 
     @Test

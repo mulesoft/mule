@@ -22,7 +22,6 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -51,27 +50,13 @@ public final class MuleEndpointTestUtils
     public static InboundEndpoint getTestInboundEndpoint(String name, final MuleContext context)
             throws Exception
     {
-        return (InboundEndpoint) getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
-        {
-            @Override
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                return getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder);
-            }
-        }, null);
+        return (InboundEndpoint) getTestEndpoint(name, null, null, null, null, context, builder -> getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder), null);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name, final MuleContext context)
             throws Exception
     {
-        return (OutboundEndpoint) getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
-        {
-            @Override
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
-            }
-        }, null);
+        return (OutboundEndpoint) getTestEndpoint(name, null, null, null, null, context, builder -> getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder), null);
     }
 
     public static InboundEndpoint getTestInboundEndpoint(String name,
@@ -84,14 +69,7 @@ public final class MuleEndpointTestUtils
             throws Exception
     {
         return (InboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context,
-                new EndpointSource()
-                {
-                    @Override
-                    public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-                    {
-                        return getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder);
-                    }
-                }, connector);
+                builder -> getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder), connector);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name,
@@ -103,14 +81,7 @@ public final class MuleEndpointTestUtils
             throws Exception
     {
         return (OutboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context,
-                new EndpointSource()
-                {
-                    @Override
-                    public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-                    {
-                        return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
-                    }
-                }, null);
+                builder -> getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder), null);
     }
 
     public static InboundEndpoint getTestInboundEndpoint(String name,
@@ -122,14 +93,7 @@ public final class MuleEndpointTestUtils
             throws Exception
     {
         return (InboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context,
-                new EndpointSource()
-                {
-                    @Override
-                    public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-                    {
-                        return getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder);
-                    }
-                }, null);
+                builder -> getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder), null);
     }
 
     public static OutboundEndpoint getTestOutboundEndpoint(String name,
@@ -142,14 +106,10 @@ public final class MuleEndpointTestUtils
             throws Exception
     {
         return (OutboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context,
-                new EndpointSource()
+                builder ->
                 {
-                    @Override
-                    public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-                    {
-                        builder.setConnector(connector);
-                        return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
-                    }
+                    builder.setConnector(connector);
+                    return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
                 }, null);
     }
 
@@ -159,15 +119,11 @@ public final class MuleEndpointTestUtils
                                                            final Connector connector)
             throws Exception
     {
-        return (OutboundEndpoint) getTestEndpoint(null, uri, null, null, null, context, new EndpointSource()
+        return (OutboundEndpoint) getTestEndpoint(null, uri, null, null, null, context, builder ->
         {
-            @Override
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                builder.setConnector(connector);
-                builder.setExchangePattern(mep);
-                return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
-            }
+            builder.setConnector(connector);
+            builder.setExchangePattern(mep);
+            return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
         }, null);
     }
 
@@ -176,14 +132,10 @@ public final class MuleEndpointTestUtils
                                                            final MuleContext context)
             throws Exception
     {
-        return (OutboundEndpoint) getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
+        return (OutboundEndpoint) getTestEndpoint(name, null, null, null, null, context, builder ->
         {
-            @Override
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                builder.setExchangePattern(mep);
-                return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
-            }
+            builder.setExchangePattern(mep);
+            return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
         }, null);
     }
 
@@ -191,14 +143,10 @@ public final class MuleEndpointTestUtils
                                                            final MuleContext context)
             throws Exception
     {
-        return (OutboundEndpoint) getTestEndpoint(null, null, null, null, null, context, new EndpointSource()
+        return (OutboundEndpoint) getTestEndpoint(null, null, null, null, null, context, builder ->
         {
-            @Override
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                builder.setExchangePattern(mep);
-                return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
-            }
+            builder.setExchangePattern(mep);
+            return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
         }, null);
     }
 
@@ -208,14 +156,10 @@ public final class MuleEndpointTestUtils
                                                          final Connector connector)
             throws Exception
     {
-        return (InboundEndpoint) getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
+        return (InboundEndpoint) getTestEndpoint(name, null, null, null, null, context, builder ->
         {
-            @Override
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                builder.setExchangePattern(mep);
-                return getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder);
-            }
+            builder.setExchangePattern(mep);
+            return getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder);
         }, connector);
     }
 
@@ -223,14 +167,10 @@ public final class MuleEndpointTestUtils
                                                          final MuleContext context)
             throws Exception
     {
-        return (InboundEndpoint) getTestEndpoint(null, null, null, null, null, context, new EndpointSource()
+        return (InboundEndpoint) getTestEndpoint(null, null, null, null, null, context, builder ->
         {
-            @Override
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                builder.setExchangePattern(mep);
-                return getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder);
-            }
+            builder.setExchangePattern(mep);
+            return getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder);
         }, null);
     }
 
@@ -238,17 +178,13 @@ public final class MuleEndpointTestUtils
                                                                    final MuleContext context)
             throws Exception
     {
-        return (InboundEndpoint) getTestEndpoint(null, null, null, null, null, context, new EndpointSource()
+        return (InboundEndpoint) getTestEndpoint(null, null, null, null, null, context, builder ->
         {
-            @Override
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                builder.setExchangePattern(mep);
-                TransactionConfig txConfig = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
-                txConfig.setFactory(new TestTransactionFactory());
-                builder.setTransactionConfig(txConfig);
-                return getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder);
-            }
+            builder.setExchangePattern(mep);
+            TransactionConfig txConfig = new MuleTransactionConfig(TransactionConfig.ACTION_BEGIN_OR_JOIN);
+            txConfig.setFactory(new TestTransactionFactory());
+            builder.setTransactionConfig(txConfig);
+            return getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder);
         }, null);
     }
 
@@ -305,14 +241,7 @@ public final class MuleEndpointTestUtils
                                                                          final MuleContext context)
             throws Exception
     {
-        return getTestSchemeMetaInfoEndpoint(name, protocol, context, new EndpointSource()
-        {
-            @Override
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                return getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder);
-            }
-        });
+        return getTestSchemeMetaInfoEndpoint(name, protocol, context, builder -> getEndpointFactory(context.getRegistry()).getInboundEndpoint(builder));
     }
 
     public static ImmutableEndpoint getTestSchemeMetaInfoOutboundEndpoint(String name,
@@ -320,14 +249,7 @@ public final class MuleEndpointTestUtils
                                                                           final MuleContext context)
             throws Exception
     {
-        return getTestSchemeMetaInfoEndpoint(name, protocol, context, new EndpointSource()
-        {
-            @Override
-            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
-            {
-                return getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder);
-            }
-        });
+        return getTestSchemeMetaInfoEndpoint(name, protocol, context, builder -> getEndpointFactory(context.getRegistry()).getOutboundEndpoint(builder));
     }
 
     private static ImmutableEndpoint getTestSchemeMetaInfoEndpoint(String name,
@@ -349,31 +271,6 @@ public final class MuleEndpointTestUtils
         endpointBuilder.setConnector(connector);
         endpointBuilder.setName(name);
         return source.getEndpoint(endpointBuilder);
-    }
-
-    public static MuleEvent getTestEvent(Object data,
-                                         FlowConstruct flowConstruct,
-                                         MessageExchangePattern mep,
-                                         MuleContext context)
-            throws Exception
-    {
-        final MuleSession session = getTestSession(flowConstruct, context);
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data), mep, flowConstruct, session);
-        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("test1", mep, context, null));
-        return event;
-    }
-
-
-    /**
-     * Supply endpoint but no service
-     */
-    public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, MuleContext context)
-            throws Exception
-    {
-        final MuleSession session = getTestSession(flowConstruct, context);
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data), flowConstruct, session);
-        DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("test1", MessageExchangePattern.REQUEST_RESPONSE, context, null));
-        return event;
     }
 
     /**

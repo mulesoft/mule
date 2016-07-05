@@ -8,22 +8,18 @@ package org.mule.compatibility.core;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.tck.MuleEndpointTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
-import java.util.Map;
-
 public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleContextEndpointTestCase
 {
     protected ThreadSafeAccess dummyEvent() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null);
+        MuleMessage message = MuleMessage.builder().payload(new Object()).build();
         final DefaultMuleEvent event = new DefaultMuleEvent(message, getTestFlow());
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, MuleEndpointTestUtils.getTestInboundEndpoint("test",
                 MessageExchangePattern.ONE_WAY, muleContext, null));
@@ -78,9 +74,9 @@ public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleConte
         {
             try
             {
-                for (int i = 0; i < write.length; i++)
+                for (boolean element : write)
                 {
-                    target.assertAccess(write[i]);
+                    target.assertAccess(element);
                 }
             }
             catch (IllegalStateException e)

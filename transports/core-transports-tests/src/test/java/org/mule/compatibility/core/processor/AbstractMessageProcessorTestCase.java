@@ -19,13 +19,11 @@ import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
@@ -53,22 +51,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 public abstract class AbstractMessageProcessorTestCase extends AbstractMuleContextEndpointTestCase
 {
     protected static final String TEST_URI = "test://myTestUri";
     protected static String RESPONSE_MESSAGE = "response-message";
-    protected static MutableMuleMessage responseMessage;
-    protected Answer<MuleEvent> echoEventAnswer = new Answer<MuleEvent>()
-    {
-        @Override
-        public MuleEvent answer(InvocationOnMock invocation) throws Throwable
-        {
-            return (MuleEvent) invocation.getArguments()[0];
-        }
-    };
+    protected static MuleMessage responseMessage;
+    protected Answer<MuleEvent> echoEventAnswer = invocation -> (MuleEvent) invocation.getArguments()[0];
 
 
     @Override
@@ -143,9 +133,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
 
     protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint) throws Exception
     {
-        Map<String, Serializable> props = new HashMap<>();
-        props.put("prop1", "value1");
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props),
+        final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build(),
                 getTestFlow(), getTestSession(null, muleContext));
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint);
         return event;
@@ -233,15 +221,15 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         {
             flow.setExceptionListener(exceptionListener);
         }
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props),
+        final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build(),
                 flow, getTestSession(null, muleContext));
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
         return event;
     }
 
-    protected MutableMuleMessage createTestResponseMuleMessage()
+    protected MuleMessage createTestResponseMuleMessage()
     {
-        return new DefaultMuleMessage(RESPONSE_MESSAGE);
+        return MuleMessage.builder().payload(RESPONSE_MESSAGE).build();
     }
 
     public static class TestFilter implements Filter
@@ -300,7 +288,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         }
 
         public EndpointMessageNotification messageNotification;
-        public List<EndpointMessageNotification> messageNotificationList = new ArrayList<EndpointMessageNotification>();
+        public List<EndpointMessageNotification> messageNotificationList = new ArrayList<>();
 
         public CountDownLatch latchFirst;
         public CountDownLatch latch;

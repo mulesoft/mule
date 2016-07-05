@@ -138,6 +138,12 @@ public final class MuleTestUtils
         return getTestEvent(data, getTestFlow(context), MessageExchangePattern.REQUEST_RESPONSE, context);
     }
 
+    public static MuleEvent getTestEvent(MuleMessage message, MessageExchangePattern mep, MuleContext context)
+            throws Exception
+    {
+        return getTestEvent(message, getTestFlow(context), mep, context);
+    }
+
     public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep, MuleContext context)
             throws Exception
     {
@@ -156,6 +162,16 @@ public final class MuleTestUtils
     //        return getTestInboundEvent(data, getTestService(context), mep, context);
     //    }
 
+
+    public static MuleEvent getTestEvent(MuleMessage message,
+                                         FlowConstruct flowConstruct,
+                                         MessageExchangePattern mep,
+                                         MuleContext context) throws Exception
+    {
+        final MuleSession session = getTestSession(flowConstruct, context);
+        final DefaultMuleEvent event = new DefaultMuleEvent(message, mep, flowConstruct, session);
+        return event;
+    }
 
     public static MuleEvent getTestEvent(Object data,
                                          FlowConstruct flowConstruct,

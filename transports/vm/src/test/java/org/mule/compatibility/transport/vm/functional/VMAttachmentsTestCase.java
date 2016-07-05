@@ -13,7 +13,6 @@ import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.File;
@@ -35,10 +34,9 @@ public class VMAttachmentsTestCase extends FunctionalTestCase
     @Test
     public void testAttachments() throws Exception
     {
-        MutableMuleMessage msg = getTestMuleMessage("Mmm... attachments!");
         FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/"
                                                         + getConfigFile()).getAbsoluteFile());
-        msg.addOutboundAttachment("test-attachment", new DataHandler(ds));
+        MuleMessage msg = MuleMessage.builder().payload("Mmm... attachments!").addOutboundAttachment("test-attachment", new DataHandler(ds)).build();
 
         MuleClient client = muleContext.getClient();
         MuleMessage reply = client.send("vm-in", msg);

@@ -22,6 +22,7 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.ThreadSafeAccess;
@@ -123,11 +124,11 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         }
     }
 
-    private MuleEvent createResponseEvent(MutableMuleMessage resultMessage, MuleEvent requestEvent) throws MuleException
+    private MuleEvent createResponseEvent(MuleMessage resultMessage, MuleEvent requestEvent) throws MuleException
     {
         if (resultMessage != null)
         {
-            resultMessage.setMessageRootId(requestEvent.getMessage().getMessageRootId());
+            resultMessage = MuleMessage.builder(resultMessage).rootId(requestEvent.getMessage().getMessageRootId()).build();
 
             MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
                     resultMessage, requestEvent.getMuleContext());
@@ -237,7 +238,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
     protected abstract void doDispatch(MuleEvent event) throws Exception;
 
-    protected abstract MutableMuleMessage doSend(MuleEvent event) throws Exception;
+    protected abstract MuleMessage doSend(MuleEvent event) throws Exception;
 
     protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MutableMuleMessage, Exception, Void> completionHandler)
     {

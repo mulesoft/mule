@@ -21,7 +21,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_S
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -135,7 +134,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
         Object payload = Collections.emptySet();
         Flow fc = getTestFlow();
         MuleSession session = getTestSession(fc, muleContext);
-        MuleMessage toSplit = new DefaultMuleMessage(payload, new HashMap<>(), new HashMap<>(), null);
+        MuleMessage toSplit = MuleMessage.builder().payload(payload).build();
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(toSplit, fc, session);
@@ -175,7 +174,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
             expectedSequences.add(i);
         }
 
-        MuleMessage toSplit = new DefaultMuleMessage(payload, inboundProps, outboundProps, null);
+        MuleMessage toSplit = MuleMessage.builder().payload(payload).inboundProperties(inboundProps).outboundProperties(outboundProps).build();
         CollectionSplitter splitter = new CollectionSplitter();
         splitter.setMuleContext(muleContext);
         Grabber grabber = new Grabber();

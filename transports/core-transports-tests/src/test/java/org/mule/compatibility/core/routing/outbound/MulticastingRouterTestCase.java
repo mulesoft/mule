@@ -13,13 +13,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.routing.CorrelationMode;
 import org.mule.runtime.core.routing.filters.RegExFilter;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestCase
@@ -56,7 +54,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
         EndpointMulticastingRouter router = createObject(EndpointMulticastingRouter.class);
 
-        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> endpoints = new ArrayList<>();
         endpoints.add(mockendpoint1);
         endpoints.add(mockendpoint2);
         router.setRoutes(endpoints);
@@ -84,14 +82,14 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
         RegExFilter filter = new RegExFilter("(.*) Message");
         filter.setMuleContext(muleContext);
         router.setFilter(filter);
-        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> endpoints = new ArrayList<>();
         endpoints.add(mockendpoint1);
         endpoints.add(mockendpoint2);
         router.setRoutes(endpoints);
 
         assertEquals(filter, router.getFilter());
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
         assertTrue(router.isMatch(getTestEvent(message)));
 
@@ -123,12 +121,12 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
         EndpointMulticastingRouter router = createObject(EndpointMulticastingRouter.class);
 
-        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> endpoints = new ArrayList<>();
         endpoints.add(mockendpoint1);
         endpoints.add(mockendpoint2);
         router.setRoutes(endpoints);
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
         assertTrue(router.isMatch(getTestEvent(message)));
         MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
@@ -158,33 +156,28 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
         EndpointMulticastingRouter router = createObject(EndpointMulticastingRouter.class);
 
-        List<MessageProcessor> endpoints = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> endpoints = new ArrayList<>();
         endpoints.add(mockendpoint1);
         endpoints.add(mockendpoint2);
         router.setRoutes(endpoints);
         router.setEnableCorrelation(CorrelationMode.NEVER);
 
-        MutableMuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
-        message.setOutboundProperty(MULE_CORRELATION_ID_PROPERTY, "MyCustomCorrelationId");
+        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty(MULE_CORRELATION_ID_PROPERTY, "MyCustomCorrelationId").build();
 
         assertTrue(router.isMatch(getTestEvent(message)));
 
-        Answer<MuleEvent> answer = new Answer<MuleEvent>()
+        Answer<MuleEvent> answer = invocation ->
         {
-            @Override
-            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
-            {
-                Object[] arguments = invocation.getArguments();
-                assertEquals(1, arguments.length);
-                assertTrue(arguments[0] instanceof MuleEvent);
+            Object[] arguments = invocation.getArguments();
+            assertEquals(1, arguments.length);
+            assertTrue(arguments[0] instanceof MuleEvent);
 
-                MuleEvent event = (MuleEvent) arguments[0];
-                String correlationId = event.getMessage().getOutboundProperty(MULE_CORRELATION_ID_PROPERTY);
-                assertNotNull(correlationId);
-                assertEquals("MyCustomCorrelationId", correlationId);
+            MuleEvent event = (MuleEvent) arguments[0];
+            String correlationId = event.getMessage().getOutboundProperty(MULE_CORRELATION_ID_PROPERTY);
+            assertNotNull(correlationId);
+            assertEquals("MyCustomCorrelationId", correlationId);
 
-                return event;
-            }
+            return event;
         };
         when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(answer);
         when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(answer);

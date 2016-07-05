@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -59,7 +60,7 @@ public class CxfDataTypeTestCase extends FunctionalTestCase
     @Test
     public void testCxfClient() throws Exception
     {
-        MuleMessage received = flowRunner("helloServiceClient").withPayload(getTestMuleMessage("hello")).run().getMessage();
+        MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
         Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
 
@@ -87,7 +88,7 @@ MuleMessage received = muleContext.getClient().send("http://localhost:" + dynami
     @Test
     public void testCxfSimpleClient() throws Exception
     {
-        MuleMessage received = flowRunner("helloServiceClient").withPayload(getTestMuleMessage("hello")).run().getMessage();
+        MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
         Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
     }
 

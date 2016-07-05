@@ -59,13 +59,13 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
-    protected MutableMuleMessage doSend(MuleEvent event) throws Exception
+    protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail"))
         {
             throw new RoutingException(event, (OutboundEndpoint) endpoint);
         }
-        return (MutableMuleMessage) event.getMessage();
+        return event.getMessage();
     }
 
     @Override

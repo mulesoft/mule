@@ -6,7 +6,6 @@
  */
 package org.mule.compatibility.core.transport;
 
-import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -18,7 +17,6 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -75,21 +73,21 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase
     {
         MessageReceiver receiver = createMessageReciever(MessageExchangePattern.ONE_WAY);
 
-        assertNotNull(receiver.routeMessage(createRequestMessage()));
+        assertNotNull(receiver.routeMessage((MutableMuleMessage) createRequestMessage()));
     }
 
     @Test
     public void routeMessageRequestResponseReturnsEvent() throws MuleException
     {
         MessageReceiver receiver = createMessageReciever(REQUEST_RESPONSE);
-        MutableMuleMessage request = createRequestMessage();
+        MuleMessage request = createRequestMessage();
 
-        assertEquals(request, receiver.routeMessage(request).getMessage());
+        assertEquals(request, receiver.routeMessage((MutableMuleMessage) request).getMessage());
     }
 
-    protected MutableMuleMessage createRequestMessage()
+    protected MuleMessage createRequestMessage()
     {
-        return new DefaultMuleMessage("", emptyMap(), emptyMap(), emptyMap());
+        return MuleMessage.builder().payload("").build();
     }
 
     protected MessageReceiver createMessageReciever(MessageExchangePattern mep) throws MuleException
