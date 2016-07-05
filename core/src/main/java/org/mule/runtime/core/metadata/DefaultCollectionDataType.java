@@ -52,8 +52,7 @@ public class DefaultCollectionDataType<C extends Collection<T>, T> extends Simpl
         }
         DefaultCollectionDataType that = (DefaultCollectionDataType) dataType;
 
-        return DataType.OBJECT.isCompatibleWith(that.getItemDataType()) || this.getItemDataType().isCompatibleWith
-                (that.getItemDataType());
+        return this.getItemDataType().isCompatibleWith(that.getItemDataType());
 
     }
 
