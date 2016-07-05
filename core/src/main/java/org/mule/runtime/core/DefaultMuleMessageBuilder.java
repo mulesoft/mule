@@ -411,7 +411,10 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
         }
         else if ("MULE_REPLYTO".equalsIgnoreCase(key))
         {
-            replyTo = value;
+            if(replyTo == null)
+            {
+                replyTo = value;
+            }
         }
     }
 
