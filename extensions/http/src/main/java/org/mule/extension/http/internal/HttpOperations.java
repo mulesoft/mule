@@ -9,7 +9,6 @@ package org.mule.extension.http.internal;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -33,10 +32,9 @@ public class HttpOperations
      * @param securityProviders The delegate-security-provider to use for authenticating. Use this in case you have multiple security managers defined in your configuration.
      * @param statusCodeFlowVar Reference to the flow variable name used for the statusCode attribute of the error-response-builder.
      * @param headersFlowVar Reference to the flow variable name used for the headersRef attribute of the error-response-builder.
-     * @return the same {@link org.mule.runtime.api.message.MuleMessage} received if successfully authenticated.
      * @throws MuleException if unauthenticated.
      */
-    public MuleMessage basicSecurityFilter(String realm,
+    public void basicSecurityFilter(String realm,
                                            @Optional String securityProviders,
                                            MuleEvent event,
                                            @Optional(defaultValue = "statusCode") String statusCodeFlowVar,
@@ -45,7 +43,6 @@ public class HttpOperations
         HttpBasicAuthenticationFilter filter = createFilter(realm, securityProviders, statusCodeFlowVar, headersFlowVar);
 
         filter.doFilter(event);
-        return event.getMessage();
     }
 
     private HttpBasicAuthenticationFilter createFilter(String realm, String securityProviders, String statusCodeFlowVar, String headersFlowVar) throws InitialisationException

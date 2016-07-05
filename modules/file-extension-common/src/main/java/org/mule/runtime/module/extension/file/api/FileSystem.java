@@ -12,6 +12,7 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.file.api.lock.PathLock;
 
 import java.io.InputStream;
@@ -61,7 +62,7 @@ public interface FileSystem
      * however, the extent of such lock will depend on the implementation.
      * What is guaranteed by passing {@code true} on the {@code lock} argument
      * is that {@code this} instance will not attempt to modify this file
-     * until the {@link InputStream} returned by {@link MuleMessage#getPayload()}
+     * until the {@link InputStream} returned by {@link OperationResult#getOutput()}
      * this method returns is closed or fully consumed. Some implementation might
      * actually perform a file system level locking which goes beyond the extend
      * of {@code this} instance or even mule. For some other file systems that
@@ -75,11 +76,11 @@ public interface FileSystem
      * @param message  the incoming {@link MuleMessage}
      * @param filePath the path of the file you want to read
      * @param lock     whether or not to lock the file
-     * @return A {@link MuleMessage} with an {@link InputStream} with the file's content as payload
+     * @return An {@link OperationResult} with an {@link InputStream} with the file's content as payload
      * and a {@link FileAttributes} object as {@link MuleMessage#getAttributes()}
      * @throws IllegalArgumentException if the file at the given path doesn't exists
      */
-    MuleMessage<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage<?, ?> message, String filePath, boolean lock);
+    OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage<?, ?> message, String filePath, boolean lock);
 
     /**
      * Writes the {@code content} into the file pointed by {@code filePath}.
@@ -248,8 +249,8 @@ public interface FileSystem
      * As for the {@link MediaType#getCharset()}, the {@code dataType} one is respected
      *
      * @param originalMediaType the original {@link MediaType} that the {@link MuleMessage} had before
-     *            executing the operation
-     * @param attributes the {@link FileAttributes} of the file being processed
+     *                          executing the operation
+     * @param attributes        the {@link FileAttributes} of the file being processed
      * @return a {@link DataType} the resulting {@link DataType}.
      */
     MediaType getFileMessageMediaType(MediaType originalMediaType, FileAttributes attributes);

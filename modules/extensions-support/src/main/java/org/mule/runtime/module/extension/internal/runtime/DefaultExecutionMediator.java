@@ -18,8 +18,8 @@ import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationMo
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.Interceptor;
-import org.mule.runtime.extension.api.runtime.OperationContext;
-import org.mule.runtime.extension.api.runtime.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
@@ -62,9 +62,8 @@ import org.slf4j.LoggerFactory;
 public final class DefaultExecutionMediator implements ExecutionMediator
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
     public static final SerialWorkManager WORK_MANAGER = new SerialWorkManager();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
     private final ExceptionEnricherManager exceptionEnricherManager;
     private final ConnectionManagerAdapter connectionManager;
 
@@ -237,12 +236,48 @@ public final class DefaultExecutionMediator implements ExecutionMediator
         });
     }
 
+    private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConnectionProvider> optionalConnectionProvider)
+    {
+        if (optionalConnectionProvider.isPresent())
+        {
+            final ConnectionProvider connectionProvider = optionalConnectionProvider.get();
+            if (ConnectionProviderWrapper.class.isAssignableFrom(connectionProvider.getClass()))
+            {
+                return ((ConnectionProviderWrapper) connectionProvider).getRetryPolicyTemplate();
+            }
+        }
+        return connectionManager.getDefaultRetryPolicyTemplate();
+    }
+
+    private MutableConfigurationStats getMutableConfigurationStats(OperationContext context)
+    {
+        ConfigurationStats stats = context.getConfiguration().getStatistics();
+        return stats instanceof MutableConfigurationStats
+               ? (MutableConfigurationStats) stats
+               : null;
+    }
+
+    private List<Interceptor> collectInterceptors(Object... interceptableCandidates)
+    {
+        ImmutableList.Builder<Interceptor> interceptors = ImmutableList.builder();
+
+        for (Object interceptableCandidate : interceptableCandidates)
+        {
+            if (interceptableCandidate instanceof Interceptable)
+            {
+                interceptors.addAll(((Interceptable) interceptableCandidate).getInterceptors());
+            }
+        }
+
+        return interceptors.build();
+    }
+
     private class OperationRetryCallBack implements RetryCallback
     {
 
-        private OperationExecutor operationExecutor;
         private final OperationContext context;
         private final List<Interceptor> interceptorList;
+        private OperationExecutor operationExecutor;
         private OperationExecutionResult operationExecutionResult;
 
         private OperationRetryCallBack(OperationExecutor operationExecutor, OperationContext context, List<Interceptor> interceptorList)
@@ -294,44 +329,6 @@ public final class DefaultExecutionMediator implements ExecutionMediator
         {
             return operationExecutionResult;
         }
-    }
-
-    private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConnectionProvider> optionalConnectionProvider)
-    {
-        if (optionalConnectionProvider.isPresent())
-        {
-            final ConnectionProvider connectionProvider = optionalConnectionProvider.get();
-            if (ConnectionProviderWrapper.class.isAssignableFrom(connectionProvider.getClass()))
-            {
-                return ((ConnectionProviderWrapper) connectionProvider).getRetryPolicyTemplate();
-            }
-        }
-        return connectionManager.getDefaultRetryPolicyTemplate();
-    }
-
-    private MutableConfigurationStats getMutableConfigurationStats(OperationContext context)
-    {
-        ConfigurationStats stats = context.getConfiguration().getStatistics();
-        return stats instanceof MutableConfigurationStats
-               ? (MutableConfigurationStats) stats
-               : null;
-    }
-
-
-
-    private List<Interceptor> collectInterceptors(Object... interceptableCandidates)
-    {
-        ImmutableList.Builder<Interceptor> interceptors = ImmutableList.builder();
-
-        for (Object interceptableCandidate : interceptableCandidates)
-        {
-            if (interceptableCandidate instanceof Interceptable)
-            {
-                interceptors.addAll(((Interceptable) interceptableCandidate).getInterceptors());
-            }
-        }
-
-        return interceptors.build();
     }
 
 

@@ -9,7 +9,9 @@ package org.mule.runtime.module.extension.file.api;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -21,7 +23,7 @@ import java.util.Spliterator;
 /**
  * Represents a node on a file system tree.
  * <p>
- * It contains a {@link MuleMessage} which represents the file {@code this}
+ * It contains an {@link OperationResult} which represents the file {@code this}
  * node points to.
  * <p>
  * Because {@code this} node itself can point to a directory, it also
@@ -43,6 +45,69 @@ import java.util.Spliterator;
 public class TreeNode implements Serializable, Iterable
 {
 
+    private transient final OperationResult<?, FileAttributes> info;
+    private final List<TreeNode> childs;
+    private TreeNode(OperationResult<?, FileAttributes> info, List<TreeNode> childs)
+    {
+        this.info = info;
+        this.childs = childs;
+    }
+
+    /**
+     * @return a immutable {@link List} with {@code this} node's childs
+     */
+    public List<TreeNode> getChilds()
+    {
+        return childs;
+    }
+
+    /**
+     * @return a {@link FileAttributes} object with the node's metadata
+     */
+    public FileAttributes getAttributes()
+    {
+        return info.getAttributes();
+    }
+
+    /**
+     * @return a {@link DataType} with type metadata about the referenced node
+     */
+    public MediaType getMediaType()
+    {
+        return info.getMediaType();
+    }
+
+    /**
+     * @return an {@link InputStream} if the node is a file, or {@code null} if it's a directory
+     */
+    public InputStream getContent()
+    {
+        if (info.getOutput() instanceof InputStream)
+        {
+            return (InputStream) info.getOutput();
+        }
+
+        return null;
+    }
+
+    /**
+     * @return the {@link #getChilds()} {@link Iterator}
+     */
+    @Override
+    public Iterator iterator()
+    {
+        return getChilds().iterator();
+    }
+
+    /**
+     * @return the {@link #getChilds()} {@link Spliterator}
+     */
+    @Override
+    public Spliterator spliterator()
+    {
+        return getChilds().spliterator();
+    }
+
     /**
      * Implementation of the buidler design pattern to create
      * instances of {@link TreeNode}
@@ -50,9 +115,13 @@ public class TreeNode implements Serializable, Iterable
     public static class Builder
     {
 
-        private final LinkedList<Builder> childs = new LinkedList<>();
-        private MuleMessage<?, FileAttributes> message;
+        private final List<Builder> childs = new LinkedList<>();
+        private OperationResult<?, FileAttributes> info;
         private TreeNode instance;
+
+        private Builder()
+        {
+        }
 
         /**
          * Obtains a new {@link Builder} instance to be used to create
@@ -64,7 +133,7 @@ public class TreeNode implements Serializable, Iterable
         public static Builder forDirectory(FileAttributes attributes)
         {
             Builder builder = new Builder();
-            builder.message = MuleMessage.builder().payload(NullPayload.getInstance()).attributes(attributes).build();
+            builder.info = OperationResult.<Object, FileAttributes>builder().output(NullPayload.getInstance()).attributes(attributes).build();
 
             return builder;
         }
@@ -77,16 +146,12 @@ public class TreeNode implements Serializable, Iterable
          *                and a {@link FileAttributes} instance as attributes
          * @return a new {@link Builder}
          */
-        public static Builder forFile(MuleMessage<InputStream, FileAttributes> message)
+        public static Builder forFile(OperationResult<InputStream, FileAttributes> message)
         {
             Builder builder = new Builder();
-            builder.message = message;
+            builder.info = message;
 
             return builder;
-        }
-
-        private Builder()
-        {
         }
 
         /**
@@ -112,74 +177,10 @@ public class TreeNode implements Serializable, Iterable
         {
             if (instance == null)
             {
-                instance = new TreeNode(message, childs.stream().map(Builder::build).collect(new ImmutableListCollector<>()));
+                instance = new TreeNode(info, childs.stream().map(Builder::build).collect(new ImmutableListCollector<>()));
             }
             return instance;
         }
 
-    }
-
-    private transient final MuleMessage<?, FileAttributes> message;
-    private final List<TreeNode> childs;
-
-    private TreeNode(MuleMessage<?, FileAttributes> message, List<TreeNode> childs)
-    {
-        this.message = message;
-        this.childs = childs;
-    }
-
-    /**
-     * @return a immutable {@link List} with {@code this} node's childs
-     */
-    public List<TreeNode> getChilds()
-    {
-        return childs;
-    }
-
-    /**
-     * @return a {@link FileAttributes} object with the node's metadata
-     */
-    public FileAttributes getAttributes()
-    {
-        return message.getAttributes();
-    }
-
-    /**
-     * @return a {@link DataType} with type metadata about the referenced node
-     */
-    public DataType<?> getDataType()
-    {
-        return message.getDataType();
-    }
-
-    /**
-     * @return an {@link InputStream} if the node is a file, or {@code null} if it's a directory
-     */
-    public InputStream getContent()
-    {
-        if (message.getPayload() instanceof InputStream)
-        {
-            return (InputStream) message.getPayload();
-        }
-
-        return null;
-    }
-
-    /**
-     * @return the {@link #getChilds()} {@link Iterator}
-     */
-    @Override
-    public Iterator iterator()
-    {
-        return getChilds().iterator();
-    }
-
-    /**
-     * @return the {@link #getChilds()} {@link Spliterator}
-     */
-    @Override
-    public Spliterator spliterator()
-    {
-        return getChilds().spliterator();
     }
 }

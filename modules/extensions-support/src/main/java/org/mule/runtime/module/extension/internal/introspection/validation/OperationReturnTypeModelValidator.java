@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
@@ -29,31 +31,33 @@ import java.util.List;
 public class OperationReturnTypeModelValidator implements ModelValidator
 {
 
+    private final List<Class<?>> illegalReturnTypes = ImmutableList.of(MuleEvent.class, MuleMessage.class);
+
     @Override
     public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
     {
-        doValidate(extensionModel, extensionModel.getOperationModels());
-        extensionModel.getConfigurationModels().forEach(config -> doValidate(extensionModel, config.getOperationModels()));
-    }
-
-    private void doValidate(ExtensionModel extensionModel, List<OperationModel> operations)
-    {
-        for (OperationModel operationModel : operations)
+        new IdempotentExtensionWalker()
         {
-            if (operationModel.getOutput() == null || operationModel.getOutput().getType() == null)
+            @Override
+            protected void onOperation(OperationModel operationModel)
             {
-                throw missingReturnTypeException(extensionModel, operationModel);
-            }
+                if (operationModel.getOutput() == null || operationModel.getOutput().getType() == null)
+                {
+                    throw missingReturnTypeException(extensionModel, operationModel);
+                }
 
-            MetadataType returnType = operationModel.getOutput().getType();
-            if (returnType.getMetadataFormat().equals(JAVA) &&
-                MuleEvent.class.isAssignableFrom(getType(returnType)))
-            {
-                throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are " +
-                                                                                 "not allowed to return objects of that type",
-                                                                                 operationModel.getName(), extensionModel.getName(), MuleEvent.class.getName()));
+                final Class<Object> returnType = getType(operationModel.getOutput().getType());
+
+                illegalReturnTypes.stream()
+                        .filter(forbiddenType -> forbiddenType.isAssignableFrom(returnType))
+                        .findFirst()
+                        .ifPresent(forbiddenType -> {
+                            throw new IllegalOperationModelDefinitionException(String.format("Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are " +
+                                                                                             "not allowed to return objects of that type",
+                                                                                             operationModel.getName(), extensionModel.getName(), MuleEvent.class.getName()));
+                        });
             }
-        }
+        }.walk(extensionModel);
     }
 
     private IllegalModelDefinitionException missingReturnTypeException(ExtensionModel model, OperationModel operationModel)

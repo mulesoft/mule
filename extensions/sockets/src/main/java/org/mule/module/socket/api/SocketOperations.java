@@ -18,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 
 import java.io.IOException;
 
@@ -44,12 +45,12 @@ public class SocketOperations
      * @throws ConnectionException if the connection couldn't be established, if the remote host was unavailable.
      */
     @MetadataScope(outputResolver = SocketMetadataResolver.class, keysResolver = SocketMetadataResolver.class)
-    public MuleMessage<?, ?> send(@Connection RequesterConnection connection,
-                                  @UseConfig RequesterConfig config,
-                                  @Optional(defaultValue = "#[payload]") @NoRef Object content,
-                                  @Optional String outputEncoding,
-                                  String hasResponse, // TODO Add metadata https://www.mulesoft.org/jira/browse/MULE-9894
-                                  MuleMessage<?, ?> muleMessage) throws ConnectionException, IOException
+    public OperationResult<?, ?> send(@Connection RequesterConnection connection,
+                                      @UseConfig RequesterConfig config,
+                                      @Optional(defaultValue = "#[payload]") @NoRef Object content,
+                                      @Optional String outputEncoding,
+                                      String hasResponse, // TODO Add metadata https://www.mulesoft.org/jira/browse/MULE-9894
+                                      MuleMessage<?, ?> muleMessage) throws ConnectionException, IOException
     {
         SocketClient client = connection.getClient();
 
@@ -61,7 +62,7 @@ public class SocketOperations
         client.write(content, outputEncoding);
 
         return Boolean.valueOf(hasResponse) ?
-               MuleMessage.builder().payload(client.read()).attributes(client.getAttributes()).build() :
-               muleMessage;
+               OperationResult.builder().output(client.read()).attributes(client.getAttributes()).build() :
+               OperationResult.builder(muleMessage).build();
     }
 }

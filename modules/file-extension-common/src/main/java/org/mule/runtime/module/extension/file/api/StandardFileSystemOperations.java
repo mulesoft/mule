@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.file.api.matcher.NullFilePayloadPredicate;
 
 import java.io.InputStream;
@@ -95,11 +96,11 @@ public class StandardFileSystemOperations
      * @throws IllegalArgumentException if the file at the given path doesn't exists
      */
     @DataTypeParameters
-    public MuleMessage<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
-                                                         @Connection FileSystem fileSystem,
-                                                         MuleMessage<?, ?> message,
-                                                         String path,
-                                                         @Optional(defaultValue = "false") boolean lock)
+    public OperationResult<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
+                                                             @Connection FileSystem fileSystem,
+                                                             MuleMessage<?, ?> message,
+                                                             String path,
+                                                             @Optional(defaultValue = "false") boolean lock)
     {
         fileSystem.changeToBaseDir(config);
         return fileSystem.read(config, message, path, lock);

@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
-import org.mule.runtime.module.extension.internal.runtime.processor.OperationMessageProcessor;
+import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing {@link OperationMessageProcessor}

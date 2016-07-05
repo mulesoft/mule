@@ -11,7 +11,8 @@ import static java.util.Collections.emptySet;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
@@ -56,6 +57,13 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
     public void muleEventReturnType()
     {
         when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(MuleEvent.class), false, emptySet()));
+        validator.validate(extensionModel);
+    }
+
+    @Test(expected = IllegalOperationModelDefinitionException.class)
+    public void muleMessageReturnType()
+    {
+        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(MuleMessage.class), false, emptySet()));
         validator.validate(extensionModel);
     }
 }
