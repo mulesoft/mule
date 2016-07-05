@@ -6,6 +6,7 @@
  */
 package org.mule.impl.config.builders;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,6 +20,8 @@ import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -35,7 +38,7 @@ public class AutoConfigurationBuilderTestCase extends AbstractMuleContextTestCas
     public void testConfigureSpring() throws ConfigurationException, InitialisationException
     {
         ConfigurationBuilder configurationBuilder = new AutoConfigurationBuilder(
-            "org/mule/test/spring/config1/test-xml-mule2-config.xml");
+                "org/mule/test/spring/config1/test-xml-mule2-config.xml", emptyMap());
         configurationBuilder.configure(muleContext);
 
         // Just a few of the asserts from AbstractConfigBuilderTestCase

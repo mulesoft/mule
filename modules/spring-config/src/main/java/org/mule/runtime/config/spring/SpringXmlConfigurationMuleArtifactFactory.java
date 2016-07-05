@@ -239,7 +239,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             }
             MuleContextFactory factory = new DefaultMuleContextFactory();
 
-            builder = new SpringXmlConfigurationBuilder(new ConfigResource[] {config, defaultConfigOverride});
+            builder = new SpringXmlConfigurationBuilder(new ConfigResource[] {config, defaultConfigOverride}, environmentProperties);
             muleContext = factory.createMuleContext(builder);
             muleContext.start();
 

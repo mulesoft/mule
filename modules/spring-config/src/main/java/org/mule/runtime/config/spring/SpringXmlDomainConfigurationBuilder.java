@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Collections.emptyMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.config.ConfigResource;
@@ -18,15 +19,22 @@ import org.springframework.context.ApplicationContext;
 public class SpringXmlDomainConfigurationBuilder extends SpringXmlConfigurationBuilder
 {
 
+    /**
+     * Creates a {@link org.mule.runtime.core.api.config.ConfigurationBuilder} based on
+     * configuration file and a set of external properties to configure a domain artifact.
+     *
+     * @param configResources the domain config file reference
+     * @throws ConfigurationException
+     */
     public SpringXmlDomainConfigurationBuilder(String configResources) throws ConfigurationException
     {
-        super(configResources);
+        super(configResources, emptyMap());
         setUseMinimalConfigResource(true);
     }
 
     @Override
     protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] applicationConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController)
     {
-        return new MuleDomainContext(muleContext, applicationConfigResources, springResources, optionalObjectsController);
+        return new MuleDomainContext(muleContext, applicationConfigResources, springResources, optionalObjectsController, getArtifactProperties());
     }
 }

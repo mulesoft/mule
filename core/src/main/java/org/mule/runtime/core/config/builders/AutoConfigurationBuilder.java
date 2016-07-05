@@ -31,19 +31,19 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 {
     private MuleContext domainContext;
 
-    public AutoConfigurationBuilder(String resource) throws ConfigurationException
+    public AutoConfigurationBuilder(String resource, Map<String, String> artifactProperties) throws ConfigurationException
     {
-        super(resource);
+        super(resource, artifactProperties);
     }
 
-    public AutoConfigurationBuilder(String[] resources) throws ConfigurationException
+    public AutoConfigurationBuilder(String[] resources, Map<String, String> artifactProperties) throws ConfigurationException
     {
-        super(resources);
+        super(resources, artifactProperties);
     }
 
-    public AutoConfigurationBuilder(ConfigResource[] resources)
+    public AutoConfigurationBuilder(ConfigResource[] resources, Map<String, String> artifactProperties)
     {
-        super(resources);
+        super(resources, artifactProperties);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 
                 ConfigResource[] constructorArg = new ConfigResource[configs.size()];
                 System.arraycopy(configs.toArray(), 0, constructorArg, 0, configs.size());
-                ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, new Object[] {constructorArg});
+                ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, new Object[] {constructorArg, getArtifactProperties()});
                 if (domainContext != null && cb instanceof DomainMuleContextAwareConfigurationBuilder)
                 {
                     ((DomainMuleContextAwareConfigurationBuilder) cb).setDomainContext(domainContext);

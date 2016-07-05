@@ -19,7 +19,7 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceI
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.runtime.config.spring.dsl.processor.ApplicationConfig;
+import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
@@ -175,25 +175,25 @@ public class ApplicationModel
     private Properties applicationProperties;
 
     /**
-     * Creates an {code ApplicationModel} from a {@link ApplicationConfig}.
+     * Creates an {code ApplicationModel} from a {@link ArtifactConfig}.
      * <p/>
      * A set of validations are applied that may make creation fail.
      *
-     * @param applicationConfig the mule artifact configuration content.
+     * @param artifactConfig the mule artifact configuration content.
      * @throws Exception when the application configuration has semantic errors.
      */
-    public ApplicationModel(ApplicationConfig applicationConfig) throws Exception
+    public ApplicationModel(ArtifactConfig artifactConfig) throws Exception
     {
-        configurePropertyPlaceholderResolver(applicationConfig);
-        convertConfigFileToComponentModel(applicationConfig);
+        configurePropertyPlaceholderResolver(artifactConfig);
+        convertConfigFileToComponentModel(artifactConfig);
         validateModel();
     }
 
-    private void configurePropertyPlaceholderResolver(ApplicationConfig applicationConfig)
+    private void configurePropertyPlaceholderResolver(ArtifactConfig artifactConfig)
     {
         //TODO MULE-9825: a new mechanism for property placeholders need to be defined
         final List<String> locations = new ArrayList<>();
-        applicationConfig.getConfigFiles().stream().forEach( configFile -> {
+        artifactConfig.getConfigFiles().stream().forEach(configFile -> {
             configFile.getConfigLines().get(0).getChildren().stream().forEach( configLine -> {
                 if (configLine.getIdentifier().equals(PROPERTY_PLACEHOLDER_ELEMENT))
                 {
@@ -207,6 +207,12 @@ public class ApplicationModel
         applicationProperties = new Properties();
         applicationProperties.putAll(getenv());
         applicationProperties.putAll(getProperties());
+        //TODO MULE-9638: This check should not be required once we don't use the old mechanism.
+        if (artifactConfig.getApplicationProperties() != null)
+        {
+            applicationProperties.putAll(artifactConfig.getApplicationProperties());
+
+        }
         for (String propertyFileLocation : locations)
         {
             Properties properties = new Properties();
@@ -245,9 +251,9 @@ public class ApplicationModel
                 ).findFirst();
     }
 
-    private void convertConfigFileToComponentModel(ApplicationConfig applicationConfig)
+    private void convertConfigFileToComponentModel(ArtifactConfig artifactConfig)
     {
-        List<ConfigFile> configFiles = applicationConfig.getConfigFiles();
+        List<ConfigFile> configFiles = artifactConfig.getConfigFiles();
         configFiles.stream()
                 .forEach(configFile -> {
                     List<ComponentModel> componentModels = extractComponentDefinitionModel(asList(configFile.getConfigLines().get(0)), configFile.getFilename());

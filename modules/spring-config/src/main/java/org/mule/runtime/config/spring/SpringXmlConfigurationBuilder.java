@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Collections.emptyMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DomainMuleContextAwareConfigurationBuilder;
@@ -19,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -51,19 +53,29 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     protected ApplicationContext parentContext;
     protected ApplicationContext applicationContext;
 
-    public SpringXmlConfigurationBuilder(String[] configResources) throws ConfigurationException
+    public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties) throws ConfigurationException
     {
-        super(configResources);
+        super(configResources, artifactProperties);
     }
 
-    public SpringXmlConfigurationBuilder(String configResources) throws ConfigurationException
+    public SpringXmlConfigurationBuilder(String configResources, Map<String, String> artifactProperties) throws ConfigurationException
     {
-        super(configResources);
+        super(configResources, artifactProperties);
     }
 
-    public SpringXmlConfigurationBuilder(ConfigResource[] configResources)
+    public SpringXmlConfigurationBuilder(ConfigResource[] configResources, Map<String, String> artifactProperties)
     {
-        super(configResources);
+        super(configResources, artifactProperties);
+    }
+
+    public SpringXmlConfigurationBuilder(String configResource) throws ConfigurationException
+    {
+        this(configResource, emptyMap());
+    }
+
+    public SpringXmlConfigurationBuilder(String[] configFiles) throws ConfigurationException
+    {
+        super(configFiles, emptyMap());
     }
 
     protected List<ConfigResource> getConfigResources() throws IOException
@@ -153,7 +165,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController)
     {
-        return new MuleArtifactContext(muleContext, artifactConfigResources, springResources, optionalObjectsController);
+        return new MuleArtifactContext(muleContext, artifactConfigResources, springResources, optionalObjectsController, getArtifactProperties());
     }
 
 

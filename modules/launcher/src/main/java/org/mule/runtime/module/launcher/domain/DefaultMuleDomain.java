@@ -100,7 +100,7 @@ public class DefaultMuleDomain implements Domain
     {
         String configBuilderClassName = determineConfigBuilderClassNameForApplication(application);
         ConfigurationBuilder configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
-                                                                                                       new Object[] {application.getDescriptor().getAbsoluteResourcePaths()}, application.getArtifactClassLoader().getClassLoader());
+                                                                                                       new Object[] {application.getDescriptor().getAbsoluteResourcePaths(), application.getDescriptor().getAppProperties()}, application.getArtifactClassLoader().getClassLoader());
 
         if (!containsSharedResources())
         {

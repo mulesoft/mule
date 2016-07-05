@@ -7,12 +7,11 @@
 package org.mule.functional.junit4;
 
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
-
+import org.mule.runtime.config.spring.SpringXmlDomainConfigurationBuilder;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.config.spring.SpringXmlDomainConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 
