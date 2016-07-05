@@ -8,6 +8,7 @@ package org.mule.runtime.module.cxf.support;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.util.Collection;
@@ -33,10 +34,8 @@ public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
         if (atts != null && !atts.isEmpty())
         {
             event.setFlowVariable(CxfConstants.ATTACHMENTS, atts);
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.copyProperty(CONTENT_TYPE);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(CONTENT_TYPE, event
+                    .getMessage().getInboundProperty(CONTENT_TYPE)).build());
         }
     }
 

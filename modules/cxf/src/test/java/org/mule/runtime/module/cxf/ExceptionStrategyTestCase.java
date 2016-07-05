@@ -13,9 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -30,9 +28,7 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -82,7 +78,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFaultInCxfService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestFaultPayload, (Map<String, Serializable>) null);
+        MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
         registerExceptionNotificationListener();
@@ -96,7 +92,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testExceptionInCxfService() throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(requestPayload, (Map<String, Serializable>) null);
+        MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
         MuleClient client = muleContext.getClient();
         latch = new CountDownLatch(1);
         registerExceptionNotificationListener();

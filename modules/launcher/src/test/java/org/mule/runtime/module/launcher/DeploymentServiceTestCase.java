@@ -43,12 +43,11 @@ import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
-
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -1371,7 +1370,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1405,7 +1404,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1425,7 +1424,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1446,7 +1445,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1462,7 +1461,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }
@@ -1478,7 +1477,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         Application application = deploymentService.getApplications().get(0);
         Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
         mainFlow.process(new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE, mainFlow));
     }

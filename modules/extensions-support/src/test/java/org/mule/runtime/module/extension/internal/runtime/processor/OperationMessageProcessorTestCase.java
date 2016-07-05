@@ -35,14 +35,13 @@ import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataReso
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
 
 import org.mule.metadata.api.model.StringType;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -129,6 +128,9 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleEvent event;
+
+    @Mock
+    private MuleMessage message;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext context;
@@ -271,7 +273,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(MuleMessage.builder().payload
                 (payload).mediaType(mediaType).attributes(attributes).build());
 
-        ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
+        ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
 
         messageProcessor.process(event);
 
@@ -301,7 +303,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
 
-        ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
+        ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
         verify(event).setFlowVariable(same(TARGET_VAR), captor.capture());
         MuleMessage message = captor.getValue();
         assertThat(message, is(notNullValue()));
@@ -322,7 +324,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
                 (payload).mediaType(mediaType).build());
         when(event.getMessage()).thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes
                 (oldAttributes).build());
-        ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
+        ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
 
         messageProcessor.process(event);
 
@@ -345,7 +347,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
                 (payload).build());
         when(event.getMessage()).thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes
                 (oldAttributes).build());
-        ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
+        ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
 
         messageProcessor.process(event);
 
@@ -366,7 +368,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(MuleMessage.builder().payload
                 (payload).attributes(attributes).build());
-        ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
+        ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
 
         messageProcessor.process(event);
 
@@ -408,7 +410,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
 
-        ArgumentCaptor<DefaultMuleMessage> captor = ArgumentCaptor.forClass(DefaultMuleMessage.class);
+        ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
         verify(event).setFlowVariable(same(TARGET_VAR), captor.capture());
 
         MuleMessage message = captor.getValue();
@@ -539,6 +541,8 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     private MuleEvent configureMockEvent(MuleEvent mockEvent)
     {
         when(mockEvent.getMessage().getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
+        when(mockEvent.getMessage()).thenReturn(message);
+        when(message.getPayload()).thenReturn(TEST_PAYLOAD);
         return mockEvent;
     }
 }

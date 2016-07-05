@@ -7,8 +7,7 @@
 package org.mule.runtime.module.cxf;
 
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -468,18 +467,17 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
             payload = response;
         }
 
-        transportResponse.setMessage(transportResponse.getMessage().transform(msg -> {
-            Serializable httpStatusCode = msg.getInboundProperty(HTTP_STATUS_PROPERTY);
-            if (isProxy() && httpStatusCode != null)
-            {
-                msg.setOutboundProperty(HTTP_STATUS_PROPERTY, httpStatusCode);
-            }
+        MuleMessage.Builder builder = MuleMessage.builder(transportResponse.getMessage());
+        Serializable httpStatusCode = transportResponse.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY);
+        if (isProxy() && httpStatusCode != null)
+        {
+            builder.addOutboundProperty(HTTP_STATUS_PROPERTY, httpStatusCode);
+        }
 
-            Class payloadClass = payload != null ? payload.getClass() : Object.class;
-            msg.setPayload(payload, DataType.builder().type(payloadClass).mediaType(getMimeType()).build());
-            return msg;
-        }));
+        Class payloadClass = payload != null ? payload.getClass() : Object.class;
+        builder.payload(payload !=null ? payload : NullPayload.getInstance()).mediaType(getMimeType());
 
+        transportResponse.setMessage(builder.build());
         return transportResponse;
     }
 

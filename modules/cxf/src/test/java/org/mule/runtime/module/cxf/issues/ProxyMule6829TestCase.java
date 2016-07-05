@@ -10,16 +10,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.TimeUnit;
 
@@ -151,17 +150,15 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
 
     private MuleMessage executeSoap11Call(String msgString, String soapAction) throws MuleException
     {
-        MutableMuleMessage msg = getTestMuleMessage(msgString);
-        msg.setOutboundProperty("soapAction", soapAction);
+        MuleMessage msg = MuleMessage.builder(getTestMuleMessage(msgString)).addOutboundProperty("soapAction", soapAction).build();
 
         return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", msg, HTTP_REQUEST_OPTIONS);
     }
 
     private MuleMessage executeSoap12Call(String msgString, String soapAction) throws MuleException
     {
-        MutableMuleMessage msg = getTestMuleMessage(msgString);
         String contentType = "application/soap+xml;charset=UTF-8;action=\"" + soapAction + "\"";
-        msg.setOutboundProperty("Content-Type", contentType);
+        MuleMessage msg = MuleMessage.builder(getTestMuleMessage(msgString)).addOutboundProperty("Content-Type", contentType).build();
 
         return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", msg, HTTP_REQUEST_OPTIONS);
     }

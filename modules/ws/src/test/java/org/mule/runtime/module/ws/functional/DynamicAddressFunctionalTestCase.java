@@ -7,7 +7,7 @@
 package org.mule.runtime.module.ws.functional;
 
 
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunction
     {
         Map<String, Serializable> properties = new HashMap<>();
         properties.put("pathInboundProperty", "services/Test");
-        assertValidResponse("clientInboundProperty", new DefaultMuleMessage(ECHO_REQUEST, properties, null, null));
+        assertValidResponse("clientInboundProperty", MuleMessage.builder().payload(ECHO_REQUEST).inboundProperties(properties).build());
     }
 
     @Test

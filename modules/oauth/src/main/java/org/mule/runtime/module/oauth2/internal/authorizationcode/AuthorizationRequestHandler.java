@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
@@ -136,10 +137,8 @@ public class AuthorizationRequestHandler implements MuleContextAware
                         .setState(stateEncoder.getEncodedState())
                         .setScope(scopes).buildUrl();
 
-                muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
-                    msg.setOutboundProperty(LOCATION, authorizationUrlWithParams);
-                    return msg;
-                }));
+                muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).addOutboundProperty(LOCATION,
+                                                                                                     authorizationUrlWithParams).build());
                 return muleEvent;
             }
         };

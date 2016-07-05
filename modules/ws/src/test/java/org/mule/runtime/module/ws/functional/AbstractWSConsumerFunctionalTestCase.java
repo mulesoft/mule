@@ -7,11 +7,10 @@
 package org.mule.runtime.module.ws.functional;
 
 
+import static java.util.Collections.EMPTY_MAP;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.mule.runtime.module.ws.functional.SoapFaultCodeMatcher.hasFaultCode;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.ws.consumer.SoapFaultException;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -45,7 +44,7 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
 
     protected void assertValidResponse(String flowName, Map<String, Serializable> properties) throws Exception
     {
-        MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST, properties);
+        MuleMessage request = MuleMessage.builder().payload(ECHO_REQUEST).inboundProperties(properties).build();
         assertValidResponse(flowName, request);
     }
 
@@ -62,14 +61,14 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
 
     protected void assertSoapFault(String flowName, String message, String expectedFaultCode) throws Exception
     {
-        assertSoapFault(flowName, message, null, expectedFaultCode);
+        assertSoapFault(flowName, message, EMPTY_MAP, expectedFaultCode);
     }
 
     protected void assertSoapFault(String flowName, String message, Map<String, Serializable> properties, String expectedFaultCode) throws Exception
     {
         expectedException.expect(SoapFaultException.class);
         expectedException.expect(hasFaultCode(expectedFaultCode));
-        flowRunner(flowName).withPayload(new DefaultMuleMessage(message, properties)).run().getMessage();
+        flowRunner(flowName).withPayload(MuleMessage.builder().payload(message).inboundProperties(properties).build()).run().getMessage();
     }
 
 }

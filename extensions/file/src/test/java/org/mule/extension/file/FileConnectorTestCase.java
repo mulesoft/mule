@@ -14,7 +14,6 @@ import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.extension.file.api.FileWriteMode;
 import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
@@ -84,7 +83,7 @@ public abstract class FileConnectorTestCase extends ExtensionFunctionalTestCase
 
     protected MuleMessage<AbstractFileInputStream, LocalFileAttributes> readPath(String path) throws Exception
     {
-        return ((MutableMuleMessage) getPath(path).getMessage()).asNewMessage();
+        return getPath(path).getMessage();
     }
 
     protected MuleEvent getPath(String path) throws Exception

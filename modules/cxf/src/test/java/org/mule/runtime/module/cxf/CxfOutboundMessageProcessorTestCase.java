@@ -7,9 +7,8 @@
 package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.component.simple.EchoService;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.module.cxf.builder.SimpleClientMessageProcessorBuilder;
@@ -58,7 +57,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
             {
                 e.printStackTrace();
             }
-            event.setMessage(new DefaultMuleMessage(msg, event.getMessage()));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(msg).build());
             gotEvent = true;
             return event;
         };

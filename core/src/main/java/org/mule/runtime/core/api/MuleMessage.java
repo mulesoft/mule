@@ -172,6 +172,12 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
          * @param rootId
          * @return
          */
+        Builder<PAYLOAD, ATTRIBUTES> id(String id);
+
+        /**
+         * @param rootId
+         * @return
+         */
         Builder<PAYLOAD, ATTRIBUTES> rootId(String rootId);
 
         /**

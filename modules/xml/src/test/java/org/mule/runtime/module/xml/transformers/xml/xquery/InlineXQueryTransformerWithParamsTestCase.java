@@ -7,7 +7,7 @@
 package org.mule.runtime.module.xml.transformers.xml.xquery;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import org.mule.runtime.core.util.IOUtils;
@@ -78,7 +78,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
         Map<String, Serializable> props = new HashMap<>(2);
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
-        return new DefaultMuleMessage(srcData, props);
+        return MuleMessage.builder().payload(srcData).outboundProperties(props).build();
     }
 
     @Override

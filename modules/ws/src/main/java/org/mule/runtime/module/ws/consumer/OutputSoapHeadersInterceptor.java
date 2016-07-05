@@ -10,6 +10,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
@@ -62,10 +63,7 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor
                     String key = WSConsumer.SOAP_HEADERS_PROPERTY_PREFIX + header.getName().getLocalPart();
                     String value = (String) transformer.transform(header.getObject());
 
-                    event.setMessage(event.getMessage().transform(msg -> {
-                        msg.setInboundProperty(key, value);
-                        return msg;
-                    }));
+                    event.setMessage(MuleMessage.builder(event.getMessage()).addInboundProperty(key, value).build());
                 }
                 catch (TransformerException e)
                 {

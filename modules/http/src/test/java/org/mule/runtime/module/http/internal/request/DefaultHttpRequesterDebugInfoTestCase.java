@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.module.http.api.requester.HttpSendBodyMode.ALWAYS;
 import static org.mule.runtime.module.http.internal.HttpParamType.QUERY_PARAM;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.AUTHENTICATION_TYPE_DEBUG;
@@ -32,15 +31,12 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.WORKSTATION_DEBUG;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
-
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.internal.HttpParam;
 import org.mule.runtime.module.http.internal.HttpSingleParam;
@@ -89,7 +85,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
 
     private DefaultHttpRequester requester = new DefaultHttpRequester();
     private DefaultHttpRequesterConfig config = new DefaultHttpRequesterConfig();
-    private DefaultMuleMessage message;
+    private MuleMessage message;
     private DefaultMuleEvent event;
 
     @Before
@@ -101,7 +97,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
         requester.setPath("/");
         requester.setRequestBuilder(createRequestBuilder());
 
-        message = new DefaultMuleMessage(TEST_MESSAGE);
+        message = MuleMessage.builder().payload(TEST_MESSAGE).build();
         event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE, getTestFlow());
     }
 

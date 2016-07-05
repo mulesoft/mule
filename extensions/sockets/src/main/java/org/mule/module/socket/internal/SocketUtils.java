@@ -8,7 +8,6 @@ package org.mule.module.socket.internal;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-
 import org.mule.module.socket.api.connection.AbstractSocketConnection;
 import org.mule.module.socket.api.exceptions.UnresolvableHostException;
 import org.mule.module.socket.api.socket.tcp.TcpSocketProperties;
@@ -19,7 +18,6 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 
 import java.io.IOException;
@@ -91,7 +89,7 @@ public final class SocketUtils
         return connection.validate();
     }
 
-    public static MuleMessage<InputStream, SocketAttributes> createMuleMessage(InputStream content, SocketAttributes attributes)
+    public static MuleMessage createMuleMessage(InputStream content, SocketAttributes attributes)
     {
         DataType dataType = DataType.INPUT_STREAM;
         Object payload = NullPayload.getInstance();
@@ -102,8 +100,7 @@ public final class SocketUtils
             payload = content;
         }
 
-        message = new DefaultMuleMessage(payload, dataType, attributes);
-        return message;
+        return MuleMessage.builder().payload(payload).attributes(attributes).build();
     }
 
     /**

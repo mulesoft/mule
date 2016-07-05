@@ -11,12 +11,10 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
@@ -143,7 +141,7 @@ public class FileReadTestCase extends FileConnectorTestCase
 
     private MuleMessage<AbstractFileInputStream, LocalFileAttributes> readWithLock() throws Exception
     {
-        MuleMessage<AbstractFileInputStream, LocalFileAttributes> message = ((MutableMuleMessage) flowRunner("readWithLock").run().getMessage()).asNewMessage();
+        MuleMessage<AbstractFileInputStream, LocalFileAttributes> message = flowRunner("readWithLock").run().getMessage();
         assertThat(message.getPayload().isLocked(), is(true));
 
         return message;

@@ -9,12 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.processor;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
-
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
@@ -48,15 +45,17 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
 
     protected MuleMessage toMessage(Object value, OperationContextAdapter operationContext)
     {
-        DataType dataType = resolveDataType(value, operationContext);
+        MediaType mediaType = resolveMediaType(value, operationContext);
         if (value instanceof MuleMessage)
         {
             MuleMessage outputMessage = (MuleMessage) value;
-            return new DefaultMuleMessage(outputMessage.getPayload(), dataType, resolveAttributes(outputMessage, operationContext));
+            return MuleMessage.builder().payload(outputMessage.getPayload()).mediaType(mediaType)
+                    .attributes(resolveAttributes(outputMessage, operationContext)).build();
         }
         else
         {
-            return new DefaultMuleMessage(value, dataType, operationContext.getEvent().getMessage().getAttributes());
+            return MuleMessage.builder().payload(value).mediaType(mediaType).attributes
+                    (operationContext.getEvent().getMessage().getAttributes()).build();
         }
     }
 
@@ -74,15 +73,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
      * @param operationContext
      * @return
      */
-    private DataType resolveDataType(Object value, OperationContextAdapter operationContext)
+    private MediaType resolveMediaType(Object value, OperationContextAdapter operationContext)
     {
-        if (value == null || value instanceof NullPayload)
-        {
-            return null;
-        }
-
         Charset existingEncoding = getDefaultEncoding(muleContext);
-        DataTypeParamsBuilder dataTypeBuilder;
+        MediaType mediaType;
         if (value instanceof MuleMessage)
         {
             DataType dataType = ((MuleMessage) value).getDataType();
@@ -90,27 +84,27 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
             {
                 existingEncoding = dataType.getMediaType().getCharset().get();
             }
-            dataTypeBuilder = DataType.builder(dataType);
+            mediaType = dataType.getMediaType();
         }
         else
         {
-            dataTypeBuilder = DataType.builder().type((Class) (value != null ? value.getClass() : Object.class));
+            mediaType = MediaType.ANY;
         }
 
         if (operationContext.hasParameter(MIME_TYPE_PARAMETER_NAME))
         {
-            dataTypeBuilder = dataTypeBuilder.mediaType(operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class));
+            mediaType = MediaType.parse(operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class));
         }
 
         if (operationContext.hasParameter(ENCODING_PARAMETER_NAME))
         {
-            dataTypeBuilder = dataTypeBuilder.charset(operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class));
+            mediaType = mediaType.withCharset(Charset.forName(operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class)));
         }
         else
         {
-            dataTypeBuilder = dataTypeBuilder.charset(existingEncoding);
+            mediaType = mediaType.withCharset(existingEncoding);
         }
 
-        return dataTypeBuilder.build();
+        return mediaType;
     }
 }

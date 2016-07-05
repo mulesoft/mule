@@ -18,9 +18,9 @@ import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
@@ -296,7 +296,7 @@ public class MuleExtensionUtils
 
     public static MuleEvent getInitialiserEvent(MuleContext muleContext)
     {
-        return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance()), REQUEST_RESPONSE, new FlowConstruct()
+        return new DefaultMuleEvent(MuleMessage.builder().payload(NullPayload.getInstance()).build(), REQUEST_RESPONSE, new FlowConstruct()
         {
             // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
 

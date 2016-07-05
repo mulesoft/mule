@@ -8,8 +8,7 @@
 package org.mule.runtime.module.ws.consumer;
 
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -170,10 +169,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                  * of the payload of the message. This will happen when an operation required no input parameters. */
                 if (requestBody != null)
                 {
-                    event.setMessage(event.getMessage().transform(msg -> {
-                        msg.setPayload(requestBody);
-                        return msg;
-                    }));
+                    event.setMessage(MuleMessage.builder(event.getMessage()).payload(requestBody).build());
+
                 }
 
                 copyAttachmentsRequest(event);
@@ -197,10 +194,11 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                     {
                         SoapFault soapFault = (SoapFault) e.getCause();
 
-                        event.setMessage(event.getMessage().transform(msg -> {
-                            msg.setPayload(soapFault.getDetail());
-                            return msg;
-                        }));
+                        event.setMessage(MuleMessage.builder(event.getMessage()).payload(soapFault.getDetail() !=
+                                                                                         null ? soapFault.getDetail()
+                                                                                              : NullPayload
+                                                                                                 .getInstance())
+                                                 .build());
 
                         throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(),
                                                      soapFault.getMessage(), soapFault.getDetail(), this);
@@ -260,16 +258,15 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
                 List<String> outboundProperties = new ArrayList<>(event.getMessage().getOutboundPropertyNames());
 
-                event.setMessage(event.getMessage().transform(msg -> {
-                    for (String outboundProperty : outboundProperties)
+                MuleMessage.Builder builder = MuleMessage.builder(event.getMessage());
+                for (String outboundProperty : outboundProperties)
+                {
+                    if (outboundProperty.startsWith(SOAP_HEADERS_PROPERTY_PREFIX))
                     {
-                        if (outboundProperty.startsWith(SOAP_HEADERS_PROPERTY_PREFIX))
-                        {
-                            msg.removeOutboundProperty(outboundProperty);
-                        }
+                        builder.removeOutboundProperty(outboundProperty);
                     }
-                    return msg;
-                }));
+                }
+                event.setMessage(builder.build());
 
                 return super.processRequest(event);
             }
@@ -281,10 +278,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                 Object statusCode = response.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY, null);
                 if (statusCode != null && !(statusCode instanceof String))
                 {
-                    response.setMessage(response.getMessage().transform(msg -> {
-                        msg.setInboundProperty(HTTP_STATUS_PROPERTY, statusCode.toString());
-                        return msg;
-                    }));
+                    response.setMessage(MuleMessage.builder(response.getMessage()).addInboundProperty
+                            (HTTP_STATUS_PROPERTY, statusCode.toString()).build());
                 }
                 return super.processResponse(response, request);
             }
@@ -455,10 +450,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             }
             event.setFlowVariable(CxfConstants.ATTACHMENTS, attachments);
 
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.clearAttachments();
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).clearOutboundAttachments().build());
         }
     }
 
@@ -473,11 +465,12 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         if (event.getFlowVariable(CxfConstants.ATTACHMENTS) != null)
         {
             Collection<Attachment> attachments = event.getFlowVariable(CxfConstants.ATTACHMENTS);
+            MuleMessage.Builder builder = MuleMessage.builder(message);
             for (Attachment attachment : attachments)
             {
                 try
                 {
-                    ((DefaultMuleMessage)message).addInboundAttachment(attachment.getId(), attachment.getDataHandler());
+                    builder.addInboundAttachment(attachment.getId(), attachment.getDataHandler());
                 }
                 catch (Exception e)
                 {
@@ -485,8 +478,8 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                                                                                   attachment.getId()), event, e, this);
                 }
             }
+            event.setMessage(builder.build());
         }
-
 
     }
 

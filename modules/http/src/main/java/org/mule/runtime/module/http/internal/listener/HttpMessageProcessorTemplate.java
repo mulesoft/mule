@@ -12,6 +12,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.execution.AsyncResponseFlowProcessingPhaseTemplate;
@@ -160,10 +161,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
                 .setReasonPhrase(messagingException.getMessage());
         addThrottlingHeaders(failureResponseBuilder);
         MuleEvent event = messagingException.getEvent();
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setPayload(messagingException.getMessage());
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).payload(messagingException.getMessage()).build());
         final HttpResponse response = errorResponseBuilder.build(failureResponseBuilder, event);
         responseReadyCallback.responseReady(response, getResponseFailureCallback(responseCompletationCallback, messagingException.getEvent()));
     }

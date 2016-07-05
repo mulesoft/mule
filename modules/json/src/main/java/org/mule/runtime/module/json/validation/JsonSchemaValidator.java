@@ -9,21 +9,13 @@ package org.mule.runtime.module.json.validation;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.json.DefaultJsonParser;
-
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.load.Dereferencing;
@@ -34,6 +26,13 @@ import com.github.fge.jsonschema.core.load.uri.URITranslatorConfigurationBuilder
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
+
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URI;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Validates json payloads against json schemas compliant with drafts v3 and v4.
@@ -271,7 +270,7 @@ public class JsonSchemaValidator
 
             if ((input instanceof Reader) || (input instanceof InputStream))
             {
-                event.setMessage(new DefaultMuleMessage(jsonNode.toString()));
+                event.setMessage(MuleMessage.builder().payload(jsonNode.toString()).build());
             }
 
             report = schema.validate(jsonNode);

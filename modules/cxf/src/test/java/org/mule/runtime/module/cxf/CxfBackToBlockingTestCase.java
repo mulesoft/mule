@@ -11,9 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.IOUtils;
@@ -73,7 +71,7 @@ public class CxfBackToBlockingTestCase extends FunctionalTestCase
         Map<String, Serializable> props = new HashMap<>();
         props.put("Content-Type", "application/soap+xml");
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", new DefaultMuleMessage(xml, props), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", MuleMessage.builder().payload(xml).inboundProperties(props).build(), HTTP_REQUEST_OPTIONS);
         assertTrue(getPayloadAsString(result).contains("Hello!"));
         String ct = result.getInboundProperty(CONTENT_TYPE, "");
         assertEquals("text/xml; charset=UTF-8", ct);

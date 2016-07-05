@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPE
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
@@ -117,7 +116,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public <N> MuleMessage.Builder<N, ATTRIBUTES> payload(N payload)
+    public <N> Builder<N, ATTRIBUTES> payload(N payload)
     {
         requireNonNull(payload);
         this.payload = (PAYLOAD) payload;
@@ -148,7 +147,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> mediaType(MediaType mediaType)
+    public Builder<PAYLOAD, ATTRIBUTES> mediaType(MediaType mediaType)
     {
         this.dataType = DataType.<PAYLOAD>builder().mediaType(mediaType).build();
         return this;
@@ -162,49 +161,56 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> correlationId(String correlationId)
+    public Builder<PAYLOAD, ATTRIBUTES> correlationId(String correlationId)
     {
         this.correlationId = correlationId;
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> correlationSequence(Integer correlationSequence)
+    public Builder<PAYLOAD, ATTRIBUTES> correlationSequence(Integer correlationSequence)
     {
         this.correlationSequence = correlationSequence;
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> correlationGroupSize(Integer correlationGroupSize)
+    public Builder<PAYLOAD, ATTRIBUTES> correlationGroupSize(Integer correlationGroupSize)
     {
         this.correlationGroupSize = correlationGroupSize;
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> exceptionPayload(ExceptionPayload exceptionPayload)
+    public Builder<PAYLOAD, ATTRIBUTES> exceptionPayload(ExceptionPayload exceptionPayload)
     {
         this.exceptionPayload = exceptionPayload;
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> replyTo(Object replyTo)
+    public Builder<PAYLOAD, ATTRIBUTES> replyTo(Object replyTo)
     {
         this.replyTo = replyTo;
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> rootId(String rootId)
+    public Builder<PAYLOAD, ATTRIBUTES> id(String id)
+    {
+        this.id = id;
+        return this;
+    }
+
+    @Override
+    public Builder<PAYLOAD, ATTRIBUTES> rootId(String rootId)
     {
         this.rootId = rootId;
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, Serializable value)
+    public Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, Serializable value)
     {
         inboundProperties.put(key, new TypedValue(value, DataType.fromObject(value)));
         updateDataTypeWithProperty(key, value);
@@ -212,7 +218,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public <T extends Serializable> MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, MediaType mediaType)
+    public <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, MediaType mediaType)
     {
         inboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
         updateDataTypeWithProperty(key, value);
@@ -220,7 +226,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public <T extends Serializable> MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, DataType<T>
+    public <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, T value, DataType<T>
             dataType)
     {
         inboundProperties.put(key, new TypedValue(value, dataType));
@@ -229,7 +235,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, Serializable value)
+    public Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, Serializable value)
     {
         outboundProperties.put(key, new TypedValue(value, DataType.fromObject(value)));
         updateDataTypeWithProperty(key, value);
@@ -237,7 +243,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public <T extends Serializable> MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, MediaType mediaType)
+    public <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, MediaType mediaType)
     {
         outboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
         updateDataTypeWithProperty(key, value);
@@ -245,7 +251,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public <T extends Serializable> MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, DataType<T>
+    public <T extends Serializable> Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, T value, DataType<T>
             dataType)
     {
         outboundProperties.put(key, new TypedValue(value, dataType));
@@ -268,14 +274,14 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addInboundAttachment(String key, DataHandler value)
+    public Builder<PAYLOAD, ATTRIBUTES> addInboundAttachment(String key, DataHandler value)
     {
         inboundAttachments.put(key, value);
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> addOutboundAttachment(String key, DataHandler value)
+    public Builder<PAYLOAD, ATTRIBUTES> addOutboundAttachment(String key, DataHandler value)
     {
         outboundAttachments.put(key, value);
         return this;
@@ -303,32 +309,36 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> inboundProperties(Map<String, Serializable> inboundProperties)
+    public Builder<PAYLOAD, ATTRIBUTES> inboundProperties(Map<String, Serializable> inboundProperties)
     {
+        requireNonNull(inboundProperties);
         this.inboundProperties.clear();
         inboundProperties.forEach((s, serializable) -> addInboundProperty(s, serializable));
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> outboundProperties(Map<String, Serializable> outboundProperties)
+    public Builder<PAYLOAD, ATTRIBUTES> outboundProperties(Map<String, Serializable> outboundProperties)
     {
+        requireNonNull(outboundProperties);
         this.outboundProperties.clear();
         outboundProperties.forEach((s, serializable) -> addOutboundProperty(s, serializable));
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> inboundAttachments(Map<String, DataHandler> inboundAttachments)
+    public Builder<PAYLOAD, ATTRIBUTES> inboundAttachments(Map<String, DataHandler> inboundAttachments)
     {
-        this.inboundAttachments = inboundAttachments;
+        requireNonNull(inboundAttachments);
+        this.inboundAttachments = new HashMap<>(inboundAttachments);
         return this;
     }
 
     @Override
-    public MuleMessage.Builder<PAYLOAD, ATTRIBUTES> outboundAttachments(Map<String, DataHandler> outbundAttachments)
+    public Builder<PAYLOAD, ATTRIBUTES> outboundAttachments(Map<String, DataHandler> outbundAttachments)
     {
-        this.outboundAttachments = outbundAttachments;
+        requireNonNull(outbundAttachments);
+        this.outboundAttachments = new HashMap<>(outbundAttachments);
         return this;
     }
 

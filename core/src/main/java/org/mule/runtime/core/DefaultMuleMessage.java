@@ -1035,12 +1035,6 @@ public class DefaultMuleMessage implements MutableMuleMessage, ThreadSafeAccess,
         }
     }
 
-    @Override
-    public <PAYLOAD, ATTRIBUTES extends Serializable> org.mule.runtime.api.message.MuleMessage<PAYLOAD, ATTRIBUTES> asNewMessage()
-    {
-        return this;
-    }
-
     /**
      * Find property by searching outbound and then inbound scopes in order.
      * @param name name of the property to find

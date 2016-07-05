@@ -7,7 +7,6 @@
 package org.mule.runtime.module.cxf;
 
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
@@ -67,12 +66,8 @@ public class MuleInvoker implements Invoker
             {
                 Object payload = extractPayload(exchange.getInMessage());
                 Class payloadClass = payload != null ? payload.getClass() : Object.class;
-                event.setMessage(event.getMessage().transform(msg ->
-                {
-                    msg.setPayload(payload, DataType.builder().type(payloadClass).mediaType(cxfMmessageProcessor.getMimeType()).build());
-                    return msg;
-                }));
-
+                event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).mediaType
+                        (cxfMmessageProcessor.getMimeType()).build());
                 BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
                 Service svc = exchange.get(Service.class);
                 if (!cxfMmessageProcessor.isProxy())
