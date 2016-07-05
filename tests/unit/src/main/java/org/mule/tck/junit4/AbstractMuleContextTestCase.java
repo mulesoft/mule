@@ -10,7 +10,6 @@ import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingFo
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,7 +18,6 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -41,7 +39,6 @@ import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -356,26 +353,22 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * TODO MULE-9856 Replace with the builder
-     * 
      * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with a test payload
      */
     @Deprecated
-    protected MutableMuleMessage getTestMuleMessage()
+    protected MuleMessage getTestMuleMessage()
     {
         return getTestMuleMessage(TEST_PAYLOAD);
     }
 
     /**
-     * TODO MULE-9856 Replace with the builder
-     * 
      * @param message
      * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with message as payload
      */
     @Deprecated
-    protected MutableMuleMessage getTestMuleMessage(Object message)
+    protected MuleMessage getTestMuleMessage(Object message)
     {
-        return new DefaultMuleMessage(message, DataType.builder(DataType.OBJECT).charset(SystemUtils.getDefaultEncoding(muleContext)).build());
+        return MuleMessage.builder().payload(message).build();
     }
 
     public static MuleEvent getTestEvent(Object data, FlowConstruct service) throws Exception
@@ -389,6 +382,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     }
 
     public static MuleEvent getTestEvent(Object data, MuleContext muleContext) throws Exception
+    {
+        return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+    }
+
+    public static MuleEvent getTestEvent(MuleMessage data) throws Exception
     {
         return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
     }

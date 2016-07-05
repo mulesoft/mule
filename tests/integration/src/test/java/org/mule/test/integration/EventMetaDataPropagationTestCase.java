@@ -11,11 +11,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -63,34 +61,37 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
                 props.put("integerParam", 12345);
                 props.put("longParam", (long) 123456789);
                 props.put("booleanParam", Boolean.TRUE);
-                MutableMuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props);
-                msg.addOutboundAttachment("test1", new DataHandler(new DataSource()
-                {
-                    @Override
-                    public InputStream getInputStream() throws IOException
-                    {
-                        return null;
-                    }
 
-                    @Override
-                    public OutputStream getOutputStream() throws IOException
-                    {
-                        return null;
-                    }
+                return MuleMessage.builder()
+                                  .payload(context.getMessageAsString())
+                                  .outboundProperties(props)
+                                  .addOutboundAttachment("test1", new DataHandler(new DataSource()
+                                  {
+                                      @Override
+                                      public InputStream getInputStream() throws IOException
+                                      {
+                                          return null;
+                                      }
 
-                    @Override
-                    public String getContentType()
-                    {
-                        return "text/plain";
-                    }
+                                      @Override
+                                      public OutputStream getOutputStream() throws IOException
+                                      {
+                                          return null;
+                                      }
 
-                    @Override
-                    public String getName()
-                    {
-                        return "test1";
-                    }
-                }));
-                return msg;
+                                      @Override
+                                      public String getContentType()
+                                      {
+                                          return "text/plain";
+                                      }
+
+                                      @Override
+                                      public String getName()
+                                      {
+                                          return "test1";
+                                      }
+                                  }))
+                                  .build();
             }
             else
             {

@@ -24,7 +24,6 @@ import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.compatibility.core.transformer.simple.InboundAppendTransformer;
 import org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -39,9 +38,6 @@ import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.NullMessageProcessor;
 import org.mule.tck.security.TestSecurityFilter;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -245,10 +241,9 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
-        responseEvent.setMessage(responseEvent.getMessage().transform(msg -> {
-            msg.setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
-            return msg;
-        }));
+        responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage())
+                                            .exceptionPayload(new DefaultExceptionPayload(new RuntimeException()))
+                                            .build());
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
@@ -267,10 +262,9 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
-        responseEvent.setMessage(responseEvent.getMessage().transform(msg -> {
-            msg.setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
-            return msg;
-        }));
+        responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage())
+                                            .exceptionPayload(new DefaultExceptionPayload(new RuntimeException()))
+                                            .build());
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
 
@@ -355,9 +349,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
     protected MuleMessage createTestRequestMessage()
     {
-        Map<String, Serializable> props = new HashMap<>();
-        props.put("prop1", "value1");
-        return new DefaultMuleMessage(TEST_MESSAGE, props);
+        return MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build();
     }
 
     protected MuleEvent createTestRequestEvent(InboundEndpoint ep) throws Exception
@@ -369,7 +361,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
     protected MuleEvent createTestResponseEvent(InboundEndpoint ep) throws Exception
     {
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(RESPONSE_MESSAGE),
+        final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(RESPONSE_MESSAGE).build(),
                 getTestFlow(), getTestSession(null, muleContext));
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, ep);
         return event;

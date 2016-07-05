@@ -9,8 +9,7 @@ package org.mule.test.xml.functional;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -36,8 +35,7 @@ public class XsltWithParamsTransformerTestCase extends FunctionalTestCase
     {
         Transformer trans = muleContext.getRegistry().lookupTransformer("test1");
         assertNotNull(trans);
-        MutableMuleMessage message = new DefaultMuleMessage("<testing/>");
-        message.setOutboundProperty("Welcome", "hello");
+        MuleMessage message = MuleMessage.builder().payload("<testing/>").addOutboundProperty("Welcome", "hello").build();
         Object result = trans.transform(message);
         assertNotNull(result);
         XMLUnit.setIgnoreWhitespace(true);

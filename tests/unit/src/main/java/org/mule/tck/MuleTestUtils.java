@@ -7,18 +7,16 @@
 package org.mule.tck;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.component.JavaComponent;
@@ -140,6 +138,12 @@ public final class MuleTestUtils
         return getTestEvent(data, getTestFlow(context), MessageExchangePattern.REQUEST_RESPONSE, context);
     }
 
+    public static MuleEvent getTestEvent(MuleMessage message, MessageExchangePattern mep, MuleContext context)
+            throws Exception
+    {
+        return getTestEvent(message, getTestFlow(context), mep, context);
+    }
+
     public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep, MuleContext context)
             throws Exception
     {
@@ -159,15 +163,23 @@ public final class MuleTestUtils
     //    }
 
 
+    public static MuleEvent getTestEvent(MuleMessage message,
+                                         FlowConstruct flowConstruct,
+                                         MessageExchangePattern mep,
+                                         MuleContext context) throws Exception
+    {
+        final MuleSession session = getTestSession(flowConstruct, context);
+        final DefaultMuleEvent event = new DefaultMuleEvent(message, mep, flowConstruct, session);
+        return event;
+    }
+
     public static MuleEvent getTestEvent(Object data,
                                          FlowConstruct flowConstruct,
                                          MessageExchangePattern mep,
                                          MuleContext context) throws Exception
     {
         final MuleSession session = getTestSession(flowConstruct, context);
-        // TODO MULE-9856 Replace with the builder
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data,
-                DataType.builder().fromObject(data).charset(getDefaultEncoding(context)).build()), mep, flowConstruct, session);
+        final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(data).build(), mep, flowConstruct, session);
         return event;
     }
 
@@ -179,8 +191,7 @@ public final class MuleTestUtils
             throws Exception
     {
         final MuleSession session = getTestSession(flowConstruct, context);
-        // TODO MULE-9856 Replace with the builder
-        final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data), flowConstruct, session);
+        final DefaultMuleEvent event = new DefaultMuleEvent(MuleMessage.builder().payload(data).build(), flowConstruct, session);
         return event;
     }
 

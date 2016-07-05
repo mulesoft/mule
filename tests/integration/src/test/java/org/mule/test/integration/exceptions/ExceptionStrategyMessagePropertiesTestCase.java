@@ -10,9 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
@@ -53,7 +53,7 @@ public class ExceptionStrategyMessagePropertiesTestCase extends FunctionalTestCa
             {
                 for (int i = 0; i < numMessages; ++i)
                 {
-                    flowRunner("inbound").withPayload(getTestMuleMessage())
+                    flowRunner("inbound").withPayload(TEST_PAYLOAD)
                                          .withInboundProperty("foo", "bar")
                                          .asynchronously()
                                          .run();

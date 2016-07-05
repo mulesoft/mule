@@ -43,7 +43,6 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -410,7 +409,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         }
 
         @Override
-        protected MutableMuleMessage doSend(MuleEvent event) throws Exception
+        protected MuleMessage doSend(MuleEvent event) throws Exception
         {
             sensedSendEvent = event;
             sentEvent = true;

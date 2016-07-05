@@ -37,7 +37,7 @@ public class WsCustomValidatorTestCase extends FunctionalTestCase
     public void testSuccessfulAuthentication() throws Exception
     {
         ClientPasswordCallback.setPassword("secret");
-        MuleMessage received = flowRunner("cxfClient").withPayload(getTestMuleMessage("me")).run().getMessage();
+        MuleMessage received = flowRunner("cxfClient").withPayload("me").run().getMessage();
 
         assertNotNull(received);
         assertEquals("Hello me", getPayloadAsString(received));
@@ -50,6 +50,6 @@ public class WsCustomValidatorTestCase extends FunctionalTestCase
         ClientPasswordCallback.setPassword("wrongPassword");
         expectedException.expectCause(instanceOf(SOAPFaultException.class));
         expectedException.expectMessage("The security token could not be authenticated");
-        flowRunner("cxfClient").withPayload(getTestMuleMessage("hello")).run();
+        flowRunner("cxfClient").withPayload("hello").run();
     }
 }

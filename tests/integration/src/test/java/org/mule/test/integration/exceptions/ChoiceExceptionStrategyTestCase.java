@@ -10,14 +10,12 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.functional.functional.EventCallback;
-import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.sql.SQLDataException;
 
@@ -130,15 +128,11 @@ public class ChoiceExceptionStrategyTestCase extends FunctionalTestCase
     private void callAndThrowException(Object payload, final Exception exceptionToThrow, final String expectedMessage) throws Exception
     {
         FunctionalTestComponent ftc = getFunctionalTestComponent("matchesCorrectExceptionStrategyUsingExceptionType");
-        ftc.setEventCallback(new EventCallback()
+        ftc.setEventCallback((context, component) ->
         {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                throw exceptionToThrow;
-            }
+            throw exceptionToThrow;
         });
-        MuleMessage response = flowRunner("matchesCorrectExceptionStrategyUsingExceptionType").withPayload(getTestMuleMessage(payload)).run().getMessage();
+        MuleMessage response = flowRunner("matchesCorrectExceptionStrategyUsingExceptionType").withPayload(payload).run().getMessage();
         assertThat(getPayloadAsString(response), is(expectedMessage));
     }
 

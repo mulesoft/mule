@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.el.mvel;
 
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Random;
@@ -113,8 +113,7 @@ public class MVELDeepAssignPerformanceTestCase extends AbstractMuleContextTestCa
 
     protected MuleEvent createMuleEvent()
     {
-        return new DefaultMuleEvent(new DefaultMuleMessage(payload),
-            MessageExchangePattern.ONE_WAY, (Flow) null);
+        return new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), ONE_WAY, (Flow) null);
     }
 
     public static class Payload

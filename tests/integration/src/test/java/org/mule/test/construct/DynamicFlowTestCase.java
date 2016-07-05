@@ -9,7 +9,7 @@ package org.mule.test.construct;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.DynamicPipelineException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
 import java.util.ArrayList;
@@ -108,18 +107,14 @@ public class DynamicFlowTestCase extends FunctionalTestCase
     @Test
     public void exceptionOnInjectedMessageProcessor() throws Exception
     {
-        List<MessageProcessor> preList = new ArrayList<MessageProcessor>();
-        List<MessageProcessor> postList = new ArrayList<MessageProcessor>();
+        List<MessageProcessor> preList = new ArrayList<>();
+        List<MessageProcessor> postList = new ArrayList<>();
 
         Flow flow = getFlow("exceptionFlow");
         preList.add(new StringAppendTransformer("(pre)"));
-        preList.add(new MessageProcessor()
+        preList.add(event ->
         {
-            @Override
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                throw new RuntimeException("force exception!");
-            }
+            throw new RuntimeException("force exception!");
         });
         postList.add(new StringAppendTransformer("(post)"));
         flow.dynamicPipeline(null).injectBefore(preList).injectAfter(postList).resetAndUpdate();
@@ -228,7 +223,7 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             steps.append("P");
-            event.setMessage(new DefaultMuleMessage(event.getMessage().getPayload() + "(pre)", event.getMessage()));
+            event.setMessage(MuleMessage.builder().payload(event.getMessage().getPayload() + "(pre)").build());
             return event;
         }
 
@@ -260,7 +255,7 @@ public class DynamicFlowTestCase extends FunctionalTestCase
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.setMessage(new DefaultMuleMessage(event.getMessage().getPayload() + "(pre)", event.getMessage()));
+            event.setMessage(MuleMessage.builder().payload(event.getMessage().getPayload() + "(pre)").build());
             return event;
         }
 

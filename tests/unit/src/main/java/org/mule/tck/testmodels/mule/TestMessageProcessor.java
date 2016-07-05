@@ -8,6 +8,7 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NameableObject;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
@@ -35,11 +36,9 @@ public class TestMessageProcessor implements MessageProcessor, NameableObject
     {
         if (event != null && event.getMessage() != null)
         {
-            event.setMessage(event.getMessage().transform(msg ->
-            {
-                msg.setPayload(msg.getPayload() + ":" + label);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .payload(event.getMessage().getPayload() + ":" + label)
+                                        .build());
         }
         return event;
     }

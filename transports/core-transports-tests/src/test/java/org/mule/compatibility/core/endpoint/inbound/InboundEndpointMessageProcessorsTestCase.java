@@ -12,17 +12,12 @@ import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -71,9 +66,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
 
     protected MuleMessage createTestRequestMessage()
     {
-        Map<String, Serializable> props = new HashMap<>();
-        props.put("prop1", "value1");
-        return new DefaultMuleMessage(TEST_MESSAGE, props);
+        return MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build();
     }
 
     protected MuleEvent createTestRequestEvent(InboundEndpoint endpoint) throws Exception

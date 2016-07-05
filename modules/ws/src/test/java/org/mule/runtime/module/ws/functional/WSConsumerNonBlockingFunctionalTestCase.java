@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
@@ -80,9 +81,9 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
     }
 
     @Override
-    protected void assertValidResponse(String address, Map<String, Serializable> properties) throws Exception
+    protected void assertValidResponse(String address, Object payload, Map<String, Serializable> properties) throws Exception
     {
-        MuleMessage request = MuleMessage.builder().payload(ECHO_REQUEST).inboundProperties(properties).build();
+        MuleMessage request = MuleMessage.builder().payload(payload).inboundProperties(properties).build();
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
         assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));

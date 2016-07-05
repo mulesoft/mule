@@ -8,11 +8,12 @@ package org.mule.runtime.core;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.junit.ContiPerfRule;
@@ -33,8 +34,8 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
     private MuleContext muleContext;
 
     private String payload;
-    // TODO MULE-9856 Replace with the builder
-    private MutableMuleMessage message;
+
+    private MuleMessage message;
 
     @Override
     public int getTestTimeoutSecs()
@@ -55,7 +56,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         MuleMessage original = createMuleMessage();
         for (int i = 0; i < 1000; i++)
         {
-            message = new DefaultMuleMessage(original);
+            message = MuleMessage.builder(original).build();
         }
     }
 
@@ -66,7 +67,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         MuleMessage original = createMuleMessageWithProperties(10);
         for (int i = 0; i < 1000; i++)
         {
-            message = new DefaultMuleMessage(original);
+            message = MuleMessage.builder(original).build();
         }
     }
 
@@ -77,7 +78,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         MuleMessage original = createMuleMessageWithProperties(50);
         for (int i = 0; i < 1000; i++)
         {
-            message = new DefaultMuleMessage(original);
+            message = MuleMessage.builder(original).build();
         }
     }
 
@@ -88,8 +89,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         MuleMessage original = createMuleMessageWithProperties(10);
         for (int i = 0; i < 1000; i++)
         {
-            message = new DefaultMuleMessage(original);
-            message.setOutboundProperty("newKey", "val");
+            message = MuleMessage.builder(original).addOutboundProperty("newKey", "val").build();
         }
     }
 
@@ -100,11 +100,12 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         MuleMessage original = createMuleMessageWithProperties(10);
         for (int i = 0; i < 1000; i++)
         {
-            message = new DefaultMuleMessage(original);
+            final Builder builder = MuleMessage.builder(original);
             for (int j = 1; j <= 10; j++)
             {
-                message.setOutboundProperty("newKey" + i, "val");
+                builder.addOutboundProperty("newKey" + i, "val");
             }
+            message = builder.build();
         }
     }
 
@@ -115,8 +116,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         MuleMessage original = createMuleMessageWithProperties(50);
         for (int i = 0; i < 1000; i++)
         {
-            message = new DefaultMuleMessage(original);
-            message.setOutboundProperty("newKey", "val");
+            message = MuleMessage.builder(original).addOutboundProperty("newKey", "val").build();
         }
     }
 
@@ -127,31 +127,32 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
         MuleMessage original = createMuleMessageWithProperties(50);
         for (int i = 0; i < 1000; i++)
         {
-            message = new DefaultMuleMessage(original);
+            final Builder builder = MuleMessage.builder(original);
             for (int j = 1; j <= 50; j++)
             {
-                message.setOutboundProperty("newKey" + i, "val");
+                builder.addOutboundProperty("newKey" + i, "val");
             }
+            message = builder.build();
         }
     }
 
-    protected MutableMuleMessage createMuleMessage()
+    protected MuleMessage createMuleMessage()
     {
-        return new DefaultMuleMessage(payload);
+        return MuleMessage.builder().payload(payload).build();
     }
 
     protected MuleMessage createMuleMessageWithProperties(int numProperties)
     {
-        MutableMuleMessage message = createMuleMessage();
+        final Builder<String, Serializable> builder = MuleMessage.builder().payload(payload);
         for (int i = 1; i <= numProperties; i++)
         {
-            message.setOutboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");
+            builder.addOutboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");
         }
         for (int i = 1; i <= numProperties; i++)
         {
-            message.setOutboundProperty("OuTBoUnDpRoPeRtYkEy" + i, "val");
+            builder.addOutboundProperty("OuTBoUnDpRoPeRtYkEy" + i, "val");
         }
-        return message;
+        return builder.build();
     }
 
 }

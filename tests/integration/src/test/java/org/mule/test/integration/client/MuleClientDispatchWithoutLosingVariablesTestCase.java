@@ -8,15 +8,15 @@ package org.mule.test.integration.client;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import org.mule.runtime.core.DefaultMuleMessage;
+
+import org.mule.functional.functional.FlowAssert;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.functional.functional.FlowAssert;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.ClassRule;
@@ -95,7 +95,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            event.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload"));
+            event.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
             return event;
 
         }
@@ -106,7 +106,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), new DefaultMuleMessage("payload"));
+            eventContext.getMuleContext().getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
             return eventContext.getMessage();
         }
     }
@@ -116,7 +116,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends Functional
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            eventContext.sendEvent(new DefaultMuleMessage("payload"), getUrl("innerrequestresponsetest"));
+            eventContext.sendEvent(MuleMessage.builder().payload("payload").build(), getUrl("innerrequestresponsetest"));
             return eventContext.getMessage();
         }
     }

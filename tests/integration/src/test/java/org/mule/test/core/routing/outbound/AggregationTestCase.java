@@ -129,7 +129,7 @@ public class AggregationTestCase extends FunctionalTestCase
                 fc = event.getFlowConstruct();
             }
 
-            MuleMessage msg = new DefaultMuleMessage(eventList);
+            MuleMessage msg = MuleMessage.builder().payload(eventList).build();
             return new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, fc);
         }
     }

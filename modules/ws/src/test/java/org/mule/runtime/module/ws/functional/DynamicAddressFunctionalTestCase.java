@@ -7,11 +7,7 @@
 package org.mule.runtime.module.ws.functional;
 
 
-import org.mule.runtime.core.api.MuleMessage;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import static java.util.Collections.singletonMap;
 
 import org.junit.Test;
 
@@ -27,35 +23,31 @@ public class DynamicAddressFunctionalTestCase extends AbstractWSConsumerFunction
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedInboundProperty() throws Exception
     {
-        Map<String, Serializable> properties = new HashMap<>();
-        properties.put("pathInboundProperty", "services/Test");
-        assertValidResponse("clientInboundProperty", MuleMessage.builder().payload(ECHO_REQUEST).inboundProperties(properties).build());
+        assertValidResponse("clientInboundProperty", ECHO_REQUEST, singletonMap("pathInboundProperty", "services/Test"));
     }
 
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedOutboundProperty() throws Exception
     {
-        assertValidResponse("clientOutboundProperty", new HashMap<>());
+        assertValidResponse("clientOutboundProperty");
     }
 
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedFlowVar() throws Exception
     {
-        assertValidResponse("clientFlowVar", new HashMap<>());
+        assertValidResponse("clientFlowVar");
     }
 
     @Test
     public void returnsExpectedResponseWhenValidPathIsProvidedSessionVar() throws Exception
     {
-        assertValidResponse("clientSessionVar", new HashMap<>());
+        assertValidResponse("clientSessionVar");
     }
 
     @Test
     public void failsWhenInvalidPathIsProvided() throws Exception
     {
-        Map<String, Serializable> properties = new HashMap<>();
-        properties.put("clientInboundProperty", "invalid");
-        assertSoapFault("clientInboundProperty", ECHO_REQUEST, properties, "Client");
+        assertSoapFault("clientInboundProperty", ECHO_REQUEST, singletonMap("clientInboundProperty", "invalid"), "Client");
     }
 
     @Test

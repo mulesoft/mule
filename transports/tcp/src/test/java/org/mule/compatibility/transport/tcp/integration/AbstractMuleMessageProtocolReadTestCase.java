@@ -7,6 +7,7 @@
 package org.mule.compatibility.transport.tcp.integration;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.transport.tcp.TcpProtocol;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -36,7 +37,7 @@ public abstract class AbstractMuleMessageProtocolReadTestCase extends Functional
     public void testServer() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        safeProtocolSend("localhost", port.getNumber(), getTestMuleMessage(TEST_MESSAGE));
+        safeProtocolSend("localhost", port.getNumber(), MuleMessage.builder().payload(TEST_MESSAGE).build());
         MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT);
         assertEquals(TEST_MESSAGE, response.getPayload());
     }
@@ -49,7 +50,7 @@ public abstract class AbstractMuleMessageProtocolReadTestCase extends Functional
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         WireFormat wireFormat = new SerializedMuleMessageWireFormat();
         wireFormat.setMuleContext(muleContext);
-        wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().get());
+        wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
         TcpProtocol delegate = createMuleMessageProtocol();
         delegate.write(outToServer, baos.toByteArray());
         clientSocket.close();

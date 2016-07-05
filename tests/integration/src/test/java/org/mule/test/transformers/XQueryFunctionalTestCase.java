@@ -9,10 +9,10 @@ package org.mule.test.transformers;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.DefaultMuleMessage;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.Serializable;
@@ -48,8 +48,7 @@ public class XQueryFunctionalTestCase extends FunctionalTestCase
         props.put("ListRating", new Integer(6));
 
         //Invoke the service
-        final MuleMessage muleMessage = new DefaultMuleMessage(srcData, props, null, null);
-        final MuleEvent muleEvent = flowRunner("Echo").withPayload(muleMessage).run();
+        final MuleEvent muleEvent = flowRunner("Echo").withPayload(srcData).withInboundProperties(props).run();
 
         MuleMessage message = muleEvent.getMessage();
         assertNotNull(message);

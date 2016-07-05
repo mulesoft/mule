@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core;
 
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -87,10 +90,9 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
         {
             event = (DefaultMuleEvent) event.newThreadCopy();
             event.setFlowVariable("newKey", "val");
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setOutboundProperty("newKey", "val");
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .addOutboundProperty("newKey", "val")
+                                        .build());
         }
     }
 
@@ -105,11 +107,9 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
             for (int j = 1; j <= 5; j++)
             {
                 event.setFlowVariable("newKey" + j, "val");
-                int finalJ = j;
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setOutboundProperty("newKey" + finalJ, "val");
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage())
+                                            .addOutboundProperty("newKey" + j, "val")
+                                            .build());
             }
         }
     }
@@ -123,10 +123,9 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
         {
             event = (DefaultMuleEvent) original.newThreadCopy();
             event.setFlowVariable("newKey", "val");
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setOutboundProperty("newKey", "val");
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .addOutboundProperty("newKey", "val")
+                                        .build());
         }
     }
 
@@ -141,19 +140,16 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
             for (int j = 1; j <= 25; j++)
             {
                 event.setFlowVariable("newKey" + j, "val");
-                int finalJ = j;
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setOutboundProperty("newKey" + finalJ, "val");
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage())
+                                            .addOutboundProperty("newKey" + j, "val")
+                                            .build());
             }
         }
     }
 
     protected DefaultMuleEvent createMuleEvent() throws Exception
     {
-        return new DefaultMuleEvent(new DefaultMuleMessage(payload),
-            MessageExchangePattern.ONE_WAY, flow);
+        return new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), ONE_WAY, flow);
     }
 
     protected DefaultMuleEvent createMuleEventWithFlowVarsAndProperties(int numProperties) throws Exception
@@ -162,11 +158,9 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
         for (int i = 1; i <= numProperties; i++)
         {
             event.setFlowVariable("InBoUnDpRoPeRtYkEy" + i, "val");
-            int finalI = i;
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setOutboundProperty("InBoUnDpRoPeRtYkEy" + finalI, "val");
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .addOutboundProperty("InBoUnDpRoPeRtYkEy" + i, "val")
+                                        .build());
         }
         return event;
     }

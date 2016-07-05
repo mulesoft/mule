@@ -9,9 +9,10 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -79,7 +80,7 @@ public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
         {
             Object payloadBeforeException = event.getMessage().getPayload();
             MuleEvent resultEvent = super.handleException(e, event);
-            resultEvent.setMessage(new DefaultMuleMessage(payloadBeforeException, event.getMessage()));
+            resultEvent.setMessage(MuleMessage.builder(event.getMessage()).payload(payloadBeforeException).build());
             return resultEvent;
         }
     }

@@ -6,7 +6,6 @@
  */
 package org.mule.test.usecases.properties;
 
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
@@ -24,6 +23,7 @@ public class PropsComponent implements Callable
 
     protected static Apple testObjectProperty = new Apple();
 
+    @Override
     public Object onCall(MuleEventContext context) throws Exception
     {
         logger.debug("org.mule.test.usecases.props.PropsComponent");
@@ -34,7 +34,7 @@ public class PropsComponent implements Callable
             Map props = new HashMap();
             props.put("stringParam", "param1");
             props.put("objectParam", testObjectProperty);
-            MuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props);
+            MuleMessage msg = MuleMessage.builder().payload(context.getMessageAsString()).outboundProperties(props).build();
             logger.debug("Adding done: " + context.getFlowConstruct().getName());
             return msg;
         }

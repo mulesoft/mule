@@ -20,16 +20,12 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.listener.ExceptionListener;
 import org.mule.functional.listener.SystemExceptionListener;
 import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCase
 {
@@ -112,8 +108,7 @@ public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCas
     @Test
     public void transactionCommitFailureTriggersExceptionStrategyUsingFilter() throws Exception
     {
-        MutableMuleMessage muleMessage = getTestMuleMessage();
-        muleMessage.setOutboundProperty("filterMessage", true);
+        final MuleMessage muleMessage = MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("filterMessage", true).build();
         transactionCommitFailureExecutesExceptionStrategy(muleMessage);
     }
 
@@ -142,60 +137,40 @@ public class CatchExceptionStrategyTransactionTestCase extends FunctionalTestCas
     private EventCallback replaceTransactionWithMock(final EventCallback processEventCallback) throws Exception
     {
         when(mockTransaction.supports(anyObject(), anyObject())).thenReturn(true);
-        doAnswer(new Answer()
+        doAnswer(invocationOnMock ->
         {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                TransactionCoordination.getInstance().unbindTransaction(mockTransaction);
-                throw new RuntimeException();
-            }
+            TransactionCoordination.getInstance().unbindTransaction(mockTransaction);
+            throw new RuntimeException();
         }).when(mockTransaction).commit();
-        return new EventCallback()
+        return (context, component) ->
         {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                context.getCurrentTransaction().rollback();
-                TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-                processEventCallback.eventReceived(context, component);
-            }
+            context.getCurrentTransaction().rollback();
+            TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+            processEventCallback.eventReceived(context, component);
         };
     }
 
     private EventCallback replaceTransactionWithMock() throws Exception
     {
-        return replaceTransactionWithMock(new EventCallback()
+        return replaceTransactionWithMock((context, component) ->
         {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                //Do nothing
-            }
+            //Do nothing
         });
     }
 
     private EventCallback replaceTransactionWithMockAndFailComponent() throws Exception
     {
-        return replaceTransactionWithMock(new EventCallback()
+        return replaceTransactionWithMock((context, component) ->
         {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                throw new RuntimeException();
-            }
+            throw new RuntimeException();
         });
     }
 
     private EventCallback getFailureCallback()
     {
-        return new EventCallback()
+        return (context, component) ->
         {
-            @Override
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
-                throw new RuntimeException();
-            }
+            throw new RuntimeException();
         };
     }
 

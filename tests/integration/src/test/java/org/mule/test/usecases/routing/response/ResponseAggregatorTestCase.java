@@ -14,17 +14,16 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
+import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -62,10 +61,10 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
         try
         {
             MuleEvent event = getTestEvent("message1");
-            final MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
-            final String id = message.getUniqueId();
-            message.setCorrelationId(id);
-            message.setCorrelationGroupSize(1);
+            final MuleMessage message = MuleMessage.builder(event.getMessage())
+                                                   .correlationId(event.getMessage().getUniqueId())
+                                                   .correlationGroupSize(1)
+                                                   .build();
 
             SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
             mp.setListener(listener);
@@ -89,7 +88,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
     {
         private RelaxedAsyncReplyMP() throws MuleException
         {
-            store = new SimpleMemoryObjectStore<Serializable>();
+            store = new SimpleMemoryObjectStore<>();
             name = "asyncReply";
             start();
         }

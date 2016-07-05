@@ -48,6 +48,20 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
     }
 
     /**
+     * Prepares the given data to be sent as the mediaType of the payload of the {@link MuleEvent} to the configured
+     * flow.
+     *
+     * @param mediaType the mediaType to use in the message
+     * @return this {@link FlowRunner}
+     */
+    public R withMediaType(MediaType mediaType)
+    {
+        eventBuilder.withMediaType(mediaType);
+
+        return (R) this;
+    }
+
+    /**
      * Prepares the given data to be sent as the attributes of the {@link MuleEvent} to the configured flow.
      *
      * @param attributes the message attributes

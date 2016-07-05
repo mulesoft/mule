@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -18,6 +19,7 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -38,10 +40,9 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointT
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
         MuleEvent event = getTestEvent("test", getTestInboundEndpoint("test1"));
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty("port", 12345);
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .addOutboundProperty("port", 12345)
+                                    .build());
 
         MuleEvent response = endpoint.process(event);
 
@@ -75,11 +76,10 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointT
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
         MuleEvent event = getTestEvent("test", getTestInboundEndpoint("test1"));
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty("port", 12345);
-            msg.setOutboundProperty("host", "localhost");
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .addOutboundProperty("port", 12345)
+                                    .addOutboundProperty("host", "localhost")
+                                    .build());
 
         MuleEvent response = endpoint.process(event);
         assertSame(VoidMuleEvent.getInstance(), response);
@@ -90,11 +90,10 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleContextEndpointT
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
         event = getTestEvent("test", getTestInboundEndpoint("test1"));
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty("port", 12345);
-            msg.setOutboundProperty("host", "localhost");
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage())
+                                    .addOutboundProperty("port", 12345)
+                                    .addOutboundProperty("host", "localhost")
+                                    .build());
 
         response = endpoint.process(event);
         assertNotNull(response);

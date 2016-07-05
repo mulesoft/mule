@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
@@ -97,7 +96,7 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
         props.put("foo", "moo");
         props.put("bar", "mar");
 
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props);
+        MuleMessage message = MuleMessage.builder().payload(new FruitBowl(new Apple(), new Banana())).outboundProperties(props).build();
 
         Object result = transformer.transform(message);
         assertNotNull(result);
@@ -121,7 +120,7 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
         Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "moo");
 
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props);
+        MuleMessage message = MuleMessage.builder().payload(new FruitBowl(new Apple(), new Banana())).outboundProperties(props).build();
 
         Object result = transformer.transform(message);
         assertNotNull(result);
@@ -145,7 +144,7 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
         props.put("foo", "moo");
         props.put("bar", "mar");
 
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props);
+        MuleMessage message = MuleMessage.builder().payload(new FruitBowl(new Apple(), new Banana())).outboundProperties(props).build();
 
         Object result = transformer.transform(message);
         assertNotNull(result);
@@ -170,7 +169,7 @@ public class ExpressionTransformerELTestCase extends FunctionalTestCase
         props.put("foo", "moo");
         props.put("bar", "mar");
 
-        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props);
+        MuleMessage message = MuleMessage.builder().payload(new FruitBowl(new Apple(), new Banana())).outboundProperties(props).build();
 
         Object result = transformer.transform(message);
         assertNotNull(result);

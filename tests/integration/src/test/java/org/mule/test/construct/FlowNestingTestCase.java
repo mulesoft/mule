@@ -9,10 +9,10 @@ package org.mule.test.construct;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import org.mule.runtime.core.DefaultMuleMessage;
+
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -42,11 +42,9 @@ public class FlowNestingTestCase extends FunctionalTestCase
         inboundProperties.put("Currency", "MyCurrency");
         inboundProperties.put("AcquirerCountry", "MyCountry");
         inboundProperties.put("Amount", "4999");
-        MuleMessage request = new DefaultMuleMessage(new Orange(), inboundProperties, null, null);
+        flowRunner("NestedFilters").withPayload(new Orange()).withInboundProperties(inboundProperties).asynchronously().run();
 
         MuleClient client = muleContext.getClient();
-        
-        flowRunner("NestedFilters").withPayload(request).asynchronously().run();
         MuleMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT);
         assertNotNull(result);
     }
@@ -58,11 +56,9 @@ public class FlowNestingTestCase extends FunctionalTestCase
         inboundProperties.put("Currency", "MyCurrency");
         inboundProperties.put("AcquirerCountry", "MyCountry");
         inboundProperties.put("Amount", "4999");
-        MuleMessage request = new DefaultMuleMessage(new Apple(), inboundProperties, null, null);
-               
+        flowRunner("NestedFilters").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+
         MuleClient client = muleContext.getClient();
-        
-        flowRunner("NestedFilters").withPayload(request).asynchronously().run();
         MuleMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT);
         assertNull(result);
     }
@@ -73,11 +69,9 @@ public class FlowNestingTestCase extends FunctionalTestCase
         Map<String, Serializable> inboundProperties = new HashMap<>();
         inboundProperties.put("AcquirerCountry", "MyCountry");
         inboundProperties.put("Amount", "4999");
-        MuleMessage request = new DefaultMuleMessage(new Apple(), inboundProperties, null, null);
-               
+        flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+
         MuleClient client = muleContext.getClient();
-        
-        flowRunner("NestedChoice").withPayload(request).asynchronously().run();
         MuleMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT);
         assertNotNull(result);
         assertEquals("ABC", getPayloadAsString(result));
@@ -89,11 +83,9 @@ public class FlowNestingTestCase extends FunctionalTestCase
         Map<String, Serializable> inboundProperties = new HashMap<>();
         inboundProperties.put("AcquirerCountry", "MyCountry");
         inboundProperties.put("Amount", "5000");
-        MuleMessage request = new DefaultMuleMessage(new Apple(), inboundProperties, null, null);
-               
+        flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).asynchronously().run();
+
         MuleClient client = muleContext.getClient();
-        
-        flowRunner("NestedChoice").withPayload(request).asynchronously().run();
         MuleMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT);
         assertNotNull(result);
         assertEquals("AB", getPayloadAsString(result));

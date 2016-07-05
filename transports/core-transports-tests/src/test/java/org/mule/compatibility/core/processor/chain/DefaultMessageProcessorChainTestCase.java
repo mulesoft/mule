@@ -17,7 +17,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -45,8 +44,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -123,14 +120,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
                 withSettings().extraInterfaces(OutboundEndpoint.class));
         OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
         when(outboundEndpoint.getExchangePattern()).thenReturn(MessageExchangePattern.ONE_WAY);
-        when(outboundEndpoint.mayReturnVoidEvent()).thenAnswer(new Answer<Boolean>()
+        when(outboundEndpoint.mayReturnVoidEvent()).thenAnswer(invocation ->
         {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable
-            {
-                MessageExchangePattern exchangePattern = ((OutboundEndpoint) invocation.getMock()).getExchangePattern();
-                return exchangePattern == null ? true : !exchangePattern.hasResponse();
-            }
+            MessageExchangePattern exchangePattern = ((OutboundEndpoint) invocation.getMock()).getExchangePattern();
+            return exchangePattern == null ? true : !exchangePattern.hasResponse();
         });
         when(mp.process(any(MuleEvent.class))).thenReturn(VoidMuleEvent.getInstance());
 
@@ -145,7 +138,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
     protected MuleEvent getTestEventUsingFlow(Object data) throws Exception
     {
         MuleEvent event = mock(MuleEvent.class);
-        MuleMessage message = new DefaultMuleMessage(data);
+        MuleMessage message = MuleMessage.builder().payload(data).build();
         when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
         when(event.getMessage()).thenReturn(message);
         when(event.getExchangePattern()).thenReturn(exchangePattern);

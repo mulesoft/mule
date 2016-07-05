@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.cxf;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -71,7 +73,8 @@ public class DatabindingTestCase extends FunctionalTestCase
 
     private void doTest(String service) throws Exception
     {
-        MuleMessage result = muleContext.getClient().send(String.format("http://localhost:%d/services/%s?wsdl", dynamicPort.getNumber(), service), getTestMuleMessage(null), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = muleContext.getClient()
+                                        .send(format("http://localhost:%d/services/%s?wsdl", dynamicPort.getNumber(), service), getTestMuleMessage(NullPayload.getInstance()), HTTP_REQUEST_OPTIONS);
         assertNotNull(result.getPayload());
     }
 }

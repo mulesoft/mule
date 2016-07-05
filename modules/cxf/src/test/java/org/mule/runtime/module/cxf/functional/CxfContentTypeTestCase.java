@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -53,7 +54,7 @@ public class CxfContentTypeTestCase extends FunctionalTestCase
     @Test
     public void testCxfClient() throws Exception
     {
-        MuleMessage received = flowRunner("helloServiceClient").withPayload(getTestMuleMessage("hello")).run().getMessage();
+        MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
         String contentType = received.getOutboundProperty("contentType");
         assertNotNull(contentType);
         assertTrue(contentType.contains("charset"));

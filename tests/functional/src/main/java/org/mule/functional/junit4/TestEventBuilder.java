@@ -10,20 +10,20 @@ import static java.util.Objects.requireNonNull;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -43,6 +43,7 @@ public class TestEventBuilder
 {
 
     private Object payload = NullPayload.getInstance();
+    private MediaType mediaType = MediaType.ANY;
     private Serializable attributes;
     private Map<String, Serializable> inboundProperties = new HashMap<>();
     private Map<String, Serializable> outboundProperties = new HashMap<>();
@@ -70,6 +71,21 @@ public class TestEventBuilder
     {
         requireNonNull(payload);
         this.payload = payload;
+
+        return this;
+    }
+
+
+    /**
+     * Prepares the given data to be sent as the mediaType of the payload of the {@link MuleEvent} to the configured
+     * flow.
+     *
+     * @param mediaType the mediaType to use in the message
+     * @return this {@link FlowRunner}
+     */
+    public TestEventBuilder withMediaType(MediaType mediaType)
+    {
+        this.mediaType = mediaType;
 
         return this;
     }
@@ -264,16 +280,21 @@ public class TestEventBuilder
      */
     public MuleEvent build(MuleContext muleContext, FlowConstruct flow)
     {
-        final DefaultMuleMessage muleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments,
-                DataType.builder().fromObject(payload).charset(getDefaultEncoding(muleContext)).build());
-        DefaultMuleEvent event = new DefaultMuleEvent(
-                (DefaultMuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern, flow, new DefaultMuleSession(),
-                muleContext.getConfiguration().getDefaultResponseTimeout(), null, null, transacted, null, replyToHandler);
-
+        final Builder messageBuilder = MuleMessage.builder()
+                                                  .payload(payload)
+                                                  .mediaType(mediaType)
+                                                  .inboundProperties(inboundProperties)
+                                                  .outboundProperties(outboundProperties)
+                                                  .inboundAttachments(inboundAttachments);
         if (attributes != null)
         {
-            ((DefaultMuleMessage) event.getMessage()).setAttributes(attributes);
+            messageBuilder.attributes(attributes);
         }
+        final MuleMessage muleMessage = messageBuilder.build();
+
+        DefaultMuleEvent event = new DefaultMuleEvent(
+                (MuleMessage) spyTransformer.transform(muleMessage), URI.create("none"), "none", exchangePattern, flow, new DefaultMuleSession(),
+                muleContext.getConfiguration().getDefaultResponseTimeout(), null, null, transacted, null, replyToHandler);
 
         for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet())
         {
@@ -311,17 +332,9 @@ public class TestEventBuilder
         @Override
         public void addOutboundTo(MuleEvent event, String key)
         {
-            event.setMessage(event.getMessage().transform(msg -> {
-                try
-                {
-                    msg.addOutboundAttachment(key, dataHandler);
-                }
-                catch (Exception e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                        .addOutboundAttachment(key, dataHandler)
+                                        .build());
         }
     }
 
@@ -340,17 +353,16 @@ public class TestEventBuilder
         @Override
         public void addOutboundTo(MuleEvent event, String key)
         {
-            event.setMessage(event.getMessage().transform(msg -> {
-                try
-                {
-                    msg.addOutboundAttachment(key, object, contentType);
-                }
-                catch (Exception e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-                return msg;
-            }));
+            try
+            {
+                event.setMessage(MuleMessage.builder(event.getMessage())
+                                            .addOutboundAttachment(key, IOUtils.toDataHandler(key, object, contentType))
+                                            .build());
+            }
+            catch (Exception e)
+            {
+                throw new MuleRuntimeException(e);
+            }
         }
     }
 }
