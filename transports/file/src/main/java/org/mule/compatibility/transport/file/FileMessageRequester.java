@@ -9,11 +9,11 @@ package org.mule.compatibility.transport.file;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
+import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -82,7 +82,7 @@ public class FileMessageRequester extends AbstractMessageRequester
      * @throws Exception
      */
     @Override
-    protected MutableMuleMessage doRequest(long timeout) throws Exception
+    protected MuleMessage doRequest(long timeout) throws Exception
     {
         File file = FileUtils.newFile(endpoint.getEndpointURI().getAddress());
         File result = null;
@@ -160,7 +160,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                     destinationFile = FileUtils.newFile(movDir, destinationFileName);
                 }
 
-                MutableMuleMessage returnMessage = null;
+                MuleMessage returnMessage = null;
                 Charset encoding = endpoint.getEncoding();
                 try
                 {
@@ -182,8 +182,11 @@ public class FileMessageRequester extends AbstractMessageRequester
                     logger.error("File being read disappeared!", e);
                     return null;
                 }
-                returnMessage.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
-                returnMessage.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
+
+                returnMessage = MuleMessage.builder(returnMessage)
+                        .addInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName)
+                        .addInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory)
+                        .build();
 
                 if (!fileConnector.isStreaming())
                 {
@@ -202,9 +205,10 @@ public class FileMessageRequester extends AbstractMessageRequester
     {
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
-        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null);
-        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalFileName);
-        fileParserMessasge.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalDirectory);
+        MuleMessage fileParserMessasge = MuleMessage.builder().payload(NullPayload.getInstance())
+                .addInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalFileName)
+                .addInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalDirectory)
+                .build();
 
         final DefaultMuleEvent event = new DefaultMuleEvent(fileParserMessasge, (FlowConstruct) null);
 

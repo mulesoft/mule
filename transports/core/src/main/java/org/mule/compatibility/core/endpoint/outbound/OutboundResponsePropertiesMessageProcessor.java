@@ -9,6 +9,7 @@ package org.mule.compatibility.core.endpoint.outbound;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 
 import java.io.Serializable;
@@ -44,11 +45,7 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractRequestR
                 Serializable propertyValue = request.getMessage().getOutboundProperty(propertyName);
                 if (propertyValue != null)
                 {
-                    response.setMessage(response.getMessage().transform(msg -> {
-                        msg.setOutboundProperty(propertyName, propertyValue);
-                        return msg;
-                    }));
-
+                    response.setMessage(MuleMessage.builder(response.getMessage()).addOutboundProperty(propertyName, propertyValue).build());
                 }
             }
         }

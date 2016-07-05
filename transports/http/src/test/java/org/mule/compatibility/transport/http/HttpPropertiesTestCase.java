@@ -8,6 +8,10 @@ package org.mule.compatibility.transport.http;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -17,11 +21,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class HttpPropertiesTestCase extends FunctionalTestCase
 {
@@ -50,7 +49,10 @@ public class HttpPropertiesTestCase extends FunctionalTestCase
         Map<String, Serializable> properties = new HashMap<>();
         properties.put("Content-Type","application/x-www-form-urlencoded");
 
-        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/client", new DefaultMuleMessage("name=John&lastname=Galt", properties));
+        MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/resources/client", MuleMessage.builder()
+                .payload("name=John&lastname=Galt")
+                .inboundProperties(properties)
+                .build());
 
         assertNotNull(response);
         assertEquals("client", response.getInboundProperty("http.relative.path"));

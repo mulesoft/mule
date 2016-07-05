@@ -10,9 +10,8 @@ import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.H
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -109,7 +108,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit
         {
             // we've got an out of band WS-RM message or a message from a standalone client
             MuleContext muleContext = configuration.getMuleContext();
-            MuleMessage muleMsg = new DefaultMuleMessage(handler);
+            MuleMessage muleMsg = MuleMessage.builder().payload(handler).build();
 
             String url = setupURL(message);
 
@@ -126,10 +125,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit
         }
         else
         {
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setPayload(handler, DataType.XML_STRING);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).payload(handler).mediaType(MediaType.XML).build());
         }
 
         if (!decoupled)
@@ -162,10 +158,9 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit
     {
         try
         {
-            reqEvent.setMessage(reqEvent.getMessage().transform(msg -> {
-                msg.setOutboundProperty(HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
-                return msg;
-            }));
+            reqEvent.setMessage(MuleMessage.builder(reqEvent.getMessage())
+                                        .addOutboundProperty(HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString())
+                                        .build());
 
             if (reqEvent.isAllowNonBlocking())
             {

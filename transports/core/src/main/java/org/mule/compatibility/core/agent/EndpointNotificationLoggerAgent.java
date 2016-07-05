@@ -9,7 +9,6 @@ package org.mule.compatibility.core.agent;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.agent.AbstractNotificationLoggerAgent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -125,7 +124,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                 // is being used for notifications then ignore.
                 return;
             }
-            MuleMessage msg = new DefaultMuleMessage(e);
+            MuleMessage msg = MuleMessage.builder().payload(e).build();
             try
             {
                 //TODO: Filters should really be applied by the endpoint

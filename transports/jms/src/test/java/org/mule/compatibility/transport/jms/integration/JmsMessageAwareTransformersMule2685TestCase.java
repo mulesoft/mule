@@ -9,17 +9,12 @@ package org.mule.compatibility.transport.jms.integration;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import org.mockito.internal.matchers.InstanceOf;
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
@@ -28,8 +23,6 @@ import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.hamcrest.core.IsInstanceOf;
-import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,12 +102,13 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
         @Override
         public Object transformMessage(MuleEvent event, Charset outputEncoding)
         {
-            MutableMuleMessage message = (MutableMuleMessage) event.getMessage();
-
             String recipients = "vm://recipient1, vm://recipient1, vm://recipient3";
             logger.debug("Setting recipients to '" + recipients + "'");
-            message.setOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY, recipients);
-            return message;
+
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                     .addOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY, recipients)
+                                     .build());
+            return event.getMessage();
         }
 
     }

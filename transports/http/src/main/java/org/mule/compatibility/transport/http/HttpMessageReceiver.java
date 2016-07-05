@@ -6,13 +6,14 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_NOT_ACCEPTABLE;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.core.transport.TransportMessageProcessContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -106,7 +107,7 @@ public class HttpMessageReceiver extends AbstractMessageReceiver
     }
 
     @Override
-    protected MuleMessage handleUnacceptedFilter(MutableMuleMessage message)
+    protected MuleMessage handleUnacceptedFilter(MuleMessage message)
     {
         if (logger.isDebugEnabled())
         {
@@ -115,8 +116,7 @@ public class HttpMessageReceiver extends AbstractMessageReceiver
                          + "' is being rejected since it does not match the filter on this endpoint: "
                          + endpoint);
         }
-        message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(HttpConstants.SC_NOT_ACCEPTABLE));
-        return message;
+        return MuleMessage.builder(message).addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(SC_NOT_ACCEPTABLE)).build();
     }
 
     public List<Transformer> getResponseTransportTransformers()

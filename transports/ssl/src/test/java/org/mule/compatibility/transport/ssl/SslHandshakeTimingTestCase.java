@@ -12,11 +12,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -45,7 +42,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
         // run into a timeout
         try
         {
-            MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
+            MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
             callPreRoute(receiver, message);
             fail();
         }
@@ -61,9 +58,9 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
     {
         SslMessageReceiver receiver = setupMockSslMessageReciever();
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
         receiver.handshakeCompleted(new MockHandshakeCompletedEvent());
-        callPreRoute(receiver, message);
+        message = callPreRoute(receiver, message);
 
         assertNotNull(message.getOutboundProperty(SslConnector.PEER_CERTIFICATES));
         assertNotNull(message.getOutboundProperty(SslConnector.LOCAL_CERTIFICATES));
@@ -85,12 +82,12 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
         return new SslMessageReceiver(connector, mock(Flow.class), endpoint);
     }
 
-    private void callPreRoute(SslMessageReceiver receiver, MuleMessage message) throws Exception
+    private MuleMessage callPreRoute(SslMessageReceiver receiver, MuleMessage message) throws Exception
     {
-        Method preRouteMessage = receiver.getClass().getDeclaredMethod("preRoute", MutableMuleMessage.class);
+        Method preRouteMessage = receiver.getClass().getDeclaredMethod("preRoute", MuleMessage.class);
         assertNotNull(preRouteMessage);
         preRouteMessage.setAccessible(true);
 
-        preRouteMessage.invoke(receiver, new Object[] { message });
+        return (MuleMessage) preRouteMessage.invoke(receiver, new Object[] { message });
     }
 }

@@ -43,10 +43,7 @@ public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageP
             }
             if (contentType == null)
             {
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setInboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType.toString());
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage()).addInboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType.toString()).build());
             }
             else
             {

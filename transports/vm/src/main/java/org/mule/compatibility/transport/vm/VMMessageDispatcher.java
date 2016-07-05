@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -79,7 +78,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
-    protected MutableMuleMessage doSend(final MuleEvent event) throws Exception
+    protected MuleMessage doSend(final MuleEvent event) throws Exception
     {
         MuleMessage retMessage;
         final VMMessageReceiver receiver = connector.getReceiver(endpoint.getEndpointURI());
@@ -105,7 +104,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 
         ExecutionTemplate<MuleMessage> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(
                 event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
-        ExecutionCallback<MuleMessage> processingCallback = () -> receiver.onCall((MutableMuleMessage) message);
+        ExecutionCallback<MuleMessage> processingCallback = () -> receiver.onCall(message);
         retMessage = executionTemplate.execute(processingCallback);
 
         if (logger.isDebugEnabled())
@@ -126,7 +125,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
                 }
             });
         }
-        return (MutableMuleMessage) retMessage;
+        return retMessage;
     }
 
     @Override

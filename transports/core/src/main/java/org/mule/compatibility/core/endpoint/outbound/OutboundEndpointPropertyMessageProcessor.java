@@ -38,25 +38,24 @@ public class OutboundEndpointPropertyMessageProcessor implements MessageProcesso
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(MULE_ENDPOINT_PROPERTY, endpoint.getEndpointURI().toString());
+        MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage())
+                .addOutboundProperty(MULE_ENDPOINT_PROPERTY, endpoint.getEndpointURI().toString());
 
-            if (endpoint.getProperties() != null)
+        if (endpoint.getProperties() != null)
+        {
+            for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
             {
-                for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
+                String prop = (String) iterator.next();
+                Serializable value = endpoint.getProperties().get(prop);
+                // don't overwrite property on the message
+                if (!ignoreProperty(event.getMessage(), prop))
                 {
-                    String prop = (String) iterator.next();
-                    Serializable value = endpoint.getProperties().get(prop);
-                    // don't overwrite property on the message
-                    if (!ignoreProperty(msg, prop))
-                    {
-                        // inbound endpoint properties are in the invocation scope
-                        msg.setOutboundProperty(prop, value);
-                    }
+                    // inbound endpoint properties are in the invocation scope
+                    messageBuilder.addOutboundProperty(prop, value);
                 }
             }
-            return msg;
-        }));
+        }
+        event.setMessage(messageBuilder.build());
         event = OptimizedRequestContext.unsafeSetEvent(event);
         return event;
     }

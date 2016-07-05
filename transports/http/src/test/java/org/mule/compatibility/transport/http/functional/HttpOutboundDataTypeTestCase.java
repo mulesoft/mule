@@ -13,10 +13,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -42,8 +40,8 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST_MESSAGE);
-        muleMessage.setOutboundProperty(CONTENT_TYPE_PROPERTY, MediaType.TEXT + "; charset=" + UTF_16.name());
+        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty(
+        CONTENT_TYPE_PROPERTY, MediaType.TEXT + "; charset=" + UTF_16.name()).build();
 
         client.dispatch("vm://testInput", muleMessage);
 

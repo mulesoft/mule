@@ -10,9 +10,8 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -65,7 +64,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
-    protected synchronized MutableMuleMessage doSend(MuleEvent event) throws Exception
+    protected synchronized MuleMessage doSend(MuleEvent event) throws Exception
     {
         Socket socket = connector.getSocket(endpoint);
         doDispatchToSocket(socket, event);
@@ -78,12 +77,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
                     if (result == null)
                     {
-                        return new DefaultMuleMessage(NullPayload.getInstance());
+                        return MuleMessage.builder().payload(NullPayload.getInstance()).build();
                     }
                     
-                    if (result instanceof MutableMuleMessage)
+                    if (result instanceof MuleMessage)
                     {
-                        return (MutableMuleMessage) result;
+                        return (MuleMessage) result;
                     }
                     
                     return createMuleMessage(result, endpoint.getEncoding());
@@ -93,12 +92,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     // we don't necessarily expect to receive a response here
                     logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
                         + endpoint.getEndpointURI());
-                    return new DefaultMuleMessage(NullPayload.getInstance());
+                    return MuleMessage.builder().payload(NullPayload.getInstance()).build();
                 }
             }
             else
             {
-                return new DefaultMuleMessage(NullPayload.getInstance());
+                return MuleMessage.builder().payload(NullPayload.getInstance()).build();
             }
         }
         finally

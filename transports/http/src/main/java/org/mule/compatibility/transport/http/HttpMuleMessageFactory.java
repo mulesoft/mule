@@ -7,13 +7,11 @@
 package org.mule.compatibility.transport.http;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
@@ -119,7 +117,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected MutableMuleMessage addProperties(MutableMuleMessage message, Object transportMessage) throws Exception
+    protected void addProperties(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception
     {
         String method;
         HttpVersion httpVersion;
@@ -179,13 +177,13 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             headers.put(HttpConnector.HTTP_STATUS_PROPERTY, statusCode);
         }
 
-        message.addInboundProperties(headers);
-        message.addInboundProperties(httpHeaders);
-        message.addInboundProperties(queryParameters);
+        headers.forEach((k, v) -> messageBuilder.addInboundProperty(k, v));
+        httpHeaders.forEach((k, v) -> messageBuilder.addInboundProperty(k, v));
+        queryParameters.forEach((k, v) -> messageBuilder.addInboundProperty(k, v));
 
         // The encoding is stored as message property. To avoid overriding it from the message
         // properties, it must be initialized last
-        return initEncoding(message, encoding);
+        initEncoding(messageBuilder, encoding);
     }
 
     protected Map<String, Serializable> processIncomingHeaders(Map<String, Serializable> headers) throws Exception
@@ -311,13 +309,9 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         return encoding;
     }
     
-    private MutableMuleMessage initEncoding(MutableMuleMessage message, Charset encoding)
+    private MuleMessage.Builder initEncoding(MuleMessage.Builder messageBuilder, Charset encoding)
     {
-        return (MutableMuleMessage) message.transform(msg ->
-        {
-            ((DefaultMuleMessage) msg).setDataType(DataType.builder(msg.getDataType()).charset(encoding).build());
-            return msg;
-        });
+        return messageBuilder.mediaType(MediaType.ANY.withCharset(encoding));
     }
 
     private void rewriteConnectionAndKeepAliveHeaders(Map<String, Serializable> headers)

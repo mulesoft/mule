@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILENAME;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_DIRECTORY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_FILENAME;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_DIRECTORY;
@@ -19,12 +20,11 @@ import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
@@ -297,9 +297,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
-        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(NullPayload.getInstance());
-        fileParserMessasge.setInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
-        fileParserMessasge.setInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
+        MuleMessage fileParserMessasge = MuleMessage.builder()
+                .payload(NullPayload.getInstance())
+                .addInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName)
+                .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory)
+                .build();
 
         final DefaultMuleEvent event = new DefaultMuleEvent(fileParserMessasge, flowConstruct);
 
@@ -332,18 +334,18 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             destinationFile = FileUtils.newFile(moveDir, destinationFileName);
         }
 
-        MutableMuleMessage message = null;
+        MuleMessage.Builder messageBuilder = null;
         Charset encoding = endpoint.getEncoding();
         try
         {
             if (fileConnector.isStreaming())
             {
                 ReceiverFileInputStream payload = createReceiverFileInputStream(sourceFile, destinationFile, file1 -> removeProcessingMark(file1.getAbsolutePath()));
-                message = createMuleMessage(payload, encoding);
+                messageBuilder = MuleMessage.builder(createMuleMessage(payload, encoding));
             }
             else
             {
-                message = createMuleMessage(sourceFile, encoding);
+                messageBuilder = MuleMessage.builder(createMuleMessage(sourceFile, encoding));
             }
         }
         catch (FileNotFoundException e)
@@ -355,26 +357,26 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         if (workDir != null)
         {
-            message.setInboundProperty(PROPERTY_SOURCE_DIRECTORY, file.getParent());
-            message.setInboundProperty(PROPERTY_SOURCE_FILENAME, file.getName());
+            messageBuilder.addInboundProperty(PROPERTY_SOURCE_DIRECTORY, file.getParent());
+            messageBuilder.addInboundProperty(PROPERTY_SOURCE_FILENAME, file.getName());
         }
 
-        message.setInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
-        message.setInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+        messageBuilder.addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
+        messageBuilder.addInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
 
         // TODO
-        message.setOutboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
-        message.setOutboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
+        messageBuilder.addOutboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
+        messageBuilder.addOutboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
 
         if (forceSync)
         {
-            message.setInboundProperty(MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE);
+            messageBuilder.addInboundProperty(MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE);
         }
 
-        final Object originalPayload = message.getPayload();
-
         ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
-        final MutableMuleMessage finalMessage = message;
+        final MuleMessage finalMessage = messageBuilder.build();
+        final Object originalPayload = finalMessage.getPayload();
+
 
         if (fileConnector.isStreaming())
         {
@@ -429,7 +431,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final String originalSourceDirectory, final File sourceFile,final File destinationFile, ExecutionTemplate<MuleEvent> executionTemplate, final MutableMuleMessage finalMessage) throws DefaultMuleException
+    private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName, final String originalSourceDirectory, final File sourceFile,final File destinationFile, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage) throws DefaultMuleException
     {
         try
         {
@@ -462,7 +464,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    private void processWithStreaming(final File sourceFile, final ReceiverFileInputStream originalPayload, ExecutionTemplate<MuleEvent> executionTemplate, final MutableMuleMessage finalMessage)
+    private void processWithStreaming(final File sourceFile, final ReceiverFileInputStream originalPayload, ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage)
     {
         try
         {
@@ -473,8 +475,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 {
                     // If we are streaming no need to move/delete now, that will be done when
                     // stream is closed
-                    finalMessage.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
-                    FileMessageReceiver.this.routeMessage(finalMessage);
+                    routeMessage(MuleMessage.builder(finalMessage).addOutboundProperty(PROPERTY_FILENAME, sourceFile.getName()).build());
                 }
                 catch (Exception e)
                 {
@@ -543,7 +544,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     private void moveAndDelete(final File sourceFile, File destinationFile,
-                               String originalSourceFileName, String originalSourceDirectory, MutableMuleMessage message) throws MuleException
+                               String originalSourceFileName, String originalSourceDirectory, MuleMessage message) throws MuleException
     {
         // If we are moving the file to a read directory, move it there now and
         // hand over a reference to the
@@ -563,10 +564,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             }
 
             // create new Message for destinationFile
-            message = createMuleMessage(destinationFile, endpoint.getEncoding());
-            message.setInboundProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
-            message.setInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
-            message.setInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
+            message = MuleMessage.builder(createMuleMessage(destinationFile, endpoint.getEncoding()))
+                    .addInboundProperty(PROPERTY_FILENAME, destinationFile.getName())
+                    .addInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName)
+                    .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory)
+                    .build();
         }
 
         // finally deliver the file message

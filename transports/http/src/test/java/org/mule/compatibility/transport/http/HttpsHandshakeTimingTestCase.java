@@ -10,12 +10,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.transport.ssl.MockHandshakeCompletedEvent;
 import org.mule.compatibility.transport.ssl.MockSslSocket;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -54,7 +52,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
         MockSslSocket socket = new MockSslSocket();
         HttpMessageProcessTemplate messageProcessTemplate = messageReceiver.createMessageProcessTemplate(new HttpServerConnection(socket, messageReceiver.getEndpoint().getEncoding(), (HttpConnector) messageReceiver.getConnector()));
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
         messageProcessTemplate.beforeRouteEvent(getTestEvent(message));
     }
 
@@ -70,7 +68,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
 
         invokeHandshakeCompleted(serverConnection, socket);
 
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE);
+        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
         messageContext.acquireMessage();
         serverConnection.readRequest();
         MuleEvent muleEvent = messageContext.beforeRouteEvent(getTestEvent(message));

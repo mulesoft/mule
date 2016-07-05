@@ -42,7 +42,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.connector.Connectable;
@@ -2193,20 +2192,21 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     }
 
     @Override
-    public MutableMuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception
+    public MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception
     {
         MessageRequester requester = null;
-        MutableMuleMessage result = null;
+        MuleMessage result = null;
 
         try
         {
             requester = this.getRequester(endpoint);
             result = requester.request(timeout);
-            return result;
+            return setupRequestReturn(endpoint, requester, result);
         }
-        finally
+        catch (Exception e)
         {
             setupRequestReturn(endpoint, requester, result);
+            throw e;
         }
     }
 
@@ -2219,9 +2219,9 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
      * @param requester
      * @param result
      */
-    protected void setupRequestReturn(final InboundEndpoint endpoint,
+    protected MuleMessage setupRequestReturn(final InboundEndpoint endpoint,
                                       final MessageRequester requester,
-                                      MutableMuleMessage result)
+                                      MuleMessage result)
     {
         if (result != null && result.getPayload() instanceof InputStream)
         {
@@ -2240,12 +2240,12 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                     }
                 }
             };
-            result.setPayload(is, result.getDataType());
+            return MuleMessage.builder(result).payload(is).mediaType(result.getDataType().getMediaType()).build();
         }
         else
         {
-
-            this.returnRequester(endpoint, requester);
+            returnRequester(endpoint, requester);
+            return result;
         }
     }
 

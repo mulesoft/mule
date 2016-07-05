@@ -8,7 +8,6 @@ package org.mule.tck;
 
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.MuleTestUtils.getTestSession;
-
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;

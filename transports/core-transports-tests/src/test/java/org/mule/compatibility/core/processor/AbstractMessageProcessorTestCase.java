@@ -60,7 +60,6 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     protected static MuleMessage responseMessage;
     protected Answer<MuleEvent> echoEventAnswer = invocation -> (MuleEvent) invocation.getArguments()[0];
 
-
     @Override
     protected void doSetUp() throws Exception
     {
@@ -323,11 +322,10 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         public MuleEvent handleException(Exception exception, MuleEvent event)
         {
             sensedException = exception;
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setPayload(NullPayload.getInstance());
-                msg.setExceptionPayload(new DefaultExceptionPayload(exception));
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage())
+                                     .payload(NullPayload.getInstance())
+                                     .exceptionPayload(new DefaultExceptionPayload(exception))
+                                     .build());
             return event;
         }
     }

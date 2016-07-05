@@ -7,7 +7,6 @@
 package org.mule.compatibility.core.endpoint.inbound;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;

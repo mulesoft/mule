@@ -40,10 +40,9 @@ public class OutboundEndpointMimeTypeCheckingMessageProcessor implements Message
             String contentType = message.getOutboundProperty(CONTENT_TYPE_PROPERTY);
             if (contentType == null)
             {
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setOutboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType.toString());
-                    return msg;
-                }));
+                event.setMessage(MuleMessage.builder(event.getMessage())
+                                         .addOutboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType.toString())
+                                         .build());
             }
             else
             {

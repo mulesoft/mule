@@ -274,11 +274,9 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
 
         testOutboundEvent = createTestOutboundEvent();
-        testOutboundEvent.setMessage(testOutboundEvent.getMessage().transform(msg ->
-        {
-            msg.setOutboundProperty(MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
-            return msg;
-        }));
+        testOutboundEvent.setMessage(MuleMessage.builder(testOutboundEvent.getMessage())
+                                             .addOutboundProperty(MULE_EVENT_TIMEOUT_PROPERTY, testTimeout)
+                                             .build());
 
         MuleEvent response = endpoint.process(testOutboundEvent);
 

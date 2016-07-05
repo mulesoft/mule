@@ -6,9 +6,12 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_DIRECTORY;
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILE_SIZE;
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILE_TIMESTAMP;
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_FILENAME;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 
 import java.io.File;
 import java.io.InputStream;
@@ -39,12 +42,11 @@ public class FileMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected MutableMuleMessage addProperties(MutableMuleMessage message, Object transportMessage) throws Exception
+    protected void addProperties(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception
     {
-        message = super.addProperties(message, transportMessage);
+        super.addProperties(messageBuilder, transportMessage);
         File file = convertToFile(transportMessage);
-        setPropertiesFromFile(message, file);
-        return message;
+        setPropertiesFromFile(messageBuilder, file);
     }
 
     @Override
@@ -71,11 +73,11 @@ public class FileMuleMessageFactory extends AbstractMuleMessageFactory
         return file;
     }
 
-    protected void setPropertiesFromFile(MutableMuleMessage message, File file)
+    protected void setPropertiesFromFile(MuleMessage.Builder messageBuilder, File file)
     {
-        message.setInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
-        message.setInboundProperty(FileConnector.PROPERTY_DIRECTORY, file.getParent());
-        message.setInboundProperty(FileConnector.PROPERTY_FILE_SIZE, file.length());
-        message.setInboundProperty(FileConnector.PROPERTY_FILE_TIMESTAMP, file.lastModified());
+        messageBuilder.addInboundProperty(PROPERTY_ORIGINAL_FILENAME, file.getName());
+        messageBuilder.addInboundProperty(PROPERTY_DIRECTORY, file.getParent());
+        messageBuilder.addInboundProperty(PROPERTY_FILE_SIZE, file.length());
+        messageBuilder.addInboundProperty(PROPERTY_FILE_TIMESTAMP, file.lastModified());
     }
 }

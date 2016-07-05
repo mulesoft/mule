@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.ArrayList;
@@ -38,18 +38,15 @@ public class VMRequestorTestCase extends FunctionalTestCase
 
         MuleClient client = muleContext.getClient();
         List<String> results = new ArrayList<String>();
-        MutableMuleMessage result = null;
+        MuleMessage result = null;
         for (int i = 0; i < 10; i++)
         {
-            result = (MutableMuleMessage) client.request("vm://out", 3000L);
+            result = client.request("vm://out", 3000L);
             assertNotNull(result);
             results.add(getPayloadAsString(result));
         }
 
         assertEquals(10, results.size());
-
-        //This would fail if the owner thread info was not updated
-        result.setOutboundProperty("foo", "bar");
     }
 
     protected void makeClientRequest(final String message) throws MuleException

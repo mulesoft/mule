@@ -10,9 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.Serializable;
@@ -28,7 +27,7 @@ import org.junit.Test;
 public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpointTestCase
 {
     private ExpressionFilenameParser parser;
-    private MutableMuleMessage message;
+    private MuleMessage message;
     private MuleEvent event;
 
     @Override
@@ -44,8 +43,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpoin
         Map<String, Serializable> inboundProperties = new HashMap<>();
         inboundProperties.put(FileConnector.PROPERTY_ORIGINAL_FILENAME, "originalName");
         inboundProperties.put(FileConnector.PROPERTY_FILENAME, "newName");
-        message = new DefaultMuleMessage("hello", inboundProperties, null, null);
-        message.setOutboundProperty("foo", "bar");
+        message = MuleMessage.builder().payload("hello").inboundProperties(inboundProperties).addOutboundProperty("foo", "bar").build();
         event = new DefaultMuleEvent(message, getTestFlow());
     }
 

@@ -10,7 +10,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.tcp.i18n.TcpMessages;
-import org.mule.runtime.core.DefaultMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.util.MapUtils;
@@ -69,7 +69,7 @@ public class PollingTcpMessageReceiver extends AbstractPollingMessageReceiver
             Object result = TcpMessageDispatcher.receiveFromSocket(socket, timeout, endpoint);
             if (!(result == null))
             {
-                this.routeMessage(new DefaultMuleMessage(result));
+                this.routeMessage(MuleMessage.builder().payload(result).build());
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Routing new message: " + result);

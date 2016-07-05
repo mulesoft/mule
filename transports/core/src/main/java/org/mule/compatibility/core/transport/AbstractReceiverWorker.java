@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -115,8 +114,8 @@ public abstract class AbstractReceiverWorker implements Work
                         Object preProcessedPayload = preProcessMessage(payload);
                         if (preProcessedPayload != null)
                         {
-                            final MutableMuleMessage muleMessage = receiver.createMuleMessage(preProcessedPayload, endpoint.getEncoding());
-                            preRouteMuleMessage(muleMessage);
+                            MuleMessage muleMessage = receiver.createMuleMessage(preProcessedPayload, endpoint.getEncoding());
+                            muleMessage = preRouteMuleMessage(muleMessage);
                             // TODO Move getSessionHandler() to the Connector interface
                             SessionHandler handler;
                             if (endpoint.getConnector() instanceof AbstractConnector)
@@ -202,9 +201,10 @@ public abstract class AbstractReceiverWorker implements Work
      * @param message the next message to be processed
      * @throws Exception
      */
-    protected void preRouteMuleMessage(MutableMuleMessage message) throws Exception
+    protected MuleMessage preRouteMuleMessage(MuleMessage message) throws Exception
     {
         //no op
+        return  message;
     }
 
     /**

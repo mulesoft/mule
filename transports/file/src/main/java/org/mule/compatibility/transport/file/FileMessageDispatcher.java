@@ -8,18 +8,15 @@ package org.mule.compatibility.transport.file;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILENAME;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
@@ -53,18 +50,17 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     {
         Object data = event.getMessage().getPayload();
         // Wrap the transformed message before passing it to the filename parser
-        MuleMessage message = new DefaultMuleMessage(data, event.getMessage());
+        MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage()).payload(data);
 
         FileOutputStream fos = (FileOutputStream) connector.getOutputStream(getEndpoint(), event);
         try
         {
             if (event.getMessage().getOutboundProperty(PROPERTY_FILENAME) == null)
             {
-                event.setMessage(event.getMessage().transform(msg -> {
-                    msg.setOutboundProperty(PROPERTY_FILENAME, message.getOutboundProperty(PROPERTY_FILENAME, EMPTY));
-                    return msg;
-                }));
+                messageBuilder.addOutboundProperty(PROPERTY_FILENAME, event.getMessage().getOutboundProperty(PROPERTY_FILENAME, EMPTY));
             }
+            event.setMessage(messageBuilder.build());
+
 
             if (data instanceof byte[])
             {
@@ -164,10 +160,10 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
-    protected MutableMuleMessage doSend(MuleEvent event) throws Exception
+    protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return new DefaultMuleMessage(NullPayload.getInstance());
+        return MuleMessage.builder().payload(NullPayload.getInstance()).build();
     }
 
     @Override

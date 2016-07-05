@@ -14,6 +14,7 @@ import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.WorkManager;
 
 public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate
@@ -41,17 +42,16 @@ public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate
             throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(),
                                          muleEvent, e);
         }
-        muleEvent.setMessage(muleEvent.getMessage().transform(msg -> {
-            if (getHttpServerConnection().getPeerCertificateChain() != null)
-            {
-                msg.setOutboundProperty(PEER_CERTIFICATES, getHttpServerConnection().getPeerCertificateChain());
-            }
-            if (getHttpServerConnection().getLocalCertificateChain() != null)
-            {
-                msg.setOutboundProperty(LOCAL_CERTIFICATES, getHttpServerConnection().getLocalCertificateChain());
-            }
-            return msg;
-        }));
+        MuleMessage.Builder messageBuilder = MuleMessage.builder(muleEvent.getMessage());
+        if (getHttpServerConnection().getPeerCertificateChain() != null)
+        {
+            messageBuilder.addOutboundProperty(PEER_CERTIFICATES, getHttpServerConnection().getPeerCertificateChain());
+        }
+        if (getHttpServerConnection().getLocalCertificateChain() != null)
+        {
+            messageBuilder.addOutboundProperty(LOCAL_CERTIFICATES, getHttpServerConnection().getLocalCertificateChain());
+        }
+        muleEvent.setMessage(messageBuilder.build());
 
         super.beforeRouteEvent(muleEvent);
         return muleEvent;

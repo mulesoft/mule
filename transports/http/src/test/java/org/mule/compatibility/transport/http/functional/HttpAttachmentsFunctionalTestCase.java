@@ -8,14 +8,11 @@ package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.message.ds.StringDataSource;
@@ -58,8 +55,10 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase
         });
 
         MuleClient client = muleContext.getClient();
-        MutableMuleMessage msg = new DefaultMuleMessage("test");
-        msg.addOutboundAttachment("attach1", new DataHandler(new StringDataSource("foo", "attach1")));
+        MuleMessage msg = MuleMessage.builder()
+                .payload("test")
+                .addOutboundAttachment("attach1", new DataHandler(new StringDataSource("foo", "attach1")))
+                .build();
 
         MuleMessage result = client.send("endpoint1", msg);
         assertEquals("We should have no attachments coming back", 0, result.getInboundAttachmentNames().size());

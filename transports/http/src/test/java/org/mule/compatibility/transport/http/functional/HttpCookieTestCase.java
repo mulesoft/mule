@@ -13,7 +13,6 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpRequest;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -93,7 +92,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
         outboundProperties.put("cookies", (Serializable) cookiesObject);
 
         MuleClient client = muleContext.getClient();
-        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, outboundProperties);
+        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(outboundProperties).build();
 
         client.dispatch("vm://vm-in", message);
 

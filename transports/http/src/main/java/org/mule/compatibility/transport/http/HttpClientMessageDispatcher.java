@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -203,8 +202,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         // here is ok even though it is not ideal.
         client.getHttpConnectionManager().getParams().setSoTimeout(endpoint.getResponseTimeout());
 
-        MutableMuleMessage msg = (MutableMuleMessage) event.getMessage();
-        setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+        setPropertyFromEndpoint(event, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+        MuleMessage msg = event.getMessage();
 
         HttpMethod httpMethod;
         Object body = event.getMessage().getPayload();
@@ -229,15 +228,15 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return httpMethod;
     }
 
-    protected void setPropertyFromEndpoint(MuleEvent event, MutableMuleMessage msg, String prop)
+    protected void setPropertyFromEndpoint(MuleEvent event, String prop)
     {
-        Serializable o = msg.getOutboundProperty(prop);
+        Serializable o = event.getMessage().getOutboundProperty(prop);
         if (o == null)
         {
             o = endpoint.getProperty(prop);
             if (o != null)
             {
-                msg.setOutboundProperty(prop, o);
+                event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(prop, o).build());
             }
         }
     }
@@ -272,7 +271,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     }
 
     @Override
-    protected MutableMuleMessage doSend(MuleEvent event) throws Exception
+    protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
         httpConnector.setupClientAuthorization(event, httpMethod, client, endpoint);
@@ -323,7 +322,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected MutableMuleMessage handleRedirect(HttpMethod method, MuleEvent event) throws HttpResponseException, MuleException, IOException
+    protected MuleMessage handleRedirect(HttpMethod method, MuleEvent event) throws HttpResponseException, MuleException, IOException
     {
         String followRedirects = (String)endpoint.getProperty("followRedirects");
         if (followRedirects==null || "false".equalsIgnoreCase(followRedirects))
@@ -344,7 +343,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         MuleEvent result = out.process(event);
         if (result != null && !VoidMuleEvent.getInstance().equals(result))
         {
-            return (MutableMuleMessage) result.getMessage();
+            return result.getMessage();
         }
         else
         {
@@ -352,18 +351,17 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected MutableMuleMessage getResponseFromMethod(HttpMethod httpMethod, ExceptionPayload ep)
+    protected MuleMessage getResponseFromMethod(HttpMethod httpMethod, ExceptionPayload ep)
         throws IOException, MuleException
     {
-        MutableMuleMessage message = createMuleMessage(httpMethod);
+        MuleMessage message = createMuleMessage(httpMethod);
 
         if (logger.isDebugEnabled())
         {
             logger.debug("Http response is: " + message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         }
 
-        message.setExceptionPayload(ep);
-        return message;
+        return MuleMessage.builder(message).exceptionPayload(ep).build();
     }
 
     /**

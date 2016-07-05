@@ -6,9 +6,9 @@
  */
 package org.mule.compatibility.transport.jms;
 
+import static org.mule.compatibility.transport.jms.JmsConstants.JMS_REPLY_TO;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.io.Serializable;
@@ -42,26 +42,24 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     @Override
-    protected MutableMuleMessage addProperties(MutableMuleMessage muleMessage, Object transportMessage) throws Exception
+    protected void addProperties(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception
     {        
         Message jmsMessage = (Message) transportMessage;
         
         Map<String, Serializable> messageProperties = new HashMap<>();
-        addCorrelationProperties(jmsMessage, muleMessage, messageProperties);
         addDeliveryModeProperty(jmsMessage, messageProperties);
         addExpirationProperty(jmsMessage, messageProperties);
         addMessageIdProperty(jmsMessage, messageProperties);
         addPriorityProperty(jmsMessage, messageProperties);
         addRedeliveredProperty(jmsMessage, messageProperties);
-        addJMSReplyTo(muleMessage, jmsMessage);
+        addJMSReplyTo(messageBuilder, jmsMessage);
         addTimestampProperty(jmsMessage, messageProperties);
         addTypeProperty(jmsMessage, messageProperties);
-
         propagateJMSProperties(jmsMessage, messageProperties);
-        
-        muleMessage.addInboundProperties(messageProperties);
 
-        return muleMessage;
+        addCorrelationProperties(jmsMessage, messageBuilder);
+
+        messageProperties.forEach((k, v) -> messageBuilder.addInboundProperty(k, v));
     }
 
     protected void propagateJMSProperties(Message jmsMessage, Map<String, Serializable> messageProperties)
@@ -129,7 +127,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
-    protected void addJMSReplyTo(MutableMuleMessage muleMessage, Message jmsMessage)
+    protected void addJMSReplyTo(MuleMessage.Builder messageBuilder, Message jmsMessage)
     {
         try
         {
@@ -140,10 +138,10 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
                 {
                     logger.warn("ReplyTo " + replyTo + " is not serializable and will not be propagated by Mule");
                 }
-                muleMessage.setOutboundProperty(JmsConstants.JMS_REPLY_TO, (Serializable) replyTo);
+                messageBuilder.addOutboundProperty(JMS_REPLY_TO, (Serializable) replyTo);
             }
 
-            muleMessage.setReplyTo(replyTo);
+            messageBuilder.replyTo(replyTo);
         }
         catch (JMSException e)
         {
@@ -220,18 +218,17 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
-    protected void addCorrelationProperties(Message jmsMessage, MuleMessage muleMessage, 
-        Map<String, Serializable> messageProperties)
+    protected void addCorrelationProperties(Message jmsMessage, MuleMessage.Builder messageBuilder)
     {
         try
         {
             String value = jmsMessage.getJMSCorrelationID();
             if (value != null)
             {
-                messageProperties.put(JmsConstants.JMS_CORRELATION_ID, value);
+                messageBuilder.addInboundProperty(JmsConstants.JMS_CORRELATION_ID, value);
                 // this property is used my getCorrelationId in MuleMessage, but we want
                 // it on the INBOUND scoped properties so don't use setCorrelationId
-                messageProperties.put(MuleProperties.MULE_CORRELATION_ID_PROPERTY, value);
+                messageBuilder.correlationId(value);
             }
         }
         catch (JMSException e)

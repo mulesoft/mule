@@ -12,7 +12,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -50,7 +49,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         Map<String, Serializable> properties = new HashMap<>();
         properties.put("errorMessage", "ERROR !!!! ");
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties);
+        MuleMessage muleMessage = MuleMessage.builder().payload(HTTP_BODY).outboundProperties(properties).build();
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/error", muleMessage);
         assertTrue(getPayloadAsString(response).contains("ERROR !!!!"));
         assertEquals("" + HttpConstants.SC_INTERNAL_SERVER_ERROR, response.getInboundProperty("http.status"));
@@ -91,7 +90,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         Map<String, Serializable> properties = populateProperties();
 
-        DefaultMuleMessage muleMessage = new DefaultMuleMessage(HTTP_BODY, properties);
+        MuleMessage muleMessage = MuleMessage.builder().payload(HTTP_BODY).outboundProperties(properties).build();
         MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/allExpressions",  muleMessage);
         assertEquals("" + HttpConstants.SC_NOT_FOUND, response.getInboundProperty("http.status"));
         assertEquals("max-age=3600", response.getInboundProperty("Cache-Control"));

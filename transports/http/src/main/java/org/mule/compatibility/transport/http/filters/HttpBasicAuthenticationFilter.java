@@ -10,6 +10,7 @@ import static org.mule.compatibility.transport.http.HttpConnector.HTTP_PARAMS_PR
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_AUTHORIZATION;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityException;
@@ -74,9 +75,6 @@ public class HttpBasicAuthenticationFilter extends org.mule.runtime.module.http.
         String token = auth.getCredentials().toString();
         header.append(new String(Base64.encodeBase64(token.getBytes())));
 
-        event.setMessage(event.getMessage().transform(msg -> {
-            msg.setOutboundProperty(HEADER_AUTHORIZATION, header.toString());
-            return msg;
-        }));
+        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HEADER_AUTHORIZATION, header.toString()).build());
     }
 }

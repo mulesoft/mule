@@ -212,7 +212,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     @Override
     public Builder<PAYLOAD, ATTRIBUTES> addInboundProperty(String key, Serializable value)
     {
-        inboundProperties.put(key, new TypedValue(value, DataType.fromObject(value)));
+        inboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
         updateDataTypeWithProperty(key, value);
         return this;
     }
@@ -237,7 +237,7 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     @Override
     public Builder<PAYLOAD, ATTRIBUTES> addOutboundProperty(String key, Serializable value)
     {
-        outboundProperties.put(key, new TypedValue(value, DataType.fromObject(value)));
+        outboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
         updateDataTypeWithProperty(key, value);
         return this;
     }
@@ -256,6 +256,13 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     {
         outboundProperties.put(key, new TypedValue(value, dataType));
         updateDataTypeWithProperty(key, value);
+        return this;
+    }
+
+    @Override
+    public Builder<PAYLOAD, ATTRIBUTES> removeInboundProperty(String key)
+    {
+        inboundProperties.remove(key);
         return this;
     }
 

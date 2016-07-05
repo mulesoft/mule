@@ -6,9 +6,7 @@
  */
 package org.mule.compatibility.core.api.transport;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 
 import java.nio.charset.Charset;
 
@@ -26,13 +24,12 @@ public interface MuleMessageFactory
      * Creates a {@link MuleMessage} instance from <code>transportMessage</code> by extracting
      * its payload and, if available, any relevant message properties and attachments.
      */
-    MutableMuleMessage create(Object transportMessage, Charset encoding) throws Exception;
+    MuleMessage create(Object transportMessage, Charset encoding) throws Exception;
 
     /**
      * Creates a {@link MuleMessage} instance by extracting the payload from
      * <code>transportMessage</code>. Additional message properties will be taken from
      * <code>previousMessage</code>.
      */
-    MutableMuleMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding)
-            throws Exception;
+    MuleMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding) throws Exception;
 }

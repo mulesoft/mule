@@ -11,10 +11,8 @@ import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MutableMuleMessage;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.nio.charset.Charset;
@@ -31,23 +29,23 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
     }
 
     @Override
-    public MutableMuleMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding) throws Exception
+    public MuleMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding) throws Exception
     {
         return doCreate(transportMessage, previousMessage, encoding);
     }
 
     @Override
-    public MutableMuleMessage create(Object transportMessage, Charset encoding) throws Exception
+    public MuleMessage create(Object transportMessage, Charset encoding) throws Exception
     {
         return doCreate(transportMessage, null, encoding);
     }
 
-    private MutableMuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, Charset encoding)
+    private MuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, Charset encoding)
             throws Exception
     {
         if (transportMessage == null)
         {
-            return new DefaultMuleMessage(NullPayload.getInstance());
+            return MuleMessage.builder().payload(NullPayload.getInstance()).build();
         }
 
         if (!isTransportMessageTypeSupported(transportMessage))
@@ -63,19 +61,28 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
             dataTypeBuilder = dataTypeBuilder.mediaType(mimeType);
         }
         final DataType dataType = dataTypeBuilder.build();
-        MutableMuleMessage message;
+        MuleMessage.Builder messageBuilder;
         if (previousMessage != null)
         {
-            message = new DefaultMuleMessage(payload, previousMessage, dataType);
+            messageBuilder = MuleMessage.builder(previousMessage).payload(payload);
+        }
+        else if(payload instanceof MuleMessage)
+        {
+            messageBuilder = MuleMessage.builder((MuleMessage) payload);
+        }
+        else if(payload == null)
+        {
+            messageBuilder = MuleMessage.builder().payload(NullPayload.getInstance());
         }
         else
         {
-            message = new DefaultMuleMessage(payload, dataType);
+            messageBuilder = MuleMessage.builder().payload(payload);
         }
 
-        message = addProperties(message, transportMessage);
-        message = addAttachments(message, transportMessage);
-        return message;
+        messageBuilder.mediaType(dataType.getMediaType());
+        addProperties(messageBuilder, transportMessage);
+        addAttachments(messageBuilder, transportMessage);
+        return messageBuilder.build();
     }
 
     protected String getMimeType(Object transportMessage)
@@ -87,16 +94,14 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
 
     protected abstract Object extractPayload(Object transportMessage, Charset encoding) throws Exception;
 
-    protected MutableMuleMessage addProperties(MutableMuleMessage message, Object transportMessage) throws Exception
+    protected void addProperties(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception
     {
         // Template method
-        return message;
     }
 
-    protected MutableMuleMessage addAttachments(MutableMuleMessage message, Object transportMessage) throws Exception
+    protected void addAttachments(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception
     {
         // Template method
-        return message;
     }
 
     private boolean isTransportMessageTypeSupported(Object transportMessage)

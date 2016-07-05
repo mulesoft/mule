@@ -12,10 +12,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
@@ -81,9 +79,9 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
         assertTrue((afterCall.getTime() - beforeCall.getTime()) < DEFAULT_RESPONSE_TIMEOUT);
     }
 
-    private DefaultMuleMessage getTestMessage()
+    private MuleMessage getTestMessage()
     {
-        return new DefaultMuleMessage(getPayload());
+        return MuleMessage.builder().payload(getPayload()).build();
     }
 
     @Test

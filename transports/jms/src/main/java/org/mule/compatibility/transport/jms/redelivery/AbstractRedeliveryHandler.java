@@ -7,10 +7,8 @@
 package org.mule.compatibility.transport.jms.redelivery;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.jms.JmsConnector;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -46,7 +44,7 @@ public abstract class AbstractRedeliveryHandler implements RedeliveryHandler
         }
         catch (Exception e)
         {
-            return new DefaultMuleMessage(message);
+            return MuleMessage.builder().payload(message).build();
         }
     }
 }

@@ -80,10 +80,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
                 logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "="
                              + code);
             }
-            event.setMessage(event.getMessage().transform(msg -> {
-                msg.setOutboundProperty(propName, code);
-                return msg;
-            }));
+            event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propName, code).build());
         }
     }
 

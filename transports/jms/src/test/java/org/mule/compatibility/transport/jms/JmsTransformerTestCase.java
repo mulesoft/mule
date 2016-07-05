@@ -12,9 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.compatibility.transport.jms.transformers.ObjectToJMSMessage;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.RequestContext;
-import org.mule.runtime.core.api.MutableMuleMessage;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -48,10 +47,7 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
         when(textMessage.getJMSType()).thenReturn(null);
         when(textMessage.getObjectProperty("JMS_CUSTOM_PROPERTY")).thenReturn("customValue");
 
-        MutableMuleMessage msg = new DefaultMuleMessage(textMessage);
-
-        // Now we set a custom "JMS-like" property on the MuleMessage
-        msg.setOutboundProperty("JMS_CUSTOM_PROPERTY", "customValue");
+        MuleMessage msg = MuleMessage.builder().payload(textMessage).addOutboundProperty("JMS_CUSTOM_PROPERTY", "customValue").build();
 
         // The AbstractJMSTransformer will only apply JMS properties to the
         // underlying message when a "current event" is available, so we need to set

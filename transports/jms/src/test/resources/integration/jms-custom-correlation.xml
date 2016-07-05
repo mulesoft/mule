@@ -33,6 +33,7 @@
 
     <flow name="TestService1">
         <transports:inbound-endpoint address="${outbound.destination}" connector-ref="jmsConnector1"/>
+        <logger level="ERROR" message="#[HERE --- #[message.inboundProperties['MULE_CORRELATION_ID']"/>
         <test:component appendString=" TestService1"/>
     </flow>
 
