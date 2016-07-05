@@ -43,6 +43,7 @@ public class TestEventBuilder
 {
 
     private Object payload = NullPayload.getInstance();
+    private MediaType mediaType = MediaType.ANY;
     private Serializable attributes;
     private Map<String, Serializable> inboundProperties = new HashMap<>();
     private Map<String, Serializable> outboundProperties = new HashMap<>();
@@ -70,6 +71,21 @@ public class TestEventBuilder
     {
         requireNonNull(payload);
         this.payload = payload;
+
+        return this;
+    }
+
+
+    /**
+     * Prepares the given data to be sent as the mediaType of the payload of the {@link MuleEvent} to the configured
+     * flow.
+     *
+     * @param mediaType the mediaType to use in the message
+     * @return this {@link FlowRunner}
+     */
+    public TestEventBuilder withMediaType(MediaType mediaType)
+    {
+        this.mediaType = mediaType;
 
         return this;
     }
@@ -266,6 +282,7 @@ public class TestEventBuilder
     {
         final Builder messageBuilder = MuleMessage.builder()
                                                   .payload(payload)
+                                                  .mediaType(mediaType)
                                                   .inboundProperties(inboundProperties)
                                                   .outboundProperties(outboundProperties)
                                                   .inboundAttachments(inboundAttachments);

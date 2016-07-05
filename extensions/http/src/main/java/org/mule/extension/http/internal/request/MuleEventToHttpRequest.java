@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.COOKIE;
@@ -16,9 +17,9 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -244,7 +245,7 @@ public class MuleEventToHttpRequest
             {
                 if (muleEvent.getMessage().getPayload() instanceof Map)
                 {
-                    String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMediaType().getCharset().get(), (Map) payload);
+                    String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleEvent.getMuleContext())), (Map) payload);
                     requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toString());
                     return new ByteArrayHttpEntity(body.getBytes());
                 }

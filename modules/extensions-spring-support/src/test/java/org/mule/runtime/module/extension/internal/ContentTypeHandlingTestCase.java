@@ -12,6 +12,7 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
@@ -126,12 +127,13 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase
 
     private void assertDefaultEncoding(DataType dataType) throws Exception
     {
-        assertThat(getDefaultDataType().getMediaType().getCharset(), is(dataType.getMediaType().getCharset()));
+        assertThat(dataType.getMediaType().getCharset().get(), is(getDefaultEncoding(muleContext)));
     }
 
     private void assertDefaultMimeType(DataType dataType) throws Exception
     {
-        assertThat(getDefaultDataType().getMediaType(), is(dataType.getMediaType()));
+        assertThat(dataType.getMediaType().getPrimaryType(), is(getDefaultDataType().getMediaType().getPrimaryType()));
+        assertThat(dataType.getMediaType().getSubType(), is(getDefaultDataType().getMediaType().getSubType()));
     }
 
     private DataType getDefaultDataType()

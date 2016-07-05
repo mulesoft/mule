@@ -11,12 +11,12 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase.JSON_REQUEST;
 import static org.mule.test.integration.exceptions.CatchExceptionStrategyTestCase.JSON_RESPONSE;
 
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import org.codehaus.jackson.JsonNode;
@@ -38,7 +38,7 @@ public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
     @Test
     public void testFlowRefHandlingException() throws Exception
     {
-        MuleMessage response  = flowRunner("exceptionHandlingBlock").withPayload(getTestMuleMessage(JSON_REQUEST)).run().getMessage();
+        MuleMessage response = flowRunner("exceptionHandlingBlock").withPayload(JSON_REQUEST).run().getMessage();
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
@@ -49,7 +49,7 @@ public class CatchExceptionStrategyFlowRefTestCase extends FunctionalTestCase
     @Test
     public void testFlowRefHandlingExceptionWithTransaction() throws Exception
     {
-        MuleMessage response = flowRunner("transactionNotResolvedAfterException").withPayload(getTestMuleMessage(JSON_REQUEST)).run().getMessage();
+        MuleMessage response = flowRunner("transactionNotResolvedAfterException").withPayload(JSON_REQUEST).run().getMessage();
         // compare the structure and values but not the attributes' order
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));

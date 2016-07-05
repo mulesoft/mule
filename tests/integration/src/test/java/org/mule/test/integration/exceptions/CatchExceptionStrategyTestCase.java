@@ -81,7 +81,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testJsonErrorResponse() throws Exception
     {
-        assertResponse(flowRunner("continueProcessingActualMessage").withPayload(getTestMuleMessage(JSON_REQUEST)).run().getMessage());
+        assertResponse(flowRunner("continueProcessingActualMessage").withPayload(JSON_REQUEST).run().getMessage());
     }
 
     private void testJsonErrorResponse(String endpointUri) throws Exception
@@ -108,7 +108,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
 	@Test
 	public void testCatchWithComponent() throws Exception
 	{
-        MuleMessage result = flowRunner("catchWithComponent").withPayload(getTestMuleMessage(MESSAGE)).run().getMessage();
+        MuleMessage result = flowRunner("catchWithComponent").withPayload(MESSAGE).run().getMessage();
         assertThat(result,IsNull.<Object>notNullValue());
         assertThat(getPayloadAsString(result), Is.is(MESSAGE + " Caught"));
 	}
@@ -116,7 +116,7 @@ public class CatchExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testFullyDefinedCatchExceptionStrategyWithComponent() throws Exception
     {
-        MuleMessage result = flowRunner("fullyDefinedCatchExceptionStrategyWithComponent").withPayload(getTestMuleMessage(MESSAGE)).run().getMessage();
+        MuleMessage result = flowRunner("fullyDefinedCatchExceptionStrategyWithComponent").withPayload(MESSAGE).run().getMessage();
         assertThat(result,IsNull.<Object>notNullValue());
         assertThat(getPayloadAsString(result), Is.is(MESSAGE + " apt1 apt2 groovified"));
     }

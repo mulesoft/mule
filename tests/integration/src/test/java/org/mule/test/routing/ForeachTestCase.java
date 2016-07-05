@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -111,17 +110,15 @@ public class ForeachTestCase extends FunctionalTestCase
         final ArrayList<String> names = new ArrayList<>();
         names.add("residente");
         names.add("visitante");
-        Map<String, Serializable> props = new HashMap<>();
-        props.put("names", names);
-        // MuleMessage message = MuleMessage.builder().payload("message payload", props).build();
 
+        MuleMessage message = MuleMessage.builder().payload("message payload").addOutboundProperty("names", names).build();
         MuleMessage result = flowRunner("minimal-config-expression").withPayload("message payload")
-                                                                    .withInboundProperties(props)
+                                                                    .withInboundProperty("names", names)
                                                                     .run()
                                                                     .getMessage();
 
         assertThat(result.getPayload(), instanceOf(String.class));
-        assertThat(((Collection<?>) result.getOutboundProperty("names")), hasSize(names.size()));
+        assertThat(((Collection<?>) message.getOutboundProperty("names")), hasSize(names.size()));
 
         MuleMessage out = client.request("test://out", getTestTimeoutSecs());
         assertThat(out.getPayload(), instanceOf(String.class));
@@ -202,7 +199,7 @@ public class ForeachTestCase extends FunctionalTestCase
         }
 
         MuleMessage msgCollection = MuleMessage.builder().payload(list).build();
-        MuleMessage result = flowRunner("message-collection-config").withPayload(msgCollection).run().getMessage();
+        MuleMessage result = flowRunner("message-collection-config").withPayload(list).run().getMessage();
         assertThat(result.getOutboundProperty("totalMessages"), is(10));
         assertThat(result.getPayload(), is(msgCollection.getPayload()));
         FlowAssert.verify("message-collection-config");
@@ -243,17 +240,15 @@ public class ForeachTestCase extends FunctionalTestCase
         names.add("Sergei");
         names.add("Vasilievich");
         names.add("Rachmaninoff");
-        Map<String, Serializable> props = new HashMap<>();
-        props.put("names", names);
-        // MuleMessage message = MuleMessage.builder().payload("message payload", props).build();
 
+        MuleMessage message = MuleMessage.builder().payload("message payload").addOutboundProperty("names", names).build();
         MuleMessage result = flowRunner("map-expression-config").withPayload("message payload")
-                                                                .withInboundProperties(props)
+                                                                .withInboundProperty("names", names)
                                                                 .run()
                                                                 .getMessage();
 
         assertThat(result.getPayload(), instanceOf(String.class));
-        assertThat(((Collection<?>) result.getOutboundProperty("names")), hasSize(names.size()));
+        assertThat(((Collection<?>) message.getOutboundProperty("names")), hasSize(names.size()));
         assertThat(result.getOutboundProperty("totalMessages"), is(names.size()));
     }
 
