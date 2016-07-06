@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class MuleInstallation extends ExternalResource
 {
 
-    private static final String DISTRIBUTION_PROPERTY = "com.mulesoft.muleesb.distributions:mule-ee-distribution-standalone:zip";
+    private static final String DISTRIBUTION_PROPERTY = "mule.distribution";
     private static final File WORKING_DIRECTORY = new File(getProperty("user.dir"));
     private static final String DELETE_ON_EXIT = getProperty("mule.test.deleteOnExit");
     private static final String zippedDistributionFromProperty = getProperty(DISTRIBUTION_PROPERTY);

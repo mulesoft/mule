@@ -9,8 +9,9 @@ package org.mule.test.infrastructure.process.rules;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.getProperty;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
-import static org.mule.test.infrastructure.process.AppDeploymentProbe.isDeployed;
 import org.mule.tck.probe.PollingProber;
+import org.mule.test.infrastructure.process.AppDeploymentProbe;
+import org.mule.test.infrastructure.process.DomainDeploymentProbe;
 import org.mule.test.infrastructure.process.MuleProcessController;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * public class MuleApplicationTestCase {
  *  &#064;ClassRule
- *  public static MuleDeployment deployment = application(&quot;/path/to/application.zip&quot;).withProperty("-M-Dproperty", "value").timeout(120).deploy();
+ *  public static MuleDeployment deployment = builder().withApplication(&quot;/path/to/application.zip&quot;).withProperty("-M-Dproperty", "value").timeout(120).deploy();
  *
  *  &#064;Test
  *  public void useApplication() throws IOException {
@@ -44,10 +45,12 @@ public class MuleDeployment extends MuleInstallation
 {
 
     private static final long POLL_DELAY_MILLIS = 1000;
-    private static Logger logger = LoggerFactory.getLogger(MuleDeployment.class);
     private static final String DEFAULT_DEPLOYMENT_TIMEOUT = "60000";
+    private static Logger logger = LoggerFactory.getLogger(MuleDeployment.class);
+    private static PollingProber prober;
     private int deploymentTimeout = parseInt(getProperty("mule.test.deployment.timeout", DEFAULT_DEPLOYMENT_TIMEOUT));
-    private String application;
+    private List<String> applications = new ArrayList<>();
+    private List<String> domains = new ArrayList<>();
     private MuleProcessController mule;
     private Map<String, String> properties = new HashMap<>();
 
@@ -56,10 +59,9 @@ public class MuleDeployment extends MuleInstallation
 
         MuleDeployment deployment;
 
-        Builder(String application)
+        Builder()
         {
             deployment = new MuleDeployment();
-            deployment.application = application;
         }
 
         public MuleDeployment deploy()
@@ -88,11 +90,42 @@ public class MuleDeployment extends MuleInstallation
             deployment.properties.put(property, value);
             return this;
         }
+
+        public Builder withApplication(String application)
+        {
+            deployment.applications.add(application);
+            return this;
+        }
+
+        public Builder withApplications(List<String> applications)
+        {
+            for (String application : applications)
+            {
+                deployment.applications.add(application);
+            }
+            return this;
+        }
+
+        public Builder withDomain(String domain)
+        {
+            deployment.domains.add(domain);
+            return this;
+        }
+
+        public Builder withDomains(List<String> domains)
+        {
+            for (String domain : domains)
+            {
+                deployment.domains.add(domain);
+            }
+            return this;
+        }
+
     }
 
-    public static MuleDeployment.Builder application(String application)
+    public static MuleDeployment.Builder builder()
     {
-        return new Builder(application);
+        return new Builder();
     }
 
     private MuleDeployment()
@@ -132,12 +165,15 @@ public class MuleDeployment extends MuleInstallation
     protected void before() throws Throwable
     {
         super.before();
+        prober = new PollingProber(deploymentTimeout, POLL_DELAY_MILLIS);
         mule = new MuleProcessController(getMuleHome());
-        mule.deploy(application);
+        domains.forEach((domain) -> mule.deployDomain(domain));
+        applications.forEach((application) -> mule.deploy(application));
         mule.start(toArray(properties));
         logger.info("Starting Mule Server");
-        new PollingProber(deploymentTimeout, POLL_DELAY_MILLIS).check(isDeployed(mule, getName(application)));
-        logger.info("Application deployed");
+        domains.forEach((domain) -> prober.check(DomainDeploymentProbe.isDeployed(mule, getName(domain))));
+        applications.forEach((application) -> prober.check(AppDeploymentProbe.isDeployed(mule, getName(application))));
+        logger.info("Deployment successful");
     }
 
     private String getName(String application)

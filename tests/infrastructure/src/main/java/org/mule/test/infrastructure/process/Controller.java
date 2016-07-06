@@ -256,6 +256,11 @@ public abstract class Controller
         return new File(appsDir, appName + ANCHOR_SUFFIX).exists();
     }
 
+    protected boolean isDomainDeployed(String domainName)
+    {
+        return new File(domainsDir, domainName + ANCHOR_SUFFIX).exists();
+    }
+
     public File getLog()
     {
         File logEE = org.mule.runtime.core.util.FileUtils.newFile(muleHome + "/logs/mule_ee.log");
