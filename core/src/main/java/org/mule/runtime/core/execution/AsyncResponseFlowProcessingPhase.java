@@ -151,7 +151,6 @@ public class AsyncResponseFlowProcessingPhase extends NotificationFiringProcessi
             {
                 return executeCallback(() ->
                 {
-                    ((DefaultMuleEvent) event).resetAccessControl();
                     final MuleEvent exceptionStrategyResult = exceptionListener.handleException(e, event);
                     phaseResultNotifier.phaseSuccessfully();
                     return exceptionStrategyResult;

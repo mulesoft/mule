@@ -19,8 +19,8 @@ import javax.activation.DataHandler;
 /**
  * MuleMessage
  */
-public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message
-        .MuleMessage<PAYLOAD, ATTRIBUTES>, MessageProperties, MessageAttachments, MessageTransform
+public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends org.mule.runtime.api.message.MuleMessage<PAYLOAD, ATTRIBUTES>,
+        MessageProperties, MessageAttachments
 {
 
     /**
@@ -169,7 +169,7 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
         Builder<PAYLOAD, ATTRIBUTES> replyTo(Object replyTo);
 
         /**
-         * @param rootId
+         * @param id
          * @return
          */
         Builder<PAYLOAD, ATTRIBUTES> id(String id);
@@ -243,11 +243,6 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
         Builder<PAYLOAD, ATTRIBUTES> removeOutboundProperty(String key);
 
         /**
-         * @return
-         */
-        Builder<PAYLOAD, ATTRIBUTES> clearOutboundProperties();
-
-        /**
          * @param key
          * @param value
          * @return
@@ -263,24 +258,15 @@ public interface MuleMessage<PAYLOAD, ATTRIBUTES extends Serializable> extends o
 
         /**
          * @param key
-         * @param value
          * @return
          */
         Builder<PAYLOAD, ATTRIBUTES> removeInboundAttachment(String key);
 
         /**
          * @param key
-         * @param value
          * @return
          */
         Builder<PAYLOAD, ATTRIBUTES> removeOutboundAttachment(String key);
-
-        /**
-         * Removes all outbound attachments on this message builder.
-         * 
-         * @return
-         */
-        Builder<PAYLOAD, ATTRIBUTES> clearOutboundAttachments();
 
         /**
          * @param inboundProperties

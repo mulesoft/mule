@@ -8,7 +8,7 @@ package org.mule.runtime.core;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MutableMessageProperties;
+import org.mule.runtime.core.api.MessageProperties;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
@@ -16,7 +16,6 @@ import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -31,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * to any outbound messages resulting from this message. This is the default scope.</li>
  * </ol>
  */
-public class MessagePropertiesContext implements MutableMessageProperties, Serializable
+public class MessagePropertiesContext implements MessageProperties, Serializable
 {
     private static final long serialVersionUID = -5230693402768953742L;
     private static final Logger logger = LoggerFactory.getLogger(MessagePropertiesContext.class);
@@ -76,14 +75,6 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
         return getValueOrDefault((TypedValue<T>) outboundMap.get(name), defaultValue);
     }
 
-    @Override
-    public void setInboundProperty(String key, Serializable value)
-    {
-        setInboundProperty(key, value, value != null ? DataType.fromObject(value) : DataType.builder().type
-                (Serializable.class).build());
-    }
-
-    @Override
     public <T extends Serializable> void setInboundProperty(String key, T value, DataType<T> dataType)
     {
         if (key != null)
@@ -110,28 +101,11 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
         }
     }
 
-    @Override
-    public void addInboundProperties(Map<String, Serializable> properties)
-    {
-        if (properties != null)
-        {
-            synchronized (properties)
-            {
-                for (Map.Entry<String, Serializable> entry : properties.entrySet())
-                {
-                    setInboundProperty(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-    }
-
-    @Override
     public void setOutboundProperty(String key, Serializable value)
     {
         setOutboundProperty(key, value, DataType.fromObject(value));
     }
 
-    @Override
     public <T extends Serializable> void setOutboundProperty(String key, T value, DataType<T> dataType)
     {
         if (key != null)
@@ -158,51 +132,16 @@ public class MessagePropertiesContext implements MutableMessageProperties, Seria
         }
     }
 
-    @Override
-    public void addOutboundProperties(Map<String, Serializable> properties)
-    {
-        if (properties != null)
-        {
-            synchronized (properties)
-            {
-                for (Map.Entry<String, Serializable> entry : properties.entrySet())
-                {
-                    setOutboundProperty(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-    }
-
-    @Override
     public <T extends Serializable> T removeInboundProperty(String key)
     {
         TypedValue value = inboundMap.remove(key);
         return value == null ? null : (T) value.getValue();
     }
 
-    @Override
     public <T extends Serializable> T removeOutboundProperty(String key)
     {
         TypedValue value = outboundMap.remove(key);
         return value == null ? null : (T) value.getValue();
-    }
-
-    @Override
-    public void clearInboundProperties()
-    {
-        inboundMap.clear();
-    }
-
-    @Override
-    public void clearOutboundProperties()
-    {
-        outboundMap.clear();
-    }
-
-    @Override
-    public void copyProperty(String key)
-    {
-        outboundMap.put(key, new TypedValue(getInboundProperty(key), getInboundPropertyDataType(key)));
     }
 
     @Override

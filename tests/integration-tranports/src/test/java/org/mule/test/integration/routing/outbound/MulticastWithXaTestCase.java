@@ -7,9 +7,7 @@
 package org.mule.test.integration.routing.outbound;
 
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
@@ -32,7 +30,7 @@ public class MulticastWithXaTestCase extends FunctionalTestCase
     public void testName() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage msg = new DefaultMuleMessage("Hi");
+        MuleMessage msg = MuleMessage.builder().payload("Hi").build();
         client.dispatch("jms://Myflow.input?connector=simpleJmsConnector", msg);
         MuleMessage result = client.request("jms://Myflow.finishedOriginal?connector=simpleJmsConnector", 10000);
         assertNotNull(result);

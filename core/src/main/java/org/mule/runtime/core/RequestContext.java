@@ -10,7 +10,6 @@ import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 
 /**
  * <code>RequestContext</code> is a thread context where components can get the
@@ -86,14 +85,9 @@ public final class RequestContext
             MuleEvent event = getEvent();
             if (event != null)
             {
-                MuleMessage copy = newMessage(message, safe);
-                MuleEvent newEvent = new DefaultMuleEvent(copy, event);
-                if (safe)
-                {
-                    resetAccessControl(copy);
-                }
+                MuleEvent newEvent = new DefaultMuleEvent(message, event);
                 internalSetEvent(newEvent);
-                return copy;
+                return message;
             }
         }
         return message;
@@ -124,40 +118,15 @@ public final class RequestContext
         return getEvent().getMessage().getExceptionPayload();
     }
 
-    public static MuleMessage safeMessageCopy(MuleMessage message)
-    {
-        return newMessage(message, SAFE);
-    }
-
     protected static MuleEvent newEvent(MuleEvent event, boolean safe)
     {
-        if (safe && event instanceof ThreadSafeAccess)
+        if (safe && event != null)
         {
-            return (MuleEvent) ((ThreadSafeAccess)event).newThreadCopy();
+            return new DefaultMuleEvent(event.getMessage(), event);
         }
         else
         {
             return event;
-        }
-    }
-
-    protected static MuleMessage newMessage(MuleMessage message, boolean safe)
-    {
-        if (safe && message instanceof ThreadSafeAccess)
-        {
-            return (MuleMessage) ((ThreadSafeAccess)message).newThreadCopy();
-        }
-        else
-        {
-            return message;
-        }
-    }
-
-    protected static void resetAccessControl(Object object)
-    {
-        if (object instanceof ThreadSafeAccess)
-        {
-            ((ThreadSafeAccess) object).resetAccessControl();
         }
     }
 

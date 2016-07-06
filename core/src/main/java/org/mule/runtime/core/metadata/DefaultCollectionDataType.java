@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.metadata;
 
+import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 
@@ -19,8 +20,7 @@ import java.util.Collection;
  *
  * @since 3.0
  */
-public class DefaultCollectionDataType<C extends Collection<T>, T> extends SimpleDataType<C> implements org.mule
-        .runtime.api.metadata.CollectionDataType<C, T>
+public class DefaultCollectionDataType<C extends Collection<T>, T> extends SimpleDataType<C> implements CollectionDataType<C, T>
 {
     private static final long serialVersionUID = 3600944898597616006L;
 

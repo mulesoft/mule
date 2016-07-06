@@ -9,10 +9,8 @@ package org.mule.test.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.functional.AbstractConfigBuilderTestCase;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -69,7 +67,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         Map props = new HashMap();
         props.put("id", "myID123");
         props.put("correlation", "myCorrelationID456");
-        MuleMessage msg = new DefaultMuleMessage("foo", props);
+        MuleMessage msg = MuleMessage.builder().payload("foo").outboundProperties(props).build();
         MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, getTestFlow());
 
         assertEquals("myID123", mapping.getMessageId(event));

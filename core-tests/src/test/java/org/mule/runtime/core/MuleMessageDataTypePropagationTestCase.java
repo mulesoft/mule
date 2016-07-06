@@ -356,19 +356,6 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void setsDataTypeWhenCreatesInboundMessage() throws Exception
-    {
-        MediaType mediaType = APPLICATION_XML_CUSTOM;
-
-        MuleMessage message = MuleMessage.builder().payload(TEST).addOutboundProperty(TEST_PROPERTY, TEST, mediaType)
-                .build();
-
-        MuleMessage inboundMessage = ((DefaultMuleMessage) message).createInboundMessage();
-
-        assertInboundPropertyDataType(inboundMessage, DataType.builder(STRING).mediaType(mediaType).build());
-    }
-
-    @Test
     public void setsCustomPropertyDataType() throws Exception
     {
         MediaType mediaType = APPLICATION_XML_CUSTOM;

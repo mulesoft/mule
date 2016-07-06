@@ -11,14 +11,12 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.ContinuousPollingReceiverWorker;
 import org.mule.compatibility.core.transport.PollingReceiverWorker;
 import org.mule.compatibility.core.transport.TransactedPollingMessageReceiver;
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -115,10 +113,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                     if (event != null && !VoidMuleEvent.getInstance().equals(event) && getEndpoint().getExchangePattern().hasResponse())
                     {
                         MuleMessage returnedMessage = event.getMessage();
-                        if (returnedMessage != null)
-                        {
-                            ((DefaultMuleMessage) returnedMessage).release();
-                        }
                         return event;
                     }
                     return null;
@@ -150,7 +144,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
         finally
         {
-            ((DefaultMuleMessage) message).release();
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
     }
@@ -252,13 +245,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     @Override
     protected MuleEvent processMessage(Object msg) throws Exception
     {
-        MuleMessage message = (MuleMessage) msg;
-
-        if (message instanceof ThreadSafeAccess)
-        {
-            message = (MuleMessage)((ThreadSafeAccess) message).newThreadCopy();
-        }
-        return routeMessage(message);
+        return routeMessage((MuleMessage) msg);
     }
 
     /*

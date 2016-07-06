@@ -274,13 +274,6 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     }
 
     @Override
-    public Builder<PAYLOAD, ATTRIBUTES> clearOutboundProperties()
-    {
-        outboundProperties.clear();
-        return this;
-    }
-
-    @Override
     public Builder<PAYLOAD, ATTRIBUTES> addInboundAttachment(String key, DataHandler value)
     {
         inboundAttachments.put(key, value);
@@ -305,13 +298,6 @@ public class DefaultMuleMessageBuilder<PAYLOAD, ATTRIBUTES extends Serializable>
     public Builder<PAYLOAD, ATTRIBUTES> removeOutboundAttachment(String key)
     {
         outboundAttachments.remove(key);
-        return this;
-    }
-
-    @Override
-    public Builder<PAYLOAD, ATTRIBUTES> clearOutboundAttachments()
-    {
-        outboundAttachments.clear();
         return this;
     }
 

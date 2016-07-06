@@ -12,7 +12,6 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
 import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MessagingException;
@@ -284,8 +283,6 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
 
                                  private MuleEvent resetMuleEventForNewThread(MuleEvent event)
                                  {
-                                     // Reset access control for new thread
-                                     ((DefaultMuleEvent)event).resetAccessControl();
                                      // Set RequestContext ThreadLocal in new thread for backwards compatibility
                                      OptimizedRequestContext.unsafeSetEvent(event);
                                      return event;
