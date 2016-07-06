@@ -20,12 +20,12 @@ import org.slf4j.LoggerFactory;
  * Represents the set of transformations between {@link DataType} based on the
  * available {@link Converter}.
  */
-public class TransformationGraph extends DirectedMultigraph<DataType<?>, TransformationEdge>
+public class TransformationGraph extends DirectedMultigraph<DataType, TransformationEdge>
 {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     
-    private Set<Converter> registeredConverters = new HashSet<Converter>();
+    private Set<Converter> registeredConverters = new HashSet<>();
     
     public TransformationGraph()
     {
@@ -44,13 +44,13 @@ public class TransformationGraph extends DirectedMultigraph<DataType<?>, Transfo
             return;
         }
 
-        DataType<?> returnDataType = converter.getReturnDataType();
+        DataType returnDataType = converter.getReturnDataType();
         if (!containsVertex(returnDataType))
         {
             addVertex(returnDataType);
         }
 
-        for (DataType<?> sourceDataType : converter.getSourceDataTypes())
+        for (DataType sourceDataType : converter.getSourceDataTypes())
         {
             if (!containsVertex(sourceDataType))
             {
@@ -75,9 +75,9 @@ public class TransformationGraph extends DirectedMultigraph<DataType<?>, Transfo
             return;
         }
 
-        DataType<?> returnDataType = converter.getReturnDataType();
+        DataType returnDataType = converter.getReturnDataType();
 
-        for (DataType<?> sourceDataType : converter.getSourceDataTypes())
+        for (DataType sourceDataType : converter.getSourceDataTypes())
         {
             Set<TransformationEdge> allEdges = getAllEdges(sourceDataType, returnDataType);
 
@@ -86,8 +86,8 @@ public class TransformationGraph extends DirectedMultigraph<DataType<?>, Transfo
 
                 if (edge.getConverter() == converter)
                 {
-                    DataType<?> source = getEdgeSource(edge);
-                    DataType<?> target = getEdgeTarget(edge);
+                    DataType source = getEdgeSource(edge);
+                    DataType target = getEdgeTarget(edge);
 
                     removeEdge(edge);
 

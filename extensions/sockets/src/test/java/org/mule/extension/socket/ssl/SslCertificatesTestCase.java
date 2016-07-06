@@ -10,6 +10,7 @@ package org.mule.extension.socket.ssl;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+
 import org.mule.extension.socket.SocketExtensionTestCase;
 import org.mule.module.socket.api.SocketAttributes;
 import org.mule.runtime.api.message.MuleMessage;
@@ -64,11 +65,11 @@ public class SslCertificatesTestCase extends SocketExtensionTestCase
 
     }
 
-    protected void assertCertificate(MuleMessage<?, SocketAttributes> message) throws Exception
+    protected void assertCertificate(MuleMessage message) throws Exception
     {
         String payload = IOUtils.toString((InputStream) message.getPayload());
         assertThat(payload, is(notNullValue()));
-        SocketAttributes attributes = message.getAttributes();
+        SocketAttributes attributes = (SocketAttributes) message.getAttributes();
         assertThat(attributes.getLocalCertificates(), is(notNullValue()));
     }
 }

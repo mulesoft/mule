@@ -9,16 +9,16 @@ package org.mule.extension.http.internal.request;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-import org.mule.extension.http.api.HttpResponseAttributes;
+
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
@@ -72,9 +72,10 @@ public class HttpRequester
         this.notificationHelper = new NotificationHelper(config.getMuleContext().getNotificationManager(), ConnectorMessageNotification.class, false);
     }
 
-    public MuleMessage<Object, HttpResponseAttributes> doRequest(MuleEvent muleEvent, HttpClient client,
-                                                                 HttpRequesterRequestBuilder requestBuilder,
-                                                                 boolean checkRetry) throws MuleException
+    public MuleMessage doRequest(MuleEvent muleEvent, HttpClient client,
+                                 HttpRequesterRequestBuilder requestBuilder,
+                                 boolean checkRetry)
+            throws MuleException
     {
         HttpRequest httpRequest = eventToHttpRequest.create(muleEvent, requestBuilder, authentication);
 

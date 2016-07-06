@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.transformer.graph;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
@@ -37,7 +37,7 @@ public class GraphTransformerResolver implements TransformerResolver
     }
 
     @Override
-    public Transformer resolve(DataType<?> source, DataType<?> result) throws ResolverException
+    public Transformer resolve(DataType source, DataType result) throws ResolverException
     {
         String cacheKey = getDataTypeSourceResultPairHash(source, result);
 
@@ -77,7 +77,7 @@ public class GraphTransformerResolver implements TransformerResolver
         return converter;
     }
 
-    private String getDataTypeSourceResultPairHash(DataType<?> source, DataType<?> result)
+    private String getDataTypeSourceResultPairHash(DataType source, DataType result)
     {
         StringBuilder builder = new StringBuilder();
         builder.append(source.getClass().getName());

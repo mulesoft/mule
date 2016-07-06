@@ -45,7 +45,7 @@ public interface MessageProperties
      * @param name the name or key of the property. This must be non-null.
      * @return the property data type or null if the property does not exist in the specified scope
      */
-    <T extends Serializable> DataType<T> getOutboundPropertyDataType(String name);
+    DataType getOutboundPropertyDataType(String name);
 
     /**
      * Gets all outbound property names.
@@ -82,7 +82,7 @@ public interface MessageProperties
      * @param name the name or key of the property. This must be non-null.
      * @return the property data type or null if the property does not exist in the specified scope
      */
-    <T extends Serializable> DataType<T> getInboundPropertyDataType(String name);
+    DataType getInboundPropertyDataType(String name);
 
     /**
      * Gets all inbound property names.

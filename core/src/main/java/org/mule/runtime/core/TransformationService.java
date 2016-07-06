@@ -97,7 +97,7 @@ public class TransformationService
      * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
      * payload
      */
-    public <T> MuleMessage transform(MuleMessage message, DataType<T> outputDataType) throws TransformerException
+    public MuleMessage transform(MuleMessage message, DataType outputDataType) throws TransformerException
     {
         checkNotNull(message, "Message cannot be null");
         checkNotNull(outputDataType, "DataType cannot be null");
@@ -159,7 +159,7 @@ public class TransformationService
                 Transformer transformer = transformers.get(index);
 
                 Class<?> srcCls = result.getPayload().getClass();
-                DataType<?> originalSourceType = DataType.fromType(srcCls);
+                DataType originalSourceType = DataType.fromType(srcCls);
 
                 if (transformer.isSourceDataTypeSupported(originalSourceType))
                 {
@@ -263,9 +263,9 @@ public class TransformationService
         }
     }
 
-    private MediaType mergeMediaType(MuleMessage message, DataType<?> transformed)
+    private MediaType mergeMediaType(MuleMessage message, DataType transformed)
     {
-        DataType<?> original = message.getDataType();
+        DataType original = message.getDataType();
         MediaType mimeType = ANY.matches(transformed.getMediaType()) ? original.getMediaType() : transformed.getMediaType();
         Charset encoding = transformed.getMediaType().getCharset().orElse(
                 message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
@@ -288,7 +288,7 @@ public class TransformationService
      *                              transformation of the payload.
      */
     @SuppressWarnings("unchecked")
-    private <T> T getPayload(MuleMessage message, DataType<T> resultType, Charset encoding) throws TransformerException
+    private <T> T getPayload(MuleMessage message, DataType resultType, Charset encoding) throws TransformerException
     {
         // Handle null by ignoring the request
         if (resultType == null)
@@ -296,7 +296,7 @@ public class TransformationService
             throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());
         }
 
-        DataType<?> dataType = DataType.builder(resultType).type(message.getPayload().getClass()).build();
+        DataType dataType = DataType.builder(resultType).type(message.getPayload().getClass()).build();
 
         // If no conversion is necessary, just return the payload as-is
         if (resultType.isCompatibleWith(dataType))

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.transformer;
 
-import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class TransformerWeighting implements Comparable
     private void init()
     {
         inputWeighting = Integer.MAX_VALUE;
-        List<DataType<?>> sourceTypes = transformer.getSourceDataTypes();
+        List<DataType> sourceTypes = transformer.getSourceDataTypes();
 
         for (DataType type : sourceTypes)
         {
@@ -150,6 +150,7 @@ public class TransformerWeighting implements Comparable
         return inputWeighting == -1 || outputWeighting == -1;
     }
 
+    @Override
     public int compareTo(Object o)
     {
         TransformerWeighting weighting = (TransformerWeighting) o;
@@ -213,6 +214,7 @@ public class TransformerWeighting implements Comparable
         }
     }
 
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -238,6 +240,7 @@ public class TransformerWeighting implements Comparable
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         int result;
@@ -250,6 +253,7 @@ public class TransformerWeighting implements Comparable
     }
 
 
+    @Override
     public String toString()
     {
         final StringBuilder sb = new StringBuilder();

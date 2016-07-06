@@ -36,7 +36,7 @@ public class SimpleDataTypeXStreamConverter implements Converter
     {
         final SimpleDataType dataType = (SimpleDataType) source;
         writer.addAttribute("type", dataType.getType().getName());
-        writer.addAttribute("mediaType", dataType.getMediaType().toString());
+        writer.addAttribute("mediaType", dataType.getMediaType().toRfcString());
     }
 
     @Override

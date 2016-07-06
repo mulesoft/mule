@@ -62,7 +62,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void createNewAPIMessageViaMessageInterface()
     {
-        org.mule.runtime.api.message.MuleMessage<String, Apple> message;
+        org.mule.runtime.api.message.MuleMessage message;
         message = org.mule.runtime.api.message.MuleMessage.builder().payload(TEST_PAYLOAD).mediaType(HTML_STRING_UTF8)
                 .attributes(TEST_ATTR).build();
 
@@ -75,11 +75,11 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void createAPIMessageViaMessageInterfaceFromCopy()
     {
-        org.mule.runtime.api.message.MuleMessage<String, Apple> message;
+        org.mule.runtime.api.message.MuleMessage message;
         message = org.mule.runtime.api.message.MuleMessage.builder().payload(TEST_PAYLOAD).attributes(TEST_ATTR)
                 .build();
 
-        org.mule.runtime.api.message.MuleMessage<Boolean, Banana> messageCopy;
+        org.mule.runtime.api.message.MuleMessage messageCopy;
         messageCopy = org.mule.runtime.api.message.MuleMessage.builder(message).payload(true).attributes(TEST_ATTR_2).build();
 
         assertThat(messageCopy.getPayload(), is(true));
@@ -90,7 +90,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void createNewMessageViaMessageInterface()
     {
-        MuleMessage<String, Apple> message = MuleMessage.builder().payload(TEST_PAYLOAD).attributes
+        MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).attributes
                 (TEST_ATTR).build();
 
         assertThat(message.getPayload(), is(TEST_PAYLOAD));
@@ -106,7 +106,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
         htmlStringList.add("HTML2");
         htmlStringList.add("HTML3");
 
-        MuleMessage<List<String>, Apple> message;
+        MuleMessage message;
         message = MuleMessage.builder().collectionPayload(htmlStringList, String.class)
                                        .itemMediaType(HTML)
                                        .attributes(TEST_ATTR)
@@ -127,13 +127,13 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
         htmlStringList.add("HTML2");
         htmlStringList.add("HTML3");
 
-        MuleMessage<List<String>, Apple> message;
+        MuleMessage message;
         message = MuleMessage.builder().collectionPayload(htmlStringList, String.class)
                 .itemMediaType(HTML)
                 .attributes(TEST_ATTR)
                 .build();
 
-        MuleMessage<List<String>, Apple> copy = MuleMessage.builder(message).build();
+        MuleMessage copy = MuleMessage.builder(message).build();
 
         assertThat(copy.getPayload(), is(htmlStringList));
         assertThat(copy.getDataType().getType(), equalTo(ArrayList.class));
@@ -145,7 +145,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void createMessageViaMessageInterfaceFromCopy()
     {
-        MuleMessage<Boolean, Banana> messageCopy = MuleMessage.builder(createTestMessage()).payload(true)
+        MuleMessage messageCopy = MuleMessage.builder(createTestMessage())
+                                             .payload(true)
                 .attributes(TEST_ATTR_2).build();
 
         assertThat(messageCopy.getPayload(), is(true));
@@ -366,7 +367,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void nullPayloadPayload()
     {
-        MuleMessage<Object, ?> message = new DefaultMuleMessageBuilder().payload(NullPayload.getInstance()).build();
+        MuleMessage message = new DefaultMuleMessageBuilder().payload(NullPayload.getInstance()).build();
         assertThat(message.getDataType().getType(), equalTo(Object.class));
     }
 
@@ -403,7 +404,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
         assertThat(copy.getDataType().getMediaType(), is(XML));
     }
 
-    private MuleMessage<String, Apple> createTestMessage()
+    private MuleMessage createTestMessage()
     {
         return new DefaultMuleMessageBuilder()
                 .payload(TEST_PAYLOAD)

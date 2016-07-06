@@ -14,8 +14,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.size.SmallTest;
 
-import java.io.Serializable;
-
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 @SmallTest
@@ -46,7 +44,7 @@ public class AddPropertyTransformerTestCase extends AbstractAddVariablePropertyT
     }
 
     @Override
-    protected DataType<Serializable> getVariableDataType(MuleEvent event, String key)
+    protected DataType getVariableDataType(MuleEvent event, String key)
     {
         return event.getMessage().getOutboundPropertyDataType(key);
     }

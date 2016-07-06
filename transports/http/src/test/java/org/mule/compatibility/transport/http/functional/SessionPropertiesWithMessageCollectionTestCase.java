@@ -52,14 +52,14 @@ public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTe
     public void splitterAndAggregatorWithPersistentStore() throws Exception
     {
         Flow flow = (Flow) getFlowConstruct("synchronousCollectionAggregatorFlow");
-        List<String> inputData = new ArrayList<String>();
+        List<String> inputData = new ArrayList<>();
         int numberOfElements = 10;
         for (int i = 0; i < numberOfElements; i++)
         {
             inputData.add(String.valueOf(i));
         }
         MuleEvent responseEvent = flow.process(getTestEvent(inputData));
-        assertThat(responseEvent.getSession().<List>getProperty("recordsToUpdate").size(), is(numberOfElements));
+        assertThat(((List<String>) responseEvent.getSession().<List> getProperty("recordsToUpdate")).size(), is(numberOfElements));
     }
 
     private void assertNotNullAndNotExceptionResponse(MuleMessage response)
@@ -76,7 +76,7 @@ public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTe
         @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
-            ArrayList<String> elements = new ArrayList<String>();
+            ArrayList<String> elements = new ArrayList<>();
             for(int index = 0; index < 5; index++)
             {
                 elements.add("Element N" + index);

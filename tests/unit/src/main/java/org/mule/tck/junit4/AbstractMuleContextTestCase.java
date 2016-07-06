@@ -556,7 +556,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     @Deprecated
     protected String getPayloadAsString(MuleMessage message) throws Exception
     {
-        return getPayload(message, DataType.STRING);
+        return (String) getPayload(message, DataType.STRING);
     }
 
     /**
@@ -580,7 +580,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      */
     protected byte[] getPayloadAsBytes(MuleMessage message) throws Exception
     {
-        return getPayload(message, DataType.BYTE_ARRAY);
+        return (byte[]) getPayload(message, DataType.BYTE_ARRAY);
     }
 
     /**
@@ -591,9 +591,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      * @return representation of the message payload of the required dataType
      * @throws Exception if there is an unexpected error obtaining the payload representation
      */
-    protected <T> T getPayload(MuleMessage message, DataType<T> dataType) throws Exception
+    protected Object getPayload(MuleMessage message, DataType dataType) throws Exception
     {
-        return (T) muleContext.getTransformationService().transform(message, dataType).getPayload();
+        return muleContext.getTransformationService().transform(message, dataType).getPayload();
     }
 
     /**
@@ -606,7 +606,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
      */
     protected <T> T getPayload(MuleMessage message, Class<T> clazz) throws Exception
     {
-        return getPayload(message, DataType.fromType(clazz));
+        return (T) getPayload(message, DataType.fromType(clazz));
     }
 
     protected MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler) throws Exception

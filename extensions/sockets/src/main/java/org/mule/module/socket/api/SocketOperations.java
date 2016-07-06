@@ -50,7 +50,8 @@ public class SocketOperations
                                       @Optional(defaultValue = "#[payload]") @NoRef Object content,
                                       @Optional String outputEncoding,
                                       String hasResponse, // TODO Add metadata https://www.mulesoft.org/jira/browse/MULE-9894
-                                      MuleMessage<?, ?> muleMessage) throws ConnectionException, IOException
+                                      MuleMessage muleMessage)
+            throws ConnectionException, IOException
     {
         SocketClient client = connection.getClient();
 

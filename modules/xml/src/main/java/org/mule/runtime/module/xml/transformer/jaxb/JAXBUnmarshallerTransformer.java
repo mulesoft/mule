@@ -54,7 +54,7 @@ public class JAXBUnmarshallerTransformer extends AbstractTransformer
         registerSourceType(DataType.fromType(XMLEventReader.class));
     }
 
-    public JAXBUnmarshallerTransformer(JAXBContext jaxbContext, DataType<?> returnType)
+    public JAXBUnmarshallerTransformer(JAXBContext jaxbContext, DataType returnType)
     {
         this();
         this.jaxbContext = jaxbContext;

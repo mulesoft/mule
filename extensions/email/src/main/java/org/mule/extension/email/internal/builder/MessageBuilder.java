@@ -298,7 +298,7 @@ public final class MessageBuilder
             MimeMultipart multipart = new MimeMultipart();
             MimeBodyPart bodyPart = new MimeBodyPart();
             bodyPart.setDisposition(INLINE);
-            bodyPart.setContent(content, getBodyType().toString());
+            bodyPart.setContent(content, getBodyType().toRfcString());
             multipart.addBodyPart(bodyPart);
 
             MimeBodyPart attachmentPart;
@@ -324,7 +324,7 @@ public final class MessageBuilder
         else
         {
             this.message.setDisposition(INLINE);
-            this.message.setContent(content, getBodyType().toString());
+            this.message.setContent(content, getBodyType().toRfcString());
         }
 
         return message;

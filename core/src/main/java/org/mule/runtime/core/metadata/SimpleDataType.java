@@ -16,21 +16,21 @@ import org.mule.runtime.api.metadata.MediaType;
  *
  * @since 1.0
  */
-public class SimpleDataType<T> implements DataType<T>
+public class SimpleDataType implements DataType
 {
     private static final long serialVersionUID = -4590745924720880358L;
 
-    protected final Class<T> type;
+    protected final Class<?> type;
     protected final MediaType mimeType;
 
-    SimpleDataType(Class<T> type, MediaType mimeType)
+    SimpleDataType(Class<?> type, MediaType mimeType)
     {
         this.type = type;
         this.mimeType = mimeType;
     }
 
     @Override
-    public Class<T> getType()
+    public Class<?> getType()
     {
         return type;
     }

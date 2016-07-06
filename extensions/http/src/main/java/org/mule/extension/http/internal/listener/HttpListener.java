@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
@@ -282,7 +283,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
         };
     }
 
-    private MuleMessage<Object, HttpRequestAttributes> createMuleMessage(HttpRequestContext requestContext) throws HttpRequestParsingException
+    private MuleMessage createMuleMessage(HttpRequestContext requestContext) throws HttpRequestParsingException
     {
         return HttpRequestToMuleMessage.transform(requestContext, muleContext, parseRequest, listenerPath);
         //TODO: MULE-9748 Analyse RequestContext use in HTTP extension

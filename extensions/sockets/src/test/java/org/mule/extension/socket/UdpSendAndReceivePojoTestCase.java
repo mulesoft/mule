@@ -9,10 +9,8 @@ package org.mule.extension.socket;
 import static org.junit.Assert.assertEquals;
 import static org.mule.extension.socket.TcpSendAndReceivePojoTestCase.RESPONSE_AGE;
 import static org.mule.extension.socket.TcpSendAndReceivePojoTestCase.RESPONSE_NAME;
-import org.mule.module.socket.api.SocketAttributes;
-import org.mule.runtime.api.message.MuleMessage;
 
-import java.io.InputStream;
+import org.mule.runtime.api.message.MuleMessage;
 
 import org.junit.Test;
 
@@ -27,7 +25,7 @@ public class UdpSendAndReceivePojoTestCase extends SocketExtensionTestCase
     @Test
     public void sendAndReceivePojo() throws Exception
     {
-        MuleMessage<InputStream, SocketAttributes> message = (MuleMessage) flowRunner("udp-send-and-receive").
+        MuleMessage message = flowRunner("udp-send-and-receive").
                 withPayload(testPojo).
                 run().getMessage();
 

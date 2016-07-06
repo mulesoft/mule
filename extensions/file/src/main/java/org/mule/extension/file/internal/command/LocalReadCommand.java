@@ -42,7 +42,7 @@ public final class LocalReadCommand extends LocalFileCommand implements ReadComm
      * {@inheritDoc}
      */
     @Override
-    public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage<?, ?> message, String filePath, boolean lock)
+    public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath, boolean lock)
     {
         Path path = resolveExistingPath(config, filePath);
         if (Files.isDirectory(path))

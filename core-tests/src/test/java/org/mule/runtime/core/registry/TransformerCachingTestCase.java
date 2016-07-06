@@ -27,7 +27,7 @@ public class TransformerCachingTestCase extends AbstractMuleContextTestCase
     @Test
     public void testCacheUpdate() throws Exception
     {
-        DataType<FilterInputStream> sourceType = DataType.fromType(FilterInputStream.class);
+        DataType sourceType = DataType.fromType(FilterInputStream.class);
         Transformer trans = muleContext.getRegistry().lookupTransformer(sourceType, DataType.BYTE_ARRAY);
         assertNotNull(trans);
         assertTrue(trans instanceof ObjectToByteArray);

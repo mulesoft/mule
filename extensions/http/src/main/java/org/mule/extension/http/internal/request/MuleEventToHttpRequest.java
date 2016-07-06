@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -27,7 +28,6 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.ParameterMap;
@@ -100,12 +100,12 @@ public class MuleEventToHttpRequest
         builder.setHeaders(toParameterMap(requestBuilder.getHeaders()));
         builder.setQueryParams(toParameterMap(requestBuilder.getQueryParams()));
 
-        if (!builder.getHeaders().containsKey(MuleProperties.CONTENT_TYPE_PROPERTY))
+        if (!builder.getHeaders().containsKey(CONTENT_TYPE_PROPERTY))
         {
-            DataType<?> dataType = event.getMessage().getDataType();
+            DataType dataType = event.getMessage().getDataType();
             if (!MediaType.ANY.matches(dataType.getMediaType()))
             {
-                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMediaType().toString());
+                builder.addHeader(CONTENT_TYPE_PROPERTY, dataType.getMediaType().toRfcString());
             }
         }
 

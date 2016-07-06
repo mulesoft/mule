@@ -61,7 +61,7 @@ public class StandardFileSystemOperations
                          @Connection FileSystem fileSystem,
                          @Optional String directoryPath,
                          @Optional(defaultValue = "false") boolean recursive,
-                         MuleMessage<?, ?> message,
+                         MuleMessage message,
                          @Optional FilePredicateBuilder matchWith)
     {
         fileSystem.changeToBaseDir(config);
@@ -98,7 +98,7 @@ public class StandardFileSystemOperations
     @DataTypeParameters
     public OperationResult<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
                                                              @Connection FileSystem fileSystem,
-                                                             MuleMessage<?, ?> message,
+                                                             MuleMessage message,
                                                              String path,
                                                              @Optional(defaultValue = "false") boolean lock)
     {
@@ -360,7 +360,7 @@ public class StandardFileSystemOperations
             return path;
         }
 
-        MuleMessage<?, ?> message = event.getMessage();
+        MuleMessage message = event.getMessage();
         if (message.getAttributes() instanceof FileAttributes)
         {
             return ((FileAttributes) message.getAttributes()).getPath();

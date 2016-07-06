@@ -143,7 +143,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public <T> T transformMessage(DataType<T> outputType) throws TransformerException
+        public Object transformMessage(DataType outputType) throws TransformerException
         {
             return null;
         }
@@ -262,7 +262,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public DataType<?> getFlowVariableDataType(String key)
+        public DataType getFlowVariableDataType(String key)
         {
             return null;
         }

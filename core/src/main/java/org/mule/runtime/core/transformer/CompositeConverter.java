@@ -66,13 +66,13 @@ public class CompositeConverter implements Converter
     }
 
     @Override
-    public boolean isSourceDataTypeSupported(DataType<?> dataType)
+    public boolean isSourceDataTypeSupported(DataType dataType)
     {
         return chain.size() > 0 && chain.peekFirst().isSourceDataTypeSupported(dataType);
     }
 
     @Override
-    public List<DataType<?>> getSourceDataTypes()
+    public List<DataType> getSourceDataTypes()
     {
         return chain.peekFirst().getSourceDataTypes();
     }
@@ -117,13 +117,13 @@ public class CompositeConverter implements Converter
     }
 
     @Override
-    public void setReturnDataType(DataType<?> type)
+    public void setReturnDataType(DataType type)
     {
         chain.peekLast().setReturnDataType(type);
     }
 
     @Override
-    public DataType<?> getReturnDataType()
+    public DataType getReturnDataType()
     {
         return chain.peekLast().getReturnDataType();
     }

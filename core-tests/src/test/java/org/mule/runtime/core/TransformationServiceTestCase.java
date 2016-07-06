@@ -63,9 +63,9 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase
         this.transformationService = new TransformationService(muleContext);
     }
 
-    private static final DataType<B> dataTypeB = DataType.fromType(B.class);
-    private static final DataType<C> dataTypeC = DataType.fromType(C.class);
-    private static final DataType<D> dataTypeD = DataType.fromType(D.class);
+    private static final DataType dataTypeB = DataType.fromType(B.class);
+    private static final DataType dataTypeC = DataType.fromType(C.class);
+    private static final DataType dataTypeD = DataType.fromType(D.class);
 
     @Test
     public void failsOnConverterWhenSourceAndReturnTypeDoesNotMatchAndThereIsNoImplicitConversion() throws MuleException

@@ -37,7 +37,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void buildSimple()
     {
-        final DataType<String> dataType = DataType.fromType(String.class);
+        final DataType dataType = DataType.fromType(String.class);
         assertThat(dataType, instanceOf(SimpleDataType.class));
         assertThat(dataType.getType(), is(equalTo(String.class)));
     }
@@ -45,7 +45,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void buildCollection()
     {
-        final DataType<Set> dataType = DataType.fromType(Set.class);
+        final DataType dataType = DataType.fromType(Set.class);
         assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(Set.class)));
         assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.OBJECT));
@@ -54,7 +54,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void buildTypedCollection()
     {
-        final DataType<List> dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
+        final DataType dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
         assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
         assertThat(dataType.getType(), is(equalTo(List.class)));
         assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.STRING));
@@ -63,7 +63,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void templateSimple()
     {
-        final DataType<String> template = DataType.builder().type(String.class).mediaType("text/plain;charset=ASCII").build();
+        final DataType template = DataType.builder().type(String.class).mediaType("text/plain;charset=ASCII").build();
         final DataType dataType = DataType.builder(template).build();
 
         assertThat(dataType, instanceOf(SimpleDataType.class));
@@ -76,7 +76,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void templateCollection()
     {
-        final DataType<Set> template = DataType.builder().type(Set.class).mediaType("text/plain;charset=ASCII").build();
+        final DataType template = DataType.builder().type(Set.class).mediaType("text/plain;charset=ASCII").build();
         final DataType dataType = DataType.builder(template).build();
 
         assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
@@ -90,7 +90,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void templateTypedCollection()
     {
-        final DataType<List> template = DataType.builder()
+        final DataType template = DataType.builder()
                                                .collectionType(List.class)
                                                .itemType(String.class)
                                                .mediaType("text/plain;charset=ASCII")
@@ -139,7 +139,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void recycleBuilder()
     {
-        final DataTypeParamsBuilder<String> builder = DataType.builder().type(String.class);
+        final DataTypeParamsBuilder builder = DataType.builder().type(String.class);
         builder.build();
 
         expected.expect(IllegalStateException.class);
@@ -149,8 +149,8 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void cachedInstances()
     {
-        final DataTypeParamsBuilder<String> builder1 = DataType.builder().type(String.class);
-        final DataTypeParamsBuilder<String> builder2 = DataType.builder().type(String.class);
+        final DataTypeParamsBuilder builder1 = DataType.builder().type(String.class);
+        final DataTypeParamsBuilder builder2 = DataType.builder().type(String.class);
 
         assertThat(builder1, equalTo(builder2));
         assertThat(builder1.build(), sameInstance(builder2.build()));

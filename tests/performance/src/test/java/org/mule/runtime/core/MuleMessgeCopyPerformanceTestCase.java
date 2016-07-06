@@ -13,7 +13,6 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.junit.ContiPerfRule;
@@ -143,7 +142,7 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase
 
     protected MuleMessage createMuleMessageWithProperties(int numProperties)
     {
-        final Builder<String, Serializable> builder = MuleMessage.builder().payload(payload);
+        final Builder builder = MuleMessage.builder().payload(payload);
         for (int i = 1; i <= numProperties; i++)
         {
             builder.addOutboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");

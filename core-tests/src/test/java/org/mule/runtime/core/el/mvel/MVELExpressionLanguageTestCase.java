@@ -466,7 +466,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase
     @Test
     public void returnsDataType() throws Exception
     {
-        DataType<String> dataType = DataType.builder().type(String.class).mediaType(JSON).charset(UTF_16.name()).build();
+        DataType dataType = DataType.builder().type(String.class).mediaType(JSON).charset(UTF_16.name()).build();
 
         MuleEvent event = createMockEvent(TEST_MESSAGE, dataType);
 

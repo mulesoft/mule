@@ -8,10 +8,11 @@ package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.extension.email.internal.builder.EmailAttributesBuilder.fromMessage;
+
 import org.mule.extension.email.api.EmailAttributes;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.internal.EmailContentProcessor;
 import org.mule.extension.email.internal.exception.EmailRetrieverException;
+import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.LinkedList;
@@ -45,15 +46,15 @@ public final class ListCommand
      * @param readContent if should read the email content or not.
      * @param matcher     a {@link Predicate} of {@link EmailAttributes} used to filter the output list  @return a {@link List} of {@link MuleMessage} carrying all the emails and it's corresponding attributes.
      */
-    public List<MuleMessage<String, EmailAttributes>> list(RetrieverConnection connection,
-                                                           String folderName,
-                                                           boolean readContent,
-                                                           Predicate<EmailAttributes> matcher)
+    public List<MuleMessage> list(RetrieverConnection connection,
+                                  String folderName,
+                                  boolean readContent,
+                                  Predicate<EmailAttributes> matcher)
     {
         try
         {
             Folder folder = connection.getFolder(folderName, READ_ONLY);
-            List<MuleMessage<String, EmailAttributes>> list = new LinkedList<>();
+            List<MuleMessage> list = new LinkedList<>();
             for (Message m : folder.getMessages())
             {
                 String body = "";

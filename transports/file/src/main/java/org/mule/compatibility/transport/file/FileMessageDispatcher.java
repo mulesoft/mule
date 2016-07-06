@@ -8,6 +8,7 @@ package org.mule.compatibility.transport.file;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILENAME;
+
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
@@ -76,7 +77,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             }
             else
             {
-                InputStream is = event.transformMessage(DataType.fromType(InputStream.class));
+                InputStream is = (InputStream) event.transformMessage(DataType.fromType(InputStream.class));
                 IOUtils.copyLarge(is, fos);
                 is.close();
             }

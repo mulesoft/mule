@@ -38,7 +38,7 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void createsDataTypeForNullPayload() throws Exception
     {
-        DataType<?> dataType = DataType.fromObject(NullPayload.getInstance());
+        DataType dataType = DataType.fromObject(NullPayload.getInstance());
 
         assertThat(dataType, like(Object.class, MediaType.ANY, null));
     }
@@ -46,7 +46,7 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void createsDataTypeForNonNullObject() throws Exception
     {
-        DataType<?> dataType = DataType.fromObject("test");
+        DataType dataType = DataType.fromObject("test");
 
         assertThat(dataType, like(String.class, MediaType.ANY, null));
     }
@@ -54,7 +54,7 @@ public class DataTypeFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void mimeTypeWithEncodingInformation() throws Exception
     {
-        DataType<?> dataType = DataType.builder().type(type).mediaType(format("%s; charset=UTF-8", mimeType)).charset(encoding).build();
+        DataType dataType = DataType.builder().type(type).mediaType(format("%s; charset=UTF-8", mimeType)).charset(encoding).build();
         assertThat(dataType.getType(), equalTo(type));
         assertThat(dataType.getMediaType().getPrimaryType(), is(mimeType.split("/")[0]));
         assertThat(dataType.getMediaType().getSubType(), is(mimeType.split("/")[1]));

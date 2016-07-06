@@ -86,7 +86,7 @@ public class TransformerUtils
     {
         if (null != names)
         {
-            List<Transformer> transformers = new LinkedList<Transformer>();
+            List<Transformer> transformers = new LinkedList<>();
             StringTokenizer st = new StringTokenizer(names, COMMA);
             while (st.hasMoreTokens())
             {
@@ -123,7 +123,7 @@ public class TransformerUtils
 
         if (transformer.getReturnDataType() != null)
         {
-            DataType<?> dt = DataType.fromType(value.getClass());
+            DataType dt = DataType.fromType(value.getClass());
             if (!transformer.getReturnDataType().isCompatibleWith(dt))
             {
                 throw new TransformerException(
@@ -138,12 +138,12 @@ public class TransformerUtils
         }
     }
 
-    public static <T> Object transformToAny(T input, MuleContext muleContext, DataType<?>... supportedTypes)
+    public static <T> Object transformToAny(T input, MuleContext muleContext, DataType... supportedTypes)
     {
-        final DataType<T> sourceType = (DataType<T>) DataType.fromType(input.getClass());
+        final DataType sourceType = DataType.fromType(input.getClass());
         Object transformedData = null;
 
-        for (DataType<?> supportedType : supportedTypes)
+        for (DataType supportedType : supportedTypes)
         {
             transformedData = attemptTransformation(sourceType, input, supportedType, muleContext);
             if (transformedData != null)
@@ -155,7 +155,7 @@ public class TransformerUtils
         return transformedData;
     }
 
-    private static <S, R> R attemptTransformation(DataType<S> sourceDataType, S source, DataType<R> resultDataType, MuleContext muleContext)
+    private static <S, R> R attemptTransformation(DataType sourceDataType, S source, DataType resultDataType, MuleContext muleContext)
     {
         Transformer transformer;
         try

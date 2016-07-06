@@ -116,11 +116,11 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
-        return transformMessage(DataType.fromType(outputType));
+        return (T) transformMessage(DataType.fromType(outputType));
     }
 
     @Override
-    public <T> T transformMessage(DataType<T> outputType) throws TransformerException
+    public Object transformMessage(DataType outputType) throws TransformerException
     {
         throw new UnsupportedOperationException();
     }
@@ -128,7 +128,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     @Override
     public String transformMessageToString() throws TransformerException
     {
-        return new String(transformMessage(DataType.BYTE_ARRAY), message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(getMuleContext())));
+        return new String((byte[]) transformMessage(DataType.BYTE_ARRAY), message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(getMuleContext())));
     }
 
     @Override
@@ -240,7 +240,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
     }
 
     @Override
-    public DataType<?> getFlowVariableDataType(String key)
+    public DataType getFlowVariableDataType(String key)
     {
         return null;
     }

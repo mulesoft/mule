@@ -16,6 +16,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -74,10 +75,10 @@ public class HttpResponseToMuleEvent
     public void convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException
     {
         String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
-        DataType<?> dataType = muleEvent.getMessage().getDataType();
+        DataType dataType = muleEvent.getMessage().getDataType();
         if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType()))
         {
-            responseContentType = dataType.getMediaType().toString();
+            responseContentType = dataType.getMediaType().toRfcString();
         }
 
         InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();

@@ -7,6 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
@@ -35,7 +36,6 @@ import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -72,9 +72,11 @@ public class HeisenbergOperations
     public OperationResult<String, Integer> getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
     {
         Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
-        org.mule.runtime.api.metadata.DataType<String> dt = DataType.builder().type(String.class).mediaType("dead/dead")
-                                                                                         .charset(lastSupportedEncoding.toString())
-                                                                                         .build();
+        org.mule.runtime.api.metadata.DataType dt = DataType.builder()
+                                                            .type(String.class)
+                                                            .mediaType("dead/dead")
+                                                            .charset(lastSupportedEncoding.toString())
+                                                            .build();
 
         return OperationResult.<String, Integer>builder().output(config.getEnemies().get(index)).mediaType(dt.getMediaType()).attributes
                 (index).build();
@@ -151,9 +153,9 @@ public class HeisenbergOperations
         return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
     }
 
-    public void getPaymentFromMessage(@UseConfig HeisenbergExtension config, MuleMessage<Long, Serializable> message)
+    public void getPaymentFromMessage(@UseConfig HeisenbergExtension config, MuleMessage message)
     {
-        Long payment = message.getPayload();
+        Long payment = (Long) message.getPayload();
         config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
     }
 

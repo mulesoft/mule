@@ -15,6 +15,7 @@ import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
+
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.runtime.api.message.MuleMessage;
@@ -50,7 +51,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     private static final int TIMEOUT_MILLIS = 5000;
     private static final int POLL_DELAY_MILLIS = 100;
 
-    private static List<MuleMessage<?, ListenerFileAttributes>> receivedMessages;
+    private static List<MuleMessage> receivedMessages;
 
     private File matcherLessFolder;
     private File withMatcherFolder;
@@ -162,7 +163,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     public void matcher() throws Exception
     {
         write(new File(withMatcherFolder, MATCH_FILE), "");
-        MuleMessage<?, ListenerFileAttributes> message = listen(CREATE, MATCH_FILE);
+        MuleMessage message = listen(CREATE, MATCH_FILE);
 
         assertThat(message.getPayload(), equalTo(DR_MANHATTAN));
     }
@@ -195,7 +196,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
         }, "source did not stop"));
     }
 
-    private void assertEvent(MuleMessage<?, ListenerFileAttributes> message, Object expectedContent) throws Exception
+    private void assertEvent(MuleMessage message, Object expectedContent) throws Exception
     {
         Object payload = message.getPayload();
         if (payload instanceof InputStream)
@@ -207,14 +208,14 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
         assertThat(payload, equalTo(expectedContent));
     }
 
-    private MuleMessage<?, ListenerFileAttributes> listen(FileEventType type, String fileName)
+    private MuleMessage listen(FileEventType type, String fileName)
     {
         PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-        ValueHolder<MuleMessage<?, ListenerFileAttributes>> messageHolder = new ValueHolder<>();
+        ValueHolder<MuleMessage> messageHolder = new ValueHolder<>();
         prober.check(new JUnitLambdaProbe(() -> {
-            for (MuleMessage<?, ListenerFileAttributes> message : receivedMessages)
+            for (MuleMessage message : receivedMessages)
             {
-                ListenerFileAttributes attributes = message.getAttributes();
+                ListenerFileAttributes attributes = (ListenerFileAttributes) message.getAttributes();
                 if (attributes.getPath().endsWith("/" + fileName) && attributes.getEventType().equals(type.name()))
                 {
                     messageHolder.set(message);

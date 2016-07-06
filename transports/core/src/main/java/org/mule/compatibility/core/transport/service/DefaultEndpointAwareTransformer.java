@@ -87,13 +87,13 @@ public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
     }
 
     @Override
-    public boolean isSourceDataTypeSupported(DataType<?> dataType)
+    public boolean isSourceDataTypeSupported(DataType dataType)
     {
         return transformer.isSourceDataTypeSupported(dataType);
     }
 
     @Override
-    public List<DataType<?>> getSourceDataTypes()
+    public List<DataType> getSourceDataTypes()
     {
         return transformer.getSourceDataTypes();
     }
@@ -149,13 +149,13 @@ public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
     }
 
     @Override
-    public void setReturnDataType(DataType<?> type)
+    public void setReturnDataType(DataType type)
     {
         transformer.setReturnDataType(type);
     }
 
     @Override
-    public DataType<?> getReturnDataType()
+    public DataType getReturnDataType()
     {
         return transformer.getReturnDataType();
     }

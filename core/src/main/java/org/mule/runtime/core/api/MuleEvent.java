@@ -77,7 +77,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent
      * @throws TransformerException if a failure occurs in the transformer
      * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
      */
-    <T> T transformMessage(DataType<T> outputType) throws TransformerException;
+    Object transformMessage(DataType outputType) throws TransformerException;
 
     /**
      * Returns the message transformed into it's recognised or expected format and then into a String. The
@@ -225,7 +225,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent
      * @param key the name or key of the variable. This must be non-null.
      * @return the property data type or null if the flow variable does not exist
      */
-    DataType<?> getFlowVariableDataType(String key);
+    DataType getFlowVariableDataType(String key);
 
     Set<String> getFlowVariableNames();
 

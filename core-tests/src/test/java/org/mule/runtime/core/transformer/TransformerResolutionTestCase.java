@@ -28,9 +28,9 @@ import org.junit.Test;
 public class TransformerResolutionTestCase extends AbstractMuleContextTestCase
 {
 
-    public static final DataType<Fruit> FRUIT_DATA_TYPE = DataType.fromType(Fruit.class);
-    public static final DataType<Orange> ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
-    public static final DataType<Apple> APPLE_DATA_TYPE = DataType.fromType(Apple.class);
+    public static final DataType FRUIT_DATA_TYPE = DataType.fromType(Fruit.class);
+    public static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
+    public static final DataType APPLE_DATA_TYPE = DataType.fromType(Apple.class);
 
     @Test
     public void resolvesMultipleApplicableTransformers() throws MuleException

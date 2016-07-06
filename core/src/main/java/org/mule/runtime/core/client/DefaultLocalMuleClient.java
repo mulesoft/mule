@@ -123,9 +123,9 @@ public class DefaultLocalMuleClient implements MuleClient
         return send(url, message, newOptions().outbound().responseTimeout(timeout).build());
     }
 
-    protected MuleMessage<Object, Serializable> createMessage(Object payload, Map<String, Serializable> messageProperties)
+    protected MuleMessage createMessage(Object payload, Map<String, Serializable> messageProperties)
     {
-        final Builder<Object, Serializable> builder = MuleMessage.builder().payload(payload != null ? payload : NullPayload.getInstance());
+        final Builder builder = MuleMessage.builder().payload(payload != null ? payload : NullPayload.getInstance());
         if (messageProperties != null)
         {
             builder.outboundProperties(messageProperties);

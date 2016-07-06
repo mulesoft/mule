@@ -43,15 +43,15 @@ public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageP
             }
             if (contentType == null)
             {
-                event.setMessage(MuleMessage.builder(event.getMessage()).addInboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType.toString()).build());
+                event.setMessage(MuleMessage.builder(event.getMessage()).addInboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType.toRfcString()).build());
             }
             else
             {
-                String messageMimeType = DataType.builder().mediaType(contentType).build().getMediaType().toString();
-                if (!messageMimeType.equals(endpointMimeType.toString()))
+                String messageMimeType = DataType.builder().mediaType(contentType).build().getMediaType().toRfcString();
+                if (!messageMimeType.equals(endpointMimeType.toRfcString()))
                 {
                     throw new MessagingException(
-                            CoreMessages.unexpectedMIMEType(messageMimeType, endpointMimeType.toString()), event, this);
+                            CoreMessages.unexpectedMIMEType(messageMimeType, endpointMimeType.toRfcString()), event, this);
                 }
             }
         }

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.transformer.graph;
 
-import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.transformer.Converter;
 
 import java.util.List;
 
@@ -26,6 +26,6 @@ public interface ConverterFilter
      * @param result result data type being resolved
      * @return a non null list of converters that match the specified criteria
      */
-    public List<Converter> filter(List<Converter> converters, DataType<?> source, DataType<?> result);
+    public List<Converter> filter(List<Converter> converters, DataType source, DataType result);
 
 }

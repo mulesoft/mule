@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
@@ -101,7 +102,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     @Test
     public void aggregateMultipleEvents() throws Exception
     {
-        DataType<String> simpleDateType1 = DataType.builder().type(String.class).mediaType("text/plain").build();
+        DataType simpleDateType1 = DataType.builder().type(String.class).mediaType("text/plain").build();
         MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
         MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
         MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
@@ -122,7 +123,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
         event3.getSession().setProperty("KEY2", "value2NEW");
         event3.getSession().setProperty("key3", "value3");
 
-        List<MuleEvent> events = new ArrayList<MuleEvent>();
+        List<MuleEvent> events = new ArrayList<>();
         events.add(event2);
         events.add(event3);
 
@@ -162,7 +163,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
         DefaultMuleEvent event2 = new DefaultMuleEvent(message2, flow);
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event2, endpoint);
         event2.setFlowVariable("key2", "value2");
-        List<MuleEvent> events = new ArrayList<MuleEvent>();
+        List<MuleEvent> events = new ArrayList<>();
         events.add(null);
         events.add(event2);
 
@@ -233,7 +234,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
         DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event3, endpoint);
         event3.setFlowVariable("key3", "value3");
 
-        List<MuleEvent> events = new ArrayList<MuleEvent>();
+        List<MuleEvent> events = new ArrayList<>();
         events.add(event2);
         events.add(event3);
 

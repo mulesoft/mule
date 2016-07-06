@@ -52,30 +52,30 @@ public class MessagePropertiesContext implements MessageProperties, Serializable
     }
 
     @Override
-    public <T extends Serializable> T getInboundProperty(String name)
+    public Serializable getInboundProperty(String name)
     {
         return getInboundProperty(name, null);
     }
 
     @Override
-    public <T extends Serializable> T getInboundProperty(String name, T defaultValue)
+    public Serializable getInboundProperty(String name, Serializable defaultValue)
     {
-        return getValueOrDefault((TypedValue<T>) inboundMap.get(name), defaultValue);
+        return getValueOrDefault(inboundMap.get(name), defaultValue);
     }
 
     @Override
-    public <T extends Serializable> T getOutboundProperty(String name)
+    public Serializable getOutboundProperty(String name)
     {
         return getOutboundProperty(name, null);
     }
 
     @Override
-    public <T extends Serializable> T getOutboundProperty(String name, T defaultValue)
+    public Serializable getOutboundProperty(String name, Serializable defaultValue)
     {
-        return getValueOrDefault((TypedValue<T>) outboundMap.get(name), defaultValue);
+        return getValueOrDefault(outboundMap.get(name), defaultValue);
     }
 
-    public <T extends Serializable> void setInboundProperty(String key, T value, DataType<T> dataType)
+    public void setInboundProperty(String key, Serializable value, DataType dataType)
     {
         if (key != null)
         {
@@ -106,7 +106,7 @@ public class MessagePropertiesContext implements MessageProperties, Serializable
         setOutboundProperty(key, value, DataType.fromObject(value));
     }
 
-    public <T extends Serializable> void setOutboundProperty(String key, T value, DataType<T> dataType)
+    public void setOutboundProperty(String key, Serializable value, DataType dataType)
     {
         if (key != null)
         {
@@ -145,14 +145,14 @@ public class MessagePropertiesContext implements MessageProperties, Serializable
     }
 
     @Override
-    public DataType<? extends Serializable> getInboundPropertyDataType(String name)
+    public DataType getInboundPropertyDataType(String name)
     {
         TypedValue typedValue = inboundMap.get(name);
         return typedValue == null ? null : typedValue.getDataType();
     }
 
     @Override
-    public DataType<? extends Serializable> getOutboundPropertyDataType(String name)
+    public DataType getOutboundPropertyDataType(String name)
     {
         TypedValue typedValue = outboundMap.get(name);
         return typedValue == null ? null : typedValue.getDataType();
@@ -184,13 +184,13 @@ public class MessagePropertiesContext implements MessageProperties, Serializable
         return buf.toString();
     }
 
-    private <T extends Serializable> T getValueOrDefault(TypedValue<T> typedValue, T defaultValue)
+    private Serializable getValueOrDefault(TypedValue typedValue, Serializable defaultValue)
     {
         if (typedValue == null)
         {
             return defaultValue;
         }
-        T value = typedValue.getValue();
+        Serializable value = (Serializable) typedValue.getValue();
         //Note that we need to keep the (redundant) casts in here because the compiler compiler complains
         //about primitive types being cast to a generic type
         if (defaultValue == null)
@@ -199,35 +199,35 @@ public class MessagePropertiesContext implements MessageProperties, Serializable
         }
         else if (defaultValue instanceof Boolean)
         {
-            return  (T) (Boolean) ObjectUtils.getBoolean(value, (Boolean) defaultValue);
+            return ObjectUtils.getBoolean(value, (Boolean) defaultValue);
         }
         else if (defaultValue instanceof Byte)
         {
-            return (T) (Byte) ObjectUtils.getByte(value, (Byte) defaultValue);
+            return ObjectUtils.getByte(value, (Byte) defaultValue);
         }
         else if (defaultValue instanceof Integer)
         {
-            return (T) (Integer) ObjectUtils.getInt(value, (Integer) defaultValue);
+            return ObjectUtils.getInt(value, (Integer) defaultValue);
         }
         else if (defaultValue instanceof Short)
         {
-            return (T) (Short) ObjectUtils.getShort(value, (Short) defaultValue);
+            return ObjectUtils.getShort(value, (Short) defaultValue);
         }
         else if (defaultValue instanceof Long)
         {
-            return (T) (Long) ObjectUtils.getLong(value, (Long) defaultValue);
+            return ObjectUtils.getLong(value, (Long) defaultValue);
         }
         else if (defaultValue instanceof Float)
         {
-            return (T) (Float) ObjectUtils.getFloat(value, (Float) defaultValue);
+            return ObjectUtils.getFloat(value, (Float) defaultValue);
         }
         else if (defaultValue instanceof Double)
         {
-            return (T) (Double) ObjectUtils.getDouble(value, (Double) defaultValue);
+            return ObjectUtils.getDouble(value, (Double) defaultValue);
         }
         else if (defaultValue instanceof String)
         {
-            return (T) ObjectUtils.getString(value, (String) defaultValue);
+            return ObjectUtils.getString(value, (String) defaultValue);
         }
         else
         {

@@ -54,7 +54,7 @@ public class StringToBoolean extends AbstractTransformer implements Discoverable
     }
 
     @Override
-    public void setReturnDataType(DataType<?> type)
+    public void setReturnDataType(DataType type)
     {
         if (!Boolean.class.isAssignableFrom(type.getType()))
         {

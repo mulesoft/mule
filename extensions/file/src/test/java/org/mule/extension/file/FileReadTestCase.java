@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
+
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MediaType;
@@ -105,19 +106,19 @@ public class FileReadTestCase extends FileConnectorTestCase
     @Test
     public void readLockReleasedOnContentConsumed() throws Exception
     {
-        MuleMessage<AbstractFileInputStream, LocalFileAttributes> message = readWithLock();
-        IOUtils.toString(message.getPayload());
+        final AbstractFileInputStream payload = (AbstractFileInputStream) readWithLock().getPayload();
+        IOUtils.toString(payload);
 
-        assertThat(message.getPayload().isLocked(), is(false));
+        assertThat(payload.isLocked(), is(false));
     }
 
     @Test
     public void readLockReleasedOnEarlyClose() throws Exception
     {
-        MuleMessage<AbstractFileInputStream, LocalFileAttributes> message = readWithLock();
-        message.getPayload().close();
+        final AbstractFileInputStream payload = (AbstractFileInputStream) readWithLock().getPayload();
+        payload.close();
 
-        assertThat(message.getPayload().isLocked(), is(false));
+        assertThat(payload.isLocked(), is(false));
     }
 
     @Test
@@ -139,10 +140,10 @@ public class FileReadTestCase extends FileConnectorTestCase
         assertThat(filePayload.isRegularFile(), is(true));
     }
 
-    private MuleMessage<AbstractFileInputStream, LocalFileAttributes> readWithLock() throws Exception
+    private MuleMessage readWithLock() throws Exception
     {
-        MuleMessage<AbstractFileInputStream, LocalFileAttributes> message = flowRunner("readWithLock").run().getMessage();
-        assertThat(message.getPayload().isLocked(), is(true));
+        MuleMessage message = flowRunner("readWithLock").run().getMessage();
+        assertThat(((AbstractFileInputStream) message.getPayload()).isLocked(), is(true));
 
         return message;
     }

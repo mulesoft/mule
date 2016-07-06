@@ -27,7 +27,7 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     @Test
     public void acceptsSupportedEncoding() throws Exception
     {
-        DataType<?> dataType = DataType.builder().charset(UTF_8.name()).build();
+        DataType dataType = DataType.builder().charset(UTF_8.name()).build();
 
         assertThat(dataType.getMediaType().getCharset().get(), equalTo(UTF_8));
     }
@@ -41,7 +41,7 @@ public class SimpleDataTypeTestCase extends AbstractMuleTestCase
     @Test
     public void acceptsValidMimeType() throws Exception
     {
-        DataType<?> dataType = DataType.builder().mediaType(JSON).build();
+        DataType dataType = DataType.builder().mediaType(JSON).build();
 
         assertThat(dataType.getMediaType(), equalTo(JSON));
     }

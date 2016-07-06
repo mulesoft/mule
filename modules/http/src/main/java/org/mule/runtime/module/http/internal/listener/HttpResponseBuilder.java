@@ -106,10 +106,10 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
 
         if (!outboundProperties.contains(MuleProperties.CONTENT_TYPE_PROPERTY))
         {
-            DataType<?> dataType = event.getMessage().getDataType();
+            DataType dataType = event.getMessage().getDataType();
             if (!MediaType.ANY.matches(dataType.getMediaType()))
             {
-                httpResponseHeaderBuilder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMediaType().toString());
+                httpResponseHeaderBuilder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMediaType().toRfcString());
             }
         }
 
