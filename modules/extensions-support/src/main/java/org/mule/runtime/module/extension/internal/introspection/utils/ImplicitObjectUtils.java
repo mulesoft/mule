@@ -38,7 +38,7 @@ public final class ImplicitObjectUtils
      * then it's ignored
      *
      * @param parameterizedModel a model holding the {@link ParameterModel}s to consider
-     * @param expressionManager a {@link ExpressionManager} for the default values which are expessions
+     * @param expressionManager  a {@link ExpressionManager} for the default values which are expessions
      * @return a {@link ResolverSet}
      */
     public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, ExpressionManager expressionManager)
@@ -50,7 +50,7 @@ public final class ImplicitObjectUtils
             if (defaultValue != null)
             {
                 ValueResolver<Object> valueResolver;
-                if (defaultValue instanceof String && expressionManager.isExpression((String) defaultValue) && parameterModel.getExpressionSupport() != ExpressionSupport.LITERAL)
+                if (defaultValue instanceof String && parameterModel.getExpressionSupport() != ExpressionSupport.LITERAL)
                 {
                     valueResolver = new TypeSafeExpressionValueResolver<>((String) defaultValue, getType(parameterModel.getType()));
                 }
