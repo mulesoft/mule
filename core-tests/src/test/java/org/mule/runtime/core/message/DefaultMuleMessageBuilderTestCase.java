@@ -24,7 +24,6 @@ import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleMessageBuilder;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
