@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.introspection.Interceptable;
-import org.mule.runtime.extension.api.runtime.Interceptor;
+import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 
 import com.google.common.collect.ImmutableList;
 

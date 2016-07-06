@@ -55,7 +55,7 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel
 import org.mule.runtime.extension.api.introspection.source.ImmutableRuntimeSourceModel;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
-import org.mule.runtime.extension.api.runtime.Interceptor;
+import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.validation.ConfigurationModelValidator;

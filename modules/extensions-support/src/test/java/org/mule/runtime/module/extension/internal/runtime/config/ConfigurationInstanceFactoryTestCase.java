@@ -29,7 +29,7 @@ import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationM
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.Interceptor;
+import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase;
 import org.mule.runtime.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase.TestConfig;
