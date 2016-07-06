@@ -13,11 +13,10 @@ import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
-
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.construct.Flow;
 
@@ -87,7 +86,6 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
     @Test
     public void getSourceStaticOutputMetadata() throws IOException
     {
-
         final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
         assertExpectedOutput(componentMetadata.getOutputMetadata(), new TypeToken<Map<String, Object>>()
         {
@@ -98,10 +96,10 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase
     public void getSourceParametersStaticMetadata() throws IOException
     {
         final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
-        final List<TypeMetadataDescriptor> parametersMetadata = componentMetadata.getParametersMetadata();
+        final List<MetadataResult<ParameterMetadataDescriptor>> parametersMetadata = componentMetadata.getParametersMetadata();
 
         assertThat(parametersMetadata.size(), is(1));
-        final TypeMetadataDescriptor typeMetadataDescriptor = parametersMetadata.get(0);
+        final MetadataResult<ParameterMetadataDescriptor> typeMetadataDescriptor = parametersMetadata.get(0);
         assertExpectedType(typeMetadataDescriptor, TYPE_PARAMETER_NAME, String.class);
     }
 

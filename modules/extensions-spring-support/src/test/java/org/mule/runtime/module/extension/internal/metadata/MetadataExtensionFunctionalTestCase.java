@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
-
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -19,6 +18,7 @@ import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
@@ -33,6 +33,7 @@ import org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -120,8 +121,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected ComponentMetadataDescriptor getComponentDynamicMetadata(MetadataKey key)
     {
         MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId, key);
-        assertThat(componentMetadata.getFailure().isPresent() ? componentMetadata.getFailure().get().getReason() : "No Failure",
-                   componentMetadata.isSuccess(), is(true));
+        assertThat(componentMetadata.getFailure().isPresent() ? componentMetadata.getFailure().get().getReason() : "No Failure", componentMetadata.isSuccess(), is(true));
 
         return componentMetadata.get();
     }
@@ -137,53 +137,63 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     protected void assertFailure(MetadataResult<?> result, String msgContains, FailureCode failureCode, String traceContains) throws IOException
     {
         assertThat(result.isSuccess(), is(false));
-        MetadataFailure metadataFailure = result.getFailure().get();
-        assertThat(metadataFailure.getMessage(), metadataFailure.getFailureCode(), is(failureCode));
+        Optional<MetadataFailure> metadataFailure = result.getFailure();
+        assertThat(metadataFailure.get().getMessage(), metadataFailure.get().getFailureCode(), is(failureCode));
 
         if (!StringUtils.isBlank(msgContains))
         {
-            assertThat(metadataFailure.getMessage(), containsString(msgContains));
+            assertThat(metadataFailure.get().getMessage(), containsString(msgContains));
         }
 
         if (!StringUtils.isBlank(traceContains))
         {
-            assertThat(metadataFailure.getReason(), containsString(traceContains));
+            assertThat(metadataFailure.get().getReason(), containsString(traceContains));
         }
     }
 
-    protected void assertExpectedOutput(OutputMetadataDescriptor outputDescriptor, Type payloadType, Type attributesType) throws IOException
+    protected void assertExpectedOutput(MetadataResult<OutputMetadataDescriptor> outputDescriptor, Type payloadType, Type attributesType) throws IOException
     {
-        assertExpectedType(outputDescriptor.getPayloadMetadata(), "Message.Payload", payloadType);
-        assertExpectedType(outputDescriptor.getAttributesMetadata(), "Message.Attributes", attributesType);
+        assertExpectedType(outputDescriptor.get().getPayloadMetadata(), payloadType);
+        assertExpectedType(outputDescriptor.get().getAttributesMetadata(), attributesType);
     }
 
-    protected void assertExpectedOutput(OutputMetadataDescriptor outputDescriptor, MetadataType payloadType, Type attributesType) throws IOException
+    protected void assertExpectedOutput(MetadataResult<OutputMetadataDescriptor> outputDescriptor, MetadataType payloadType, Type attributesType) throws IOException
     {
-        assertExpectedType(outputDescriptor.getPayloadMetadata(), "Message.Payload", payloadType);
-        assertExpectedType(outputDescriptor.getAttributesMetadata(), "Message.Attributes", attributesType);
+        assertExpectedType(outputDescriptor.get().getPayloadMetadata(), payloadType);
+        assertExpectedType(outputDescriptor.get().getAttributesMetadata(), attributesType);
     }
 
-    protected void assertExpectedOutput(OutputMetadataDescriptor outputDescriptor, MetadataType payloadType, MetadataType attributesType) throws IOException
+    protected void assertExpectedOutput(MetadataResult<OutputMetadataDescriptor> outputDescriptor, MetadataType payloadType, MetadataType attributesType) throws IOException
     {
-        assertExpectedType(outputDescriptor.getPayloadMetadata(), "Message.Payload", payloadType);
-        assertExpectedType(outputDescriptor.getAttributesMetadata(), "Message.Attributes", attributesType);
+        assertExpectedType(outputDescriptor.get().getPayloadMetadata(), payloadType);
+        assertExpectedType(outputDescriptor.get().getAttributesMetadata(), attributesType);
     }
 
-    protected void assertExpectedType(TypeMetadataDescriptor param, String name, Type type) throws IOException
+    protected void assertExpectedType(MetadataResult<TypeMetadataDescriptor> descriptor, Type type) throws IOException
     {
+        assertThat(descriptor.get().getType(), is(typeLoader.load(type)));
+    }
+
+    protected void assertExpectedType(MetadataResult<ParameterMetadataDescriptor> descriptor, String name, Type type) throws IOException
+    {
+        assertThat(descriptor.get().getType(), is(typeLoader.load(type)));
         if (!StringUtils.isBlank(name))
         {
-            assertThat(param.getName(), is(name));
+            assertThat(descriptor.get().getName(), is(name));
         }
-        assertThat(param.getType(), is(typeLoader.load(type)));
     }
 
-    protected void assertExpectedType(TypeMetadataDescriptor param, String name, MetadataType type) throws IOException
+    protected void assertExpectedType(MetadataResult<TypeMetadataDescriptor> descriptor, MetadataType type) throws IOException
     {
+        assertThat(descriptor.get().getType(), is(type));
+    }
+
+    protected void assertExpectedType(MetadataResult<ParameterMetadataDescriptor> descriptor, String name, MetadataType type) throws IOException
+    {
+        assertThat(descriptor.get().getType(), is(type));
         if (!StringUtils.isBlank(name))
         {
-            assertThat(param.getName(), is(name));
+            assertThat(descriptor.get().getName(), is(name));
         }
-        assertThat(param.getType(), is(type));
     }
 }
