@@ -112,7 +112,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                     MuleEvent event = routeMessage(message);
                     if (event != null && !VoidMuleEvent.getInstance().equals(event) && getEndpoint().getExchangePattern().hasResponse())
                     {
-                        MuleMessage returnedMessage = event.getMessage();
                         return event;
                     }
                     return null;
