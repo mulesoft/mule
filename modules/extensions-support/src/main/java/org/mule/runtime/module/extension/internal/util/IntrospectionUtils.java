@@ -25,7 +25,6 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -48,6 +47,7 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
@@ -102,8 +102,8 @@ public final class IntrospectionUtils
 
     /**
      * Returns a {@link MetadataType} representing the given {@link Method}'s return type.
-     * If the {@code method} returns a {@link MuleMessage}, then it returns the type
-     * of the {@code Payload} generic. If the {@link MuleMessage} type is being used
+     * If the {@code method} returns an {@link OperationResult}, then it returns the type
+     * of the {@code Output} generic. If the {@link OperationResult} type is being used
      * in its raw form, then an {@link AnyType} will be returned.
      *
      * @param method     the {@link Method} being introspected
@@ -115,19 +115,19 @@ public final class IntrospectionUtils
     {
         return getMethodType(method, typeLoader, 0, () -> {
             ResolvableType methodType = getMethodResolvableType(method);
-            return methodType.getRawClass().equals(MuleMessage.class)
+            return methodType.getRawClass().equals(OperationResult.class)
                    ? typeBuilder().anyType().build()
                    : typeLoader.load(methodType.getType());
         });
     }
 
     /**
-     * Returns a {@link MetadataType} representing the {@link MuleMessage#getAttributes()}
+     * Returns a {@link MetadataType} representing the {@link OperationResult#getAttributes()}
      * that will be set after executing the given {@code method}.
      * <p>
-     * If the {@code method} returns a {@link MuleMessage}, then it returns the type
+     * If the {@code method} returns a {@link OperationResult}, then it returns the type
      * of the {@code Attributes} generic. In any other case
-     * (including raw uses of {@link MuleMessage}) it will return a {@link NullType}
+     * (including raw uses of {@link OperationResult}) it will return a {@link NullType}
      *
      * @param method     the {@link Method} being introspected
      * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
@@ -146,7 +146,7 @@ public final class IntrospectionUtils
     {
         ResolvableType methodType = getMethodResolvableType(method);
         Type type = null;
-        if (methodType.getRawClass().equals(MuleMessage.class))
+        if (methodType.getRawClass().equals(OperationResult.class))
         {
             ResolvableType genericType = methodType.getGenerics()[genericIndex];
             if (genericType.getRawClass() != null)

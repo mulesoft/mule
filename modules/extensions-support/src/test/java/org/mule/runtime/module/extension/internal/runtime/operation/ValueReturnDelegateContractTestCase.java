@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.processor;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -19,6 +19,7 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -70,12 +71,12 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     }
 
     @Test
-    public void operationReturnsMuleMessageButKeepsAttributes() throws Exception
+    public void operationReturnsOperationResultButKeepsAttributes() throws Exception
     {
         Object payload = new Object();
         MediaType mediaType = ANY.withCharset(getDefaultEncoding(muleContext));
 
-        delegate.asReturnValue(MuleMessage.builder().payload(payload).mediaType(mediaType).build(), operationContext);
+        delegate.asReturnValue(OperationResult.builder().output(payload).mediaType(mediaType).build(), operationContext);
 
         MuleMessage message = getOutputMessage();
 
@@ -85,11 +86,11 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     }
 
     @Test
-    public void operationReturnsMuleMessageThatOnlySpecifiesPayload() throws Exception
+    public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception
     {
         Object payload = "hello world!";
 
-        delegate.asReturnValue(MuleMessage.builder().payload(payload).build(), operationContext);
+        delegate.asReturnValue(OperationResult.builder().output(payload).build(), operationContext);
 
         MuleMessage message = getOutputMessage();
 
@@ -99,12 +100,12 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     }
 
     @Test
-    public void operationReturnsMuleMessageThatOnlySpecifiesPayloadAndAttributes() throws Exception
+    public void operationReturnsOperationResultThatOnlySpecifiesPayloadAndAttributes() throws Exception
     {
         Object payload = "hello world!";
         Serializable newAttributes = mock(Serializable.class);
 
-        delegate.asReturnValue(MuleMessage.builder().payload(payload).attributes(newAttributes).build(), operationContext);
+        delegate.asReturnValue(OperationResult.builder().output(payload).attributes(newAttributes).build(), operationContext);
 
         MuleMessage message = getOutputMessage();
 

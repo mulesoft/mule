@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.processor;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptySet;
@@ -33,7 +33,6 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
-
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -66,9 +65,10 @@ import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartMode
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.OperationContext;
-import org.mule.runtime.extension.api.runtime.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionEnricher;
@@ -264,14 +264,17 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     }
 
     @Test
-    public void operationReturnsMuleMessageWichKeepsNoValues() throws Exception
+    public void operationReturnsOperationResultWhichKeepsNoValues() throws Exception
     {
         Object payload = new Object();
         MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
         Serializable attributes = mock(Serializable.class);
 
-        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(MuleMessage.builder().payload
-                (payload).mediaType(mediaType).attributes(attributes).build());
+        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder()
+                                                                                        .output(payload)
+                                                                                        .mediaType(mediaType)
+                                                                                        .attributes(attributes)
+                                                                                        .build());
 
         ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
 
@@ -287,7 +290,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     }
 
     @Test
-    public void operationReturnsMuleMessageOnTarget() throws Exception
+    public void operationReturnsOperationResultOnTarget() throws Exception
     {
         target = TARGET_VAR;
         messageProcessor = createOperationMessageProcessor();
@@ -296,8 +299,11 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
         Serializable attributes = mock(Serializable.class);
 
-        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(MuleMessage.builder().payload
-                (payload).mediaType(mediaType).attributes(attributes).build());
+        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder()
+                                                                                        .output(payload)
+                                                                                        .mediaType(mediaType)
+                                                                                        .attributes(attributes)
+                                                                                        .build());
 
         messageProcessor.process(event);
 
@@ -314,14 +320,17 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     }
 
     @Test
-    public void operationReturnsMuleMessageButKeepsAttributes() throws Exception
+    public void operationReturnsOperationResultButKeepsAttributes() throws Exception
     {
         Object payload = new Object();
         MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
         Serializable oldAttributes = mock(Serializable.class);
 
-        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(MuleMessage.builder().payload
-                (payload).mediaType(mediaType).build());
+        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder()
+                                                                                        .output(payload)
+                                                                                        .mediaType(mediaType)
+                                                                                        .build());
+
         when(event.getMessage()).thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes
                 (oldAttributes).build());
         ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
@@ -338,15 +347,13 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     }
 
     @Test
-    public void operationReturnsMuleMessageThatOnlySpecifiesPayload() throws Exception
+    public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception
     {
         Object payload = "hello world!";
         Serializable oldAttributes = mock(Serializable.class);
 
-        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(MuleMessage.builder().payload
-                (payload).build());
-        when(event.getMessage()).thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes
-                (oldAttributes).build());
+        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder().output(payload).build());
+        when(event.getMessage()).thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes(oldAttributes).build());
         ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
 
         messageProcessor.process(event);
@@ -361,13 +368,14 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     }
 
     @Test
-    public void operationReturnsMuleMessageWithPayloadAndAttributes() throws Exception
+    public void operationReturnsOperationResultWithPayloadAndAttributes() throws Exception
     {
         Object payload = "hello world!";
         Serializable attributes = mock(Serializable.class);
 
-        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(MuleMessage.builder().payload
-                (payload).attributes(attributes).build());
+        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder().output(payload)
+                                                                                        .attributes(attributes)
+                                                                                        .build());
         ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
 
         messageProcessor.process(event);

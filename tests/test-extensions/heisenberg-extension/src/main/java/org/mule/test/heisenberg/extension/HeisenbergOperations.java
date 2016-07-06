@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
@@ -68,14 +69,14 @@ public class HeisenbergOperations
     }
 
     @DataTypeParameters
-    public MuleMessage<String, Integer> getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
+    public OperationResult<String, Integer> getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
     {
         Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
         org.mule.runtime.api.metadata.DataType<String> dt = DataType.builder().type(String.class).mediaType("dead/dead")
                                                                                          .charset(lastSupportedEncoding.toString())
                                                                                          .build();
 
-        return MuleMessage.builder().payload(config.getEnemies().get(index)).mediaType(dt.getMediaType()).attributes
+        return OperationResult.<String, Integer>builder().output(config.getEnemies().get(index)).mediaType(dt.getMediaType()).attributes
                 (index).build();
     }
 

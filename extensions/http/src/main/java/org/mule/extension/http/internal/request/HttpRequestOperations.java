@@ -7,9 +7,6 @@
 package org.mule.extension.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
-import org.mule.extension.http.internal.request.validator.HttpMetadataResolver;
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
-import org.mule.extension.http.internal.HttpConnector;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -18,7 +15,9 @@ import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.http.internal.request.validator.HttpMetadataResolver;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -27,6 +26,7 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.HttpParser;
 
@@ -59,25 +59,25 @@ public class HttpRequestOperations
      * @param responseValidator Configures error handling of the response.
      * @param config the {@link HttpConnector} configuration for this operation. All parameters not configured will be taken from it.
      * @param muleEvent the current {@link MuleEvent}
-     * @return a {@link MuleMessage} with {@link HttpResponseAttributes}
+     * @return an {@link OperationResult} with {@link HttpResponseAttributes}
      */
     @MetadataScope(keysResolver = HttpMetadataResolver.class, outputResolver = HttpMetadataResolver.class)
-    public MuleMessage<Object, HttpResponseAttributes> request(String path,
-                                                          @Optional(defaultValue = "GET") String method,
-                                                          @Optional String host,
-                                                          @Optional Integer port,
-                                                          @Optional String source,
-                                                          @Optional Boolean followRedirects,
-                                                          @Optional Boolean parseResponse,
-                                                          @Optional HttpStreamingType requestStreamingMode,
-                                                          @Optional HttpSendBodyMode sendBodyMode,
-                                                          @Optional Integer responseTimeout,
-                                                          @Optional ResponseValidator responseValidator,
-                                                          @Optional HttpRequesterRequestBuilder requestBuilder,
-                                                          @MetadataKeyId String key,
-                                                          @Connection HttpClient client,
-                                                          @UseConfig HttpRequesterConfig config,
-                                                          MuleEvent muleEvent) throws MuleException
+    public OperationResult<Object, HttpResponseAttributes> request(String path,
+                                                                   @Optional(defaultValue = "GET") String method,
+                                                                   @Optional String host,
+                                                                   @Optional Integer port,
+                                                                   @Optional String source,
+                                                                   @Optional Boolean followRedirects,
+                                                                   @Optional Boolean parseResponse,
+                                                                   @Optional HttpStreamingType requestStreamingMode,
+                                                                   @Optional HttpSendBodyMode sendBodyMode,
+                                                                   @Optional Integer responseTimeout,
+                                                                   @Optional ResponseValidator responseValidator,
+                                                                   @Optional HttpRequesterRequestBuilder requestBuilder,
+                                                                   @MetadataKeyId String key,
+                                                                   @Connection HttpClient client,
+                                                                   @UseConfig HttpRequesterConfig config,
+                                                                   MuleEvent muleEvent) throws MuleException
     {
         HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder
                                                                              : new HttpRequesterRequestBuilder();
@@ -111,7 +111,7 @@ public class HttpRequestOperations
                 .setConfig(config)
                 .build();
 
-        return requester.doRequest(muleEvent, client, resolvedBuilder, true);
+        return OperationResult.<Object, HttpResponseAttributes>builder(requester.doRequest(muleEvent, client, resolvedBuilder, true)).build();
     }
 
     private <T> T resolveIfNecessary(T value, Function<MuleEvent, T> function, MuleEvent event)

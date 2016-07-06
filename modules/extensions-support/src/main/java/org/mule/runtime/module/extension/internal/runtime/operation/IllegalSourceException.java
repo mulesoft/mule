@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.processor;
+package org.mule.runtime.module.extension.internal.runtime.operation;
+
+import org.mule.runtime.module.extension.internal.runtime.exception.IllegalComponentException;
 
 /**
  * A {@link IllegalComponentException} which marks that a selected Source is not valid or is misconfigured

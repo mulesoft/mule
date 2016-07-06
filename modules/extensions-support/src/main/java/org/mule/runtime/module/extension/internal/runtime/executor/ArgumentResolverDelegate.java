@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.executor;
 
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.runtime.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 
 /**
  * Extracts argument values from an {@link OperationContext}
@@ -22,7 +22,7 @@ interface ArgumentResolverDelegate
      * Returns an object array with the argument values
      * of the given {@code operationContext}
      *
-     * @param operationContext the {@link org.mule.runtime.extension.api.runtime.OperationContext context} of an {@link OperationModel} being currently executed
+     * @param operationContext the {@link OperationContext context} of an {@link OperationModel} being currently executed
      * @param parameterTypes
      * @return an object array
      */

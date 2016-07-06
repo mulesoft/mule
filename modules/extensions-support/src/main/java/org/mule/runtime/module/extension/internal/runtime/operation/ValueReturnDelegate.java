@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.processor;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleContext;

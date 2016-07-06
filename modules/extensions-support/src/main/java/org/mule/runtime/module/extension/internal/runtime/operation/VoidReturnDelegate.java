@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.processor;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.extension.api.runtime.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
 /**

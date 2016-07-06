@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.processor;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
@@ -13,10 +13,12 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 /**
  * Base class for {@link ReturnDelegate} implementations.
@@ -46,11 +48,11 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
     protected MuleMessage toMessage(Object value, OperationContextAdapter operationContext)
     {
         MediaType mediaType = resolveMediaType(value, operationContext);
-        if (value instanceof MuleMessage)
+        if (value instanceof OperationResult)
         {
-            MuleMessage outputMessage = (MuleMessage) value;
-            return MuleMessage.builder().payload(outputMessage.getPayload()).mediaType(mediaType)
-                    .attributes(resolveAttributes(outputMessage, operationContext)).build();
+            OperationResult operationResult = (OperationResult) value;
+            return MuleMessage.builder().payload(operationResult.getOutput()).mediaType(mediaType)
+                    .attributes(resolveAttributes(operationResult, operationContext)).build();
         }
         else
         {
@@ -59,10 +61,9 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
         }
     }
 
-    private Serializable resolveAttributes(MuleMessage outputMessage, OperationContextAdapter operationContext)
+    private Serializable resolveAttributes(OperationResult operationResult, OperationContextAdapter operationContext)
     {
-        Serializable attributes = outputMessage.getAttributes();
-        return attributes != null ? attributes : operationContext.getEvent().getMessage().getAttributes();
+        return (Serializable) operationResult.getAttributes().orElseGet(() -> operationContext.getEvent().getMessage().getAttributes());
     }
 
     /**
@@ -76,17 +77,20 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
     private MediaType resolveMediaType(Object value, OperationContextAdapter operationContext)
     {
         Charset existingEncoding = getDefaultEncoding(muleContext);
-        MediaType mediaType;
-        if (value instanceof MuleMessage)
+        MediaType mediaType = null;
+        if (value instanceof OperationResult)
         {
-            DataType dataType = ((MuleMessage) value).getDataType();
-            if (dataType.getMediaType().getCharset().isPresent())
-            {
-                existingEncoding = dataType.getMediaType().getCharset().get();
+            final Optional<MediaType> optionalMediaType = ((OperationResult) value).getMediaType();
+            if (optionalMediaType.isPresent()) {
+                mediaType = optionalMediaType.get();
+                if (mediaType.getCharset().isPresent())
+                {
+                    existingEncoding = mediaType.getCharset().get();
+                }
             }
-            mediaType = dataType.getMediaType();
         }
-        else
+
+        if (mediaType == null)
         {
             mediaType = MediaType.ANY;
         }

@@ -12,9 +12,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.extension.api.runtime.Interceptor;
-import org.mule.runtime.extension.api.runtime.OperationContext;
-import org.mule.runtime.extension.api.runtime.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.introspection.AbstractInterceptable;
 
 import java.util.List;
