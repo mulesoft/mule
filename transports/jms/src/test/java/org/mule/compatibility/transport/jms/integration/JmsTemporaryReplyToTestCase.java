@@ -13,7 +13,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+
+import java.nio.charset.Charset;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
@@ -122,5 +127,16 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     private void assertNullPayloadResponse(MuleMessage response)
     {
         assertThat(response.getPayload(), CoreMatchers.<Object> is(NullPayload.getInstance()));
+    }
+
+    public static class SetReplyTo extends AbstractMessageTransformer
+    {
+        @Override
+        public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
+        {
+            final MuleMessage message = MuleMessage.builder(event.getMessage()).replyTo(muleContext.getRegistry().get(MIDDLE_ENDPOINT_KEY)).build();
+            event.setMessage(message);
+            return message;
+        }
     }
 }

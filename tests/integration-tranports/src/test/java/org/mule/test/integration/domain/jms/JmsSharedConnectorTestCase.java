@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.domain.jms;
 
+import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -85,8 +86,8 @@ public class JmsSharedConnectorTestCase extends DomainFunctionalTestCase
 
     private void executeScenario(final String inQueue,final String outQueue) throws Exception
     {
-        getMuleContextForApp(CLIENT_APP).getClient().dispatch(queueAddress(inQueue), "test", null);
-        final AtomicReference<MuleMessage> response = new AtomicReference<MuleMessage>();
+        getMuleContextForApp(CLIENT_APP).getClient().dispatch(queueAddress(inQueue), MuleMessage.builder().payload("test").build());
+        final AtomicReference<MuleMessage> response = new AtomicReference<>();
         new PollingProber(10000,100).check(new Probe()
         {
             @Override
@@ -120,17 +121,11 @@ public class JmsSharedConnectorTestCase extends DomainFunctionalTestCase
 
     private String queueAddress(String inQueue)
     {
-        return String.format("%s://%s?%s", getTransportScheme(), inQueue, CONNECTOR_PARAMETER);
+        return format("%s://%s?%s", getTransportScheme(), inQueue, CONNECTOR_PARAMETER);
     }
 
     protected String getTransportScheme()
     {
         return "jms";
     }
-
-    // @Override
-    // protected ConfigurationBuilder getBuilder() throws Exception
-    // {
-    // return new TransportsConfigurationBuilder();
-    // }
 }

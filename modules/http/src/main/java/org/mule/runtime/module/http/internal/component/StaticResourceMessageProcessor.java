@@ -14,9 +14,10 @@ import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.H
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
+
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -121,10 +122,12 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
                 mimetype = DEFAULT_MIME_TYPE;
             }
 
-            MuleMessage message = MuleMessage.builder().payload(NullPayload.getInstance())
-                    .addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(OK.getStatusCode()))
-                    .addOutboundProperty(CONTENT_TYPE, mimetype)
-                    .addOutboundProperty(CONTENT_LENGTH, buffer.length).build();
+            MuleMessage message = MuleMessage.builder()
+                                             .payload(NullPayload.getInstance())
+                                             .mediaType(MediaType.parse(mimetype))
+                                             .addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(OK.getStatusCode()))
+                                             .addOutboundProperty(CONTENT_LENGTH, buffer.length)
+                                             .build();
             resultEvent = new DefaultMuleEvent(message, event);
         }
         catch (IOException e)

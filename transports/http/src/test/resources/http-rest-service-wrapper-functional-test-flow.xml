@@ -78,7 +78,7 @@
 
     <flow name="PreserveRequestContentTypeHeader">
         <vm:inbound-endpoint name="restServiceEndpoint4" path="restservice4" exchange-pattern="request-response"/>
-        <set-property propertyName="Content-Type" value="foo/bar"/>
+        <set-payload value="#[payload]" mimeType="foo/bar"/>
         <!-- Tests that the content type is not overwritten by RestServiceWrapper -->
         <http:rest-service-component serviceUrl="http://localhost:${port2}/echo" httpMethod="POST"/>
     </flow>

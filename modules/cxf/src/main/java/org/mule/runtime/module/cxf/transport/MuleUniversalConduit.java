@@ -8,10 +8,10 @@ package org.mule.runtime.module.cxf.transport;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import static org.mule.runtime.api.metadata.MediaType.XML;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
@@ -282,7 +282,16 @@ public class MuleUniversalConduit extends AbstractConduit
             InputStream is = getResponseBody(m, resEvent);
             if (is != null)
             {
-                final DataType dataType = DataType.builder(result.getDataType()).mediaType(result.getInboundProperty(CONTENT_TYPE, "text/xml")).build();
+                DataType dataType;
+                if (MediaType.ANY.matches(result.getDataType().getMediaType()))
+                {
+                    dataType = DataType.builder(result.getDataType()).mediaType(MediaType.XML).build();
+                }
+                else
+                {
+                    dataType = result.getDataType();
+                }
+
                 Message inMessage = new MessageImpl();
                 dataType.getMediaType().getCharset().ifPresent(encoding ->
                 {

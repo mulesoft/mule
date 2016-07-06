@@ -47,8 +47,8 @@ public class MuleProperties
      */
     public static final String MULE_REPLY_TO_STOP_PROPERTY = PROPERTY_PREFIX + "REPLYTO_STOP";
     public static final String MULE_USER_PROPERTY = PROPERTY_PREFIX + "USER";
-    public static final String MULE_ENCODING_PROPERTY = PROPERTY_PREFIX + "ENCODING";
     public static final String MULE_REPLY_TO_REQUESTOR_PROPERTY = PROPERTY_PREFIX + "REPLYTO_REQUESTOR";
+    @Deprecated // TODO MULE-9072
     public static final String MULE_SESSION_PROPERTY = PROPERTY_PREFIX + "SESSION";
     public static final String MULE_MESSAGE_ID_PROPERTY = PROPERTY_PREFIX + "MESSAGE_ID";
     public static final String MULE_CORRELATION_ID_PROPERTY = PROPERTY_PREFIX + "CORRELATION_ID";
@@ -198,5 +198,4 @@ public class MuleProperties
     public static final String MULE_DEFAULT_PROCESSING_STRATEGY = SYSTEM_PROPERTY_PREFIX + "default.processing.strategy";
     public static final String MULE_FLOW_TRACE = SYSTEM_PROPERTY_PREFIX + "flowTrace";
     public static final String MULE_LOG_VERBOSE_CLASSLOADING = SYSTEM_PROPERTY_PREFIX + "classloading.verbose";
-    public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
 }

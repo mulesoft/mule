@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
@@ -96,13 +95,10 @@ public class MuleEventToHttpRequest
             }
         }
 
-        if (!event.getMessage().getOutboundPropertyNames().contains(MuleProperties.CONTENT_TYPE_PROPERTY))
+        DataType dataType = event.getMessage().getDataType();
+        if (!MediaType.ANY.matches(dataType.getMediaType()))
         {
-            DataType dataType = event.getMessage().getDataType();
-            if (!MediaType.ANY.matches(dataType.getMediaType()))
-            {
-                builder.addHeader(MuleProperties.CONTENT_TYPE_PROPERTY, dataType.getMediaType().toRfcString());
-            }
+            builder.addHeader(CONTENT_TYPE, dataType.getMediaType().toRfcString());
         }
 
         if (requester.getConfig().isEnableCookies())
@@ -237,12 +233,12 @@ public class MuleEventToHttpRequest
         {
             String contentType = requestBuilder.getHeaders().get(CONTENT_TYPE);
 
-            if (contentType == null || contentType.equals(APPLICATION_X_WWW_FORM_URLENCODED.toString()))
+            if (contentType == null || contentType.equals(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()))
             {
                 if (muleEvent.getMessage().getPayload() instanceof Map)
                 {
                     String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)), (Map) payload);
-                    requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toString());
+                    requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
                     return new ByteArrayHttpEntity(body.getBytes());
                 }
             }

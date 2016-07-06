@@ -28,7 +28,7 @@
                               exchange-pattern="one-way"/>
         </request-reply>
         <expression-message-info-mapping messageIdExpression="#[message.inboundProperties.customCorrelation]"
-                                         correlationIdExpression="#[message.correlationId]"/>
+                                         correlationIdExpression="#[message.correlation.id.orElse(null)]"/>
     </flow>
 
     <flow name="TestService1">

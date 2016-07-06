@@ -14,7 +14,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.runtime.api.message.NullPayload;
@@ -123,7 +122,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getDataType(), like(Object.class, MediaType.ANY, getDefaultEncoding(muleContext)));
+        assertThat(muleEvent.getMessage().getDataType(), like(Object.class, MediaType.ANY, null));
     }
 
     @Test
@@ -134,7 +133,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.ANY, getDefaultEncoding(muleContext)));
+        assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.ANY, null));
     }
 
     @Test
@@ -158,6 +157,6 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.APPLICATION_XML, getDefaultEncoding(muleContext)));
+        assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.APPLICATION_XML, null));
     }
 }

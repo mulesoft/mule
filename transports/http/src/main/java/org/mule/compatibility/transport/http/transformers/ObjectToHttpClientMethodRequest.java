@@ -8,6 +8,7 @@ package org.mule.compatibility.transport.http.transformers;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_PARAMS_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
@@ -242,11 +243,15 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
 
     private void checkForContentType(MuleMessage msg, EntityEnclosingMethod method)
     {
-        // if a content type was specified on the endpoint, use it
-        String outgoingContentType = msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
-        if (outgoingContentType != null)
+        // TODO MULE-9986 need MuleMessage to support multipart payload
+        if (!msg.getInboundPropertyNames().contains("multipart_" + HEADER_CONTENT_TYPE))
         {
-            method.setRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, outgoingContentType);
+            // if a content type was specified on the endpoint, use it
+            final MediaType mediaType = msg.getDataType().getMediaType();
+            if (!MediaType.ANY.matches(mediaType))
+            {
+                method.setRequestHeader(HEADER_CONTENT_TYPE, mediaType.toRfcString());
+            }
         }
     }
 
@@ -326,7 +331,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         // This way client calls can control if a POST body is posted explicitly
         if (!(msg.getPayload() instanceof NullPayload))
         {
-            String outboundMimeType = (String) msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+            String outboundMimeType = msg.getDataType().getMediaType().toRfcString();
             if (outboundMimeType == null)
             {
                 outboundMimeType = (getEndpoint() != null && getEndpoint().getMimeType() != null ? getEndpoint().getMimeType().toRfcString() : null);

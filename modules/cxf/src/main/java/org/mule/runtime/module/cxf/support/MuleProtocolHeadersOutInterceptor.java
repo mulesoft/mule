@@ -6,17 +6,20 @@
  */
 package org.mule.runtime.module.cxf.support;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.cxf.message.Message.PROTOCOL_HEADERS;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +45,7 @@ public class MuleProtocolHeadersOutInterceptor
         getAfter().add(AttachmentOutInterceptor.class.getName());
     }
 
+    @Override
     public void handleMessage(Message message) throws Fault
     {
         MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
@@ -104,16 +108,11 @@ public class MuleProtocolHeadersOutInterceptor
         String ct = (String) message.get(Message.CONTENT_TYPE);
         if (ct != null)
         {
-            String encoding = getEncoding(message);
-            if (ct.indexOf("charset") == -1)
-            {
-                ct = ct + "; charset=" + encoding;
-            }
-            builder.addOutboundProperty(CONTENT_TYPE, ct);
+            builder.mediaType(MediaType.parse(ct).withCharset(getEncoding(message)));
         }
     }
 
-    private String getEncoding(Message message)
+    private Charset getEncoding(Message message)
     {
         Exchange ex = message.getExchange();
         String encoding = (String)message.get(Message.ENCODING);
@@ -123,10 +122,13 @@ public class MuleProtocolHeadersOutInterceptor
         }
 
         if (encoding == null) {
-            encoding = "UTF-8";
-            message.put(Message.ENCODING, encoding);
+            message.put(Message.ENCODING, UTF_8.name());
+            return UTF_8;
         }
-        return encoding;
+        else
+        {
+            return Charset.forName(encoding);
+        }
     }
 
     private String format(List<String> value)

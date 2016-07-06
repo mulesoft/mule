@@ -7,9 +7,4 @@
     <flow name="base64decode">
         <base64-decoder-transformer encoding="UTF-16LE" returnClass="java.lang.String"/>
     </flow>
-
-    <flow name="base64decode2">
-        <set-property value="UTF-16LE" propertyName="MULE_ENCODING"/>
-        <base64-decoder-transformer returnClass="java.lang.String"/>
-    </flow>
 </mule>

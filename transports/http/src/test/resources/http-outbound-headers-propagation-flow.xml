@@ -12,7 +12,8 @@
 	<flow name="gzipContentType">	    
 	    <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
 
-		<http:outbound-endpoint  connector-ref="connector" address="http://localhost:${port1}/" exchange-pattern="one-way" method="POST">
+		<http:outbound-endpoint  connector-ref="connector" address="http://localhost:${port1}/" exchange-pattern="one-way" method="POST"
+                contentType="application/gzip">
 			<gzip-compress-transformer/>
             
 			<!-- add all request http headers -->
@@ -70,7 +71,6 @@
 			<set-property propertyName="Content-Location" value="gzip"/>
 			<set-property propertyName="Content-MD5" value="gzip"/>
 			<set-property propertyName="Content-Range" value="gzip"/>
-			<set-property propertyName="Content-Type" value="application/gzip"/>
 			<set-property propertyName="Expires" value="gzip"/>
 			<set-property propertyName="Last-Modified" value="gzip"/>
 		</http:outbound-endpoint>	

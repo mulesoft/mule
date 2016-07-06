@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -22,11 +23,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -36,8 +36,6 @@ import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCal
 import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.Collections;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -125,18 +123,14 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase
         assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
     }
 
-    private MuleEvent createMockEvent()
+    private MuleEvent createMockEvent() throws MuleException
     {
-        MuleMessage testMessage = mock(MuleMessage.class);
-        when(testMessage.getOutboundPropertyNames()).thenReturn(Collections.<String>emptySet());
-        when(testMessage.getPayload()).thenReturn(NullPayload.getInstance());
-        DataType datatype = DataType.STRING;
-        when(testMessage.getDataType()).thenReturn( datatype);
+        MuleMessage testMessage = MuleMessage.builder().payload("").build();
 
         MuleEvent testEvent = mock(MuleEvent.class);
         when(testEvent.getMessage()).thenReturn(testMessage);
-
         when(testEvent.getMuleContext()).thenReturn(mock(MuleContext.class, RETURNS_DEEP_STUBS));
+        when(testEvent.getMessageAsBytes()).thenReturn("".getBytes(UTF_8));
         return testEvent;
     }
 

@@ -6,19 +6,10 @@
  */
 package org.mule.runtime.core.message;
 
-import static java.lang.String.format;
-import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.util.ObjectUtils.getByte;
@@ -34,6 +25,7 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.MuleMessageCorrelation;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -53,7 +45,6 @@ import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -112,9 +103,9 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     private void copyMessageAttributes(MuleMessage message)
     {
         this.id = message.getUniqueId();
-        this.correlationId = message.getCorrelationId();
-        this.correlationSequence = message.getCorrelationSequence();
-        this.correlationGroupSize = message.getCorrelationGroupSize();
+        message.getCorrelation().getId().ifPresent(v -> this.correlationId = v);
+        message.getCorrelation().getSequence().ifPresent(v -> this.correlationSequence = v);
+        message.getCorrelation().getGroupSize().ifPresent(v -> this.correlationGroupSize = v);
         this.replyTo = message.getReplyTo();
         this.rootId = message.getMessageRootId();
         this.exceptionPayload = message.getExceptionPayload();
@@ -251,7 +242,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     public Builder addInboundProperty(String key, Serializable value)
     {
         inboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
-        updateDataTypeWithProperty(key, value);
         return this;
     }
 
@@ -259,7 +249,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     public Builder addInboundProperty(String key, Serializable value, MediaType mediaType)
     {
         inboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
-        updateDataTypeWithProperty(key, value);
         return this;
     }
 
@@ -267,7 +256,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     public Builder addInboundProperty(String key, Serializable value, DataType dataType)
     {
         inboundProperties.put(key, new TypedValue(value, dataType));
-        updateDataTypeWithProperty(key, value);
         return this;
     }
 
@@ -275,7 +263,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     public Builder addOutboundProperty(String key, Serializable value)
     {
         outboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
-        updateDataTypeWithProperty(key, value);
         return this;
     }
 
@@ -283,7 +270,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     public Builder addOutboundProperty(String key, Serializable value, MediaType mediaType)
     {
         outboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
-        updateDataTypeWithProperty(key, value);
         return this;
     }
 
@@ -291,7 +277,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     public Builder addOutboundProperty(String key, Serializable value, DataType dataType)
     {
         outboundProperties.put(key, new TypedValue(value, dataType));
-        updateDataTypeWithProperty(key, value);
         return this;
     }
 
@@ -393,53 +378,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         }
     }
 
-    // TODO MULE-9858 remove this magic properties
-    @Deprecated
-    private void updateDataTypeWithProperty(String key, Object value)
-    {
-        // updates dataType when encoding is updated using a property instead of using #setEncoding
-        if (MULE_ENCODING_PROPERTY.equals(key))
-        {
-            final Class type = dataType != null ? dataType.getType() : Object.class;
-            dataType = DataType.builder().type(type).charset((String) value).build();
-        }
-        else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
-        {
-            final DataTypeBuilder builder = DataType.builder();
-            try
-            {
-                builder.mediaType((String) value);
-            }
-            catch (IllegalArgumentException e)
-            {
-                if (Boolean.parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
-                {
-                    throw new IllegalArgumentException("Invalid Content-Type property value", e);
-                }
-                else
-                {
-                    String encoding = defaultCharset().name();
-                    logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
-                    logger.warn(format("Using defualt encoding: %s", encoding));
-                    builder.charset(encoding);
-                }
-            }
-            final Class type = dataType != null ? dataType.getType() : Object.class;
-            dataType = builder.type(type).build();
-        }
-        else if (MULE_CORRELATION_ID_PROPERTY.equalsIgnoreCase(key))
-        {
-            correlationId = value.toString();
-        }
-        else if ("MULE_REPLYTO".equalsIgnoreCase(key))
-        {
-            if(replyTo == null)
-            {
-                replyTo = value;
-            }
-        }
-    }
-
     /**
      * <code>DefaultMuleMessage</code> is a wrapper that contains a payload and properties
      * associated with the payload.
@@ -479,6 +417,8 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
          */
         private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
+        private MuleMessageCorrelation correlation;
+
         // these are transient because serialisation generates a new instance
         // so we allow mutation again (and we can't serialize threads anyway)
         private transient AtomicReference<Thread> ownerThread = null;
@@ -487,11 +427,13 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         private transient TypedValue typedValue;
         private Attributes attributes;
 
+        private Serializable replyTo;
+
         private MuleMessageImplementation(String id, String rootId, TypedValue typedValue, Attributes attributes,
                                   Map<String, TypedValue<Serializable>> inboundProperties,
                                   Map<String, TypedValue<Serializable>> outboundProperties,
                                   Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
-                                  String corealationId, Integer correlationGroupSize, Integer correlationSequence,
+                                  String correlationId, Integer correlationGroupSize, Integer correlationSequence,
                                   Object replyTo, ExceptionPayload exceptionPayload)
         {
             this.id = id;
@@ -502,9 +444,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             this.properties.outboundMap.putAll(outboundProperties);
             this.inboundAttachments = inboundAttachments;
             this.outboundAttachments = outboundAttachments;
-            setCorrelationId(corealationId);
-            setCorrelationGroupSize(correlationGroupSize);
-            setCorrelationSequence(correlationSequence);
+            this.correlation = new MuleMessageCorrelation(correlationId, correlationGroupSize, correlationSequence);
             setReplyTo(replyTo);
             this.exceptionPayload = exceptionPayload;
         }
@@ -524,31 +464,10 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             return rootId;
         }
 
-        private void setCorrelationId(String id)
-        {
-            if (StringUtils.isNotBlank(id))
-            {
-                setOutboundProperty(MULE_CORRELATION_ID_PROPERTY, id, DataType.STRING);
-            }
-            else
-            {
-                removeOutboundProperty(MULE_CORRELATION_ID_PROPERTY);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
-        public String getCorrelationId()
+        public MuleMessageCorrelation getCorrelation()
         {
-            String correlationId = (String) getOutboundProperty(MULE_CORRELATION_ID_PROPERTY);
-            if (correlationId == null)
-            {
-                correlationId = (String) getInboundProperty(MULE_CORRELATION_ID_PROPERTY);
-            }
-
-            return correlationId;
+            return correlation;
         }
 
         private void setReplyTo(Object replyTo)
@@ -559,11 +478,14 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
                 {
                     logger.warn("ReplyTo " + replyTo + " is not serializable and will not be propagated by Mule");
                 }
-                setOutboundProperty(MULE_REPLY_TO_PROPERTY, (Serializable) replyTo);
+                else
+                {
+                    this.replyTo = (Serializable) replyTo;
+                }
             }
             else
             {
-                removeOutboundProperty(MULE_REPLY_TO_PROPERTY);
+                this.replyTo = null;
             }
         }
 
@@ -573,59 +495,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         @Override
         public Object getReplyTo()
         {
-            Serializable replyTo = getOutboundProperty(MULE_REPLY_TO_PROPERTY);
-            if (replyTo == null)
-            {
-                // fallback to inbound, use the requestor's setting if the invocation didn't set any
-                replyTo = getInboundProperty(MULE_REPLY_TO_PROPERTY);
-            }
             return replyTo;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Integer getCorrelationSequence()
-        {
-            // need to wrap with another getInt() as some transports operate on it as a String
-            final int correlationSequence = getInt(findProperty(MULE_CORRELATION_SEQUENCE_PROPERTY), -1);
-            return correlationSequence < 0 ? null : correlationSequence;
-        }
-
-        private void setCorrelationSequence(Integer sequence)
-        {
-            if (sequence != null)
-            {
-                setOutboundProperty(MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
-            }
-            else
-            {
-                removeOutboundProperty(MULE_CORRELATION_SEQUENCE_PROPERTY);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Integer getCorrelationGroupSize()
-        {
-            // need to wrap with another getInt() as some transports operate on it as a String
-            final int correlationGroupSize = getInt(findProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY), -1);
-            return correlationGroupSize < 0 ? null : correlationGroupSize;
-        }
-
-        private void setCorrelationGroupSize(Integer size)
-        {
-            if (size != null)
-            {
-                setOutboundProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
-            }
-            else
-            {
-                removeOutboundProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-            }
         }
 
         /**
@@ -652,11 +522,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             buf.append(LINE_SEPARATOR);
             buf.append("  payload=").append(getPayload().getClass().getName());
             buf.append(LINE_SEPARATOR);
-            buf.append("  correlationId=").append(StringUtils.defaultString(getCorrelationId(), NOT_SET));
-            buf.append(LINE_SEPARATOR);
-            buf.append("  correlationGroup=").append(getCorrelationGroupSize());
-            buf.append(LINE_SEPARATOR);
-            buf.append("  correlationSeq=").append(getCorrelationSequence());
+            buf.append("  correlation=").append(getCorrelation().toString());
             buf.append(LINE_SEPARATOR);
             buf.append("  exceptionPayload=").append(ObjectUtils.defaultIfNull(exceptionPayload, NOT_SET));
             buf.append(LINE_SEPARATOR);
@@ -952,19 +818,16 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         public void setInboundProperty(String key, Serializable value, DataType dataType)
         {
             properties.setInboundProperty(key, value, dataType);
-            updateDataTypeWithProperty(key, value);
         }
 
         public void setOutboundProperty(String key, Serializable value)
         {
             properties.setOutboundProperty(key, value);
-            updateDataTypeWithProperty(key, value);
         }
 
         public void setOutboundProperty(String key, Serializable value, DataType dataType)
         {
             properties.setOutboundProperty(key, value, dataType);
-            updateDataTypeWithProperty(key, value);
         }
 
         public Serializable removeOutboundProperty(String key)
@@ -994,38 +857,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         public DataType getOutboundPropertyDataType(String name)
         {
             return properties.getOutboundPropertyDataType(name);
-        }
-
-        private void updateDataTypeWithProperty(String key, Object value)
-        {
-            // updates dataType when encoding is updated using a property instead of using #setEncoding
-            if (MULE_ENCODING_PROPERTY.equals(key))
-            {
-                setDataType(DataType.builder().type(getDataType().getType()).charset((String) value).build());
-            }
-            else if (CONTENT_TYPE_PROPERTY.equalsIgnoreCase(key))
-            {
-                final DataTypeBuilder builder = DataType.builder();
-                try
-                {
-                    builder.mediaType((String) value);
-                }
-                catch (IllegalArgumentException e)
-                {
-                    if (Boolean.parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType")))
-                    {
-                        throw new IllegalArgumentException("Invalid Content-Type property value", e);
-                    }
-                    else
-                    {
-                        String encoding = defaultCharset().name();
-                        logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), value, e.getMessage()));
-                        logger.warn(format("Using defualt encoding: %s", encoding));
-                        builder.charset(encoding);
-                    }
-                }
-                setDataType(builder.type(getDataType().getType()).build());
-            }
         }
 
         /**

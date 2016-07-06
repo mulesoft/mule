@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.module.cxf.issues;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -25,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.namespace.QName;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -36,6 +40,9 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port1");
 
+    private Latch latch;
+    private TestCxfEventCallback testCxfEventCallback;
+
     @Override
     protected String getConfigFile()
     {
@@ -44,7 +51,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
 
     private static class TestCxfEventCallback implements EventCallback
     {
-        private Latch latch;
+        private final Latch latch;
         private String cxfOperationName;
 
         private TestCxfEventCallback(Latch latch)
@@ -67,11 +74,16 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
         }
     }
 
-    @Test
-    public void testProxyServerSoap11() throws Exception
+    @Before
+    public void before()
     {
-         final Latch latch = new Latch();
-         TestCxfEventCallback testCxfEventCallback = new TestCxfEventCallback(latch);
+        latch = new Latch();
+        testCxfEventCallback = new TestCxfEventCallback(latch);
+    }
+
+    @Test
+    public void testProxyServerSoap11Op1() throws Exception
+    {
          FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent("soap11Flow");
          testComponent.setEventCallback(testCxfEventCallback);
 
@@ -79,13 +91,6 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
                  + "<soapenv:Header/>"
                  + "  <soapenv:Body>"
                  + "    <new:parameter1>hello world</new:parameter1>"
-                 + "  </soapenv:Body>"
-                 + "</soapenv:Envelope>";
-
-         String msgEchoOperation2 = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:new=\"http://new.webservice.namespace\">"
-                 + "<soapenv:Header/>"
-                 + "  <soapenv:Body>"
-                 + "    <new:parameter2>hello world</new:parameter2>"
                  + "  </soapenv:Body>"
                  + "</soapenv:Envelope>";
 
@@ -97,36 +102,41 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
          String payload = getPayloadAsString(response);
          assertTrue(payload.contains("<new:parameter1"));
          assertTrue(payload.contains("hello world"));
-
-         soapOperation = "EchoOperation2";
-         response = executeSoap11Call(msgEchoOperation2, soapOperation);
-         assertTrue(latch.await(1000L, TimeUnit.MILLISECONDS));
-         cxfOperationName = testCxfEventCallback.getCxfOperationName();
-         assertEquals(soapOperation, cxfOperationName);
-         payload = getPayloadAsString(response);
-         assertTrue(payload.contains("<new:parameter2"));
-         assertTrue(payload.contains("hello world"));
     }
 
     @Test
-    public void testProxyServerSoap12() throws Exception
+    public void testProxyServerSoap11Op2() throws Exception
     {
-         final Latch latch = new Latch();
-         TestCxfEventCallback testCxfEventCallback = new TestCxfEventCallback(latch);
+        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent("soap11Flow");
+        testComponent.setEventCallback(testCxfEventCallback);
+
+        String msgEchoOperation2 = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:new=\"http://new.webservice.namespace\">"
+                                   + "<soapenv:Header/>"
+                                   + "  <soapenv:Body>"
+                                   + "    <new:parameter2>hello world</new:parameter2>"
+                                   + "  </soapenv:Body>"
+                                   + "</soapenv:Envelope>";
+
+        String soapOperation = "EchoOperation2";
+        MuleMessage response = executeSoap11Call(msgEchoOperation2, soapOperation);
+        assertTrue(latch.await(1000L, TimeUnit.MILLISECONDS));
+        String cxfOperationName = testCxfEventCallback.getCxfOperationName();
+        assertEquals(soapOperation, cxfOperationName);
+        String payload = getPayloadAsString(response);
+        assertTrue(payload.contains("<new:parameter2"));
+        assertTrue(payload.contains("hello world"));
+    }
+
+    @Test
+    public void testProxyServerSoap12Op1() throws Exception
+    {
          FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent("soap12Flow");
-         testComponent.setEventCallback(testCxfEventCallback);
+        testComponent.setEventCallback(testCxfEventCallback);
 
          String msgEchoOperation1 = "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:new=\"http://new.webservice.namespace\">"
                  + "<soap:Header/>"
                  + "  <soap:Body>"
                  + "    <new:parameter1>hello world</new:parameter1>"
-                 + "  </soap:Body>"
-                 + "</soap:Envelope>";
-
-         String msgEchoOperation2 = "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:new=\"http://new.webservice.namespace\">"
-                 + "<soap:Header/>"
-                 + "  <soap:Body>"
-                 + "    <new:parameter2>hello world</new:parameter2>"
                  + "  </soap:Body>"
                  + "</soap:Envelope>";
 
@@ -138,15 +148,29 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
          String payload = getPayloadAsString(response);
          assertTrue(payload.contains("<new:parameter1"));
          assertTrue(payload.contains("hello world"));
+    }
 
-         soapOperation = "EchoOperation2";
-         response = executeSoap12Call(msgEchoOperation2, soapOperation);
-         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
-         cxfOperationName = testCxfEventCallback.getCxfOperationName();
-         assertEquals(soapOperation, cxfOperationName);
-         payload = getPayloadAsString(response);
-         assertTrue(payload.contains("<new:parameter2"));
-         assertTrue(payload.contains("hello world"));
+    @Test
+    public void testProxyServerSoap12Op2() throws Exception
+    {
+        FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent("soap12Flow");
+        testComponent.setEventCallback(testCxfEventCallback);
+
+        String msgEchoOperation2 = "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:new=\"http://new.webservice.namespace\">"
+                                   + "<soap:Header/>"
+                                   + "  <soap:Body>"
+                                   + "    <new:parameter2>hello world</new:parameter2>"
+                                   + "  </soap:Body>"
+                                   + "</soap:Envelope>";
+
+        String soapOperation = "EchoOperation2";
+        MuleMessage response = executeSoap12Call(msgEchoOperation2, soapOperation);
+        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+        String cxfOperationName = testCxfEventCallback.getCxfOperationName();
+        assertEquals(soapOperation, cxfOperationName);
+        String payload = getPayloadAsString(response);
+        assertTrue(payload.contains("<new:parameter2"));
+        assertTrue(payload.contains("hello world"));
     }
 
     private MuleMessage executeSoap11Call(String msgString, String soapAction) throws MuleException
@@ -158,11 +182,9 @@ public class ProxyMule6829TestCase extends FunctionalTestCase
 
     private MuleMessage executeSoap12Call(String msgString, String soapAction) throws MuleException
     {
-        String contentType = "application/soap+xml;charset=UTF-8;action=\"" + soapAction + "\"";
-        MuleMessage msg = MuleMessage.builder().payload(msgString).addOutboundProperty("Content-Type", contentType).build();
+        String contentType = APP_SOAP_XML.withCharset(UTF_8).toRfcString() + ";action=\"" + soapAction + "\"";
+        MuleMessage msg = MuleMessage.builder().payload(msgString).mediaType(MediaType.parse(contentType)).build();
 
         return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", msg, HTTP_REQUEST_OPTIONS);
     }
 }
-
-

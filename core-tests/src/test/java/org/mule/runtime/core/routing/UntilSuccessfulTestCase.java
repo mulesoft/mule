@@ -88,7 +88,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
             untilSuccessful.setMillisBetweenRetries(millisBetweenRetries);
         }
 
-        objectStore = new SimpleMemoryObjectStore<MuleEvent>();
+        objectStore = new SimpleMemoryObjectStore<>();
         untilSuccessful.setObjectStore(objectStore);
 
         targetMessageProcessor = new ConfigurableMessageProcessor();
@@ -291,7 +291,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
         throws MuleException
     {
         // events have been rewritten so are different but the correlation ID has been carried around
-        assertEquals(testEvent.getMessage().getCorrelationId(), eventReceived.getMessage().getCorrelationId());
+        assertEquals(testEvent.getMessage().getCorrelation().getId(), eventReceived.getMessage().getCorrelation().getId());
         // and their payload
         assertEquals(testEvent.getMessageAsString(), eventReceived.getMessageAsString());
     }

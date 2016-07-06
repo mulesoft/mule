@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.cxf.support;
 
+import static org.mule.runtime.api.metadata.MediaType.XML;
+
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -36,13 +38,13 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.frontend.WSDLQueryException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ResourceManagerWSDLLocator;
@@ -69,7 +71,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
     public String getResponseContentType(String baseUri, String ctx) {
         if (baseUri.toLowerCase().contains("?wsdl")
             || baseUri.toLowerCase().contains("?xsd=")) {
-            return "text/xml";
+            return XML.toRfcString();
         }
         return null;
     }

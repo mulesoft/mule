@@ -21,7 +21,7 @@
     <flow name="testService1">
         <vm:inbound-endpoint ref="inbound1"/>
         <transports:outbound-endpoint ref="outbound1">
-            <set-property propertyName="Content-Type" value="text/xml;charset=UTF-8"/>
+            <custom-transformer class="org.mule.compatibility.transport.vm.functional.TransformerContentTypeTestCase$SetXmlMediaTypeTransformer"/>
         </transports:outbound-endpoint>
     </flow>
 
@@ -33,7 +33,7 @@
     <flow name="testService2">
         <vm:inbound-endpoint ref="inbound2"/>
         <transports:outbound-endpoint ref="outbound2">
-            <set-property propertyName="Content-Type" value="text/plain;charset=UTF-8"/>
+            <custom-transformer class="org.mule.compatibility.transport.vm.functional.TransformerContentTypeTestCase$SetTextMediaTypeTransformer"/>
         </transports:outbound-endpoint>
     </flow>
 

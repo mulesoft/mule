@@ -7,6 +7,7 @@
 package org.mule.compatibility.transport.jms;
 
 import static org.mule.compatibility.transport.jms.JmsConstants.JMS_REPLY_TO;
+
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -57,7 +58,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
         addTypeProperty(jmsMessage, messageProperties);
         propagateJMSProperties(jmsMessage, messageProperties);
 
-        addCorrelationProperties(jmsMessage, messageBuilder);
+        addCorrelationProperties(jmsMessage, messageBuilder, messageProperties);
 
         messageProperties.forEach((k, v) -> messageBuilder.addInboundProperty(k, v));
     }
@@ -218,7 +219,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
-    protected void addCorrelationProperties(Message jmsMessage, MuleMessage.Builder messageBuilder)
+    protected void addCorrelationProperties(Message jmsMessage, MuleMessage.Builder messageBuilder, Map<String, Serializable> messageProperties)
     {
         try
         {
@@ -226,9 +227,13 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory
             if (value != null)
             {
                 messageBuilder.addInboundProperty(JmsConstants.JMS_CORRELATION_ID, value);
-                // this property is used my getCorrelationId in MuleMessage, but we want
-                // it on the INBOUND scoped properties so don't use setCorrelationId
                 messageBuilder.correlationId(value);
+            }
+
+            final Serializable mcid = messageProperties.remove(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+            if (mcid != null)
+            {
+                messageBuilder.correlationId(mcid.toString());
             }
         }
         catch (JMSException e)

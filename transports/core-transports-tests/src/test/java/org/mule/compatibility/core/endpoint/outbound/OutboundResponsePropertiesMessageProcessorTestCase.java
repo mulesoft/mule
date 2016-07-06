@@ -6,10 +6,11 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.AbstractEndpointBuilder;
@@ -17,7 +18,6 @@ import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 
 import org.junit.Test;
@@ -50,17 +50,16 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
 
         MuleEvent event = createTestOutboundEvent();
         event.setMessage(MuleMessage.builder(event.getMessage())
-                                             .addOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL)
-                                             .addOutboundProperty(MULE_CORRELATION_ID_PROPERTY, MULE_CORRELATION_ID_VAL)
-                                             .build());
+                                    .addOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL)
+                                    .correlationId(MULE_CORRELATION_ID_VAL)
+                                    .build());
 
         MuleEvent result = mp.process(event);
 
         assertNotNull(result);
-        assertEquals(TEST_MESSAGE, result.getMessageAsString());
-        assertEquals(MY_PROPERTY_VAL, result.getMessage().getOutboundProperty(MY_PROPERTY_KEY));
-        assertEquals(MULE_CORRELATION_ID_VAL,
-                     result.getMessage().getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY));
+        assertThat(result.getMessageAsString(), is(TEST_MESSAGE));
+        assertThat(result.getMessage().getOutboundProperty(MY_PROPERTY_KEY), is(MY_PROPERTY_VAL));
+        assertThat(result.getMessage().getCorrelation().getId().get(), is(MULE_CORRELATION_ID_VAL));
     }
 
     @Override

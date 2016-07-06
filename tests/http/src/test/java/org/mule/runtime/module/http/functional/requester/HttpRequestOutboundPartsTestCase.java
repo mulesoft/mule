@@ -105,7 +105,7 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
 
         flowRunner("requestFlow").withPayload(TEST_MESSAGE)
                                  .withFlowVariable(PARTS, partsToSend)
-                                 .withOutboundProperty("Content-Type", "multipart/form-data2")
+                                 .withMediaType(MediaType.parse("multipart/form-data2"))
                                  .run();
 
         assertThat(requestContentType, startsWith("multipart/form-data2; boundary="));

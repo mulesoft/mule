@@ -51,18 +51,12 @@ public class MuleSoapHeaders
      */
     public MuleSoapHeaders(MuleEvent event)
     {
-        setCorrelationId(event.getMessage().getCorrelationId());
-        if (event.getMessage().getCorrelationGroupSize() != null)
-        {
-            setCorrelationGroup(String.valueOf(event.getMessage().getCorrelationGroupSize()));
-        }
-        if (event.getMessage().getCorrelationSequence() != null)
-        {
-            setCorrelationSequence(String.valueOf(event.getMessage().getCorrelationSequence()));
-        }
+        event.getMessage().getCorrelation().getId().ifPresent(v -> setCorrelationId(v));
+        event.getMessage().getCorrelation().getGroupSize().map(v -> v.toString()).ifPresent(v -> setCorrelationGroup(v));
+        event.getMessage().getCorrelation().getSequence().map(v -> v.toString()).ifPresent(v -> setCorrelationSequence(v));
 
         // only propogate the reply to header if it's in the outbound scope
-        Object replyTo = event.getMessage().getOutboundProperty(MULE_REPLY_TO_PROPERTY);
+        Object replyTo = event.getMessage().getReplyTo();
         if (replyTo != null)
         {
             setReplyTo(replyTo.toString());

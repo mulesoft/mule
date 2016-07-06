@@ -7,8 +7,6 @@
 
 package org.mule.runtime.core.transformer.simple;
 
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
@@ -44,30 +42,13 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
         if (dataType == null)
         {
             final TypedValue typedValue = resolveTypedValue(event);
-            if (typedValue.getDataType().getMediaType().getCharset().isPresent())
-            {
-                builder.payload(typedValue.getValue() != null ? typedValue.getValue() : NullPayload.getInstance()).mediaType(typedValue.getDataType().getMediaType());
-            }
-            else
-            {
-                builder.payload(typedValue.getValue() != null ? typedValue.getValue() : NullPayload.getInstance()).mediaType(DataType.builder(typedValue.getDataType())
-                                                                         .charset(getDefaultEncoding(muleContext))
-                                                                         .build()
-                                                                         .getMediaType());
-            }
+            builder.payload(typedValue.getValue() != null ? typedValue.getValue() : NullPayload.getInstance()).mediaType(typedValue.getDataType().getMediaType());
         }
         else
         {
             Object value = resolveValue(event);
             final DataTypeParamsBuilder dataTypeBuilder = DataType.builder(dataType).type((value == null || value instanceof NullPayload) ? Object.class : value.getClass());
-            if (dataType.getMediaType().getCharset().isPresent())
-            {
-                builder.payload(value != null ? value : NullPayload.getInstance()).mediaType(dataTypeBuilder.build().getMediaType());
-            }
-            else
-            {
-                builder.payload(value != null ? value : NullPayload.getInstance()).mediaType(dataTypeBuilder.charset(getDefaultEncoding(muleContext)).build().getMediaType());
-            }
+            builder.payload(value != null ? value : NullPayload.getInstance()).mediaType(dataTypeBuilder.build().getMediaType());
         }
 
         event.setMessage(builder.build());

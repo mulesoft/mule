@@ -7,11 +7,11 @@
 package org.mule.runtime.module.json.filters;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 
@@ -42,9 +42,7 @@ public class IsJsonFilter implements Filter, MuleContextAware
     @Override
     public boolean accept(MuleMessage obj)
     {
-        // TODO should be checking inbound IMO
-        final String contentType = obj.getOutboundProperty("Content-Type", StringUtils.EMPTY);
-        if (contentType.contains("application/json"))
+        if (MediaType.APPLICATION_JSON.matches(obj.getDataType().getMediaType()))
         {
             return true;
         }

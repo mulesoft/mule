@@ -10,7 +10,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
+
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
@@ -39,7 +39,7 @@ public class ReplyToChainIntegration5TestCase extends FunctionalTestCase
         final Latch flowExecutedLatch = new Latch();
         FunctionalTestComponent ftc = getFunctionalTestComponent("replierService");
         ftc.setEventCallback((context, component) -> flowExecutedLatch.release());
-        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
+        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_PAYLOAD).replyTo("jms://response").build();
         client.dispatch("jms://jmsIn1", muleMessage);
         flowExecutedLatch.await(TIMEOUT, MILLISECONDS);
         MuleMessage response = client.request("jms://response", TIMEOUT);

@@ -10,15 +10,17 @@ package org.mule.compatibility.transport.http.functional;
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.nio.charset.Charset;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,8 +42,7 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty(
-        CONTENT_TYPE_PROPERTY, MediaType.TEXT + "; charset=" + UTF_16.name()).build();
+        MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse(MediaType.TEXT + "; charset=" + UTF_16.name())).build();
 
         client.dispatch("vm://testInput", muleMessage);
 
@@ -50,7 +51,16 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase
         assertThat(response.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
         assertThat(response.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
         assertThat(response.getDataType().getMediaType().getCharset().get(), equalTo(UTF_16));
-        assertThat(response.getOutboundProperty(MuleProperties.MULE_ENCODING_PROPERTY), is(nullValue()));
-        assertThat(response.getOutboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY), is(nullValue()));
+    }
+
+    public static class SetMediaTypeTransformer extends AbstractMessageTransformer
+    {
+        @Override
+        public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
+        {
+            final MuleMessage message = MuleMessage.builder(event.getMessage()).build();
+            event.setMessage(message);
+            return message;
+        }
     }
 }

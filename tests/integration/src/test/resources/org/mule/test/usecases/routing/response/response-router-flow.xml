@@ -15,7 +15,6 @@
 
         <echo-component />
 
-        <remove-property propertyName="MULE_REPLYTO"/>
         <flow-ref name="W10Report"/>
     </flow>
 

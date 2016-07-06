@@ -14,11 +14,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.transport.http.HttpConstants.DEFAULT_CONTENT_TYPE;
 import static org.mule.compatibility.transport.http.HttpConstants.FORM_URLENCODED_CONTENT_TYPE;
-import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
+
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -103,14 +104,17 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
     {
         Map<String, Serializable> inboundProperties = new HashMap<>();
         inboundProperties.put("http.method", method);
-        inboundProperties.put(HEADER_CONTENT_TYPE, contentType);
 
         String payload = "key1=value1&key2=value2";
         if ("GET".equals(method))
         {
             payload = "http://localhost/?" + payload;
         }
-        return MuleMessage.builder().payload(payload).inboundProperties(inboundProperties).build();
+        return MuleMessage.builder()
+                          .payload(payload)
+                          .inboundProperties(inboundProperties)
+                          .mediaType(MediaType.parse(contentType))
+                          .build();
     }
 
 }

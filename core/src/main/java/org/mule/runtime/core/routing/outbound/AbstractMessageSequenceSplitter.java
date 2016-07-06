@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
-import static org.mule.runtime.core.routing.CorrelationMode.ALWAYS;
-import static org.mule.runtime.core.routing.CorrelationMode.IF_NOT_SET;
 import static org.mule.runtime.core.routing.CorrelationMode.NEVER;
 
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -124,14 +122,13 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
             }
 
             final Builder builder = MuleMessage.builder(event.getMessage());
+
+            if (event.getMessage().getCorrelation().doCorrelation(enableCorrelation))
+            {
+                builder.correlationId(correlationId);
+            }
             if (enableCorrelation != NEVER)
             {
-                boolean correlationSet = event.getMessage().getCorrelationId() != null;
-                if ((!correlationSet && (enableCorrelation == IF_NOT_SET)) || (enableCorrelation == ALWAYS))
-                {
-                    builder.correlationId(correlationId);
-                }
-
                 // take correlation group size from the message properties, set by concrete message splitter
                 // implementations
                 builder.correlationGroupSize(count);

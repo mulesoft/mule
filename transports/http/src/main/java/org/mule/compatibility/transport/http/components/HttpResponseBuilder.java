@@ -11,6 +11,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.CUSTOM_HEADER_
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
 import org.mule.compatibility.transport.http.CacheControlHeader;
 import org.mule.compatibility.transport.http.CookieHelper;
@@ -18,6 +19,7 @@ import org.mule.compatibility.transport.http.CookieWrapper;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -138,26 +140,19 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
     private void copyCorrelationIdProperties(HttpResponse response, MuleMessage message)
     {
-        if(message.getCorrelationId() != null)
+        message.getCorrelation().getId().ifPresent(v ->
         {
-            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, message.getCorrelationId()));
-            if (message.getCorrelationGroupSize() != null)
-            {
-                response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_GROUP_SIZE_PROPERTY, valueOf(message.getCorrelationGroupSize())));
-            }
-            if (message.getCorrelationSequence() != null)
-            {
-                response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_SEQUENCE_PROPERTY, valueOf(message.getCorrelationSequence())));
-            }
-        }
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, v));
+            message.getCorrelation().getGroupSize().ifPresent(s -> response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_GROUP_SIZE_PROPERTY, valueOf(s))));
+            message.getCorrelation().getSequence().ifPresent(s -> response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_SEQUENCE_PROPERTY, valueOf(s))));
+        });
     }
 
     private void copyReplyToProperty(HttpResponse response, MuleMessage message)
     {
         if(message.getReplyTo() != null)
         {
-            response.setHeader(new Header(HttpConstants.CUSTOM_HEADER_PREFIX + MuleProperties.MULE_REPLY_TO_PROPERTY,
-                    message.getReplyTo().toString()));
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_REPLY_TO_PROPERTY, message.getReplyTo().toString()));
         }
     }
 
@@ -357,10 +352,15 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
     private String getDefaultContentType(MuleMessage message)
     {
-        String contentType = message.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
-        if(contentType == null)
+        final MediaType mediaType = message.getDataType().getMediaType();
+        String contentType;
+        if (MediaType.ANY.matches(mediaType))
         {
             contentType = HttpConstants.DEFAULT_CONTENT_TYPE;
+        }
+        else
+        {
+            contentType = mediaType.toRfcString();
         }
         return contentType;
     }

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
+import static org.mule.runtime.core.MuleMessageCorrelation.NOT_SET;
+
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -393,7 +395,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             {
                 logger.debug(MessageFormat.format(
                         "Aggregator expired, but ''failOnTimeOut'' is false. Forwarding {0} events out of {1} "
-                        + "total for group ID: {2}", group.size(), group.expectedSize(),
+                                                  + "total for group ID: {2}",
+                        group.size(), group.expectedSize().map(v -> v.toString()).orElse(NOT_SET),
                         group.getGroupId()));
             }
 

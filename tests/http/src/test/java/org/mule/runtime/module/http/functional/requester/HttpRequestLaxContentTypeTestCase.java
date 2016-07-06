@@ -12,9 +12,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -47,6 +48,6 @@ public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase
 
     private void assertNoContentTypeProperty(MuleMessage response)
     {
-        assertThat(response.getInboundPropertyNames(), not(hasItem(equalToIgnoringCase(MuleProperties.CONTENT_TYPE_PROPERTY))));
+        assertThat(response.getInboundPropertyNames(), not(hasItem(equalToIgnoringCase(CONTENT_TYPE))));
     }
 }

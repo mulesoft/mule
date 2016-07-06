@@ -8,14 +8,10 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
@@ -38,7 +34,7 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
     public void testOutboundEndpointResponse() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://vminbound", "some message", null);
+        MuleMessage response = client.send("vm://vminbound", MuleMessage.builder().payload("some message").build());
         assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.getInboundProperty("test"), Is.is("test"));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
@@ -48,7 +44,7 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
     public void testInboundEndpointResponse() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://vminbound2", MESSAGE, null);
+        MuleMessage response = client.send("vm://vminbound2", MuleMessage.builder().payload(MESSAGE).build());
         assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
     }
@@ -58,11 +54,8 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
 
-        Map<String, Serializable> messageProperties = new HashMap<>();
         String replyToUri = "jms://out2";
-        messageProperties.put(MULE_REPLY_TO_PROPERTY, replyToUri);
-
-        client.dispatch("jms://out", MESSAGE, messageProperties);
+        client.dispatch("jms://out", MuleMessage.builder().payload(MESSAGE).replyTo(replyToUri).build());
 
         MuleMessage response = client.request(replyToUri, TIMEOUT);
         assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
@@ -75,7 +68,7 @@ public class JmsResponseElementTestCase extends FunctionalTestCase
     public void testInboundEndpointOneWay() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("jms://in3", MESSAGE, null);
+        MuleMessage response = client.send("jms://in3", MuleMessage.builder().payload(MESSAGE).build());
         assertThat(getPayloadAsString(response), is(EXPECTED_MODIFIED_MESSAGE));
         assertThat(response.getExceptionPayload(), IsNull.<Object>nullValue());
     }

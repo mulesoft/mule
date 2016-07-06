@@ -90,17 +90,17 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase
         CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer("MULE_*");
 
         muleMessage = MuleMessage.builder(muleMessage)
+                                 .correlationId(PROPERTY_VALUE.toString())
                                  .addInboundProperty("MULE_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
-                                 .addInboundProperty("MULE_CORRELATION_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
                                  .addInboundProperty("MULE_GROUP_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
                                  .addInboundProperty("SomeVar", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
                                  .build();
 
         final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
 
+        assertThat(transformed.getCorrelation().getId().get(), is(PROPERTY_VALUE));
         assertThat(transformed.getOutboundProperty("SomeVar"), is(nullValue()));
         assertThat(transformed.getOutboundProperty("MULE_ID"), is(PROPERTY_VALUE));
-        assertThat(transformed.getOutboundProperty("MULE_CORRELATION_ID"), is(PROPERTY_VALUE));
         assertThat(transformed.getOutboundProperty("MULE_GROUP_ID"), is(PROPERTY_VALUE));
     }
 

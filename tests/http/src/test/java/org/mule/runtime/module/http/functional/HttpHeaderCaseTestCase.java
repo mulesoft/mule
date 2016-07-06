@@ -50,7 +50,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase
         assertThat(((ParameterMap) payload).keySet(), hasItem("CustomValue"));
         assertThat(((ParameterMap) payload).get("CustomValue"), is("value"));
         HttpResponseAttributes attributes = (HttpResponseAttributes) response.getMessage().getAttributes();
-        assertThat(attributes.getHeaders().get(CONTENT_TYPE), is(APPLICATION_X_WWW_FORM_URLENCODED.toString()));
+        assertThat(attributes.getHeaders().get(CONTENT_TYPE), is(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()));
         assertThat(attributes.getHeaders().get("customname1"), is("customValue"));
     }
 }

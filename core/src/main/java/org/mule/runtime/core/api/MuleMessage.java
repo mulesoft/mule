@@ -9,6 +9,7 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.MuleMessageCorrelation;
 import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
 
 import java.io.Serializable;
@@ -67,39 +68,16 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     String getMessageRootId();
 
     /**
-     * Sets a correlationId for this message. The correlation Id can be used by
-     * components in the system to manage message relations. <p/> The correlationId
-     * is associated with the message using the underlying transport protocol. As
-     * such not all messages will support the notion of a correlationId i.e. tcp or
-     * file. In this situation the correlation Id is set as a property of the message
-     * where it's up to developer to keep the association with the message. For
-     * example if the message is serialised to xml the correlationId will be
-     * available in the message.
-     *
-     * @return the correlationId for this message or null if one hasn't been set
+     * Returns the correlation metadata of this message. See {@link MuleMessageCorrelation}.
+     * 
+     * @return the correlation metadata of this message.
      */
-    String getCorrelationId();
+    MuleMessageCorrelation getCorrelation();
 
     /**
-     * Gets the sequence or ordering number for this message in the the correlation group (as defined by the
-     * correlationId)
-     *
-     * @return the sequence number or null if the sequence is not important
-     */
-    Integer getCorrelationSequence();
-
-    /**
-     * Determines how many messages are in the correlation group
-     *
-     * @return total messages in this group or null if the size is not known
-     */
-    Integer getCorrelationGroupSize();
-
-    /**
-     * Returns a replyTo address for this message. This is useful in an asynchronous
-     * environment where the caller doesn't wait for a response and the response
-     * needs to be routed somewhere for further processing. The value of this field
-     * can be any valid endpointUri url.
+     * Returns a replyTo address for this message. This is useful in an asynchronous environment where the caller
+     * doesn't wait for a response and the response needs to be routed somewhere for further processing. The value of
+     * this field can be any valid endpointUri url.
      *
      * @return the endpointUri url to reply to or null if one has not been set
      */

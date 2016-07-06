@@ -27,7 +27,7 @@ public class TestReceiver
             logger.debug(StringMessageUtils.getBoilerPlate("Received: " + message + " Number: " + inc()
                                                            + " in thread: "
                                                            + Thread.currentThread().getName()));
-            logger.debug("Message ID is: " + RequestContext.getEventContext().getMessage().getCorrelationId());
+            logger.debug("Message ID is: " + RequestContext.getEventContext().getMessage().getCorrelation().getId());
         }
 
         return "Received: " + message;

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -253,7 +254,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
 
         public MyEventGroup(Object groupId, int expectedSize)
         {
-            super(groupId, muleContext, expectedSize, "EventGroupTestCase");
+            super(groupId, muleContext, of(expectedSize), "EventGroupTestCase");
         }
     }
 }

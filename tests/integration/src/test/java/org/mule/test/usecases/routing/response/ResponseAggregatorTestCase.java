@@ -25,7 +25,6 @@ import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import org.junit.Rule;
@@ -48,7 +47,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
-        MuleMessage message = client.send(format("http://localhost:%s", port.getNumber()), getTestMuleMessage("request"), httpRequestOptions);
+        MuleMessage message = client.send(format("http://localhost:%s", port.getNumber()), MuleMessage.builder().payload("request").build(), httpRequestOptions);
         assertNotNull(message);
         assertThat(new String(getPayloadAsBytes(message)), is("Received: request"));
     }
@@ -65,6 +64,7 @@ public class ResponseAggregatorTestCase extends FunctionalTestCase
                                                    .correlationId(event.getMessage().getUniqueId())
                                                    .correlationGroupSize(1)
                                                    .build();
+            event.setMessage(message);
 
             SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
             mp.setListener(listener);

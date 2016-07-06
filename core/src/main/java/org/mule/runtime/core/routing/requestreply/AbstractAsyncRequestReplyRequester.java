@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
+import static org.mule.runtime.core.MuleMessageCorrelation.NOT_SET;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -187,11 +189,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         // TODO add logic to use also seqNo when present so it works with split
         // messages
         String correlationId = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event);
-        if (event.getMessage().getCorrelationSequence() != null)
-        {
-            correlationId += event.getMessage().getCorrelationSequence();
-        }
-        return correlationId;
+        return correlationId + event.getMessage().getCorrelation().getSequence().map(v -> v.toString()).orElse(NOT_SET);
     }
 
     protected void sendAsyncRequest(MuleEvent event) throws MuleException

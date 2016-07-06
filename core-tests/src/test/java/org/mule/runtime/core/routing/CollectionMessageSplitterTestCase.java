@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
@@ -16,8 +15,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -203,8 +200,15 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         {
             MuleMessage msg = event.getMessage();
             assertTrue(msg.getPayload() instanceof String);
-            assertThat(msg.getOutboundProperty(MULE_CORRELATION_GROUP_SIZE_PROPERTY), counted ? is(count) : nullValue());
-            actualSequences.add(msg.getOutboundProperty(MULE_CORRELATION_SEQUENCE_PROPERTY));
+            if (counted)
+            {
+                assertThat(msg.getCorrelation().getGroupSize().get(), is(count));
+            }
+            else
+            {
+                assertThat(msg.getCorrelation().getGroupSize().isPresent(), is(false));
+            }
+            actualSequences.add(msg.getCorrelation().getSequence().get());
             String str = (String)msg.getPayload();
             assertTrue(TEST_LIST_MULTIPLE.contains(str));
             for (String key : inboundProps.keySet())
