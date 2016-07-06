@@ -6,12 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
+import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -22,9 +28,11 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
+import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
 
 import org.junit.Test;
 
@@ -48,10 +56,10 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase
     {
         final Integer defaultValue = 42;
         ImplicitConfigExtension config = (ImplicitConfigExtension) flowRunner("implicitConfig").withPayload("")
-                                                                                               .withFlowVariable("optionalWithDefault", defaultValue)
-                                                                                               .run()
-                                                                                               .getMessage()
-                                                                                               .getPayload();
+                .withFlowVariable("optionalWithDefault", defaultValue)
+                .run()
+                .getMessage()
+                .getPayload();
 
 
         assertThat(config, is(notNullValue()));
@@ -62,9 +70,17 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase
         assertThat(config.getOptionalWithDefault(), is(defaultValue));
     }
 
+    @Test
+    public void getImplicitConnection() throws Exception
+    {
+        Object connection = flowRunner("implicitConnection").run().getMessage().getPayload();
+        assertThat(connection, is(instanceOf(Apple.class)));
+    }
+
     @Extension(name = "implicit")
     @Operations({ImplicitOperations.class})
     @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/implicit", namespace = "implicit")
+    @Providers(ImplicitConnectionProvider.class)
     public static class ImplicitConfigExtension implements Initialisable, Startable, MuleContextAware
     {
 
@@ -124,12 +140,45 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase
         }
     }
 
+    public static class ImplicitConnectionProvider implements ConnectionProvider<Apple>
+    {
+
+        @Override
+        public Apple connect() throws ConnectionException
+        {
+            return new Apple();
+        }
+
+        @Override
+        public void disconnect(Apple apple)
+        {
+
+        }
+
+        @Override
+        public ConnectionValidationResult validate(Apple apple)
+        {
+            return ConnectionValidationResult.success();
+        }
+
+        @Override
+        public ConnectionHandlingStrategy<Apple> getHandlingStrategy(ConnectionHandlingStrategyFactory<Apple> handlingStrategyFactory)
+        {
+            return handlingStrategyFactory.none();
+        }
+    }
+
     public static class ImplicitOperations
     {
 
         public ImplicitConfigExtension getConfig(@UseConfig ImplicitConfigExtension config)
         {
             return config;
+        }
+
+        public Apple getConnection(@Connection Apple connection)
+        {
+            return connection;
         }
     }
 }
