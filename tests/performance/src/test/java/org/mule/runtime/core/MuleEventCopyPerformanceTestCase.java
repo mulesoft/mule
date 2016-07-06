@@ -55,7 +55,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
         event = createMuleEvent();
         for (int i = 0; i < 1000; i++)
         {
-            event = (DefaultMuleEvent) event.newThreadCopy();
+            event = new DefaultMuleEvent(event.getMessage(), event);
         }
     }
 
@@ -66,7 +66,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
         event = createMuleEventWithFlowVarsAndProperties(10);
         for (int i = 0; i < 1000; i++)
         {
-            event = (DefaultMuleEvent) event.newThreadCopy();
+            event = new DefaultMuleEvent(event.getMessage(), event);
         }
     }
 
@@ -77,7 +77,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
         event = createMuleEventWithFlowVarsAndProperties(50);
         for (int i = 0; i < 1000; i++)
         {
-            event = (DefaultMuleEvent) event.newThreadCopy();
+            event = new DefaultMuleEvent(event.getMessage(), event);
         }
     }
 
@@ -88,7 +88,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
         event = createMuleEventWithFlowVarsAndProperties(10);
         for (int i = 0; i < 1000; i++)
         {
-            event = (DefaultMuleEvent) event.newThreadCopy();
+            event = new DefaultMuleEvent(event.getMessage(), event);
             event.setFlowVariable("newKey", "val");
             event.setMessage(MuleMessage.builder(event.getMessage())
                                         .addOutboundProperty("newKey", "val")
@@ -103,7 +103,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
         DefaultMuleEvent original = createMuleEventWithFlowVarsAndProperties(10);
         for (int i = 0; i < 1000; i++)
         {
-            event = (DefaultMuleEvent) original.newThreadCopy();
+            event = new DefaultMuleEvent(original.getMessage(), original);
             for (int j = 1; j <= 5; j++)
             {
                 event.setFlowVariable("newKey" + j, "val");
@@ -121,7 +121,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
         DefaultMuleEvent original = createMuleEventWithFlowVarsAndProperties(50);
         for (int i = 0; i < 1000; i++)
         {
-            event = (DefaultMuleEvent) original.newThreadCopy();
+            event = new DefaultMuleEvent(original.getMessage(), original);
             event.setFlowVariable("newKey", "val");
             event.setMessage(MuleMessage.builder(event.getMessage())
                                         .addOutboundProperty("newKey", "val")
@@ -136,7 +136,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
         DefaultMuleEvent original = createMuleEventWithFlowVarsAndProperties(50);
         for (int i = 0; i < 1000; i++)
         {
-            event = (DefaultMuleEvent) original.newThreadCopy();
+            event = new DefaultMuleEvent(original.getMessage(), original);
             for (int j = 1; j <= 25; j++)
             {
                 event.setFlowVariable("newKey" + j, "val");

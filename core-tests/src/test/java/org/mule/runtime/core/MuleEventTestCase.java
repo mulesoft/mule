@@ -11,10 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.Credentials;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -199,8 +196,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         MuleEvent event = getTestEvent("whatever");
         event.setFlowVariable("foo", "bar");
 
-        MuleEvent copy = new DefaultMuleEvent(
-            (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false, false);
+        MuleEvent copy = new DefaultMuleEvent(event.getMessage(), event, false, false);
 
         copy.setFlowVariable("foo", "bar2");
 
@@ -215,8 +211,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase
         MuleEvent event = getTestEvent("whatever");
         event.setFlowVariable("foo", "bar");
 
-        MuleEvent copy = new DefaultMuleEvent(
-                (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy(), event, false);
+        MuleEvent copy = new DefaultMuleEvent(event.getMessage(), event, false);
 
         copy.setFlowVariable("foo", "bar2");
 

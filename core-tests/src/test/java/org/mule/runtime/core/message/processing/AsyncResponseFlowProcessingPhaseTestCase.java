@@ -237,7 +237,6 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
         }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
-        verify(mockMuleEvent).resetAccessControl();
         verifyOnlySuccessfulWasCalled();
     }
 
@@ -269,7 +268,6 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
 
         sensingMessageProcessor.latch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS);
         verify(mockContext.getFlowConstruct().getExceptionListener()).handleException(any(Exception.class), any(MuleEvent.class));
-        verify(mockMuleEvent).resetAccessControl();
         verifyOnlySuccessfulWasCalled();
     }
 
@@ -323,7 +321,6 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
         when(mockTemplate.routeEvent(any(MuleEvent.class))).thenReturn(null);
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
 
-        when(mockMuleEvent.newThreadCopy()).thenReturn(mockMuleEvent);
         RequestContext.setEvent(mockMuleEvent);
         phase.runPhase(mockTemplate, mockContext, mockNotifier);
     }
@@ -422,16 +419,16 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
 
     private void verifyOnlySuccessfulWasCalled()
     {
-        verify(mockNotifier, Mockito.never()).phaseFailure(any(Exception.class));
-        verify(mockNotifier, Mockito.never()).phaseConsumedMessage();
+        verify(mockNotifier, never()).phaseFailure(any(Exception.class));
+        verify(mockNotifier, never()).phaseConsumedMessage();
         verify(mockNotifier).phaseSuccessfully();
     }
 
     private void verifyOnlyFailureWasCalled(Exception e)
     {
         verify(mockNotifier).phaseFailure(e);
-        verify(mockNotifier, Mockito.never()).phaseConsumedMessage();
-        verify(mockNotifier, Mockito.never()).phaseSuccessfully();
+        verify(mockNotifier, never()).phaseConsumedMessage();
+        verify(mockNotifier, never()).phaseSuccessfully();
     }
 
 }

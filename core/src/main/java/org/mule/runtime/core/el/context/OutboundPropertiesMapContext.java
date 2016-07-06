@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el.context;
 
+import static java.util.Collections.emptyMap;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
@@ -50,7 +51,7 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable>
     @Override
     public void clear()
     {
-        event.setMessage(MuleMessage.builder(event.getMessage()).clearOutboundProperties().build());
+        event.setMessage(MuleMessage.builder(event.getMessage()).outboundProperties(emptyMap()).build());
     }
 
     @Override

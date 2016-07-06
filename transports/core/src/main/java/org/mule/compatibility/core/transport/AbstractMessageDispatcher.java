@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -267,7 +266,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                     {
                         try
                         {
-                            resetAccessControl(result);
                             MuleEvent responseEvent = createResponseEvent(result, event);
                             // Set RequestContext ThreadLocal in new thread for backwards compatibility
                             unsafeSetEvent(responseEvent);
@@ -307,7 +305,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                     @Override
                     public void run()
                     {
-                        resetAccessControl(event);
                         // Set RequestContext ThreadLocal in new thread for backwards compatibility
                         unsafeSetEvent(event);
                         event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
@@ -325,15 +322,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                 // Handle exception in transport thread if unable to schedule work
                 event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, exception), null);
             }
-        }
-    }
-
-    private void resetAccessControl(Object result)
-    {
-        // Reset access control for new thread
-        if (result instanceof ThreadSafeAccess)
-        {
-            ((ThreadSafeAccess) result).resetAccessControl();
         }
     }
 

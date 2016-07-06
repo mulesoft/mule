@@ -22,7 +22,6 @@
     </flow>
 
     <flow name="withNoCorrelationId">
-        <expression-component>_muleMessage.uniqueId='custom-cid'</expression-component>
         <transports:outbound-endpoint ref="in" />
     </flow>
 

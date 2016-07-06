@@ -10,7 +10,6 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
@@ -67,10 +66,7 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
         // message
         for (int i = 0; i < results.length; i++)
         {
-            if (results[i] instanceof ThreadSafeAccess)
-            {
-                results[i] = (MuleEvent)((ThreadSafeAccess)results[i]).newThreadCopy();
-            }
+            results[i] = new DefaultMuleEvent(results[i].getMessage(), results[i]);
         }
         return new DefaultMuleEvent(MuleMessage.builder().payload(results).build(), results[0]);
     }

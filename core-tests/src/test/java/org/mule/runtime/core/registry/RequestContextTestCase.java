@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -102,7 +101,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
 
     }
 
-    private class DummyEvent implements MuleEvent, ThreadSafeAccess
+    private class DummyEvent implements MuleEvent
     {
 
         private MuleMessage message = MuleMessage.builder().payload("").build();
@@ -207,31 +206,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         public MuleContext getMuleContext()
         {
             return null;
-        }
-
-        @Override
-        public void assertAccess(boolean write)
-        {
-            // no action
-        }
-
-        @Override
-        public void resetAccessControl()
-        {
-            // no action
-        }
-
-        @Override
-        public ThreadSafeAccess newThreadCopy()
-        {
-            if (threadSafeEvent)
-            {
-                return new DummyEvent();
-            }
-            else
-            {
-                return this;
-            }
         }
 
         @Override

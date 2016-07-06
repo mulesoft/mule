@@ -10,14 +10,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import org.mule.runtime.core.DefaultMuleMessage;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -55,18 +51,6 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase
         assertTrue("Timed out waiting for latch", latch.await(2000, TimeUnit.MILLISECONDS));
 
         assertSame(originalEvent, RequestContext.getEvent());
-
-        try
-        {
-            // Ensure that even after Work has been created, scheduled and executed
-            // the original event instance is still owned by this thread and still
-            // mutable.
-            ((DefaultMuleMessage) originalEvent.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-        }
     }
 
     @Test
@@ -81,19 +65,6 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase
         // overwritten with a new copy which is not desirable.
         // See: MULE-4409
         assertNotSame(originalEvent, RequestContext.getEvent());
-
-        try
-        {
-            // Ensure that even after Work has been created, scheduled and executed
-            // the original event instance is still owned by this thread and still
-            // mutable.
-            ((DefaultMuleMessage) originalEvent.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-        }
-
     }
 
     private class TestMuleEventWork extends AbstractMuleEventWork
@@ -109,17 +80,6 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase
         {
             assertNotSame("MuleEvent", event, originalEvent);
             assertNotNull("RequestContext.getEvent() is null", RequestContext.getEvent());
-
-            try
-            {
-                // Ensure that the new event copied for this event is owned by the
-                // thread that is executing this work and is mutable
-                ((DefaultMuleMessage) event.getMessage()).assertAccess(ThreadSafeAccess.WRITE);
-            }
-            catch (Exception e)
-            {
-                fail(e.getMessage());
-            }
             latch.countDown();
         }
     }

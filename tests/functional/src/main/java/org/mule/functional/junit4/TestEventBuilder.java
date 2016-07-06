@@ -280,12 +280,21 @@ public class TestEventBuilder
      */
     public MuleEvent build(MuleContext muleContext, FlowConstruct flow)
     {
-        final Builder messageBuilder = MuleMessage.builder()
-                                                  .payload(payload)
-                                                  .mediaType(mediaType)
-                                                  .inboundProperties(inboundProperties)
-                                                  .outboundProperties(outboundProperties)
-                                                  .inboundAttachments(inboundAttachments);
+        final Builder messageBuilder;
+
+        if (payload instanceof MuleMessage)
+        {
+            messageBuilder = MuleMessage.builder((MuleMessage) payload);
+        }
+        else
+        {
+            messageBuilder = MuleMessage.builder().payload(payload);
+        }
+        messageBuilder.mediaType(mediaType)
+                      .inboundProperties(inboundProperties)
+                      .outboundProperties(outboundProperties)
+                      .inboundAttachments(inboundAttachments);
+
         if (attributes != null)
         {
             messageBuilder.attributes(attributes);

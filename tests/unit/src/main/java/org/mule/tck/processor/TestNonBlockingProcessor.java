@@ -10,7 +10,6 @@ import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -35,7 +34,6 @@ public class TestNonBlockingProcessor implements NonBlockingMessageProcessor, In
         {
             executor.execute(() ->
             {
-                ((ThreadSafeAccess)event).resetAccessControl();
                 try
                 {
                     event.getReplyToHandler().processReplyTo(event, null, null);

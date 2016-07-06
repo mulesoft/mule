@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.vm;
 
+import static java.util.Collections.emptyMap;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.NoReceiverForEndpointException;
@@ -15,7 +16,6 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -23,6 +23,12 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.util.queue.Queue;
 import org.mule.runtime.core.util.queue.QueueSession;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.activation.DataHandler;
 
 /**
  * <code>VMMessageDispatcher</code> is used for providing in memory interaction between components.
@@ -48,16 +54,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
         MuleEvent eventToDispatch = DefaultMuleEvent.copy(event);
         eventToDispatch.clearFlowVariables();
-        eventToDispatch.setMessage(eventToDispatch.getMessage().transform(msg -> {
-            try
-            {
-                return msg.createInboundMessage();
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        }));
+        eventToDispatch.setMessage(createInboundMessage(eventToDispatch.getMessage()));
         QueueSession session = getQueueSession();
         Queue queue = session.getQueue(endpointUri.getAddress());
         if (!queue.offer(eventToDispatch.getMessage(), connector.getQueueTimeout()))
@@ -91,16 +88,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
 
         MuleEvent eventToSend = DefaultMuleEvent.copy(event);
-        final MuleMessage message = eventToSend.getMessage().transform(msg -> {
-            try
-            {
-                return msg.createInboundMessage();
-            }
-            catch (Exception e)
-            {
-                throw new MuleRuntimeException(e);
-            }
-        });
+        final MuleMessage message = createInboundMessage(eventToSend.getMessage());
 
         ExecutionTemplate<MuleMessage> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(
                 event.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
@@ -113,17 +101,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         }
         if (retMessage != null)
         {
-            retMessage = retMessage.transform(msg ->
-            {
-                try
-                {
-                    return msg.createInboundMessage();
-                }
-                catch (Exception e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-            });
+            retMessage = createInboundMessage(retMessage);
         }
         return retMessage;
     }
@@ -149,6 +127,22 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     protected void doDisconnect() throws Exception
     {
         // template method
+    }
+
+    private MuleMessage createInboundMessage(MuleMessage message)
+    {
+        Map<String, Serializable> outboundProperties = new HashMap<>();
+        Map<String, DataHandler> outboundAttachments = new HashMap<>();
+
+        message.getOutboundPropertyNames().stream().forEach(key -> outboundProperties.put(key, message.getOutboundProperty(key)));
+        message.getOutboundAttachmentNames().stream().forEach(key -> outboundAttachments.put(key, message.getOutboundAttachment(key)));
+
+        return MuleMessage.builder(message)
+                .inboundProperties(outboundProperties)
+                .inboundAttachments(outboundAttachments)
+                .outboundProperties(emptyMap())
+                .outboundAttachments(emptyMap())
+                .build();
     }
 
 }

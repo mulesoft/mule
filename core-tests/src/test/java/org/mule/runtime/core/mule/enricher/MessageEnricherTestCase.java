@@ -30,7 +30,6 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
@@ -344,7 +343,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 
         nullReplyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
 
-        assertThat(sensingNullMessageProcessor.event.getMessage(), not(sameInstance(in.getMessage())));
+        assertThat(sensingNullMessageProcessor.event.getMessage(), sameInstance(in.getMessage()));
 
         assertThat(out, is(instanceOf(NonBlockingVoidMuleEvent.class)));
         assertThat(nullReplyToHandler.event.getMessage(), is(sameInstance(in.getMessage())));
@@ -367,7 +366,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 
         MuleEvent out = processEnricherInChain(enricher, in);
 
-        assertThat(sensingNullMessageProcessor.event.getMessage(), not(sameInstance(in.getMessage())));
+        assertThat(sensingNullMessageProcessor.event.getMessage(), sameInstance(in.getMessage()));
         assertThat(out.getMessage(), is(sameInstance(in.getMessage())));
     }
 
@@ -419,8 +418,6 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
     {
         return DefaultMessageProcessorChain.from(enricher, event ->
         {
-            // Ensure that message is writable after being processed by enricher with non-blocking target
-            ((ThreadSafeAccess) event).assertAccess(true);
             assertThat(event.getMessage(), is(sameInstance(in.getMessage())));
             return event;
         }).process(in);

@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -66,7 +65,7 @@ import org.slf4j.LoggerFactory;
  * set and retrieved by Mule components.
  */
 
-public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, DeserializationPostInitialisable
+public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialisable
 {
     private static final long serialVersionUID = 1L;
 
@@ -854,40 +853,6 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     }
 
     @Override
-    public ThreadSafeAccess newThreadCopy()
-    {
-        if (message instanceof ThreadSafeAccess)
-        {
-            DefaultMuleEvent copy = new DefaultMuleEvent(
-                (MuleMessage) ((ThreadSafeAccess) message).newThreadCopy(), this);
-            copy.resetAccessControl();
-            return copy;
-        }
-        else
-        {
-            return this;
-        }
-    }
-
-    @Override
-    public void resetAccessControl()
-    {
-        if (message instanceof ThreadSafeAccess)
-        {
-            ((ThreadSafeAccess) message).resetAccessControl();
-        }
-    }
-
-    @Override
-    public void assertAccess(boolean write)
-    {
-        if (message instanceof ThreadSafeAccess)
-        {
-            ((ThreadSafeAccess) message).assertAccess(write);
-        }
-    }
-
-    @Override
     public ProcessingTime getProcessingTime()
     {
         return processingTime;
@@ -1026,11 +991,8 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
      */
     public static MuleEvent copy(MuleEvent event)
     {
-        MuleMessage messageCopy = (MuleMessage) ((ThreadSafeAccess) event.getMessage()).newThreadCopy();
-        DefaultMuleEvent eventCopy = new DefaultMuleEvent(messageCopy, event, new DefaultMuleSession(
-            event.getSession()));
+        DefaultMuleEvent eventCopy = new DefaultMuleEvent(event.getMessage(), event, new DefaultMuleSession(event.getSession()));
         eventCopy.flowVariables = ((DefaultMuleEvent) event).flowVariables.clone();
-        ((DefaultMuleMessage) messageCopy).resetAccessControl();
         return eventCopy;
     }
 

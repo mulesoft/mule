@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el.context;
 
+import static java.util.Collections.emptyMap;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
@@ -49,7 +50,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
     @Override
     public void clear()
     {
-        event.setMessage(MuleMessage.builder(event.getMessage()).clearOutboundAttachments().build());
+        event.setMessage(MuleMessage.builder(event.getMessage()).outboundAttachments(emptyMap()).build());
     }
 
 }

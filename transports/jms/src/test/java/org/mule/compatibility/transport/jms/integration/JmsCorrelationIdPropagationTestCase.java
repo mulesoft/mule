@@ -8,6 +8,8 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.mule.functional.functional.FlowAssert.verify;
 
+import org.mule.runtime.core.api.MuleMessage;
+
 import org.junit.Test;
 
 /**
@@ -38,7 +40,7 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
     @Test
     public void testNoCorrelationIdPropagation() throws Exception
     {
-        runFlow("withNoCorrelationId");
+        flowRunner("withNoCorrelationId").withPayload(MuleMessage.builder().payload(TEST_PAYLOAD).id("custom-cid").build()).run();
         verifyPropagation();
     }
 

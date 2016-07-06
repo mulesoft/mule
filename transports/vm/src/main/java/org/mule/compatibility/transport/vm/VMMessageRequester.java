@@ -10,7 +10,6 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.ThreadSafeAccess;
 import org.mule.runtime.core.util.queue.Queue;
 import org.mule.runtime.core.util.queue.QueueSession;
 
@@ -84,11 +83,6 @@ public class VMMessageRequester extends AbstractMessageRequester
                 }
                 if (message != null)
                 {
-                    //The message will contain old thread information, we need to reset it
-                    if(message instanceof ThreadSafeAccess)
-                    {
-                        ((ThreadSafeAccess) message).resetAccessControl();
-                    }
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Message received: " + message);
