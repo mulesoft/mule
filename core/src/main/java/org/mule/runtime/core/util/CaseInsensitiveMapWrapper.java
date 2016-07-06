@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,12 @@ public class CaseInsensitiveMapWrapper<T> implements Map<String, T>, Serializabl
         {
             throw new RuntimeException(String.format("Can not create an instance of %s", mapClass.getCanonicalName()), e);
         }
+    }
+
+    public CaseInsensitiveMapWrapper(Map<String, T> map)
+    {
+        baseMap = new HashMap<>();
+        putAll(map);
     }
 
     @Override
@@ -280,5 +287,10 @@ public class CaseInsensitiveMapWrapper<T> implements Map<String, T>, Serializabl
         }
 
         protected abstract B convert(A next);
+    }
+
+    public Map<String, Serializable> asHashMap()
+    {
+        return new HashMap(baseMap);
     }
 }
