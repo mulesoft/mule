@@ -23,6 +23,7 @@
             <httpn:response-builder>
                 <httpn:simple-response-builder statusCode="#[message.getAttributes().getStatusCode()]"
                                              reasonPhrase="#[message.getAttributes().getReasonPhrase()]"
+                                               headersRef="#[message.getAttributes().getHeaders()]"
                                              />
             </httpn:response-builder>
         </httpn:listener>

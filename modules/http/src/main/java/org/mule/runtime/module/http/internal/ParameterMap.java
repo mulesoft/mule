@@ -26,7 +26,7 @@ import java.util.Set;
 public class ParameterMap implements HttpParameters, Serializable
 {
 
-    private final Map<String, LinkedList<String>> paramsMap;
+    protected Map<String, LinkedList<String>> paramsMap;
 
     public ParameterMap(final Map paramsMap)
     {

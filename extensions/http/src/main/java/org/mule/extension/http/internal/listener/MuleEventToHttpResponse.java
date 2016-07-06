@@ -9,12 +9,11 @@ package org.mule.extension.http.internal.listener;
 
 import static org.mule.extension.http.api.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.api.HttpStreamingType.AUTO;
-import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
-
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.runtime.api.message.NullPayload;
@@ -86,14 +85,6 @@ public class MuleEventToHttpResponse
         Map<String, String> headers = listenerResponseBuilder.getHeaders(event);
 
         final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
-        if (!headers.containsKey(CONTENT_TYPE_PROPERTY))
-        {
-            DataType dataType = event.getMessage().getDataType();
-            if (!MediaType.ANY.matches(dataType.getMediaType()))
-            {
-                httpResponseHeaderBuilder.addHeader(CONTENT_TYPE_PROPERTY, dataType.getMediaType().toRfcString());
-            }
-        }
 
         for (String name : headers.keySet())
         {
@@ -105,6 +96,15 @@ public class MuleEventToHttpResponse
             else
             {
                 httpResponseHeaderBuilder.addHeader(name, headers.get(name));
+            }
+        }
+
+        if (httpResponseHeaderBuilder.getContentType() == null)
+        {
+            DataType dataType = event.getMessage().getDataType();
+            if (!MediaType.ANY.matches(dataType.getMediaType()))
+            {
+                httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, dataType.getMediaType().toString());
             }
         }
 

@@ -33,7 +33,12 @@ public class ParameterMapTestCase extends AbstractMuleTestCase
     public static final String VALUE_1 = "value1";
     public static final String VALUE_2 = "value2";
 
-    private ParameterMap parameterMap = new ParameterMap();
+    protected ParameterMap parameterMap = getParameterMap();
+
+    protected ParameterMap getParameterMap()
+    {
+        return new ParameterMap();
+    }
 
     @Test
     public void putAndGet()

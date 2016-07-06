@@ -9,26 +9,17 @@ package org.mule.runtime.module.http.functional.requester;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
-import static org.hamcrest.Matchers.hasItem;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestContentTypeTestCase extends AbstractHttpTestCase
+public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase
 {
 
     private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";
-
-    @Rule
-    public DynamicPort httpPort = new DynamicPort("httpPort");
 
     @Rule
     public SystemProperty strictContentType = new SystemProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType", Boolean.TRUE.toString());
@@ -42,18 +33,19 @@ public class HttpRequestContentTypeTestCase extends AbstractHttpTestCase
     @Test
     public void sendsContentTypeOnRequest() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        final String url = String.format("http://localhost:%s/requestClient", httpPort.getNumber());
-
-        MuleMessage response = client.send(url, TEST_MESSAGE, null);
-
-        assertContentTypeProperty(response);
-        assertThat(getPayloadAsString(response), equalTo(EXPECTED_CONTENT_TYPE));
+        verifyContentTypeForFlow("requesterContentType");
     }
 
-    private void assertContentTypeProperty(MuleMessage response)
+    @Test
+    public void sendsContentTypeOnRequestBuilder() throws Exception
     {
-        assertThat(response.getInboundPropertyNames(), hasItem(equalToIgnoringCase(MuleProperties.CONTENT_TYPE_PROPERTY)));
-        assertThat((String) response.getInboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY), equalTo(EXPECTED_CONTENT_TYPE));
+        verifyContentTypeForFlow("requesterBuilderContentType");
+    }
+
+    public void verifyContentTypeForFlow(String flowName) throws Exception
+    {
+        flowRunner(flowName).withPayload(TEST_MESSAGE).run().getMessage();
+
+        assertThat(getFirstReceivedHeader(CONTENT_TYPE.toLowerCase()), equalTo(EXPECTED_CONTENT_TYPE));
     }
 }
