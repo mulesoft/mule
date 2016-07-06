@@ -66,7 +66,7 @@ public class TreeNode implements Serializable, Iterable
      */
     public FileAttributes getAttributes()
     {
-        return info.getAttributes();
+        return info.getAttributes().get();
     }
 
     /**
@@ -74,7 +74,7 @@ public class TreeNode implements Serializable, Iterable
      */
     public MediaType getMediaType()
     {
-        return info.getMediaType();
+        return info.getMediaType().get();
     }
 
     /**

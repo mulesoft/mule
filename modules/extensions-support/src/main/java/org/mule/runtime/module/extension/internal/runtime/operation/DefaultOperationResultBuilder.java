@@ -17,20 +17,20 @@ import java.util.Optional;
 /**
  * Default implementation of {@link OperationResult.Builder}
  *
- * @param <OUTPUT>     the generic type of the output value
- * @param <ATTRIBUTES> the generic type of the message attributes
+ * @param <Output>     the generic type of the output value
+ * @param <Attributes> the generic type of the message attributes
  * @since 4.0
  */
-final class DefaultOperationResultBuilder<OUTPUT, ATTRIBUTES extends Serializable> implements OperationResult.Builder<OUTPUT, ATTRIBUTES>
+final class DefaultOperationResultBuilder<Output, Attributes extends Serializable> implements OperationResult.Builder<Output, Attributes>
 {
 
-    private final DefaultOperationResult<OUTPUT, ATTRIBUTES> operationResult = new DefaultOperationResult<>();
+    private final DefaultOperationResult<Output, Attributes> operationResult = new DefaultOperationResult<>();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public OperationResult.Builder<OUTPUT, ATTRIBUTES> output(OUTPUT output)
+    public OperationResult.Builder<Output, Attributes> output(Output output)
     {
         operationResult.output = output;
         return this;
@@ -40,7 +40,7 @@ final class DefaultOperationResultBuilder<OUTPUT, ATTRIBUTES extends Serializabl
      * {@inheritDoc}
      */
     @Override
-    public OperationResult.Builder<OUTPUT, ATTRIBUTES> attributes(ATTRIBUTES attributes)
+    public OperationResult.Builder<Output, Attributes> attributes(Attributes attributes)
     {
         operationResult.attributes = ofNullable(attributes);
         return this;
@@ -50,7 +50,7 @@ final class DefaultOperationResultBuilder<OUTPUT, ATTRIBUTES extends Serializabl
      * {@inheritDoc}
      */
     @Override
-    public OperationResult.Builder<OUTPUT, ATTRIBUTES> mediaType(MediaType dataType)
+    public OperationResult.Builder<Output, Attributes> mediaType(MediaType dataType)
     {
         operationResult.mediaType = ofNullable(dataType);
         return this;
@@ -60,24 +60,24 @@ final class DefaultOperationResultBuilder<OUTPUT, ATTRIBUTES extends Serializabl
      * {@inheritDoc}
      */
     @Override
-    public OperationResult<OUTPUT, ATTRIBUTES> build()
+    public OperationResult<Output, Attributes> build()
     {
         return operationResult;
     }
 
-    private final class DefaultOperationResult<OUTPUT, ATTRIBUTES extends Serializable> implements OperationResult<OUTPUT, ATTRIBUTES>
+    private final class DefaultOperationResult<Output, Attributes extends Serializable> implements OperationResult<Output, Attributes>
     {
 
-        private OUTPUT output;
-        private Optional<ATTRIBUTES> attributes = empty();
+        private Output output;
+        private Optional<Attributes> attributes = empty();
         private Optional<MediaType> mediaType = empty();
 
-        public OUTPUT getOutput()
+        public Output getOutput()
         {
             return output;
         }
 
-        public Optional<ATTRIBUTES> getAttributes()
+        public Optional<Attributes> getAttributes()
         {
             return attributes;
         }
