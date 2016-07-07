@@ -15,7 +15,7 @@ import org.mule.test.infrastructure.process.MuleProcessController;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,11 +66,43 @@ public class MuleDeployment extends MuleInstallation
             deployment = new MuleDeployment();
         }
 
+        /**
+         * Deploys and starts the Mule instance with the specified configuration.
+         * @return
+         */
         public MuleDeployment deploy()
         {
             return deployment;
         }
 
+        /**
+         * Specifies the deployment timeout for each deployed artifact.
+         * @param seconds
+         * @return
+         */
+        public Builder timeout(int seconds)
+        {
+            deployment.deploymentTimeout = seconds * 1000;
+            return this;
+        }
+
+        /**
+         * Specifies a system property to be passed in the command line when starting Mule.
+         * @param property
+         * @param value
+         * @return
+         */
+        public Builder withProperty(String property, String value)
+        {
+            deployment.properties.put(property, value);
+            return this;
+        }
+
+        /**
+         * Specifies a Map of system properties to be passed in the command line when starting Mule.
+         * @param properties
+         * @return
+         */
         public Builder withProperties(Map<String, String> properties)
         {
             if (deployment.properties.size() != 0)
@@ -81,33 +113,36 @@ public class MuleDeployment extends MuleInstallation
             return this;
         }
 
-        public Builder timeout(int seconds)
-        {
-            deployment.deploymentTimeout = seconds * 1000;
-            return this;
-        }
-
-        public Builder withProperty(String property, String value)
-        {
-            deployment.properties.put(property, value);
-            return this;
-        }
-
+        /**
+         * Specifies application folders or ZIP files to be deployed to the apps folder.
+         * @param applications
+         * @return
+         */
         public Builder withApplications(String... applications)
         {
-            Arrays.stream(applications).forEach((application) -> deployment.applications.add(application));
+            Collections.addAll(deployment.applications, applications);
             return this;
         }
 
+        /**
+         * Specifies domains or domain-bundles to be deployed to the domains folder.
+         * @param domains
+         * @return
+         */
         public Builder withDomains(String... domains)
         {
-            Arrays.stream(domains).forEach((domain) -> deployment.domains.add(domain));
+            Collections.addAll(deployment.domains, domains);
             return this;
         }
 
+        /**
+         * Adds libraries to lib/user folder.
+         * @param libraries
+         * @return
+         */
         public Builder withLibraries(String... libraries)
         {
-            Arrays.stream(libraries).forEach((library) -> deployment.libraries.add(library));
+            Collections.addAll(deployment.libraries, libraries);
             return this;
         }
 
