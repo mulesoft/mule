@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
+import org.mule.runtime.core.message.BaseAttributes;
+
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -16,7 +18,7 @@ import java.time.ZoneId;
  *
  * @since 4.0
  */
-public abstract class AbstractFileAttributes implements FileAttributes
+public abstract class AbstractFileAttributes extends BaseAttributes implements FileAttributes
 {
 
     protected final Path path;

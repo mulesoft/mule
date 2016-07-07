@@ -11,6 +11,7 @@ import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -44,7 +45,7 @@ public class TestEventBuilder
 
     private Object payload = NullPayload.getInstance();
     private MediaType mediaType = MediaType.ANY;
-    private Serializable attributes;
+    private Attributes attributes;
     private Map<String, Serializable> inboundProperties = new HashMap<>();
     private Map<String, Serializable> outboundProperties = new HashMap<>();
     private Map<String, DataHandler> inboundAttachments = new HashMap<>();
@@ -97,7 +98,7 @@ public class TestEventBuilder
      * @param attributes the attributes object for the produced {@link org.mule.runtime.api.message.MuleMessage}
      * @return this {@link TestEventBuilder}
      */
-    public TestEventBuilder withAttributes(Serializable attributes)
+    public TestEventBuilder withAttributes(Attributes attributes)
     {
         this.attributes = attributes;
         return this;

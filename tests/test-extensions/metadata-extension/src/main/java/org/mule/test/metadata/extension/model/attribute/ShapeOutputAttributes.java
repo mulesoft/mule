@@ -6,7 +6,9 @@
  */
 package org.mule.test.metadata.extension.model.attribute;
 
-public class ShapeOutputAttributes implements AbstractOutputAttributes
+import org.mule.runtime.core.message.BaseAttributes;
+
+public class ShapeOutputAttributes extends BaseAttributes implements AbstractOutputAttributes
 {
 
     private String outputId = "ShapesOutputAttributes";
@@ -23,6 +25,7 @@ public class ShapeOutputAttributes implements AbstractOutputAttributes
         this.sides = sides;
     }
 
+    @Override
     public String getOutputId()
     {
         return outputId;

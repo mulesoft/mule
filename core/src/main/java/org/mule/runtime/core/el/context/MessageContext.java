@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el.context;
 
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
@@ -151,7 +152,7 @@ public class MessageContext
         return new OutboundAttachmentMapContext(event);
     }
 
-    public Serializable getAttributes()
+    public Attributes getAttributes()
     {
         return event.getMessage().getAttributes();
     }

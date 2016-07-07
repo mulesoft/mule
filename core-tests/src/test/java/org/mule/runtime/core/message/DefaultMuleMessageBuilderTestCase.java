@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.HTML_STRING;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -22,14 +21,15 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
+import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
+
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessageBuilder;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import java.io.Serializable;
@@ -43,6 +43,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 /**
  *
  */
@@ -50,8 +52,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 {
 
     private static final String NEW_PAYLOAD = "new payload";
-    private static final Apple TEST_ATTR = new Apple();
-    private static final Banana TEST_ATTR_2 = new Banana();
+    private static final Attributes TEST_ATTR = NULL_ATTRIBUTES;
+    private static final Attributes TEST_ATTR_2 = new BaseAttributes() { };
     private static final String PROPERTY_KEY = "propertyKey";
     private static final Serializable PROPERTY_VALUE = "propertyValue";
     private static final String ATTACHMENT_KEY = "attachmentKey";

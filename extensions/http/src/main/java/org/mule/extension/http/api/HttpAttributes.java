@@ -8,9 +8,9 @@ package org.mule.extension.http.api;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
 
+import org.mule.runtime.core.message.BaseAttributes;
 import org.mule.runtime.module.http.internal.ParameterMap;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -20,7 +20,7 @@ import javax.activation.DataHandler;
  *
  * @since 4.0
  */
-public abstract class HttpAttributes implements Serializable
+public abstract class HttpAttributes extends BaseAttributes
 {
     /**
      * Map of HTTP headers in the message. Former properties.

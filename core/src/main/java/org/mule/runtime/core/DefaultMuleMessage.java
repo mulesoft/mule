@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROP
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.util.ObjectUtils.getInt;
 
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -97,9 +98,9 @@ public class DefaultMuleMessage implements MuleMessage, DeserializationPostIniti
     private transient AtomicBoolean mutable = null;
 
     private transient TypedValue typedValue;
-    private Serializable attributes;
+    private Attributes attributes;
 
-    DefaultMuleMessage(String id, String rootId, TypedValue typedValue, Serializable attributes,
+    DefaultMuleMessage(String id, String rootId, TypedValue typedValue, Attributes attributes,
                        Map<String, TypedValue<Serializable>> inboundProperties,
                        Map<String, TypedValue<Serializable>> outboundProperties,
                        Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
@@ -510,7 +511,7 @@ public class DefaultMuleMessage implements MuleMessage, DeserializationPostIniti
     }
 
     @Override
-    public Serializable getAttributes()
+    public Attributes getAttributes()
     {
         return attributes;
     }

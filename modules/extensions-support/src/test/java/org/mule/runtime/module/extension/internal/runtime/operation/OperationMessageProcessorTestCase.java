@@ -34,6 +34,7 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
 import org.mule.metadata.api.model.StringType;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -79,7 +80,6 @@ import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
@@ -268,7 +268,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     {
         Object payload = new Object();
         MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
-        Serializable attributes = mock(Serializable.class);
+        Attributes attributes = mock(Attributes.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder()
                                                                                         .output(payload)
@@ -297,7 +297,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         Object payload = new Object();
         MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
-        Serializable attributes = mock(Serializable.class);
+        Attributes attributes = mock(Attributes.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder()
                                                                                         .output(payload)
@@ -324,7 +324,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     {
         Object payload = new Object();
         MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
-        Serializable oldAttributes = mock(Serializable.class);
+        Attributes oldAttributes = mock(Attributes.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder()
                                                                                         .output(payload)
@@ -350,7 +350,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception
     {
         Object payload = "hello world!";
-        Serializable oldAttributes = mock(Serializable.class);
+        Attributes oldAttributes = mock(Attributes.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder().output(payload).build());
         when(event.getMessage()).thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes(oldAttributes).build());
@@ -371,7 +371,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     public void operationReturnsOperationResultWithPayloadAndAttributes() throws Exception
     {
         Object payload = "hello world!";
-        Serializable attributes = mock(Serializable.class);
+        Attributes attributes = mock(Attributes.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder().output(payload)
                                                                                         .attributes(attributes)

@@ -8,9 +8,10 @@ package org.mule.runtime.module.extension.internal.connector;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-
-import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -21,12 +22,10 @@ import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.test.petstore.extension.PetStoreConnector;
 
-import java.io.Serializable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -95,7 +94,7 @@ public class PetStoreSourceRetryPolicyTestCase extends ExtensionFunctionalTestCa
     }
 
     @Alias("source")
-    public static class PetStoreSource extends Source<String, Serializable>
+    public static class PetStoreSource extends Source<String, Attributes>
     {
 
         @UseConfig

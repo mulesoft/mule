@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
-import java.io.Serializable;
+import org.mule.runtime.api.message.Attributes;
 
 /**
  * Canonical representation of a file's metadata attributes.
@@ -16,7 +16,7 @@ import java.io.Serializable;
  *
  * @since 4.0
  */
-public interface FileAttributes extends Serializable
+public interface FileAttributes extends Attributes
 {
 
     /**

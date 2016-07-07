@@ -7,11 +7,11 @@
 package org.mule.extension.email.api;
 
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.message.BaseAttributes;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +32,7 @@ import javax.mail.Message;
  *
  * @since 4.0
  */
-public class EmailAttributes implements Serializable
+public class EmailAttributes extends BaseAttributes
 {
 
     /**

@@ -9,9 +9,9 @@ package org.mule.test.heisenberg.extension;
 import static java.lang.String.format;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-
 import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -24,14 +24,13 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
 @Alias("ListenPayments")
-public class HeisenbergSource extends Source<Void, Serializable> implements Initialisable
+public class HeisenbergSource extends Source<Void, Attributes> implements Initialisable
 {
 
     public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";

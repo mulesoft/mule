@@ -6,9 +6,9 @@
  */
 package org.mule.test.metadata.extension.model.attribute;
 
-import java.io.Serializable;
+import org.mule.runtime.api.message.Attributes;
 
-public interface AbstractOutputAttributes extends Serializable
+public interface AbstractOutputAttributes extends Attributes
 {
 
     String getOutputId();

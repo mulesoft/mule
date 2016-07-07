@@ -8,6 +8,7 @@ package org.mule.test.metadata.extension;
 
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 
+import org.mule.runtime.core.message.NullAttributes;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -22,7 +23,7 @@ import java.util.Map;
         contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
         outputResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class,
         attributesResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class)
-public class MetadataSource extends Source<Map<String, Object>, String>
+public class MetadataSource extends Source<Map<String, Object>, NullAttributes>
 {
 
     @MetadataKeyId

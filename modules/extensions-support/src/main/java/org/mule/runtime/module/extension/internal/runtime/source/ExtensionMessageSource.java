@@ -13,10 +13,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -51,7 +51,6 @@ import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnr
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalOperationException;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 
-import java.io.Serializable;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -70,7 +69,7 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public class ExtensionMessageSource extends ExtensionComponent implements MessageSource,
-        MessageHandler<Object, Serializable>,
+        MessageHandler<Object, Attributes>,
         ExceptionCallback<Void, Throwable>
 {
 

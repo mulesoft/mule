@@ -7,7 +7,8 @@
 
 package org.mule.module.socket.api;
 
-import java.io.Serializable;
+import org.mule.runtime.api.message.Attributes;
+
 import java.security.cert.Certificate;
 
 /**
@@ -18,7 +19,7 @@ import java.security.cert.Certificate;
  *
  * @since 4.0
  */
-public interface SocketAttributes extends Serializable
+public interface SocketAttributes extends Attributes
 {
 
     /**

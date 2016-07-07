@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,8 +24,6 @@ import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.io.Serializable;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +45,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     protected MuleEvent event;
 
     @Mock
-    protected Serializable attributes;
+    protected Attributes attributes;
 
     protected ReturnDelegate delegate;
 
@@ -103,7 +102,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     public void operationReturnsOperationResultThatOnlySpecifiesPayloadAndAttributes() throws Exception
     {
         Object payload = "hello world!";
-        Serializable newAttributes = mock(Serializable.class);
+        Attributes newAttributes = mock(Attributes.class);
 
         delegate.asReturnValue(OperationResult.builder().output(payload).attributes(newAttributes).build(), operationContext);
 

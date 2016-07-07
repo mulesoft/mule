@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.extension.api.runtime.operation.OperationResultBuilderFactory;
-
-import java.io.Serializable;
 
 /**
  * Default implementation of {@link OperationResultBuilderFactory}
@@ -23,7 +22,7 @@ public final class DefaultOperationResultBuilderFactory extends OperationResultB
      * {@inheritDoc}
      */
     @Override
-    public <Output, Attributes extends Serializable> OperationResult.Builder<Output, Attributes> create()
+    public <Output, A extends Attributes> OperationResult.Builder<Output, A> create()
     {
         return new DefaultOperationResultBuilder<>();
     }
