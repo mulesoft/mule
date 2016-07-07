@@ -8,6 +8,7 @@ package org.mule.functional.junit4;
 
 import static org.junit.Assert.fail;
 
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -67,7 +68,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner>
      * @param attributes the message attributes
      * @return this {@link FlowRunner}
      */
-    public R withAttributes(Serializable attributes)
+    public R withAttributes(Attributes attributes)
     {
         eventBuilder.withAttributes(attributes);
         return (R) this;

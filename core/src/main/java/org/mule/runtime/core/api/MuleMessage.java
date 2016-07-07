@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
@@ -130,7 +131,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder mediaType(MediaType mediaType);
 
         @Override
-        Builder attributes(Serializable value);
+        Builder attributes(Attributes value);
 
         /**
          * @param correlationId

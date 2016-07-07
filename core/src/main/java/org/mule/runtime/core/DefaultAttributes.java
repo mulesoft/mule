@@ -4,12 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.metadata.extension.model.attribute;
+package org.mule.runtime.core;
 
 import org.mule.runtime.api.message.Attributes;
 
-public interface AbstractOutputAttributes extends Attributes
+/**
+ * Default implementation of {@link Attributes} to be used when no other connector specific attributes instance is set.
+ */
+public class DefaultAttributes implements Attributes
 {
 
-    String getOutputId();
 }

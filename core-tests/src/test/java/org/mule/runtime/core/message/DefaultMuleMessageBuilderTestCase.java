@@ -22,14 +22,13 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleMessageBuilder;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import java.io.Serializable;
@@ -50,8 +49,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 {
 
     private static final String NEW_PAYLOAD = "new payload";
-    private static final Apple TEST_ATTR = new Apple();
-    private static final Banana TEST_ATTR_2 = new Banana();
+    private static final Attributes TEST_ATTR = new Attributes() {};
+    private static final Attributes TEST_ATTR_2 = new Attributes() {};
     private static final String PROPERTY_KEY = "propertyKey";
     private static final Serializable PROPERTY_VALUE = "propertyValue";
     private static final String ATTACHMENT_KEY = "attachmentKey";

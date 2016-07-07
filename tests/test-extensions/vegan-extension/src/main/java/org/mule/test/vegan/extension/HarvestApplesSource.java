@@ -6,15 +6,14 @@
  */
 package org.mule.test.vegan.extension;
 
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import java.io.Serializable;
-
 @Alias("harvest-apples")
-public class HarvestApplesSource extends Source<Apple, Serializable>
+public class HarvestApplesSource extends Source<Apple, Attributes>
 {
 
     @UseConfig

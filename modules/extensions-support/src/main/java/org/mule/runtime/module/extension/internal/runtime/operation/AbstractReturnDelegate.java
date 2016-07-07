@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -16,7 +17,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
@@ -61,9 +61,9 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
         }
     }
 
-    private Serializable resolveAttributes(OperationResult operationResult, OperationContextAdapter operationContext)
+    private Attributes resolveAttributes(OperationResult operationResult, OperationContextAdapter operationContext)
     {
-        return (Serializable) operationResult.getAttributes().orElseGet(() -> operationContext.getEvent().getMessage().getAttributes());
+        return (Attributes) operationResult.getAttributes().orElseGet(() -> operationContext.getEvent().getMessage().getAttributes());
     }
 
     /**

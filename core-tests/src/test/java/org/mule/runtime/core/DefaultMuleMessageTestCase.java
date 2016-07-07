@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
@@ -39,7 +40,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 {
 
     public static final String FOO_PROPERTY = "foo";
-    private Serializable testAttributes = new Apple();
+    private Attributes testAttributes = new Attributes() {};
 
     @Test
     public void testMessagePropertiesAccessors()

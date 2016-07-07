@@ -6,6 +6,7 @@
  */
 package org.mule.test.metadata.extension;
 
+import org.mule.runtime.core.DefaultAttributes;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -127,7 +128,7 @@ public class MetadataOperations extends MetadataOperationsParent
     }
 
     @MetadataScope(outputResolver = TestOutputResolverWithoutKeyResolver.class)
-    public OperationResult<Object, String> messageAttributesPersonTypeMetadata(@MetadataKeyId String type)
+    public OperationResult<Object, DefaultAttributes> messageAttributesPersonTypeMetadata(@MetadataKeyId String type)
     {
         return null;
     }
