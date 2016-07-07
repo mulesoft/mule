@@ -9,12 +9,13 @@ package org.mule.test.infrastructure.process.rules;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.getProperty;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
+import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.test.infrastructure.process.AppDeploymentProbe;
-import org.mule.test.infrastructure.process.DomainDeploymentProbe;
 import org.mule.test.infrastructure.process.MuleProcessController;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * public class MuleApplicationTestCase {
  *  &#064;ClassRule
- *  public static MuleDeployment deployment = builder().withApplication(&quot;/path/to/application.zip&quot;).withProperty("-M-Dproperty", "value").timeout(120).deploy();
+ *  public static MuleDeployment deployment = builder().withApplications(&quot;/path/to/application.zip&quot;).withProperty("-M-Dproperty", "value").timeout(120).deploy();
  *
  *  &#064;Test
  *  public void useApplication() throws IOException {
@@ -51,6 +52,7 @@ public class MuleDeployment extends MuleInstallation
     private int deploymentTimeout = parseInt(getProperty("mule.test.deployment.timeout", DEFAULT_DEPLOYMENT_TIMEOUT));
     private List<String> applications = new ArrayList<>();
     private List<String> domains = new ArrayList<>();
+    private List<String> libraries = new ArrayList<>();
     private MuleProcessController mule;
     private Map<String, String> properties = new HashMap<>();
 
@@ -91,33 +93,21 @@ public class MuleDeployment extends MuleInstallation
             return this;
         }
 
-        public Builder withApplication(String application)
+        public Builder withApplications(String... applications)
         {
-            deployment.applications.add(application);
+            Arrays.stream(applications).forEach((application) -> deployment.applications.add(application));
             return this;
         }
 
-        public Builder withApplications(List<String> applications)
+        public Builder withDomains(String... domains)
         {
-            for (String application : applications)
-            {
-                deployment.applications.add(application);
-            }
+            Arrays.stream(domains).forEach((domain) -> deployment.domains.add(domain));
             return this;
         }
 
-        public Builder withDomain(String domain)
+        public Builder withLibraries(String... libraries)
         {
-            deployment.domains.add(domain);
-            return this;
-        }
-
-        public Builder withDomains(List<String> domains)
-        {
-            for (String domain : domains)
-            {
-                deployment.domains.add(domain);
-            }
+            Arrays.stream(libraries).forEach((library) -> deployment.libraries.add(library));
             return this;
         }
 
@@ -167,18 +157,55 @@ public class MuleDeployment extends MuleInstallation
         super.before();
         prober = new PollingProber(deploymentTimeout, POLL_DELAY_MILLIS);
         mule = new MuleProcessController(getMuleHome());
+        libraries.forEach((library) -> mule.addLibrary(new File(library)));
         domains.forEach((domain) -> mule.deployDomain(domain));
         applications.forEach((application) -> mule.deploy(application));
         mule.start(toArray(properties));
         logger.info("Starting Mule Server");
-        domains.forEach((domain) -> prober.check(DomainDeploymentProbe.isDeployed(mule, getName(domain))));
-        applications.forEach((application) -> prober.check(AppDeploymentProbe.isDeployed(mule, getName(application))));
+        domains.forEach((domain) -> checkDomainIsDeployed(getName(domain)));
+        applications.forEach((application) -> checkAppIsDeployed(getName(application)));
         logger.info("Deployment successful");
     }
 
     private String getName(String application)
     {
         return removeExtension(FilenameUtils.getName(application));
+    }
+
+    private void checkAppIsDeployed(String appName)
+    {
+        prober.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                return mule.isDeployed(appName);
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Application " + appName + " is not deployed after " + (deploymentTimeout / 60) + "seconds.";
+            }
+        });
+    }
+
+    private void checkDomainIsDeployed(String domainName)
+    {
+        prober.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                return mule.isDomainDeployed(domainName);
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Domain " + domainName + " is not deployed after " + (deploymentTimeout / 60) + "seconds.";
+            }
+        });
     }
 
     protected void after()
