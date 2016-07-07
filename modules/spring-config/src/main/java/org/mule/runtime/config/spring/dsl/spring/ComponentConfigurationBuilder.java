@@ -247,10 +247,10 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
+        public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier, Optional<String> childIdentifier)
         {
             ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
-            valueExtractor.onComplexChild(type, wrapperIdentifier);
+            valueExtractor.onComplexChild(type, wrapperIdentifier, childIdentifier);
             Object value = valueExtractor.getValue();
             if (value != null)
             {
@@ -392,9 +392,10 @@ class ComponentConfigurationBuilder
         }
 
         @Override
-        public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
+        public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier, Optional<String> childIdentifier)
         {
-            Predicate<ComponentValue> matchesTypeAndIdentifierPredicate = getTypeAndIdentifierPredicate(type, wrapperIdentifier);
+            Optional<String> identifier = wrapperIdentifier.isPresent() ? wrapperIdentifier : childIdentifier;
+            Predicate<ComponentValue> matchesTypeAndIdentifierPredicate = getTypeAndIdentifierPredicate(type, identifier);
             Optional<ComponentValue> value = complexParameters.stream().filter(matchesTypeAndIdentifierPredicate).findFirst();
             value.ifPresent(beanDefinitionTypePair -> {
                 complexParameters.remove(beanDefinitionTypePair);
@@ -403,11 +404,11 @@ class ComponentConfigurationBuilder
             });
         }
 
-        private Predicate<ComponentValue> getTypeAndIdentifierPredicate(Class<?> type, Optional<String> wrapperIdentifierOptional)
+        private Predicate<ComponentValue> getTypeAndIdentifierPredicate(Class<?> type, Optional<String> identifierOptional)
         {
             return componentValue -> {
                         AtomicReference<Boolean> matchesIdentifier = new AtomicReference<>(true);
-                        wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> {
+                        identifierOptional.ifPresent(wrapperIdentifier -> {
                             matchesIdentifier.set(wrapperIdentifier.equals(componentValue.getComponentModel().getIdentifier().getName()));
                         });
                         return matchesIdentifier.get() && areMatchingTypes(type, componentValue.getType());

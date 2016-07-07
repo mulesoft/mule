@@ -10,6 +10,8 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.config.spring.dsl.processor.AttributeDefinitionVisitor;
 
+import java.util.Optional;
+
 /**
  * Defines how to build an attribute from an object.
  * <p/>
@@ -38,6 +40,7 @@ public class AttributeDefinition
     private TypeConverter typeConverter;
     private KeyAttributeDefinitionPair[] definitions;
     private String wrapperIdentifier;
+    private String childIdentifier;
 
 
     private AttributeDefinition()
@@ -79,7 +82,9 @@ public class AttributeDefinition
         }
         else if (childObjectType != null)
         {
-            visitor.onComplexChild(childObjectType, ofNullable(wrapperIdentifier));
+            Optional<String> wrapperIdentifier = ofNullable(this.wrapperIdentifier);
+            Optional<String> childIdentifier = ofNullable(this.childIdentifier);
+            visitor.onComplexChild(childObjectType, wrapperIdentifier, childIdentifier);
         }
         else if (valueFromTextContent)
         {
@@ -317,6 +322,12 @@ public class AttributeDefinition
             Builder builder = new Builder();
             builder.attributeDefinition.definitions = definitions;
             return builder;
+        }
+
+        public Builder withIdentifier(String childIdentifier)
+        {
+            attributeDefinition.childIdentifier = childIdentifier;
+            return this;
         }
 
         /**

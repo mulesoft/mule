@@ -84,11 +84,11 @@ public interface AttributeDefinitionVisitor
 
     /**
      * Called when the attribute is configured from an object with a certain type.
-     *
-     * @param type              type of the attribute value.
+     *  @param type              type of the attribute value.
      * @param wrapperIdentifier the identifier of the component
+     * @param childIdentifier
      */
-    void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier);
+    void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier, Optional<String> childIdentifier);
 
     /**
      * Called when the attribute is configured from the {@code ComponentModel} inner configuration.

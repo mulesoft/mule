@@ -60,7 +60,7 @@ public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVi
     }
 
     @Override
-    public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier)
+    public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifier, Optional<String> childIdentifier)
     {
     }
 

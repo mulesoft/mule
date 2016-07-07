@@ -273,7 +273,7 @@ public class BeanDefinitionFactory
             }
 
             @Override
-            public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifierOptional)
+            public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifierOptional, Optional<String> childIdentifier)
             {
                 wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> {
                     wrapperIdentifierAndTypeMap.put(wrapperIdentifier, SINGLE);

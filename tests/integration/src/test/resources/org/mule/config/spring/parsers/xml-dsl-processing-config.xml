@@ -105,4 +105,9 @@
         <parsers-test:my-pojo someParameter="pepe"/>
     </parsers-test:element-with-attribute-and-child>
 
+    <parsers-test:same-child-type-container name="sameChildTypesObject">
+        <parsers-test:elementTypeA firstname="Pablo" lastname="La Greca" age="32"/>
+        <parsers-test:anotherElementTypeA firstname="Mariano" lastname="Gonzalez" age="31"/>
+    </parsers-test:same-child-type-container>
+
 </mule>
