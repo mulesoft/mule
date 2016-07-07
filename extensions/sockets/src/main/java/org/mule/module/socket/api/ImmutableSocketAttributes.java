@@ -8,6 +8,8 @@ package org.mule.module.socket.api;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 
+import org.mule.runtime.core.message.BaseAttributes;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -26,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class ImmutableSocketAttributes implements SocketAttributes
+public class ImmutableSocketAttributes extends BaseAttributes implements SocketAttributes
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImmutableSocketAttributes.class);

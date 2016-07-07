@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleMessage.CollectionBuilder;
+import org.mule.runtime.core.message.NullAttributes;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
@@ -47,7 +48,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
     private Object payload;
     private DataType dataType;
-    private Attributes attributes = new DefaultAttributes();
+    private Attributes attributes = new NullAttributes();
 
     private String id;
     private String rootId;

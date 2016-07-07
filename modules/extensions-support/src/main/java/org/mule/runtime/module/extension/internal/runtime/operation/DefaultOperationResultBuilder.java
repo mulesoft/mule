@@ -17,8 +17,8 @@ import java.util.Optional;
 /**
  * Default implementation of {@link OperationResult.Builder}
  *
- * @param <Output>     the generic type of the output value
- * @param <A> the generic type of the message attributes
+ * @param <Output> the generic type of the output value
+ * @param <A>      the generic type of the message attributes
  * @since 4.0
  */
 final class DefaultOperationResultBuilder<Output, A extends Attributes> implements OperationResult.Builder<Output, A>

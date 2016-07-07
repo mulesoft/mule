@@ -6,8 +6,8 @@
  */
 package org.mule.extension.email.api;
 
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.message.BaseAttributes;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -32,7 +32,7 @@ import javax.mail.Message;
  *
  * @since 4.0
  */
-public class EmailAttributes implements Attributes
+public class EmailAttributes extends BaseAttributes
 {
 
     /**

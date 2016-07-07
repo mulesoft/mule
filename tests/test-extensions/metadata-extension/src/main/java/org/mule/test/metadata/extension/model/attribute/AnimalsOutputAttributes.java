@@ -6,7 +6,9 @@
  */
 package org.mule.test.metadata.extension.model.attribute;
 
-public class AnimalsOutputAttributes implements AbstractOutputAttributes
+import org.mule.runtime.core.message.BaseAttributes;
+
+public class AnimalsOutputAttributes extends BaseAttributes implements AbstractOutputAttributes
 {
 
     private String outputId = "AnimalsOutputAttributes";
@@ -22,6 +24,7 @@ public class AnimalsOutputAttributes implements AbstractOutputAttributes
         this.kind = kind;
     }
 
+    @Override
     public String getOutputId()
     {
         return outputId;

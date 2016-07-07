@@ -16,12 +16,14 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.message.NullAttributes;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -183,7 +185,7 @@ public class MessageContextTestCase extends AbstractELTestCase
     @Test
     public void attributes() throws Exception
     {
-        Attributes attributes = new Attributes() {};
+        Attributes attributes = new NullAttributes();
         when(message.getAttributes()).thenReturn(attributes);
         assertThat(evaluate("message.attributes", event), is(attributes));
     }

@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.HTML_STRING;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -22,6 +21,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
+
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -42,6 +42,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 /**
  *
  */
@@ -49,8 +51,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 {
 
     private static final String NEW_PAYLOAD = "new payload";
-    private static final Attributes TEST_ATTR = new Attributes() {};
-    private static final Attributes TEST_ATTR_2 = new Attributes() {};
+    private static final Attributes TEST_ATTR = new NullAttributes();
+    private static final Attributes TEST_ATTR_2 = new NullAttributes();
     private static final String PROPERTY_KEY = "propertyKey";
     private static final Serializable PROPERTY_VALUE = "propertyValue";
     private static final String ATTACHMENT_KEY = "attachmentKey";
