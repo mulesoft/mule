@@ -10,9 +10,11 @@ import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents a Map from String to {@link T} where the key's case is not taken into account when looking for it, but
@@ -46,6 +48,16 @@ public class CaseInsensitiveMapWrapper<T> implements Map<String, T>, Serializabl
         {
             throw new RuntimeException(String.format("Can not create an instance of %s", mapClass.getCanonicalName()), e);
         }
+    }
+
+    /**
+     * Created a new instance using an existing map.
+     * @param map  existing map
+     */
+    public CaseInsensitiveMapWrapper(Map map)
+    {
+        baseMap = new HashMap<>();
+        putAll(map);
     }
 
     @Override
@@ -281,4 +293,16 @@ public class CaseInsensitiveMapWrapper<T> implements Map<String, T>, Serializabl
 
         protected abstract B convert(A next);
     }
+
+    /**
+     * Returns this map as a case sensitive map.
+     *
+     * @return case-sensitive map
+     */
+    public Map<String, T> asCaseSensitiveMap()
+    {
+        return baseMap.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().getKey(), entry -> entry
+                .getValue()));
+    }
+
 }
