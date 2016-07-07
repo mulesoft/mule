@@ -53,7 +53,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
 
     private static final String NEW_PAYLOAD = "new payload";
     private static final Attributes TEST_ATTR = NULL_ATTRIBUTES;
-    private static final Attributes TEST_ATTR_2 = NULL_ATTRIBUTES;
+    private static final Attributes TEST_ATTR_2 = new BaseAttributes() { };
     private static final String PROPERTY_KEY = "propertyKey";
     private static final Serializable PROPERTY_VALUE = "propertyValue";
     private static final String ATTACHMENT_KEY = "attachmentKey";
