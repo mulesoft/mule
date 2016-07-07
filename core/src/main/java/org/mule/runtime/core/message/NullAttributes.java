@@ -12,6 +12,8 @@ import java.io.ObjectStreamException;
 
 /**
  * Default implementation of {@link Attributes} to be used when no other connector specific attributes instance is set.
+ * 
+ * @since 4.0
  */
 public final class NullAttributes implements Attributes
 {
@@ -27,12 +29,6 @@ public final class NullAttributes implements Attributes
     private Object readResolve() throws ObjectStreamException
     {
         return NULL_ATTRIBUTES;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return 664636978;
     }
 
     @Override
