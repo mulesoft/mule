@@ -13,6 +13,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.test.config.spring.parsers.beans.ParameterAndChildElement;
+import org.mule.test.config.spring.parsers.beans.PojoWithSameTypeChildren;
 import org.mule.test.config.spring.parsers.beans.SimpleCollectionObject;
 import org.mule.test.config.spring.parsers.beans.SimplePojo;
 
@@ -43,7 +44,7 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase
         SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("onlySimpleParametersObject");
         Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
         assertThat(simpleParameters.size(), is(3));
-        assertFirstChildParameters(simpleParameters);
+        assertPabloChildParameters(simpleParameters);
     }
 
     @Test
@@ -52,7 +53,7 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase
         SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("onlyComplexFirstChildParameterObject");
         Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
         assertThat(simpleParameters.size(), is(1));
-        assertFirstChildParameters(((SimpleCollectionObject) simpleParameters.get("first-child")).getSimpleParameters());
+        assertPabloChildParameters(((SimpleCollectionObject) simpleParameters.get("first-child")).getSimpleParameters());
     }
 
     @Test
@@ -61,7 +62,7 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase
         SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("onlyComplexSecondChildParameterObject");
         Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
         assertThat(simpleParameters.size(), is(1));
-        assertSecondChildParameters(((SimpleCollectionObject) simpleParameters.get("second-child")).getSimpleParameters());
+        assertMarianoChildParameters(((SimpleCollectionObject) simpleParameters.get("second-child")).getSimpleParameters());
     }
 
     @Test
@@ -79,9 +80,9 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase
         SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("completeParametersObject");
         Map<Object, Object> simpleParameters = simpleCollectionObject.getSimpleParameters();
         assertThat(simpleParameters.size(), is(6));
-        assertFirstChildParameters(simpleParameters);
-        assertFirstChildParameters(((SimpleCollectionObject) simpleParameters.get("first-child")).getSimpleParameters());
-        assertSecondChildParameters(((SimpleCollectionObject) simpleParameters.get("second-child")).getSimpleParameters());
+        assertPabloChildParameters(simpleParameters);
+        assertPabloChildParameters(((SimpleCollectionObject) simpleParameters.get("first-child")).getSimpleParameters());
+        assertMarianoChildParameters(((SimpleCollectionObject) simpleParameters.get("second-child")).getSimpleParameters());
         assertCollectionChildrenContent((List<SimpleCollectionObject>) simpleParameters.get("other-children"));
     }
 
@@ -143,8 +144,8 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase
         SimpleCollectionObject simpleCollectionObject = muleContext.getRegistry().get("complexTypeMapObject");
         Map<Long, SimpleCollectionObject> simpleTypeMap = simpleCollectionObject.getComplexTypeMap();
         assertThat(simpleTypeMap.size(), is(2));
-        assertFirstChildParameters(simpleTypeMap.get(1l).getSimpleParameters());
-        assertSecondChildParameters(simpleTypeMap.get(2l).getSimpleParameters());
+        assertPabloChildParameters(simpleTypeMap.get(1l).getSimpleParameters());
+        assertMarianoChildParameters(simpleTypeMap.get(2l).getSimpleParameters());
     }
 
     @Test
@@ -168,6 +169,14 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase
         assertThat(parameterAndChildElement.getSimplePojo().equals(new SimplePojo("pepe")), is(true));
     }
 
+    @Test
+    public void objectWithTwoChildrenOfSameTypeWithoutWrapper()
+    {
+        PojoWithSameTypeChildren pojoWithSameTypeChildren = muleContext.getRegistry().get("sameChildTypesObject");
+        assertPabloChildParameters(pojoWithSameTypeChildren.getElementTypeA().getSimpleParameters());
+        assertMarianoChildParameters(pojoWithSameTypeChildren.getAnotherElementTypeA().getSimpleParameters());
+    }
+
     private void assertSimpleTypeCollectionValues(Collection<String> simpleTypeCollectionValues)
     {
         assertThat(simpleTypeCollectionValues.size(), is(2));
@@ -176,18 +185,18 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase
 
     private void assertCollectionChildrenContent(List<SimpleCollectionObject> collectionObjects)
     {
-        assertFirstChildParameters(collectionObjects.get(0).getSimpleParameters());
-        assertSecondChildParameters(collectionObjects.get(1).getSimpleParameters());
+        assertPabloChildParameters(collectionObjects.get(0).getSimpleParameters());
+        assertMarianoChildParameters(collectionObjects.get(1).getSimpleParameters());
     }
 
-    private void assertFirstChildParameters(Map<Object, Object> simpleParameters)
+    private void assertPabloChildParameters(Map<Object, Object> simpleParameters)
     {
         assertThat(simpleParameters.get(FIRST_NAME_ATTRIBUTE), is("Pablo"));
         assertThat(simpleParameters.get(LAST_NAME_ATTRIBUTE), is("La Greca"));
         assertThat(simpleParameters.get(AGE_ATTRIBUTE), is("32"));
     }
 
-    private void assertSecondChildParameters(Map<Object, Object> simpleParameters)
+    private void assertMarianoChildParameters(Map<Object, Object> simpleParameters)
     {
         assertThat(simpleParameters.get(FIRST_NAME_ATTRIBUTE), is("Mariano"));
         assertThat(simpleParameters.get(LAST_NAME_ATTRIBUTE), is("Gonzalez"));

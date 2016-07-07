@@ -9,7 +9,7 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
 
@@ -20,7 +20,10 @@
     <xsd:element name="named" type="dynamicNamedType"/>
     <xsd:element name="inherit" type="inheritType"/>
     <xsd:element name="container" type="containerType"/>
-    <xsd:element name="parameter-collection-parser" type="simpleParameterCollectionParser" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="same-child-type-container" type="sameChildTypeContainer"
+                 substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="parameter-collection-parser" type="simpleParameterCollectionParser"
+                 substitutionGroup="mule:abstract-extension"/>
 
     <xsd:element name="global-element-with-object-factory" substitutionGroup="mule:abstract-extension">
         <xsd:complexType>
@@ -62,8 +65,10 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:sequence>
-                    <xsd:element name="first-child" minOccurs="0" maxOccurs="1" type="parameterCollectionParserWrapper"/>
-                    <xsd:element name="second-child" minOccurs="0" maxOccurs="1" type="parameterCollectionParserWrapper"/>
+                    <xsd:element name="first-child" minOccurs="0" maxOccurs="1"
+                                 type="parameterCollectionParserWrapper"/>
+                    <xsd:element name="second-child" minOccurs="0" maxOccurs="1"
+                                 type="parameterCollectionParserWrapper"/>
                     <xsd:element name="other-children" minOccurs="0" maxOccurs="1">
                         <xsd:complexType>
                             <xsd:sequence>
@@ -81,28 +86,32 @@
                     <xsd:element name="simple-type-child-list" minOccurs="0">
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="simple-type-child" minOccurs="1" maxOccurs="unbounded" type="simpleTypeChildType"/>
+                                <xsd:element name="simple-type-child" minOccurs="1" maxOccurs="unbounded"
+                                             type="simpleTypeChildType"/>
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
                     <xsd:element name="simple-type-child-set" minOccurs="0">
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="simple-type-child" minOccurs="1" maxOccurs="unbounded" type="simpleTypeChildType"/>
+                                <xsd:element name="simple-type-child" minOccurs="1" maxOccurs="unbounded"
+                                             type="simpleTypeChildType"/>
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
                     <xsd:element name="other-simple-type-child-list" minOccurs="0">
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="simple-type-child" minOccurs="1" maxOccurs="unbounded" type="simpleTypeChildType"/>
+                                <xsd:element name="simple-type-child" minOccurs="1" maxOccurs="unbounded"
+                                             type="simpleTypeChildType"/>
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
                     <xsd:element name="simple-type-child-list-with-converter" minOccurs="0">
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="simple-type-child-with-converter" minOccurs="1" maxOccurs="unbounded" type="simpleTypeChildType"/>
+                                <xsd:element name="simple-type-child-with-converter" minOccurs="1" maxOccurs="unbounded"
+                                             type="simpleTypeChildType"/>
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
@@ -124,7 +133,8 @@
                                 <xsd:element name="simple-list-entry">
                                     <xsd:complexType>
                                         <xsd:sequence>
-                                            <xsd:element name="simple-type-child" minOccurs="0" maxOccurs="unbounded" type="simpleTypeChildType"/>
+                                            <xsd:element name="simple-type-child" minOccurs="0" maxOccurs="unbounded"
+                                                         type="simpleTypeChildType"/>
                                         </xsd:sequence>
                                         <xsd:attribute name="key"/>
                                         <xsd:attribute name="value"/>
@@ -182,7 +192,7 @@
                 <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="kid-ref" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="offspring-ref" type="xsd:NMTOKEN"/>
-             </xsd:extension>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -197,7 +207,7 @@
                 <xsd:attribute name="kid-ref" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="kids-ref" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="offspring-ref" type="xsd:NMTOKEN"/>
-             </xsd:extension>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -212,7 +222,7 @@
                 <xsd:attribute name="kid-ref" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="kids-ref" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="offspring-ref" type="xsd:NMTOKEN"/>
-             </xsd:extension>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -309,6 +319,17 @@
         <xsd:attribute name="name" type="xsd:string"/>
     </xsd:complexType>
 
+    <xsd:complexType name="sameChildTypeContainer">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence>
+                    <xsd:element name="elementTypeA" type="simpleParameterCollectionParser" minOccurs="0"/>
+                    <xsd:element name="anotherElementTypeA" type="simpleParameterCollectionParser" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 
 </xsd:schema>

@@ -17,6 +17,7 @@ import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.test.config.spring.parsers.beans.ParameterAndChildElement;
+import org.mule.test.config.spring.parsers.beans.PojoWithSameTypeChildren;
 import org.mule.test.config.spring.parsers.beans.SimpleCollectionObject;
 import org.mule.test.config.spring.parsers.beans.SimplePojo;
 import org.mule.runtime.core.api.MuleContext;
@@ -43,50 +44,64 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
         List<ComponentBuildingDefinition> definitions = new ArrayList<>();
         ComponentBuildingDefinition.Builder baseBuilder = new ComponentBuildingDefinition.Builder()
                 .withNamespace(PARSERS_TEST_NAMESACE);
-        definitions.add(baseBuilder
+
+        ComponentBuildingDefinition.Builder baseParameterCollectionParserBuilder = baseBuilder
+                .copy()
+                .withTypeDefinition(fromType(SimpleCollectionObject.class))
+                .withSetterParameterDefinition("simpleTypeList", fromChildConfiguration(List.class).withWrapperIdentifier("simple-type-child-list").build())
+                .withSetterParameterDefinition("simpleTypeListWithConverter", fromChildConfiguration(List.class).withWrapperIdentifier("simple-type-child-list-with-converter").build())
+                .withSetterParameterDefinition("simpleTypeSet", fromChildConfiguration(Set.class).withWrapperIdentifier("simple-type-child-set").build())
+                .withSetterParameterDefinition("simpleTypeMap", fromChildMapConfiguration(String.class, Integer.class).withWrapperIdentifier("simple-type-map").build())
+                .withSetterParameterDefinition("simpleListTypeMap", fromChildMapConfiguration(String.class, String.class).withWrapperIdentifier("simple-list-type-map").build())
+                .withSetterParameterDefinition("complexTypeMap", fromChildMapConfiguration(Long.class, SimpleCollectionObject.class).withWrapperIdentifier("complex-type-map").build())
+                .withSetterParameterDefinition("simpleParameters", fromMultipleDefinitions(
+                        newBuilder()
+                                .withAttributeDefinition(fromSimpleParameter("firstname").build())
+                                .withKey("firstname")
+                                .build(),
+                        newBuilder()
+                                .withAttributeDefinition(fromSimpleParameter("lastname").build())
+                                .withKey("lastname")
+                                .build(),
+                        newBuilder()
+                                .withAttributeDefinition(fromSimpleParameter("age").build())
+                                .withKey("age")
+                                .build(),
+                        newBuilder()
+                                .withAttributeDefinition(fromChildConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("first-child").build())
+                                .withKey("first-child")
+                                .build(),
+                        newBuilder()
+                                .withAttributeDefinition(fromChildConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("second-child").build())
+                                .withKey("second-child")
+                                .build(),
+                        newBuilder()
+                                .withAttributeDefinition(fromChildConfiguration(List.class).withWrapperIdentifier("other-children").build())
+                                .withKey("other-children")
+                                .build(),
+                        newBuilder()
+                                .withAttributeDefinition(fromChildConfiguration(List.class).withWrapperIdentifier("other-children-custom-collection-type").build())
+                                .withKey("other-children-custom-collection-type")
+                                .build(),
+                        newBuilder()
+                                .withAttributeDefinition(fromChildConfiguration(List.class).withWrapperIdentifier("other-simple-type-child-list").build())
+                                .withKey("other-simple-type-child-list-custom-key")
+                                .build())
+                        .build());
+
+        definitions.add(baseParameterCollectionParserBuilder
                                 .copy()
                                 .withIdentifier("parameter-collection-parser")
-                                .withTypeDefinition(fromType(SimpleCollectionObject.class))
-                                .withSetterParameterDefinition("simpleTypeList", fromChildConfiguration(List.class).withWrapperIdentifier("simple-type-child-list").build())
-                                .withSetterParameterDefinition("simpleTypeListWithConverter", fromChildConfiguration(List.class).withWrapperIdentifier("simple-type-child-list-with-converter").build())
-                                .withSetterParameterDefinition("simpleTypeSet", fromChildConfiguration(Set.class).withWrapperIdentifier("simple-type-child-set").build())
-                                .withSetterParameterDefinition("simpleTypeMap", fromChildMapConfiguration(String.class, Integer.class).withWrapperIdentifier("simple-type-map").build())
-                                .withSetterParameterDefinition("simpleListTypeMap", fromChildMapConfiguration(String.class, String.class).withWrapperIdentifier("simple-list-type-map").build())
-                                .withSetterParameterDefinition("complexTypeMap", fromChildMapConfiguration(Long.class, SimpleCollectionObject.class).withWrapperIdentifier("complex-type-map").build())
-                                .withSetterParameterDefinition("simpleParameters", fromMultipleDefinitions(
-                                        newBuilder()
-                                                .withAttributeDefinition(fromSimpleParameter("firstname").build())
-                                                .withKey("firstname")
-                                                .build(),
-                                        newBuilder()
-                                                .withAttributeDefinition(fromSimpleParameter("lastname").build())
-                                                .withKey("lastname")
-                                                .build(),
-                                        newBuilder()
-                                                .withAttributeDefinition(fromSimpleParameter("age").build())
-                                                .withKey("age")
-                                                .build(),
-                                        newBuilder()
-                                                .withAttributeDefinition(fromChildConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("first-child").build())
-                                                .withKey("first-child")
-                                                .build(),
-                                        newBuilder()
-                                                .withAttributeDefinition(fromChildConfiguration(SimpleCollectionObject.class).withWrapperIdentifier("second-child").build())
-                                                .withKey("second-child")
-                                                .build(),
-                                        newBuilder()
-                                                .withAttributeDefinition(fromChildConfiguration(List.class).withWrapperIdentifier("other-children").build())
-                                                .withKey("other-children")
-                                                .build(),
-                                        newBuilder()
-                                                .withAttributeDefinition(fromChildConfiguration(List.class).withWrapperIdentifier("other-children-custom-collection-type").build())
-                                                .withKey("other-children-custom-collection-type")
-                                                .build(),
-                                        newBuilder()
-                                                .withAttributeDefinition(fromChildConfiguration(List.class).withWrapperIdentifier("other-simple-type-child-list").build())
-                                                .withKey("other-simple-type-child-list-custom-key")
-                                                .build())
-                                        .build())
+                                .build());
+
+        definitions.add(baseParameterCollectionParserBuilder
+                                .copy()
+                                .withIdentifier("elementTypeA")
+                                .build());
+
+        definitions.add(baseParameterCollectionParserBuilder
+                                .copy()
+                                .withIdentifier("anotherElementTypeA")
                                 .build());
 
         definitions.add(baseBuilder
@@ -204,6 +219,13 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
                                 .withSetterParameterDefinition("someParameter", fromSimpleParameter("someParameter").build())
                                 .build());
 
+        definitions.add(baseBuilder
+                                .copy()
+                                .withIdentifier("same-child-type-container")
+                                .withTypeDefinition(fromType(PojoWithSameTypeChildren.class))
+                                .withSetterParameterDefinition("elementTypeA", fromChildConfiguration(SimpleCollectionObject.class).withIdentifier("elementTypeA").build())
+                                .withSetterParameterDefinition("anotherElementTypeA", fromChildConfiguration(SimpleCollectionObject.class).withIdentifier("anotherElementTypeA").build())
+                                .build());
         return definitions;
     }
 
