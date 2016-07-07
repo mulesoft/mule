@@ -8,6 +8,12 @@ package org.mule.test.infrastructure.process;
 
 import org.mule.tck.probe.Probe;
 
+/**
+ * Checks if a Mule application is successfully deployed.
+ *
+ * @deprecated use {@link org.mule.test.infrastructure.process.rules.MuleDeployment#checkAppIsDeployed(String)}  instead}
+ */
+@Deprecated
 public class AppDeploymentProbe implements Probe
 {
 
