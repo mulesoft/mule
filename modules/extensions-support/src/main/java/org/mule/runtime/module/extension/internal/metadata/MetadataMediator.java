@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.typeDescriptor;
+import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.componentDescriptor;
+import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.outputDescriptor;
+import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.parameterDescriptor;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
-import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContentParameter;
@@ -29,11 +31,12 @@ import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.builder.ComponentMetadataDescriptorBuilder;
-import org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder;
-import org.mule.runtime.api.metadata.descriptor.builder.TypeMetadataDescriptorBuilder;
+import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -42,6 +45,7 @@ import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
+import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.Named;
 import org.mule.runtime.extension.api.introspection.OutputModel;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
@@ -60,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 /**
@@ -91,9 +96,7 @@ public class MetadataMediator
         this.resolverFactory = componentModel.getMetadataResolverFactory();
         this.contentParameter = getContentParameter(componentModel);
         this.metadataKeyParts = getMetadataKeyParts(componentModel);
-        this.subTypesMappingContainer = new SubTypesMappingContainer(extensionModel.getModelProperty(SubTypesModelProperty.class)
-                                                                             .map(SubTypesModelProperty::getSubTypesMapping)
-                                                                             .orElse(ImmutableMap.of()));
+        this.subTypesMappingContainer = getSubTypesMappingContainer(extensionModel);
     }
 
     /**
@@ -118,13 +121,10 @@ public class MetadataMediator
         {
             final Set<MetadataKey> metadataKeys = resolverFactory.getKeyResolver().getMetadataKeys(context);
             final Map<Integer, String> partOrder = getPartOrderMapping(metadataKeyParts);
-
-            final Set<MetadataKey> enrichedMetadataKeys = metadataKeys
-                    .stream()
-                    .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partOrder, 1))
-                    .map(MetadataKeyBuilder::build)
-                    .collect(toSet());
-
+            final Set<MetadataKey> enrichedMetadataKeys = metadataKeys.stream()
+                                                                    .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partOrder, 1))
+                                                                    .map(MetadataKeyBuilder::build)
+                                                                    .collect(toSet());
             return success(enrichedMetadataKeys);
         }
         catch (Exception e)
@@ -142,11 +142,11 @@ public class MetadataMediator
      */
     public MetadataResult<ComponentMetadataDescriptor> getMetadata()
     {
-        ComponentMetadataDescriptorBuilder componentDescriptorBuilder = MetadataDescriptorBuilder.componentDescriptor(componentModel.getName())
-                .withParametersDescriptor(getParametersMetadataDescriptors())
-                .withOutputDescriptor(getOutputMetadataDescriptor());
+        ComponentMetadataDescriptorBuilder componentDescriptorBuilder = componentDescriptor(componentModel.getName())
+                                                                            .withParametersDescriptor(getParametersMetadataDescriptors())
+                                                                            .withOutputDescriptor(getOutputMetadataDescriptor());
 
-        Optional<TypeMetadataDescriptor> contentDescriptor = getContentMetadataDescriptor();
+        Optional<MetadataResult<ParameterMetadataDescriptor>> contentDescriptor = getContentMetadataDescriptor();
         if (contentDescriptor.isPresent())
         {
             componentDescriptorBuilder.withContentDescriptor(contentDescriptor.get());
@@ -176,21 +176,28 @@ public class MetadataMediator
     public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context, MetadataKey key)
     {
         MetadataResult<OutputMetadataDescriptor> outputResult = getOutputMetadataDescriptor(context, key);
-        Optional<MetadataResult<TypeMetadataDescriptor>> contentDescriptor = getContentMetadataDescriptor(context, key);
+        Optional<MetadataResult<ParameterMetadataDescriptor>> contentDescriptor = getContentMetadataDescriptor(context, key);
 
-        ComponentMetadataDescriptorBuilder componentDescriptorBuilder = MetadataDescriptorBuilder.componentDescriptor(componentModel.getName())
-                .withParametersDescriptor(getParametersMetadataDescriptors())
-                .withOutputDescriptor(outputResult.get());
+        ComponentMetadataDescriptorBuilder componentDescriptorBuilder = componentDescriptor(componentModel.getName())
+                                                                            .withParametersDescriptor(getParametersMetadataDescriptors())
+                                                                            .withOutputDescriptor(outputResult);
 
         if (!contentDescriptor.isPresent())
         {
-            return outputResult.isSuccess() ? success(componentDescriptorBuilder.build()) : failure(componentDescriptorBuilder.build(), outputResult);
+            return outputResult.isSuccess() ? success(componentDescriptorBuilder.build())
+                                            : failure(componentDescriptorBuilder.build(), outputResult);
         }
 
-        MetadataResult<TypeMetadataDescriptor> contentResult = contentDescriptor.get();
-        componentDescriptorBuilder.withContentDescriptor(contentResult.get());
+        MetadataResult<ParameterMetadataDescriptor> contentResult = contentDescriptor.get();
+        componentDescriptorBuilder.withContentDescriptor(contentResult);
+        ComponentMetadataDescriptor componentMetadataDescriptor = componentDescriptorBuilder.build();
 
-        return mergeResults(componentDescriptorBuilder.build(), outputResult, contentResult);
+        if (!outputResult.isSuccess() || !contentResult.isSuccess())
+        {
+            return mergeFailures(componentMetadataDescriptor, outputResult, contentResult);
+        }
+
+        return success(componentMetadataDescriptor);
     }
 
     /**
@@ -200,7 +207,7 @@ public class MetadataMediator
      * @return A {@link List} containing a {@link TypeMetadataDescriptor} for each input parameter
      * using only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
      */
-    private List<TypeMetadataDescriptor> getParametersMetadataDescriptors()
+    private List<MetadataResult<ParameterMetadataDescriptor>> getParametersMetadataDescriptors()
     {
         Stream<ParameterModel> parameters = componentModel.getParameterModels().stream();
 
@@ -209,9 +216,8 @@ public class MetadataMediator
             parameters = parameters.filter(p -> p != contentParameter.get());
         }
 
-        return parameters
-                .map(this::buildParameterTypeMetadataDescriptor)
-                .collect(new ImmutableListCollector<>());
+        return parameters.map(this::buildParameterTypeMetadataDescriptor)
+                         .collect(new ImmutableListCollector<>());
     }
 
     /**
@@ -221,25 +227,27 @@ public class MetadataMediator
      * @param parameterModel the {@link ParameterModel} to build the {@link TypeMetadataDescriptor}
      * @return the {@link TypeMetadataDescriptor} for the {@link ParameterModel}
      */
-    private TypeMetadataDescriptor buildParameterTypeMetadataDescriptor(ParameterModel parameterModel)
+    private MetadataResult<ParameterMetadataDescriptor> buildParameterTypeMetadataDescriptor(ParameterModel parameterModel)
     {
-        MetadataType parameterType = parameterModel.getType();
-        TypeMetadataDescriptorBuilder typeDescriptorBuilder = typeDescriptor(parameterModel.getName());
-
-        return typeDescriptorBuilder.withType(
-                subTypesUnion(parameterType, subTypesMappingContainer, extensionClassLoader)).build();
+        MetadataType metadataType = subTypesUnion(parameterModel.getType(), subTypesMappingContainer, extensionClassLoader);
+        return success(parameterDescriptor(parameterModel.getName()).withType(metadataType).build());
     }
 
     /**
      * @return a {@link TypeMetadataDescriptor} representing the Component's output metadata based only
      * on its static {@link MetadataType} type and ignoring if a {@link MetadataOutputResolver} was available
      */
-    private Optional<TypeMetadataDescriptor> getContentMetadataDescriptor()
+    private Optional<MetadataResult<ParameterMetadataDescriptor>> getContentMetadataDescriptor()
     {
-        return contentParameter.isPresent() ? Optional.of(typeDescriptor(contentParameter.get().getName())
-                                                                  .withType(contentParameter.get().getType())
-                                                                  .build())
-                                            : Optional.empty();
+        if (contentParameter.isPresent())
+        {
+            ParameterMetadataDescriptor descriptor = parameterDescriptor(contentParameter.get().getName())
+                                                        .withType(contentParameter.get().getType())
+                                                        .build();
+            return Optional.of(success(descriptor));
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -254,7 +262,7 @@ public class MetadataMediator
      * returning {@link Optional#empty()} if no Content parameter is present
      * Failure if the dynamic resolution fails for any reason.
      */
-    private Optional<MetadataResult<TypeMetadataDescriptor>> getContentMetadataDescriptor(MetadataContext context, MetadataKey key)
+    private Optional<MetadataResult<ParameterMetadataDescriptor>> getContentMetadataDescriptor(MetadataContext context, MetadataKey key)
     {
         if (!contentParameter.isPresent())
         {
@@ -262,10 +270,9 @@ public class MetadataMediator
         }
 
         MetadataResult<MetadataType> contentMetadataResult = getContentMetadata(context, key);
-        TypeMetadataDescriptor descriptor =
-                typeDescriptor(contentParameter.get().getName())
-                        .withType(contentMetadataResult.get())
-                        .build();
+        ParameterMetadataDescriptor descriptor = parameterDescriptor(contentParameter.get().getName())
+                                                            .withType(contentMetadataResult.get())
+                                                            .build();
 
         return Optional.of(contentMetadataResult.isSuccess() ? success(descriptor) : failure(descriptor, contentMetadataResult));
     }
@@ -274,12 +281,14 @@ public class MetadataMediator
      * @return a {@link OutputMetadataDescriptor} representing the Component's output metadata based only
      * on its static {@link MetadataType} and ignoring if a {@link MetadataOutputResolver} was available
      */
-    private OutputMetadataDescriptor getOutputMetadataDescriptor()
+    private MetadataResult<OutputMetadataDescriptor> getOutputMetadataDescriptor()
     {
-        return MetadataDescriptorBuilder.outputDescriptor()
-                .withReturnType(subTypesUnion(componentModel.getOutput().getType(), subTypesMappingContainer, extensionClassLoader))
-                .withAttributesType(subTypesUnion(componentModel.getOutputAttributes().getType(), subTypesMappingContainer, extensionClassLoader))
-                .build();
+        MetadataType outputType = subTypesUnion(componentModel.getOutput().getType(), subTypesMappingContainer, extensionClassLoader);
+        MetadataType attributesType = subTypesUnion(componentModel.getOutputAttributes().getType(), subTypesMappingContainer, extensionClassLoader);
+        return success(outputDescriptor()
+                        .withReturnType(outputType)
+                        .withAttributesType(attributesType)
+                        .build());
     }
 
     /**
@@ -297,11 +306,15 @@ public class MetadataMediator
         MetadataResult<MetadataType> outputMetadataResult = getOutputMetadata(context, key);
         MetadataResult<MetadataType> attributesMetadataResult = getOutputAttributesMetadata(context, key);
 
-        OutputMetadataDescriptor descriptor = MetadataDescriptorBuilder.outputDescriptor()
-                .withReturnType(outputMetadataResult.get())
-                .withAttributesType(attributesMetadataResult.get()).build();
+        OutputMetadataDescriptor descriptor = outputDescriptor().withReturnType(outputMetadataResult.get())
+                                                                .withAttributesType(attributesMetadataResult.get()).build();
 
-        return mergeResults(descriptor, outputMetadataResult, attributesMetadataResult);
+        if (!outputMetadataResult.isSuccess() || !attributesMetadataResult.isSuccess())
+        {
+            return mergeFailures(descriptor, outputMetadataResult, attributesMetadataResult);
+        }
+
+        return success(descriptor);
     }
 
     /**
@@ -405,8 +418,8 @@ public class MetadataMediator
     {
 
         MetadataType resolve() throws MetadataResolvingException, ConnectionException;
-    }
 
+    }
     /**
      * Introspect the {@link List} of {@link ParameterModel} of the {@link ComponentModel} and filter the ones that are parts of the
      * {@link MetadataKey} and creates a mapping with the order number of each part with their correspondent name.
@@ -432,11 +445,33 @@ public class MetadataMediator
      */
     private MetadataKeyBuilder cloneAndEnrichMetadataKey(MetadataKey key, Map<Integer, String> partOrderMapping, int level)
     {
-        final MetadataKeyBuilder keyBuilder = newKey(key.getId(), partOrderMapping.get(level))
-                .withDisplayName(key.getDisplayName());
-
+        final MetadataKeyBuilder keyBuilder = newKey(key.getId(), partOrderMapping.get(level)).withDisplayName(key.getDisplayName());
         key.getProperties().stream().forEach(keyBuilder::withProperty);
         key.getChilds().forEach(childKey -> keyBuilder.withChild(cloneAndEnrichMetadataKey(childKey, partOrderMapping, level + 1)));
         return keyBuilder;
+    }
+
+    /**
+     * @return the {@link SubTypesMappingContainer} associated to the extensionModel.
+     */
+    private SubTypesMappingContainer getSubTypesMappingContainer(ExtensionModel extensionModel)
+    {
+        return new SubTypesMappingContainer(extensionModel.getModelProperty(SubTypesModelProperty.class)
+                                                    .map(SubTypesModelProperty::getSubTypesMapping)
+                                                    .orElse(ImmutableMap.of()));
+    }
+
+    /**
+     * Merge multiple failed {@link MetadataResult} into one {@link MetadataFailure}.
+     *
+     * @param results the results to be merged as one
+     * @return a new single {@link MetadataFailure}
+     */
+    private <T> MetadataResult<T> mergeFailures(T descriptor, MetadataResult<?>... results)
+    {
+        List<MetadataResult<?>> failedResults = Stream.of(results).filter(result -> !result.isSuccess()).collect(toList());
+        StringJoiner messageBuilder = new StringJoiner(" and ");
+        failedResults.forEach(failure -> messageBuilder.add(failure.getFailure().get().getMessage()));
+        return failure(descriptor, messageBuilder.toString(), failedResults.size() == 1 ? results[0].getFailure().get().getFailureCode() : FailureCode.MULTIPLE, "");
     }
 }

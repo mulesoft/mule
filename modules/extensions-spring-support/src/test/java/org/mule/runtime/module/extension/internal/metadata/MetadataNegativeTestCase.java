@@ -10,8 +10,6 @@ import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetad
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
-import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.MISSING_ELEMENT_ERROR_MESSAGE;
-
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.ProcessorId;
@@ -31,6 +29,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
     private static final String FAIL_WITH_RESOLVING_EXCEPTION = "failWithResolvingException";
     private static final String FAIL_WITH_RUNTIME_EXCEPTION = "failWithRuntimeException";
+    private static final String FAIL_KEYS_RETRIEVER = "Failing keysResolver retriever";
     private static final String NON_EXISTING_FLOW = "nonExistingFlow";
     private static final String LOGGER_FLOW = "loggerFlow";
     private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
@@ -47,8 +46,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     {
         componentId = new ProcessorId(FAIL_WITH_RESOLVING_EXCEPTION, FIRST_PROCESSOR_INDEX);
         MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
-
-        assertFailure(metadata, "", FailureCode.CONNECTION_FAILURE, MetadataResolvingException.class.getName());
+        assertFailure(metadata, "", FailureCode.MULTIPLE, "");
     }
 
     @Test
@@ -66,7 +64,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
         componentId = new ProcessorId(FAIL_WITH_RUNTIME_EXCEPTION, FIRST_PROCESSOR_INDEX);
         MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
 
-        assertFailure(metadata, "", FailureCode.UNKNOWN, RuntimeException.class.getName());
+        assertFailure(metadata, "", FailureCode.MULTIPLE, "");
     }
 
     @Test
@@ -110,8 +108,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     {
         componentId = new ProcessorId(CONTENT_ONLY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
         MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, nullMetadataKey);
-
-        assertFailure(metadata, MISSING_ELEMENT_ERROR_MESSAGE, FailureCode.RESOURCE_UNAVAILABLE, MetadataResolvingException.class.getName());
+        assertFailure(metadata, "", FailureCode.UNKNOWN, "");
     }
 
     @Test
@@ -130,6 +127,6 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
         final MetadataKey metadataKey = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY)).build();
 
         final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, metadataKey);
-        assertFailure(metadataResult, "city", FailureCode.INVALID_METADATA_KEY, MetadataResolvingException.class.getName());
+        assertFailure(metadataResult, "", FailureCode.UNKNOWN, "");
     }
 }

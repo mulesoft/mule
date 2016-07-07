@@ -255,8 +255,7 @@ public abstract class ExtensionComponent implements MuleContextAware, MetadataAw
         MuleEvent fakeEvent = getInitialiserEvent(muleContext);
         ConfigurationInstance<Object> configuration = getConfiguration(fakeEvent);
         ConfigurationProvider<Object> configurationProvider = findConfigurationProvider()
-                .orElseThrow(() -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
-                                                                  FailureCode.INVALID_CONFIGURATION));
+                .orElseThrow(() -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval", FailureCode.INVALID_CONFIGURATION));
 
         if (configurationProvider instanceof DynamicConfigurationProvider)
         {
