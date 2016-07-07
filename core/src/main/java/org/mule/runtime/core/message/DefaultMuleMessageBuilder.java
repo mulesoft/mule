@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.message.;
+package org.mule.runtime.core.message;
 
 import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
@@ -34,6 +34,8 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MessageProperties;
 import org.mule.runtime.core.api.MuleContext;
@@ -372,11 +374,11 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     @Override
     public MuleMessage build()
     {
-        return new DefaultMuleMessage(id != null ? id : UUID.getUUID(), rootId,
-                                      new TypedValue(payload, resolveDataType()), attributes,
-                                      inboundProperties, outboundProperties, inboundAttachments,
-                                      outboundAttachments, correlationId, correlationGroupSize,
-                                      correlationSequence, replyTo, exceptionPayload);
+        return new MuleMessageImplementation(id != null ? id : UUID.getUUID(), rootId,
+                                             new TypedValue(payload, resolveDataType()), attributes,
+                                             inboundProperties, outboundProperties, inboundAttachments,
+                                             outboundAttachments, correlationId, correlationGroupSize,
+                                             correlationSequence, replyTo, exceptionPayload);
     }
 
     private DataType resolveDataType()
@@ -442,12 +444,12 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
      * <code>DefaultMuleMessage</code> is a wrapper that contains a payload and properties
      * associated with the payload.
      */
-    public class DefaultMuleMessage implements MuleMessage, DeserializationPostInitialisable
+    public static class MuleMessageImplementation implements MuleMessage, DeserializationPostInitialisable
     {
         private static final String NOT_SET = "<not set>";
 
         private static final long serialVersionUID = 1541720810851984845L;
-        private static final Logger logger = LoggerFactory.getLogger(DefaultMuleMessage.class);
+        private static final Logger logger = LoggerFactory.getLogger(MuleMessageImplementation.class);
 
         /**
          * The default UUID for the message. If the underlying transport has the notion of a
@@ -485,12 +487,12 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         private transient TypedValue typedValue;
         private Attributes attributes;
 
-        DefaultMuleMessage(String id, String rootId, TypedValue typedValue, Attributes attributes,
-                           Map<String, TypedValue<Serializable>> inboundProperties,
-                           Map<String, TypedValue<Serializable>> outboundProperties,
-                           Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
-                           String corealationId, Integer correlationGroupSize, Integer correlationSequence,
-                           Object replyTo, ExceptionPayload exceptionPayload)
+        private MuleMessageImplementation(String id, String rootId, TypedValue typedValue, Attributes attributes,
+                                  Map<String, TypedValue<Serializable>> inboundProperties,
+                                  Map<String, TypedValue<Serializable>> outboundProperties,
+                                  Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
+                                  String corealationId, Integer correlationGroupSize, Integer correlationSequence,
+                                  Object replyTo, ExceptionPayload exceptionPayload)
         {
             this.id = id;
             this.rootId = rootId != null ? rootId : id;
@@ -910,11 +912,11 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         @Override
         public boolean equals(Object obj)
         {
-            if (!(obj instanceof DefaultMuleMessage))
+            if (!(obj instanceof MuleMessageImplementation))
             {
                 return false;
             }
-            return this.id.equals(((DefaultMuleMessage)obj).id);
+            return this.id.equals(((MuleMessageImplementation)obj).id);
         }
 
         @Override

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents a Map from String to {@link T} where the key's case is not taken into account when looking for it, but
@@ -49,7 +50,11 @@ public class CaseInsensitiveMapWrapper<T> implements Map<String, T>, Serializabl
         }
     }
 
-    public CaseInsensitiveMapWrapper(Map<String, T> map)
+    /**
+     * Created a new instance using an existing map.
+     * @param map  existing map
+     */
+    public CaseInsensitiveMapWrapper(Map map)
     {
         baseMap = new HashMap<>();
         putAll(map);
@@ -289,8 +294,15 @@ public class CaseInsensitiveMapWrapper<T> implements Map<String, T>, Serializabl
         protected abstract B convert(A next);
     }
 
-    public Map<String, Serializable> asHashMap()
+    /**
+     * Returns this map as a case sensitive map.
+     *
+     * @return case-sensitive map
+     */
+    public Map<String, T> asCaseSensitiveMap()
     {
-        return new HashMap(baseMap);
+        return baseMap.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().getKey(), entry -> entry
+                .getValue()));
     }
+
 }
