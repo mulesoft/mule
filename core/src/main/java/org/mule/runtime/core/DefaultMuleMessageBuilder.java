@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPE
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
@@ -22,7 +23,6 @@ import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleMessage.CollectionBuilder;
-import org.mule.runtime.core.message.NullAttributes;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
@@ -48,7 +48,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
     private Object payload;
     private DataType dataType;
-    private Attributes attributes = new NullAttributes();
+    private Attributes attributes = NULL_ATTRIBUTES;
 
     private String id;
     private String rootId;

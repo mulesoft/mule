@@ -7,6 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
@@ -79,8 +80,11 @@ public class HeisenbergOperations
                                                             .charset(lastSupportedEncoding.toString())
                                                             .build();
 
-        return OperationResult.<String, NullAttributes>builder().output(config.getEnemies().get(index)).mediaType(dt.getMediaType()).attributes
-                (new NullAttributes()).build();
+        return OperationResult.<String, NullAttributes> builder()
+                              .output(config.getEnemies().get(index))
+                              .mediaType(dt.getMediaType())
+                              .attributes(NULL_ATTRIBUTES)
+                              .build();
     }
 
     public String kill(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage) throws Exception
