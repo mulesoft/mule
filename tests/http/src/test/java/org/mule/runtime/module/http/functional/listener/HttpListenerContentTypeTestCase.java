@@ -7,19 +7,15 @@
 
 package org.mule.runtime.module.http.functional.listener;
 
+import static org.apache.http.entity.ContentType.TEXT_PLAIN;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -54,11 +50,17 @@ public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase
     @Test
     public void returnsContentTypeInResponse() throws Exception
     {
-        MuleClient client = muleContext.getClient();
+        HttpResponse response = Request.Post(getUrl()).body(new StringEntity(TEST_MESSAGE, TEXT_PLAIN)).execute().returnResponse();
 
-        MuleMessage response = client.send(getUrl(), TEST_MESSAGE, null);
+        assertContentTypeProperty(response, EXPECTED_CONTENT_TYPE);
+    }
 
-        assertContentTypeProperty(response);
+    @Test
+    public void returnsContentTypeInResponseFromBuilder() throws Exception
+    {
+        HttpResponse response = Request.Post(getUrl("testBuilder")).body(new StringEntity(TEST_MESSAGE, TEXT_PLAIN)).execute().returnResponse();
+
+        assertContentTypeProperty(response, "text/plain");
     }
 
     @Test
@@ -87,12 +89,18 @@ public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase
 
     private String getUrl()
     {
-        return String.format("http://localhost:%s/testInput", httpPort.getValue());
+        return getUrl("testInput");
     }
 
-    private void assertContentTypeProperty(MuleMessage response)
+    private String getUrl(String path)
     {
-        assertThat(response.getInboundPropertyNames(), hasItem(equalToIgnoringCase(MuleProperties.CONTENT_TYPE_PROPERTY)));
-        assertThat((String) response.getInboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY), equalTo(EXPECTED_CONTENT_TYPE));
+        return String.format("http://localhost:%s/%s", httpPort.getValue(), path);
+    }
+
+    private void assertContentTypeProperty(HttpResponse response, String expectedContentType)
+    {
+        String contentType = response.getFirstHeader(CONTENT_TYPE).getValue();
+        assertThat(contentType, notNullValue());
+        assertThat(contentType, equalTo(expectedContentType));
     }
 }

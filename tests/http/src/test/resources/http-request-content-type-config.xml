@@ -6,25 +6,25 @@
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <httpn:listener-config name="httpConf">
-        <httpn:listener-connection  host="localhost" port="${httpPort}"/>
-    </httpn:listener-config>
-
     <httpn:request-config name="requesterConfig">
         <httpn:request-connection host="localhost" port="${httpPort}"/>
     </httpn:request-config>
 
-    <flow name="requesterContentTypeClient" >
-        <httpn:listener config-ref="httpConf" path="requestClient"/>
-
+    <flow name="requesterContentType" >
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
-
-        <httpn:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET"  key="ANY"/>
+        <httpn:request config-ref="requesterConfig" port="${httpPort}" path="testPath" method="GET"  key="ANY"/>
     </flow>
 
-    <flow name="requesterContentTypeServer" >
-        <httpn:listener config-ref="httpConf" path="requestServer"/>
-
-        <set-payload value="#[message.getAttributes().getHeaders().get('content-type')]"/>
+    <flow name="requesterBuilderContentType" >
+        <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="text/plain" encoding="UTF-8"/>
+        <httpn:request config-ref="requesterConfig" port="${httpPort}" path="testPath" method="GET"  key="ANY">
+            <httpn:request-builder>
+                <httpn:simple-request-builder>
+                    <httpn:headers>
+                        <httpn:header key="content-type" value="application/json; charset=UTF-8"/>
+                    </httpn:headers>
+                </httpn:simple-request-builder>
+            </httpn:request-builder>
+        </httpn:request>
     </flow>
 </mule>

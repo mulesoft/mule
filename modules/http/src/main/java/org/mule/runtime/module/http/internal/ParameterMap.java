@@ -23,10 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Implementation of {@link HttpParameters} that allows the aggregation of keys and access to the aggregated list or a
+ * single value (the last).
+ */
 public class ParameterMap implements HttpParameters, Serializable
 {
 
-    private final Map<String, LinkedList<String>> paramsMap;
+    protected Map<String, LinkedList<String>> paramsMap;
 
     public ParameterMap(final Map paramsMap)
     {
