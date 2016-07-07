@@ -137,7 +137,7 @@ public class MetadataMediator
      * Resolves the {@link ComponentMetadataDescriptor} for the associated {@link MetadataAware} Component using
      * only the static types of the Component parameters, attributes and output.
      *
-     * @return An {@link ComponentMetadataDescriptor} with the Static Metadata representation
+     * @return a{@link MetadataResult} of {@link ComponentMetadataDescriptor} with the Static Metadata representation
      * of the Component.
      */
     public MetadataResult<ComponentMetadataDescriptor> getMetadata()
@@ -204,7 +204,7 @@ public class MetadataMediator
      * For each of the Component's {@link ParameterModel} creates the corresponding {@link TypeMetadataDescriptor}
      * using only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
      *
-     * @return A {@link List} containing a {@link TypeMetadataDescriptor} for each input parameter
+     * @return A {@link List} containing a {@link MetadataResult} of {@link TypeMetadataDescriptor} for each input parameter
      * using only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
      */
     private List<MetadataResult<ParameterMetadataDescriptor>> getParametersMetadataDescriptors()
@@ -225,7 +225,7 @@ public class MetadataMediator
      * an its subtypes if have any.
      *
      * @param parameterModel the {@link ParameterModel} to build the {@link TypeMetadataDescriptor}
-     * @return the {@link TypeMetadataDescriptor} for the {@link ParameterModel}
+     * @return a {@link MetadataResult} with the {@link TypeMetadataDescriptor} for the {@link ParameterModel}
      */
     private MetadataResult<ParameterMetadataDescriptor> buildParameterTypeMetadataDescriptor(ParameterModel parameterModel)
     {
@@ -234,8 +234,8 @@ public class MetadataMediator
     }
 
     /**
-     * @return a {@link TypeMetadataDescriptor} representing the Component's output metadata based only
-     * on its static {@link MetadataType} type and ignoring if a {@link MetadataOutputResolver} was available
+     * @return a {@link MetadataResult} of a {@link TypeMetadataDescriptor} representing the Component's content metadata based only
+     * on its static {@link MetadataType} type and ignoring if a {@link MetadataContentResolver} was available
      */
     private Optional<MetadataResult<ParameterMetadataDescriptor>> getContentMetadataDescriptor()
     {
@@ -278,7 +278,7 @@ public class MetadataMediator
     }
 
     /**
-     * @return a {@link OutputMetadataDescriptor} representing the Component's output metadata based only
+     * @return a {@link MetadataResult} of {@link OutputMetadataDescriptor} representing the Component's output metadata based only
      * on its static {@link MetadataType} and ignoring if a {@link MetadataOutputResolver} was available
      */
     private MetadataResult<OutputMetadataDescriptor> getOutputMetadataDescriptor()
@@ -323,8 +323,8 @@ public class MetadataMediator
      *
      * @param context {@link MetadataContext} of the MetaData resolution
      * @param key     {@link MetadataKey} of the type which's structure has to be resolved
-     * @return Success with the {@link MetadataType} of the {@link Content} parameter
-     * Failure if the component has no {@link Content} parameter
+     * @return a success {@link MetadataResult} with the {@link MetadataType} of the {@link Content} parameter.
+     * A failure {@link MetadataResult} if the component has no {@link Content} parameter
      */
     private MetadataResult<MetadataType> getContentMetadata(MetadataContext context, MetadataKey key)
     {
@@ -343,7 +343,7 @@ public class MetadataMediator
      *
      * @param context {@link MetadataContext} of the Metadata resolution
      * @param key     {@link MetadataKey} of the type which's structure has to be resolved
-     * @return the {@link MetadataType} of the components output
+     * @return a {@link MetadataResult} with the {@link MetadataType} of the component's output
      */
     private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final MetadataKey key)
     {
@@ -364,7 +364,7 @@ public class MetadataMediator
      *
      * @param context {@link MetadataContext} of the Metadata resolution
      * @param key     {@link MetadataKey} of the type which's structure has to be resolved
-     * @return the {@link MetadataType} of the components output {@link MuleMessage#getAttributes()}
+     * @return a {@link MetadataResult} with the {@link MetadataType} of the components output {@link MuleMessage#getAttributes()}
      */
     private MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, final MetadataKey key)
     {
@@ -380,13 +380,13 @@ public class MetadataMediator
 
     /**
      * Uses the {@link MetadataDelegate} to resolve dynamic metadata of the component, executing internally
-     * one of the {@link MetadataType}resolving components:
+     * one of the {@link MetadataType} resolving components:
      * {@link MetadataContentResolver#getContentMetadata} or {@link MetadataOutputResolver#getOutputMetadata}
      *
      * @param staticType static type used as default if no dynamic type is available
      * @param delegate   Delegate which performs the final invocation to the one of the metadata resolvers
-     * @return The {@link MetadataType} resolved by the delegate invocation. Success if the type has been successfully
-     * fetched, Failure otherwise.
+     * @return a {@link MetadataResult} with the {@link MetadataType} resolved by the delegate invocation.
+     * Success if the type has been successfully fetched, Failure otherwise.
      */
     private MetadataResult<MetadataType> resolveMetadataType(MetadataType staticType, MetadataDelegate delegate)
     {
