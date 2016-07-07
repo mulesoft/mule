@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.ClassUtils;

@@ -7,13 +7,11 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.message.NullAttributes;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -28,6 +26,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.tck.message.IntegerAttributes;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
@@ -71,7 +70,7 @@ public class HeisenbergOperations
     }
 
     @DataTypeParameters
-    public OperationResult<String, NullAttributes> getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
+    public OperationResult<String, IntegerAttributes> getEnemy(@UseConfig HeisenbergExtension config, @Optional(defaultValue = "0") int index)
     {
         Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
         org.mule.runtime.api.metadata.DataType dt = DataType.builder()
@@ -80,10 +79,10 @@ public class HeisenbergOperations
                                                             .charset(lastSupportedEncoding.toString())
                                                             .build();
 
-        return OperationResult.<String, NullAttributes> builder()
+        return OperationResult.<String, IntegerAttributes> builder()
                               .output(config.getEnemies().get(index))
                               .mediaType(dt.getMediaType())
-                              .attributes(NULL_ATTRIBUTES)
+                              .attributes(new IntegerAttributes(index))
                               .build();
     }
 

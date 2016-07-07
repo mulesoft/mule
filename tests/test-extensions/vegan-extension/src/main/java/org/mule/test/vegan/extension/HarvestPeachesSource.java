@@ -6,14 +6,14 @@
  */
 package org.mule.test.vegan.extension;
 
-import org.mule.runtime.core.message.NullAttributes;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.tck.message.StringAttributes;
 import org.mule.tck.testmodels.fruit.Peach;
 
 @Alias("harvest-peaches")
-public class HarvestPeachesSource extends Source<String, NullAttributes>
+public class HarvestPeachesSource extends Source<String, StringAttributes>
 {
 
     public static boolean isConnected;

@@ -12,7 +12,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -33,6 +32,7 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
@@ -47,6 +47,7 @@ import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.LocationKey;
 import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.attribute.AnimalsOutputAttributes;
@@ -61,6 +62,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCase
 {
@@ -286,7 +289,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
         componentId = new ProcessorId(MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA, FIRST_PROCESSOR_INDEX);
 
         final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
-        assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, String.class);
+        assertExpectedOutput(metadataDescriptor.getOutputMetadata(), personType, StringAttributes.class);
 
         assertThat(metadataDescriptor.getParametersMetadata().size(), is(1));
         assertExpectedType(metadataDescriptor.getParametersMetadata().get(0), "type", String.class);

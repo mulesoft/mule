@@ -10,18 +10,18 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.ARGENTINA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.BUENOS_AIRES;
 
-import org.mule.runtime.core.message.NullAttributes;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputNullTypeResolver;
 
 import java.util.Map;
 
 @MetadataScope(keysResolver = TestMultiLevelKeyResolver.class, contentResolver = TestMultiLevelKeyResolver.class, outputResolver = TestOutputNullTypeResolver.class)
-public class MetadataSourceWithMultilevel extends Source<Map<String, Object>, NullAttributes>
+public class MetadataSourceWithMultilevel extends Source<Map<String, Object>, StringAttributes>
 {
 
     private static final String ERROR_MESSAGE = "LocationKey field was not injected properly";

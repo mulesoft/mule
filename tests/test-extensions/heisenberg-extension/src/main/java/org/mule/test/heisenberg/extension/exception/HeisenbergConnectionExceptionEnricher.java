@@ -16,6 +16,6 @@ public class HeisenbergConnectionExceptionEnricher implements ExceptionEnricher
     @Override
     public Exception enrichException(Exception e)
     {
-        return new ConnectionException(ENRICHED_MESSAGE + e.getMessage());
+        return new ConnectionException(ENRICHED_MESSAGE + e.getMessage(), e);
     }
 }
