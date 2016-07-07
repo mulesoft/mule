@@ -42,6 +42,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+
 import org.mule.api.MuleVersion;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
@@ -81,6 +82,8 @@ import org.mule.runtime.module.extension.internal.exception.IllegalConfiguration
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.tck.message.IntegerAttributes;
+import org.mule.tck.message.StringAttributes;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergConnection;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
@@ -248,7 +251,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
                 .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object").with(new ClassInformationAnnotation(Object.class, null)))
                 .build(), true);
-        assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(String.class), true);
+        assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), true);
         assertParameterType(findParameter(sourceDynamicAttributes.getParameters(), "type"), toMetadataType(String.class), false);
 
         SourceDeclaration sourceStaticAttributes = declaration.getMessageSources().stream().filter(s -> s.getName().equals("MetadataSourceWithMultilevel")).findFirst()
@@ -258,7 +261,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
                 .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object").with(new ClassInformationAnnotation(Object.class, null)))
                 .build(), true);
-        assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(String.class), false);
+        assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
 
         List<ParameterDeclaration> locationKey = sourceStaticAttributes.getParameters();
         assertParameterType(findParameter(locationKey, "continent"), toMetadataType(String.class), false);
@@ -565,7 +568,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
         assertThat(operation.getOutputPayload().getType(), equalTo(toMetadataType(String.class)));
-        assertThat(operation.getOutputAttributes().getType(), equalTo(toMetadataType(Integer.class)));
+        assertThat(operation.getOutputAttributes().getType(), equalTo(toMetadataType(IntegerAttributes.class)));
         assertParameter(operation.getParameters(), "index", "", toMetadataType(int.class), false, SUPPORTED, "0");
 
         operation = getOperation(extensionDeclaration, KILL_OPERATION);

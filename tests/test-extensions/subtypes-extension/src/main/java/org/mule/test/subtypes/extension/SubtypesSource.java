@@ -6,11 +6,11 @@
  */
 package org.mule.test.subtypes.extension;
 
-import org.mule.runtime.core.message.NullAttributes;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.tck.message.StringAttributes;
 
-public class SubtypesSource  extends Source<String, NullAttributes>
+public class SubtypesSource extends Source<String, StringAttributes>
 {
 
     @Parameter
