@@ -27,7 +27,7 @@ import org.junit.Test;
 public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 {
     private static final int CHAINSAW_PORT = 8080;
-    
+
     public ManagementNamespaceHandlerTestCase()
     {
         super();
@@ -76,22 +76,6 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 //        agent = muleContext.getRegistry().lookupAgent("yourkit-profiler");
 //        assertNotNull(agent);
 //        assertEquals(YourKitProfilerAgent.class, agent.getClass());
-    }
-
-    @Test
-    public void testAgentsOrder() throws Exception
-    {
-        Registry registry = muleContext.getRegistry();
-        assertNotNull(registry);
-        Collection<Agent> agents = registry.lookupObjects(Agent.class);
-        assertEquals(agents.size(), 5);
-        
-        Iterator<Agent> iter = agents.iterator();
-        assertTrue(iter.next() instanceof Log4jAgent);
-        assertTrue(iter.next() instanceof Mx4jAgent);
-        assertTrue(iter.next() instanceof TestAgent);
-        assertTrue(iter.next() instanceof JmxServerNotificationAgent);
-        assertTrue(iter.next() instanceof JmxApplicationAgent);
     }
 
 }

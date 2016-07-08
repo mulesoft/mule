@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.registry;
 
+import static org.mule.runtime.core.api.registry.TransformerResolver.RegistryAction.ADDED;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -322,7 +323,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
             transformersWriteLock.lock();
             try
             {
-                if (action == TransformerResolver.RegistryAction.ADDED)
+                if (action == ADDED)
                 {
                     transformers.add(t);
                 }
@@ -559,7 +560,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
 
         if (value instanceof Converter)
         {
-            notifyTransformerResolvers((Converter) value, TransformerResolver.RegistryAction.ADDED);
+            notifyTransformerResolvers((Converter) value, ADDED);
         }
     }
 

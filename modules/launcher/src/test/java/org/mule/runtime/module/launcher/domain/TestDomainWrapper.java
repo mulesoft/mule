@@ -41,12 +41,6 @@ public class TestDomainWrapper implements Domain
     }
 
     @Override
-    public ConfigurationBuilder createApplicationConfigurationBuilder(Application application) throws Exception
-    {
-        return this.delegate.createApplicationConfigurationBuilder(application);
-    }
-
-    @Override
     public void install() throws InstallException
     {
         delegate.install();

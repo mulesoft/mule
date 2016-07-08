@@ -12,12 +12,12 @@ import org.mule.runtime.core.api.MuleContext;
  * Configuration builders that implements this interface will receive a reference
  * to the context of the domain they belong to.
  */
-public interface DomainMuleContextAwareConfigurationBuilder extends ConfigurationBuilder
+public interface ParentMuleContextAwareConfigurationBuilder extends ConfigurationBuilder
 {
 
     /**
-     * @param domainContext MuleContext of the domain.
+     * @param parentContext MuleContext of the domain.
      */
-    void setDomainContext(MuleContext domainContext);
+    void setParentContext(MuleContext parentContext);
 
 }

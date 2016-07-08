@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.common.MuleArtifact;
 import org.mule.common.MuleArtifactFactoryException;
 import org.mule.common.config.XmlConfigurationCallback;
@@ -15,6 +16,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.config.ConfigResource;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -230,8 +232,6 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
         try
         {
             ConfigResource config = new ConfigResource("embedded-datasense.xml", xmlConfig);
-            // This configuration overrides the default-mule-config one to replace beans that are not required
-            ConfigResource defaultConfigOverride = new ConfigResource(getClass().getClassLoader().getResource("default-mule-config-override.xml").toURI().toURL());
 
             if (environmentProperties != null)
             {
@@ -239,7 +239,7 @@ public class SpringXmlConfigurationMuleArtifactFactory implements XmlConfigurati
             }
             MuleContextFactory factory = new DefaultMuleContextFactory();
 
-            builder = new SpringXmlConfigurationBuilder(new ConfigResource[] {config, defaultConfigOverride}, environmentProperties);
+            builder = new SpringXmlConfigurationBuilder(new ConfigResource[] {config}, environmentProperties, APP);
             muleContext = factory.createMuleContext(builder);
             muleContext.start();
 

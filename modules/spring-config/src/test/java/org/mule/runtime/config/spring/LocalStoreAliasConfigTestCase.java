@@ -7,8 +7,9 @@
 
 package org.mule.runtime.config.spring;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertSame;
-
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -22,7 +23,7 @@ public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase
     @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return new SpringXmlConfigurationBuilder(new String[] {});
+        return new SpringXmlConfigurationBuilder(new String[0], emptyMap(), APP);
     }
 
     @Test

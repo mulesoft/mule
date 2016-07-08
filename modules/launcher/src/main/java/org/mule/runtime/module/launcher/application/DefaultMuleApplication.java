@@ -7,6 +7,8 @@
 package org.mule.runtime.module.launcher.application;
 
 import static java.lang.String.format;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
@@ -17,8 +19,8 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
-import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
@@ -31,6 +33,7 @@ import org.mule.runtime.module.launcher.DeploymentStartException;
 import org.mule.runtime.module.launcher.DeploymentStopException;
 import org.mule.runtime.module.launcher.InstallException;
 import org.mule.runtime.module.launcher.MuleDeploymentService;
+import org.mule.runtime.module.launcher.artifact.ArtifactMuleContextBuilder;
 import org.mule.runtime.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.domain.Domain;
@@ -38,7 +41,6 @@ import org.mule.runtime.module.launcher.domain.DomainRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -172,24 +174,25 @@ public class DefaultMuleApplication implements Application
 
         try
         {
-            ConfigurationBuilder cfgBuilder = domainRepository.getDomain(descriptor.getDomain()).createApplicationConfigurationBuilder(this);
-            if (!cfgBuilder.isConfigured())
+            ArtifactMuleContextBuilder artifactBuilder = new ArtifactMuleContextBuilder()
+                    .setArtifactProperties(descriptor.getAppProperties())
+                    .setArtifactType(APP)
+                    .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getArtifactName()))
+                    .setConfigurationFiles(descriptor.getAbsoluteResourcePaths())
+                    .setDefaultEncoding(descriptor.getEncoding())
+                    .setApplicationPlugins(applicationPlugins)
+                    .setExecutionClassloader(deploymentClassLoader.getClassLoader());
+
+            Domain domain = domainRepository.getDomain(descriptor.getDomain());
+            if (domain.getMuleContext() != null)
             {
-                List<ConfigurationBuilder> builders = new LinkedList<>();
-                builders.add(new ApplicationExtensionsManagerConfigurationBuilder(applicationPlugins));
-                builders.add(createConfigurationBuilderFromApplicationProperties());
-                builders.add(cfgBuilder);
-
-                DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-                if (deploymentListener != null)
-                {
-                    muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
-                }
-
-                ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor);
-                applicationContextBuilder.setExecutionClassLoader(deploymentClassLoader.getClassLoader());
-                setMuleContext(muleContextFactory.createMuleContext(builders, applicationContextBuilder));
+                artifactBuilder.setParentContext(domain.getMuleContext());
             }
+            if (deploymentListener != null)
+            {
+                artifactBuilder.setMuleContextListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
+            }
+            setMuleContext(artifactBuilder.build());
         }
         catch (Exception e)
         {
@@ -360,8 +363,8 @@ public class DefaultMuleApplication implements Application
     public String toString()
     {
         return format("%s[%s]@%s", getClass().getName(),
-                             descriptor.getName(),
-                             Integer.toHexString(System.identityHashCode(this)));
+                      descriptor.getName(),
+                      Integer.toHexString(System.identityHashCode(this)));
     }
 
     protected void doDispose()

@@ -13,6 +13,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,7 @@ public class DynamicDataTypeConversionResolver implements DataTypeConversionReso
 
     private final  MuleContext muleContext;
 
+    @Inject
     public DynamicDataTypeConversionResolver(MuleContext muleContext)
     {
         this.muleContext = muleContext;

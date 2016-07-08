@@ -24,6 +24,8 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 
 import java.util.Collection;
 
@@ -124,8 +126,20 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         assertNotNull(adminListener);
         assertFalse(adminListener.isCalled());
         manager.fireNotification(new TestSecurityEvent(muleContext));
-        Thread.sleep(1000); // asynch events
-        assertTrue(listener2.isCalled());
+        new PollingProber(2000, 100).check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return listener2.isCalled();
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "listener2 should be notified";
+            }
+        });
         assertFalse(adminListener.isCalled());
     }
 

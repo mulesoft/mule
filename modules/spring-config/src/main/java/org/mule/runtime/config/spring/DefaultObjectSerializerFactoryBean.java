@@ -10,6 +10,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 
+import javax.inject.Inject;
+
 import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
@@ -31,6 +33,7 @@ public class DefaultObjectSerializerFactoryBean implements SmartFactoryBean<Obje
 
     private final MuleContext muleContext;
 
+    @Inject
     public DefaultObjectSerializerFactoryBean(MuleContext muleContext)
     {
         this.muleContext = muleContext;

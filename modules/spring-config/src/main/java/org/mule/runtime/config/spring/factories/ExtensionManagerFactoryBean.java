@@ -9,6 +9,8 @@ package org.mule.runtime.config.spring.factories;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.ExtensionManager;
 
+import javax.inject.Inject;
+
 import org.springframework.beans.factory.FactoryBean;
 
 /**
@@ -23,6 +25,7 @@ public class ExtensionManagerFactoryBean implements FactoryBean<ExtensionManager
 {
     private final MuleContext muleContext;
 
+    @Inject
     public ExtensionManagerFactoryBean(MuleContext muleContext)
     {
         this.muleContext = muleContext;

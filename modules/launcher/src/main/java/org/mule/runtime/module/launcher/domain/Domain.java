@@ -40,13 +40,4 @@ public interface Domain extends DeployableArtifact<DomainDescriptor>
      */
     MuleContext getMuleContext();
 
-    /**
-     * Creates a {@link ConfigurationBuilder} for a certain application which is going to be configured
-     * to use the correct domain.
-     *
-     * @param application application for which the configuration builder should be created.
-     * @return configuration builder to getDomainClassLoader the application
-     * @throws Exception
-     */
-    ConfigurationBuilder createApplicationConfigurationBuilder(Application application) throws Exception;
 }

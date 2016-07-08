@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.config.builders;
 
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.api.MuleContext;
@@ -44,7 +45,6 @@ import org.mule.runtime.core.util.store.MuleObjectStoreManager;
  * <li>{@link QueueManager}
  * <li>{@link SecurityManager}
  * <li>{@link ObjectStore}
- * <li>{@link DefaultEndpointFactory}
  * <li>{@link ThreadingProfile} defaultThreadingProfile
  * <li>{@link ThreadingProfile} defaultMessageDispatcherThreadingProfile
  * <li>{@link ThreadingProfile} defaultMessageRequesterThreadingProfile
@@ -60,7 +60,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         MuleRegistry registry = muleContext.getRegistry();
 
         registry.registerObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP,
-            new SimpleRegistryBootstrap());
+            new SimpleRegistryBootstrap(APP, muleContext));
 
         configureQueueManager(muleContext);
 

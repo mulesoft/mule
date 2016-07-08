@@ -16,10 +16,11 @@ import org.junit.Test;
 
 public class DefaultThreadingProfileTestCase extends FunctionalTestCase
 {
+
     @Override
-    protected String getConfigFile()
+    protected String[] getConfigFiles()
     {
-        return "";
+        return new String[0];
     }
 
     @Test

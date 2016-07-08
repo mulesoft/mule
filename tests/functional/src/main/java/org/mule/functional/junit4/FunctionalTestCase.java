@@ -6,7 +6,9 @@
  */
 package org.mule.functional.junit4;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
@@ -22,6 +24,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.Schedulers;
 import org.mule.runtime.core.component.AbstractJavaComponent;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.construct.AbstractPipeline;
 import org.mule.runtime.core.construct.Flow;
@@ -33,6 +36,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.junit.After;
 
@@ -76,7 +80,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
         String configResources = getConfigResources();
         if (configResources != null)
         {
-            return new SpringXmlConfigurationBuilder(configResources);
+            return new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP);
         }
         configResources = getConfigFile();
         if (configResources != null)
@@ -85,10 +89,10 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
             {
                 throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
             }
-            return new SpringXmlConfigurationBuilder(configResources);
+            return new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP);
         }
         String[] multipleConfigResources = getConfigFiles();
-        return new SpringXmlConfigurationBuilder(multipleConfigResources);
+        return new SpringXmlConfigurationBuilder(multipleConfigResources, emptyMap(), APP);
     }
 
     /**

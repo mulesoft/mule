@@ -7,6 +7,7 @@
 package org.mule.runtime.core;
 
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -18,6 +19,7 @@ import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.PropertiesMuleConfigurationFactory;
 import org.mule.runtime.core.config.StartupContext;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
@@ -377,7 +379,7 @@ public class MuleServer implements Runnable
         try
         {
             return (ConfigurationBuilder) ClassUtils.instanciateClass(getConfigBuilderClassName(),
-                    new Object[]{ configurationResources , emptyMap()}, MuleServer.class);
+                                                                      new Object[]{ configurationResources , emptyMap(), APP}, MuleServer.class);
         }
         catch (Exception e)
         {

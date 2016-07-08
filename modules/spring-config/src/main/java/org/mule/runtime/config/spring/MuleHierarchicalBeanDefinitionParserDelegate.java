@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
@@ -20,6 +21,7 @@ import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
+import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -139,7 +141,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                                 }
                                 else
                                 {
-                                    name = resolvedComponent.getIdentifier().toString();
+                                    name = AutoIdUtils.uniqueValue(resolvedComponent.getIdentifier().toString());
                                 }
                             }
                             BeanDefinitionFactory.checkElementNameUnique(registry, element);
@@ -435,7 +437,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         if (StringUtils.isBlank(id))
         {
             String parentId = SpringXMLUtils.getNameOrId((Element) e.getParentNode());
-            return "." + parentId + ":" + e.getLocalName();
+            return INNER_BEAN_PREFIX + "." + parentId + ":" + e.getLocalName();
         }
         else
         {

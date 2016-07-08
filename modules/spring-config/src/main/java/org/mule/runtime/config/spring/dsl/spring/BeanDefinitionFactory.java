@@ -135,7 +135,8 @@ public class BeanDefinitionFactory
         //TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
         //how core constructs are processed.
         processMuleConfiguration(componentModel, registry);
-        return componentModel.getBeanDefinition();
+        BeanDefinition beanDefinition = componentModel.getBeanDefinition();
+        return beanDefinition;
     }
 
     private void processMuleConfiguration(ComponentModel componentModel, BeanDefinitionRegistry registry)

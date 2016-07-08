@@ -7,18 +7,19 @@
 package org.mule.runtime.config.spring;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.spring.factories.BootstrapObjectFactoryBean;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryProvider;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.bootstrap.AbstractRegistryBootstrap;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.bootstrap.BootstrapObjectFactory;
 import org.mule.runtime.core.config.bootstrap.ObjectBootstrapProperty;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
@@ -27,14 +28,10 @@ import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.util.Map.Entry;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * Specialization of {@link SimpleRegistryBootstrap which instead of registering the objects directly
@@ -43,26 +40,23 @@ import org.springframework.context.ApplicationContextAware;
  *
  * @since 3.7.0
  */
-public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implements BeanFactoryAware, ApplicationContextAware
+public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implements Initialisable
 {
 
     private OptionalObjectsController optionalObjectsController;
     private BeanDefinitionRegistry beanDefinitionRegistry;
 
-    @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException
+    /**
+     * @param artifactType              type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's not associated to the related artifact it will be ignored.
+     * @param muleContext               the {@code MuleContext} of the artifact.
+     * @param optionalObjectsController a controller for objects that may be optional. When an object can be optional and mule it's not able to create it, then it gets ignored.
+     * @param beanDefinitionRegistry    the spring bean definition registry where the bean definitions gets stored
+     */
+    public SpringRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext, OptionalObjectsController optionalObjectsController, BeanDefinitionRegistry beanDefinitionRegistry)
     {
-        checkArgument(beanFactory instanceof BeanDefinitionRegistry, "this bootstrap class only accepts BeanFactory instances which implement " + BeanDefinitionRegistry.class);
-        beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
-    {
-        if (applicationContext instanceof MuleArtifactContext)
-        {
-            optionalObjectsController = ((MuleArtifactContext) applicationContext).getOptionalObjectsController();
-        }
+        super(artifactType, muleContext);
+        this.optionalObjectsController = optionalObjectsController;
+        this.beanDefinitionRegistry = beanDefinitionRegistry;
     }
 
     @Override
@@ -95,7 +89,7 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
         if (returnClass != null)
         {
             DataTypeParamsBuilder dataTypeBuilder = DataType.builder().type(returnClass);
-            if(isNotEmpty(bootstrapProperty.getMimeType()))
+            if (isNotEmpty(bootstrapProperty.getMimeType()))
             {
                 dataTypeBuilder = dataTypeBuilder.mediaType(bootstrapProperty.getMimeType());
             }
@@ -191,4 +185,5 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     {
         return optionalObjectsController;
     }
+
 }

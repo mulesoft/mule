@@ -7,7 +7,6 @@
 package org.mule.runtime.module.launcher.application;
 
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -15,18 +14,24 @@ import org.mule.runtime.core.config.PropertiesMuleConfigurationFactory;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.work.MuleWorkManager;
-import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
+
+import java.util.Map;
 
 /**
  * Takes Mule application descriptor into account when building the context.
  */
 public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
 {
-    protected ApplicationDescriptor desc;
 
-    public ApplicationMuleContextBuilder(ApplicationDescriptor desc)
+    private final Map<String, String> appProperties;
+    private final String appName;
+    private final String defaultEncoding;
+
+    public ApplicationMuleContextBuilder(String appName, Map<String, String> appProperties, String defaultEncoding)
     {
-        this.desc = desc;
+        this.appProperties = appProperties;
+        this.appName = appName;
+        this.defaultEncoding = defaultEncoding;
     }
 
     @Override
@@ -41,9 +46,9 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
     protected DefaultMuleConfiguration createMuleConfiguration()
     {
         final DefaultMuleConfiguration configuration = new DefaultMuleConfiguration(true);
-        PropertiesMuleConfigurationFactory.initializeFromProperties(configuration, desc.getAppProperties());
-        configuration.setId(desc.getName());
-        final String encoding = desc.getEncoding();
+        PropertiesMuleConfigurationFactory.initializeFromProperties(configuration, appProperties);
+        configuration.setId(appName);
+        final String encoding = defaultEncoding;
         if (StringUtils.isNotBlank(encoding))
         {
             configuration.setDefaultEncoding(encoding);
@@ -55,7 +60,7 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
     protected MuleWorkManager createWorkManager()
     {
         // use app name in the core Mule thread
-        final String threadName = String.format("[%s].Mule", desc.getName());
+        final String threadName = String.format("[%s].Mule", appName);
         return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, threadName, getMuleConfiguration().getShutdownTimeout());
 
     }

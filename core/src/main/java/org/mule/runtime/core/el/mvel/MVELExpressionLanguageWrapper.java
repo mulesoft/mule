@@ -10,13 +10,15 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.expression.DefaultExpressionManager;
 
+import javax.inject.Inject;
+
 /**
  * Wraps a {@link MVELExpressionLanguage} to take care of injecting new instances in the
  * muleContext's {@link DefaultExpressionManager}
  */
 public final class MVELExpressionLanguageWrapper extends MVELExpressionLanguage
 {
-
+    @Inject
     public MVELExpressionLanguageWrapper(MuleContext muleContext)
     {
         super(muleContext);

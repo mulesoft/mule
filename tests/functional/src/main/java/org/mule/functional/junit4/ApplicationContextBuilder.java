@@ -73,7 +73,7 @@ public class ApplicationContextBuilder
         SpringXmlConfigurationBuilder springXmlConfigurationBuilder = new SpringXmlConfigurationBuilder(configResource);
         if (domainContext != null)
         {
-            springXmlConfigurationBuilder.setDomainContext(domainContext);
+            springXmlConfigurationBuilder.setParentContext(domainContext);
         }
         return springXmlConfigurationBuilder;
     }

@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.config.builders;
 
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.DomainMuleContextAwareConfigurationBuilder;
+import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.config.ConfigResource;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -27,23 +29,28 @@ import java.util.Properties;
  * auto-detecting the ConfigurationBuilder to use for each resource. This is resolved by either checking the
  * classpath for config modules e.g. spring-config or by using the file extention or a combination.
  */
-public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder implements DomainMuleContextAwareConfigurationBuilder
+public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder implements ParentMuleContextAwareConfigurationBuilder
 {
-    private MuleContext domainContext;
 
-    public AutoConfigurationBuilder(String resource, Map<String, String> artifactProperties) throws ConfigurationException
+    private final ArtifactType artifactType;
+    private MuleContext parentContext;
+
+    public AutoConfigurationBuilder(String resource, Map<String, String> artifactProperties, ArtifactType artifactType) throws ConfigurationException
     {
         super(resource, artifactProperties);
+        this.artifactType = artifactType;
     }
 
-    public AutoConfigurationBuilder(String[] resources, Map<String, String> artifactProperties) throws ConfigurationException
+    public AutoConfigurationBuilder(String[] resources, Map<String, String> artifactProperties, ArtifactType artifactType) throws ConfigurationException
     {
         super(resources, artifactProperties);
+        this.artifactType = artifactType;
     }
 
-    public AutoConfigurationBuilder(ConfigResource[] resources, Map<String, String> artifactProperties)
+    public AutoConfigurationBuilder(ConfigResource[] resources, Map<String, String> artifactProperties, ArtifactType artifactType)
     {
         super(resources, artifactProperties);
+        this.artifactType = artifactType;
     }
 
     @Override
@@ -89,12 +96,12 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 
                 ConfigResource[] constructorArg = new ConfigResource[configs.size()];
                 System.arraycopy(configs.toArray(), 0, constructorArg, 0, configs.size());
-                ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, new Object[] {constructorArg, getArtifactProperties()});
-                if (domainContext != null && cb instanceof DomainMuleContextAwareConfigurationBuilder)
+                ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, new Object[] {constructorArg, getArtifactProperties(), artifactType});
+                if (parentContext != null && cb instanceof ParentMuleContextAwareConfigurationBuilder)
                 {
-                    ((DomainMuleContextAwareConfigurationBuilder) cb).setDomainContext(domainContext);
+                    ((ParentMuleContextAwareConfigurationBuilder) cb).setParentContext(parentContext);
                 }
-                else if (domainContext != null)
+                else if (parentContext != null)
                 {
                     throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("ConfigurationBuilder %s does not support domain context", cb.getClass().getCanonicalName())));
                 }
@@ -112,8 +119,8 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
     }
 
     @Override
-    public void setDomainContext(MuleContext domainContext)
+    public void setParentContext(MuleContext parentContext)
     {
-        this.domainContext  = domainContext;
+        this.parentContext = parentContext;
     }
 }

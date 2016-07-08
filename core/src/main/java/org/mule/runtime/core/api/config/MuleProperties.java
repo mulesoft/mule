@@ -123,13 +123,19 @@ public class MuleProperties
     public static final String OBJECT_SECURITY_MANAGER = "_muleSecurityManager";
     public static final String OBJECT_TRANSACTION_MANAGER = "_muleTransactionManager";
     public static final String OBJECT_QUEUE_MANAGER = "_muleQueueManager";
+    public static final String OBJECT_LOCAL_QUEUE_MANAGER = "_localQueueManager";
     public static final String OBJECT_STORE_DEFAULT_IN_MEMORY_NAME = "_defaultInMemoryObjectStore";
     public static final String OBJECT_STORE_DEFAULT_PERSISTENT_NAME = "_defaultPersistentObjectStore";
+    public static final String OBJECT_LOCAL_STORE_IN_MEMORY = "_localInMemoryObjectStore";
+    public static final String OBJECT_LOCAL_STORE_PERSISTENT = "_localPersistentObjectStore";
     public static final String QUEUE_STORE_DEFAULT_IN_MEMORY_NAME = "_defaultInMemoryQueueStore";
     public static final String QUEUE_STORE_DEFAULT_PERSISTENT_NAME = "_defaultPersistentQueueStore";
     public static final String DEFAULT_USER_OBJECT_STORE_NAME = "_defaultUserObjectStore";
     public static final String DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME = "_defaultTransientUserObjectStore";
+    public static final String DEFAULT_LOCAL_USER_OBJECT_STORE_NAME = "_localUserObjectStore";
+    public static final String DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME = "_localTransientUserObjectStore";
     public static final String OBJECT_STORE_MANAGER = "_muleObjectStoreManager";
+    public static final String LOCAL_OBJECT_STORE_MANAGER = "_localObjectStoreManager";
     public static final String OBJECT_STORE_SIMPLE_MEMORY_NAME = "_simpleMemoryQueueStore";
     public static final String OBJECT_STORE_FILE_NAME = "_fileQueueStore";
     public static final String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
@@ -158,6 +164,8 @@ public class MuleProperties
     public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";
     public static final String OBJECT_CONNECTION_MANAGER = "_muleConnectionManager";
     public static final String OBJECT_METADATA_MANAGER = "_muleMetadataManager";
+    public static final String OBJECT_EXCEPTION_LOCATION_PROVIDER = "_muleExceptionLocationProvider";
+    public static final String OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER = "_muleMessageProcessingFlowTraceManager";
     public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
     public static final String DEFAULT_TLS_CONTEXT_FACTORY_BUILDER_REGISTRY_KEY = "_muleDefaultTlsContextFactoryBuilder";
 
