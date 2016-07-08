@@ -41,12 +41,6 @@ public class DomainWrapper extends DeployableArtifactWrapper<Domain, DomainDescr
     }
 
     @Override
-    public ConfigurationBuilder createApplicationConfigurationBuilder(Application application) throws Exception
-    {
-        return getDelegate().createApplicationConfigurationBuilder(application);
-    }
-
-    @Override
     public void dispose()
     {
         try

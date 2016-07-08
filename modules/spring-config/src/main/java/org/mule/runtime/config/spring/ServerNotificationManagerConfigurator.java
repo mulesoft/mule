@@ -6,33 +6,40 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.lang.String.format;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
+
+import javax.inject.Inject;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 public class ServerNotificationManagerConfigurator
-    implements MuleContextAware, SmartFactoryBean, ApplicationContextAware
+    implements SmartFactoryBean
 {
 
+    @Inject
     private MuleContext muleContext;
+    @Inject
     private ApplicationContext applicationContext;
 
     private Boolean dynamic;
-    private Map interfaceToEvents;
-    private Collection interfaces;
-    private Collection<ListenerSubscriptionPair> pairs;
+    private List<Notification> enabledNotifications = new ArrayList<>();
+    private List<Notification> disabledNotifications = new ArrayList<>();
+    private Collection<ListenerSubscriptionPair> notificationListeners;
 
     public void setMuleContext(MuleContext context)
     {
@@ -46,14 +53,8 @@ public class ServerNotificationManagerConfigurator
         {
             notificationManager.setNotificationDynamic(dynamic.booleanValue());
         }
-        if (interfaceToEvents != null)
-        {
-            notificationManager.setInterfaceToTypes(interfaceToEvents);
-        }
-        if (interfaces != null)
-        {
-            notificationManager.setDisabledInterfaces(interfaces);
-        }
+        enableNotifications(notificationManager);
+        disableNotifications(notificationManager);
 
         // Merge:
         // i) explicitly configured notification listeners,
@@ -66,8 +67,52 @@ public class ServerNotificationManagerConfigurator
             {
                 notificationManager.addListenerSubscriptionPair(sub);
             }
+            else
+            {
+                notificationManager.removeListener(sub.getListener());
+                notificationManager.addListenerSubscriptionPair(sub);
+            }
         }
         return notificationManager;
+    }
+
+    private void disableNotifications(ServerNotificationManager notificationManager)
+    {
+        for (Notification disabledNotification : disabledNotifications)
+        {
+            BiConsumer<DisableNotificationTask, Class> disableNotificationFunction = (disableFunction, type) -> {
+                try
+                {
+                    disableFunction.run();
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(createStaticMessage(format("Fail trying to disable a notification of type %s since such type does not exists", type)), e);
+                }
+            };
+            if (disabledNotification.isInterfaceExplicitlyConfigured())
+            {
+                disableNotificationFunction.accept(() -> {
+                    notificationManager.disableInterface(disabledNotification.getInterfaceClass().get());
+                }, disabledNotification.getInterfaceClass().get());
+            }
+            if (disabledNotification.isEventExplicitlyConfigured())
+            {
+                disableNotificationFunction.accept(() -> {
+                    notificationManager.disableType(disabledNotification.getEventClass().get());
+                }, disabledNotification.getEventClass().get());
+            }
+        }
+    }
+
+
+
+    private void enableNotifications(ServerNotificationManager notificationManager)
+    {
+        for (Notification notification : enabledNotifications)
+        {
+            notificationManager.addInterfaceToType(notification.getInterfaceClass().get(), notification.getEventClass().get());
+        }
     }
 
     protected Set<ListenerSubscriptionPair> getMergedListeners(ServerNotificationManager notificationManager)
@@ -85,14 +130,14 @@ public class ServerNotificationManagerConfigurator
                 (ServerNotificationListener<?>) applicationContext.getBean(name), null));
         }
 
-        if (pairs != null)
+        if (notificationListeners != null)
         {
-            mergedListeners.addAll(pairs);
+            mergedListeners.addAll(notificationListeners);
 
             for (ListenerSubscriptionPair candidate : adhocListeners)
             {
                 boolean explicityDefined = false;
-                for (ListenerSubscriptionPair explicitListener : pairs)
+                for (ListenerSubscriptionPair explicitListener : notificationListeners)
                 {
                     if (candidate.getListener().equals(explicitListener.getListener()))
                     {
@@ -129,21 +174,6 @@ public class ServerNotificationManagerConfigurator
         this.dynamic = new Boolean(dynamic);
     }
 
-    public void setInterfaceToTypes(Map interfaceToEvents) throws ClassNotFoundException
-    {
-        this.interfaceToEvents = interfaceToEvents;
-    }
-
-    public void setAllListenerSubscriptionPairs(Collection pairs)
-    {
-        this.pairs = pairs;
-    }
-
-    public void setDisabledInterfaces(Collection interfaces) throws ClassNotFoundException
-    {
-        this.interfaces = interfaces;
-    }
-
     public boolean isEagerInit()
     {
         return true;
@@ -157,7 +187,25 @@ public class ServerNotificationManagerConfigurator
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         this.applicationContext = applicationContext;
-
     }
 
+    public void setEnabledNotifications(List<Notification> enabledNotifications)
+    {
+        this.enabledNotifications = enabledNotifications;
+    }
+
+    public void setNotificationListeners(Collection<ListenerSubscriptionPair> notificationListeners)
+    {
+        this.notificationListeners = notificationListeners;
+    }
+
+    public void setDisabledNotifications(List<Notification> disabledNotifications)
+    {
+        this.disabledNotifications = disabledNotifications;
+    }
+
+    interface DisableNotificationTask
+    {
+        void run() throws ClassNotFoundException;
+    }
 }

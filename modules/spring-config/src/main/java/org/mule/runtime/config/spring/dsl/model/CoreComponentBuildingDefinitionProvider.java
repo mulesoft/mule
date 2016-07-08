@@ -7,8 +7,8 @@
 
 package org.mule.runtime.config.spring.dsl.model;
 
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
@@ -18,6 +18,8 @@ import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
+import org.mule.runtime.config.spring.Notification;
+import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
@@ -47,6 +49,8 @@ import org.mule.runtime.core.api.schedule.SchedulerFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ChoiceMessagingExceptionStrategy;
@@ -488,6 +492,43 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
                                                  .withSetterParameterDefinition("defaultObjectSerializer", fromSimpleReferenceParameter("defaultObjectSerializer-ref").build())
                                                  .build());
+
+        componentBuildingDefinitions.add(baseDefinition.copy()
+                                                 .withIdentifier("notifications")
+                                                 .withTypeDefinition(fromType(ServerNotificationManager.class))
+                                                 .withObjectFactoryType(ServerNotificationManagerConfigurator.class)
+                                                 .withSetterParameterDefinition("notificationDynamic", fromSimpleParameter("dynamic").build())
+                                                 .withSetterParameterDefinition("enabledNotifications", fromChildCollectionConfiguration(Notification.EnabledNotification.class).build())
+                                                 .withSetterParameterDefinition("disabledNotifications", fromChildCollectionConfiguration(Notification.DisabledNotification.class).build())
+                                                 .withSetterParameterDefinition("notificationListeners", fromChildCollectionConfiguration(ListenerSubscriptionPair.class).build())
+                                                 .build());
+
+        ComponentBuildingDefinition.Builder baseNotificationDefinition = baseDefinition.copy()
+                .withSetterParameterDefinition("interfase", fromSimpleParameter("interface").build())
+                .withSetterParameterDefinition("event", fromSimpleParameter("event").build())
+                .withSetterParameterDefinition("interfaceClass", fromSimpleParameter("interface-class").build())
+                .withSetterParameterDefinition("eventClass", fromSimpleParameter("event-class").build());
+
+        componentBuildingDefinitions.add(baseNotificationDefinition
+                                                 .copy()
+                                                 .withTypeDefinition(fromType(Notification.EnabledNotification.class))
+                                                 .withIdentifier("notification")
+                                                 .build());
+
+        componentBuildingDefinitions.add(baseNotificationDefinition
+                                                 .copy()
+                                                 .withTypeDefinition(fromType(Notification.DisabledNotification.class))
+                                                 .withIdentifier("disable-notification")
+                                                 .build());
+
+        componentBuildingDefinitions.add(baseDefinition
+                                                 .copy()
+                                                 .withIdentifier("notification-listener")
+                                                 .withTypeDefinition(fromType(ListenerSubscriptionPair.class))
+                                                 .withSetterParameterDefinition("listener", fromSimpleReferenceParameter("ref").build())
+                                                 .withSetterParameterDefinition("subscription", fromSimpleParameter("subscription").build())
+                                                 .build());
+
         return componentBuildingDefinitions;
     }
 

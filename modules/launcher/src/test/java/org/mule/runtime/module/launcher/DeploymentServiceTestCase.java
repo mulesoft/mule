@@ -43,6 +43,7 @@ import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -74,7 +75,7 @@ import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainClassLoaderFactory;
 import org.mule.runtime.module.launcher.domain.TestDomainFactory;
 import org.mule.runtime.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
@@ -98,13 +99,15 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 
-public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
+public class DeploymentServiceTestCase extends AbstractMuleTestCase
 {
 
     private static final int FILE_TIMESTAMP_PRECISION_MILLIS = 1000;
@@ -174,10 +177,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.doSetUp();
+        //super.doSetUp();
         // set up some mule home structure
         final String tmpDir = System.getProperty("java.io.tmpdir");
         muleHome = new File(new File(tmpDir, "mule home"), getClass().getSimpleName() + System.currentTimeMillis());
@@ -203,8 +206,8 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.addDomainDeploymentListener(domainDeploymentListener);
     }
 
-    @Override
-    protected void doTearDown() throws Exception
+    @After
+    public void tearDown() throws Exception
     {
         // comment out the deletion to analyze results after test is done
         if (deploymentService != null)
@@ -212,7 +215,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             deploymentService.stop();
         }
         FileUtils.deleteTree(muleHome);
-        super.doTearDown();
 
         // this is a complex classloader setup and we can't reproduce standalone Mule 100%,
         // so trick the next test method into thinking it's the first run, otherwise

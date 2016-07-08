@@ -14,15 +14,16 @@
 
     <notifications>
         <notification event="MESSAGE-PROCESSOR"/>
+        <notification-listener ref="notificationLogger"/>
     </notifications>
 
     <http:request-config name="requestConfig" host="localhost" />
 
     <spring:bean name="notificationLogger" class="org.mule.test.core.context.notification.processors.MessageProcessorNotificationLogger"/>
 
-    <notifications>
-        <notification-listener ref="notificationLogger"/>
-    </notifications>
+    <!--<notifications>-->
+        <!--<notification-listener ref="notificationLogger"/>-->
+    <!--</notifications>-->
 
     <spring:bean id="objectStore" class="org.mule.runtime.core.util.store.SimpleMemoryObjectStore"/>
 

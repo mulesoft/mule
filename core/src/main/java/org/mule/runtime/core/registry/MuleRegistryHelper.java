@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.registry;
 
+import static org.mule.runtime.core.api.registry.TransformerResolver.RegistryAction.ADDED;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -181,6 +182,24 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     protected Transformer resolveTransformer(DataType source, DataType result) throws TransformerException
     {
         Lock readLock = transformerResolversLock.readLock();
+        //if (transformerResolvers.isEmpty())
+        //{
+        //    Lock writeLock = transformerResolversLock.writeLock();
+        //    writeLock.lock();
+        //    try
+        //    {
+        //        transformerResolvers.addAll(muleContext.getRegistry().lookupObjects(TransformerResolver.class));
+        //        Collection<Converter> converters = muleContext.getRegistry().lookupObjects(Converter.class);
+        //        for (Converter converter : converters)
+        //        {
+        //            notifyTransformerResolvers(converter, ADDED);
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        writeLock.unlock();
+        //    }
+        //}
         readLock.lock();
 
         try
@@ -322,7 +341,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
             transformersWriteLock.lock();
             try
             {
-                if (action == TransformerResolver.RegistryAction.ADDED)
+                if (action == ADDED)
                 {
                     transformers.add(t);
                 }
@@ -559,7 +578,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
 
         if (value instanceof Converter)
         {
-            notifyTransformerResolvers((Converter) value, TransformerResolver.RegistryAction.ADDED);
+            notifyTransformerResolvers((Converter) value, ADDED);
         }
     }
 

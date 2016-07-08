@@ -6,17 +6,16 @@
  */
 package org.mule.runtime.module.launcher.domain;
 
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.builders.AutoConfigurationBuilder;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -25,19 +24,17 @@ import org.mule.runtime.module.launcher.DeploymentListener;
 import org.mule.runtime.module.launcher.DeploymentStartException;
 import org.mule.runtime.module.launcher.DeploymentStopException;
 import org.mule.runtime.module.launcher.MuleDeploymentService;
-import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.application.NullDeploymentListener;
+import org.mule.runtime.module.launcher.artifact.ArtifactMuleContextBuilder;
 import org.mule.runtime.module.launcher.artifact.MuleContextDeploymentListener;
-import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
+import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import org.slf4j.Logger;
@@ -96,49 +93,6 @@ public class DefaultMuleDomain implements Domain
     }
 
     @Override
-    public ConfigurationBuilder createApplicationConfigurationBuilder(Application application) throws Exception
-    {
-        String configBuilderClassName = determineConfigBuilderClassNameForApplication(application);
-        ConfigurationBuilder configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
-                                                                                                       new Object[] {application.getDescriptor().getAbsoluteResourcePaths(), application.getDescriptor().getAppProperties()}, application.getArtifactClassLoader().getClassLoader());
-
-        if (!containsSharedResources())
-        {
-            return configurationBuilder;
-        }
-        else
-        {
-            if (configurationBuilder instanceof DomainMuleContextAwareConfigurationBuilder)
-            {
-                ((DomainMuleContextAwareConfigurationBuilder) configurationBuilder).setDomainContext(getMuleContext());
-            }
-            else
-            {
-                throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("ConfigurationBuilder %s does not support domain context", configurationBuilder.getClass().getCanonicalName())));
-            }
-            return configurationBuilder;
-        }
-    }
-
-    protected String determineConfigBuilderClassNameForApplication(Application defaultMuleApplication)
-    {
-        // Provide a shortcut for Spring: "-builder spring"
-        final String builderFromDesc = defaultMuleApplication.getDescriptor().getConfigurationBuilder();
-        if ("spring".equalsIgnoreCase(builderFromDesc))
-        {
-            return ApplicationDescriptor.CLASSNAME_SPRING_CONFIG_BUILDER;
-        }
-        else if (builderFromDesc == null)
-        {
-            return AutoConfigurationBuilder.class.getName();
-        }
-        else
-        {
-            return builderFromDesc;
-        }
-    }
-
-    @Override
     public void install()
     {
         if (logger.isInfoEnabled())
@@ -163,20 +117,18 @@ public class DefaultMuleDomain implements Domain
             {
                 validateConfigurationFileDoNotUsesCoreNamespace();
 
-                ConfigurationBuilder cfgBuilder = createConfigurationBuilder();
-                if (!cfgBuilder.isConfigured())
-                {
-                    List<ConfigurationBuilder> builders = new ArrayList<>(3);
-                    builders.add(cfgBuilder);
+                ArtifactMuleContextBuilder artifactBuilder = new ArtifactMuleContextBuilder()
+                        .setArtifactName(getArtifactName())
+                        .setExecutionClassloader(deploymentClassLoader.getClassLoader())
+                        .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleDomainsDir(), getArtifactName()))
+                        .setConfigurationFiles(new String[]{this.configResourceFile.getAbsolutePath()})
+                        .setArtifactType(DOMAIN);
 
-                    DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-                    if (deploymentListener != null)
-                    {
-                        muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
-                    }
-                    DomainMuleContextBuilder domainMuleContextBuilder = new DomainMuleContextBuilder(descriptor.getName());
-                    muleContext = muleContextFactory.createMuleContext(builders, domainMuleContextBuilder);
+                if (deploymentListener != null)
+                {
+                    artifactBuilder.setMuleContextListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                 }
+                muleContext = artifactBuilder.build();
             }
         }
         catch (Exception e)

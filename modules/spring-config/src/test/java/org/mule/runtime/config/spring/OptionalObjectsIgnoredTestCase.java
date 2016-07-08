@@ -11,8 +11,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -35,7 +37,7 @@ public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase
     @Before
     public void before() throws Exception
     {
-        muleContext = new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(new String[] {}, emptyMap()));
+        muleContext = new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(new String[] {}, emptyMap(), APP));
         muleContext.start();
         muleContext.getRegistry().lookupByType(Calendar.class);
     }
@@ -47,16 +49,6 @@ public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase
         {
             LifecycleUtils.disposeIfNeeded(muleContext, LOGGER);
         }
-    }
-
-    @Test
-    public void optionalObjectDetected() throws Exception
-    {
-        SpringRegistryBootstrap registryBootstrap = muleContext.getRegistry().lookupObject(SpringRegistryBootstrap.class);
-        assertThat(registryBootstrap, is(not(nullValue())));
-        OptionalObjectsController optionalObjectsController = registryBootstrap.getOptionalObjectsController();
-        assertThat(optionalObjectsController.isOptional(OPTIONAL_OBJECT_KEY), is(true));
-        assertThat(optionalObjectsController.isDiscarded(OPTIONAL_OBJECT_KEY), is(true));
     }
 
     @Test

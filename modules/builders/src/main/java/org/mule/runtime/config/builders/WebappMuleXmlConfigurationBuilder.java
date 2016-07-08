@@ -7,6 +7,7 @@
 package org.mule.runtime.config.builders;
 
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.runtime.config.spring.OptionalObjectsController;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
@@ -58,14 +59,14 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String configResources)
         throws ConfigurationException
     {
-        super(configResources, emptyMap());
+        super(configResources, emptyMap(), APP);
         context = servletContext;
     }
 
     public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String[] configResources)
         throws ConfigurationException
     {
-        super(configResources, emptyMap());
+        super(configResources, emptyMap(), APP);
         context = servletContext;
     }
 
@@ -98,11 +99,10 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     }
 
     @Override
-    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController)
+    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, OptionalObjectsController optionalObjectsController)
     {
-        Resource[] springServletContextResources = preProcessResources(springResources);
         Resource[] artifactConfigServletContextResources = preProcessResources(artifactConfigResources);
-        return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, springServletContextResources, emptyMap());
+        return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, optionalObjectsController, emptyMap(), APP);
     }
 
     private Resource[] preProcessResources(ConfigResource[] configResources)

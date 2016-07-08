@@ -7,16 +7,17 @@
 package org.mule.runtime.config.spring;
 
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.DomainMuleContextAwareConfigurationBuilder;
+import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.config.ConfigResource;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,20 +31,9 @@ import org.springframework.context.ConfigurableApplicationContext;
  * Spring XML Configuration file used with Mule name-spaces. Multiple configuration
  * files can be loaded from this builder (specified as a comma-separated list).
  */
-public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder implements DomainMuleContextAwareConfigurationBuilder
+public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder implements ParentMuleContextAwareConfigurationBuilder
 {
 
-    public static final String MULE_DEFAULTS_CONFIG = "default-mule-config.xml";
-    public static final String MULE_DEFAULTS_ENDPOINT_CONFIG = "default-endpoint-mule-config.xml";
-    public static final String MULE_SPRING_CONFIG = "mule-spring-config.xml";
-    public static final String MULE_MINIMAL_CONFIG = "minimal-mule-config.xml";
-    public static final String MULE_MINIMAL_SPRING_CONFIG = "minimal-mule-config-beans.xml";
-    public static final String MULE_REGISTRY_BOOTSTRAP_SPRING_CONFIG = "registry-bootstrap-mule-config.xml";
-    public static final String MULE_DOMAIN_REGISTRY_BOOTSTRAP_SPRING_CONFIG = "registry-bootstrap-mule-domain-config.xml";
-
-    /**
-     * Prepend "default-mule-config.xml" to the list of config resources.
-     */
     protected boolean useDefaultConfigResource = true;
     protected boolean useMinimalConfigResource = false;
 
@@ -52,72 +42,40 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     protected ApplicationContext domainContext;
     protected ApplicationContext parentContext;
     protected ApplicationContext applicationContext;
+    private final ArtifactType artifactType;
 
-    public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties) throws ConfigurationException
+    public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties, ArtifactType artifactType) throws ConfigurationException
     {
         super(configResources, artifactProperties);
+        this.artifactType = artifactType;
     }
 
-    public SpringXmlConfigurationBuilder(String configResources, Map<String, String> artifactProperties) throws ConfigurationException
+    public SpringXmlConfigurationBuilder(String configResources, Map<String, String> artifactProperties, ArtifactType artifactType) throws ConfigurationException
     {
-        super(configResources, artifactProperties);
+        this(new String[]{configResources}, artifactProperties, artifactType);
     }
 
-    public SpringXmlConfigurationBuilder(ConfigResource[] configResources, Map<String, String> artifactProperties)
+    public SpringXmlConfigurationBuilder(ConfigResource[] configResources, Map<String, String> artifactProperties, ArtifactType artifactType)
     {
         super(configResources, artifactProperties);
+        this.artifactType = artifactType;
     }
 
     public SpringXmlConfigurationBuilder(String configResource) throws ConfigurationException
     {
-        this(configResource, emptyMap());
+        this(configResource, emptyMap(), APP);
     }
 
     public SpringXmlConfigurationBuilder(String[] configFiles) throws ConfigurationException
     {
         super(configFiles, emptyMap());
-    }
-
-    protected List<ConfigResource> getConfigResources() throws IOException
-    {
-        List<ConfigResource> allResources = new ArrayList<>();
-        if (useMinimalConfigResource)
-        {
-            allResources.add(new ConfigResource(MULE_DOMAIN_REGISTRY_BOOTSTRAP_SPRING_CONFIG));
-            allResources.add(new ConfigResource(MULE_MINIMAL_SPRING_CONFIG));
-            allResources.add(new ConfigResource(MULE_MINIMAL_CONFIG));
-            allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
-        }
-        else if (useDefaultConfigResource)
-        {
-            allResources.add(new ConfigResource(MULE_REGISTRY_BOOTSTRAP_SPRING_CONFIG));
-            allResources.add(new ConfigResource(MULE_MINIMAL_SPRING_CONFIG));
-            allResources.add(new ConfigResource(MULE_MINIMAL_CONFIG));
-            allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
-            allResources.add(new ConfigResource(MULE_DEFAULTS_CONFIG));
-            try
-            {
-                allResources.add(new ConfigResource(MULE_DEFAULTS_ENDPOINT_CONFIG));
-            }
-            catch (FileNotFoundException e)
-            {
-                logger.debug("Transports bundle not present.");
-            }
-        }
-        else
-        {
-            allResources.add(new ConfigResource(MULE_SPRING_CONFIG));
-        }
-        return allResources;
+        this.artifactType = APP;
     }
 
     @Override
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
-        List<ConfigResource> allResources = getConfigResources();
-        addResources(allResources);
-        ConfigResource[] configResourcesArray = new ConfigResource[allResources.size()];
-        applicationContext = createApplicationContext(muleContext, allResources.toArray(configResourcesArray));
+        applicationContext = createApplicationContext(muleContext);
         createSpringRegistry(muleContext, applicationContext);
     }
 
@@ -143,8 +101,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         configured = false;
     }
 
-    private ApplicationContext createApplicationContext(MuleContext muleContext,
-                                                        ConfigResource[] configResources) throws Exception
+    private ApplicationContext createApplicationContext(MuleContext muleContext) throws Exception
     {
         OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
         OptionalObjectsController parentObjectController = null;
@@ -160,12 +117,12 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
             applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
         }
 
-        return doCreateApplicationContext(muleContext, artifactConfigResources, configResources, applicationObjectcontroller);
+        return doCreateApplicationContext(muleContext, artifactConfigResources, applicationObjectcontroller);
     }
 
-    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, ConfigResource[] springResources, OptionalObjectsController optionalObjectsController)
+    protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources, OptionalObjectsController optionalObjectsController)
     {
-        return new MuleArtifactContext(muleContext, artifactConfigResources, springResources, optionalObjectsController, getArtifactProperties());
+        return new MuleArtifactContext(muleContext, artifactConfigResources, optionalObjectsController, getArtifactProperties(), artifactType);
     }
 
 
@@ -222,11 +179,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         }
     }
 
-    public boolean isUseDefaultConfigResource()
-    {
-        return useDefaultConfigResource;
-    }
-
     public void setUseDefaultConfigResource(boolean useDefaultConfigResource)
     {
         this.useDefaultConfigResource = useDefaultConfigResource;
@@ -253,7 +205,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
 
     @Override
-    public void setDomainContext(MuleContext domainContext)
+    public void setParentContext(MuleContext domainContext)
     {
         this.domainContext = domainContext.getRegistry().get("springApplicationContext");
     }

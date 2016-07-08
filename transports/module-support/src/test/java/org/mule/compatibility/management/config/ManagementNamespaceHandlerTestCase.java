@@ -47,16 +47,4 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(enlAgent.getEndpoint().getEndpointURI().toString(), "test://test");
     }
 
-    @Test
-    public void testAgentsOrder() throws Exception
-    {
-        Registry registry = muleContext.getRegistry();
-        assertNotNull(registry);
-        Collection<Agent> agents = registry.lookupObjects(Agent.class);
-        assertEquals(agents.size(), 3);
-        
-        Iterator<Agent> iter = agents.iterator();
-        assertTrue(iter.next() instanceof EndpointNotificationLoggerAgent);
-    }
-
 }

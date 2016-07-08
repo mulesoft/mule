@@ -9,6 +9,7 @@ package org.mule.runtime.core.config.bootstrap;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.registry.ObjectProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -34,6 +35,16 @@ import java.util.Map;
 @Deprecated
 public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap
 {
+
+    /**
+     * @param supportedArtifactType type of the artifact to support. This attributes defines which types of registry bootstrap entries will be
+     *                              created depending on the entry applyToArtifactType parameter value.
+     * @param muleContext {@code MuleContext} in which the objects will be registered
+     */
+    public SimpleRegistryBootstrap(ArtifactType supportedArtifactType, MuleContext muleContext)
+    {
+        super(supportedArtifactType, muleContext);
+    }
 
     @Override
     protected void doRegisterTransformer(TransformerBootstrapProperty bootstrapProperty, Class<?> returnClass, Class<? extends Transformer> transformerClass) throws Exception
