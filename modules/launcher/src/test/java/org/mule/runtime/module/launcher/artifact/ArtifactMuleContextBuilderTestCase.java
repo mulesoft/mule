@@ -50,24 +50,21 @@ public class ArtifactMuleContextBuilderTestCase extends AbstractMuleTestCase
     public void buildWithoutClassloader() throws Exception
     {
         expectedException.expectMessage(EXECUTION_CLASSLOADER_WAS_NOT_SET);
-        new ArtifactMuleContextBuilder()
-                .build();
+        new ArtifactMuleContextBuilder().build();
     }
 
     @Test
     public void setNullArtifactProperties() throws Exception
     {
         expectedException.expectMessage(MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL);
-        new ArtifactMuleContextBuilder()
-                .setArtifactProperties(null);
+        new ArtifactMuleContextBuilder().setArtifactProperties(null);
     }
 
     @Test
     public void setRegularFileInstallationLocation() throws Exception
     {
         expectedException.expectMessage(INSTALLATION_DIRECTORY_MUST_BE_A_DIRECTORY);
-        new ArtifactMuleContextBuilder()
-                .setArtifactInstallationDirectory(temporaryFolder.newFile());
+        new ArtifactMuleContextBuilder().setArtifactInstallationDirectory(temporaryFolder.newFile());
     }
 
     @Test

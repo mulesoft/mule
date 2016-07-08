@@ -10,6 +10,8 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -55,7 +57,7 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
     @Test
     public void registerOnlyDomainPropertiesType() throws Exception
     {
-        createTestRegistryBootstrap(ArtifactType.DOMAIN);
+        createTestRegistryBootstrap(DOMAIN);
         assertThat(muleContext.getRegistry().lookupObject(String.class), nullValue());
         assertThat(muleContext.getRegistry().lookupObject(Properties.class), notNullValue());
         assertThat(muleContext.getRegistry().lookupObject(ArrayList.class), notNullValue());
@@ -64,9 +66,9 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
     private SimpleRegistryBootstrap createTestRegistryBootstrap(ArtifactType artifactType) throws InitialisationException
     {
         final Properties properties = new Properties();
-        properties.put("1", String.format("java.lang.String,%s=%s", ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, APP.getAsString()));
-        properties.put("2", String.format("java.util.Properties,%s=%s", ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, ArtifactType.DOMAIN.getAsString()));
-        properties.put("3", String.format("java.util.ArrayList,%s=%s", ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, ArtifactType.ALL.getAsString()));
+        properties.put("1", String.format("java.lang.String,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, APP.getAsString()));
+        properties.put("2", String.format("java.util.Properties,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, DOMAIN.getAsString()));
+        properties.put("3", String.format("java.util.ArrayList,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, ArtifactType.ALL.getAsString()));
         properties.put("jms.singletx.transaction.resource1", String.format("%s,optional)", TEST_TRANSACTION_FACTORY_CLASS));
         properties.put("test.singletx.transaction.factory1", FakeTransactionFactory.class.getName());
         properties.put("test.singletx.transaction.resource1", FakeTransactionResource.class.getName());

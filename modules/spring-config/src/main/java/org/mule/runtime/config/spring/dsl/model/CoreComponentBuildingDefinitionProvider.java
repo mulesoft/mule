@@ -18,7 +18,7 @@ import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
-import org.mule.runtime.config.spring.Notification;
+import org.mule.runtime.config.spring.NotificationConfig;
 import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
@@ -498,26 +498,26 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withTypeDefinition(fromType(ServerNotificationManager.class))
                                                  .withObjectFactoryType(ServerNotificationManagerConfigurator.class)
                                                  .withSetterParameterDefinition("notificationDynamic", fromSimpleParameter("dynamic").build())
-                                                 .withSetterParameterDefinition("enabledNotifications", fromChildCollectionConfiguration(Notification.EnabledNotification.class).build())
-                                                 .withSetterParameterDefinition("disabledNotifications", fromChildCollectionConfiguration(Notification.DisabledNotification.class).build())
+                                                 .withSetterParameterDefinition("enabledNotifications", fromChildCollectionConfiguration(NotificationConfig.EnabledNotificationConfig.class).build())
+                                                 .withSetterParameterDefinition("disabledNotifications", fromChildCollectionConfiguration(NotificationConfig.DisabledNotificationConfig.class).build())
                                                  .withSetterParameterDefinition("notificationListeners", fromChildCollectionConfiguration(ListenerSubscriptionPair.class).build())
                                                  .build());
 
         ComponentBuildingDefinition.Builder baseNotificationDefinition = baseDefinition.copy()
-                .withSetterParameterDefinition("interfase", fromSimpleParameter("interface").build())
-                .withSetterParameterDefinition("event", fromSimpleParameter("event").build())
+                .withSetterParameterDefinition("interfaseName", fromSimpleParameter("interface").build())
+                .withSetterParameterDefinition("eventName", fromSimpleParameter("event").build())
                 .withSetterParameterDefinition("interfaceClass", fromSimpleParameter("interface-class").build())
                 .withSetterParameterDefinition("eventClass", fromSimpleParameter("event-class").build());
 
         componentBuildingDefinitions.add(baseNotificationDefinition
                                                  .copy()
-                                                 .withTypeDefinition(fromType(Notification.EnabledNotification.class))
+                                                 .withTypeDefinition(fromType(NotificationConfig.EnabledNotificationConfig.class))
                                                  .withIdentifier("notification")
                                                  .build());
 
         componentBuildingDefinitions.add(baseNotificationDefinition
                                                  .copy()
-                                                 .withTypeDefinition(fromType(Notification.DisabledNotification.class))
+                                                 .withTypeDefinition(fromType(NotificationConfig.DisabledNotificationConfig.class))
                                                  .withIdentifier("disable-notification")
                                                  .build());
 

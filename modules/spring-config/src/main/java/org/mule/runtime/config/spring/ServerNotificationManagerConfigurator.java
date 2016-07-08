@@ -37,8 +37,8 @@ public class ServerNotificationManagerConfigurator
     private ApplicationContext applicationContext;
 
     private Boolean dynamic;
-    private List<Notification> enabledNotifications = new ArrayList<>();
-    private List<Notification> disabledNotifications = new ArrayList<>();
+    private List<NotificationConfig> enabledNotifications = new ArrayList<>();
+    private List<NotificationConfig> disabledNotifications = new ArrayList<>();
     private Collection<ListenerSubscriptionPair> notificationListeners;
 
     public void setMuleContext(MuleContext context)
@@ -78,7 +78,7 @@ public class ServerNotificationManagerConfigurator
 
     private void disableNotifications(ServerNotificationManager notificationManager)
     {
-        for (Notification disabledNotification : disabledNotifications)
+        for (NotificationConfig disabledNotification : disabledNotifications)
         {
             BiConsumer<DisableNotificationTask, Class> disableNotificationFunction = (disableFunction, type) -> {
                 try
@@ -109,7 +109,7 @@ public class ServerNotificationManagerConfigurator
 
     private void enableNotifications(ServerNotificationManager notificationManager)
     {
-        for (Notification notification : enabledNotifications)
+        for (NotificationConfig notification : enabledNotifications)
         {
             notificationManager.addInterfaceToType(notification.getInterfaceClass().get(), notification.getEventClass().get());
         }
@@ -189,7 +189,7 @@ public class ServerNotificationManagerConfigurator
         this.applicationContext = applicationContext;
     }
 
-    public void setEnabledNotifications(List<Notification> enabledNotifications)
+    public void setEnabledNotifications(List<NotificationConfig> enabledNotifications)
     {
         this.enabledNotifications = enabledNotifications;
     }
@@ -199,7 +199,7 @@ public class ServerNotificationManagerConfigurator
         this.notificationListeners = notificationListeners;
     }
 
-    public void setDisabledNotifications(List<Notification> disabledNotifications)
+    public void setDisabledNotifications(List<NotificationConfig> disabledNotifications)
     {
         this.disabledNotifications = disabledNotifications;
     }

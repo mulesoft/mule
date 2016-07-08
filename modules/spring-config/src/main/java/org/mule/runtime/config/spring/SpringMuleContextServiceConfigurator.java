@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
@@ -46,6 +47,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLI
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.core.util.ClassUtils.loadClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean;
@@ -98,6 +100,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -107,6 +111,9 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  */
 class SpringMuleContextServiceConfigurator
 {
+
+    private static final String ENDPOINT_FACTORY_IMPL_CLASS_NAME = "org.mule.compatibility.core.endpoint.DefaultEndpointFactory";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringMuleContextServiceConfigurator.class);
 
     void createArtifactServices(BeanDefinitionRegistry beanDefinitionRegistry, MuleContext muleContext, ArtifactType artifactType, OptionalObjectsController optionalObjectsController)
     {
@@ -205,26 +212,29 @@ class SpringMuleContextServiceConfigurator
     {
         try
         {
-            Class endpointFactoryClass = ClassUtils.loadClass("org.mule.compatibility.core.endpoint.DefaultEndpointFactory", Thread.currentThread().getContextClassLoader());
+            Class endpointFactoryClass = loadClass(ENDPOINT_FACTORY_IMPL_CLASS_NAME, Thread.currentThread().getContextClassLoader());
             beanDefinitionRegistry.registerBeanDefinition("_muleEndpointFactory", getBeanDefinition(endpointFactoryClass));
         }
         catch (ClassNotFoundException e)
         {
-            //Nothing to do.
+            if (LOGGER.isDebugEnabled())
+            {
+                LOGGER.debug(format("Could not load class endpoint factory implementation %s. Endpoint factory will not be available.", ENDPOINT_FACTORY_IMPL_CLASS_NAME), e);
+            }
         }
     }
 
     private void createNotificationManager(BeanDefinitionRegistry beanDefinitionRegistry)
     {
-        List<Notification> defaultNotifications = new ArrayList<>();
-        defaultNotifications.add(new Notification(MuleContextNotificationListener.class, MuleContextNotification.class));
-        defaultNotifications.add(new Notification(SecurityNotificationListener.class, SecurityNotification.class));
-        defaultNotifications.add(new Notification(ManagementNotificationListener.class, ManagementNotification.class));
-        defaultNotifications.add(new Notification(ConnectionNotificationListener.class, ConnectionNotification.class));
-        defaultNotifications.add(new Notification(RegistryNotificationListener.class, RegistryNotification.class));
-        defaultNotifications.add(new Notification(CustomNotificationListener.class, CustomNotification.class));
-        defaultNotifications.add(new Notification(ExceptionNotificationListener.class, ExceptionNotification.class));
-        defaultNotifications.add(new Notification(TransactionNotificationListener.class, TransactionNotification.class));
+        List<NotificationConfig> defaultNotifications = new ArrayList<>();
+        defaultNotifications.add(new NotificationConfig(MuleContextNotificationListener.class, MuleContextNotification.class));
+        defaultNotifications.add(new NotificationConfig(SecurityNotificationListener.class, SecurityNotification.class));
+        defaultNotifications.add(new NotificationConfig(ManagementNotificationListener.class, ManagementNotification.class));
+        defaultNotifications.add(new NotificationConfig(ConnectionNotificationListener.class, ConnectionNotification.class));
+        defaultNotifications.add(new NotificationConfig(RegistryNotificationListener.class, RegistryNotification.class));
+        defaultNotifications.add(new NotificationConfig(CustomNotificationListener.class, CustomNotification.class));
+        defaultNotifications.add(new NotificationConfig(ExceptionNotificationListener.class, ExceptionNotification.class));
+        defaultNotifications.add(new NotificationConfig(TransactionNotificationListener.class, TransactionNotification.class));
         beanDefinitionRegistry.registerBeanDefinition(OBJECT_NOTIFICATION_MANAGER, getBeanDefinitionBuilder(ServerNotificationManagerConfigurator.class)
                 .addPropertyValue("enabledNotifications", defaultNotifications)
                 .getBeanDefinition());
@@ -245,8 +255,7 @@ class SpringMuleContextServiceConfigurator
 
     private AbstractBeanDefinition getBeanDefinition(Class<?> beanType)
     {
-        return getBeanDefinitionBuilder(beanType)
-                .getBeanDefinition();
+        return getBeanDefinitionBuilder(beanType).getBeanDefinition();
     }
 
     private BeanDefinitionBuilder getBeanDefinitionBuilder(Class<?> beanType)

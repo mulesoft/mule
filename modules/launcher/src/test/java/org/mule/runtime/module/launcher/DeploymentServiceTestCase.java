@@ -180,8 +180,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Before
     public void setUp() throws Exception
     {
-        //super.doSetUp();
-        // set up some mule home structure
         final String tmpDir = System.getProperty("java.io.tmpdir");
         muleHome = new File(new File(tmpDir, "mule home"), getClass().getSimpleName() + System.currentTimeMillis());
         appsDir = new File(muleHome, "apps");
@@ -209,7 +207,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @After
     public void tearDown() throws Exception
     {
-        // comment out the deletion to analyze results after test is done
         if (deploymentService != null)
         {
             deploymentService.stop();

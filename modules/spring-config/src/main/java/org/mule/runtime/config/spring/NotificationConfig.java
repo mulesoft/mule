@@ -54,7 +54,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class Notification
+public class NotificationConfig
 {
 
     private static final String ENDPOINT_MESSAGE_NOTIFICATION_CLASS = "org.mule.compatibility.core.context.notification.EndpointMessageNotification";
@@ -106,28 +106,28 @@ public class Notification
         EVENT_MAP.put("MESSAGE", ENDPOINT_MESSAGE_NOTIFICATION_CLASS);
     }
 
-    public Notification(Class interfaceClass, Class eventClass)
+    public NotificationConfig(Class interfaceClass, Class eventClass)
     {
         this.interfaceClass = interfaceClass;
         this.eventClass = eventClass;
     }
 
-    public Notification()
+    public NotificationConfig()
     {
         //used by the parser builder.
     }
 
-    private String event;
+    private String eventName;
     private Class eventClass;
-    private String interfase;
+    private String interfaseName;
     private Class interfaceClass;
     private boolean eventExplicitlyConfigured;
     private boolean interfaceExplicitlyConfigured;
 
-    public void setInterfase(String interfase)
+    public void setInterfaseName(String interfaseName)
     {
         interfaceExplicitlyConfigured = true;
-        this.interfase = interfase;
+        this.interfaseName = interfaseName;
     }
 
     public void setEventClass(Class eventClass)
@@ -136,10 +136,10 @@ public class Notification
         this.eventClass = eventClass;
     }
 
-    public void setEvent(String event)
+    public void setEventName(String eventName)
     {
         eventExplicitlyConfigured = true;
-        this.event = event;
+        this.eventName = eventName;
     }
 
     public void setInterfaceClass(Class interfaceClass)
@@ -154,11 +154,11 @@ public class Notification
         {
             return of(eventClass);
         }
-        if (event != null)
+        if (eventName != null)
         {
-            return of(loadClass(EVENT_MAP.get(event)));
+            return of(loadClass(EVENT_MAP.get(eventName)));
         }
-        return ofNullable(loadClass(EVENT_MAP.get(interfase)));
+        return ofNullable(loadClass(EVENT_MAP.get(interfaseName)));
     }
 
     private Class loadClass(String className)
@@ -183,11 +183,11 @@ public class Notification
         {
             return of(interfaceClass);
         }
-        if (interfase != null)
+        if (interfaseName != null)
         {
-            return of(loadClass(INTERFACE_MAP.get(interfase)));
+            return of(loadClass(INTERFACE_MAP.get(interfaseName)));
         }
-        return ofNullable(loadClass(INTERFACE_MAP.get(event)));
+        return ofNullable(loadClass(INTERFACE_MAP.get(eventName)));
     }
 
     public boolean isEventExplicitlyConfigured()
@@ -203,15 +203,15 @@ public class Notification
     /**
      * Notifications that must be enabled
      */
-    public static class EnabledNotification extends Notification
+    public static class EnabledNotificationConfig extends NotificationConfig
     {
 
-        public EnabledNotification(Class interfaceClass, Class eventClass)
+        public EnabledNotificationConfig(Class interfaceClass, Class eventClass)
         {
             super(interfaceClass, eventClass);
         }
 
-        public EnabledNotification()
+        public EnabledNotificationConfig()
         {
         }
     }
@@ -219,15 +219,15 @@ public class Notification
     /**
      * Notifications that must be disabled
      */
-    public static class DisabledNotification extends Notification
+    public static class DisabledNotificationConfig extends NotificationConfig
     {
 
-        public DisabledNotification(Class interfaceClass, Class eventClass)
+        public DisabledNotificationConfig(Class interfaceClass, Class eventClass)
         {
             super(interfaceClass, eventClass);
         }
 
-        public DisabledNotification()
+        public DisabledNotificationConfig()
         {
         }
     }

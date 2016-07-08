@@ -182,24 +182,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     protected Transformer resolveTransformer(DataType source, DataType result) throws TransformerException
     {
         Lock readLock = transformerResolversLock.readLock();
-        //if (transformerResolvers.isEmpty())
-        //{
-        //    Lock writeLock = transformerResolversLock.writeLock();
-        //    writeLock.lock();
-        //    try
-        //    {
-        //        transformerResolvers.addAll(muleContext.getRegistry().lookupObjects(TransformerResolver.class));
-        //        Collection<Converter> converters = muleContext.getRegistry().lookupObjects(Converter.class);
-        //        for (Converter converter : converters)
-        //        {
-        //            notifyTransformerResolvers(converter, ADDED);
-        //        }
-        //    }
-        //    finally
-        //    {
-        //        writeLock.unlock();
-        //    }
-        //}
         readLock.lock();
 
         try
