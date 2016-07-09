@@ -23,8 +23,8 @@
                         </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-                    <xs:attribute type="mule:expressionObject" use="required" name="requiredPojoExpressionRequired"></xs:attribute>
-                    <xs:attribute type="mule:expressionObject" use="optional" name="requiredExtensiblePojo"></xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="requiredPojoExpressionRequired"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="requiredExtensiblePojo"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -77,7 +77,7 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/basic" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FooType" substitutionGroup="mule:abstract-message-processor" name="foo"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/basic" type="FooType" substitutionGroup="mule:abstract-message-processor" name="foo"></xs:element>
     <xs:complexType name="FooType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">

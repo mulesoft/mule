@@ -15,7 +15,6 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXP
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_LIST;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_LONG;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_MAP;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_OBJECT;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_STRING;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.STRING;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_BOOLEAN;
@@ -112,7 +111,7 @@ public final class SchemaTypeConversion
             @Override
             protected void defaultVisit(MetadataType metadataType)
             {
-                qName.set(dynamic ? EXPRESSION_OBJECT : STRING);
+                qName.set(STRING);
             }
 
             private void onDate()

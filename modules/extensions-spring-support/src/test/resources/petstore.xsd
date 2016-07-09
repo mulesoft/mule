@@ -41,7 +41,7 @@
                     <xs:attribute type="xs:string" use="optional" name="threadingProfile"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="pets"></xs:attribute>
-                    <xs:attribute type="mule:expressionObject" use="optional" name="cage"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="cage"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -145,7 +145,7 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetCageType" substitutionGroup="mule:abstract-message-processor" name="get-cage"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="GetCageType" substitutionGroup="mule:abstract-message-processor" name="get-cage"></xs:element>
     <xs:complexType name="GetCageType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -162,7 +162,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetClientType" substitutionGroup="mule:abstract-message-processor" name="get-client"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="GetClientType" substitutionGroup="mule:abstract-message-processor" name="get-client"></xs:element>
     <xs:complexType name="GetClientType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -179,7 +179,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetClientOnLatchType" substitutionGroup="mule:abstract-message-processor" name="get-client-on-latch"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="GetClientOnLatchType" substitutionGroup="mule:abstract-message-processor" name="get-client-on-latch"></xs:element>
     <xs:complexType name="GetClientOnLatchType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -196,7 +196,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetPetsType" substitutionGroup="mule:abstract-message-processor" name="get-pets"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="GetPetsType" substitutionGroup="mule:abstract-message-processor" name="get-pets"></xs:element>
     <xs:complexType name="GetPetsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
