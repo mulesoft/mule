@@ -45,7 +45,7 @@ public final class SubtypesModelValidator implements ModelValidator
     public void validate(ExtensionModel model) throws IllegalModelDefinitionException
     {
         Optional<Map<MetadataType, List<MetadataType>>> typesMapping = model.getModelProperty(SubTypesModelProperty.class)
-                                                                        .map(SubTypesModelProperty::getSubTypesMapping);
+                .map(SubTypesModelProperty::getSubTypesMapping);
         if (typesMapping.isPresent())
         {
             validateNonAbstractSubtypes(model, typesMapping.get());

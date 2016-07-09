@@ -11,9 +11,6 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 
 import java.util.List;
 
-/**
- * //TODO
- */
 @Extensible
 public class ExtensiblePojo
 {

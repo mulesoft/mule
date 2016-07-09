@@ -39,14 +39,7 @@ public final class FieldSetter<Target, Value>
      */
     public void set(Target target, Value value)
     {
-        try
-        {
-            ReflectionUtils.setField(field, target, value);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        ReflectionUtils.setField(field, target, value);
     }
 
     /**
