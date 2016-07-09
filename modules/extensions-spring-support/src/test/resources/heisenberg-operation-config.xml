@@ -29,17 +29,11 @@
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
             <heisenberg:ricin microgramsPerKilo="22">
-                <heisenberg:destination>
-                    <heisenberg:door victim="Lidia" address="Stevia coffe shop"/>
-                </heisenberg:destination>
+                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door>
-            <heisenberg:door address="pollos hermanos" victim="Gustavo Fring">
-                <heisenberg:previous>
-                    <heisenberg:door victim="Krazy-8" address="Jesse's"/>
-                </heisenberg:previous>
-            </heisenberg:door>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>
         <heisenberg:monthly-incomes>
             <heisenberg:monthly-income value="12000"/>
@@ -128,9 +122,7 @@
 
     <flow name="knockStaticInlineDoor">
         <heisenberg:knock>
-            <heisenberg:knocked-door>
-                <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
-            </heisenberg:knocked-door>
+            <heisenberg:knocked-door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
         </heisenberg:knock>
     </flow>
 
@@ -144,9 +136,7 @@
 
     <flow name="knockDynamicInlineDoor">
         <heisenberg:knock>
-            <heisenberg:knocked-door>
-                <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane"/>
-            </heisenberg:knocked-door>
+            <heisenberg:knocked-door victim="#[victim]" address="308 Negra Arroyo Lane"/>
         </heisenberg:knock>
     </flow>
 
@@ -169,9 +159,7 @@
 
     <flow name="killWithWeapon">
         <heisenberg:kill-with-weapon weapon="#[weapon]" type="MELEE_WEAPON">
-            <heisenberg:attributes-of-weapon>
-                <heisenberg:weapon-attributes brand="Pizza on the rooftop"/>
-            </heisenberg:attributes-of-weapon>
+            <heisenberg:attributes-of-weapon brand="Pizza on the rooftop"/>
         </heisenberg:kill-with-weapon>
     </flow>
 
@@ -191,14 +179,10 @@
         <heisenberg:kill-with-ricins>
             <heisenberg:ricin-list>
                 <heisenberg:ricin microgramsPerKilo="20">
-                    <heisenberg:destination>
-                        <heisenberg:door victim="Lidia" address="Stevia coffe shop"/>
-                    </heisenberg:destination>
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
                 </heisenberg:ricin>
                 <heisenberg:ricin microgramsPerKilo="22">
-                    <heisenberg:destination>
-                        <heisenberg:door address="pollos hermanos" victim="Gustavo Fring"/>
-                    </heisenberg:destination>
+                    <heisenberg:destination address="pollos hermanos" victim="Gustavo Fring"/>
                 </heisenberg:ricin>
             </heisenberg:ricin-list>
         </heisenberg:kill-with-ricins>

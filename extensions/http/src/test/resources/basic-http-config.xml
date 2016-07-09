@@ -16,14 +16,12 @@
     <flow name="client">
         <httpn:request path="/" config-ref="reqConfig" key="ANY">
             <httpn:request-builder>
-                <httpn:simple-request-builder>
-                    <httpn:query-params>
-                        <httpn:query-param key="query" value="param"/>
-                    </httpn:query-params>
-                    <httpn:headers>
-                        <httpn:header key="X-Custom" value="custom-value"/>
-                    </httpn:headers>
-                </httpn:simple-request-builder>
+                <httpn:query-params>
+                    <httpn:query-param key="query" value="param"/>
+                </httpn:query-params>
+                <httpn:headers>
+                    <httpn:header key="X-Custom" value="custom-value"/>
+                </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
     </flow>

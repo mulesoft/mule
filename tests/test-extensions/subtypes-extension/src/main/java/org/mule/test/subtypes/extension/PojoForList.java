@@ -6,6 +6,9 @@
  */
 package org.mule.test.subtypes.extension;
 
+import org.mule.runtime.extension.api.annotation.Extensible;
+
+@Extensible
 public class PojoForList
 {
 

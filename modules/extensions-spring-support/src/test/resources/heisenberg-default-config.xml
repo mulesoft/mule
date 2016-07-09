@@ -27,19 +27,12 @@
         </heisenberg:enemies>
         <heisenberg:ricin-packs>
             <heisenberg:ricin microgramsPerKilo="22">
-                <heisenberg:destination>
-                    <heisenberg:door victim="Lidia" address="Stevia coffe shop"/>
-                </heisenberg:destination>
+                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door>
-            <heisenberg:door address="pollos hermanos" victim="Gustavo Fring">
-                <heisenberg:previous>
-                    <heisenberg:door victim="Krazy-8" address="Jesse's"/>
-                </heisenberg:previous>
-            </heisenberg:door>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>
-
     </heisenberg:config>
 
     <flow name="sayMyName">

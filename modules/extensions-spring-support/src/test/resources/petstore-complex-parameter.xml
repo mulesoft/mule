@@ -23,32 +23,25 @@
 
     <petstore:config name="configWithReferences">
         <petstore:connection username="john" password="doe"/>
-        <petstore:cage>
-            <petstore:pet-cage birds="#[app.registry.birds]" ammenities="#[app.registry.ammenities]"/>
-        </petstore:cage>
+        <petstore:cage birds="#[app.registry.birds]" ammenities="#[app.registry.ammenities]"/>
     </petstore:config>
 
     <petstore:config name="configWithMELReferences">
         <petstore:connection username="john" password="doe"/>
-        <petstore:cage>
-            <petstore:pet-cage ammenities="#[['spinning wheel', 'food can']]"
-                               birds="#[['mockingjay':15, 'mockingbird': 10]]"/>
-        </petstore:cage>
+        <petstore:cage ammenities="#[['spinning wheel', 'food can']]" birds="#[['mockingjay':15, 'mockingbird': 10]]"/>
     </petstore:config>
 
     <petstore:config name="configWithChildElements">
         <petstore:connection username="john" password="doe"/>
         <petstore:cage>
-            <petstore:pet-cage>
-                <petstore:birds>
-                    <petstore:bird key="mockingjay" value="15"/>
-                    <petstore:bird key="mockingbird" value="10"/>
-                </petstore:birds>
-                <petstore:ammenities>
-                    <petstore:ammenity value="spinning wheel"/>
-                    <petstore:ammenity value="food can"/>
-                </petstore:ammenities>
-            </petstore:pet-cage>
+            <petstore:birds>
+                <petstore:bird key="mockingjay" value="15"/>
+                <petstore:bird key="mockingbird" value="10"/>
+            </petstore:birds>
+            <petstore:ammenities>
+                <petstore:ammenity value="spinning wheel"/>
+                <petstore:ammenity value="food can"/>
+            </petstore:ammenities>
         </petstore:cage>
     </petstore:config>
 

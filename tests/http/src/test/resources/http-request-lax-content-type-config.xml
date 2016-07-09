@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
@@ -21,11 +21,9 @@
 
         <httpn:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET"  key="ANY">
             <httpn:request-builder>
-                <httpn:simple-request-builder>
-                    <httpn:headers>
-                        <httpn:header key="Content-Type" value="invalidMimeType"/>
-                    </httpn:headers>
-                </httpn:simple-request-builder>
+                <httpn:headers>
+                    <httpn:header key="Content-Type" value="invalidMimeType"/>
+                </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
     </flow>

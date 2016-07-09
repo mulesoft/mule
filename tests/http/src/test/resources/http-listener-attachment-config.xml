@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
@@ -14,9 +14,7 @@
 
     <flow name="testFlow1">
         <httpn:listener config-ref="listenerConfig" path="${formDataPath}">
-            <httpn:response-builder>
-                <httpn:simple-response-builder partsRef="#[parts]"/>
-            </httpn:response-builder>
+            <httpn:response-builder partsRef="#[parts]"/>
         </httpn:listener>
         <custom-processor
                 class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$ConvertPartsMessageProcessor"/>
@@ -26,12 +24,10 @@
 
     <flow name="testFlow2">
         <httpn:listener config-ref="listenerConfig" path="${mixedPath}">
-            <httpn:response-builder>
-                <httpn:simple-response-builder partsRef="#[parts]">
-                    <httpn:headers>
-                        <httpn:header key="Content-Type" value="multipart/mixed"/>
-                    </httpn:headers>
-                </httpn:simple-response-builder>
+            <httpn:response-builder partsRef="#[parts]">
+                <httpn:headers>
+                    <httpn:header key="Content-Type" value="multipart/mixed"/>
+                </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
         <custom-processor
@@ -42,9 +38,7 @@
 
     <flow name="testFlow3">
         <httpn:listener config-ref="listenerConfig" path="${contentLength}">
-            <httpn:response-builder>
-                <httpn:simple-response-builder partsRef="#[parts]"/>
-            </httpn:response-builder>
+            <httpn:response-builder partsRef="#[parts]"/>
         </httpn:listener>
         <custom-processor
                 class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartMessageProcessor"/>
@@ -53,9 +47,7 @@
 
     <flow name="testFlow4">
         <httpn:listener config-ref="listenerConfig" path="${chunked}" responseStreamingMode="ALWAYS">
-            <httpn:response-builder>
-                <httpn:simple-response-builder partsRef="#[parts]"/>
-            </httpn:response-builder>
+            <httpn:response-builder partsRef="#[parts]"/>
         </httpn:listener>
         <custom-processor
                 class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartMessageProcessor"/>
@@ -64,9 +56,7 @@
 
     <flow name="testFlow5">
         <httpn:listener config-ref="listenerConfig" path="${filePath}">
-            <httpn:response-builder>
-                <httpn:simple-response-builder partsRef="#[parts]"/>
-            </httpn:response-builder>
+            <httpn:response-builder partsRef="#[parts]"/>
         </httpn:listener>
         <custom-processor
                 class="org.mule.runtime.module.http.functional.listener.HttpListenerAttachmentsTestCase$CreatePartsMessageProcessor"/>
@@ -77,11 +67,9 @@
     <flow name="fixedPart">
         <httpn:listener config-ref="listenerConfig" path="fixedPart">
             <httpn:response-builder>
-                <httpn:simple-response-builder>
-                    <httpn:parts>
-                        <httpn:part id="field1" data="yes" contentType="text/json"/>
-                    </httpn:parts>
-                </httpn:simple-response-builder>
+                <httpn:parts>
+                    <httpn:part id="field1" data="yes" contentType="text/json"/>
+                </httpn:parts>
             </httpn:response-builder>
         </httpn:listener>
         <echo-component/>

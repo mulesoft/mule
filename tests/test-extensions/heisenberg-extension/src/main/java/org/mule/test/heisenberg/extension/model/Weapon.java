@@ -6,6 +6,9 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
+import org.mule.runtime.extension.api.annotation.Extensible;
+
+@Extensible
 public interface Weapon
 {
 

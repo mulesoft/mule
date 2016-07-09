@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
@@ -20,21 +20,15 @@
 
     <flow name="proxyTemplate">
         <httpn:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO" parseRequest="false">
-            <httpn:response-builder>
-                <httpn:simple-response-builder statusCode="#[message.getAttributes().getStatusCode()]"
-                                             reasonPhrase="#[message.getAttributes().getReasonPhrase()]"
-                                               headersRef="#[message.getAttributes().getHeaders()]"
-                                             />
-            </httpn:response-builder>
+            <httpn:response-builder statusCode="#[message.getAttributes().getStatusCode()]"
+                                    reasonPhrase="#[message.getAttributes().getReasonPhrase()]"
+                                    headersRef="#[message.getAttributes().getHeaders()]" />
         </httpn:listener>
 
         <processor ref="sensingRequestResponseProcessor" />
 
         <httpn:request config-ref="requestConfig" method="#[message.getAttributes().getMethod()]" path="#[message.getAttributes().getRequestPath()]" parseResponse="false"  key="ANY">
-            <httpn:request-builder>
-                <httpn:simple-request-builder queryParams="#[message.getAttributes().getQueryParams()]"
-                                                 headers="#[message.getAttributes().getHeaders()]"/>
-            </httpn:request-builder>
+            <httpn:request-builder queryParams="#[message.getAttributes().getQueryParams()]" headers="#[message.getAttributes().getHeaders()]"/>
         </httpn:request>
 
     </flow>

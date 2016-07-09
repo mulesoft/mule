@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
@@ -16,11 +16,9 @@
                 <httpn:success-status-code-validator values="0..599" />
             </httpn:response-validator>
             <httpn:request-builder>
-                <httpn:simple-request-builder>
-                    <httpn:headers>
-                        <httpn:header key="Expect" value="Continue"/>
-                    </httpn:headers>
-                </httpn:simple-request-builder>
+                <httpn:headers>
+                    <httpn:header key="Expect" value="Continue"/>
+                </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
     </flow>

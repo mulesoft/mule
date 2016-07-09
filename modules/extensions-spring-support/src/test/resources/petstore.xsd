@@ -31,9 +31,9 @@
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="cage">
                             <xs:complexType>
-                                <xs:sequence minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" minOccurs="0" maxOccurs="1" ref="petstore:abstract-pet-cage"></xs:element>
-                                </xs:sequence>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PetCage"></xs:extension>
+                                </xs:complexContent>
                             </xs:complexType>
                         </xs:element>
                     </xs:sequence>
@@ -76,12 +76,19 @@
                 </xs:sequence>
                 <xs:attribute type="mule:expressionMap" use="optional" name="birds"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="ammenities"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-pet-cage"></xs:element>
-    <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" type="petstore:org.mule.test.petstore.extension.PetCage" substitutionGroup="petstore:abstract-pet-cage" name="pet-cage"></xs:element>
+    <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" substitutionGroup="petstore:abstract-pet-cage" name="pet-cage">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="petstore:org.mule.test.petstore.extension.PetCage">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="connection">
         <xs:complexType>
             <xs:complexContent>

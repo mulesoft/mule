@@ -23,7 +23,7 @@ import javax.activation.DataHandler;
  *
  * @since 4.0
  */
-@Alias("simple-response-builder")
+@Alias("response-builder")
 public class HttpListenerResponseBuilder extends HttpMessageBuilder
 {
     /**

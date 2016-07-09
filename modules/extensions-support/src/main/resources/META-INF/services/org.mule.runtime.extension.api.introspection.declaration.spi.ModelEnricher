@@ -6,3 +6,5 @@ org.mule.runtime.module.extension.internal.introspection.enricher.ConfigNameMode
 org.mule.runtime.module.extension.internal.introspection.enricher.ClassLoaderModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ExportModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ImportedTypesModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.SubTypesModelEnricher

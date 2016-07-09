@@ -24,4 +24,7 @@ public class GlobalPojoConnector
     @Expression(ExpressionSupport.REQUIRED)
     private Owner requiredPojoExpressionRequired;
 
+    @Parameter
+    private ExtensibleOwner requiredExtensiblePojo;
+
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:email="http://www.mulesoft.org/schema/mule/email"
-      xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
@@ -47,9 +47,7 @@
 
     <flow name="forwardEmailWithContent">
         <email:forward config-ref="config" subject="Email Subject">
-            <email:content>
-                <email:email-content body="More Content To Forward"/>
-            </email:content>
+            <email:content body="More Content To Forward"/>
             <email:to-addresses>
                 <email:to-address value="pablo.musumeci@mulesoft.com"/>
             </email:to-addresses>
@@ -58,9 +56,7 @@
 
     <flow name="sendEncodedMessage">
         <email:send config-ref="config" subject="Email Subject">
-            <email:content>
-                <email:email-content body="#[payload]" charset="#[flowVars.encoding]"/>
-            </email:content>
+            <email:content body="#[payload]" charset="#[flowVars.encoding]"/>
             <email:to-addresses>
                 <email:to-address value="pablo.musumeci@mulesoft.com"/>
             </email:to-addresses>

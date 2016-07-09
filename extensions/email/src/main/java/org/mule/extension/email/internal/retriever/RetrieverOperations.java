@@ -7,7 +7,6 @@
 package org.mule.extension.email.internal.retriever;
 
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.INBOX_FOLDER;
-
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailPredicateBuilder;
 import org.mule.extension.email.internal.commands.DeleteCommand;
@@ -41,16 +40,16 @@ public class RetrieverOperations
      * @param config        the {@link RetrieverConfiguration} associated to this operation.
      * @param connection    the corresponding {@link RetrieverConnection} instance.
      * @param mailboxFolder the mailbox folder where the emails are going to be fetched
-     * @param matchWith     a {@link EmailPredicateBuilder} used to filter the output emails.
+     * @param matcher       a {@link EmailPredicateBuilder} used to filter the output emails.
      * @return a {@link List} of {@link MuleMessage} carrying all the emails and it's corresponding attributes.
      */
     //TODO: ADD PAGINATION SUPPORT WHEN AVAILABLE
     public List<MuleMessage> list(@UseConfig RetrieverConfiguration config,
                                   @Connection RetrieverConnection connection,
                                   @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                  @Optional EmailPredicateBuilder matchWith)
+                                  @Optional EmailPredicateBuilder matcher)
     {
-        return listCommand.list(connection, mailboxFolder, config.isEagerlyFetchContent(), buildMatcher(matchWith));
+        return listCommand.list(connection, mailboxFolder, config.isEagerlyFetchContent(), buildMatcher(matcher));
     }
 
     /**
@@ -69,7 +68,7 @@ public class RetrieverOperations
      *
      * @param connection     the associated {@link RetrieverConnection}.
      * @param muleMessage    the incoming {@link MuleMessage}.
-     * @param mailboxFolder     the name of the folder where the email(s) is going to be fetched.
+     * @param mailboxFolder  the name of the folder where the email(s) is going to be fetched.
      * @param localDirectory the localDirectory where the emails are going to be stored.
      * @param fileName       the name of the file that is going to be stored. The operation will append the email number and received date in the end.
      * @param emailId        the optional number of the email to be marked. for default the email is taken from the incoming {@link MuleMessage}.
@@ -87,9 +86,9 @@ public class RetrieverOperations
         storeCommand.store(connection, muleMessage, mailboxFolder, localDirectory, fileName, emailId, overwrite);
     }
 
-    private Predicate<EmailAttributes> buildMatcher(EmailPredicateBuilder matchWith)
+    private Predicate<EmailAttributes> buildMatcher(EmailPredicateBuilder matcher)
     {
-        return matchWith != null ? matchWith.build() : attributes -> true;
+        return matcher != null ? matcher.build() : attributes -> true;
     }
 
     /**
@@ -101,10 +100,10 @@ public class RetrieverOperations
      * If no {@code emailId} is provided and no emails are found in the incoming {@link MuleMessage} this operation will fail
      * and no email is going to be erased from the folder, not even the ones marked as DELETED previously.
      *
-     * @param message    the incoming {@link MuleMessage}.
-     * @param connection the corresponding {@link RetrieverConnection} instance.
-     * @param mailboxFolder     the folder where the emails are going to be fetched
-     * @param emailId    an optional email number to look up in the folder, if there is no email in the incoming {@link MuleMessage}.
+     * @param message       the incoming {@link MuleMessage}.
+     * @param connection    the corresponding {@link RetrieverConnection} instance.
+     * @param mailboxFolder the folder where the emails are going to be fetched
+     * @param emailId       an optional email number to look up in the folder, if there is no email in the incoming {@link MuleMessage}.
      */
     public void delete(MuleMessage message,
                        @Connection RetrieverConnection connection,

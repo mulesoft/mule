@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import static org.mule.runtime.module.extension.internal.xml.XmlModelUtils.createXmlModelProperty;
+
+import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.createXmlModelProperty;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 
 /**
  * Verifies if the extension is annotated with {@link Xml} and if so, enriches the {@link ExtensionDeclarer}

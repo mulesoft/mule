@@ -10,6 +10,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.extension.xml.dsl.api.DslElementDeclaration;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -28,7 +29,7 @@ public class MediaTypeValueResolverParsingDelegate implements ValueResolverParsi
     }
 
     @Override
-    public ValueResolver<Object> parse(String key, MetadataType metadataType)
+    public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementDeclaration elementDsl)
     {
         return new StaticValueResolver<>(DataType.builder().mediaType(key).build().getMediaType());
     }
