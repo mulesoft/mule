@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
@@ -16,21 +16,17 @@
 
     <flow name="requestFlow">
         <httpn:request config-ref="requestConfig" path="path" method="POST"  key="ANY">
-            <httpn:request-builder>
-                <httpn:simple-request-builder parts="#[parts]"/>
-            </httpn:request-builder>
+            <httpn:request-builder parts="#[parts]"/>
         </httpn:request>
     </flow>
 
     <flow name="requestPartFlow">
         <httpn:request config-ref="requestConfig" path="path" method="POST"  key="ANY">
             <httpn:request-builder>
-                <httpn:simple-request-builder>
-                    <httpn:parts>
-                        <httpn:part id="part1" data="#['content 1']" contentType="text/plain"/>
-                        <httpn:part id="part2" data="#['content 2'.getBytes()]" contentType="text/plain" filename="myPart.txt"/>
-                    </httpn:parts>
-                </httpn:simple-request-builder>
+                <httpn:parts>
+                    <httpn:part id="part1" data="#['content 1']" contentType="text/plain"/>
+                    <httpn:part id="part2" data="#['content 2'.getBytes()]" contentType="text/plain" filename="myPart.txt"/>
+                </httpn:parts>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -51,9 +47,7 @@
 
     <flow name="requestFlowTls">
         <httpn:request config-ref="requestConfigTls" path="path" method="POST" responseTimeout="5000"  key="ANY">
-            <httpn:request-builder>
-                <httpn:simple-request-builder parts="#[parts]"/>
-            </httpn:request-builder>
+            <httpn:request-builder parts="#[parts]"/>
         </httpn:request>
     </flow>
 

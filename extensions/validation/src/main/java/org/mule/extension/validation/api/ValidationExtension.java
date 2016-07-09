@@ -58,7 +58,7 @@ public class ValidationExtension extends AbstractAnnotatedObject implements Conf
 {
 
     public static final String DEFAULT_LOCALE = Locale.getDefault().getLanguage();
-    private static final String EXCEPTION_FACTORY_PARAMETER_NAME = "exceptionProvider";
+    private static final String EXCEPTION_FACTORY_PARAMETER_NAME = "exceptionFactory";
 
     private ValidationMessages messageFactory;
     private ExceptionFactory exceptionFactory;
@@ -71,7 +71,7 @@ public class ValidationExtension extends AbstractAnnotatedObject implements Conf
 
     @Parameter
     @Optional
-    private I18NConfig i18nConfig;
+    private I18NConfig i18n;
 
 
     @Override
@@ -83,13 +83,13 @@ public class ValidationExtension extends AbstractAnnotatedObject implements Conf
 
     private void initialiseMessageFactory()
     {
-        if (i18nConfig == null)
+        if (i18n == null)
         {
             messageFactory = new ValidationMessages();
         }
         else
         {
-            messageFactory = new ValidationMessages(i18nConfig.getBundlePath(), i18nConfig.getLocale());
+            messageFactory = new ValidationMessages(i18n.getBundlePath(), i18n.getLocale());
         }
     }
 

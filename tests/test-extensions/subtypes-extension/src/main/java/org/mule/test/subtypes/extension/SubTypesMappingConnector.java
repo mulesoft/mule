@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.Ricin;
+import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.vegan.extension.VeganCookBook;
 import org.mule.test.vegan.extension.VeganExtension;
 
@@ -29,6 +30,7 @@ import java.util.List;
 @SubTypeMapping(baseType = ParentShape.class, subTypes = {Square.class, Triangle.class})
 @SubTypeMapping(baseType = Door.class, subTypes = {HouseDoor.class, CarDoor.class})
 @Import(type = Ricin.class, from = HeisenbergExtension.class)
+@Import(type = Weapon.class, from = HeisenbergExtension.class)
 @Import(type = VeganCookBook.class, from = VeganExtension.class)
 @Export(classes = {Revolver.class})
 @Xml(namespace = "subtypes", namespaceLocation = "http://www.mulesoft.org/schema/mule/subtypes")
@@ -45,13 +47,19 @@ public class SubTypesMappingConnector
     private Square explicitSquare;
 
     @Parameter
-    private FinalPojo simplePojo;
+    private FinalPojo finalPojo;
 
     @Parameter
-    private Ricin importedRicin;
+    private Ricin ricin;
+
+    @Parameter
+    private Weapon extensibleWeapon;
 
     @Parameter
     private ParentShape triangle;
+
+    @Parameter
+    private ExtensiblePojo pojoWithExtension;
 
     @Parameter
     private List<PojoForList> pojoListOne;
@@ -67,6 +75,11 @@ public class SubTypesMappingConnector
     public List<PojoForList> getPojoListTwo()
     {
         return pojoListTwo;
+    }
+
+    public ExtensiblePojo getExtensiblePojo()
+    {
+        return pojoWithExtension;
     }
 
     public ParentShape getAbstractShape()
@@ -86,7 +99,7 @@ public class SubTypesMappingConnector
 
     public FinalPojo getFinalPojo()
     {
-        return simplePojo;
+        return finalPojo;
     }
 
     public ParentShape getTriangle()
@@ -96,7 +109,7 @@ public class SubTypesMappingConnector
 
     public Ricin getRicin()
     {
-        return importedRicin;
+        return ricin;
     }
 
 }

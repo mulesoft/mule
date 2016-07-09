@@ -8,7 +8,8 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -16,6 +17,7 @@ import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -26,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * {@link ModelValidator} which applies to {@link ExtensionModel}s.
@@ -50,6 +51,25 @@ public final class SubtypesModelValidator implements ModelValidator
             validateNonAbstractSubtypes(model, typesMapping.get());
             validateSubtypesExtendOrImplementBaseType(model, typesMapping.get());
             validateSubtypesNameClashing(model, typesMapping.get());
+            validateBaseTypeNotFinal(model, typesMapping.get());
+        }
+    }
+
+    private void validateBaseTypeNotFinal(ExtensionModel model, Map<MetadataType, List<MetadataType>> typesMapping)
+    {
+        List<String> finalBaseTypes = typesMapping.keySet().stream()
+                .filter(MetadataTypeUtils::isFinal)
+                .map(base -> base.getAnnotation(TypeIdAnnotation.class).stream().findFirst()
+                        .map(TypeIdAnnotation::getValue)
+                        .orElse(getType(base).getName()))
+                .collect(toList());
+
+        if (!finalBaseTypes.isEmpty())
+        {
+            throw new IllegalModelDefinitionException(
+                    String.format("All the declared SubtypesMapping in extension %s should have non final base types, but [%s] are final",
+                                  model.getName(), Arrays.toString(finalBaseTypes.toArray()))
+            );
         }
     }
 
@@ -100,13 +120,14 @@ public final class SubtypesModelValidator implements ModelValidator
 
         ImmutableList<MetadataType> mappedTypes = ImmutableList.<MetadataType>builder()
                 .addAll(typesMapping.keySet())
-                .addAll(typesMapping.values().stream().flatMap(Collection::stream).collect(Collectors.toList())).build();
+                .addAll(typesMapping.values().stream().flatMap(Collection::stream).collect(toList()))
+                .build();
 
         Map<String, MetadataType> typesByName = new HashMap<>();
-        for (MetadataType type: mappedTypes)
+        for (MetadataType type : mappedTypes)
         {
             MetadataType previousType = typesByName.put(getTopLevelTypeName(type), type);
-            if (previousType != null  && !previousType.equals(type))
+            if (previousType != null && !previousType.equals(type))
             {
                 throw new IllegalModelDefinitionException(
                         String.format("Subtypes mapped Type [%s] with alias [%s] in extension [%s] should have a different alias name " +

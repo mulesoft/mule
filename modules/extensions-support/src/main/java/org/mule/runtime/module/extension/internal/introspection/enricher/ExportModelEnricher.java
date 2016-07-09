@@ -7,8 +7,12 @@
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static java.util.Arrays.stream;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 
 /**
@@ -26,9 +30,11 @@ public class ExportModelEnricher extends AbstractAnnotatedModelEnricher
         Export exportAnnotation = extractAnnotation(describingContext.getExtensionDeclarer().getDeclaration(), Export.class);
         if (exportAnnotation != null)
         {
+            final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+
             describingContext.getExtensionDeclarer().withModelProperty(
-                    new ExportModelProperty(copyOf(exportAnnotation.classes()),
-                                            copyOf(exportAnnotation.resources())));
+                    new ExportModelProperty(stream(exportAnnotation.classes()).map(typeLoader::load)
+                                                    .collect(new ImmutableListCollector<>()), copyOf(exportAnnotation.resources())));
         }
     }
 }

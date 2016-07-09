@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.test.heisenberg.extension.model.Weapon;
 
-public class Revolver implements Weapon
+public final class Revolver implements Weapon
 {
 
     @Parameter

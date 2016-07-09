@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.module.extension.internal.config.ExtensionNamespaceHandler;
 

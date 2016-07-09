@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.introspection.describer;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
@@ -21,14 +20,12 @@ import static org.mule.runtime.module.extension.internal.introspection.describer
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseMetadataAnnotations;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseParameters;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getInterfaceGenerics;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
@@ -48,7 +45,6 @@ import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -56,14 +52,10 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.ExtensionOf;
-import org.mule.runtime.extension.api.annotation.Import;
-import org.mule.runtime.extension.api.annotation.ImportedTypes;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.SubTypeMapping;
-import org.mule.runtime.extension.api.annotation.SubTypesMapping;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -95,9 +87,7 @@ import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherF
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.runtime.extension.api.introspection.property.DisplayModelPropertyBuilder;
-import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
@@ -207,8 +197,6 @@ public final class AnnotationsBasedDescriber implements Describer
                 .withExceptionEnricherFactory(getExceptionEnricherFactory(extensionType))
                 .withModelProperty(new ImplementingTypeModelProperty(extensionType));
 
-        declareSubTypesMapping(declaration, extensionType);
-        declareImportedTypes(declaration, extensionType);
         declareConfigurations(declaration, extensionType);
         declareOperations(declaration, extensionType);
         declareConnectionProviders(declaration, extensionType);
@@ -220,48 +208,6 @@ public final class AnnotationsBasedDescriber implements Describer
     private String getVersion(Extension extension)
     {
         return versionResolver.resolveVersion(extension);
-    }
-
-    private void declareSubTypesMapping(ExtensionDeclarer declaration, Class<?> extensionType)
-    {
-        List<SubTypeMapping> typeMappings = parseRepeatableAnnotation(extensionType, SubTypeMapping.class, c -> ((SubTypesMapping) c).value());
-
-        if (!typeMappings.isEmpty())
-        {
-            if (typeMappings.stream().map(SubTypeMapping::baseType).distinct().collect(toList()).size() != typeMappings.size())
-            {
-                throw new IllegalModelDefinitionException(String.format("There should be only one SubtypeMapping for any given base type in extension [%s]." +
-                                                                        " Duplicated base types are not allowed", declaration.getDeclaration().getName()));
-            }
-
-            Map<MetadataType, List<MetadataType>> subTypesMap = typeMappings.stream().collect(
-                    new ImmutableMapCollector<>(mapping -> getMetadataType(mapping.baseType(), typeLoader),
-                                                mapping -> stream(mapping.subTypes())
-                                                        .map(subType -> getMetadataType(subType, typeLoader))
-                                                        .collect(new ImmutableListCollector<>())));
-
-            declaration.withModelProperty(new SubTypesModelProperty(subTypesMap));
-        }
-    }
-
-    private void declareImportedTypes(ExtensionDeclarer declaration, Class<?> extensionType)
-    {
-        List<Import> importTypes = parseRepeatableAnnotation(extensionType, Import.class, c -> ((ImportedTypes) c).value());
-
-        if (!importTypes.isEmpty())
-        {
-            if (importTypes.stream().map(Import::type).distinct().collect(toList()).size() != importTypes.size())
-            {
-                throw new IllegalModelDefinitionException(String.format("There should be only one Import declaration for any given type in extension [%s]." +
-                                                                        " Multiple imports of the same type are not allowed", declaration.getDeclaration().getName()));
-            }
-
-            Map<MetadataType, MetadataType> importedTypes = importTypes.stream().collect(
-                    new ImmutableMapCollector<>(imports -> getMetadataType(imports.type(), typeLoader),
-                                                imports -> getMetadataType(imports.from(), typeLoader)));
-
-            declaration.withModelProperty(new ImportedTypesModelProperty(importedTypes));
-        }
     }
 
     private void declareConfigurations(ExtensionDeclarer declaration, Class<?> extensionType)

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.extension.xml.dsl.api.DslElementDeclaration;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -32,10 +33,11 @@ public class DefaultValueResolverParsingDelegate implements ValueResolverParsing
     /**
      * @param key          the parsed entity key
      * @param metadataType a {@link MetadataType}
+     * @param dslElementResolver
      * @return A {@link ValueResolver} that performs a registry lookup using the given {@code key}
      */
     @Override
-    public ValueResolver<Object> parse(String key, MetadataType metadataType)
+    public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementDeclaration elementDsl)
     {
         return new RegistryLookupValueResolver<>(key);
     }

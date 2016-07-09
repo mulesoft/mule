@@ -10,7 +10,6 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.core.api.MuleContext;
@@ -18,7 +17,10 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
+import org.mule.runtime.extension.xml.dsl.api.DslElementDeclaration;
+import org.mule.runtime.extension.xml.dsl.api.resolver.DslElementResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
+import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
 /**
@@ -33,19 +35,23 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser
     private final RuntimeExtensionModel extensionModel;
     private final RuntimeSourceModel sourceModel;
     private final MuleContext muleContext;
+    private final DslElementDeclaration sourceDsl;
 
-    public SourceDefinitionParser(ComponentBuildingDefinition.Builder definition, RuntimeExtensionModel extensionModel, RuntimeSourceModel sourceModel, MuleContext muleContext)
+    public SourceDefinitionParser(ComponentBuildingDefinition.Builder definition, RuntimeExtensionModel extensionModel,
+                                  RuntimeSourceModel sourceModel, DslElementResolver dslElementResolver, MuleContext muleContext,
+                                  ExtensionParsingContext parsingContext)
     {
-        super(definition);
+        super(definition, dslElementResolver, parsingContext);
         this.extensionModel = extensionModel;
         this.sourceModel = sourceModel;
         this.muleContext = muleContext;
+        this.sourceDsl = dslElementResolver.resolve(sourceModel);
     }
 
     @Override
     protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException
     {
-        definitionBuilder.withIdentifier(hyphenize(sourceModel.getName()))
+        definitionBuilder.withIdentifier(sourceDsl.getElementName())
                 .withTypeDefinition(fromType(ExtensionMessageSource.class))
                 .withObjectFactoryType(ExtensionSourceObjectFactory.class)
                 .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())

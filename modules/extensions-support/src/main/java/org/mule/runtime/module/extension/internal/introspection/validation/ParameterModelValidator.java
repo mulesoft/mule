@@ -10,9 +10,9 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.introspection.parameter.ParameterModel.RESERVED_NAMES;
+import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getAliasName;
 import org.mule.metadata.api.model.ArrayType;
@@ -29,18 +29,14 @@ import org.mule.runtime.extension.api.introspection.connection.ConnectionProvide
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
-import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -66,7 +62,6 @@ public final class ParameterModelValidator implements ModelValidator
     private static final String SOURCE = "source";
 
     private SubTypesMappingContainer subTypesMapping;
-    private Map<MetadataType, MetadataType> importedTypes;
 
     @Override
     public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
@@ -119,9 +114,6 @@ public final class ParameterModelValidator implements ModelValidator
                 .map(p -> new SubTypesMappingContainer(p.getSubTypesMapping()));
         subTypesMapping = typesMapping.isPresent() ? typesMapping.get() : new SubTypesMappingContainer(emptyMap());
 
-        Optional<Map<MetadataType, MetadataType>> typeImports = extensionModel.getModelProperty(ImportedTypesModelProperty.class)
-                .map(ImportedTypesModelProperty::getImportedTypes);
-        importedTypes = typeImports.isPresent() ? typeImports.get() : ImmutableMap.of();
 
         String extensionModelName = extensionModel.getName();
         new ExtensionWalker()
@@ -170,15 +162,6 @@ public final class ParameterModelValidator implements ModelValidator
                                   getTopLevelTypeName(subTypeWithNameCollision.get()), ownerModelType, ownerName, extensionName,
                                   getType(subTypeWithNameCollision.get()).getSimpleName(), parameterModel.getName()));
         }
-
-        if (isInstantiable(getType(parameterModel.getType())) && parameterNames.contains(getTopLevelTypeName(parameterModel.getType())))
-        {
-            throw new IllegalParameterModelDefinitionException(
-                    String.format("The parameter [%s] in the %s [%s] from the extension [%s] can't have the same name as the ClassName or Alias of its declared type [%s]",
-                                  getTopLevelTypeName(parameterModel.getType()), ownerModelType, ownerName, extensionName,
-                                  getType(parameterModel.getType()).getSimpleName()));
-        }
-
     }
 
     private void validateParameterGroup(ParameterModel parameterModel, String ownerName, String ownerModelType, String extensionName)

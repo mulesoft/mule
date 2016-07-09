@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
 import static org.apache.commons.lang.StringUtils.capitalize;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TYPE_SUFFIX;

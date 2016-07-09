@@ -11,12 +11,19 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionInt" use="optional" name="area"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-parent-shape"></xs:element>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ParentShape" substitutionGroup="subtypes:abstract-parent-shape" name="parent-shape"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-parent-shape" name="parent-shape">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.ParentShape">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.Square">
         <xs:complexContent>
             <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.ParentShape">
@@ -25,7 +32,15 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-parent-shape" abstract="true" name="abstract-square"></xs:element>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Square" substitutionGroup="subtypes:abstract-square" name="square"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-square" name="square">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.Square">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.Triangle">
         <xs:complexContent>
             <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.ParentShape">
@@ -34,12 +49,18 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-parent-shape" abstract="true" name="abstract-triangle-alias"></xs:element>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Triangle" substitutionGroup="subtypes:abstract-triangle-alias" name="triangle-alias"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-triangle-alias" name="triangle-alias">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.Triangle">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.Door">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-            </xs:extension>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Door" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-door"></xs:element>
@@ -52,7 +73,15 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-door" abstract="true" name="abstract-house-door"></xs:element>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.HouseDoor" substitutionGroup="subtypes:abstract-house-door" name="house-door"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-house-door" name="house-door">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.HouseDoor">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.CarDoor">
         <xs:complexContent>
             <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.Door">
@@ -62,17 +91,32 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-door" abstract="true" name="abstract-car-door"></xs:element>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.CarDoor" substitutionGroup="subtypes:abstract-car-door" name="car-door"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-car-door" name="car-door">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.CarDoor">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.Revolver">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionInt" use="optional" default="6" name="bullets"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-revolver"></xs:element>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Revolver" substitutionGroup="subtypes:abstract-revolver" name="revolver"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-revolver" name="revolver">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.Revolver">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
         <xs:complexType>
             <xs:complexContent>
@@ -99,22 +143,29 @@
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="explicit-square">
                             <xs:complexType>
-                                <xs:sequence minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-square"></xs:element>
-                                </xs:sequence>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.Square"></xs:extension>
+                                </xs:complexContent>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="simple-pojo">
+                        <xs:element minOccurs="0" maxOccurs="1" name="final-pojo">
                             <xs:complexType>
-                                <xs:sequence minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-final-pojo"></xs:element>
-                                </xs:sequence>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.FinalPojo"></xs:extension>
+                                </xs:complexContent>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="imported-ricin">
+                        <xs:element minOccurs="0" maxOccurs="1" name="ricin">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.Ricin"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="extensible-weapon">
                             <xs:complexType>
                                 <xs:sequence minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-ricin"></xs:element>
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -122,6 +173,13 @@
                             <xs:complexType>
                                 <xs:sequence minOccurs="1" maxOccurs="1">
                                     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="pojo-with-extension">
+                            <xs:complexType>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-extensible-pojo"></xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -144,9 +202,11 @@
                     <xs:attribute type="mule:expressionObject" use="optional" name="abstractShape"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="doorInterface"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="explicitSquare"></xs:attribute>
-                    <xs:attribute type="mule:expressionObject" use="optional" name="simplePojo"></xs:attribute>
-                    <xs:attribute type="mule:expressionObject" use="optional" name="importedRicin"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="finalPojo"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="ricin"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="extensibleWeapon"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="optional" name="triangle"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="pojoWithExtension"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="pojoListOne"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="pojoListTwo"></xs:attribute>
                 </xs:extension>
@@ -157,22 +217,67 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionString" use="optional" name="someString"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-final-pojo"></xs:element>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.FinalPojo" substitutionGroup="subtypes:abstract-final-pojo" name="final-pojo"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-final-pojo" name="final-pojo">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.FinalPojo">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.ExtensiblePojo">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="numbers">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="number">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionList" use="optional" name="numbers"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="myString"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-extensible-pojo"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-extensible-pojo" name="extensible-pojo">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.ExtensiblePojo">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.PojoForList">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionString" use="optional" name="id"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-pojo-for-list"></xs:element>
-    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.PojoForList" substitutionGroup="subtypes:abstract-pojo-for-list" name="pojo-for-list"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-pojo-for-list" name="pojo-for-list">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.PojoForList">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="connection">
         <xs:complexType>
             <xs:complexContent>
@@ -332,11 +437,11 @@
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" name="final-pojo-param">
+                    <xs:element minOccurs="0" maxOccurs="1" name="final-pojo">
                         <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-final-pojo"></xs:element>
-                            </xs:sequence>
+                            <xs:complexContent>
+                                <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.FinalPojo"></xs:extension>
+                            </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
@@ -368,7 +473,7 @@
                 </xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="baseShape"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="door"></xs:attribute>
-                <xs:attribute type="mule:expressionObject" use="optional" name="finalPojoParam"></xs:attribute>
+                <xs:attribute type="mule:expressionObject" use="optional" name="finalPojo"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="cookBook"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="squareShape"></xs:attribute>
                 <xs:attribute type="mule:expressionObject" use="optional" name="triangle"></xs:attribute>

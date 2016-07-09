@@ -7,9 +7,7 @@
     <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
     <xs:complexType name="org.mule.test.metadata.extension.model.animals.Animal">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-            </xs:extension>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="metadata:org.mule.test.metadata.extension.model.animals.Animal" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-animal"></xs:element>
@@ -21,12 +19,19 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-animal" abstract="true" name="abstract-bear"></xs:element>
-    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" type="metadata:org.mule.test.metadata.extension.model.animals.Bear" substitutionGroup="metadata:abstract-bear" name="bear"></xs:element>
+    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-bear" name="bear">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="metadata:org.mule.test.metadata.extension.model.animals.Bear">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.metadata.extension.model.shapes.Shape">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionString" use="optional" name="color"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -39,7 +44,15 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-shape" abstract="true" name="abstract-circle"></xs:element>
-    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" type="metadata:org.mule.test.metadata.extension.model.shapes.Circle" substitutionGroup="metadata:abstract-circle" name="circle"></xs:element>
+    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-circle" name="circle">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="metadata:org.mule.test.metadata.extension.model.shapes.Circle">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.metadata.extension.model.shapes.Rectangle">
         <xs:complexContent>
             <xs:extension xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" base="metadata:org.mule.test.metadata.extension.model.shapes.Shape">
@@ -49,12 +62,18 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-shape" abstract="true" name="abstract-rectangle"></xs:element>
-    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" type="metadata:org.mule.test.metadata.extension.model.shapes.Rectangle" substitutionGroup="metadata:abstract-rectangle" name="rectangle"></xs:element>
+    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-rectangle" name="rectangle">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="metadata:org.mule.test.metadata.extension.model.shapes.Rectangle">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-            </xs:extension>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="metadata:org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-abstract-output-attributes"></xs:element>
@@ -67,7 +86,15 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-abstract-output-attributes" abstract="true" name="abstract-animals-output-attributes"></xs:element>
-    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" type="metadata:org.mule.test.metadata.extension.model.attribute.AnimalsOutputAttributes" substitutionGroup="metadata:abstract-animals-output-attributes" name="animals-output-attributes"></xs:element>
+    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-animals-output-attributes" name="animals-output-attributes">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="metadata:org.mule.test.metadata.extension.model.attribute.AnimalsOutputAttributes">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.metadata.extension.model.attribute.ShapeOutputAttributes">
         <xs:complexContent>
             <xs:extension xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" base="metadata:org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes">
@@ -77,14 +104,30 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-abstract-output-attributes" abstract="true" name="abstract-shape-output-attributes"></xs:element>
-    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" type="metadata:org.mule.test.metadata.extension.model.attribute.ShapeOutputAttributes" substitutionGroup="metadata:abstract-shape-output-attributes" name="shape-output-attributes"></xs:element>
+    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-shape-output-attributes" name="shape-output-attributes">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="metadata:org.mule.test.metadata.extension.model.attribute.ShapeOutputAttributes">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:complexType name="org.mule.test.metadata.extension.model.shapes.Square">
         <xs:complexContent>
             <xs:extension xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" base="metadata:org.mule.test.metadata.extension.model.shapes.Rectangle"></xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-rectangle" abstract="true" name="abstract-square"></xs:element>
-    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" type="metadata:org.mule.test.metadata.extension.model.shapes.Square" substitutionGroup="metadata:abstract-square" name="square"></xs:element>
+    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" substitutionGroup="metadata:abstract-square" name="square">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="metadata:org.mule.test.metadata.extension.model.shapes.Square">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
         <xs:complexType>
             <xs:complexContent>
@@ -150,26 +193,9 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentAndOutputCacheResolverType" substitutionGroup="mule:abstract-message-processor" name="content-and-output-cache-resolver"></xs:element>
-    <xs:complexType name="java.lang.Object">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="metadata:java.lang.Object" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-object"></xs:element>
     <xs:complexType name="ContentAndOutputCacheResolverType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -189,15 +215,6 @@
     <xs:complexType name="ContentAndOutputMetadataWithKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -217,15 +234,6 @@
     <xs:complexType name="ContentAndOutputMetadataWithoutKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -244,15 +252,6 @@
     <xs:complexType name="ContentMetadataWithKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -272,15 +271,6 @@
     <xs:complexType name="ContentMetadataWithoutKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -299,15 +289,6 @@
     <xs:complexType name="ContentMetadataWithoutKeysWithKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -322,15 +303,6 @@
     <xs:complexType name="ContentOnlyCacheResolverType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -350,15 +322,6 @@
     <xs:complexType name="ContentOnlyIgnoresOutputType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -373,15 +336,6 @@
     <xs:complexType name="FailWithResolvingExceptionType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -401,15 +355,6 @@
     <xs:complexType name="FailWithRuntimeExceptionType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -530,15 +475,6 @@
     <xs:complexType name="OutputMetadataWithKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -558,15 +494,6 @@
     <xs:complexType name="OutputMetadataWithoutKeyIdType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -621,15 +548,6 @@
     <xs:complexType name="ResolverContentWithContextClassLoaderType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -675,15 +593,6 @@
     <xs:complexType name="ShouldInheritExtensionResolversType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -698,15 +607,6 @@
     <xs:complexType name="ShouldInheritOperationParentResolversType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -721,15 +621,6 @@
     <xs:complexType name="ShouldInheritOperationResolversType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -749,15 +640,6 @@
     <xs:complexType name="SimpleMultiLevelKeyResolverType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="content">
-                        <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="0" maxOccurs="1" ref="metadata:abstract-object"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>

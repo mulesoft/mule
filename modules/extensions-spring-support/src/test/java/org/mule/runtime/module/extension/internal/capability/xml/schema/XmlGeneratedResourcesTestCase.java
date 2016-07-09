@@ -21,7 +21,7 @@ import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;

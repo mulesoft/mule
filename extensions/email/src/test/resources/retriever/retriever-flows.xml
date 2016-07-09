@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:email="http://www.mulesoft.org/schema/mule/email"
-      xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
@@ -11,9 +11,7 @@
 
     <flow name="retrieveMatchingSubjectAndFromAddress">
         <email:list config-ref="config">
-            <email:match-with>
-                <email:matcher subjectRegex="Email Subject" fromRegex="@mulesoft"/>
-            </email:match-with>
+            <email:matcher subjectRegex="Email Subject" fromRegex="@mulesoft"/>
         </email:list>
     </flow>
 

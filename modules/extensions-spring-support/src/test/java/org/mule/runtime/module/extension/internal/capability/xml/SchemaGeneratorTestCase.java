@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
@@ -95,7 +95,6 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase
 
         ExtensionDeclarer declarer = new AnnotationsBasedDescriber(extensionUnderTest, new StaticVersionResolver(getProductVersion())).describe(new DefaultDescribingContext(extensionUnderTest.getClassLoader()));
         ExtensionModel extensionModel = extensionFactory.createFrom(declarer, new DefaultDescribingContext(declarer, getClass().getClassLoader()));
-
         XmlModelProperty capability = extensionModel.getModelProperty(XmlModelProperty.class).get();
 
         String schema = generator.generate(extensionModel, capability);

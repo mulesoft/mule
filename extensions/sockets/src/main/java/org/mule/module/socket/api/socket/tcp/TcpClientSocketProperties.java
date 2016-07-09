@@ -6,6 +6,7 @@
  */
 package org.mule.module.socket.api.socket.tcp;
 
+import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -14,6 +15,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 4.0
  */
+@Extensible
 public class TcpClientSocketProperties extends AbstractTcpSocketProperties
 {
 

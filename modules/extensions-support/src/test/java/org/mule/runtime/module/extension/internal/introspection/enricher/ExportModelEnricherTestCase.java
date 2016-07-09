@@ -16,10 +16,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -51,6 +53,7 @@ public class ExportModelEnricherTestCase extends AbstractMuleTestCase
     private ExtensionDeclaration extensionDeclaration;
 
     private ExportModelEnricher enricher = new ExportModelEnricher();
+    private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
     @Before
     public void before()
@@ -71,7 +74,8 @@ public class ExportModelEnricherTestCase extends AbstractMuleTestCase
 
         ExportModelProperty property = captor.getValue();
         assertThat(property, is(notNullValue()));
-        assertThat(property.getExportedClasses(), hasItem(ExportModelEnricherTestCase.class));
+
+        assertThat(property.getExportedTypes(), hasItem(typeLoader.load(ExportModelEnricherTestCase.class)));
         assertThat(property.getExportedResources(), hasItem(EXPORTED_RESOURCE));
     }
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
@@ -37,12 +37,10 @@
 
     <flow name="redirectFlow">
         <httpn:listener path="redirectPath" config-ref="listenerConfig">
-            <httpn:response-builder>
-                <httpn:simple-response-builder statusCode="302">
-                    <httpn:headers>
-                        <httpn:header key="Location" value="http://localhost:${port}/path"/>
-                    </httpn:headers>
-                </httpn:simple-response-builder>
+            <httpn:response-builder statusCode="302">
+                <httpn:headers>
+                    <httpn:header key="Location" value="http://localhost:${port}/path"/>
+                </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
         <set-payload value="test-response"/>
@@ -55,9 +53,7 @@
 
     <flow name="failureStatusCodeFlow">
         <httpn:listener path="failurePath" config-ref="listenerConfig">
-            <httpn:response-builder>
-                <httpn:simple-response-builder statusCode="500"/>
-            </httpn:response-builder>
+            <httpn:response-builder statusCode="500"/>
         </httpn:listener>
         <set-payload value="test-response"/>
     </flow>

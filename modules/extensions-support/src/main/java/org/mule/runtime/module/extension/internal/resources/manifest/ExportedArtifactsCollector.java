@@ -25,9 +25,9 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
-import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -125,11 +125,8 @@ final class ExportedArtifactsCollector
 
     private void collectManuallyExportedPackages()
     {
-        Optional<ExportModelProperty> exportProperty = getExportModelProperty();
-        if (exportProperty.isPresent())
-        {
-            exportedClasses.addAll(exportProperty.get().getExportedClasses());
-        }
+        getExportModelProperty().map(ExportModelProperty::getExportedTypes)
+                .ifPresent(types -> types.forEach( c -> exportedClasses.add(getType(c))));
     }
 
     private Optional<ExportModelProperty> getExportModelProperty()

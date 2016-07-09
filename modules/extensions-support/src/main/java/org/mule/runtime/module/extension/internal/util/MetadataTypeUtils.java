@@ -7,18 +7,20 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
+import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 
 import com.google.common.collect.ImmutableList;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -96,7 +98,7 @@ public final class MetadataTypeUtils
             return baseType;
         }
 
-        boolean baseIsInstantiable = isInstantiable(getType(baseType, classLoader));
+        boolean baseIsInstantiable = isInstantiable(baseType);
         if (subTypes.size() == 1 && !baseIsInstantiable)
         {
             // avoid single type union
@@ -112,5 +114,26 @@ public final class MetadataTypeUtils
         UnionTypeBuilder<?> unionTypeBuilder = BaseTypeBuilder.create(baseType.getMetadataFormat()).unionType();
         union.build().forEach(unionTypeBuilder::of);
         return unionTypeBuilder.build();
+    }
+
+    public static boolean isInstantiable(MetadataType metadataType)
+    {
+        return org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation(metadataType, ClassInformationAnnotation.class)
+                .map(ClassInformationAnnotation::isInstantiable)
+                .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) &&
+                        IntrospectionUtils.isInstantiable(getType(metadataType)));
+    }
+
+    public static boolean hasExposedFields(MetadataType metadataType)
+    {
+        return metadataType instanceof ObjectType && !((ObjectType) metadataType).getFields().isEmpty();
+    }
+
+    public static boolean isFinal(MetadataType metadataType)
+    {
+        return org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation(metadataType, ClassInformationAnnotation.class)
+                .map(ClassInformationAnnotation::isFinal)
+                .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) &&
+                        Modifier.isFinal(getType(metadataType).getModifiers()));
     }
 }

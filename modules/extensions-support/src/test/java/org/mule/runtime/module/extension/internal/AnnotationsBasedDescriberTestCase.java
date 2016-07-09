@@ -42,7 +42,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
-
 import org.mule.api.MuleVersion;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
@@ -202,38 +201,38 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         List<ParameterDeclaration> params;
 
         OperationDeclaration dynamicContent = getOperation(declaration, "contentMetadataWithKeyId");
-        assertOutputType(dynamicContent.getOutputPayload(), toMetadataType(Object.class), true);
+        assertOutputType(dynamicContent.getOutput(), toMetadataType(Object.class), true);
         assertOutputType(dynamicContent.getOutputAttributes(), toMetadataType(void.class), false);
         params = dynamicContent.getParameters();
         assertParameterType(findParameter(params, "type"), toMetadataType(String.class), false);
         assertParameterType(findParameter(params, "content"), toMetadataType(Object.class), true);
 
         OperationDeclaration dynamicOutput = getOperation(declaration, "outputMetadataWithKeyId");
-        assertOutputType(dynamicOutput.getOutputPayload(), toMetadataType(Object.class), true);
+        assertOutputType(dynamicOutput.getOutput(), toMetadataType(Object.class), true);
         assertOutputType(dynamicOutput.getOutputAttributes(), toMetadataType(void.class), false);
         params = dynamicOutput.getParameters();
         assertParameterType(findParameter(params, "type"), toMetadataType(String.class), false);
         assertParameterType(findParameter(params, "content"), toMetadataType(Object.class), false);
 
         OperationDeclaration dynaimcContentAndOutput = getOperation(declaration, "contentAndOutputMetadataWithKeyId");
-        assertOutputType(dynaimcContentAndOutput.getOutputPayload(), toMetadataType(Object.class), true);
+        assertOutputType(dynaimcContentAndOutput.getOutput(), toMetadataType(Object.class), true);
         assertOutputType(dynaimcContentAndOutput.getOutputAttributes(), toMetadataType(void.class), false);
         params = dynaimcContentAndOutput.getParameters();
         assertParameterType(findParameter(params, "type"), toMetadataType(String.class), false);
         assertParameterType(findParameter(params, "content"), toMetadataType(Object.class), true);
 
         OperationDeclaration dynamicOutputAndAttributes = getOperation(declaration, "outputAttributesWithDynamicMetadata");
-        assertOutputType(dynamicOutputAndAttributes.getOutputPayload(), toMetadataType(Object.class), true);
+        assertOutputType(dynamicOutputAndAttributes.getOutput(), toMetadataType(Object.class), true);
         assertOutputType(dynamicOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), true);
         params = dynamicOutputAndAttributes.getParameters();
         assertParameterType(findParameter(params, "type"), toMetadataType(String.class), false);
 
         OperationDeclaration staticOutputOnly = getOperation(declaration, "typeWithDeclaredSubtypesMetadata");
-        assertOutputType(staticOutputOnly.getOutputPayload(), toMetadataType(boolean.class), false);
+        assertOutputType(staticOutputOnly.getOutput(), toMetadataType(boolean.class), false);
         assertOutputType(staticOutputOnly.getOutputAttributes(), toMetadataType(void.class), false);
 
         OperationDeclaration staticOutputAndAttributes = getOperation(declaration, "outputAttributesWithDeclaredSubtypesMetadata");
-        assertOutputType(staticOutputAndAttributes.getOutputPayload(), toMetadataType(Shape.class), false);
+        assertOutputType(staticOutputAndAttributes.getOutput(), toMetadataType(Shape.class), false);
         assertOutputType(staticOutputAndAttributes.getOutputAttributes(), toMetadataType(AbstractOutputAttributes.class), false);
     }
 
@@ -247,7 +246,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         SourceDeclaration sourceDynamicAttributes = declaration.getMessageSources().stream().filter(s -> s.getName().equals("MetadataSource")).findFirst()
                 .orElseThrow(() -> new RuntimeException("Missing source declaration MetadataSource"));
 
-        assertOutputType(sourceDynamicAttributes.getOutputPayload(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+        assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
                 .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object").with(new ClassInformationAnnotation(Object.class, null)))
                 .build(), true);
@@ -257,7 +256,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         SourceDeclaration sourceStaticAttributes = declaration.getMessageSources().stream().filter(s -> s.getName().equals("MetadataSourceWithMultilevel")).findFirst()
                 .orElseThrow(() -> new RuntimeException("Missing source declaration MetadataSource"));
 
-        assertOutputType(sourceStaticAttributes.getOutputPayload(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+        assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
                 .ofValue(TYPE_BUILDER.objectType().id("java.lang.Object").with(new ClassInformationAnnotation(Object.class, null)))
                 .build(), true);
@@ -394,7 +393,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ExtensionDeclarer declarer = describerFor(HeisenbergWithGenericlessMessageOperation.class).describe(new DefaultDescribingContext(HeisenbergWithSameOperationsAndConfigs.class.getClassLoader()));
         OperationDeclaration operation = getOperation(declarer.getDeclaration(), "noGenerics");
 
-        assertThat(operation.getOutputPayload().getType(), is(instanceOf(AnyType.class)));
+        assertThat(operation.getOutput().getType(), is(instanceOf(AnyType.class)));
         assertThat(operation.getOutputAttributes().getType(), is(instanceOf(NullType.class)));
     }
 
@@ -567,14 +566,14 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         operation = getOperation(extensionDeclaration, GET_ENEMY_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(1));
-        assertThat(operation.getOutputPayload().getType(), equalTo(toMetadataType(String.class)));
+        assertThat(operation.getOutput().getType(), equalTo(toMetadataType(String.class)));
         assertThat(operation.getOutputAttributes().getType(), equalTo(toMetadataType(IntegerAttributes.class)));
         assertParameter(operation.getParameters(), "index", "", toMetadataType(int.class), false, SUPPORTED, "0");
 
         operation = getOperation(extensionDeclaration, KILL_OPERATION);
         assertThat(operation, is(notNullValue()));
         assertThat(operation.getParameters(), hasSize(2));
-        assertThat(operation.getOutputPayload().getType(), equalTo(toMetadataType(String.class)));
+        assertThat(operation.getOutput().getType(), equalTo(toMetadataType(String.class)));
         assertThat(operation.getOutputAttributes().getType(), is(instanceOf(NullType.class)));
         assertParameter(operation.getParameters(), "victim", "", toMetadataType(String.class), false, SUPPORTED, "#[payload]");
         assertParameter(operation.getParameters(), "goodbyeMessage", "", toMetadataType(String.class), true, SUPPORTED, null);
@@ -613,7 +612,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         operation = getOperation(extensionDeclaration, GET_PAYMENT_FROM_MESSAGE_OPERATION);
         assertThat(operation, is(notNullValue()));
-        assertThat(operation.getOutputPayload().getType(), is(instanceOf(NullType.class)));
+        assertThat(operation.getOutput().getType(), is(instanceOf(NullType.class)));
         assertThat(operation.getOutputAttributes().getType(), is(instanceOf(NullType.class)));
         assertThat(operation.getParameters().isEmpty(), is(true));
 

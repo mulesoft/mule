@@ -127,8 +127,8 @@ public final class MuleExtensionAnnotationParser
         return parsedParameters;
     }
 
-    static <T extends Annotation> List<T> parseRepeatableAnnotation(Class<?> extensionType, Class<T> annotation,
-                                                                    Function<Annotation, T[]> containerConsumer)
+    public static <T extends Annotation> List<T> parseRepeatableAnnotation(Class<?> extensionType, Class<T> annotation,
+                                                                           Function<Annotation, T[]> containerConsumer)
     {
         List<T> annotationDeclarations = ImmutableList.of();
 

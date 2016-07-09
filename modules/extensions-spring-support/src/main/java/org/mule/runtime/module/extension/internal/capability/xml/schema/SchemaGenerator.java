@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;

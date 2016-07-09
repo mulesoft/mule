@@ -12,20 +12,23 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.getTopLevelTypeName;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.sanitizeName;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.singularize;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.api.util.NameUtils.itemize;
+import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
+import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
+import static org.mule.runtime.extension.api.util.NameUtils.singularize;
+import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.createXmlModelProperty;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiableWithParameters;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
@@ -49,7 +52,6 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPR
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TLS_CONTEXT_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.xml.XmlModelUtils.createXmlModelProperty;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -61,13 +63,14 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.utils.MetadataTypeUtils;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.config.spring.dsl.api.xml.NameUtils;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
+import org.mule.runtime.extension.api.annotation.SubTypesMapping;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -81,8 +84,9 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.runtime.extension.api.introspection.property.XmlModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -106,10 +110,8 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
 import com.google.common.collect.ImmutableMap;
@@ -176,7 +178,7 @@ public final class SchemaBuilder
         Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
         builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : ImmutableMap.of());
 
-        extensionModel.getModelProperty(ExportModelProperty.class).ifPresent(e -> builder.withExportedTypes(e.getExportedClasses()));
+        extensionModel.getModelProperty(ExportModelProperty.class).ifPresent(e -> builder.withExportedTypes(e.getExportedTypes()));
 
 
         return builder;
@@ -196,11 +198,10 @@ public final class SchemaBuilder
         return this;
     }
 
-    private SchemaBuilder withExportedTypes(List<Class> exportedTypes)
+    private SchemaBuilder withExportedTypes(List<MetadataType> exportedTypes)
     {
         exportedTypes.stream()
-                .filter(IntrospectionUtils::isInstantiableWithParameters)
-                .map(c -> getMetadataType(c, ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(c.getClassLoader())))
+                .filter(t -> isInstantiableWithParameters(getType(t)))
                 .forEach(t -> registerPojoType(t, t.getDescription().orElse(EMPTY)));
         return this;
     }
@@ -395,7 +396,6 @@ public final class SchemaBuilder
         if (baseType == null)
         {
             complexType = declarePojoAsType(clazz, metadataType, MULE_ABSTRACT_EXTENSION_TYPE, description, metadataType.getFields());
-            complexType.getComplexContent().getExtension().getAttributeOrAttributeGroup().add(createNameAttribute(false));
         }
         else
         {
@@ -522,18 +522,20 @@ public final class SchemaBuilder
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(abstractElement);
 
-        QName typeRef = new QName(schema.getTargetNamespace(), registerPojoType(metadataType, description), xmlProperties.getNamespace());
+        QName typeQName = new QName(schema.getTargetNamespace(), registerPojoType(metadataType, description), xmlProperties.getNamespace());
         if (!isInstantiableWithParameters(getType(metadataType)))
         {
-            abstractElement.setType(typeRef);
+            abstractElement.setType(typeQName);
         }
         else
         {
             TopLevelElement objectElement = new TopLevelElement();
             objectElement.setName(getTopLevelTypeName(metadataType));
-            objectElement.setType(typeRef);
             objectElement.setSubstitutionGroup(new QName(xmlProperties.getNamespaceUri(), abstractElementName, xmlProperties.getNamespace()));
             objectElement.setAnnotation(createDocAnnotation(description));
+
+            objectElement.setComplexType(createLocalComplexTypeExtension(typeQName));
+            objectElement.getComplexType().getComplexContent().getExtension().getAttributeOrAttributeGroup().add(createNameAttribute(false));
             schema.getSimpleTypeOrComplexTypeOrGroup().add(objectElement);
         }
     }
@@ -654,10 +656,8 @@ public final class SchemaBuilder
 
     private void generateMapElement(ExplicitGroup all, String name, String description, DictionaryType metadataType, boolean required)
     {
-        name = hyphenize(name);
-
         BigInteger minOccurs = required ? ONE : ZERO;
-        String mapName = hyphenize(NameUtils.pluralize(name));
+        String mapName = hyphenize(pluralize(name));
         LocalComplexType mapComplexType = generateMapComplexType(mapName, metadataType);
 
         TopLevelElement mapElement = createTopLevelElement(mapName, minOccurs, "1");
@@ -689,7 +689,7 @@ public final class SchemaBuilder
             @Override
             public void visitObject(ObjectType objectType)
             {
-                final boolean shouldGenerateChildElement = shouldGenerateDataTypeChildElements(objectType, SUPPORTED);
+                final boolean shouldGenerateChildElement = shouldGenerateChildElement(objectType, SUPPORTED);
 
                 entryComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, valueType, !shouldGenerateChildElement, SUPPORTED));
 
@@ -714,7 +714,7 @@ public final class SchemaBuilder
                 MetadataType itemType = arrayType.getType();
                 itemComplexType.getAttributeOrAttributeGroup().add(createAttribute(ATTRIBUTE_NAME_VALUE, itemType, true, REQUIRED));
 
-                String itemName = hyphenize(singularize(name)).concat("-item");
+                String itemName = itemize(singularize(name));
                 TopLevelElement itemElement = createTopLevelElement(itemName, ZERO, SchemaConstants.UNBOUNDED, itemComplexType);
                 entryComplexType.getSequence().getParticle().add(objectFactory.createElement(itemElement));
             }
@@ -824,8 +824,8 @@ public final class SchemaBuilder
                                                                final ExplicitGroup all, final ParameterModel parameterModel)
     {
         return getParameterDeclarationVisitor(extensionType, all, parameterModel.getName(), parameterModel.getDescription(),
-                                              parameterModel.getType(), parameterModel.getExpressionSupport(),
-                                              parameterModel.isRequired(), parameterModel.getDefaultValue());
+                                              parameterModel.getExpressionSupport(), parameterModel.isRequired(),
+                                              parameterModel.getDefaultValue());
     }
 
     private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
@@ -835,12 +835,12 @@ public final class SchemaBuilder
         final String defaultValue = MetadataTypeUtils.getDefaultValue(field).orElse(null);
         final ExpressionSupport expressionSupport = TypeUtils.getExpressionSupport(field);
 
-        return getParameterDeclarationVisitor(extensionType, all, name, EMPTY, field.getValue(),
+        return getParameterDeclarationVisitor(extensionType, all, name, EMPTY,
                                               expressionSupport, field.isRequired(), defaultValue);
     }
 
     private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all,
-                                                               final String name, final String description, final MetadataType metadataType,
+                                                               final String name, final String description,
                                                                ExpressionSupport expressionSupport, boolean required, Object defaultValue)
     {
         return new MetadataTypeVisitor()
@@ -851,9 +851,9 @@ public final class SchemaBuilder
             public void visitArrayType(ArrayType arrayType)
             {
                 MetadataType genericType = arrayType.getType();
-                final boolean supportsChildElement = shouldGenerateDataTypeChildElements(genericType, expressionSupport);
+                final boolean supportsChildElement = shouldGenerateChildElement(genericType, expressionSupport);
 
-                forceOptional = !getType(genericType).equals(Object.class) && (supportsChildElement || shouldForceOptional(genericType));
+                forceOptional = !genericType.equals(typeLoader.load(Object.class)) && (supportsChildElement || shouldForceOptional(genericType));
                 defaultVisit(arrayType);
                 if (supportsChildElement)
                 {
@@ -868,7 +868,7 @@ public final class SchemaBuilder
                 forceOptional = shouldForceOptional(keyType);
 
                 defaultVisit(dictionaryType);
-                if (shouldGenerateDataTypeChildElements(keyType, expressionSupport))
+                if (shouldGenerateChildElement(keyType, expressionSupport))
                 {
                     generateMapElement(all, name, description, dictionaryType, isRequired(true, required));
 
@@ -895,22 +895,32 @@ public final class SchemaBuilder
 
                 defaultVisit(objectType);
 
+                if (!shouldGenerateChildElementForType(objectType))
+                {
+                    return;
+                }
+
                 if (ExpressionSupport.REQUIRED != expressionSupport)
                 {
                     if (importedTypes.get(objectType) != null)
                     {
-                        addImportedTypeRef(getType(importedTypes.get(objectType)), name, description, objectType, all);
+                        addImportedTypeElement(getType(importedTypes.get(objectType)), name, description, objectType, all);
                     }
                     else
                     {
-                        registerPojoType(objectType, description);
-                        addAbstractTypeRef(name, description, objectType, all);
-                    }
-
-                    List<MetadataType> subTypes = subTypesMapping.getSubTypes(objectType);
-                    if (!subTypes.isEmpty())
-                    {
-                        registerPojoSubtypes(objectType, subTypes);
+                        List<MetadataType> subTypes = subTypesMapping.getSubTypes(objectType);
+                        //FIXME class => annotation
+                        if (!subTypes.isEmpty() || getType(objectType).isAnnotationPresent(Extensible.class))
+                        {
+                            registerPojoSubtypes(objectType, subTypes);
+                            addAbstractTypeRef(name, description, objectType, all);
+                        }
+                        else
+                        {
+                            String typeName = registerPojoType(objectType, description);
+                            QName localQName = new QName(xmlProperties.getNamespaceUri(), typeName, xmlProperties.getNamespace());
+                            addChildElementTypeExtension(localQName, description, name, all);
+                        }
                     }
                 }
                 else
@@ -929,9 +939,7 @@ public final class SchemaBuilder
 
             private boolean shouldForceOptional(MetadataType type)
             {
-                return !required ||
-                       !subTypesMapping.getSubTypes(type).isEmpty() ||
-                       (isInstantiable(getType(type)) && ExpressionSupport.REQUIRED != expressionSupport);
+                return !required || shouldGenerateChildElement(type, expressionSupport);
             }
 
             private boolean isRequired(boolean forceOptional, boolean required)
@@ -941,43 +949,69 @@ public final class SchemaBuilder
         };
     }
 
-    private boolean shouldGenerateDataTypeChildElements(MetadataType metadataType, ExpressionSupport expressionSupport)
+    private void addChildElementTypeExtension(QName typeQName, String description, String name, ExplicitGroup all)
     {
-        boolean isExpressionRequired = ExpressionSupport.REQUIRED == expressionSupport;
+        TopLevelElement objectElement = createTopLevelElement(hyphenize(name), ZERO, "1");
+        objectElement.setAnnotation(createDocAnnotation(description));
+        objectElement.setComplexType(createLocalComplexTypeExtension(typeQName));
+        all.getParticle().add(objectFactory.createElement(objectElement));
+    }
+
+    private boolean shouldGenerateChildElement(MetadataType metadataType, ExpressionSupport expressionSupport)
+    {
+        return ExpressionSupport.REQUIRED != expressionSupport && shouldGenerateChildElementForType(metadataType);
+    }
+
+    private boolean shouldGenerateChildElementForType(MetadataType metadataType)
+    {
         boolean isPojo = metadataType instanceof ObjectType;
         Class<?> clazz = getType(metadataType);
         boolean isPrimitive = clazz.isPrimitive() || ClassUtils.isPrimitiveWrapper(clazz);
+        boolean isExtensible = clazz.isAnnotationPresent(Extensible.class);
 
-        return !isExpressionRequired &&
-               (isPrimitive || !subTypesMapping.getSubTypes(metadataType).isEmpty()
-                               || (isPojo && isInstantiableWithParameters(clazz))
-                               || (!isPojo && isInstantiable(clazz)));
+        return isPrimitive ||
+               isExtensible || !subTypesMapping.getSubTypes(metadataType).isEmpty() ||
+               (isPojo && isInstantiableWithParameters(clazz)) ||
+               (!isPojo && isInstantiable(clazz));
     }
 
-    private void addImportedTypeRef(Class<?> extensionType, String name, String description, MetadataType metadataType, ExplicitGroup all)
+    private void addImportedTypeElement(Class<?> extensionType, String name, String description, MetadataType metadataType, ExplicitGroup all)
     {
-        TopLevelElement objectElement = createTopLevelElement(hyphenize(name), ZERO, "1");
-        objectElement.setComplexType(new LocalComplexType());
-        objectElement.setAnnotation(createDocAnnotation(description));
-
-        ExplicitGroup sequence = new ExplicitGroup();
-        sequence.setMinOccurs(ONE);
-        sequence.setMaxOccurs("1");
-
         XmlModelProperty baseTypeXml = registerExtensionImport(extensionType);
 
-        QName qName = new QName(baseTypeXml.getNamespaceUri(), getTopLevelAbstractTypeName(metadataType), baseTypeXml.getNamespace());
-        sequence.getParticle().add(objectFactory.createElement(createRefElement(qName, false)));
+        //TODO review this when union types and annotations are added
+        List<SubTypeMapping> ownerExtensionMappings = parseRepeatableAnnotation(extensionType, SubTypeMapping.class,
+                                                                                c -> ((SubTypesMapping) c).value());
+        Class<?> importedType = getType(metadataType);
+        if (importedType.isAnnotationPresent(Extensible.class) ||
+            ownerExtensionMappings.stream().anyMatch(m -> m.baseType().getName().equals(importedType.getName())))
+        {
+            QName refQName = new QName(baseTypeXml.getNamespaceUri(), getTopLevelAbstractTypeName(metadataType), baseTypeXml.getNamespace());
 
-        objectElement.getComplexType().setSequence(sequence);
+            TopLevelElement objectElement = createTopLevelElement(hyphenize(name), ZERO, "1");
+            objectElement.setComplexType(new LocalComplexType());
+            objectElement.setAnnotation(createDocAnnotation(description));
 
-        all.getParticle().add(objectFactory.createElement(objectElement));
+            ExplicitGroup sequence = new ExplicitGroup();
+            sequence.setMinOccurs(ONE);
+            sequence.setMaxOccurs("1");
+            sequence.getParticle().add(objectFactory.createElement(createRefElement(refQName, false)));
+
+            objectElement.getComplexType().setSequence(sequence);
+            all.getParticle().add(objectFactory.createElement(objectElement));
+        }
+        else
+        {
+            //FIXME class => annotation
+            QName typeQName = new QName(baseTypeXml.getNamespaceUri(), sanitizeName(importedType.getName()), baseTypeXml.getNamespace());
+            addChildElementTypeExtension(typeQName, description, name, all);
+        }
     }
 
     private XmlModelProperty registerExtensionImport(Class<?> extensionType)
     {
         XmlModelProperty importedExtensionXml = createXmlModelProperty(getAnnotation(extensionType, Xml.class),
-                                                                       getAnnotation(extensionType, Extension.class).name(), "");
+                getAnnotation(extensionType, Extension.class).name(), "");
 
         Import schemaImport = new Import();
         schemaImport.setNamespace(importedExtensionXml.getNamespaceUri());
@@ -1010,6 +1044,19 @@ public final class SchemaBuilder
         objectElement.setComplexType(createComplexTypeWithAbstractElementRef(metadataType));
 
         all.getParticle().add(objectFactory.createElement(objectElement));
+    }
+
+    private LocalComplexType createLocalComplexTypeExtension(QName base)
+    {
+        final LocalComplexType complexType = new LocalComplexType();
+        ComplexContent complexContent = new ComplexContent();
+        complexType.setComplexContent(complexContent);
+
+        final ExtensionType extension = new ExtensionType();
+        extension.setBase(base);
+
+        complexContent.setExtension(extension);
+        return complexType;
     }
 
     private LocalComplexType createComplexTypeWithAbstractElementRef(MetadataType metadataType)
@@ -1086,6 +1133,11 @@ public final class SchemaBuilder
         element.setMinOccurs(isRequired ? ONE : ZERO);
         element.setMaxOccurs("1");
         return element;
+    }
+
+    private boolean isInstantiableWithParameters(Class<?> type)
+    {
+        return isInstantiable(type) && !getExposedFields(type).isEmpty();
     }
 
     private void generateNestedProcessorElement(ExplicitGroup all, ParameterModel parameterModel, String maxOccurs)

@@ -8,10 +8,10 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.runtime.config.spring.dsl.api.xml.NameUtils.hyphenize;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.TemplateParser.createMuleStyleParser;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.metadata.MetadataAware;

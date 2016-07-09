@@ -55,7 +55,7 @@ import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.runtime.module.extension.internal.introspection.SubTypesMappingContainer;
+import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;

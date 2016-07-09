@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-@Alias("simple-request-builder")
+@Alias("request-builder")
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder
 {
     /**

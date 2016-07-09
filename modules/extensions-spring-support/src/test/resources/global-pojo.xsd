@@ -14,9 +14,17 @@
                     </xs:annotation>
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="required-extensible-pojo">
+                            <xs:complexType>
+                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" minOccurs="0" maxOccurs="1" ref="basic:abstract-extensible-owner"></xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="mule:expressionObject" use="required" name="requiredPojoExpressionRequired"></xs:attribute>
+                    <xs:attribute type="mule:expressionObject" use="optional" name="requiredExtensiblePojo"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -32,12 +40,43 @@
                 <xs:attribute type="xs:string" use="optional" name="optionalFieldExpressionNotSupported"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="requiredFieldExpressionRequired"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="optionalFieldExpressionSupported"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-owner"></xs:element>
-    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" type="basic:org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner" substitutionGroup="basic:abstract-owner" name="owner"></xs:element>
+    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" substitutionGroup="basic:abstract-owner" name="owner">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="basic:org.mule.runtime.module.extension.internal.runtime.connector.basic.Owner">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.runtime.module.extension.internal.runtime.connector.basic.ExtensibleOwner">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionString" use="required" name="requiredFieldExpressionSupported"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="optionalFieldExpressionRequired"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="optionalFieldDefault"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="requiredFieldExpressionRequired"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="optionalFieldExpressionSupported"></xs:attribute>
+                <xs:attribute type="xs:string" use="required" name="requiredFieldExpressionNotSupported"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="requiredFieldDefault"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="optionalFieldExpressionNotSupported"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-extensible-owner"></xs:element>
+    <xs:element xmlns:basic="http://www.mulesoft.org/schema/mule/basic" substitutionGroup="basic:abstract-extensible-owner" name="extensible-owner">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="basic:org.mule.runtime.module.extension.internal.runtime.connector.basic.ExtensibleOwner">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/basic" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FooType" substitutionGroup="mule:abstract-message-processor" name="foo"></xs:element>
     <xs:complexType name="FooType">
         <xs:complexContent>
