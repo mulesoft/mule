@@ -14,19 +14,12 @@ import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class UntilSuccessfulInvalidConfigTestCase extends AbstractMuleTestCase
 {
 
     private MuleContext context;
-
-    @Before
-    public void before() throws InitialisationException, ConfigurationException
-    {
-        context = new DefaultMuleContextFactory().createMuleContext();
-    }
 
     @After
     public void after()
@@ -37,10 +30,10 @@ public class UntilSuccessfulInvalidConfigTestCase extends AbstractMuleTestCase
         }
     }
 
-    @Test(expected = ConfigurationException.class)
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    @Test(expected = InitialisationException.class)
     public void exclusiveWaitConfig() throws Exception
     {
-        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("until-successful-invalid-wait-test.xml");
-        builder.configure(context);
+        context = new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder("until-successful-invalid-wait-test.xml"));
     }
 }
