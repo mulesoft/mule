@@ -6,11 +6,14 @@
  */
 package org.mule.pattern.core.config;
 
-import org.mule.config.spring.handlers.MuleNamespaceHandler;
+import static org.apache.logging.log4j.Level.WARN;
+import static org.mule.config.spring.handlers.MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE;
+
 import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
 import org.mule.tck.logging.TestAppender;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 
-import org.apache.logging.log4j.Level;
 import org.junit.Test;
 
 public class CoreDeprecationTestCase extends AbstractDeprecationTestCase
@@ -25,6 +28,14 @@ public class CoreDeprecationTestCase extends AbstractDeprecationTestCase
     @Test
     public void ensureCoreDeprecation()
     {
-        testAppender.ensure(new TestAppender.Expectation(Level.WARN.toString(), BridgeDefinitionParser.class.getName(), MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE));
+        new PollingProber(200, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                testAppender.ensure(new TestAppender.Expectation(WARN.toString(), BridgeDefinitionParser.class.getName(), PATTERNS_DEPRECATION_MESSAGE));
+                return true;
+            }
+        });
     }
 }
