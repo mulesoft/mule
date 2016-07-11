@@ -26,6 +26,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
@@ -309,7 +310,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         messageProcessor.process(event);
 
-        verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
+        verify(event, never()).setMessage(any(MuleMessage.class));
 
         ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
         verify(event).setFlowVariable(same(TARGET_VAR), captor.capture());
@@ -326,36 +327,13 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
     {
         Object payload = new Object();
         MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
-        Attributes oldAttributes = mock(Attributes.class);
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder()
                                                                                         .output(payload)
                                                                                         .mediaType(mediaType)
                                                                                         .build());
 
-        when(event.getMessage()).thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes
-                (oldAttributes).build());
-        ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
-
-        messageProcessor.process(event);
-
-        verify(event).setMessage(captor.capture());
-        MuleMessage message = captor.getValue();
-        assertThat(message, is(notNullValue()));
-
-        assertThat(message.getPayload(), is(sameInstance(payload)));
-        assertThat(message.getAttributes(), is(sameInstance(oldAttributes)));
-        assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
-    }
-
-    @Test
-    public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception
-    {
-        Object payload = "hello world!";
-        Attributes oldAttributes = mock(Attributes.class);
-
-        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder().output(payload).build());
-        when(event.getMessage()).thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes(oldAttributes).build());
+        when(event.getMessage()).thenReturn(MuleMessage.builder().payload("").attributes(mock(Attributes.class)).build());
         ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
 
         messageProcessor.process(event);
@@ -365,7 +343,27 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         assertThat(message, is(notNullValue()));
 
         assertThat(message.getPayload(), is(sameInstance(payload)));
-        assertThat(message.getAttributes(), is(sameInstance(oldAttributes)));
+        assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
+        assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
+    }
+
+    @Test
+    public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception
+    {
+        Object payload = "hello world!";
+
+        when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder().output(payload).build());
+        when(event.getMessage()).thenReturn(MuleMessage.builder().payload("").attributes(mock(Attributes.class)).build());
+        ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
+
+        messageProcessor.process(event);
+
+        verify(event).setMessage(captor.capture());
+        MuleMessage message = captor.getValue();
+        assertThat(message, is(notNullValue()));
+
+        assertThat(message.getPayload(), is(sameInstance(payload)));
+        assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
         assertThat(message.getDataType().getType().equals(String.class), is(true));
     }
 
@@ -399,7 +397,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         messageProcessor.process(event);
 
-        ArgumentCaptor<org.mule.runtime.core.api.MuleMessage> captor = ArgumentCaptor.forClass(org.mule.runtime.core.api.MuleMessage.class);
+        ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
         verify(event).setMessage(captor.capture());
 
         MuleMessage message = captor.getValue();
@@ -418,7 +416,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         messageProcessor.process(event);
 
-        verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
+        verify(event, never()).setMessage(any(MuleMessage.class));
 
         ArgumentCaptor<MuleMessage> captor = ArgumentCaptor.forClass(MuleMessage.class);
         verify(event).setFlowVariable(same(TARGET_VAR), captor.capture());
@@ -436,7 +434,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
 
         when(operationExecutor.execute(any(OperationContext.class))).thenReturn(null);
         assertThat(messageProcessor.process(event), is(sameInstance(event)));
-        verify(event, never()).setMessage(any(org.mule.runtime.core.api.MuleMessage.class));
+        verify(event, never()).setMessage(any(MuleMessage.class));
     }
 
     @Test
