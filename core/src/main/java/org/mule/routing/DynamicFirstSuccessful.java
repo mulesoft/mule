@@ -6,6 +6,7 @@
  */
 package org.mule.routing;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -13,6 +14,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.routing.FirstSuccessfulRoutingStrategy.RouteProcessor;
 
 
 /**
@@ -25,7 +27,7 @@ import org.mule.api.processor.MessageProcessor;
  * successful route is found.
  *
  */
-public class DynamicFirstSuccessful  implements MessageProcessor, Initialisable, MuleContextAware
+public class DynamicFirstSuccessful implements MessageProcessor, Initialisable, MuleContextAware
 {
     private FirstSuccessfulRoutingStrategy routingStrategy;
     private MuleContext muleContext;
@@ -42,7 +44,14 @@ public class DynamicFirstSuccessful  implements MessageProcessor, Initialisable,
     @Override
     public void initialise() throws InitialisationException
     {
-        routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression);
+        routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression, new RouteProcessor()
+        {
+            @Override
+            public MuleEvent processRoute(MessageProcessor route, MuleEvent event) throws MessagingException, MuleException
+            {
+                return route.process(event);
+            }
+        });
     }
 
     @Override
