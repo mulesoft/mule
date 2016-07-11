@@ -7,11 +7,17 @@
 
 package org.mule.transport.jms.integration;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.object.IsCompatibleType.typeCompatibleWith;
 import static org.mule.tck.functional.FlowAssert.verify;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import javax.jms.TextMessage;
 
 import org.junit.Test;
 
@@ -37,5 +43,16 @@ public class JmsObjectToMessageDataTypeTransformerTestCase extends AbstractJmsFu
         };
         send(sendTextMessageScenario);
         verify("message-to-string-flow");
+    }
+
+    public static class CheckTextMessageType implements MessageProcessor
+    {
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            assertThat(event.getMessage().getDataType().getType(), typeCompatibleWith(TextMessage.class));
+            return event;
+        }
     }
 }
