@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
  * successful route is found.
  *
  */
-public class DynamicFirstSuccessful  implements MessageProcessor, Initialisable, MuleContextAware
+public class DynamicFirstSuccessful implements MessageProcessor, Initialisable, MuleContextAware
 {
     private FirstSuccessfulRoutingStrategy routingStrategy;
     private MuleContext muleContext;
@@ -42,7 +42,7 @@ public class DynamicFirstSuccessful  implements MessageProcessor, Initialisable,
     @Override
     public void initialise() throws InitialisationException
     {
-        routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression);
+        routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression, (route, event) -> route.process(event));
     }
 
     @Override

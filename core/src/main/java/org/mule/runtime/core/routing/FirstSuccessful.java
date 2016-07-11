@@ -30,7 +30,7 @@ public class FirstSuccessful extends AbstractOutboundRouter
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression);
+        routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression, (route, event) -> doProcessRoute(route, event));
     }
 
     /**

@@ -163,13 +163,20 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 .serial(prePost())
 
                 //first-successful
+                .serial(prePost()) // logger
+                .serial(pre()) // first-successful
                 .serial(prePost())
                 .serial(prePost())
+                .serial(prePost())
+                .serial(prePost()) // dlq
+                .serial(post())
 
                 //round-robin
-                .serial(prePost())
-                .serial(prePost())
-
+                .serial(pre()) // round-robin
+                .serial(prePost()) // inner logger
+                .serial(post())
+                .serial(prePost()) // logger
+                
                 //collection-aggregator
                 .serial(pre())      //open Splitter, unpacks three messages
                 .serial(prePost())  //1st message on Logger
