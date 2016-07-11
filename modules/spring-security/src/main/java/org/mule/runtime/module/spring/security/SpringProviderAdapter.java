@@ -10,7 +10,10 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.security.AbstractSecurityProvider;
+import org.mule.runtime.module.spring.security.config.SecurityProperty;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -87,9 +90,13 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
         return securityProperties;
     }
 
-    public void setSecurityProperties(Map securityProperties)
+    public void setSecurityProperties(List<SecurityProperty> securityProperties)
     {
-        this.securityProperties = securityProperties;
+        this.securityProperties = new HashMap();
+        for (SecurityProperty securityProperty : securityProperties)
+        {
+            this.securityProperties.put(securityProperty.getName(), securityProperty.getValue());
+        }
     }
 
     public SpringAuthenticationProvider getAuthenticationProvider()

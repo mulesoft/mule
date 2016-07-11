@@ -8,12 +8,15 @@ package org.mule.runtime.core.el;
 
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -48,14 +51,20 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase
 
     @SuppressWarnings("unchecked")
     @Before
-    public void setup() throws InitialisationException
+    public void setup() throws Exception
     {
         expressionManager = new DefaultExpressionManager();
         muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
         MuleRegistry muleRegistry = mock(MuleRegistry.class);
-        Mockito.when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
-        Mockito.when(muleContext.getRegistry()).thenReturn(muleRegistry);
-        Mockito.when(muleRegistry.lookupObjectsForLifecycle(Mockito.any(Class.class))).thenReturn(
+        when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
+        when(muleContext.getRegistry()).thenReturn(muleRegistry);
+        ExpressionLanguage expressionLanguage = getExpressionLanguage();
+        if (expressionLanguage instanceof Initialisable)
+        {
+            ((Initialisable) expressionLanguage).initialise();
+        }
+        when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
+        when(muleRegistry.lookupObjectsForLifecycle(Mockito.any(Class.class))).thenReturn(
             Collections.<Object> emptyList());
         expressionManager.setMuleContext(muleContext);
         expressionManager.initialise();

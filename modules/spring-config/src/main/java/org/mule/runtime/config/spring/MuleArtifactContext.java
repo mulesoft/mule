@@ -96,7 +96,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
     private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry = new ComponentBuildingDefinitionRegistry();
-    private final SpringMuleContextServiceConfigurator springMuleContextServiceConfigurator = new SpringMuleContextServiceConfigurator();
     private final OptionalObjectsController optionalObjectsController;
     private final Map<String, String> artifactProperties;
     private ApplicationModel applicationModel;
@@ -317,7 +316,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext
     protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory)
     {
         super.customizeBeanFactory(beanFactory);
-        springMuleContextServiceConfigurator.createArtifactServices(beanFactory, muleContext, artifactType, optionalObjectsController);
+        new SpringMuleContextServiceConfigurator(muleContext, artifactType, optionalObjectsController, beanFactory).createArtifactServices();
     }
 
     @Override

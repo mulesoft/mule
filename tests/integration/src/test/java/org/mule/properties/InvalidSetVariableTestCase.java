@@ -27,23 +27,6 @@ public class InvalidSetVariableTestCase extends AbstractMuleTestCase
 {
     private String muleConfigPath;
 
-    private MuleContext context;
-
-    @Before
-    public void before() throws InitialisationException, ConfigurationException
-    {
-        context = new DefaultMuleContextFactory().createMuleContext();
-    }
-
-    @After
-    public void after()
-    {
-        if (context != null)
-        {
-            context.dispose();
-        }
-    }
-
     @Parameterized.Parameters
     public static Collection<Object[]> data()
     {
@@ -58,10 +41,10 @@ public class InvalidSetVariableTestCase extends AbstractMuleTestCase
         this.muleConfigPath = muleConfigPath;
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test(expected = InitialisationException.class)
     public void emptyVariableNameValidatedBySchema() throws Exception
     {
-        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(muleConfigPath);
-        builder.configure(context);
+        //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+        new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder(muleConfigPath));
     }
 }

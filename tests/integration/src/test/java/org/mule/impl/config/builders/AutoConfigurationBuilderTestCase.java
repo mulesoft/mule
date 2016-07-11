@@ -19,26 +19,24 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.Arrays;
 
 import org.junit.Test;
 
-public class AutoConfigurationBuilderTestCase extends AbstractMuleContextTestCase
+public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
 {
-
-    protected MuleContext createMuleContext() throws Exception
-    {
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        return muleContextFactory.createMuleContext(new SimpleConfigurationBuilder(null));
-    }
 
     @Test
     public void testConfigureSpring() throws ConfigurationException, InitialisationException
     {
-        ConfigurationBuilder configurationBuilder = new AutoConfigurationBuilder(
-                "org/mule/test/spring/config1/test-xml-mule2-config.xml", emptyMap(), APP);
-        configurationBuilder.configure(muleContext);
+        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+        MuleContext muleContext = muleContextFactory.createMuleContext(Arrays.asList(new SimpleConfigurationBuilder(null), new AutoConfigurationBuilder(
+                "org/mule/test/spring/config1/test-xml-mule2-config.xml", emptyMap(), APP)), new DefaultMuleContextBuilder());
 
         // Just a few of the asserts from AbstractConfigBuilderTestCase
         Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleComponent");

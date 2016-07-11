@@ -25,7 +25,7 @@ public class ComponentFailsToInitialiseTestCase extends FunctionalTestCase
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        expectedException.expectCause(CoreMatchers.<InitialisationException>instanceOf(InitialisationException.class));
+        expectedException.expect(CoreMatchers.<InitialisationException>instanceOf(InitialisationException.class));
         FailLifecycleTestObject.setup();
     }
 

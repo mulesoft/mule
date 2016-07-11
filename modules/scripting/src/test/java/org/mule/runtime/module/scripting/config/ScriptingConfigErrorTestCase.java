@@ -16,9 +16,10 @@ import org.junit.Test;
 public class ScriptingConfigErrorTestCase extends AbstractMuleTestCase
 {
 
-    @Test(expected = ConfigurationException.class)
+    @Test(expected = InitialisationException.class)
     public void testMissingEngine() throws InitialisationException, ConfigurationException
     {
+        //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
         new DefaultMuleContextFactory().createMuleContext("config-error.xml");
     }
 }

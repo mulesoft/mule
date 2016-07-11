@@ -20,9 +20,6 @@ public class TransportsConfigurationBuilder extends DefaultsConfigurationBuilder
     {
         super.doConfigure(muleContext);
 
-        MuleRegistry registry = muleContext.getRegistry();
-
-        registry.registerObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
-
+        registerObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory(), muleContext);
     }
 }

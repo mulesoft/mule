@@ -223,11 +223,6 @@ public class TransientRegistry extends AbstractRegistry
 
     protected Object applyProcessors(Object object, Object metadata)
     {
-        if (!isInitialised())
-        {
-            return object;
-        }
-
         Object theObject = object;
 
         if (!hasFlag(metadata, MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG))

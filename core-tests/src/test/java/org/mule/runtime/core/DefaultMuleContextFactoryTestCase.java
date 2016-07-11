@@ -190,8 +190,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 
         InOrder inOrder = inOrder(listener);
         inOrder.verify(listener, times(1)).onCreation(context);
-        inOrder.verify(listener, times(1)).onInitialization(context);
         inOrder.verify(listener, times(1)).onConfiguration(context);
+        //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+        inOrder.verify(listener, times(1)).onInitialization(context);
     }
 
     private void assertDefaults(MuleContext context)
@@ -201,7 +202,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
-        assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
     }
 
     private void assertNoDefaults(MuleContext context)

@@ -253,11 +253,11 @@ public class ComponentWithBindingsDefinitionParserFlowTestCase extends AbstractM
         }
         catch (Exception e)
         {
-            assertEquals(ConfigurationException.class, e.getClass());
-            assertEquals(InitialisationException.class, e.getCause().getClass());
-            assertThat(e.getCause().getCause(), instanceOf(BeanDefinitionStoreException.class));
+            //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+            assertEquals(InitialisationException.class, e.getClass());
+            assertThat(e.getCause(), instanceOf(BeanDefinitionStoreException.class));
             assertEquals(CheckExclusiveClassAttributeObjectFactoryException.class, 
-                e.getCause().getCause().getCause().getClass());
+                e.getCause().getCause().getClass());
         }
     }
 

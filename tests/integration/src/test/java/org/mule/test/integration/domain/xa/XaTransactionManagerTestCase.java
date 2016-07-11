@@ -12,6 +12,7 @@ import static org.mule.runtime.core.config.ExceptionHelper.getRootException;
 
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
@@ -32,7 +33,7 @@ public class XaTransactionManagerTestCase extends DomainFunctionalTestCase
     @Override
     public void setUpMuleContexts() throws Exception
     {
-        thrown.expect(ConfigurationException.class);
+        thrown.expect(InitialisationException.class);
         thrown.expect(hasMessage(containsString("No qualifying bean of type [org.mule.runtime.core.api.transaction.TransactionManagerFactory] is defined: expected single matching bean but found 2:")));
         thrown.expect(ThrowableRootCauseMatcher.hasRootCause(IsInstanceOf.<ConfigurationException> instanceOf(NoUniqueBeanDefinitionException.class)));
         super.setUpMuleContexts();

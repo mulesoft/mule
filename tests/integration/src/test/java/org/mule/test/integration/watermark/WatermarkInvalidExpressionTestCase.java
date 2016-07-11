@@ -7,15 +7,16 @@
 
 package org.mule.test.integration.watermark;
 
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.functional.junit4.ApplicationContextBuilder;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import org.junit.Test;
 
 public class WatermarkInvalidExpressionTestCase
 {
 
-    @Test(expected = ConfigurationException.class)
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    @Test(expected = InitialisationException.class)
     public void invalidUpdateExpression() throws Exception
     {
         ApplicationContextBuilder builder = new ApplicationContextBuilder();

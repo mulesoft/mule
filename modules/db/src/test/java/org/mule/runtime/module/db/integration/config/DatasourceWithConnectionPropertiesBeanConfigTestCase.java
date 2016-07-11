@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.db.integration.config;
 
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -16,11 +16,11 @@ import org.junit.Test;
 public class DatasourceWithConnectionPropertiesBeanConfigTestCase extends AbstractMuleContextTestCase
 {
 
-    @Test(expected = ConfigurationException.class)
+    @Test(expected = InitialisationException.class)
     public void expectFailure() throws Exception
     {
-        ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder("integration/config/bean-datasource-with-connection-properties-config.xml");
-        configBuilder.configure(muleContext);
+        //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+        new DefaultMuleContextFactory().createMuleContext(new SpringXmlConfigurationBuilder("integration/config/bean-datasource-with-connection-properties-config.xml"));
     }
 
 }

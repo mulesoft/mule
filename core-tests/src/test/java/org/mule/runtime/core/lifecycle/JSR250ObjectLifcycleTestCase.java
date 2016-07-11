@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.lifecycle;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.annotation.PostConstruct;
@@ -13,14 +15,12 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 /**
  * Test lifecycle behaviour and restrictions on lifecyce methods
  */
 public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase
 {
+
     @Test
     public void testNormalBehaviour() throws Exception
     {
