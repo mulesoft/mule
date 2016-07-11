@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
@@ -51,19 +52,20 @@ abstract class AbstractReturnDelegate implements ReturnDelegate
         if (value instanceof OperationResult)
         {
             OperationResult operationResult = (OperationResult) value;
-            return MuleMessage.builder().payload(operationResult.getOutput()).mediaType(mediaType)
-                    .attributes(resolveAttributes(operationResult, operationContext)).build();
+            return MuleMessage.builder()
+                    .payload(operationResult.getOutput())
+                    .mediaType(mediaType)
+                    .attributes((Attributes) operationResult.getAttributes().orElse(NULL_ATTRIBUTES))
+                    .build();
         }
         else
         {
-            return MuleMessage.builder().payload(value).mediaType(mediaType).attributes
-                    (operationContext.getEvent().getMessage().getAttributes()).build();
+            return MuleMessage.builder()
+                    .payload(value)
+                    .mediaType(mediaType)
+                    .attributes(NULL_ATTRIBUTES)
+                    .build();
         }
-    }
-
-    private Attributes resolveAttributes(OperationResult operationResult, OperationContextAdapter operationContext)
-    {
-        return (Attributes) operationResult.getAttributes().orElseGet(() -> operationContext.getEvent().getMessage().getAttributes());
     }
 
     /**

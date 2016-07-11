@@ -14,6 +14,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.MuleMessage;
@@ -80,7 +81,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
         MuleMessage message = getOutputMessage();
 
         assertThat(message.getPayload(), is(sameInstance(payload)));
-        assertThat(message.getAttributes(), is(sameInstance(attributes)));
+        assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
         assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
     }
 
@@ -94,7 +95,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
         MuleMessage message = getOutputMessage();
 
         assertThat(message.getPayload(), is(sameInstance(payload)));
-        assertThat(message.getAttributes(), is(sameInstance(attributes)));
+        assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
         assertThat(message.getDataType().getType().equals(String.class), is(true));
     }
 
