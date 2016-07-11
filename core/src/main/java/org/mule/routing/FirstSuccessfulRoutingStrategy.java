@@ -10,6 +10,7 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
@@ -30,12 +31,13 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
 {
     protected ExpressionFilter failureExpressionFilter;
     private final MuleContext muleContext;
+    private RouteProcessor processor;
 
     /**
      * @param muleContext
      * @param failureExpression Mule expression that validates if a {@link MessageProcessor} execution was successful or not.
      */
-    public FirstSuccessfulRoutingStrategy(final MuleContext muleContext, final String failureExpression)
+    public FirstSuccessfulRoutingStrategy(final MuleContext muleContext, final String failureExpression, RouteProcessor processor)
     {
         super(muleContext);
         this.muleContext = muleContext;
@@ -48,6 +50,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
             failureExpressionFilter = new ExpressionFilter("exception-type:");
         }
         failureExpressionFilter.setMuleContext(muleContext);
+        this.processor = processor;
     }
 
     @Override
@@ -62,7 +65,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
             try
             {
                 MuleEvent toProcess = cloneEventForRoutinng(event, mp);
-                returnEvent = mp.process(toProcess);
+                returnEvent = processor.processRoute(mp, toProcess);
 
                 if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent))
                 {
@@ -105,4 +108,8 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy
         return createEventToRoute(event, cloneMessage(event, event.getMessage(), muleContext), mp);
     }
 
+    interface RouteProcessor
+    {
+        MuleEvent processRoute(MessageProcessor route, MuleEvent event) throws MessagingException, MuleException;
+    }
 }

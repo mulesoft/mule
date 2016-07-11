@@ -11,7 +11,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.routing.FirstSuccessfulRoutingStrategy.RouteProcessor;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 
@@ -31,7 +33,14 @@ public class FirstSuccessful extends AbstractOutboundRouter
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression);
+        routingStrategy = new FirstSuccessfulRoutingStrategy(muleContext, failureExpression, new RouteProcessor()
+        {
+            @Override
+            public MuleEvent processRoute(MessageProcessor route, MuleEvent event) throws MessagingException, MuleException
+            {
+                return doProcessRoute(route, event);
+            }
+        });
     }
 
     /**

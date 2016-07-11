@@ -42,7 +42,7 @@ public class RoundRobin extends AbstractOutboundRouter
         MessageProcessor mp = routes.get(modulo);
         try
         {
-            return mp.process(event);
+            return doProcessRoute(mp, event);
         }
         catch (MuleException ex)
         {
