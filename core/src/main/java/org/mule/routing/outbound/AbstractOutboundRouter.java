@@ -467,6 +467,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                 event.setTimeout(timeout);
             }
         }
+        return doProcessRoute(route, event);
+    }
+
+    protected MuleEvent doProcessRoute(MessageProcessor route, MuleEvent event) throws MuleException, MessagingException
+    {
         if (route instanceof MessageProcessorChain)
         {
             return route.process(event);

@@ -164,12 +164,19 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
                 .serial(prePost()) //call throw cs4
 
                 //first-successful
+                .serial(prePost()) // logger
+                .serial(pre()) // first-successful
                 .serial(prePost())
                 .serial(prePost())
+                .serial(prePost())
+                .serial(prePost()) // dlq
+                .serial(post())
 
                 //round-robin
-                .serial(prePost())
-                .serial(prePost())
+                .serial(pre()) // round-robin
+                .serial(prePost()) // inner logger
+                .serial(post())
+                .serial(prePost()) // logger
 
                 //recipient-list
                 .serial(prePost())  //send message to the requested endpoint
