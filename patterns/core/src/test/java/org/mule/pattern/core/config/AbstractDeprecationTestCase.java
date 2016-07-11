@@ -18,6 +18,8 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 public class AbstractDeprecationTestCase extends FunctionalTestCase
 {
 
+    protected static final int PROBE_TIMEOUT_MILLIS = 2500;
+
     protected TestAppender testAppender;
 
     @Override

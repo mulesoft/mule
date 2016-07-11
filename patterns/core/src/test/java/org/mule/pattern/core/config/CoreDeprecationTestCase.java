@@ -28,7 +28,7 @@ public class CoreDeprecationTestCase extends AbstractDeprecationTestCase
     @Test
     public void ensureCoreDeprecation()
     {
-        new PollingProber(200, 50).check(new JUnitProbe()
+        new PollingProber(PROBE_TIMEOUT_MILLIS, 50).check(new JUnitProbe()
         {
             @Override
             public boolean test()
