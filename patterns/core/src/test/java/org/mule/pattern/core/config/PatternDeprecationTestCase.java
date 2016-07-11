@@ -6,12 +6,15 @@
  */
 package org.mule.pattern.core.config;
 
-import org.mule.config.spring.handlers.MuleNamespaceHandler;
-import org.mule.tck.logging.TestAppender;
-import org.mule.transport.http.HttpConnector;
-import org.mule.transport.http.config.HttpNamespaceHandler;
+import static org.apache.log4j.Level.WARN;
+import static org.mule.config.spring.handlers.MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE;
+import static org.mule.transport.http.config.HttpNamespaceHandler.HTTP_TRANSPORT_DEPRECATION_MESSAGE;
 
-import org.apache.log4j.Level;
+import org.mule.tck.logging.TestAppender;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
+import org.mule.transport.http.HttpConnector;
+
 import org.junit.Test;
 
 public class PatternDeprecationTestCase extends AbstractDeprecationTestCase
@@ -26,9 +29,17 @@ public class PatternDeprecationTestCase extends AbstractDeprecationTestCase
     @Test
     public void ensurePatternsDeprecation()
     {
-        testAppender.ensure(
-                new TestAppender.Expectation(Level.WARN.toString(), CorePatternNamespaceHandler.class.getName(), MuleNamespaceHandler.PATTERNS_DEPRECATION_MESSAGE),
-                new TestAppender.Expectation(Level.WARN.toString(), HttpConnector.class.getName(), HttpNamespaceHandler.HTTP_TRANSPORT_DEPRECATION_MESSAGE)
-        );
+        new PollingProber(PROBE_TIMEOUT_MILLIS, 50).check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                testAppender.ensure(
+                        new TestAppender.Expectation(WARN.toString(), CorePatternNamespaceHandler.class.getName(), PATTERNS_DEPRECATION_MESSAGE),
+                        new TestAppender.Expectation(WARN.toString(), HttpConnector.class.getName(), HTTP_TRANSPORT_DEPRECATION_MESSAGE));
+                return true;
+            }
+        });
+
     }
 }
