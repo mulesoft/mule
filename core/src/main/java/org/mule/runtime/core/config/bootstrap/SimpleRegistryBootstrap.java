@@ -11,6 +11,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.ObjectProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.TransformerResolver;
@@ -105,7 +106,6 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap
         {
             value = ((BootstrapObjectFactory) value).create();
         }
-
         muleContext.getRegistry().registerObject(bootstrapProperty.getKey(), value, meta);
     }
 }

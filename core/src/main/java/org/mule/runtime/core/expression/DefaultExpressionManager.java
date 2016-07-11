@@ -243,9 +243,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     @Override
     public void initialise() throws InitialisationException
     {
-        MVELExpressionLanguage mel = new MVELExpressionLanguage(muleContext);
-        mel.initialise();
-        expressionLanguage = mel;
+        expressionLanguage = muleContext.getExpressionLanguage();
     }
 
     @Override

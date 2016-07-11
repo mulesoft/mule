@@ -6,12 +6,43 @@
  */
 package org.mule.runtime.core.config.builders;
 
+import static org.mule.runtime.core.DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
+import static org.mule.runtime.core.DefaultMuleContext.LOCAL_TRANSIENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ObjectStore;
@@ -59,85 +90,95 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
     {
         MuleRegistry registry = muleContext.getRegistry();
 
-        registry.registerObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP,
-            new SimpleRegistryBootstrap(APP, muleContext));
+        new SimpleRegistryBootstrap(APP, muleContext).initialise();
+        //registry.registerObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP,
+        //    );
 
         configureQueueManager(muleContext);
 
-        registry.registerObject(MuleProperties.OBJECT_MULE_CONTEXT, muleContext);
-        registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
+        registry.registerObject(OBJECT_MULE_CONTEXT, muleContext);
+        registerObject(OBJECT_SECURITY_MANAGER, new MuleSecurityManager(), muleContext);
 
-        registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
-            DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore());
+        registerObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
+                       DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore(), muleContext);
 
-        registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME,
-            DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore());
+        registerObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME,
+                       DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore(), muleContext);
 
         registerLocalObjectStoreManager(muleContext, registry);
 
-        registry.registerObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME,
-                                DefaultObjectStoreFactoryBean.createDefaultInMemoryQueueStore());
-        registry.registerObject(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME,
-            DefaultObjectStoreFactoryBean.createDefaultPersistentQueueStore());
-        registry.registerObject(MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME,
-            DefaultObjectStoreFactoryBean.createDefaultUserObjectStore());
-        registry.registerObject(MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME,
-            DefaultObjectStoreFactoryBean.createDefaultUserTransientObjectStore());
-        registry.registerObject(MuleProperties.OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
-        registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER,
-            new MuleMessageProcessingManager());
+        registerObject(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME,
+                       DefaultObjectStoreFactoryBean.createDefaultInMemoryQueueStore(), muleContext);
+        registerObject(QUEUE_STORE_DEFAULT_PERSISTENT_NAME,
+                       DefaultObjectStoreFactoryBean.createDefaultPersistentQueueStore(), muleContext);
+        registerObject(DEFAULT_USER_OBJECT_STORE_NAME,
+                       DefaultObjectStoreFactoryBean.createDefaultUserObjectStore(), muleContext);
+        registerObject(DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME,
+                       DefaultObjectStoreFactoryBean.createDefaultUserTransientObjectStore(), muleContext);
+        registerObject(OBJECT_STORE_MANAGER, new MuleObjectStoreManager(), muleContext);
+        registerObject(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER,
+                       new MuleMessageProcessingManager(), muleContext);
 
-        registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE,
-            new DefaultStreamCloserService());
+        registerObject(OBJECT_MULE_STREAM_CLOSER_SERVICE,
+                       new DefaultStreamCloserService(), muleContext);
 
-        registry.registerObject(MuleProperties.OBJECT_LOCK_PROVIDER, new SingleServerLockProvider());
-        registry.registerObject(MuleProperties.OBJECT_LOCK_FACTORY, new MuleLockFactory());
+        registerObject(OBJECT_LOCK_PROVIDER, new SingleServerLockProvider(), muleContext);
+        registerObject(OBJECT_LOCK_FACTORY, new MuleLockFactory(), muleContext);
 
-        registry.registerObject(MuleProperties.OBJECT_PROCESSING_TIME_WATCHER,
-            new DefaultProcessingTimeWatcher());
+        registerObject(OBJECT_PROCESSING_TIME_WATCHER,
+                       new DefaultProcessingTimeWatcher(), muleContext);
 
-        configureThreadingProfiles(registry);
+        configureThreadingProfiles(muleContext);
 
-        registry.registerObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE,
-                                new NoRetryPolicyTemplate());
-        registry.registerObject(MuleProperties.OBJECT_CONVERTER_RESOLVER,
-            new DynamicDataTypeConversionResolver(muleContext));
+        registerObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE,
+                       new NoRetryPolicyTemplate(), muleContext);
+        registerObject(OBJECT_CONVERTER_RESOLVER,
+                       new DynamicDataTypeConversionResolver(muleContext), muleContext);
 
-        registry.registerObject(MuleProperties.OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguageWrapper(muleContext));
-        registry.registerObject(MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, new MuleConnectorOperationLocator());
-        registry.registerObject(MuleProperties.OBJECT_TIME_SUPPLIER, new TimeSupplier());
-        registry.registerObject(MuleProperties.OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext));
-        registry.registerObject(MuleProperties.OBJECT_METADATA_MANAGER, new MuleMetadataManager());
+        registerObject(OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguageWrapper(muleContext), muleContext);
+        registerObject(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, new MuleConnectorOperationLocator(), muleContext);
+        registerObject(OBJECT_TIME_SUPPLIER, new TimeSupplier(), muleContext);
+        registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
+        registerObject(OBJECT_METADATA_MANAGER, new MuleMetadataManager(), muleContext);
+    }
+
+    protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException
+    {
+        if (serviceImpl instanceof MuleContextAware)
+        {
+            ((MuleContextAware) serviceImpl).setMuleContext(muleContext);
+        }
+        muleContext.getRegistry().registerObject(serviceId, serviceImpl);
     }
 
     private void registerLocalObjectStoreManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException
     {
         MuleObjectStoreManager osm = new MuleObjectStoreManager();
-        osm.setBasePersistentStoreKey(DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY);
-        osm.setBaseTransientStoreKey(DefaultMuleContext.LOCAL_TRANSIENT_OBJECT_STORE_KEY);
+        osm.setBasePersistentStoreKey(LOCAL_PERSISTENT_OBJECT_STORE_KEY);
+        osm.setBaseTransientStoreKey(LOCAL_TRANSIENT_OBJECT_STORE_KEY);
         osm.setMuleContext(muleContext);
-        registry.registerObject(DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY, osm);
+        registry.registerObject(LOCAL_PERSISTENT_OBJECT_STORE_KEY, osm);
     }
 
     protected void configureQueueManager(MuleContext muleContext) throws RegistrationException
     {
         QueueManager queueManager = new DelegateQueueManager();
-        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
-        muleContext.getRegistry().registerObject(DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY, queueManager);
+        registerObject(OBJECT_QUEUE_MANAGER, queueManager, muleContext);
+        registerObject(LOCAL_QUEUE_MANAGER_KEY, queueManager, muleContext);
     }
 
-    protected void configureThreadingProfiles(MuleRegistry registry) throws RegistrationException
+    protected void configureThreadingProfiles(MuleContext muleContext) throws RegistrationException
     {
         ThreadingProfile defaultThreadingProfile = new ChainedThreadingProfile();
-        registry.registerObject(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE, defaultThreadingProfile);
+        registerObject(OBJECT_DEFAULT_THREADING_PROFILE, defaultThreadingProfile, muleContext);
 
-        registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE,
-            new ChainedThreadingProfile(defaultThreadingProfile));
-        registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE,
-            new ChainedThreadingProfile(defaultThreadingProfile));
-        registry.registerObject(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE,
-            new ChainedThreadingProfile(defaultThreadingProfile));
-        registry.registerObject(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE,
-            new ChainedThreadingProfile(defaultThreadingProfile));
+        registerObject(OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE,
+                       new ChainedThreadingProfile(defaultThreadingProfile), muleContext);
+        registerObject(OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE,
+                       new ChainedThreadingProfile(defaultThreadingProfile), muleContext);
+        registerObject(OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE,
+                       new ChainedThreadingProfile(defaultThreadingProfile), muleContext);
+        registerObject(OBJECT_DEFAULT_SERVICE_THREADING_PROFILE,
+                       new ChainedThreadingProfile(defaultThreadingProfile), muleContext);
     }
 }

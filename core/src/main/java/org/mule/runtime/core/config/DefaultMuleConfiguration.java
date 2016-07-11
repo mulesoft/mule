@@ -7,6 +7,7 @@
 package org.mule.runtime.core.config;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -176,7 +178,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     /**
      * List of extensions defined in the configuration element at the application.
      */
-    private List<Object> extensions;
+    private List<ConfigurationExtension> extensions = new ArrayList<>();
 
     /**
      * The instance of {@link ObjectSerializer} to use by default
@@ -769,9 +771,9 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.defaultObjectSerializer = defaultObjectSerializer;
     }
 
-    public void setExtensions(List<Object> extensions)
+    public void addExtensions(List<ConfigurationExtension> extensions)
     {
-        this.extensions = extensions;
+        this.extensions.addAll(extensions);
     }
 
     @Override
@@ -780,7 +782,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return (T) CollectionUtils.find(extensions, object -> extensionType.isAssignableFrom(object.getClass()));
     }
 
-    public List<Object> getExtensions()
+    public List<ConfigurationExtension> getExtensions()
     {
         if (extensions == null)
         {

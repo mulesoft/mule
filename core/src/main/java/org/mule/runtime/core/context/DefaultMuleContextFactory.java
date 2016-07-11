@@ -214,14 +214,14 @@ public class DefaultMuleContextFactory implements MuleContextFactory
 
         notifyMuleContextCreation(muleContext);
 
-        // Initialiase MuleContext
-        muleContext.initialise();
-
-        notifyMuleContextInitialization(muleContext);
-
         try
         {
             configurator.configure(muleContext);
+
+            // Initialiase MuleContext
+            muleContext.initialise();
+
+            notifyMuleContextInitialized(muleContext);
         }
         catch (ConfigurationException e)
         {
@@ -270,7 +270,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         }
     }
 
-    private void notifyMuleContextInitialization(MuleContext context)
+    private void notifyMuleContextInitialized(MuleContext context)
     {
         for (MuleContextListener listener : listeners)
         {

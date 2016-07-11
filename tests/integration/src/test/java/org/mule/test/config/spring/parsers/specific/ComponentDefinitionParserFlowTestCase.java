@@ -240,11 +240,11 @@ public class ComponentDefinitionParserFlowTestCase extends AbstractMuleTestCase
         }
         catch (Exception e)
         {
-            assertEquals(ConfigurationException.class, e.getClass());
-            assertEquals(InitialisationException.class, e.getCause().getClass());
-            assertEquals(BeanDefinitionStoreException.class, e.getCause().getCause().getClass());
+            //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+            assertEquals(InitialisationException.class, e.getClass());
+            assertEquals(BeanDefinitionStoreException.class, e.getCause().getClass());
             assertEquals(CheckExclusiveClassAttributeObjectFactoryException.class, 
-                e.getCause().getCause().getCause().getClass());
+                e.getCause().getCause().getClass());
         }
     }
 

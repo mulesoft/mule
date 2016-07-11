@@ -403,5 +403,15 @@ public interface MuleContext extends Lifecycle
      */
     //TODO(pablo.kraan): remove this reference and use dependency injection (MULE-9157)
     BootstrapServiceDiscoverer getRegistryBootstrapServiceDiscoverer();
+
+    /**
+     * Provides access to a {@link CustomizationService} to change the default services
+     * provided by the {@code MuleContext}.
+     *
+     * Any usage of this service after the {@code MuleContext} initialization will be disregarded.
+     *
+     * @return a customization service.
+     */
+    CustomizationService getCustomizationService();
 }
 

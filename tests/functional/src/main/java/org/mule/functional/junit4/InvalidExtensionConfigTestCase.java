@@ -7,6 +7,7 @@
 package org.mule.functional.junit4;
 
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -36,7 +37,8 @@ public abstract class InvalidExtensionConfigTestCase extends ExtensionFunctional
 
     private void configureExceptionAssertions()
     {
-        expectedException.expect(ConfigurationException.class);
+        //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+        expectedException.expect(InitialisationException.class);
         additionalExceptionAssertions(expectedException);
     }
 

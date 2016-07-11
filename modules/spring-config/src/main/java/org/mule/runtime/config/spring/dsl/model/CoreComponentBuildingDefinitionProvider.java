@@ -38,6 +38,7 @@ import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFact
 import org.mule.runtime.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -491,6 +492,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                  .withSetterParameterDefinition("enricherPropagatesSessionVariableChanges", fromSimpleParameter("enricherPropagatesSessionVariableChanges").build())
                                                  .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
                                                  .withSetterParameterDefinition("defaultObjectSerializer", fromSimpleReferenceParameter("defaultObjectSerializer-ref").build())
+                                                 .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(ConfigurationExtension.class).build())
                                                  .build());
 
         componentBuildingDefinitions.add(baseDefinition.copy()

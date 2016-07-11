@@ -23,8 +23,7 @@ public interface MuleContextListener
     void onCreation(MuleContext context);
 
     /**
-     * Notifies the initialization of a {@link MuleContext} instance right
-     * before the configuration.
+     * Notifies after initialization of a {@link MuleContext} instance.
      *
      * @param context initialized context
      */

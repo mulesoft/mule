@@ -12,6 +12,7 @@ import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -74,7 +75,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
             defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
             defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
             defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
-            defaultConfig.setExtensions(config.getExtensions());
+            defaultConfig.addExtensions(config.getExtensions());
             defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
             determineDefaultProcessingStrategy(defaultConfig);
             validateDefaultExceptionStrategy();
@@ -195,9 +196,9 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
         config.setMaxQueueTransactionFilesSize(queueTransactionFilesSizeInMegabytes);
     }
 
-    public void setExtensions(List<Object> extensions)
+    public void setExtensions(List<ConfigurationExtension> extensions)
     {
-        config.setExtensions(extensions);
+        config.addExtensions(extensions);
     }
 
 }

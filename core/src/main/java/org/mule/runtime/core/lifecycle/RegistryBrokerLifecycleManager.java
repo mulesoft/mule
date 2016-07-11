@@ -60,6 +60,10 @@ public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager
         {
             invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
         }
+        catch (InitialisationException e)
+        {
+            throw e;
+        }
         catch (LifecycleException e)
         {
             throw new InitialisationException(e, object);

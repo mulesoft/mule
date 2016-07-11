@@ -47,6 +47,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLI
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.util.ClassUtils.loadClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
@@ -56,7 +57,10 @@ import org.mule.runtime.config.spring.processors.MuleObjectNameProcessor;
 import org.mule.runtime.config.spring.processors.ParentContextPropertyPlaceholderProcessor;
 import org.mule.runtime.config.spring.processors.PropertyPlaceholderProcessor;
 import org.mule.runtime.core.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.api.CustomService;
+import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
@@ -79,16 +83,17 @@ import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.RegistryNotification;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.TransactionNotification;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguageWrapper;
 import org.mule.runtime.core.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;
+import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.security.MuleSecurityManager;
 import org.mule.runtime.core.time.TimeSupplier;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
 import org.mule.runtime.core.util.lock.MuleLockFactory;
 import org.mule.runtime.core.util.lock.SingleServerLockProvider;
@@ -96,17 +101,30 @@ import org.mule.runtime.core.util.queue.DelegateQueueManager;
 import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
+ * This class configured all the services available in a {@code MuleContext}.
+ * <p>
+ * There's a predefined set of services plus a configurable set of services provided by {@code MuleContext#getCustomizationService}.
+ * <p>
+ * This class takes cares of registering bean definitions for each of the provided services
+ * so dependency injection can be propertly done through the use of {@link javax.inject.Inject}.
+ *
  * @since 4.0
  */
 class SpringMuleContextServiceConfigurator
@@ -114,101 +132,194 @@ class SpringMuleContextServiceConfigurator
 
     private static final String ENDPOINT_FACTORY_IMPL_CLASS_NAME = "org.mule.compatibility.core.endpoint.DefaultEndpointFactory";
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringMuleContextServiceConfigurator.class);
+    private final MuleContext muleContext;
+    private final ArtifactType artifactType;
+    private final OptionalObjectsController optionalObjectsController;
+    private final CustomizationService customizationService;
+    private final BeanDefinitionRegistry beanDefinitionRegistry;
 
-    void createArtifactServices(BeanDefinitionRegistry beanDefinitionRegistry, MuleContext muleContext, ArtifactType artifactType, OptionalObjectsController optionalObjectsController)
+    private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES = ImmutableSet.<String>builder()
+            .add(OBJECT_SECURITY_MANAGER)
+            .add(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)
+            .add(OBJECT_MULE_STREAM_CLOSER_SERVICE)
+            .add(OBJECT_CONVERTER_RESOLVER)
+            .add(OBJECT_LOCK_FACTORY)
+            .add(OBJECT_LOCK_PROVIDER)
+            .add(OBJECT_PROCESSING_TIME_WATCHER)
+            .add(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR)
+            .add(OBJECT_EXCEPTION_LOCATION_PROVIDER)
+            .add(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER)
+            .build();
+
+    private static final ImmutableMap<String, String> OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME = ImmutableMap.<String, String>builder()
+            .put(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, OBJECT_LOCAL_STORE_IN_MEMORY)
+            .put(OBJECT_STORE_DEFAULT_PERSISTENT_NAME, OBJECT_LOCAL_STORE_PERSISTENT)
+            .put(DEFAULT_USER_OBJECT_STORE_NAME, DEFAULT_LOCAL_USER_OBJECT_STORE_NAME)
+            .put(DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME, DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME)
+            .build();
+
+    //Do not use static field. BeanDefinitions are reused and produce weird behaviour
+    private final ImmutableMap<String, BeanDefinition> defaultContextServices = ImmutableMap.<String, BeanDefinition>builder()
+            .put(OBJECT_TRANSACTION_MANAGER, getBeanDefinition(TransactionManagerFactoryBean.class))
+            .put(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, getBeanDefinition(NoRetryPolicyTemplate.class))
+            .put(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguageWrapper.class))
+            .put(OBJECT_EXTENSION_MANAGER, getBeanDefinition(ExtensionManagerFactoryBean.class))
+            .put(OBJECT_TIME_SUPPLIER, getBeanDefinition(TimeSupplier.class))
+            .put(OBJECT_CONNECTION_MANAGER, getBeanDefinition(DefaultConnectionManager.class))
+            .put(OBJECT_METADATA_MANAGER, getBeanDefinition(MuleMetadataManager.class))
+            .put(OBJECT_OBJECT_NAME_PROCESSOR, getBeanDefinition(MuleObjectNameProcessor.class))
+            .put(OBJECT_SERIALIZER, getBeanDefinitionBuilder(DefaultObjectSerializerFactoryBean.class)
+                    .addDependsOn(OBJECT_MULE_CONFIGURATION)
+                    .getBeanDefinition())
+            .put(OBJECT_NOTIFICATION_MANAGER, createNotificationManagerBeanDefinition())
+            .put(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_STORE_IN_MEMORY).getBeanDefinition())
+            .put(OBJECT_LOCAL_STORE_IN_MEMORY, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultInMemoryObjectStore"))
+            .put(OBJECT_STORE_DEFAULT_PERSISTENT_NAME, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_STORE_PERSISTENT).getBeanDefinition())
+            .put(OBJECT_LOCAL_STORE_PERSISTENT, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultPersistentObjectStore"))
+            .put(DEFAULT_USER_OBJECT_STORE_NAME, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(DEFAULT_LOCAL_USER_OBJECT_STORE_NAME).getBeanDefinition())
+            .put(DEFAULT_LOCAL_USER_OBJECT_STORE_NAME, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultUserObjectStore"))
+            .put(DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME).getBeanDefinition())
+            .put(DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultUserTransientObjectStore"))
+            .put(OBJECT_STORE_MANAGER, getBeanDefinition(MuleObjectStoreManager.class))
+            .put(QUEUE_STORE_DEFAULT_PERSISTENT_NAME, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultPersistentQueueStore"))
+            .put(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultInMemoryQueueStore"))
+            .put(OBJECT_QUEUE_MANAGER, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER).getBeanDefinition())
+            .put(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(DelegateQueueManager.class))
+            .put(OBJECT_DEFAULT_THREADING_PROFILE, getBeanDefinition(ChainedThreadingProfile.class))
+            .put(OBJECT_DEFAULT_SERVICE_THREADING_PROFILE, getBeanDefinition(ChainedThreadingProfile.class))
+            .put(OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE, getBeanDefinitionBuilder(ChainedThreadingProfile.class).addConstructorArgReference(OBJECT_DEFAULT_THREADING_PROFILE).getBeanDefinition())
+            .put(OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE, getBeanDefinitionBuilder(ChainedThreadingProfile.class).addConstructorArgReference(OBJECT_DEFAULT_THREADING_PROFILE).getBeanDefinition())
+            .put(OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE, getBeanDefinitionBuilder(ChainedThreadingProfile.class).addConstructorArgReference(OBJECT_DEFAULT_THREADING_PROFILE).getBeanDefinition())
+            .put("_muleParentContextPropertyPlaceholderProcessor", getBeanDefinition(ParentContextPropertyPlaceholderProcessor.class))
+            .put("_mulePropertyPlaceholderProcessor", createMulePropertyPlaceholderBeanDefinition())
+            .put(OBJECT_SECURITY_MANAGER, getBeanDefinition(MuleSecurityManager.class))
+            .put(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class))
+            .put(OBJECT_MULE_STREAM_CLOSER_SERVICE, getBeanDefinition(DefaultStreamCloserService.class))
+            .put(OBJECT_CONVERTER_RESOLVER, getBeanDefinition(DynamicDataTypeConversionResolver.class))
+            .put(OBJECT_LOCK_FACTORY, getBeanDefinition(MuleLockFactory.class))
+            .put(OBJECT_LOCK_PROVIDER, getBeanDefinition(SingleServerLockProvider.class))
+            .put(OBJECT_PROCESSING_TIME_WATCHER, getBeanDefinition(DefaultProcessingTimeWatcher.class))
+            .put(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, getBeanDefinition(MuleConnectorOperationLocator.class))
+            .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
+            .put(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class))
+            .build();
+
+    public SpringMuleContextServiceConfigurator(MuleContext muleContext, ArtifactType artifactType, OptionalObjectsController optionalObjectsController, BeanDefinitionRegistry beanDefinitionRegistry)
     {
-        createBootstrapBeanDefinitions(beanDefinitionRegistry, muleContext, artifactType, optionalObjectsController);
-        createNotificationManager(beanDefinitionRegistry);
-        createObjectStoreBeanDefinitions(beanDefinitionRegistry);
-        createQueueStoreBeanDefinitions(beanDefinitionRegistry);
-        createQueueManagerBeanDefinitions(beanDefinitionRegistry);
-        createThreadingProfileBeanDefinitions(beanDefinitionRegistry);
-        createSpringSpecificBeanDefinitions(beanDefinitionRegistry);
-
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_TRANSACTION_MANAGER, getBeanDefinition(TransactionManagerFactoryBean.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, getBeanDefinition(NoRetryPolicyTemplate.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguageWrapper.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_EXTENSION_MANAGER, getBeanDefinition(ExtensionManagerFactoryBean.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_TIME_SUPPLIER, getBeanDefinition(TimeSupplier.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_CONNECTION_MANAGER, getBeanDefinition(DefaultConnectionManager.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_METADATA_MANAGER, getBeanDefinition(MuleMetadataManager.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_OBJECT_NAME_PROCESSOR, getBeanDefinition(MuleObjectNameProcessor.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_SERIALIZER, getBeanDefinitionBuilder(DefaultObjectSerializerFactoryBean.class)
-                .addDependsOn(OBJECT_MULE_CONFIGURATION)
-                .getBeanDefinition());
-
-        if (artifactType.equals(ArtifactType.APP))
-        {
-            createApplicationServicesBeanDefinitions(beanDefinitionRegistry);
-        }
-
-        createEndpointFactory(beanDefinitionRegistry);
+        this.muleContext = muleContext;
+        this.customizationService = muleContext.getCustomizationService();
+        this.artifactType = artifactType;
+        this.optionalObjectsController = optionalObjectsController;
+        this.beanDefinitionRegistry = beanDefinitionRegistry;
     }
 
-    private void createQueueStoreBeanDefinitions(BeanDefinitionRegistry beanDefinitionRegistry)
+    void createArtifactServices()
     {
-        beanDefinitionRegistry.registerBeanDefinition(QUEUE_STORE_DEFAULT_PERSISTENT_NAME, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultPersistentQueueStore"));
+        initialiseExpressionManager();
+        defaultContextServices.entrySet().stream().filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)).forEach(service -> {
+            registerBeanDefinition(service.getKey(), service.getValue());
+        });
+        createBootstrapBeanDefinitions();
+        createLocalObjectStoreBeanDefinitions();
+        createQueueStoreBeanDefinitions();
+        createQueueManagerBeanDefinitions();
+        createEndpointFactory();
+    }
+
+    private void initialiseExpressionManager()
+    {
+        try
+        {
+            //TODO: DB parsers use the expression language before initialisation phase. Remove once it gets migrated to SDK.
+            MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage(muleContext);
+            expressionLanguage.initialise();
+            ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(expressionLanguage);
+        }
+        catch (InitialisationException e)
+        {
+            throw new MuleRuntimeException(e);
+        }
+    }
+
+    private void registerBeanDefinition(String serviceId, BeanDefinition defaultBeanDefinition)
+    {
+        BeanDefinition beanDefinition = defaultBeanDefinition;
+        Optional<CustomService> customServiceOptional = customizationService.getCustomizedService(serviceId);
+        if (customServiceOptional.isPresent())
+        {
+            Optional<Class> customServiceClass = customServiceOptional.get().getServiceClass();
+            Optional<Object> customServiceImpl = customServiceOptional.get().getServiceImpl();
+            if (customServiceClass.isPresent())
+            {
+                beanDefinition = getBeanDefinitionBuilder(customServiceClass.get()).getBeanDefinition();
+            }
+            else if (customServiceImpl.isPresent())
+            {
+                beanDefinition = getConstantObjectBeanDefinition(customServiceImpl.get());
+            }
+        }
+        beanDefinitionRegistry.registerBeanDefinition(serviceId, beanDefinition);
+    }
+
+
+    private void createQueueStoreBeanDefinitions()
+    {
         beanDefinitionRegistry.registerAlias(QUEUE_STORE_DEFAULT_PERSISTENT_NAME, "_fileQueueStore");
-        beanDefinitionRegistry.registerBeanDefinition(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultInMemoryQueueStore"));
         beanDefinitionRegistry.registerAlias(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, "_simpleMemoryQueueStore");
     }
 
-    private void createApplicationServicesBeanDefinitions(BeanDefinitionRegistry beanDefinitionRegistry)
+    private static BeanDefinition createMulePropertyPlaceholderBeanDefinition()
     {
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_SECURITY_MANAGER, getBeanDefinition(MuleSecurityManager.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_MULE_STREAM_CLOSER_SERVICE, getBeanDefinition(DefaultStreamCloserService.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_MULE_STREAM_CLOSER_SERVICE, getBeanDefinition(DefaultStreamCloserService.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_CONVERTER_RESOLVER, getBeanDefinition(DynamicDataTypeConversionResolver.class)); //missing muleContext in contrcutor
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_LOCK_FACTORY, getBeanDefinition(MuleLockFactory.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_LOCK_PROVIDER, getBeanDefinition(SingleServerLockProvider.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_PROCESSING_TIME_WATCHER, getBeanDefinition(DefaultProcessingTimeWatcher.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, getBeanDefinition(MuleConnectorOperationLocator.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class));
-    }
-
-    private void createSpringSpecificBeanDefinitions(BeanDefinitionRegistry beanDefinitionRegistry)
-    {
-        beanDefinitionRegistry.registerBeanDefinition("_muleParentContextPropertyPlaceholderProcessor", getBeanDefinition(ParentContextPropertyPlaceholderProcessor.class));
         HashMap<Object, Object> factories = new HashMap<>();
         factories.put("hostname", new HostNameFactory());
-        beanDefinitionRegistry.registerBeanDefinition("_mulePropertyPlaceholderProcessor", getBeanDefinitionBuilder(PropertyPlaceholderProcessor.class)
+        BeanDefinitionBuilder mulePropertyPlaceholderProcessor = getBeanDefinitionBuilder(PropertyPlaceholderProcessor.class);
+        return mulePropertyPlaceholderProcessor
                 .addPropertyValue("factories", factories)
                 .addPropertyValue("ignoreUnresolvablePlaceholders", true)
-                .getBeanDefinition());
+                .getBeanDefinition();
     }
 
-    private void createThreadingProfileBeanDefinitions(BeanDefinitionRegistry beanDefinitionRegistry)
+    private void createQueueManagerBeanDefinitions()
     {
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_DEFAULT_THREADING_PROFILE, getBeanDefinition(ChainedThreadingProfile.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_DEFAULT_SERVICE_THREADING_PROFILE, getBeanDefinition(ChainedThreadingProfile.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE, getBeanDefinitionBuilder(ChainedThreadingProfile.class).addConstructorArgReference(OBJECT_DEFAULT_THREADING_PROFILE).getBeanDefinition());
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE, getBeanDefinitionBuilder(ChainedThreadingProfile.class).addConstructorArgReference(OBJECT_DEFAULT_THREADING_PROFILE).getBeanDefinition());
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE, getBeanDefinitionBuilder(ChainedThreadingProfile.class).addConstructorArgReference(OBJECT_DEFAULT_THREADING_PROFILE).getBeanDefinition());
+        if (customizationService.getCustomizedService(OBJECT_QUEUE_MANAGER).isPresent())
+        {
+            registerBeanDefinition(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER).getBeanDefinition());
+        }
+        else
+        {
+            registerBeanDefinition(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(DelegateQueueManager.class));
+        }
     }
 
-    private void createQueueManagerBeanDefinitions(BeanDefinitionRegistry beanDefinitionRegistry)
+    private void createLocalObjectStoreBeanDefinitions()
     {
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_QUEUE_MANAGER, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER).getBeanDefinition());
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(DelegateQueueManager.class));
+        AtomicBoolean anyBaseStoreWasRedefined = new AtomicBoolean(false);
+        OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME.entrySet().forEach(objectStoreLocal -> {
+            customizationService.getCustomizedService(objectStoreLocal.getKey()).ifPresent(customService -> {
+                beanDefinitionRegistry.registerAlias(objectStoreLocal.getKey(), objectStoreLocal.getValue());
+                customService.getServiceClass().ifPresent(serviceClass -> {
+                    anyBaseStoreWasRedefined.set(true);
+                    beanDefinitionRegistry.registerBeanDefinition(objectStoreLocal.getValue(), defaultContextServices.get(objectStoreLocal.getKey()));
+                });
+            });
+        });
+
+        if (anyBaseStoreWasRedefined.get())
+        {
+            beanDefinitionRegistry.registerBeanDefinition(LOCAL_OBJECT_STORE_MANAGER, getBeanDefinitionBuilder(MuleObjectStoreManager.class)
+                    .addPropertyValue("basePersistentStoreKey", new RuntimeBeanReference(OBJECT_STORE_DEFAULT_PERSISTENT_NAME))
+                    .addPropertyValue("baseTransientStoreKey", new RuntimeBeanReference(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME))
+                    .addPropertyValue("basePersistentUserStoreKey", new RuntimeBeanReference(DEFAULT_LOCAL_USER_OBJECT_STORE_NAME))
+                    .addPropertyValue("baseTransientUserStoreKey", new RuntimeBeanReference(DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME))
+                    .getBeanDefinition());
+        }
+        else
+        {
+            beanDefinitionRegistry.registerAlias(OBJECT_STORE_MANAGER, LOCAL_OBJECT_STORE_MANAGER);
+        }
     }
 
-    private void createObjectStoreBeanDefinitions(BeanDefinitionRegistry beanDefinitionRegistry)
-    {
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_STORE_IN_MEMORY).getBeanDefinition());
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_LOCAL_STORE_IN_MEMORY, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultInMemoryObjectStore"));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_STORE_DEFAULT_PERSISTENT_NAME, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_STORE_PERSISTENT).getBeanDefinition());
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_LOCAL_STORE_PERSISTENT, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultPersistentObjectStore"));
-        beanDefinitionRegistry.registerBeanDefinition(DEFAULT_USER_OBJECT_STORE_NAME, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(DEFAULT_LOCAL_USER_OBJECT_STORE_NAME).getBeanDefinition());
-        beanDefinitionRegistry.registerBeanDefinition(DEFAULT_LOCAL_USER_OBJECT_STORE_NAME, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultUserObjectStore"));
-        beanDefinitionRegistry.registerBeanDefinition(DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME, getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME).getBeanDefinition());
-        beanDefinitionRegistry.registerBeanDefinition(DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME, getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultUserTransientObjectStore"));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_STORE_MANAGER, getBeanDefinition(MuleObjectStoreManager.class));
-        beanDefinitionRegistry.registerAlias(OBJECT_STORE_MANAGER, LOCAL_OBJECT_STORE_MANAGER);
-    }
-
-    private void createEndpointFactory(BeanDefinitionRegistry beanDefinitionRegistry)
+    private void createEndpointFactory()
     {
         try
         {
@@ -224,7 +335,7 @@ class SpringMuleContextServiceConfigurator
         }
     }
 
-    private void createNotificationManager(BeanDefinitionRegistry beanDefinitionRegistry)
+    private static BeanDefinition createNotificationManagerBeanDefinition()
     {
         List<NotificationConfig> defaultNotifications = new ArrayList<>();
         defaultNotifications.add(new NotificationConfig(MuleContextNotificationListener.class, MuleContextNotification.class));
@@ -235,12 +346,12 @@ class SpringMuleContextServiceConfigurator
         defaultNotifications.add(new NotificationConfig(CustomNotificationListener.class, CustomNotification.class));
         defaultNotifications.add(new NotificationConfig(ExceptionNotificationListener.class, ExceptionNotification.class));
         defaultNotifications.add(new NotificationConfig(TransactionNotificationListener.class, TransactionNotification.class));
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_NOTIFICATION_MANAGER, getBeanDefinitionBuilder(ServerNotificationManagerConfigurator.class)
+        return getBeanDefinitionBuilder(ServerNotificationManagerConfigurator.class)
                 .addPropertyValue("enabledNotifications", defaultNotifications)
-                .getBeanDefinition());
+                .getBeanDefinition();
     }
 
-    private void createBootstrapBeanDefinitions(BeanDefinitionRegistry beanDefinitionRegistry, MuleContext muleContext, ArtifactType artifactType, OptionalObjectsController optionalObjectsController)
+    private void createBootstrapBeanDefinitions()
     {
         try
         {
@@ -253,17 +364,22 @@ class SpringMuleContextServiceConfigurator
         }
     }
 
-    private AbstractBeanDefinition getBeanDefinition(Class<?> beanType)
+    private static BeanDefinition getBeanDefinition(Class<?> beanType)
     {
         return getBeanDefinitionBuilder(beanType).getBeanDefinition();
     }
 
-    private BeanDefinitionBuilder getBeanDefinitionBuilder(Class<?> beanType)
+    private static BeanDefinition getConstantObjectBeanDefinition(Object impl)
+    {
+        return getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgValue(impl).getBeanDefinition();
+    }
+
+    private static BeanDefinitionBuilder getBeanDefinitionBuilder(Class<?> beanType)
     {
         return genericBeanDefinition(beanType);
     }
 
-    private AbstractBeanDefinition getBeanDefinition(Class<?> beanType, String factoryMethodName)
+    private static BeanDefinition getBeanDefinition(Class<?> beanType, String factoryMethodName)
     {
         return getBeanDefinitionBuilder(beanType)
                 .setFactoryMethod(factoryMethodName)
