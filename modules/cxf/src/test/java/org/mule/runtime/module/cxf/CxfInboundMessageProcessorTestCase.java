@@ -9,6 +9,7 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -18,6 +19,7 @@ import org.mule.runtime.module.cxf.builder.WebServiceMessageProcessorBuilder;
 import org.mule.runtime.module.cxf.testmodels.Echo;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.apache.commons.io.output.NullOutputStream;
 import org.junit.Test;
 
 public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestCase
@@ -54,7 +56,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         Object payload = response.getMessage().getPayload();
         assertTrue(payload instanceof OutputHandler);
         
-        ((OutputHandler) payload).write(response, System.out);
+        ((OutputHandler) payload).write(response, new NullOutputStream());
         assertTrue(gotEvent);
     }
     
