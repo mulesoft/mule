@@ -13,7 +13,7 @@ import java.util.Optional;
 
 /**
  * Defines a customization of a service within the {@code MuleContext}.
- *
+ * <p>
  * A service can be specified by an implementation or a class that can be
  * used to instantiate the implementation.
  */

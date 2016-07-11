@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
@@ -72,7 +73,8 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
         loadConfiguration("org/mule/test/integration/exceptions/named-flow-exception-strategy.xml");
     }
 
-    @Test(expected = ConfigurationException.class)
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly definedWatermarkInvalidExpressionTestCase
+    @Test(expected = InitialisationException.class)
     public void testReferenceExceptionStrategyAsGlobalExceptionStrategy() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/reference-global-exception-strategy.xml");
@@ -96,13 +98,15 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
         loadConfiguration("org/mule/test/integration/exceptions/default-es-as-referenced-exception-strategy.xml");
     }
 
-    @Test(expected = ConfigurationException.class)
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    @Test(expected = InitialisationException.class)
     public void testDefaultExceptionStrategyReferencesNonExistentExceptionStrategy() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-non-existent-es.xml");
     }
 
-    @Test(expected = ConfigurationException.class)
+    //TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
+    @Test(expected = InitialisationException.class)
     public void testDefaultExceptionStrategyReferencesExceptionStrategyWithExpression() throws Exception
     {
         loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-has-expression.xml");

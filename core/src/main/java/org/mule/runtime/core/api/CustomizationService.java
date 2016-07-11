@@ -25,28 +25,28 @@ public interface CustomizationService
     /**
      * Allows to customize a service. The provided implementation will be used instead of the
      * default one if it's replacing an existent service.
-     *
+     * <p>
      * The service implementation can be annotated with @Inject and implement methods from
      * {@link  org.mule.runtime.core.api.lifecycle.Lifecycle}.
-     *
+     * <p>
      * The service identifier can be used to locate the service in the mule registry.
      *
-     * @param serviceId identifier of the services implementation to customize.
+     * @param serviceId   identifier of the services implementation to customize.
      * @param serviceImpl the service implementation instance
-     * @param <T> the service type
+     * @param <T>         the service type
      */
     <T> void customizeServiceImpl(String serviceId, T serviceImpl);
 
     /**
      * Allows to customize a service. The provided class will be used to instantiate the service
      * that replaces the default one if it's replacing an existent service.
-     *
-     * The service class can be annotated with @Inject and implement methods from
+     * <p>
+     * The service class can be annotated with {@link javax.inject.Inject} and implement methods from
      * {@link  org.mule.runtime.core.api.lifecycle.Lifecycle}.
      *
-     * @param serviceId identifier of the services implementation to customize.
+     * @param serviceId    identifier of the services implementation to customize.
      * @param serviceClass the service class
-     * @param <T> the service type
+     * @param <T>          the service type
      */
     <T> void customizeServiceClass(String serviceId, Class<T> serviceClass);
 

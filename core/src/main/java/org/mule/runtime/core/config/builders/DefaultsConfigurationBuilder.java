@@ -91,8 +91,6 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         MuleRegistry registry = muleContext.getRegistry();
 
         new SimpleRegistryBootstrap(APP, muleContext).initialise();
-        //registry.registerObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP,
-        //    );
 
         configureQueueManager(muleContext);
 

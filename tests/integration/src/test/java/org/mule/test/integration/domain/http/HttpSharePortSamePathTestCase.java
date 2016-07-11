@@ -55,7 +55,7 @@ public class HttpSharePortSamePathTestCase extends AbstractMuleTestCase
         firstAppContext = new ApplicationContextBuilder().setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
         ApplicationContextBuilder secondApp = new ApplicationContextBuilder();
 
-        expected.expectCause(instanceOf(InitialisationException.class));
+        expected.expect(instanceOf(InitialisationException.class));
         secondApp.setApplicationResources(new String[] {"domain/http/http-hello-mule-app.xml"}).setDomainContext(domainContext).build();
     }
 

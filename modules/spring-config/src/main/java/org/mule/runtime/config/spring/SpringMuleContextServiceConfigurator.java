@@ -230,7 +230,7 @@ class SpringMuleContextServiceConfigurator
     {
         try
         {
-            //TODO: DB parsers use the expression language before initialisation phase. Remove once it gets migrated to SDK.
+            //TODO MULE-9638 - DB parsers use the expression language before initialisation phase. Remove once it gets migrated to SDK.
             MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage(muleContext);
             expressionLanguage.initialise();
             ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(expressionLanguage);
