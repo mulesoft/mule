@@ -985,7 +985,7 @@ public final class SchemaBuilder
                                                                                 c -> ((SubTypesMapping) c).value());
 
         String typeId = getId(metadataType);
-        if (isExtensible(metadataType)||
+        if (isExtensible(metadataType) ||
             ownerExtensionMappings.stream().anyMatch(m -> getId(typeLoader.load(m.baseType())).equals(typeId)))
         {
             QName refQName = new QName(baseTypeXml.getNamespaceUri(), getTopLevelAbstractTypeName(metadataType), baseTypeXml.getNamespace());
