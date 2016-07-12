@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.Schedulers;
 import org.mule.runtime.core.component.AbstractJavaComponent;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.construct.AbstractPipeline;
 import org.mule.runtime.core.construct.Flow;
@@ -36,7 +35,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.junit.After;
 

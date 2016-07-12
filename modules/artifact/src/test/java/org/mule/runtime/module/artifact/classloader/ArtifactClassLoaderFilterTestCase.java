@@ -77,9 +77,9 @@ public class ArtifactClassLoaderFilterTestCase extends AbstractMuleTestCase
         filter.exportsResource(null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void validatesEmptyResourceName() throws Exception
     {
-        filter.exportsResource("");
+        assertThat(filter.exportsResource(""), equalTo(false));
     }
 }

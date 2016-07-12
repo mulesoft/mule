@@ -102,7 +102,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
     private void logClassloadingTrace(String message)
     {
-        if (valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING)))
+        if (isVerboseClassLoading())
         {
             logger.info(message);
         }
@@ -110,6 +110,11 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
         {
             logger.trace(message);
         }
+    }
+
+    private Boolean isVerboseClassLoading()
+    {
+        return valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
     }
 
     protected Enumeration<URL> getResourcesFromDelegate(ArtifactClassLoader artifactClassLoader, String name) throws IOException

@@ -64,6 +64,7 @@ public class CompositeArtifactClassLoader extends CompositeClassLoader implement
         return this.artifactName;
     }
 
+    //TODO: MULE-10082 Do we have to resolve it by delegating to the parent class loader if resource is not found?
     @Override
     public URL findResource(String name)
     {
