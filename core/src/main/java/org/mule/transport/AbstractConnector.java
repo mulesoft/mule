@@ -7,6 +7,7 @@
 package org.mule.transport;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+
 import org.mule.AbstractAnnotatedObject;
 import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
@@ -191,7 +192,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     /**
      * The collection of listeners on this connector. Keyed by entrypoint
      */
-    protected final Map<Object, MessageReceiver> receivers = new ConcurrentHashMap<Object, MessageReceiver>();
+    protected final Map<Object, MessageReceiver> receivers = new ConcurrentHashMap<>();
 
     /**
      * Defines the dispatcher threading profile
@@ -233,17 +234,17 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     /**
      * A shared work manager for all receivers registered with this connector.
      */
-    private final AtomicReference<WorkManager> receiverWorkManager = new AtomicReference<WorkManager>();
+    private final AtomicReference<WorkManager> receiverWorkManager = new AtomicReference<>();
 
     /**
      * A shared work manager for all requesters created for this connector.
      */
-    private final AtomicReference<WorkManager> dispatcherWorkManager = new AtomicReference<WorkManager>();
+    private final AtomicReference<WorkManager> dispatcherWorkManager = new AtomicReference<>();
 
     /**
      * A shared work manager for all requesters created for this connector.
      */
-    private final AtomicReference<WorkManager> requesterWorkManager = new AtomicReference<WorkManager>();
+    private final AtomicReference<WorkManager> requesterWorkManager = new AtomicReference<>();
 
     /**
      * A generic scheduling service for tasks that need to be performed periodically.
@@ -307,7 +308,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         updateCachedNotificationHandler();
 
         // always add at least the default protocol
-        supportedProtocols = new ArrayList<String>();
+        supportedProtocols = new ArrayList<>();
         supportedProtocols.add(getProtocol().toLowerCase());
 
         // TODO dispatcher pool configuration should be extracted, maybe even
@@ -492,7 +493,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
                 {
                     for (MessageReceiver receiver : receivers.values())
                     {
-                        final List<MuleException> errors = new ArrayList<MuleException>();
+                        final List<MuleException> errors = new ArrayList<>();
                         try
                         {
                             if (logger.isDebugEnabled())
@@ -1581,7 +1582,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         WildcardFilter filter = new WildcardFilter(wildcardExpression);
         filter.setCaseSensitive(false);
 
-        List<MessageReceiver> found = new ArrayList<MessageReceiver>();
+        List<MessageReceiver> found = new ArrayList<>();
 
         for (Map.Entry<Object, MessageReceiver> e : receivers.entrySet())
         {
@@ -1666,7 +1667,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         {
             for (MessageReceiver receiver : receivers.values())
             {
-                final List<MuleException> errors = new ArrayList<MuleException>();
+                final List<MuleException> errors = new ArrayList<>();
                 try
                 {
                     if (logger.isDebugEnabled())
@@ -1783,7 +1784,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     }
 
     @Override
-    public final boolean isConnected()
+    public boolean isConnected()
     {
         return connected.get();
     }
