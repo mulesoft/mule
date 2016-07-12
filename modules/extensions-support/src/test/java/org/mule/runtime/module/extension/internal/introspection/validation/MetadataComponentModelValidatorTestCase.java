@@ -11,6 +11,7 @@ import static java.util.Collections.emptySet;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -29,8 +30,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +43,9 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private ExtensionModel extensionModel;
+
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    private DictionaryType dictionaryType;
 
     @Mock
     private RuntimeOperationModel operationModel;
@@ -90,16 +92,25 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
-    public void operationReturnsObjectype()
+    public void operationReturnsObjectType()
     {
         when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
         validator.validate(extensionModel);
     }
 
     @Test(expected = IllegalModelDefinitionException.class)
-    public void operationReturnsDictionaryType()
+    public void operationReturnsDictionaryTypeWithObjectTypeValue()
     {
-        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Map.class), false, emptySet()));
+        when(dictionaryType.getValueType()).thenReturn(toMetadataType(Object.class));
+        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
+        validator.validate(extensionModel);
+    }
+
+    @Test
+    public void operationReturnsDictionaryTypeWithPojoValue()
+    {
+        when(dictionaryType.getValueType()).thenReturn(toMetadataType(Apple.class));
+        when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
         validator.validate(extensionModel);
     }
 
@@ -113,12 +124,13 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     @Test(expected = IllegalModelDefinitionException.class)
     public void sourceReturnsDictionaryType()
     {
-        when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Map.class), false, emptySet()));
+        when(dictionaryType.getValueType()).thenReturn(toMetadataType(Object.class));
+        when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
         validator.validate(extensionModel);
     }
 
     @Test
-    public void sourceReturnsPOJOType()
+    public void sourceReturnsPojoType()
     {
         when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Apple.class), false, emptySet()));
         validator.validate(extensionModel);
@@ -128,6 +140,16 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     public void sourceReturnsObjectTypeWithDefinedOutputResolver()
     {
         when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", toMetadataType(Object.class), false, emptySet()));
+        when(sourceModel.getMetadataResolverFactory())
+                .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, NullMetadataResolver.class, SimpleOutputResolver.class, SimpleOutputResolver.class));
+        validator.validate(extensionModel);
+    }
+
+    @Test
+    public void sourceReturnsDictionaryTypeWithDefinedOutputResolver()
+    {
+        when(dictionaryType.getValueType()).thenReturn(toMetadataType(Object.class));
+        when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
         when(sourceModel.getMetadataResolverFactory())
                 .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, NullMetadataResolver.class, SimpleOutputResolver.class, SimpleOutputResolver.class));
         validator.validate(extensionModel);

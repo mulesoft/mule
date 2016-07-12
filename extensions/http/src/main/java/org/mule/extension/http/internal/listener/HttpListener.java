@@ -15,6 +15,7 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
+import org.mule.extension.http.internal.request.validator.HttpMetadataResolver;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.MuleMessage;
@@ -30,6 +31,7 @@ import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -72,6 +74,7 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 @Alias("listener")
+@MetadataScope(keysResolver = HttpMetadataResolver.class, outputResolver = HttpMetadataResolver.class)
 public class HttpListener extends Source<Object, HttpRequestAttributes> implements Initialisable, Disposable
 {
     private static final Logger logger = LoggerFactory.getLogger(HttpListener.class);
