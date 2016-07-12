@@ -17,8 +17,11 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * Allows to check log events occurrences in a test case.
@@ -44,7 +47,7 @@ public class TestAppender extends AbstractAppender
     {
         if (!expectations.equals(expectationsToCheck))
         {
-            throw new RuntimeException(difference(expectationsToCheck, expectations));
+            throw new AssertionFailedError(difference(expectationsToCheck, expectations));
         }
     }
 
