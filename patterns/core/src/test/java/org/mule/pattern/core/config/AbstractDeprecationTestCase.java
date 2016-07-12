@@ -34,6 +34,18 @@ public class AbstractDeprecationTestCase extends FunctionalTestCase
         context.getConfiguration().addAppender(testAppender);
         rootLogger.addAppender(testAppender, Level.WARN, null);
 
+        testAppender.start();
         context.updateLoggers();
+    }
+    
+    @Override
+    protected void doTearDownAfterMuleContextDispose() throws Exception
+    {
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
+
+        testAppender.stop();
+        rootLogger.removeAppender(testAppender.getName());
+        super.doTearDownAfterMuleContextDispose();
     }
 }
