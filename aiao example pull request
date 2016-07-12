@@ -1,0 +1,204 @@
+@@ -0,0 +1,202 @@
+<form stylesheet="aiao-itsm-ticketanalysis-ui:styles.css" script="aiao-itsm-ticketanalysis-ui:scripts.js,aiao-itsm-ticketanalysis-ui:autodiscover.js">
+  <label>Resource Ranking</label>
+  <!-- Define the Page Heading -->
+  <row id="dashboard_logo">
+    <panel>
+      <html>
+      <div class="tab_logo">
+        <div class="aiao-links">
+            <a class="help" href="./help"> </a>
+          </div>
+        <div class="accenture_logo">
+          AIAO Ticket Resource Ranking
+        </div>
+      </div> 
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="time" searchWhenChanged="true">
+        <label>Time Range</label>
+        <default>
+          <earliest>0</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="dropdown" token="asset_id" searchWhenChanged="true">
+        <label>Application</label>
+        <search>
+          <query>| stats count | eval value="*" | eval label="All" | append [search `itsm_ticketanalysis_index(main)` | stats count by asset_id  | eventstats sum(count) as total | eval percent=round(count/total*100,2) | eval label=asset_id." (".percent."%)" | eval value=asset_id]</query>
+          <earliest>0</earliest>
+        </search>
+        <fieldForLabel>label</fieldForLabel>
+        <fieldForValue>value</fieldForValue>
+        <default>*</default>
+      </input>
+      <input type="dropdown" token="owner_id" searchWhenChanged="true">
+        <label>Owner</label>
+        <search>
+          <query>search `itsm_ticketanalysis_index(main)` asset_id="*" | dedup owner_name| table owner_name | eval label=owner_name | eval value=owner_name |sort by owner_name</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <fieldForLabel>owner_name</fieldForLabel>
+        <fieldForValue>owner_name</fieldForValue>
+        <default>*</default>
+      </input>
+    </panel>
+  </row>
+  <row id="project_metrics_row">
+    <panel>
+      <table>
+        <title>Project Metrics</title>
+        <search>
+          <query>`itsm_ticketanalysis_index(main)` asset_id="*"  owner_name="*"|dedup ticket_number| fillnull owner_name |stats dc(ticket_number) as total_ticket, dc(owner_name) as total_resources, count(eval(severity=1)) as total_sev1, count(eval(severity=2)) as total_sev2,count(eval(severity=3)) as total_sev3,count(eval(severity=4)) as total_sev4,count(eval(severity=5)) as total_sev5</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row id="project_duration_total_row">
+    <panel>
+      <table>
+        <title>Incident Report Duration</title>
+        <search>
+          <query>`itsm_ticketanalysis_index(main)`  asset_id="$asset_id$" owner_name="$owner_id$"|`itsm_ticketanalysis_to_time(service_restored_date, endtime)`|stats min(_time) as start, max(endtime) as end, dc(asset_id) as distict_apps|eval duration_for_sort=(end-start)|eval duration=(end-start)|sort by duration| `itsm_ticketanalysis_format_time(duration)`|fields start, end, duration,distict_apps|fieldformat start= strftime(start, "%d/%m/%Y")|fieldformat end=strftime(end, "%d/%m/%Y")</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row id="project_duration_metrics_row">
+    <panel>
+      <table>
+        <title>Average Duration To Resolve Incidents</title>
+        <search>
+          <query>`itsm_ticketanalysis_index(main)` asset_id="$asset_id$" owner_name="$owner_id$"|search `itsm_ticketanalysis_ticket_type(resolved)`|dedup ticket_number| fillnull owner_name |`itsm_ticketanalysis_to_time(service_restored_date, endtime)`|eval durations=(endtime-_time)|table ticket_number,severity,durations|stats avg(eval(if(severity=1, durations, null()))) as avg_sev1, avg(eval(if(severity=2, durations, null()))) as avg_sev2, avg(eval(if(severity=3, durations, null()))) as avg_sev3, avg(eval(i...(line truncated)...
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row id="day_incident_row">
+    <panel>
+      <table>
+        <title>SLA Met Metrics</title>
+        <search>
+          <query>`itsm_ticketanalysis_index(main)`  asset_id="$asset_id$" owner_name="$owner_id$"|stats count as total_fixed,count(eval(sla_status="SLA Met")) as met,count(eval(severity=1 AND sla_status="SLA Met")) as sev1,count(eval(severity=2 AND sla_status="SLA Met")) as sev2,count(eval(severity=3 AND sla_status="SLA Met")) as sev3,count(eval(severity=4 AND sla_status="SLA Met")) as sev4,count(eval(severity=5 AND sla_status="SLA Met")) as sev5 by owner_name|eval points=sev1*50+sev2*40+sev3*20+sev4*10+sev...(line truncated)...
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Resource Durations and Cross Skill</title>
+        <search>
+          <query>`itsm_ticketanalysis_index(main)` asset_id="$asset_id$" owner_name="$owner_id$" owner_name!="NoN/A"|`itsm_ticketanalysis_to_time(service_restored_date, endtime)`|stats min(_time) as start, max(endtime) as end, dc(asset_id) as distinct_apps by owner_name|eval duration_for_sort=(end-start)|eval duration=(end-start)|sort by duration| `itsm_ticketanalysis_format_time(duration)`|fields owner_name,start, end, duration,distinct_apps|fieldformat start= strftime(start, "%d/%m/%Y")|fieldformat end=st...(line truncated)...
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row id="day_cross_skill_row">
+    <panel>
+      <table>
+        <title>SLA Breached Metrics</title>
+        <search>
+          <query>`itsm_ticketanalysis_index(main)` asset_id="$asset_id$" owner_name="$owner_id$"|stats count as total_fixed,count(eval(sla_status="SLA Breached")) as breached,count(eval(severity=1 AND sla_status="SLA Breached")) as sev1,count(eval(severity=2 AND sla_status="SLA Breached")) as sev2,count(eval(severity=3 AND sla_status="SLA Breached")) as sev3,count(eval(severity=4 AND sla_status="SLA Breached")) as sev4,count(eval(severity=5 AND sla_status="SLA Breached")) as sev5 by owner_name|eval points=0...(line truncated)...
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>SLA Breach Duration</title>
+        <search>
+          <query>`itsm_ticketanalysis_index(main)`   asset_id="$asset_id$" owner_name="$owner_id$" owner_name!="NoN/A" service_restored_date="*" |`itsm_ticketanalysis_to_time(service_restored_date, endtime)`|eval durations=(endtime-_time)|eval duration_pt=case(severity=1 AND sla_status="SLA Breached", (durations-32077),severity=2 AND sla_status="SLA Breached", (durations-225968),severity=3  AND sla_status="SLA Breached", (durations-582860),severity=4 AND sla_status="SLA Breached", (durations-53628),severity...(line truncated)...
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row id="overall_ranking_row">
+    <panel>
+      <chart>
+        <title>Overall Ranking</title>
+        <search>
+          <query>`itsm_ticketanalysis_index(main)` |`itsm_ticketanalysis_to_time(service_restored_date, endtime)`|eval durations=(endtime-_time)|eval duration_pt=case(severity=1 AND sla_status="SLA Breached", (durations-32077),severity=2 AND sla_status="SLA Breached", (durations-225968),severity=3  AND sla_status="SLA Breached", (durations-582860),severity=4 AND sla_status="SLA Breached", (durations-53628),severity=5 AND sla_status="SLA Breached", (durations-150759),1=1,0)|stats count as total_fixed,count(e...(line truncated)...
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>
+\ No newline at end of file
