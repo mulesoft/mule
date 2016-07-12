@@ -16,6 +16,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.introspection.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 
 import com.google.common.collect.ImmutableList;
@@ -135,5 +136,16 @@ public final class MetadataTypeUtils
                 .map(ClassInformationAnnotation::isFinal)
                 .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) &&
                         Modifier.isFinal(getType(metadataType).getModifiers()));
+    }
+
+    public static String getId(MetadataType metadataType)
+    {
+        return org.mule.metadata.utils.MetadataTypeUtils.getTypeId(metadataType)
+                .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) ? getType(metadataType).getName() : "");
+    }
+
+    public static boolean isExtensible(MetadataType metadataType)
+    {
+        return org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation(metadataType, ExtensibleTypeAnnotation.class).isPresent();
     }
 }
