@@ -29,6 +29,8 @@ import static org.mule.runtime.module.extension.internal.introspection.describer
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isExtensible;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
@@ -967,10 +969,9 @@ public final class SchemaBuilder
         boolean isPojo = metadataType instanceof ObjectType;
         Class<?> clazz = getType(metadataType);
         boolean isPrimitive = clazz.isPrimitive() || ClassUtils.isPrimitiveWrapper(clazz);
-        boolean isExtensible = clazz.isAnnotationPresent(Extensible.class);
 
         return isPrimitive ||
-               isExtensible || !subTypesMapping.getSubTypes(metadataType).isEmpty() ||
+               isExtensible(metadataType) || !subTypesMapping.getSubTypes(metadataType).isEmpty() ||
                (isPojo && isInstantiableWithParameters(clazz)) ||
                (!isPojo && isInstantiable(clazz));
     }
@@ -982,9 +983,10 @@ public final class SchemaBuilder
         //TODO review this when union types and annotations are added
         List<SubTypeMapping> ownerExtensionMappings = parseRepeatableAnnotation(extensionType, SubTypeMapping.class,
                                                                                 c -> ((SubTypesMapping) c).value());
-        Class<?> importedType = getType(metadataType);
-        if (importedType.isAnnotationPresent(Extensible.class) ||
-            ownerExtensionMappings.stream().anyMatch(m -> m.baseType().getName().equals(importedType.getName())))
+
+        String typeId = getId(metadataType);
+        if (isExtensible(metadataType)||
+            ownerExtensionMappings.stream().anyMatch(m -> getId(typeLoader.load(m.baseType())).equals(typeId)))
         {
             QName refQName = new QName(baseTypeXml.getNamespaceUri(), getTopLevelAbstractTypeName(metadataType), baseTypeXml.getNamespace());
 
@@ -1002,8 +1004,7 @@ public final class SchemaBuilder
         }
         else
         {
-            //FIXME class => annotation
-            QName typeQName = new QName(baseTypeXml.getNamespaceUri(), sanitizeName(importedType.getName()), baseTypeXml.getNamespace());
+            QName typeQName = new QName(baseTypeXml.getNamespaceUri(), sanitizeName(typeId), baseTypeXml.getNamespace());
             addChildElementTypeExtension(typeQName, description, name, all);
         }
     }
@@ -1011,7 +1012,7 @@ public final class SchemaBuilder
     private XmlModelProperty registerExtensionImport(Class<?> extensionType)
     {
         XmlModelProperty importedExtensionXml = createXmlModelProperty(getAnnotation(extensionType, Xml.class),
-                getAnnotation(extensionType, Extension.class).name(), "");
+                                                                       getAnnotation(extensionType, Extension.class).name(), "");
 
         Import schemaImport = new Import();
         schemaImport.setNamespace(importedExtensionXml.getNamespaceUri());
