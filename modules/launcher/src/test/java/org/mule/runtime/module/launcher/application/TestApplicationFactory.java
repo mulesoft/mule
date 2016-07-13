@@ -8,11 +8,15 @@ package org.mule.runtime.module.launcher.application;
 
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.launcher.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
+import org.mule.runtime.module.launcher.ArtifactClassLoaderBuilderFactory;
 import org.mule.runtime.module.launcher.domain.DomainManager;
-import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
-import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
-import org.mule.runtime.module.launcher.plugin.ApplicationPluginRepository;
+import org.mule.runtime.module.launcher.domain.DomainRepository;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -28,9 +32,23 @@ public class TestApplicationFactory extends DefaultApplicationFactory
     private boolean failOnStopApplication;
     private boolean failOnDisposeApplication;
 
-    public TestApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, DomainManager domainManager)
+    public TestApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory, ApplicationDescriptorFactory applicationDescriptorFactory, DomainRepository domainRepository)
     {
-        super(applicationClassLoaderFactory, new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory()), new TestEmptyApplicationPluginRepository()), new DefaultApplicationPluginFactory(new ApplicationPluginClassLoaderFactory()), domainManager, new TestEmptyApplicationPluginRepository());
+        super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainRepository);
+    }
+
+    public static TestApplicationFactory createTestApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, DomainManager domainManager)
+    {
+        DefaultArtifactClassLoaderFilterFactory classLoaderFilterFactory = new DefaultArtifactClassLoaderFilterFactory();
+        ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory = new ArtifactPluginDescriptorFactory(classLoaderFilterFactory);
+        ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
+        TestEmptyApplicationPluginRepository applicationPluginRepository = new TestEmptyApplicationPluginRepository();
+        ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository);
+        ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory = new ArtifactPluginClassLoaderFactory();
+        DefaultArtifactPluginFactory applicationPluginFactory = new DefaultArtifactPluginFactory(artifactPluginClassLoaderFactory);
+        ArtifactClassLoaderBuilderFactory artifactClassLoaderBuilderFactory = new ArtifactClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository, applicationPluginFactory, artifactPluginDescriptorLoader);
+        ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(artifactClassLoaderBuilderFactory, domainManager);
+        return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainManager);
     }
 
     @Override
@@ -56,10 +74,9 @@ public class TestApplicationFactory extends DefaultApplicationFactory
     }
 
 
-    private static class TestEmptyApplicationPluginRepository implements ApplicationPluginRepository
+    private static class TestEmptyApplicationPluginRepository implements ArtifactPluginRepository
     {
-        @Override
-        public List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors()
+        public List<ArtifactPluginDescriptor> getContainerArtifactPluginDescriptors()
         {
             return Collections.emptyList();
         }

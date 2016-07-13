@@ -40,6 +40,7 @@ import static org.mule.runtime.module.launcher.MuleFoldersUtil.CONTAINER_APP_PLU
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getDomainFolder;
+import static org.mule.runtime.module.launcher.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
@@ -65,7 +66,7 @@ import org.mule.runtime.module.launcher.application.ApplicationStatus;
 import org.mule.runtime.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.module.launcher.application.TestApplicationFactory;
 import org.mule.runtime.module.launcher.builder.ApplicationFileBuilder;
-import org.mule.runtime.module.launcher.builder.ApplicationPluginFileBuilder;
+import org.mule.runtime.module.launcher.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.launcher.builder.DomainFileBuilder;
 import org.mule.runtime.module.launcher.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
@@ -124,11 +125,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     private static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
 
     // Application plugin file builders
-    private final ApplicationPluginFileBuilder echoPlugin = new ApplicationPluginFileBuilder("echoPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar");
-    private final ApplicationPluginFileBuilder echoPluginWithLib1 = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/bar-1.0.jar").containingClass("org/foo/Plugin1Echo.clazz");
-    private final ApplicationPluginFileBuilder echoPluginWithoutLib1 = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz");
-    private final ApplicationPluginFileBuilder echoPluginWithLib2 = new ApplicationPluginFileBuilder("echoPlugin2").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo").usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/echo/Plugin2Echo.clazz");
-    private final ApplicationPluginFileBuilder pluginWithResource = new ApplicationPluginFileBuilder("resourcePlugin").configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/").containingResource("pluginResourceSource.properties", "pluginResource.properties");
+    private final ArtifactPluginFileBuilder echoPlugin = new ArtifactPluginFileBuilder("echoPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar");
+    private final ArtifactPluginFileBuilder echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/bar-1.0.jar").containingClass("org/foo/Plugin1Echo.clazz");
+    private final ArtifactPluginFileBuilder echoPluginWithoutLib1 = new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz");
+    private final ArtifactPluginFileBuilder echoPluginWithLib2 = new ArtifactPluginFileBuilder("echoPlugin2").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo").usingLibrary("lib/bar-2.0.jar").containingClass("org/foo/echo/Plugin2Echo.clazz");
+    private final ArtifactPluginFileBuilder pluginWithResource = new ArtifactPluginFileBuilder("resourcePlugin").configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/").containingResource("pluginResourceSource.properties", "pluginResource.properties");
 
     // Application file builders
     private final ApplicationFileBuilder emptyAppFileBuilder = new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
@@ -1041,7 +1042,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final DefaultDomainManager domainManager = new DefaultDomainManager();
         domainManager.addDomain(createDefaultDomain());
 
-        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()), domainManager);
+        TestApplicationFactory appFactory = createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()), domainManager);
         appFactory.setFailOnStopApplication(true);
 
         deploymentService.setAppFactory(appFactory);
@@ -1066,7 +1067,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final DefaultDomainManager domainManager = new DefaultDomainManager();
         domainManager.addDomain(createDefaultDomain());
 
-        TestApplicationFactory appFactory = new TestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()), domainManager);
+        TestApplicationFactory appFactory = createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()), domainManager);
         appFactory.setFailOnDisposeApplication(true);
         deploymentService.setAppFactory(appFactory);
         deploymentService.start();
@@ -1284,7 +1285,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysAppZipWithContainerPluginBroken() throws Exception
     {
-        ApplicationPluginFileBuilder echoPluginBroken = new ApplicationPluginFileBuilder("echoPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar").corrupted();
+        ArtifactPluginFileBuilder echoPluginBroken = new ArtifactPluginFileBuilder("echoPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").usingLibrary("lib/echo-test.jar").corrupted();
 
         installContainerPlugin(echoPluginBroken);
 
@@ -1356,7 +1357,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysAppWithAppSharedLibPrecedenceOverPluginLib() throws Exception
     {
-        final ApplicationPluginFileBuilder echoPlugin1WithLib2 = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz").usingLibrary("lib/bar-2.0.jar");
+        final ArtifactPluginFileBuilder echoPlugin1WithLib2 = new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz").usingLibrary("lib/bar-2.0.jar");
         final ApplicationFileBuilder sharedLibPluginAppPrecedenceFileBuilder = new ApplicationFileBuilder("shared-plugin-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml").containingPlugin(echoPlugin1WithLib2).sharingLibrary("lib/bar-1.0.jar");
 
         addPackedAppFromBuilder(sharedLibPluginAppPrecedenceFileBuilder);
@@ -1377,7 +1378,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysAppZipWithExtensionPlugin() throws Exception
     {
-        ApplicationPluginFileBuilder extensionPlugin = new ApplicationPluginFileBuilder("extensionPlugin")
+        ArtifactPluginFileBuilder extensionPlugin = new ArtifactPluginFileBuilder("extensionPlugin")
                 .usingLibrary("lib/mule-module-hello-4.0-SNAPSHOT.jar")
                 .configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/, META-INF");
         ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin").definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
@@ -1432,7 +1433,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     public void deploysDomainWithSharedLibPrecedenceOverApplicationPluginLib() throws Exception
     {
         final String domainId = "shared-lib";
-        final ApplicationPluginFileBuilder pluginFileBuilder = new ApplicationPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz").usingLibrary("lib/bar-2.0.jar");
+        final ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo").containingClass("org/foo/Plugin1Echo.clazz").usingLibrary("lib/bar-2.0.jar");
         final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("shared-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml").containingPlugin(pluginFileBuilder).deployedWith(PROPERTY_DOMAIN, domainId);
         final DomainFileBuilder domainFileBuilder = new DomainFileBuilder(domainId).usingLibrary("lib/bar-1.0.jar").containing(applicationFileBuilder);
 
@@ -2353,19 +2354,19 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
      * Copies the artifact file (zip) of the applicationPluginFileBuilder to the container application plugins directory so the given plugin would be
      * treated as container application plugin.
      *
-     * @param applicationPluginFileBuilder
+     * @param artifactPluginFileBuilder
      * @throws Exception
      */
-    private void installContainerPlugin(ApplicationPluginFileBuilder applicationPluginFileBuilder) throws Exception
+    private void installContainerPlugin(ArtifactPluginFileBuilder artifactPluginFileBuilder) throws Exception
     {
-        copyFileToContainerPluginFolder(applicationPluginFileBuilder.getArtifactFile(), applicationPluginFileBuilder.getId() + ".zip");
+        copyFileToContainerPluginFolder(artifactPluginFileBuilder.getArtifactFile(), artifactPluginFileBuilder.getId() + ".zip");
     }
 
-    private void installContainerPluginExpanded(ApplicationPluginFileBuilder applicationPluginFileBuilder) throws Exception
+    private void installContainerPluginExpanded(ArtifactPluginFileBuilder artifactPluginFileBuilder) throws Exception
     {
         final File pluginFolderExpanded = new File(getContainerAppPluginsFolder(),
-                                                   separator + applicationPluginFileBuilder.getId());
-        FileUtils.unzip(applicationPluginFileBuilder.getArtifactFile(), pluginFolderExpanded);
+                                                   separator + artifactPluginFileBuilder.getId());
+        FileUtils.unzip(artifactPluginFileBuilder.getArtifactFile(), pluginFolderExpanded);
     }
 
     private void copyFileToContainerPluginFolder(File sourceFile, String targetFileName) throws IOException
