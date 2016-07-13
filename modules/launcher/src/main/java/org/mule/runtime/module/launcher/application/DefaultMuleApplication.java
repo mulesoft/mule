@@ -54,7 +54,6 @@ public class DefaultMuleApplication implements Application
     protected transient final Logger deployLogger = LoggerFactory.getLogger(MuleDeploymentService.class);
 
     protected final ApplicationDescriptor descriptor;
-    private final List<ApplicationPlugin> applicationPlugins;
     private final DomainRepository domainRepository;
     private ApplicationStatus status;
 
@@ -63,10 +62,9 @@ public class DefaultMuleApplication implements Application
     protected DeploymentListener deploymentListener;
     private ServerNotificationListener<MuleContextNotification> statusListener;
 
-    public DefaultMuleApplication(ApplicationDescriptor descriptor, ArtifactClassLoader deploymentClassLoader, List<ApplicationPlugin> applicationPlugins, DomainRepository domainRepository)
+    public DefaultMuleApplication(ApplicationDescriptor descriptor, ArtifactClassLoader deploymentClassLoader, DomainRepository domainRepository)
     {
         this.descriptor = descriptor;
-        this.applicationPlugins = applicationPlugins;
         this.domainRepository = domainRepository;
         this.deploymentListener = new NullDeploymentListener();
         updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
@@ -180,7 +178,6 @@ public class DefaultMuleApplication implements Application
                     .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getArtifactName()))
                     .setConfigurationFiles(descriptor.getAbsoluteResourcePaths())
                     .setDefaultEncoding(descriptor.getEncoding())
-                    .setApplicationPlugins(applicationPlugins)
                     .setExecutionClassloader(deploymentClassLoader.getClassLoader());
 
             Domain domain = domainRepository.getDomain(descriptor.getDomain());

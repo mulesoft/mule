@@ -9,23 +9,23 @@ package org.mule.runtime.module.launcher.application;
 
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
 
 /**
  * Creates an application plugin artifact.
  *
  * @since 4.0
  */
-public interface ApplicationPluginFactory
+public interface ArtifactPluginFactory
 {
 
     /**
-     * Creates an {@link ApplicationPlugin} along with its classloader. The classloader for the application plugin
+     * Creates an {@link ArtifactPlugin} along with its classloader. The classloader for the application plugin
      * would be a child classloader of the given parent and it will use the same {@link ClassLoaderLookupPolicy} as the parent.
      *
      * @param descriptor that defines the application plugin
      * @param parent {@link ArtifactClassLoader} to be used as parent classloader
-     * @return an {@link ApplicationPlugin}
+     * @return an {@link ArtifactPlugin}
      */
-    ApplicationPlugin create(ApplicationPluginDescriptor descriptor, ArtifactClassLoader parent);
+    ArtifactPlugin create(ArtifactPluginDescriptor descriptor, ArtifactClassLoader parent);
 }

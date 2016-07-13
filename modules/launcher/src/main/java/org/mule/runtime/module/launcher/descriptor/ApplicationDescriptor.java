@@ -7,14 +7,12 @@
  */
 package org.mule.runtime.module.launcher.descriptor;
 
-import static org.apache.commons.collections.CollectionUtils.find;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,15 +34,14 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor
     private String encoding;
     private String configurationBuilder;
     private String domain = DEFAULT_DOMAIN_NAME;
-    private String packagesToScan;
     private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
     private String[] absoluteResourcePaths;
     private File[] configResourcesFile;
     private Map<String, String> appProperties = new HashMap<String, String>();
 
     private File logConfigFile;
-    private Set<ApplicationPluginDescriptor> plugins = new HashSet<ApplicationPluginDescriptor>(0);
-    private URL[] sharedPluginLibs = new URL[0];
+    private File sharedPluginFolder;
+    private Set<ArtifactPluginDescriptor> plugins = new HashSet<ArtifactPluginDescriptor>(0);
 
     public String getEncoding()
     {
@@ -133,33 +130,35 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor
         return logConfigFile;
     }
 
-    public Set<ApplicationPluginDescriptor> getPlugins()
+    /**
+     * @return the {@code ApplicationPluginDescriptor} that describe the plugins the application requires.
+     */
+    public Set<ArtifactPluginDescriptor> getPlugins()
     {
         return plugins;
     }
 
-    public void setSharedPluginLibs(URL[] sharedPluginLibs)
-    {
-        this.sharedPluginLibs = sharedPluginLibs;
-    }
-
-    public URL[] getSharedPluginLibs()
-    {
-        return sharedPluginLibs;
-    }
-
-    public void setPlugins(Set<ApplicationPluginDescriptor> plugins)
+    /**
+     * @param plugins a set of {@code ApplicationPluginDescriptor} which are dependencies of the application.
+     */
+    public void setPlugins(Set<ArtifactPluginDescriptor> plugins)
     {
         this.plugins = plugins;
     }
 
     /**
-     * @param appPluginDescriptor
-     * @return true if this application has the given appPluginDescriptor already defined in its plugins list.
+     * @param sharedPluginFolder folder where the shared libraries between the application plugins are located
      */
-    public boolean containsApplicationPluginDescriptor(final ApplicationPluginDescriptor appPluginDescriptor)
+    public void setSharedPluginFolder(File sharedPluginFolder)
     {
-        return find(this.plugins, object -> ((ApplicationPluginDescriptor) object).getName().equals(appPluginDescriptor.getName())) != null;
+        this.sharedPluginFolder = sharedPluginFolder;
     }
 
+    /**
+     * @return the folder where the shared libraries between the application plugins are located
+     */
+    public File getSharedPluginFolder()
+    {
+        return sharedPluginFolder;
+    }
 }

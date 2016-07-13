@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
-import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -27,19 +27,19 @@ import java.net.URL;
 import org.junit.Test;
 
 @SmallTest
-public class DefaultApplicationPluginFactoryTestCase extends AbstractMuleTestCase
+public class DefaultArtifactPluginFactoryTestCase extends AbstractMuleTestCase
 {
     @Test
     public void createApplicationPlugin() throws MalformedURLException, ClassNotFoundException
     {
-        ApplicationPluginDescriptor descriptor = mock(ApplicationPluginDescriptor.class);
+        ArtifactPluginDescriptor descriptor = mock(ArtifactPluginDescriptor.class);
         when(descriptor.getName()).thenReturn("aPlugin");
         URL[] urls = new URL[] { getClass().getClassLoader().getResource("lib/bar-1.0.jar") };
         when(descriptor.getRuntimeLibs()).thenReturn(urls);
         when(descriptor.getRuntimeClassesDir()).thenReturn(getClass().getClassLoader().getResource("org/foo/"));
 
         ArtifactClassLoader parentClassLoader = new MuleArtifactClassLoader("mule", new URL[0], getClass().getClassLoader(), new MuleClassLoaderLookupPolicy(emptyMap(), emptySet()));
-        ApplicationPlugin appPlugin = new DefaultApplicationPluginFactory(new ApplicationPluginClassLoaderFactory()).create(descriptor, parentClassLoader);
+        ArtifactPlugin appPlugin = new DefaultArtifactPluginFactory(new ArtifactPluginClassLoaderFactory()).create(descriptor, parentClassLoader);
 
         // Look for a class in bar-1.0.jar to check classloader has been correctly set
         assertThat(Class.forName("org.bar.BarUtils", true, appPlugin.getArtifactClassLoader().getClassLoader()), is(notNullValue()));
