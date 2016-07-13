@@ -27,6 +27,8 @@ import org.mule.util.MapUtils;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -46,8 +48,9 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     protected boolean reuseConsumer;
     protected boolean reuseSession;
     protected final ThreadContextLocal context = new ThreadContextLocal();
+    protected final Set<JmsThreadContext> allContexts = new CopyOnWriteArraySet<>();
     protected final long timeout;
-    private final AtomicReference<RedeliveryHandler> redeliveryHandler = new AtomicReference<RedeliveryHandler>();
+    private final AtomicReference<RedeliveryHandler> redeliveryHandler = new AtomicReference<>();
     private final boolean topic;
 
     @Override
@@ -357,11 +360,21 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     protected void closeResource(boolean force)
     {
         JmsThreadContext ctx = context.getContext();
-        if (ctx == null)
+        if (ctx.consumer == null && ctx.session == null)
         {
-            return;
+            for (JmsThreadContext threadContext : allContexts)
+            {
+                doCloseResource(force, threadContext);
+            }
         }
+        else
+        {
+            doCloseResource(force, ctx);
+        }
+    }
 
+    protected void doCloseResource(boolean force, JmsThreadContext ctx)
+    {
         // Close consumer
         if (force || !reuseSession || !reuseConsumer)
         {
@@ -391,10 +404,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             JmsSupport jmsSupport = this.connector.getJmsSupport();
 
             JmsThreadContext ctx = context.getContext();
-            if (ctx == null)
-            {
-                ctx = new JmsThreadContext();
-            }
+            allContexts.add(context.getContext());
 
             Session session;
             Transaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -419,10 +429,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                 }
             }
 
-            if (reuseSession)
-            {
-                ctx.session = session;
-            }
+            ctx.session = session;
 
             // TODO How can I verify that the consumer is active?
             if (this.reuseConsumer && ctx.consumer != null)
@@ -466,10 +473,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             // Create consumer
             MessageConsumer consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(),
                 durableName, topic, endpoint);
-            if (reuseConsumer)
-            {
-                ctx.consumer = consumer;
-            }
+            ctx.consumer = consumer;
             return consumer;
         }
         catch (JMSException e)
