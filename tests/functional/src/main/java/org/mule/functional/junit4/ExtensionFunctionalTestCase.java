@@ -7,45 +7,24 @@
 package org.mule.functional.junit4;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.ArrayUtils;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.introspection.ExtensionFactory;
-import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
-import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
-import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
-import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.resources.AbstractResourcesGenerator;
-
-import com.google.common.collect.ImmutableList;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.jar.Manifest;
 
 import org.apache.commons.io.FileUtils;
 
@@ -74,11 +53,7 @@ import org.apache.commons.io.FileUtils;
 public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
 {
 
-    private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
-    private final ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, getClass().getClassLoader());
     private ExtensionManagerAdapter extensionManager;
-    private File generatedResourcesDirectory;
-
 
     /**
      * Implement this method to limit the amount of extensions
@@ -129,63 +104,20 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
         });
     }
 
-    private List<GeneratedResourceFactory> getResourceFactories()
-    {
-        return ImmutableList.copyOf(serviceRegistry.lookupProviders(GeneratedResourceFactory.class));
-    }
-
     private void createExtensionsManager(MuleContext muleContext) throws Exception
     {
         extensionManager = new DefaultExtensionManager();
-        generatedResourcesDirectory = getGenerationTargetDirectory();
-        createManifestFileIfNecessary(generatedResourcesDirectory);
+        File generatedResourcesDirectory = getGenerationTargetDirectory();
 
         ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
         initialiseIfNeeded(extensionManager, muleContext);
-        discoverExtensions();
+
+        ExtensionsTestInfrastructureDiscoverer extensionsTestInfrastructureDiscoverer = new ExtensionsTestInfrastructureDiscoverer(extensionManager, generatedResourcesDirectory);
+        List<GeneratedResource> generatedResources = extensionsTestInfrastructureDiscoverer.discoverExtensions(getDescribers(), getAnnotatedExtensionClasses());
+        generateResourcesAndAddToClasspath(generatedResourcesDirectory, generatedResources);
     }
 
-    private void discoverExtensions() throws Exception
-    {
-        Describer[] describers = getDescribers();
-        if (ArrayUtils.isEmpty(describers))
-        {
-            Class<?>[] annotatedClasses = getAnnotatedExtensionClasses();
-            if (!ArrayUtils.isEmpty(annotatedClasses))
-            {
-                describers = new Describer[annotatedClasses.length];
-                int i = 0;
-                for (Class<?> annotatedClass : annotatedClasses)
-                {
-                    describers[i++] = new AnnotationsBasedDescriber(annotatedClass, new StaticVersionResolver(getProductVersion()));
-                }
-            }
-        }
-
-        if (ArrayUtils.isEmpty(describers))
-        {
-            throw new IllegalStateException("No extension referenced from test");
-        }
-        else
-        {
-            loadExtensionsFromDescribers(extensionManager, describers);
-        }
-
-        ExtensionsTestInfrastructureResourcesGenerator generator = new ExtensionsTestInfrastructureResourcesGenerator(getResourceFactories(), generatedResourcesDirectory);
-        extensionManager.getExtensions().forEach(generator::generateFor);
-        generateResourcesAndAddToClasspath(generator.dumpAll());
-    }
-
-    private void loadExtensionsFromDescribers(ExtensionManagerAdapter extensionManager, Describer[] describers)
-    {
-        for (Describer describer : describers)
-        {
-            final DescribingContext context = new DefaultDescribingContext(getClass().getClassLoader());
-            extensionManager.registerExtension(extensionFactory.createFrom(describer.describe(context), context));
-        }
-    }
-
-    private void generateResourcesAndAddToClasspath(List<GeneratedResource> resources) throws Exception
+    private void generateResourcesAndAddToClasspath(File generatedResourcesDirectory, List<GeneratedResource> resources) throws Exception
     {
         ClassLoader cl = getClass().getClassLoader();
         Method method = findMethod(cl.getClass(), "addURL", URL.class);
@@ -250,75 +182,4 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
         return null;
     }
 
-
-    private class ExtensionsTestInfrastructureResourcesGenerator extends AbstractResourcesGenerator
-    {
-
-        private File targetDirectory;
-        private Map<String, StringBuilder> contents = new HashMap<>();
-
-        private ExtensionsTestInfrastructureResourcesGenerator(Collection<GeneratedResourceFactory> resourceFactories, File targetDirectory)
-        {
-            super(resourceFactories);
-            this.targetDirectory = targetDirectory;
-        }
-
-        @Override
-        protected void write(GeneratedResource resource)
-        {
-            StringBuilder builder = contents.get(resource.getPath());
-            if (builder == null)
-            {
-                builder = new StringBuilder();
-                contents.put(resource.getPath(), builder);
-            }
-
-            if (builder.length() > 0)
-            {
-                builder.append("\n");
-            }
-
-            builder.append(new String(resource.getContent()));
-        }
-
-        List<GeneratedResource> dumpAll()
-        {
-            List<GeneratedResource> allResources = contents.entrySet().stream()
-                    .map(entry -> new GeneratedResource(entry.getKey(), entry.getValue().toString().getBytes()))
-                    .collect(new ImmutableListCollector<>());
-
-            allResources.forEach(resource -> {
-                File targetFile = new File(targetDirectory, resource.getPath());
-                try
-                {
-                    FileUtils.write(targetFile, new String(resource.getContent()));
-                }
-                catch (IOException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            return allResources;
-        }
-    }
-
-    private File createManifestFileIfNecessary(File targetDirectory) throws IOException
-    {
-        return createManifestFileIfNecessary(targetDirectory, MuleManifest.getManifest());
-    }
-
-    private File createManifestFileIfNecessary(File targetDirectory, Manifest sourceManifest) throws IOException
-    {
-        File manifestFile = new File(targetDirectory.getPath(), "MANIFEST.MF");
-        if (!manifestFile.exists())
-        {
-            Manifest manifest = new Manifest(sourceManifest);
-            try (FileOutputStream fileOutputStream = new FileOutputStream(manifestFile))
-            {
-                manifest.write(fileOutputStream);
-            }
-        }
-        return manifestFile;
-    }
 }
