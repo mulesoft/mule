@@ -42,6 +42,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
@@ -74,6 +75,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.SubTypesMapping;
 import org.mule.runtime.extension.api.annotation.capability.Xml;
+import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
@@ -181,7 +183,6 @@ public final class SchemaBuilder
         builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : ImmutableMap.of());
 
         extensionModel.getModelProperty(ExportModelProperty.class).ifPresent(e -> builder.withExportedTypes(e.getExportedTypes()));
-
 
         return builder;
     }
@@ -328,27 +329,28 @@ public final class SchemaBuilder
     private List<ParameterModel> getSortedParameterModels(Collection<ParameterModel> parameterModels)
     {
         List<ParameterModel> sortedParameters = new ArrayList<>(parameterModels);
-        sortedParameters.sort((left, right) -> {
-            boolean isLeftInfrastructure = left.getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
-            boolean isRightInfrastructure = right.getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
+        sortedParameters.sort((left, right) ->
+                              {
+                                  boolean isLeftInfrastructure = left.getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
+                                  boolean isRightInfrastructure = right.getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
 
-            if (!isLeftInfrastructure && !isRightInfrastructure)
-            {
-                return 0;
-            }
+                                  if (!isLeftInfrastructure && !isRightInfrastructure)
+                                  {
+                                      return 0;
+                                  }
 
-            if (!isLeftInfrastructure && isRightInfrastructure)
-            {
-                return 1;
-            }
+                                  if (!isLeftInfrastructure && isRightInfrastructure)
+                                  {
+                                      return 1;
+                                  }
 
-            if (isLeftInfrastructure && !isRightInfrastructure)
-            {
-                return -1;
-            }
+                                  if (isLeftInfrastructure && !isRightInfrastructure)
+                                  {
+                                      return -1;
+                                  }
 
-            return left.getName().compareTo(right.getName());
-        });
+                                  return left.getName().compareTo(right.getName());
+                              });
         return sortedParameters;
     }
 
@@ -594,8 +596,15 @@ public final class SchemaBuilder
                     throw new IllegalParameterModelDefinitionException(String.format("Parameter '%s' refers to an enum class which couldn't be loaded.", name), e);
                 }
 
-                attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(enumType.getName()) + SchemaConstants.ENUM_TYPE_SUFFIX));
-                registeredEnums.add(enumType);
+                if (OperationTransactionalAction.class.equals(enumType))
+                {
+                    attribute.setType(MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE);
+                }
+                else
+                {
+                    attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(enumType.getName()) + SchemaConstants.ENUM_TYPE_SUFFIX));
+                    registeredEnums.add(enumType);
+                }
             }
 
             @Override

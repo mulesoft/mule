@@ -42,7 +42,7 @@ class ExternalTransactionInterceptor<T> implements ExecutionInterceptor<T>
                 {
                     ExternalTransactionAwareTransactionFactory externalTransactionFactory =
                             (ExternalTransactionAwareTransactionFactory) tmFactory;
-                    joinedExternal = tx = externalTransactionFactory.joinExternalTransaction(muleContext);
+                    joinedExternal = externalTransactionFactory.joinExternalTransaction(muleContext);
                 }
             }
             return next.execute(callback, executionContext);

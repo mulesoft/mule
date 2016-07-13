@@ -10,6 +10,9 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
@@ -24,10 +27,12 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.routing.MessageInfoMapping;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
@@ -47,7 +52,7 @@ import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -176,7 +181,7 @@ public class MuleExtensionUtils
     public static Class<?> getOperationsConnectionType(ExtensionModel extensionModel)
     {
         Set<Class<?>> connectionTypes = extensionModel.getOperationModels().stream()
-                .map(operation -> operation.getModelProperty(ConnectionTypeModelProperty.class).map(ConnectionTypeModelProperty::getConnectionType).orElse(null))
+                .map(operation -> operation.getModelProperty(ConnectivityModelProperty.class).map(ConnectivityModelProperty::getConnectionType).orElse(null))
                 .filter(type -> type != null)
                 .map(JavaTypeUtils::getType)
                 .collect(toSet());
@@ -381,20 +386,50 @@ public class MuleExtensionUtils
 
     public static void injectConfigName(EnrichableModel model, Object target, String configName)
     {
-        model.getModelProperty(RequireNameField.class).ifPresent(property -> {
-            final Field configNameField = property.getConfigNameField();
+        model.getModelProperty(RequireNameField.class).ifPresent(property ->
+                                                                 {
+                                                                     final Field configNameField = property.getConfigNameField();
 
-            if (!configNameField.getDeclaringClass().isInstance(target))
-            {
-                throw new IllegalConfigurationModelDefinitionException(String.format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
-                                                                                     configNameField.toString(),
-                                                                                     ConfigName.class.getSimpleName(),
-                                                                                     target.getClass().getName()));
-            }
+                                                                     if (!configNameField.getDeclaringClass().isInstance(target))
+                                                                     {
+                                                                         throw new IllegalConfigurationModelDefinitionException(String.format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
+                                                                                                                                              configNameField.toString(),
+                                                                                                                                              ConfigName.class.getSimpleName(),
+                                                                                                                                              target.getClass().getName()));
+                                                                     }
 
-            configNameField.setAccessible(true);
-            setField(configNameField, target, configName);
-        });
+                                                                     configNameField.setAccessible(true);
+                                                                     setField(configNameField, target, configName);
+                                                                 });
+    }
+
+    /**
+     * Converts the given {@code action} to its equivalent transactional
+     * action as defined in {@link TransactionConfig}
+     *
+     * @param action a {@link OperationTransactionalAction}
+     * @return a byte transactional action
+     */
+    public static byte toActionCode(OperationTransactionalAction action)
+    {
+        switch (action)
+        {
+            case ALWAYS_JOIN:
+                return ACTION_ALWAYS_JOIN;
+            case JOIN_IF_POSSIBLE:
+                return ACTION_JOIN_IF_POSSIBLE;
+            case NOT_SUPPORTED:
+                return ACTION_NOT_SUPPORTED;
+        }
+
+        throw new IllegalArgumentException("Unsupported action: " + action.name());
+    }
+
+    public static boolean isTransactional(OperationModel operationModel)
+    {
+        return operationModel.getModelProperty(ConnectivityModelProperty.class)
+                .map(ConnectivityModelProperty::supportsTransactions)
+                .orElse(false);
     }
 
     /**
@@ -409,6 +444,11 @@ public class MuleExtensionUtils
         return new IllegalModelDefinitionException("No ClassLoader was specified for extension " + extensionName);
     }
 
+    private static boolean isConnected(EnrichableModel o)
+    {
+        return o.getModelProperty(ConnectivityModelProperty.class).isPresent();
+    }
+
     private static class NamedComparator implements Comparator<Named>
     {
 
@@ -417,10 +457,5 @@ public class MuleExtensionUtils
         {
             return o1.getName().compareTo(o2.getName());
         }
-    }
-
-    private static boolean isConnected(EnrichableModel o)
-    {
-        return o.getModelProperty(ConnectionTypeModelProperty.class).isPresent();
     }
 }

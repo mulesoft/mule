@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:tx="http://www.mulesoft.org/schema/mule/tx"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tx http://www.mulesoft.org/schema/mule/tx/current/mule-tx.xsd">
+
+
+    <tx:config name="localTx" />
+
+    <flow name="commitLocalTx">
+        <tx:verify-no-transaction />
+        <transactional>
+            <tx:verify-transaction-begun />
+        </transactional>
+        <tx:verify-transaction-commited />
+    </flow>
+
+    <flow name="rollbackLocalTx">
+        <tx:verify-no-transaction />
+        <transactional>
+            <tx:verify-transaction-begun />
+            <tx:fail />
+        </transactional>
+        <catch-exception-strategy>
+            <tx:verify-transaction-rolledback />
+        </catch-exception-strategy>
+    </flow>
+
+    <flow name="executeTransactionless">
+        <tx:verify-no-transaction />
+        <transactional>
+            <tx:get-connection transactionalAction="NOT_SUPPORTED" />
+        </transactional>
+    </flow>
+</mule>

@@ -72,7 +72,7 @@ import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartMode
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.message.StringAttributes;
@@ -569,7 +569,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
         operation = getOperation(extensionDeclaration, CALL_SAUL);
         assertThat(operation.getParameters(), is(empty()));
-        ConnectionTypeModelProperty connectionType = operation.getModelProperty(ConnectionTypeModelProperty.class).get();
+        ConnectivityModelProperty connectionType = operation.getModelProperty(ConnectivityModelProperty.class).get();
         assertThat(connectionType.getConnectionType(), equalTo(toMetadataType(HeisenbergConnection.class)));
 
         operation = getOperation(extensionDeclaration, CURE_CANCER);

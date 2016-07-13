@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -115,7 +115,7 @@ public class LifecycleAwareConnectionProviderWrapper<Connection> extends Connect
             return ((ConnectionProviderWrapper) delegate).getRetryPolicyTemplate();
         }
 
-        return ((ConnectionManagerAdapter) muleContext.getRegistry().get(MuleProperties.OBJECT_CONNECTION_MANAGER)).getDefaultRetryPolicyTemplate();
+        return ((ConnectionManagerAdapter) muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER)).getDefaultRetryPolicyTemplate();
     }
 
     @Override

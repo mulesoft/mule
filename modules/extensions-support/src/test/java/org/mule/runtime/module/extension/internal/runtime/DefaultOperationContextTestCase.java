@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -60,6 +61,9 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
     private MuleEvent event;
 
     @Mock
+    private MuleContext muleContext;
+
+    @Mock
     private ExtensionManager extensionManager;
 
     private Object configurationInstance = new Object();
@@ -75,7 +79,7 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase
         parametersMap.put(PARAM_NAME, VALUE);
         when(resolverSetResult.asMap()).thenReturn(parametersMap);
 
-        operationContext = new DefaultOperationContext(configuration, resolverSetResult, operationModel, event);
+        operationContext = new DefaultOperationContext(configuration, resolverSetResult, operationModel, event, muleContext);
     }
 
     @Test

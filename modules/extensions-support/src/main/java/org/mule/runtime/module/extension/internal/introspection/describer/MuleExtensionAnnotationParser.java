@@ -42,7 +42,7 @@ import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
@@ -317,7 +317,7 @@ public final class MuleExtensionAnnotationParser
 
     static void addConnectionTypeModelProperty(MetadataType annotatedFieldClass, HasModelProperties parameter)
     {
-        parameter.withModelProperty(new ConnectionTypeModelProperty(annotatedFieldClass));
+        parameter.withModelProperty(new ConnectivityModelProperty(annotatedFieldClass));
     }
 
     static void addConfigTypeModelProperty(MetadataType annotatedFieldClass, HasModelProperties parameter)

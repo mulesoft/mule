@@ -22,6 +22,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.ExtensionManager;
@@ -77,6 +78,9 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     @Mock
     private ExtensionManager extensionManager;
 
+    @Mock
+    private MuleContext muleContext;
+
     private ReflectiveMethodOperationExecutor executor;
     private ConfigurationInstance<Object> configurationInstance;
     private OperationContextAdapter operationContext;
@@ -91,7 +95,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         initHeisenberg();
         configurationInstance = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, config, emptyList(), Optional.empty());
         when(muleEvent.getMessage().getDataType()).thenReturn(DATA_TYPE);
-        operationContext = new DefaultOperationContext(configurationInstance, parameters, operationModel, muleEvent);
+        operationContext = new DefaultOperationContext(configurationInstance, parameters, operationModel, muleEvent, muleContext);
         operationContext = spy(operationContext);
     }
 

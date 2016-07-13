@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.CachedConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.connection.PooledConnectionProviderWrapper;
+import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.property.ConnectionHandlingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
@@ -76,7 +76,7 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
         {
             if (connectionHandlingType.isPooled())
             {
-                provider = new PooledConnectionProviderWrapper(provider, poolingProfile, disableValidation, retryPolicyTemplate);
+                provider = new PoolingConnectionProviderWrapper(provider, poolingProfile, disableValidation, retryPolicyTemplate);
             }
 
             if (connectionHandlingType.isCached())
