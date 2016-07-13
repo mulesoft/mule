@@ -8,17 +8,17 @@ package org.mule.test.core.routing.outbound;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.message.ExceptionMessage;
 
 import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
 
-public class MulticastRouterTestCase extends FunctionalTestCase
+public class MulticastRouterTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

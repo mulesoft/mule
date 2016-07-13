@@ -9,8 +9,7 @@ package org.mule.test.core.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.EncryptionStrategy;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.security.MuleCredentials;
@@ -30,7 +29,7 @@ import org.junit.Test;
  * see EE-979
  */
 @Ignore
-public class MultiuserSecurityTestCase extends FunctionalTestCase
+public class MultiuserSecurityTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

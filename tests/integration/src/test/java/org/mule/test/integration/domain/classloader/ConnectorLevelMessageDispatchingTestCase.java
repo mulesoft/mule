@@ -22,9 +22,11 @@ import org.mule.test.infrastructure.deployment.FakeMuleServer;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.hamcrest.core.Is;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore
 public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleServerTestCase
 {
 

@@ -9,7 +9,7 @@ package org.mule.test.config.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class CoreNamespaceRoutersFlowTestCase extends FunctionalTestCase
+public class CoreNamespaceRoutersFlowTestCase extends AbstractIntegrationTestCase
 {
     @Override
     public String getConfigFile()

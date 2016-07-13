@@ -8,14 +8,13 @@ package org.mule.test.core.transformers.simple;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class TransformerArraysTestCase extends FunctionalTestCase
+public class TransformerArraysTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

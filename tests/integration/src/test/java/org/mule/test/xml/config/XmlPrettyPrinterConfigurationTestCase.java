@@ -11,12 +11,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.module.xml.transformer.XmlPrettyPrinter;
 
 import org.junit.Test;
 
-public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase
+public class XmlPrettyPrinterConfigurationTestCase extends AbstractIntegrationTestCase
 {
     public XmlPrettyPrinterConfigurationTestCase()
     {

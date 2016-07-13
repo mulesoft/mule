@@ -8,14 +8,13 @@ package org.mule.test.integration.interceptor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class InterceptorFlowTestCase extends FunctionalTestCase
+public class InterceptorFlowTestCase extends AbstractIntegrationTestCase
 {
     @Test
     public void testDefaultJavaComponentShortcut() throws Exception

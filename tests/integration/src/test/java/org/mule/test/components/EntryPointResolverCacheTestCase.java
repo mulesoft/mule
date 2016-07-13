@@ -10,9 +10,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 
 import org.junit.Test;
@@ -20,7 +19,7 @@ import org.junit.Test;
 /**
  * Test an entry-point resolver used for multiple classes
  */
-public class EntryPointResolverCacheTestCase extends FunctionalTestCase
+public class EntryPointResolverCacheTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

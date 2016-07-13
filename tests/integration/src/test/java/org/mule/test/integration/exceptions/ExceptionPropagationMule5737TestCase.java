@@ -9,15 +9,14 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,7 +27,7 @@ import org.junit.rules.ExpectedException;
  * assert that a sub-flow/processor-chain does not handle it's own exception but they are rather handled by
  * calling flow.
  */
-public class ExceptionPropagationMule5737TestCase extends FunctionalTestCase
+public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTestCase
 {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

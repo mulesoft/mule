@@ -11,14 +11,13 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class MessagePropertySessionScopesTestCase extends FunctionalTestCase
+public class MessagePropertySessionScopesTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

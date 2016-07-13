@@ -6,11 +6,6 @@
  */
 package org.mule.test.config.dsl;
 
-import static org.mule.test.config.dsl.LifecycleAction.DISPOSE;
-import static org.mule.test.config.dsl.LifecycleAction.GET_OBJECT;
-import static org.mule.test.config.dsl.LifecycleAction.INITIALISE;
-import static org.mule.test.config.dsl.LifecycleAction.START;
-import static org.mule.test.config.dsl.LifecycleAction.STOP;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -28,7 +23,7 @@ public class LifecycleSensingObjectFactory implements ObjectFactory<MessageProce
     @Override
     public MessageProcessor getObject() throws Exception
     {
-        lifecycleActions.add(GET_OBJECT);
+        lifecycleActions.add(LifecycleAction.GET_OBJECT);
         LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor = new LifecycleSensingMessageProcessor();
         lifecycleSensingMessageProcessor.setObjectFactory(this);
         return lifecycleSensingMessageProcessor;
@@ -37,25 +32,25 @@ public class LifecycleSensingObjectFactory implements ObjectFactory<MessageProce
     @Override
     public void dispose()
     {
-        lifecycleActions.add(DISPOSE);
+        lifecycleActions.add(LifecycleAction.DISPOSE);
     }
 
     @Override
     public void initialise() throws InitialisationException
     {
-        lifecycleActions.add(INITIALISE);
+        lifecycleActions.add(LifecycleAction.INITIALISE);
     }
 
     @Override
     public void start() throws MuleException
     {
-        lifecycleActions.add(START);
+        lifecycleActions.add(LifecycleAction.START);
     }
 
     @Override
     public void stop() throws MuleException
     {
-        lifecycleActions.add(STOP);
+        lifecycleActions.add(LifecycleAction.STOP);
     }
 
     public List<LifecycleAction> getLifecycleActions()

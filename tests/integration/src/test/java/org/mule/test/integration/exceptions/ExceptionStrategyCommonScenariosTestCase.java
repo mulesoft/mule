@@ -9,8 +9,7 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.component.ComponentException;
@@ -20,7 +19,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ExceptionStrategyCommonScenariosTestCase extends FunctionalTestCase
+public class ExceptionStrategyCommonScenariosTestCase extends AbstractIntegrationTestCase
 {
     public static final String MESSAGE_TO_SEND = "A message";
     public static final String MESSAGE_MODIFIED = "A message with some text added";

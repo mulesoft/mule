@@ -9,18 +9,18 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.exception.CatchMessagingExceptionStrategy;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
 
-public class DefaultExceptionStrategyTestCase extends FunctionalTestCase
+public class DefaultExceptionStrategyTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

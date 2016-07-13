@@ -9,14 +9,13 @@ package org.mule.test.xml.functional;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTestCase
+public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

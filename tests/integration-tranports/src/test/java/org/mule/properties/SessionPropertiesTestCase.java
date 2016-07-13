@@ -10,13 +10,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
 
 import org.junit.Test;
 
-public class SessionPropertiesTestCase extends FunctionalTestCase
+public class SessionPropertiesTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

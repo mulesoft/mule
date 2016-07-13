@@ -6,7 +6,8 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,12 +15,11 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
-public class ExceptionAfterAggregationTestCase extends FunctionalTestCase
+@RunnerDelegateTo(Parameterized.class)
+public class ExceptionAfterAggregationTestCase extends AbstractIntegrationTestCase
 {
 
     @Rule

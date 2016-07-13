@@ -10,14 +10,14 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class PropertiesWithAllTestCase extends FunctionalTestCase
+public class PropertiesWithAllTestCase extends AbstractIntegrationTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");

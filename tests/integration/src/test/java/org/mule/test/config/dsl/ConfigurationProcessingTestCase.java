@@ -9,14 +9,14 @@ package org.mule.test.config.dsl;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ConfigurationProcessingTestCase extends FunctionalTestCase
+public class ConfigurationProcessingTestCase extends AbstractIntegrationTestCase
 {
 
     @Rule

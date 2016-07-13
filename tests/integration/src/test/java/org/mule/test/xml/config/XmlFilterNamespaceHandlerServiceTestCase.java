@@ -7,18 +7,18 @@
 package org.mule.test.xml.config;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.module.xml.filters.IsXmlFilter;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
+import org.mule.runtime.module.xml.filters.IsXmlFilter;
 
 import java.util.List;
 
 import org.junit.Test;
 
-public class XmlFilterNamespaceHandlerServiceTestCase extends FunctionalTestCase
+public class XmlFilterNamespaceHandlerServiceTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

@@ -7,13 +7,12 @@
 package org.mule.test.config.spring.parsers.specific;
 
 import static org.junit.Assert.assertEquals;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import org.junit.Test;
 
-public class CompositeMessageProcessorDefinitionParserTestCase extends FunctionalTestCase
+public class CompositeMessageProcessorDefinitionParserTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

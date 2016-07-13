@@ -11,11 +11,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.Base64;
 
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
-public class DefaultEntryPointResolverSetMultithreadingTestCase extends FunctionalTestCase
+public class DefaultEntryPointResolverSetMultithreadingTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

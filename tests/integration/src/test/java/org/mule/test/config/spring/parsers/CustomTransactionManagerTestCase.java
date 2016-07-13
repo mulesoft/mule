@@ -8,8 +8,7 @@ package org.mule.test.config.spring.parsers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
 
 import java.lang.reflect.Proxy;
@@ -19,7 +18,7 @@ import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 
-public class CustomTransactionManagerTestCase extends FunctionalTestCase
+public class CustomTransactionManagerTestCase extends AbstractIntegrationTestCase
 {
     @Override
     public String getConfigFile()

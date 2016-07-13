@@ -9,14 +9,13 @@ package org.mule.test.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.registry.Registry;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.services.UniqueComponent;
 
 import org.junit.Test;
 
-public class ObjectFactoryTestCase extends FunctionalTestCase
+public class ObjectFactoryTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

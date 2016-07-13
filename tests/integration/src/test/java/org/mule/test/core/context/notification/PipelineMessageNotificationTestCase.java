@@ -94,6 +94,6 @@ public class PipelineMessageNotificationTestCase extends AbstractNotificationTes
     @Override
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
-        // Nothing to do
+        // TODO Auto-generated method stub
     }
 }

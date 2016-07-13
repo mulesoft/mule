@@ -11,21 +11,20 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
 
 import java.util.List;
 
 import org.junit.Test;
 
-public class GlobalInterceptingMessageProcessorsTestCase extends FunctionalTestCase
+public class GlobalInterceptingMessageProcessorsTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

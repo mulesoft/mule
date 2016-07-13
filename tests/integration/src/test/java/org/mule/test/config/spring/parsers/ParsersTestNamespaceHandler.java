@@ -58,6 +58,12 @@ public class ParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler
         // simpler list element parser doesn't support dynamic attribute
 //        registerBeanDefinitionParser("list-element-test-3", new AllAttributeChildDefinitionParser(new ChildListEntryDefinitionParser("kids")));
 
+        // TODO ComplexComponentDefinitionParser is not longer used, is there any way to rewrite/reuse the "factory" element for testing?
+//         registerBeanDefinitionParser("factory",
+//                new ComplexComponentDefinitionParser(
+//                        new SimpleComponentDefinitionParser(ChildBean.class),
+//                        (ChildDefinitionParser) new ChildDefinitionParser("child", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring")));
+
         registerBeanDefinitionParser("no-name", new OrphanDefinitionParser(OrphanBean.class, true));
         registerBeanDefinitionParser("no-name-2", new IndependentDefinitionParser());
         registerBeanDefinitionParser("container", new ThirdPartyContainerDefinitionParser());

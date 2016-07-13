@@ -15,8 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
@@ -28,7 +27,7 @@ import javax.inject.Named;
 
 import org.junit.Test;
 
-public class RegistrationAndInjectionTestCase extends FunctionalTestCase
+public class RegistrationAndInjectionTestCase extends AbstractIntegrationTestCase
 {
 
     private static final String KEY = "key";

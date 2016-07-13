@@ -12,9 +12,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
 import org.mule.functional.functional.FlowAssert;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -36,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class ExceptionHandlingTestCase extends FunctionalTestCase
+public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase
 {
     public static final String MESSAGE = "some message";
 

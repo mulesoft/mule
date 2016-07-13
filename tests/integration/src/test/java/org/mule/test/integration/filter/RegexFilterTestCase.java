@@ -10,9 +10,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RegexFilterTestCase extends FunctionalTestCase
+public class RegexFilterTestCase extends AbstractIntegrationTestCase
 {
 
     Map<String, String> payloadMap;

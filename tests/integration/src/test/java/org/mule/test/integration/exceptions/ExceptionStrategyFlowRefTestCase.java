@@ -9,14 +9,13 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class ExceptionStrategyFlowRefTestCase extends FunctionalTestCase
+public class ExceptionStrategyFlowRefTestCase extends AbstractIntegrationTestCase
 {
     public static final String MESSAGE = "some message";
     public static final int TIMEOUT = 5000;

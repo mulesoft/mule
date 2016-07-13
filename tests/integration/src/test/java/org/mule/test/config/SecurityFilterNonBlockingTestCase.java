@@ -6,7 +6,7 @@
  */
 package org.mule.test.config;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -20,7 +20,7 @@ import org.junit.Test;
 /**
  * Test configuration of security filters
  */
-public class SecurityFilterNonBlockingTestCase extends FunctionalTestCase
+public class SecurityFilterNonBlockingTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

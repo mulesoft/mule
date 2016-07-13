@@ -10,15 +10,15 @@ package org.mule.test.transformers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.test.transformers.GraphTransformerResolutionTestCase.A;
 import org.mule.test.transformers.GraphTransformerResolutionTestCase.B;
 
 import org.junit.Test;
 
-public class SpringPrototypesLifecycleTestCase extends FunctionalTestCase
+public class SpringPrototypesLifecycleTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

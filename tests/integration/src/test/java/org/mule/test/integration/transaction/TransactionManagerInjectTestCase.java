@@ -9,15 +9,14 @@ package org.mule.test.integration.transaction;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 
-public class TransactionManagerInjectTestCase extends FunctionalTestCase
+public class TransactionManagerInjectTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

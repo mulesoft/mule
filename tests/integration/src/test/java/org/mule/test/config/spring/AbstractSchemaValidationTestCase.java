@@ -6,8 +6,9 @@
  */
 package org.mule.test.config.spring;
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import static org.junit.Assert.assertNotNull;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,8 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-
-import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestCase
 {

@@ -15,8 +15,10 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class DomainTransformerRegistrationTestCase extends DomainFunctionalTestCase
 {
 

@@ -11,11 +11,10 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
 
 import java.io.Serializable;
@@ -24,7 +23,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class CollectionAggregatorRouterCustomStoreTestCase extends FunctionalTestCase
+public class CollectionAggregatorRouterCustomStoreTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

@@ -8,12 +8,11 @@ package org.mule.test.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class PropertyPlaceholderDefaultTestCase extends FunctionalTestCase
+public class PropertyPlaceholderDefaultTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

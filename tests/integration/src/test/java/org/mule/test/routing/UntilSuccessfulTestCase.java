@@ -13,7 +13,9 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.InvocationCountMessageProcessor.getNumberOfInvocationsFor;
-
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -22,12 +24,10 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.util.store.AbstractPartitionedObjectStore;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.runtime.core.util.store.AbstractPartitionedObjectStore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,11 +37,10 @@ import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
-public class UntilSuccessfulTestCase extends FunctionalTestCase
+@RunnerDelegateTo(Parameterized.class)
+public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase
 {
     private final String configFile;
 

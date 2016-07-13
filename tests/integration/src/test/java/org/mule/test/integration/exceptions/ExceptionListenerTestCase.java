@@ -13,21 +13,20 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
 import org.junit.Test;
 
-public class ExceptionListenerTestCase extends FunctionalTestCase
+public class ExceptionListenerTestCase extends AbstractIntegrationTestCase
 {
 
     private static final int TIMEOUT_MILLIS = 5000;

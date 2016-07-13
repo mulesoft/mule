@@ -6,14 +6,14 @@
  */
 package org.mule.test.transformers;
 
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
 
-public class TransformerWeightingFunctionalTestCase extends FunctionalTestCase
+public class TransformerWeightingFunctionalTestCase extends AbstractIntegrationTestCase
 {
     private static final String XML_REQUEST = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                                               "<catalog>\n" +

@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -15,7 +15,7 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class AbstractExceptionStrategyTestCase extends FunctionalTestCase
+public abstract class AbstractExceptionStrategyTestCase extends AbstractIntegrationTestCase
 {
 
     public static final int LATCH_AWAIT_TIMEOUT = 3000;

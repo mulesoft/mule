@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 
@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class TransformationContentTypeTestCase extends FunctionalTestCase
+public class TransformationContentTypeTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

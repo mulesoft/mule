@@ -7,20 +7,19 @@
 package org.mule.test.integration.work;
 
 import static org.junit.Assert.assertTrue;
-
+import org.mule.functional.functional.EventCallback;
+import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.functional.EventCallback;
-import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
+public class GracefulShutdownTimeoutTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

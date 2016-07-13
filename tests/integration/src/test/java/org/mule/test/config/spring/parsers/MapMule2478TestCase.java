@@ -49,4 +49,21 @@ public class MapMule2478TestCase extends AbstractNamespaceTestCase
         assertTrue(map.containsKey("list"));
         assertEquals("list2", ((List<?>) map.get("list")).get(0));
     }
+
+// TODO ComplexComponentDefinitionParser is not longer used, is there any way to rewrite/reuse the "factory" element for testing?
+//    @Test
+//    public void testFactory() throws Exception
+//    {
+//        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
+//        ObjectFactory factory = (ObjectFactory) orphan.getObject();
+//        assertNotNull(factory);
+//        Object product = factory.getInstance();
+//        assertNotNull(product);
+//        assertTrue(product instanceof ChildBean);
+//        ChildBean child3 = (ChildBean) product;
+//        assertEquals("string3", child3.getString());
+//        assertNotNull(child3.getList());
+//        assertEquals("list3", child3.getList().get(0));
+//    }
+
 }

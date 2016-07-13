@@ -9,8 +9,7 @@ package org.mule.test.config.spring;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -24,7 +23,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ManuallyRegisteredObjectLifecycleTestCase extends FunctionalTestCase
+public class ManuallyRegisteredObjectLifecycleTestCase extends AbstractIntegrationTestCase
 {
 
     private static final String INITIALISABLE = "initialisable";

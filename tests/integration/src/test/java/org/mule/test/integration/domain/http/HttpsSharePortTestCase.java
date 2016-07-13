@@ -13,7 +13,9 @@ import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import java.io.IOException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 
+@Ignore
 public class HttpsSharePortTestCase extends HttpSharePortTestCase
 {
 

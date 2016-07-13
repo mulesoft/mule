@@ -7,15 +7,15 @@
 package org.mule.test.integration.config;
 
 import static org.junit.Assert.assertTrue;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
 /*
  * This test has been added due to MULE-610
  */
-public class GlobalTransformerTestCase extends FunctionalTestCase
+public class GlobalTransformerTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

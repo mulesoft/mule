@@ -12,10 +12,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
-public class AggregationTimeoutTestCase extends FunctionalTestCase
+public class AggregationTimeoutTestCase extends AbstractIntegrationTestCase
 {
 
     private static final CountDownLatch blockExecution = new CountDownLatch(1);

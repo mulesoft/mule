@@ -9,8 +9,7 @@ package org.mule.test.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -19,7 +18,7 @@ import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class FlowStateTestCase extends FunctionalTestCase
+public class FlowStateTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

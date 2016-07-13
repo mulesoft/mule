@@ -7,24 +7,23 @@
 package org.mule.test.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
+import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
-import org.mule.test.core.context.notification.Node;
-import org.mule.test.core.context.notification.RestrictedNode;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.core.context.notification.Node;
+import org.mule.test.core.context.notification.RestrictedNode;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import org.junit.Rule;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
+@RunnerDelegateTo(Parameterized.class)
 public class HttpMessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
 {
 
@@ -64,7 +63,7 @@ public class HttpMessageProcessorNotificationTestCase extends AbstractMessagePro
     {
         List<String> testList = Arrays.asList("test", "with", "collection");
 
-        MuleClient client = AbstractMuleContextTestCase.muleContext.getClient();
+        MuleClient client = muleContext.getClient();
         assertNotNull(client.send("http://localhost:" + proxyPort.getValue() + "/in", "test", null));
     }
 

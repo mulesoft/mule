@@ -6,12 +6,12 @@
  */
 package org.mule.test.core.transformers.simple;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
 
-public class BadTransformationContentTypeTestCase extends FunctionalTestCase
+public class BadTransformationContentTypeTestCase extends AbstractIntegrationTestCase
 {
     public BadTransformationContentTypeTestCase()
     {

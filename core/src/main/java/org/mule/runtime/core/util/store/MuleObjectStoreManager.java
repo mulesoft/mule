@@ -38,7 +38,7 @@ public class MuleObjectStoreManager
     private static Logger logger = LoggerFactory.getLogger(MuleObjectStoreManager.class);
     protected ScheduledThreadPoolExecutor scheduler;
     MuleContext muleContext;
-    ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<String, ObjectStore<?>>();
+    protected ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<String, ObjectStore<?>>();
     private final ConcurrentMap<String, ScheduledFuture<?>> monitors = new ConcurrentHashMap<>();
     private String baseTransientStoreKey = MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
     private String basePersistentStoreKey = MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;

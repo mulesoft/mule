@@ -7,15 +7,14 @@
 package org.mule.test.el;
 
 import static org.junit.Assert.fail;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
-public class ExpressionLanguageConcurrencyTestCase extends FunctionalTestCase
+public class ExpressionLanguageConcurrencyTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

@@ -8,16 +8,15 @@ package org.mule.test.integration.transformer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
 
-public class TransformerOnMessageCollectionTestCase extends FunctionalTestCase
+public class TransformerOnMessageCollectionTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

@@ -12,8 +12,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FLOW_TRACE;
 import static org.mule.tck.util.FlowTraceUtils.assertStackElements;
 import static org.mule.tck.util.FlowTraceUtils.isFlowStackElement;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.FlowTraceUtils.FlowStackAsserter;
@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class FlowStackTestCase extends FunctionalTestCase
+public class FlowStackTestCase extends AbstractIntegrationTestCase
 {
     @Rule
     public SystemProperty flowTraceEnabled = new SystemProperty(MULE_FLOW_TRACE, "true");

@@ -6,11 +6,11 @@
  */
 package org.mule.test.core;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class NonBlockingPartlySupportedFunctionalTestCase extends FunctionalTestCase
+public class NonBlockingPartlySupportedFunctionalTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

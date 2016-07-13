@@ -8,10 +8,10 @@ package org.mule.test.routing;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class UntilSuccessfulWithSplitterTestCase extends FunctionalTestCase
+public class UntilSuccessfulWithSplitterTestCase extends AbstractIntegrationTestCase
 {
 
     private static final int TIMEOUT = 5;

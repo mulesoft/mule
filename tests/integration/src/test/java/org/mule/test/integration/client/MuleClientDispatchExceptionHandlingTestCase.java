@@ -9,8 +9,7 @@ package org.mule.test.integration.client;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -33,7 +32,7 @@ import org.junit.Test;
  * a sub-flow and if the component/processor throws an exception afterwards the main-flow exception strategy handles
  * it.
  */
-public class MuleClientDispatchExceptionHandlingTestCase extends FunctionalTestCase
+public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegrationTestCase
 {
     @ClassRule
     public static DynamicPort port = new DynamicPort("port");

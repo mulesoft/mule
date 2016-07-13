@@ -8,14 +8,13 @@ package org.mule.test.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.Test;
 
-public class JndiFunctionalTestCase extends FunctionalTestCase
+public class JndiFunctionalTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

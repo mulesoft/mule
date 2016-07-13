@@ -7,13 +7,13 @@
 package org.mule.test.construct;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.lifecycle.LifecycleTrackerProcessor;
 
 import org.junit.Test;
 
-public class SubFlowTestCase extends FunctionalTestCase
+public class SubFlowTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

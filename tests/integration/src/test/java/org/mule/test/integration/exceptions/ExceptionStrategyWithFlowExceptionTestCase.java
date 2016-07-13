@@ -8,7 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -16,11 +16,10 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.message.ExceptionMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class ExceptionStrategyWithFlowExceptionTestCase extends FunctionalTestCase
+public class ExceptionStrategyWithFlowExceptionTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()

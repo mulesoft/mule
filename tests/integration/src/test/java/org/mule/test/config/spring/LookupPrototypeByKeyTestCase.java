@@ -8,11 +8,11 @@ package org.mule.test.config.spring;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class LookupPrototypeByKeyTestCase extends FunctionalTestCase
+public class LookupPrototypeByKeyTestCase extends AbstractIntegrationTestCase
 {
 
     private static final String PROTOTYPE_KEY = "prototype";

@@ -7,11 +7,11 @@
 package org.mule.test.core.routing.outbound;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class MultipleCollectionAggregatorsTestCase extends FunctionalTestCase
+public class MultipleCollectionAggregatorsTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

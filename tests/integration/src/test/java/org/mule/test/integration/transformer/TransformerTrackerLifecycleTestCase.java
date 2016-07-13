@@ -8,13 +8,12 @@ package org.mule.test.integration.transformer;
 
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class TransformerTrackerLifecycleTestCase extends FunctionalTestCase
+public class TransformerTrackerLifecycleTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

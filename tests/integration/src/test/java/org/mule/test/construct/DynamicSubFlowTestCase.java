@@ -10,13 +10,13 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
-public class DynamicSubFlowTestCase extends FunctionalTestCase
+public class DynamicSubFlowTestCase extends AbstractIntegrationTestCase
 {
 
     @Override

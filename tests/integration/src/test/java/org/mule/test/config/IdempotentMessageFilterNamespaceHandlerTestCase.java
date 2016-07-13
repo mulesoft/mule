@@ -9,13 +9,12 @@ package org.mule.test.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
@@ -31,7 +30,7 @@ import org.junit.Test;
 /**
  * Tests for all object stores that can be configured on an {@link IdempotentMessageFilter}.
  */
-public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalTestCase
+public class IdempotentMessageFilterNamespaceHandlerTestCase extends AbstractIntegrationTestCase
 {
     public IdempotentMessageFilterNamespaceHandlerTestCase()
     {

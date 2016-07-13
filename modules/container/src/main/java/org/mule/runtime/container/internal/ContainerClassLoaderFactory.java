@@ -92,7 +92,11 @@ public class ContainerClassLoaderFactory
             "org.dom4j",
             "com.sun", "sun",
             "org.springframework",
-            "org.mule.mvel2"
+            "org.mule.mvel2",
+            //TODO(gfernandes): need to expose every package form groovy
+            "org.codehaus.groovy",
+            //TODO(gfernandes): review why this is required as it is exported on scripting mule-module.properties (fails ClassInterceptorTestCase)
+            "org.aopalliance.aop"
     );
 
     private ModuleDiscoverer moduleDiscoverer = new ContainerModuleDiscoverer(this.getClass().getClassLoader());

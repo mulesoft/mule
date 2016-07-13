@@ -8,16 +8,15 @@ package org.mule.test.routing;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public abstract class DynamicRouterTestCase extends FunctionalTestCase
+public abstract class DynamicRouterTestCase extends AbstractIntegrationTestCase
 {
 
     protected static final String LETTER_A = "a";

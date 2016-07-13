@@ -7,8 +7,7 @@
 package org.mule.test.integration.el;
 
 import static org.junit.Assert.assertSame;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
@@ -17,7 +16,7 @@ import org.mule.runtime.core.expression.DefaultExpressionManager;
 
 import org.junit.Test;
 
-public class ExpressionLanguageExtensionTestCase extends FunctionalTestCase
+public class ExpressionLanguageExtensionTestCase extends AbstractIntegrationTestCase
 {
     @Override
     protected String getConfigFile()
