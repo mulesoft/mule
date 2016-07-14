@@ -42,6 +42,7 @@ import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.registry.AbstractRegistryBroker;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
+import org.mule.runtime.core.util.queue.QueueManager;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
@@ -85,6 +86,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager
             initOrderedObjects.add(new NotificationLifecycleObject(ExpressionManager.class));
             initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
+            initOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
             initOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
             initOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
             initOrderedObjects.add(new NotificationLifecycleObject(SecurityManager.class));
