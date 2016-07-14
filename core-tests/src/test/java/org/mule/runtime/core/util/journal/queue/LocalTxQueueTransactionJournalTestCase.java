@@ -16,9 +16,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.journal.TransactionJournal.TX1_LOG_FILE_NAME;
 import static org.mule.runtime.core.util.journal.TransactionJournal.TX2_LOG_FILE_NAME;
+
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.util.queue.DefaultQueueStore;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.Multimap;
 
@@ -116,7 +117,7 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
         transactionJournal.close();
         transactionJournal = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
         Multimap<Integer, LocalQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(1));
+        assertThat(allEntries.size(), is(0));
     }
 
     @Test
@@ -127,7 +128,7 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
         transactionJournal.close();
         transactionJournal = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
         Multimap<Integer, LocalQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(1));
+        assertThat(allEntries.size(), is(0));
     }
 
     @Test
@@ -144,7 +145,24 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
         transactionJournal.close();
         transactionJournal = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
         Multimap<Integer, LocalQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
-        assertThat(allEntries.size(), is(1001));
+        assertThat(allEntries.size(), is(0));
+    }
+
+    @Test
+    public void logSeveralAddsThenRetrieveAndCommit() throws Exception
+    {
+        MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+        LocalTxQueueTransactionJournal transactionJournal = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+        int numberOfOffers = 1000;
+        for (int i = 0; i < numberOfOffers; i++)
+        {
+            transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
+        }
+        transactionJournal.close();
+        transactionJournal = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
+        transactionJournal.logCommit(TX_ID);
+        Multimap<Integer, LocalQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
+        assertThat(allEntries.size(), is(0));
     }
 
     @Test

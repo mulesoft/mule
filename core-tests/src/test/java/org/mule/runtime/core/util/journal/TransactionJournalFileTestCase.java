@@ -10,9 +10,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
 import org.mule.runtime.core.util.journal.queue.LocalQueueTxJournalEntry;
 import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.File;
 import java.io.Serializable;
@@ -58,7 +59,7 @@ public class TransactionJournalFileTestCase extends AbstractMuleContextTestCase
         File journalFile = new File(temporaryFolder.getRoot(), "journal");
         JournalEntrySerializer serializer = LocalTxQueueTransactionJournal.createLocalTxQueueJournalEntrySerializer(muleContext);
 
-        return new TransactionJournalFile(journalFile, serializer, KB_500);
+        return new TransactionJournalFile(journalFile, serializer, journalEntry -> false, KB_500);
     }
 
 }

@@ -55,17 +55,19 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
     private int journalOperations = 0;
 
     /**
-     * @param journalFile journal file to use. Will be created if it doesn't exists. If exists then transaction entries will get loaded from it.
+     * @param journalFile journal file to use. Will be created if it doesn't exists. If exists then transaction entries
+     *            will get loaded from it.
      * @param journalEntrySerializer serializer for {@link JournalEntry}
+     * @param transactionCompletePredicate a callback to determine if a transaction is complete.
      */
-    public TransactionJournalFile(File journalFile, JournalEntrySerializer journalEntrySerializer, Long clearFileMinimumSizeInBytes)
+    public TransactionJournalFile(File journalFile, JournalEntrySerializer journalEntrySerializer, TransactionCompletePredicate transactionCompletePredicate, Long clearFileMinimumSizeInBytes)
     {
         this.journalFile = journalFile;
         this.journalEntrySerializer = journalEntrySerializer;
         this.clearFileMinimumSizeInBytes = clearFileMinimumSizeInBytes;
         if (journalFile.exists())
         {
-            loadAllEntries();
+            loadAllEntries(transactionCompletePredicate);
         }
         createLogOutputStream();
     }
@@ -90,11 +92,21 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
      */
     public synchronized void clearEntriesForTransaction(T txId)
     {
+        doClearEntriesForTransaction(txId);
+        clearFileIfNeeded();
+    }
+
+    protected void doClearEntriesForTransaction(T txId)
+    {
         Collection<K> entries = this.entries.removeAll(txId);
         if (logger.isDebugEnabled())
         {
             logger.debug("Evicted from tx log file " + entries.size() + " entries from txid " + txId);
         }
+    }
+
+    protected void clearFileIfNeeded()
+    {
         if (this.entries.isEmpty())
         {
             if (clearFileMinimumSizeInBytes != null)
@@ -105,8 +117,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
                     journalOperations = 0;
                 }
             }
-            else
-            if (journalOperations > MINIMUM_ENTRIES_TO_CLEAR_FILE)
+            else if (journalOperations > MINIMUM_ENTRIES_TO_CLEAR_FILE)
             {
                 clear();
                 journalOperations = 0;
@@ -148,7 +159,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
         }
         synchronized (entries)
         {
-            return Collections.unmodifiableCollection(new ArrayList<K>(entries));
+            return Collections.unmodifiableCollection(new ArrayList<>(entries));
         }
     }
 
@@ -196,7 +207,13 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
         }
     }
 
-    private void loadAllEntries()
+    /**
+     * This will NOT load transactions that are already complete, according to the given
+     * {@code transactionCompletePredicate}.
+     * 
+     * @param transactionCompletePredicate a callback to determine if a transaction is complete.
+     */
+    private void loadAllEntries(TransactionCompletePredicate transactionCompletePredicate)
     {
         if (!journalFile.exists())
         {
@@ -215,6 +232,13 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
                     if (journalEntry != null)
                     {
                         this.entries.put(journalEntry.getTxId(), journalEntry);
+                        journalOperations++;
+
+                        if (transactionCompletePredicate.isTransactionComplete(journalEntry))
+                        {
+                            journalOperations -= this.entries.get(journalEntry.getTxId()).size();
+                            doClearEntriesForTransaction(journalEntry.getTxId());
+                        }
                     }
                     else
                     {
@@ -236,6 +260,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>>
                     logEntryCreationFailed = true;
                 }
             }
+            clearFileIfNeeded();
         }
         catch (FileNotFoundException e)
         {
