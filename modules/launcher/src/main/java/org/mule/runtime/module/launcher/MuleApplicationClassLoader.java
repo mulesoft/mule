@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.launcher;
 
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.launcher.application.ApplicationClassLoader;
 import org.mule.runtime.module.launcher.nativelib.NativeLibraryFinder;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
-public class MuleApplicationClassLoader extends MuleArtifactClassLoader implements ApplicationClassLoader
+public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader implements ApplicationClassLoader
 {
     static
     {
@@ -23,9 +25,9 @@ public class MuleApplicationClassLoader extends MuleArtifactClassLoader implemen
 
     private NativeLibraryFinder nativeLibraryFinder;
 
-    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, NativeLibraryFinder nativeLibraryFinder, List<URL> urls, ClassLoaderLookupPolicy lookupPolicy)
+    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, NativeLibraryFinder nativeLibraryFinder, List<URL> urls, ClassLoaderLookupPolicy lookupPolicy, Map<String, ArtifactClassLoader> artifactPluginClassLoaders)
     {
-        super(appName, urls.toArray(new URL[0]), parentCl, lookupPolicy);
+        super(appName, urls.toArray(new URL[0]), parentCl, lookupPolicy, artifactPluginClassLoaders);
 
         this.nativeLibraryFinder = nativeLibraryFinder;
     }

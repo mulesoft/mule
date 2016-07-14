@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.module.launcher;
 
-import static java.lang.String.format;
+import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.launcher.application.ArtifactPluginFactory;
+import org.mule.runtime.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.module.launcher.domain.Domain;
-import org.mule.runtime.module.launcher.domain.DomainRepository;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,92 +25,61 @@ import java.io.IOException;
  *
  * @since 4.0
  */
-public class ApplicationClassLoaderBuilder
+public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<ApplicationClassLoaderBuilder>
 {
 
-    private final ArtifactClassLoaderBuilder artifactClassLoaderBuilder;
-    private final DomainRepository domainRepository;
-    private String domain;
+    private Domain domain;
 
     /**
-     * @param domainRepository repository for domain artifacts
-     * @param artifactClassLoaderBuilder base artifact classloader builder used by this application builder
+     * Creates a new builder for creating {@link org.mule.runtime.module.launcher.application.Application} artifacts.
+     * <p>
+     * The {@code domainRepository} is used to locate the domain that this application belongs to and the {@code artifactClassLoaderBuilder}
+     * is used for building the common parts of artifacts.
+     *
+     * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
+     * @param artifactPluginRepository repository of plugins contained by the runtime
+     * @param artifactPluginFactory factory for creating artifact plugins
+     * @param artifactPluginDescriptorLoader loader for plugin zip files into their descriptors
      */
-    ApplicationClassLoaderBuilder(DomainRepository domainRepository, ArtifactClassLoaderBuilder artifactClassLoaderBuilder)
+    public ApplicationClassLoaderBuilder(MuleApplicationClassLoaderFactory artifactClassLoaderFactory,
+                                         ArtifactPluginRepository artifactPluginRepository,
+                                         ArtifactPluginFactory artifactPluginFactory,
+                                         ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader)
     {
-        this.domainRepository = domainRepository;
-        this.artifactClassLoaderBuilder = artifactClassLoaderBuilder;
+        super(artifactClassLoaderFactory, artifactPluginRepository, artifactPluginFactory, artifactPluginDescriptorLoader);
     }
 
-
     /**
+     * Creates a new {@code ArtifactClassLoader} using the provided configuration. It will create
+     * the proper class loader hierarchy and filters so application classes, resources, plugins and it's domain
+     * resources are resolve correctly.
+     *
      * @return a {@code ArtifactClassLoader} created from the provided configuration.
      * @throws IOException exception cause when it was not possible to access the file provided as dependencies
      */
-    public ArtifactClassLoader build() throws IOException
+    public MuleApplicationClassLoader build() throws IOException
     {
-        ArtifactClassLoader parentClassLoader = null;
-        if (domain != null)
-        {
-            Domain domain = domainRepository.getDomain(this.domain);
-            if (domain == null)
-            {
-                throw new IllegalArgumentException(format("Domain '%s' does not exists", domain));
-            }
-            parentClassLoader = domain.getArtifactClassLoader();
-        }
-        return artifactClassLoaderBuilder
-                .setParentClassLoader(parentClassLoader)
-                .build();
+        checkState(domain != null, "Domain cannot be null");
+        return (MuleApplicationClassLoader) super.build();
     }
 
     /**
-     * @param artifactId unique identifier for this artifact. For instance, for Applications, it can be the app name.
-     * @return the builder
+     * {@inheritDoc}
      */
-    public ApplicationClassLoaderBuilder setArtifactId(String artifactId)
+    @Override
+    ArtifactClassLoader getRootClassLoader()
     {
-        artifactClassLoaderBuilder.setArtifactId(artifactId);
-        return this;
+        return this.domain.getArtifactClassLoader();
     }
 
     /**
-     * @param domain the domain name to which the application that is going to use this classloader belongs.
+     * @param domain the domain artifact to which the application that is going to use this classloader belongs.
      * @return the builder
      */
-    public ApplicationClassLoaderBuilder setDomain(String domain)
+    public ApplicationClassLoaderBuilder setDomain(Domain domain)
     {
         this.domain = domain;
         return this;
     }
 
-    /**
-     * @param pluginsSharedLibFolder folder in which libraries shared by the plugins are located
-     * @return the builder
-     */
-    public ApplicationClassLoaderBuilder setPluginsSharedLibFolder(File pluginsSharedLibFolder)
-    {
-        artifactClassLoaderBuilder.setPluginsSharedLibFolder(pluginsSharedLibFolder);
-        return this;
-    }
-
-    /**
-     * @param plugins set of plugins descriptors that will be used by the application.
-     * @return the builder
-     */
-    public ApplicationClassLoaderBuilder addArtifactPluginDescriptor(ArtifactPluginDescriptor... plugins)
-    {
-        artifactClassLoaderBuilder.addArtifactPluginDescriptor(plugins);
-        return this;
-    }
-
-    /**
-     * @param artifactDescriptor the descriptor of the artifact for which the class loader is going to be created.
-     * @return the builder
-     */
-    public ApplicationClassLoaderBuilder setArtifactDescriptor(ArtifactDescriptor artifactDescriptor)
-    {
-        artifactClassLoaderBuilder.setArtifactDescriptor(artifactDescriptor);
-        return this;
-    }
 }

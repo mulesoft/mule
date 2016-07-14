@@ -32,6 +32,7 @@ import org.mule.runtime.module.launcher.DeploymentListener;
 import org.mule.runtime.module.launcher.DeploymentStartException;
 import org.mule.runtime.module.launcher.DeploymentStopException;
 import org.mule.runtime.module.launcher.InstallException;
+import org.mule.runtime.module.launcher.MuleApplicationClassLoader;
 import org.mule.runtime.module.launcher.MuleDeploymentService;
 import org.mule.runtime.module.launcher.artifact.ArtifactMuleContextBuilder;
 import org.mule.runtime.module.launcher.artifact.MuleContextDeploymentListener;
@@ -55,6 +56,7 @@ public class DefaultMuleApplication implements Application
 
     protected final ApplicationDescriptor descriptor;
     private final DomainRepository domainRepository;
+    private final List<ArtifactPlugin> artifactPlugins;
     private ApplicationStatus status;
 
     protected MuleContext muleContext;
@@ -62,11 +64,12 @@ public class DefaultMuleApplication implements Application
     protected DeploymentListener deploymentListener;
     private ServerNotificationListener<MuleContextNotification> statusListener;
 
-    public DefaultMuleApplication(ApplicationDescriptor descriptor, ArtifactClassLoader deploymentClassLoader, DomainRepository domainRepository)
+    public DefaultMuleApplication(ApplicationDescriptor descriptor, MuleApplicationClassLoader deploymentClassLoader, List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository)
     {
         this.descriptor = descriptor;
         this.domainRepository = domainRepository;
         this.deploymentListener = new NullDeploymentListener();
+        this.artifactPlugins = artifactPlugins;
         updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
         if (deploymentClassLoader == null)
         {
@@ -178,6 +181,7 @@ public class DefaultMuleApplication implements Application
                     .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getArtifactName()))
                     .setConfigurationFiles(descriptor.getAbsoluteResourcePaths())
                     .setDefaultEncoding(descriptor.getEncoding())
+                    .setArtifactPlugins(artifactPlugins)
                     .setExecutionClassloader(deploymentClassLoader.getClassLoader());
 
             Domain domain = domainRepository.getDomain(descriptor.getDomain());

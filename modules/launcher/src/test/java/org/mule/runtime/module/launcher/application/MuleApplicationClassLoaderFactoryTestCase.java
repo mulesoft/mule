@@ -8,6 +8,7 @@
 package org.mule.runtime.module.launcher.application;
 
 import static java.lang.System.setProperty;
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.core.Is.is;
@@ -30,6 +31,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 
 import org.junit.After;
 import org.junit.Before;
@@ -100,7 +102,7 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
         descriptor.setName(APP_NAME);
         descriptor.setDomain(DOMAIN_NAME);
 
-        final MuleApplicationClassLoader artifactClassLoader = (MuleApplicationClassLoader) classLoaderFactory.create(parentArtifactClassLoader, descriptor);
+        final MuleApplicationClassLoader artifactClassLoader = (MuleApplicationClassLoader) classLoaderFactory.create(parentArtifactClassLoader, descriptor, emptyMap());
 
         verify(nativeLibraryFinderFactory).create(APP_NAME);
         assertThat(artifactClassLoader.getParent(), is(parentArtifactClassLoader.getClassLoader()));

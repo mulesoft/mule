@@ -41,7 +41,7 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor
 
     private File logConfigFile;
     private File sharedPluginFolder;
-    private Set<ArtifactPluginDescriptor> plugins = new HashSet<ArtifactPluginDescriptor>(0);
+    private Set<ArtifactPluginDescriptor> plugins = new HashSet<>(0);
 
     public String getEncoding()
     {
