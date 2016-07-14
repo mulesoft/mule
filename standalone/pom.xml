@@ -242,14 +242,6 @@
             <artifactId>xmlunit</artifactId>
         </dependency>
 
-        <!-- include the ant tasks, so users can point to them, in lib/opt -->
-        <dependency>
-            <groupId>org.mule.tools</groupId>
-            <artifactId>mule-tools-anttasks</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-        </dependency>
-
         <!-- re-add our ant dependency as it gets transitively excluded by jetty's jsp support -->
         <dependency>
             <groupId>org.apache.ant</groupId>
