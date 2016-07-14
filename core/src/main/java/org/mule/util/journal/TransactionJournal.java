@@ -75,8 +75,8 @@ public class TransactionJournal<T, K extends JournalEntry<T>>
         File logFile2 = new File(logFileDirectory, TX2_LOG_FILE_NAME);
         logger.info(String.format("Using files for tx logs %s and %s", logFile1.getAbsolutePath(), logFile2.getAbsolutePath()));
 
-        this.currentLogFile = new TransactionJournalFile(logFile1, journalEntrySerializer, clearFileMinimumSizeInBytes);
-        this.notCurrentLogFile = new TransactionJournalFile(logFile2, journalEntrySerializer, clearFileMinimumSizeInBytes);
+        this.currentLogFile = new TransactionJournalFile(logFile1, journalEntrySerializer, transactionCompletePredicate, clearFileMinimumSizeInBytes);
+        this.notCurrentLogFile = new TransactionJournalFile(logFile2, journalEntrySerializer, transactionCompletePredicate, clearFileMinimumSizeInBytes);
         this.transactionCompletePredicate = transactionCompletePredicate;
 
     }
