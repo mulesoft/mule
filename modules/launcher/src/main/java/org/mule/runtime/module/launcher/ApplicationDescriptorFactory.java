@@ -10,6 +10,7 @@ import static java.io.File.separator;
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.PLUGINS_FOLDER;
+import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppSharedPluginLibsFolder;
 import static org.mule.runtime.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import org.mule.runtime.core.util.PropertiesUtils;
@@ -89,7 +90,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
             verifyPluginExportedPackages(getAllApplicationPlugins(plugins));
             desc.setPlugins(plugins);
 
-            desc.setSharedPluginFolder(MuleFoldersUtil.getAppSharedPluginLibsFolder(appName));
+            desc.setSharedPluginFolder(getAppSharedPluginLibsFolder(appName));
         }
         catch (IOException e)
         {

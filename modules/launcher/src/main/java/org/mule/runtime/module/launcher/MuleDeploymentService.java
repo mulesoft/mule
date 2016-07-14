@@ -79,9 +79,9 @@ public class MuleDeploymentService implements DeploymentService
 
     public MuleDeploymentService(ArtifactClassLoader containerClassLoader)
     {
-        ArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory = new DomainClassLoaderFactory(containerClassLoader.getClassLoader());
+        DomainClassLoaderFactory domainClassLoaderFactory = new DomainClassLoaderFactory(containerClassLoader.getClassLoader());
 
-        ArtifactClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory());
+        MuleApplicationClassLoaderFactory applicationClassLoaderFactory = new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory());
 
         //TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for artifact plugins.
         DefaultDomainFactory domainFactory = new DefaultDomainFactory(domainClassLoaderFactory, domainManager, containerClassLoader);
@@ -91,10 +91,10 @@ public class MuleDeploymentService implements DeploymentService
         final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory = new ArtifactPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory());
         applicationPluginRepository = new DefaultArtifactPluginRepository(artifactPluginDescriptorFactory);
 
-        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory), applicationPluginRepository);
+        ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
+        final ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository);
 
-        ArtifactClassLoaderBuilderFactory artifactClassLoaderBuilderFactory = new ArtifactClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository, artifactPluginFactory, new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory));
-        ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(artifactClassLoaderBuilderFactory, domainManager);
+        ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository, artifactPluginFactory, artifactPluginDescriptorLoader);
 
         DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainManager);
         applicationFactory.setDeploymentListener(applicationDeploymentListener);

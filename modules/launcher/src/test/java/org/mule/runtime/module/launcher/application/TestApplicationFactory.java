@@ -10,7 +10,6 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.launcher.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
-import org.mule.runtime.module.launcher.ArtifactClassLoaderBuilderFactory;
 import org.mule.runtime.module.launcher.domain.DomainManager;
 import org.mule.runtime.module.launcher.domain.DomainRepository;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
@@ -37,7 +36,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
         super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainRepository);
     }
 
-    public static TestApplicationFactory createTestApplicationFactory(ArtifactClassLoaderFactory applicationClassLoaderFactory, DomainManager domainManager)
+    public static TestApplicationFactory createTestApplicationFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory, DomainManager domainManager)
     {
         DefaultArtifactClassLoaderFilterFactory classLoaderFilterFactory = new DefaultArtifactClassLoaderFilterFactory();
         ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory = new ArtifactPluginDescriptorFactory(classLoaderFilterFactory);
@@ -46,8 +45,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
         ApplicationDescriptorFactory applicationDescriptorFactory = new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository);
         ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory = new ArtifactPluginClassLoaderFactory();
         DefaultArtifactPluginFactory applicationPluginFactory = new DefaultArtifactPluginFactory(artifactPluginClassLoaderFactory);
-        ArtifactClassLoaderBuilderFactory artifactClassLoaderBuilderFactory = new ArtifactClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository, applicationPluginFactory, artifactPluginDescriptorLoader);
-        ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(artifactClassLoaderBuilderFactory, domainManager);
+        ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository, applicationPluginFactory, artifactPluginDescriptorLoader);
         return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainManager);
     }
 

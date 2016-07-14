@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher;
 
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.launcher.application.ArtifactPluginFactory;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
@@ -19,12 +19,20 @@ import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
 public class ArtifactClassLoaderBuilderFactory
 {
 
-    private ArtifactClassLoaderFactory artifactClassLoaderFactory;
+    private DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
     private ArtifactPluginRepository applicationPluginRepository;
     private ArtifactPluginFactory artifactPluginFactory;
     private ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
 
-    public ArtifactClassLoaderBuilderFactory(ArtifactClassLoaderFactory artifactClassLoaderFactory, ArtifactPluginRepository applicationPluginRepository, ArtifactPluginFactory artifactPluginFactory, ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader)
+    /**
+     * Creates an {@code ArtifactClassLoaderBuilderFactory} to create instances of {@code ArtifactClassLoaderBuilder}.
+     *
+     * @param artifactClassLoaderFactory factory for creating the artifact resources and classes specific class loader
+     * @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
+     * @param artifactPluginFactory factory for creating an artifact plugin from it's descriptor
+     * @param artifactPluginDescriptorLoader factory for loading the artifact plugin descriptor from a file
+     */
+    public ArtifactClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory, ArtifactPluginRepository applicationPluginRepository, ArtifactPluginFactory artifactPluginFactory, ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader)
     {
         this.artifactClassLoaderFactory = artifactClassLoaderFactory;
         this.applicationPluginRepository = applicationPluginRepository;
@@ -33,6 +41,8 @@ public class ArtifactClassLoaderBuilderFactory
     }
 
     /**
+     * Create a new instance of a builder to create an artifact class loader.
+     *
      * @return a new instance of {@code ArtifactClassLoaderBuilder}
      */
     public ArtifactClassLoaderBuilder createArtifactClassLoaderBuilder()

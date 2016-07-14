@@ -7,6 +7,7 @@
 package org.mule.runtime.module.launcher;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -25,6 +26,7 @@ import org.mule.runtime.core.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -91,7 +93,7 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase
         // Create app class loader
         domainCL = new MuleSharedDomainClassLoader(DOMAIN_NAME, Thread.currentThread().getContextClassLoader(), mock(ClassLoaderLookupPolicy.class), emptyList());
 
-        appCL = new MuleApplicationClassLoader(APP_NAME, domainCL, null, urls, mock(ClassLoaderLookupPolicy.class));
+        appCL = new MuleApplicationClassLoader(APP_NAME, domainCL, null, urls, mock(ClassLoaderLookupPolicy.class), emptyMap());
     }
 
     @After

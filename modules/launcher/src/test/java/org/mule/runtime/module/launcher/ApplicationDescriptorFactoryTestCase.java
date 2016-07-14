@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -104,7 +106,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase
 
         File sharedPluginFolder = desc.getSharedPluginFolder();
 
-        assertThat(sharedPluginFolder.getAbsolutePath(), endsWith(JAR_FILE_NAME));
+        assertThat(sharedPluginFolder.getAbsolutePath(), is(pluginLibDir.getAbsolutePath()));
     }
 
     @Test

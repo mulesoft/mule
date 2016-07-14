@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.launcher;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -38,7 +39,7 @@ public class SynchronizedClassLoaderTestCase extends AbstractMuleTestCase
     @Test
     public void synchronizesLoadClassInMuleApplicationClassLoader() throws Exception
     {
-        doLoadClassSynchronizationTest(new MuleApplicationClassLoader("test", new TestClassLoader(), null, Collections.emptyList(), lookupPolicy));
+        doLoadClassSynchronizationTest(new MuleApplicationClassLoader("test", new TestClassLoader(), null, Collections.emptyList(), lookupPolicy, emptyMap()));
     }
 
     private void doLoadClassSynchronizationTest(ClassLoader classLoader) throws InterruptedException

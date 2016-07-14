@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.module.launcher;
 
-import org.mule.runtime.module.launcher.domain.DomainRepository;
+import org.mule.runtime.module.launcher.application.ArtifactPluginFactory;
+import org.mule.runtime.module.launcher.application.MuleApplicationClassLoaderFactory;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
 
 /**
  * Factory to create instances of {@code ApplicationClassLoaderBuilder}.
@@ -16,25 +19,35 @@ import org.mule.runtime.module.launcher.domain.DomainRepository;
 public class ApplicationClassLoaderBuilderFactory
 {
 
-    private final ArtifactClassLoaderBuilderFactory artifactClassLoaderBuilderFactory;
-    private DomainRepository domainRepository;
+    private final MuleApplicationClassLoaderFactory applicationClassLoaderFactory;
+    private final ArtifactPluginRepository artifactPluginRepository;
+    private final ArtifactPluginFactory artifactPluginFactory;
+    private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
 
     /**
-     * @param artifactClassLoaderBuilderFactory  class loader builder for common artifacts.
-     * @param domainRepository repository of domain artifacts.
+     * Creates an {@code ApplicationClassLoaderBuilderFactory} to create {@code ApplicationClassLoaderBuilder} instances.
+     *
+     * @param applicationClassLoaderFactory factory for the class loader of the artifact resources and classes
+     * @param artifactPluginRepository repository for artifact plugins provided by the runtime
+     * @param artifactPluginFactory factory for creating plugin instances
+     * @param artifactPluginDescriptorLoader artifact for creating plugin descriptors
      */
-    public ApplicationClassLoaderBuilderFactory(ArtifactClassLoaderBuilderFactory artifactClassLoaderBuilderFactory, DomainRepository domainRepository)
+    public ApplicationClassLoaderBuilderFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory, ArtifactPluginRepository artifactPluginRepository, ArtifactPluginFactory artifactPluginFactory, ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader)
     {
-        this.artifactClassLoaderBuilderFactory = artifactClassLoaderBuilderFactory;
-        this.domainRepository = domainRepository;
+        this.applicationClassLoaderFactory = applicationClassLoaderFactory;
+        this.artifactPluginRepository = artifactPluginRepository;
+        this.artifactPluginFactory = artifactPluginFactory;
+        this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
     }
 
     /**
+     * Creates a new {@code ApplicationClassLoaderBuilder} instance to create the application artifact class loader.
+     *
      * @return a {@code ApplicationClassLoaderBuilder} instance.
      */
     public ApplicationClassLoaderBuilder createArtifactClassLoaderBuilder()
     {
-        return new ApplicationClassLoaderBuilder(domainRepository, artifactClassLoaderBuilderFactory.createArtifactClassLoaderBuilder());
+        return new ApplicationClassLoaderBuilder(applicationClassLoaderFactory, artifactPluginRepository, artifactPluginFactory, artifactPluginDescriptorLoader);
     }
 
 }

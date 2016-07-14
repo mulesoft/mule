@@ -8,11 +8,9 @@
 package org.mule.runtime.module.launcher.application;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -20,12 +18,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.launcher.ApplicationClassLoaderBuilder;
 import org.mule.runtime.module.launcher.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
 import org.mule.runtime.module.launcher.DeploymentException;
+import org.mule.runtime.module.launcher.MuleApplicationClassLoader;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainRepository;
@@ -49,7 +48,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
     private static final String DOMAIN_NAME = "test-domain";
     private static final String APP_NAME = "test-app";
 
-    private final ArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory = mock(ArtifactClassLoaderFactory.class);
     private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = mock(ApplicationClassLoaderBuilderFactory.class);
     private final DomainRepository domainRepository = mock(DomainRepository.class);
     private final ArtifactPluginRepository applicationPluginRepository = mock(ArtifactPluginRepository.class);
@@ -90,8 +88,16 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
         final ClassLoaderLookupPolicy sharedLibLookupPolicy = mock(ClassLoaderLookupPolicy.class);
         when(domain.getArtifactClassLoader().getClassLoaderLookupPolicy().extend(anyMap())).thenReturn(sharedLibLookupPolicy);
 
-        final ArtifactClassLoader applicationArtifactClassLoader = mock(ArtifactClassLoader.class);
-        when(applicationClassLoaderFactory.create(any(), argThat(equalTo(descriptor)))).thenReturn(applicationArtifactClassLoader);
+        final MuleApplicationClassLoader applicationArtifactClassLoader = mock(MuleApplicationClassLoader.class);
+
+        ApplicationClassLoaderBuilder applicationClassLoaderBuilderMock = mock(ApplicationClassLoaderBuilder.class);
+        when(applicationClassLoaderBuilderMock.setDomain(any())).thenReturn(applicationClassLoaderBuilderMock);
+        when(applicationClassLoaderBuilderMock.setArtifactDescriptor(any())).thenReturn(applicationClassLoaderBuilderMock);
+        when(applicationClassLoaderBuilderMock.setArtifactId(any())).thenReturn(applicationClassLoaderBuilderMock);
+        when(applicationClassLoaderBuilderMock.setPluginsSharedLibFolder(any())).thenReturn(applicationClassLoaderBuilderMock);
+        when(applicationClassLoaderBuilderMock.addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]))).thenReturn(applicationClassLoaderBuilderMock);
+        when(applicationClassLoaderBuilderMock.build()).thenReturn(applicationArtifactClassLoader);
+        when(applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(applicationClassLoaderBuilderMock);
 
         final Application application = applicationFactory.createArtifact(APP_NAME);
 
@@ -101,12 +107,12 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
         assertThat(application.getArtifactName(), is(APP_NAME));
         assertThat(application.getResourceFiles(), is(resourceFiles));
 
-        verify(applicationClassLoaderFactory).create(any(), argThat(equalTo(descriptor)));
         verify(domainRepository, times(2)).getDomain(DOMAIN_NAME);
-        verify(applicationPluginRepository).getContainerArtifactPluginDescriptors();
-        verify(coreArtifactPluginDescriptor).getClassLoaderFilter();
-        verify(appPlugin).getArtifactClassLoader();
-        verify(appPlugin).getDescriptor();
+        verify(applicationClassLoaderBuilderMock).setDomain(domain);
+        verify(applicationClassLoaderBuilderMock).setPluginsSharedLibFolder(any());
+        verify(applicationClassLoaderBuilderMock).addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]));
+        verify(applicationClassLoaderBuilderMock).setArtifactDescriptor(descriptor);
+        verify(applicationClassLoaderBuilderMock).setArtifactId(APP_NAME);
     }
 
     private Domain createDomain(String name)

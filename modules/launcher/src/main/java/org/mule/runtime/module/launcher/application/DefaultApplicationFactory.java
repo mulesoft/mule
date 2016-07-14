@@ -6,19 +6,26 @@
  */
 package org.mule.runtime.module.launcher.application;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.launcher.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
+import org.mule.runtime.module.launcher.DeploymentException;
 import org.mule.runtime.module.launcher.DeploymentListener;
+import org.mule.runtime.module.launcher.MuleApplicationClassLoader;
 import org.mule.runtime.module.launcher.artifact.ArtifactFactory;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainRepository;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Creates default mule applications
@@ -68,15 +75,24 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application>
 
     protected Application createAppFrom(ApplicationDescriptor descriptor) throws IOException
     {
-        ArtifactClassLoader applicationClassLoader = applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
-                .setDomain(descriptor.getDomain())
+        Domain domain = domainRepository.getDomain(descriptor.getDomain());
+
+        if (domain == null)
+        {
+            throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'", descriptor.getDomain(), descriptor.getName())));
+        }
+
+        MuleApplicationClassLoader applicationClassLoader = applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
+                .setDomain(domain)
                 .setPluginsSharedLibFolder(descriptor.getSharedPluginFolder())
-                .addArtifactPluginDescriptor(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]))
+                .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]))
                 .setArtifactId(descriptor.getName())
                 .setArtifactDescriptor(descriptor)
                 .build();
 
-        DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor, applicationClassLoader, domainRepository);
+        List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(applicationClassLoader, descriptor.getPlugins());
+
+        DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository);
 
         if (deploymentListener != null)
         {
@@ -85,5 +101,11 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application>
 
         return new ApplicationWrapper(delegate);
     }
+
+    private List<ArtifactPlugin> createArtifactPluginList(MuleApplicationClassLoader applicationClassLoader, Set<ArtifactPluginDescriptor> plugins)
+    {
+        return plugins.stream().map( artifactPluginDescriptor -> new DefaultArtifactPlugin(artifactPluginDescriptor, applicationClassLoader.getArtifactPluginsClassLoaders().get(artifactPluginDescriptor.getName()))).collect(toList());
+    }
+
 
 }
