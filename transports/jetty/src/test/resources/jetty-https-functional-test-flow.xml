@@ -30,6 +30,7 @@
         <inbound-endpoint address="jetty-ssl:https://localhost:${port1}" exchange-pattern="request-response"
                           connector-ref="jettyConnector"/>
         <test:component appendString=" Received"/>
+        <component class="org.mule.transport.servlet.jetty.JettyHttpFunctionalTestCase$CheckForProperties"/>
     </flow>
     
 </mule>

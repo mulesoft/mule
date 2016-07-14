@@ -10,7 +10,7 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd">
 
-    <!-- for this test the client and server endponts have to be different since, Jetty is a server-only transport so
+    <!-- for this test the client and server endpoints have to be different since, Jetty is a server-only transport so
          we still use the http transport on the client side-->
     <http:endpoint address="http://localhost:${port1}" name="clientEndpoint" exchange-pattern="request-response"/>
     <jetty:endpoint address="http://localhost:${port1}" name="serverEndpoint" exchange-pattern="request-response"/>
@@ -21,11 +21,13 @@
     <flow name="testComponent">
         <inbound-endpoint ref="serverEndpoint"/>
         <test:component appendString=" Received"/>
+        <component class="org.mule.transport.servlet.jetty.JettyHttpFunctionalTestCase$CheckForProperties"/>
     </flow>
 
     <flow name="anotherComponent">
         <inbound-endpoint ref="anotherServerEndpoint"/>
         <test:component appendString=" Received"/>
+        <component class="org.mule.transport.servlet.jetty.JettyHttpFunctionalTestCase$CheckForProperties"/>
     </flow>
     
 </mule>
