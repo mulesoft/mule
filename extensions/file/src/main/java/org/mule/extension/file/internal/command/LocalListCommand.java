@@ -6,6 +6,7 @@
  */
 package org.mule.extension.file.internal.command;
 
+import static java.lang.String.format;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.internal.LocalFileSystem;
 import org.mule.runtime.api.message.MuleMessage;
@@ -55,6 +56,11 @@ public final class LocalListCommand extends LocalFileCommand implements ListComm
 
     private void doList(FileConnectorConfig config, File parent, TreeNode.Builder treeNodeBuilder, boolean recursive, MuleMessage message, Predicate<FileAttributes> matcher)
     {
+        if (!parent.canRead())
+        {
+            throw exception(format("Could not list files from directory '%s' because access was denied by the operating system", parent.getAbsolutePath()));
+        }
+
         for (File child : parent.listFiles())
         {
             Path path = child.toPath();

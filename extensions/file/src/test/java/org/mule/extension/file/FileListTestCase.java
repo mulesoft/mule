@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.TreeNode;
 
@@ -55,6 +56,14 @@ public class FileListTestCase extends FileConnectorTestCase
     {
         TreeNode node = doList(".", true);
         assertRecursiveTreeNode(node);
+    }
+
+    @Test
+    public void listWithoutReadPermission() throws Exception
+    {
+        temporaryFolder.newFolder("forbiddenDirectory").setReadable(false);
+        expectedException.expectCause(is(instanceOf(MuleRuntimeException.class)));
+        TreeNode node = doList(".", true);
     }
 
     private void assertRecursiveTreeNode(TreeNode node) throws Exception
