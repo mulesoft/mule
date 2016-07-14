@@ -160,8 +160,6 @@
                 <include>org.mule.modules:mule-module-xml</include>
                 <include>org.mule.transports:mule-transport-sockets</include>
 
-                <!-- Tools -->
-                <include>org.mule.tools:mule-tools-anttasks</include>
                 <!-- Shared libs -->
                 <include>org.mule.common:mule-common</include>
                 <include>org.mule.mvel:mule-mvel2</include>
@@ -228,7 +226,6 @@
                 <exclude>org.mule.modules:mule-module-tomcat</exclude>
                 <exclude>org.mule.modules:mule-module-ws</exclude>
                 <exclude>org.mule.modules:mule-module-xml</exclude>
-                <exclude>org.mule.tools:mule-tools-anttasks</exclude>
                 <exclude>org.mule.transports:mule-transport-sockets</exclude>
 
                 <!-- lib/app-plugins (these artifacts are zip type) -->
