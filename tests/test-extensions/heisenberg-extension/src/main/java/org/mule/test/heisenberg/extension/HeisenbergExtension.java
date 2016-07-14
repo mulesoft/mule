@@ -143,6 +143,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Parameter
     @Optional
     private Map<? extends Weapon, ?> wildCardWeaponMap;
+
     /**
      * Doors I might knock on but still haven't made up mind about
      */
@@ -352,5 +353,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public String getConfigName()
     {
         return configName;
+    }
+
+    public List<? extends Weapon> getWildCardWeapons()
+    {
+        return wildCardWeapons;
     }
 }

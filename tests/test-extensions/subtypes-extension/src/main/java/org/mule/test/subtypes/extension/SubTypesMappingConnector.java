@@ -27,11 +27,12 @@ import java.util.List;
 @Operations(TestOperationsWithSubTypeMapping.class)
 @Sources(SubtypesSource.class)
 @Providers(SubTypesConnectionProvider.class)
-@SubTypeMapping(baseType = ParentShape.class, subTypes = {Square.class, Triangle.class})
-@SubTypeMapping(baseType = Door.class, subTypes = {HouseDoor.class, CarDoor.class})
 @Import(type = Ricin.class, from = HeisenbergExtension.class)
 @Import(type = Weapon.class, from = HeisenbergExtension.class)
 @Import(type = VeganCookBook.class, from = VeganExtension.class)
+@SubTypeMapping(baseType = ParentShape.class, subTypes = {Square.class, Triangle.class})
+@SubTypeMapping(baseType = Door.class, subTypes = {HouseDoor.class, CarDoor.class})
+@SubTypeMapping(baseType = Weapon.class, subTypes = {Revolver.class})
 @Export(classes = {Revolver.class})
 @Xml(namespace = "subtypes", namespaceLocation = "http://www.mulesoft.org/schema/mule/subtypes")
 public class SubTypesMappingConnector
@@ -66,6 +67,19 @@ public class SubTypesMappingConnector
 
     @Parameter
     private List<PojoForList> pojoListTwo;
+
+    @Parameter
+    private List<Weapon> weaponList;
+
+    public List<Weapon> getWeaponList()
+    {
+        return weaponList;
+    }
+
+    public void setWeaponList(List<Weapon> weaponList)
+    {
+        this.weaponList = weaponList;
+    }
 
     public List<PojoForList> getPojoListOne()
     {

@@ -414,7 +414,7 @@ public final class SchemaBuilder
         return complexType;
     }
 
-    private XmlModelProperty getTypeXmlProperties(ObjectType baseType)
+    private XmlModelProperty getTypeXmlProperties(MetadataType baseType)
     {
         return importedTypes.get(baseType) == null ? xmlProperties
                                                    : registerExtensionImport(getType(importedTypes.get(baseType)));
@@ -637,7 +637,8 @@ public final class SchemaBuilder
             @Override
             public void visitObject(ObjectType objectType)
             {
-                TopLevelElement collectionItemElement = createRefToLocalElement(objectType);
+
+                TopLevelElement collectionItemElement = createTypeRef(objectType, false);
                 collectionItemElement.setMaxOccurs(UNBOUNDED);
                 sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
             }
@@ -654,6 +655,23 @@ public final class SchemaBuilder
         });
 
         return collectionComplexType;
+    }
+
+    private TopLevelElement createTypeRef(ObjectType type, boolean isRequired)
+    {
+        //TODO MULE-10029 replace this logic with DslElementDeclaration
+        XmlModelProperty baseTypeXml = xmlProperties;
+        if(importedTypes.get(type) != null)
+        {
+            baseTypeXml = registerExtensionImport(getType(importedTypes.get(type)));
+        }
+        else
+        {
+            registerPojoType(type, EMPTY);
+        }
+
+        QName refQName = new QName(baseTypeXml.getNamespaceUri(), getTopLevelAbstractTypeName(type), baseTypeXml.getNamespace());
+        return createRefElement(refQName, isRequired);
     }
 
     private void generateMapElement(ExplicitGroup all, String name, String description, DictionaryType metadataType, boolean required)
@@ -700,7 +718,8 @@ public final class SchemaBuilder
                     ExplicitGroup singleItemSequence = new ExplicitGroup();
                     singleItemSequence.setMaxOccurs("1");
 
-                    singleItemSequence.getParticle().add(objectFactory.createElement(createRefToLocalElement(objectType)));
+                    TopLevelElement mapItemElement = createTypeRef(objectType, false);
+                    singleItemSequence.getParticle().add(objectFactory.createElement(mapItemElement));
 
                     entryComplexType.setSequence(singleItemSequence);
                 }
@@ -911,8 +930,7 @@ public final class SchemaBuilder
                     else
                     {
                         List<MetadataType> subTypes = subTypesMapping.getSubTypes(objectType);
-                        //FIXME class => annotation
-                        if (!subTypes.isEmpty() || getType(objectType).isAnnotationPresent(Extensible.class))
+                        if (!subTypes.isEmpty() || isExtensible(objectType))
                         {
                             registerPojoSubtypes(objectType, subTypes);
                             addAbstractTypeRef(name, description, objectType, all);
@@ -1077,7 +1095,9 @@ public final class SchemaBuilder
     private TopLevelElement createRefToLocalElement(MetadataType metadataType)
     {
         registerPojoType(metadataType, EMPTY);
-        QName qName = new QName(xmlProperties.getNamespaceUri(), getTopLevelAbstractTypeName(metadataType), xmlProperties.getNamespace());
+
+        XmlModelProperty xml = getTypeXmlProperties(metadataType);
+        QName qName = new QName(xml.getNamespaceUri(), getTopLevelAbstractTypeName(metadataType), xml.getNamespace());
         return createRefElement(qName, false);
     }
 

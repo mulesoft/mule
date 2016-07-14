@@ -38,7 +38,34 @@
         <subtypes:pojo-list-one>
             <subtypes:pojo-for-list id="inner"/>
         </subtypes:pojo-list-one>
+        <subtypes:weapon-list>
+            <subtypes:revolver bullets="6"/>
+            <heisenberg:ricin microgramsPerKilo="10">
+                <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:ricin>
+            <heisenberg:ricin microgramsPerKilo="20">
+                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+            </heisenberg:ricin>
+            <subtypes:revolver bullets="0"/>
+        </subtypes:weapon-list>
     </subtypes:config>
+
+    <heisenberg:config name="heisenberg"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="1000000"
+                       finalHealth="DEAD"
+                       enemies="enemies"
+                       labAddress="#['Pollos Hermanos']"
+                       monthlyIncomes="monthlyIncomes">
+        <heisenberg:wild-card-weapons>
+            <heisenberg:ricin microgramsPerKilo="10">
+                <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:ricin>
+            <subtypes:revolver bullets="3"/>
+        </heisenberg:wild-card-weapons>
+    </heisenberg:config>
 
     <flow name="shapeRetriever">
         <subtypes:shape-retriever>

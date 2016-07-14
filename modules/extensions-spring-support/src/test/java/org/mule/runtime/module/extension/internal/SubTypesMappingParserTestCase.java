@@ -12,16 +12,18 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.module.extension.internal.config.AbstractConfigParserTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.Ricin;
+import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.subtypes.extension.CarDoor;
 import org.mule.test.subtypes.extension.FinalPojo;
 import org.mule.test.subtypes.extension.HouseDoor;
 import org.mule.test.subtypes.extension.ParentShape;
 import org.mule.test.subtypes.extension.PojoForList;
+import org.mule.test.subtypes.extension.Revolver;
 import org.mule.test.subtypes.extension.Square;
 import org.mule.test.subtypes.extension.SubTypesConnectorConnection;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
@@ -33,7 +35,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
+public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase
 {
 
     @Override
@@ -94,6 +96,24 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
         assertThat(payload.getPojoListOne(), hasSize(1));
         assertThat(payload.getPojoListOne().get(0), instanceOf(PojoForList.class));
         assertThat(payload.getPojoListOne().get(0).getId(), is("inner"));
+
+        assertThat(payload.getWeaponList(), is(notNullValue()));
+        assertThat(payload.getWeaponList(), hasSize(4));
+        assertThat(payload.getWeaponList().get(0), instanceOf(Revolver.class));
+        assertThat(((Revolver)payload.getWeaponList().get(0)).getBullets(), is(6));
+
+        assertThat(payload.getWeaponList().get(1), instanceOf(Ricin.class));
+        assertThat(((Ricin)payload.getWeaponList().get(1)).getMicrogramsPerKilo(), is(10L));
+        assertThat(((Ricin)payload.getWeaponList().get(1)).getDestination(), is(notNullValue()));
+        assertThat(((Ricin)payload.getWeaponList().get(1)).getDestination().getVictim(), is("Krazy-8"));
+
+        assertThat(payload.getWeaponList().get(1), instanceOf(Ricin.class));
+        assertThat(((Ricin)payload.getWeaponList().get(2)).getMicrogramsPerKilo(), is(20L));
+        assertThat(((Ricin)payload.getWeaponList().get(2)).getDestination(), is(notNullValue()));
+        assertThat(((Ricin)payload.getWeaponList().get(2)).getDestination().getVictim(), is("Lidia"));
+
+        assertThat(payload.getWeaponList().get(3), instanceOf(Revolver.class));
+        assertThat(((Revolver)payload.getWeaponList().get(3)).getBullets(), is(0));
     }
 
 
@@ -171,6 +191,25 @@ public class SubTypesMappingParserTestCase extends ExtensionFunctionalTestCase
         assertThat(((Triangle) payload.get(5)).getHeight(), is(6));
         assertThat(((Triangle) payload.get(5)).getArea(), is(3));
 
+    }
+
+    @Test
+    public void subtypeContributionToOtherExtension() throws Exception
+    {
+        HeisenbergExtension heisenberg = lookupHeisenberg("heisenberg");
+        assertThat(heisenberg, is(notNullValue()));
+
+        List<? extends Weapon> wildCardWeapons = heisenberg.getWildCardWeapons();
+        assertThat(wildCardWeapons, is(notNullValue()));
+        assertThat(wildCardWeapons, hasSize(2));
+
+        assertThat(wildCardWeapons.get(0), instanceOf(Ricin.class));
+        assertThat(((Ricin)wildCardWeapons.get(0)).getMicrogramsPerKilo(), is(10L));
+        assertThat(((Ricin)wildCardWeapons.get(0)).getDestination(), is(notNullValue()));
+        assertThat(((Ricin)wildCardWeapons.get(0)).getDestination().getVictim(), is("Krazy-8"));
+
+        assertThat(wildCardWeapons.get(1), instanceOf(Revolver.class));
+        assertThat(((Revolver)wildCardWeapons.get(1)).getBullets(), is(3));
     }
 
     @Test
