@@ -102,12 +102,12 @@
     </xs:element>
     <xs:complexType name="org.mule.test.subtypes.extension.Revolver">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionInt" use="optional" default="6" name="bullets"></xs:attribute>
+      <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.Weapon">
+        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" default="6" name="bullets"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-revolver"></xs:element>
+  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-weapon" abstract="true" name="abstract-revolver"></xs:element>
     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-revolver" name="revolver">
         <xs:complexType>
             <xs:complexContent>
@@ -197,6 +197,13 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="weapon-list">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-weapon"></xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="abstractShape"></xs:attribute>
@@ -209,6 +216,7 @@
                     <xs:attribute type="xs:string" use="optional" name="pojoWithExtension"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="pojoListOne"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="pojoListTwo"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="weaponList"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -307,7 +315,7 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/subtypes" type="SubtypesSourceType" substitutionGroup="mule:abstract-message-source" name="subtypes-source"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SubtypesSourceType" substitutionGroup="mule:abstract-message-source" name="subtypes-source"></xs:element>
     <xs:complexType name="SubtypesSourceType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
@@ -330,7 +338,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/subtypes" type="ConfigRetrieverType" substitutionGroup="mule:abstract-message-processor" name="config-retriever"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConfigRetrieverType" substitutionGroup="mule:abstract-message-processor" name="config-retriever"></xs:element>
     <xs:complexType name="ConfigRetrieverType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -347,7 +355,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/subtypes" type="ConnectionRetrieverType" substitutionGroup="mule:abstract-message-processor" name="connection-retriever"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConnectionRetrieverType" substitutionGroup="mule:abstract-message-processor" name="connection-retriever"></xs:element>
     <xs:complexType name="ConnectionRetrieverType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -364,7 +372,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/subtypes" type="DoorRetrieverType" substitutionGroup="mule:abstract-message-processor" name="door-retriever"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DoorRetrieverType" substitutionGroup="mule:abstract-message-processor" name="door-retriever"></xs:element>
     <xs:complexType name="DoorRetrieverType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -391,7 +399,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/subtypes" type="ShapeRetrieverType" substitutionGroup="mule:abstract-message-processor" name="shape-retriever"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShapeRetrieverType" substitutionGroup="mule:abstract-message-processor" name="shape-retriever"></xs:element>
     <xs:complexType name="ShapeRetrieverType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -418,7 +426,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/subtypes" type="SubtypedAndConcreteParametersType" substitutionGroup="mule:abstract-message-processor" name="subtyped-and-concrete-parameters"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SubtypedAndConcreteParametersType" substitutionGroup="mule:abstract-message-processor" name="subtyped-and-concrete-parameters"></xs:element>
     <xs:complexType name="SubtypedAndConcreteParametersType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
