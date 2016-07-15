@@ -26,6 +26,7 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
+import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
@@ -353,7 +354,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ConfigurationDeclaration configuration = extensionDeclaration.getConfigurations().get(1);
         assertThat(configuration, is(notNullValue()));
         assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-        assertThat(configuration.getParameters(), hasSize(26));
+        assertThat(configuration.getParameters(), hasSize(27));
         assertParameter(configuration.getParameters(), "extendedProperty", "", toMetadataType(String.class), true, SUPPORTED, null);
     }
 
@@ -470,7 +471,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
         List<ParameterDeclaration> parameters = conf.getParameters();
-        assertThat(parameters, hasSize(25));
+        assertThat(parameters, hasSize(26));
 
         assertParameter(parameters, "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
         assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
@@ -523,6 +524,11 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "deathsBySeasons", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
                                 .ofValue(TYPE_BUILDER.arrayType().id(List.class.getName()).of(TYPE_BUILDER.stringType().id(String.class.getName())))
+                                .build(),
+                        false, SUPPORTED, null);
+        assertParameter(parameters, "weaponValueMap", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+                                .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
+                                .ofValue(TYPE_LOADER.load(Weapon.class))
                                 .build(),
                         false, SUPPORTED, null);
     }

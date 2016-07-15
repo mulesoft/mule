@@ -18,6 +18,7 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builder;
@@ -147,7 +148,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
         final ExtensionParsingContext parsingContext = new ExtensionParsingContext();
         final Builder definitionBuilder = new Builder().withNamespace(xmlModelProperty.get().getNamespace());
         Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
-        SubTypesMappingContainer typeMapping = new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : emptyMap());
+        final SubTypesMappingContainer typeMapping = new SubTypesMappingContainer(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : emptyMap());
         final DslElementResolver dslElementResolver = new DslElementResolver(extensionModel);
 
         final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
@@ -184,14 +185,44 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                 @Override
                 public void onParameter(ParameterModel model)
                 {
-                    typeMapping.getSubTypes(model.getType())
-                            .forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder, extensionClassLoader, dslElementResolver, parsingContext));
-
+                    registerSubTypes(typeMapping, model.getType(), definitionBuilder, extensionClassLoader, dslElementResolver, parsingContext);
                     registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslElementResolver, parsingContext);
                 }
+
+
             }.walk(extensionModel);
 
             registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslElementResolver, parsingContext);
+        });
+    }
+
+    private void registerSubTypes(SubTypesMappingContainer typeMapping, MetadataType type, Builder definitionBuilder, ClassLoader extensionClassLoader, DslElementResolver dslElementResolver, ExtensionParsingContext parsingContext)
+    {
+        type.accept(new MetadataTypeVisitor()
+        {
+            @Override
+            public void visitUnion(UnionType unionType) {
+                unionType.getTypes().forEach(type -> type.accept(this));
+            }
+
+            @Override
+            public void visitArrayType(ArrayType arrayType)
+            {
+                arrayType.getType().accept(this);
+            }
+
+            @Override
+            public void visitObject(ObjectType objectType)
+            {
+                typeMapping.getSubTypes(objectType)
+                        .forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder, extensionClassLoader, dslElementResolver, parsingContext));
+            }
+
+            @Override
+            public void visitDictionary(DictionaryType dictionaryType)
+            {
+                dictionaryType.getValueType().accept(this);
+            }
         });
     }
 
@@ -241,6 +272,12 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                 keyType.accept(this);
                 registerTopLevelParameter(keyType, definitionBuilder.copy(), extensionClassLoader, dslElementResolver, parsingContext);
             }
+
+            @Override
+            public void visitUnion(UnionType unionType) {
+                unionType.getTypes().forEach(type -> type.accept(this));
+            }
+
         });
     }
 

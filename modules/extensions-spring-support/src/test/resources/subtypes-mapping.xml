@@ -17,6 +17,10 @@
             <subtypes:door-interface>
                 <subtypes:house-door isLocked="true"/>
             </subtypes:door-interface>
+            <subtypes:doors>
+                <subtypes:car-door color="red"/>
+                <subtypes:house-door isLocked="true"/>
+            </subtypes:doors>
         </subtypes:connection>
         <subtypes:abstract-shape>
             <subtypes:square side="1" area="1"/>
@@ -48,6 +52,18 @@
             </heisenberg:ricin>
             <subtypes:revolver bullets="0"/>
         </subtypes:weapon-list>
+        <subtypes:weapon-maps>
+            <subtypes:weapon-map key="ricinChild">
+                <heisenberg:ricin microgramsPerKilo="20">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </subtypes:weapon-map>
+            <subtypes:weapon-map key="revolverChild">
+                <subtypes:revolver bullets="1"/>
+            </subtypes:weapon-map>
+            <subtypes:weapon-map key="revolverRef" value="remington"/>
+            <subtypes:weapon-map key="revolverMEL" value="#[new org.mule.test.subtypes.extension.Revolver()]"/>
+        </subtypes:weapon-maps>
     </subtypes:config>
 
     <heisenberg:config name="heisenberg"
@@ -119,6 +135,7 @@
     <subtypes:triangle-alias name="global-triangle" height="6" area="3"/>
     <subtypes:final-pojo name="global-final-pojo" someString="globalString"/>
     <vegan:vegan-cook-book name="global-cookbook" numberOfPages="10"/>
+    <subtypes:revolver name="remington" bullets="6"/>
 
     <flow name="subtypedAndConcreteParametersAsAttributes">
         <subtypes:subtyped-and-concrete-parameters
