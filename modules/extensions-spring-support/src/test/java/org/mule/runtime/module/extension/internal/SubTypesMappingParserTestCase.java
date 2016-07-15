@@ -99,23 +99,20 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase
 
         assertThat(payload.getWeaponList(), is(notNullValue()));
         assertThat(payload.getWeaponList(), hasSize(4));
-        assertThat(payload.getWeaponList().get(0), instanceOf(Revolver.class));
-        assertThat(((Revolver)payload.getWeaponList().get(0)).getBullets(), is(6));
 
-        assertThat(payload.getWeaponList().get(1), instanceOf(Ricin.class));
-        assertThat(((Ricin)payload.getWeaponList().get(1)).getMicrogramsPerKilo(), is(10L));
-        assertThat(((Ricin)payload.getWeaponList().get(1)).getDestination(), is(notNullValue()));
-        assertThat(((Ricin)payload.getWeaponList().get(1)).getDestination().getVictim(), is("Krazy-8"));
+        assertRevolver(payload.getWeaponList().get(0), 6);
+        assertRicin(payload.getWeaponList().get(1), 10L, "Krazy-8");
+        assertRicin(payload.getWeaponList().get(2), 20L, "Lidia");
+        assertRevolver(payload.getWeaponList().get(3), 0);
 
-        assertThat(payload.getWeaponList().get(1), instanceOf(Ricin.class));
-        assertThat(((Ricin)payload.getWeaponList().get(2)).getMicrogramsPerKilo(), is(20L));
-        assertThat(((Ricin)payload.getWeaponList().get(2)).getDestination(), is(notNullValue()));
-        assertThat(((Ricin)payload.getWeaponList().get(2)).getDestination().getVictim(), is("Lidia"));
+        assertThat(payload.getWeaponMap(), is(notNullValue()));
+        assertThat(payload.getWeaponMap().entrySet(), hasSize(4));
+        assertRicin(payload.getWeaponMap().get("ricinChild"), 20L, "Lidia");
+        assertRevolver(payload.getWeaponMap().get("revolverChild"), 1);
+        assertRevolver(payload.getWeaponMap().get("revolverRef"), 6);
+        assertRevolver(payload.getWeaponMap().get("revolverMEL"), 0);
 
-        assertThat(payload.getWeaponList().get(3), instanceOf(Revolver.class));
-        assertThat(((Revolver)payload.getWeaponList().get(3)).getBullets(), is(0));
     }
-
 
     @Test
     public void connectionRetriever() throws Exception
@@ -204,12 +201,12 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase
         assertThat(wildCardWeapons, hasSize(2));
 
         assertThat(wildCardWeapons.get(0), instanceOf(Ricin.class));
-        assertThat(((Ricin)wildCardWeapons.get(0)).getMicrogramsPerKilo(), is(10L));
-        assertThat(((Ricin)wildCardWeapons.get(0)).getDestination(), is(notNullValue()));
-        assertThat(((Ricin)wildCardWeapons.get(0)).getDestination().getVictim(), is("Krazy-8"));
+        assertThat(((Ricin) wildCardWeapons.get(0)).getMicrogramsPerKilo(), is(10L));
+        assertThat(((Ricin) wildCardWeapons.get(0)).getDestination(), is(notNullValue()));
+        assertThat(((Ricin) wildCardWeapons.get(0)).getDestination().getVictim(), is("Krazy-8"));
 
         assertThat(wildCardWeapons.get(1), instanceOf(Revolver.class));
-        assertThat(((Revolver)wildCardWeapons.get(1)).getBullets(), is(3));
+        assertThat(((Revolver) wildCardWeapons.get(1)).getBullets(), is(3));
     }
 
     @Test
@@ -224,4 +221,19 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase
             fail(e.getMessage());
         }
     }
+
+    private void assertRicin(Object payload, Long micrograms, String victim)
+    {
+        assertThat(payload, instanceOf(Ricin.class));
+        assertThat(((Ricin) payload).getMicrogramsPerKilo(), is(micrograms));
+        assertThat(((Ricin) payload).getDestination(), is(notNullValue()));
+        assertThat(((Ricin) payload).getDestination().getVictim(), is(victim));
+    }
+
+    private void assertRevolver(Object payload, int bullets)
+    {
+        assertThat(payload, instanceOf(Revolver.class));
+        assertThat(((Revolver) payload).getBullets(), is(bullets));
+    }
+
 }

@@ -14,6 +14,8 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Parameter;
 
+import java.util.List;
+
 public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesConnectorConnection>
 {
 
@@ -23,6 +25,13 @@ public class SubTypesConnectionProvider implements ConnectionProvider<SubTypesCo
     @Parameter
     private Door doorInterface;
 
+    @Parameter
+    private List<Door> doors;
+
+    public List<Door> getDoors()
+    {
+        return doors;
+    }
 
     @Override
     public SubTypesConnectorConnection connect() throws ConnectionException

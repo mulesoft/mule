@@ -10,7 +10,6 @@ import static org.mule.runtime.extension.api.Category.SELECT;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -144,6 +143,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Optional
     private Map<? extends Weapon, ?> wildCardWeaponMap;
 
+    @Parameter
+    @Optional
+    private Map<String, Weapon> weaponValueMap;
+
     /**
      * Doors I might knock on but still haven't made up mind about
      */
@@ -202,6 +205,11 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public void dispose()
     {
         dispose++;
+    }
+
+    public Map<String, Weapon> getWeaponValueMap()
+    {
+        return weaponValueMap;
     }
 
     public ExtensionManager getExtensionManager()

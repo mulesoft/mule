@@ -22,6 +22,7 @@ import org.mule.test.vegan.extension.VeganCookBook;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.List;
+import java.util.Map;
 
 @Extension(name = "SubtypesConnector", description = "Test connector for pojo subtype mapping")
 @Operations(TestOperationsWithSubTypeMapping.class)
@@ -70,6 +71,14 @@ public class SubTypesMappingConnector
 
     @Parameter
     private List<Weapon> weaponList;
+
+    @Parameter
+    private Map<String, Weapon> weaponMap;
+
+    public Map<String, Weapon> getWeaponMap()
+    {
+        return weaponMap;
+    }
 
     public List<Weapon> getWeaponList()
     {
