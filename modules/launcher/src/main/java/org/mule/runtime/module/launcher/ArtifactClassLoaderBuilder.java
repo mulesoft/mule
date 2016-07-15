@@ -48,7 +48,7 @@ public class ArtifactClassLoaderBuilder extends AbstractArtifactClassLoaderBuild
      * {@inheritDoc}
      */
     @Override
-    ArtifactClassLoader getRootClassLoader()
+    ArtifactClassLoader getParentClassLoader()
     {
         return parentClassLoader;
     }

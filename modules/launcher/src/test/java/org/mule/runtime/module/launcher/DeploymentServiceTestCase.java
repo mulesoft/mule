@@ -8,6 +8,7 @@ package org.mule.runtime.module.launcher;
 
 import static java.io.File.separator;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -2946,7 +2947,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         DomainDescriptor descriptor = new DomainDescriptor();
         descriptor.setName(DEFAULT_DOMAIN_NAME);
 
-        return new DefaultMuleDomain(descriptor, new DomainClassLoaderFactory(getClass().getClassLoader()).create(containerClassLoader, descriptor, emptyMap()));
+        return new DefaultMuleDomain(descriptor, new DomainClassLoaderFactory(getClass().getClassLoader()).create(containerClassLoader, descriptor, emptyList()));
     }
 
     /**

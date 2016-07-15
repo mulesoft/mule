@@ -9,7 +9,7 @@ package org.mule.runtime.module.artifact.classloader;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import java.net.URL;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Base {@link ArtifactClassLoader} implementation of deployable artifacts.
@@ -18,18 +18,18 @@ import java.util.Map;
  */
 public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader
 {
-    private final Map<String, ArtifactClassLoader> artifactPluginClassLoaders;
+    private final List<ArtifactClassLoader> artifactPluginClassLoaders;
 
     /**
-     * Creates a {@code MuleDeployableArtifactClassLoader} with the provided configuration.
+     * Creates a {@link MuleDeployableArtifactClassLoader} with the provided configuration.
      *
      * @param name artifact name
      * @param urls the URLs from which to load classes and resources
      * @param parent parent class loader in the hierarchy
      * @param lookupPolicy policy for resolving classes and resources
-     * @param artifactPluginClassLoaders class loaders for the plugin artifacts contained by this artifact
+     * @param artifactPluginClassLoaders class loaders for the plugin artifacts contained by this artifact. Must be not null.
      */
-    public MuleDeployableArtifactClassLoader(String name, URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy, Map<String, ArtifactClassLoader> artifactPluginClassLoaders)
+    public MuleDeployableArtifactClassLoader(String name, URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy, List<ArtifactClassLoader> artifactPluginClassLoaders)
     {
         super(name, urls, parent, lookupPolicy);
         checkArgument(artifactPluginClassLoaders != null, "artifact plugin class loaders cannot be null");
@@ -37,11 +37,11 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader
     }
 
     /**
-     * Provides a map with the plugin name as key and its classloader as value.
+     * Provides a {@link List} with the plugin name as key and its classloader as value.
      *
-     * @return map of plugin class loaders
+     * @return {@link List} of plugin class loaders
      */
-    public Map<String, ArtifactClassLoader> getArtifactPluginsClassLoaders()
+    public List<ArtifactClassLoader> getArtifactPluginClassLoaders()
     {
         return artifactPluginClassLoaders;
     }

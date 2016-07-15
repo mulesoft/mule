@@ -48,7 +48,7 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
     }
 
     @Override
-    public ArtifactClassLoader create(ArtifactClassLoader parent, ApplicationDescriptor descriptor, Map<String, ArtifactClassLoader> artifactPluginClassLoders)
+    public ArtifactClassLoader create(ArtifactClassLoader parent, ApplicationDescriptor descriptor, List<ArtifactClassLoader> artifactPluginClassLoders)
     {
         List<URL> urls = getApplicationResourceUrls(descriptor);
 

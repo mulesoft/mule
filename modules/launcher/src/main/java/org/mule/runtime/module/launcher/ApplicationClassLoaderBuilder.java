@@ -8,16 +8,12 @@ package org.mule.runtime.module.launcher;
 
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.launcher.application.ArtifactPluginFactory;
 import org.mule.runtime.module.launcher.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.module.launcher.domain.Domain;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -67,7 +63,7 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
      * {@inheritDoc}
      */
     @Override
-    ArtifactClassLoader getRootClassLoader()
+    ArtifactClassLoader getParentClassLoader()
     {
         return this.domain.getArtifactClassLoader();
     }
