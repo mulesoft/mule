@@ -15,6 +15,8 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleTmpDir;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -37,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,21 +70,25 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     private String artifactId = UUID.getUUID();
     private ArtifactDescriptor artifactDescriptor;
     private ArtifactClassLoader parentClassLoader;
-    private Map<String, ArtifactClassLoader> artifactPluginClassLoaders = new HashMap<>();
+    private List<ArtifactClassLoader> artifactPluginClassLoaders = new ArrayList<>();
 
     /**
-     * Creates an AbstractArtifactClassLoaderBuilder.
+     * Creates an {@link AbstractArtifactClassLoaderBuilder}.
      *
-     * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-     * @param artifactPluginRepository repository of plugins contained by the runtime
-     * @param artifactPluginFactory factory for creating artifact plugins
-     * @param artifactPluginDescriptorLoader loader for plugin zip files into their descriptors
+     * @param artifactClassLoaderFactory     factory for the classloader specific to the artifact resource and classes. Must be not null.
+     * @param artifactPluginRepository       repository of plugins contained by the runtime. Must be not null.
+     * @param artifactPluginFactory          factory for creating artifact plugins. Must be not null.
+     * @param artifactPluginDescriptorLoader loader for plugin zip files into their descriptors. Must be not null.
      */
     public AbstractArtifactClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                               ArtifactPluginRepository artifactPluginRepository,
                                               ArtifactPluginFactory artifactPluginFactory,
                                               ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader)
     {
+        checkArgument(artifactClassLoaderFactory != null, "artifact class loader factory cannot be null");
+        checkArgument(artifactPluginRepository != null, "artifact plugin repository cannot be null");
+        checkArgument(artifactPluginFactory != null, "artifact plugin factory cannot be null");
+        checkArgument(artifactPluginDescriptorLoader != null, "artifact plugin descriptor loader cannot be null");
         this.artifactClassLoaderFactory = artifactClassLoaderFactory;
         this.artifactPluginRepository = artifactPluginRepository;
         this.artifactPluginFactory = artifactPluginFactory;
@@ -94,10 +101,10 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
      *
      * @return the root class loader for all other class loaders
      */
-    abstract ArtifactClassLoader getRootClassLoader();
+    abstract ArtifactClassLoader getParentClassLoader();
 
     /**
-     * @param artifactId unique identifier for this artifact. For instance, for Applications, it can be the app name.
+     * @param artifactId unique identifier for this artifact. For instance, for Applications, it can be the app name. Must be not null.
      * @return the builder
      */
     public T setArtifactId(String artifactId)
@@ -124,7 +131,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
      */
     public T addArtifactPluginDescriptors(ArtifactPluginDescriptor... artifactPluginDescriptors)
     {
-        checkArgument(artifactPluginDescriptors != null, "artifact plugin descriptors shared lib folder cannot be null");
+        checkArgument(artifactPluginDescriptors != null, "artifact plugin descriptors cannot be null");
         this.artifactPluginDescriptors.addAll(asList(artifactPluginDescriptors));
         return (T) this;
     }
@@ -150,7 +157,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     public ArtifactClassLoader build() throws IOException
     {
         checkState(artifactDescriptor != null, "artifact descriptor cannot be null");
-        parentClassLoader = getRootClassLoader();
+        parentClassLoader = getParentClassLoader();
         checkState(parentClassLoader != null, "parent class loader cannot be null");
 
         parentClassLoader = getSharedLibClassLoader(parentClassLoader);
@@ -247,7 +254,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
         for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors)
         {
             ArtifactPlugin artifactPlugin = artifactPluginFactory.create(artifactPluginDescriptor, parent);
-            artifactPluginClassLoaders.put(artifactPlugin.getArtifactName(), artifactPlugin.getArtifactClassLoader());
+            artifactPluginClassLoaders.add(artifactPlugin.getArtifactClassLoader());
 
             final FilteringArtifactClassLoader filteringPluginClassLoader = new FilteringArtifactClassLoader(artifactPlugin.getArtifactClassLoader(), artifactPlugin.getDescriptor().getClassLoaderFilter());
             classLoaders.add(filteringPluginClassLoader);

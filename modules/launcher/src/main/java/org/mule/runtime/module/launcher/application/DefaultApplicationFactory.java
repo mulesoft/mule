@@ -104,7 +104,14 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application>
 
     private List<ArtifactPlugin> createArtifactPluginList(MuleApplicationClassLoader applicationClassLoader, Set<ArtifactPluginDescriptor> plugins)
     {
-        return plugins.stream().map( artifactPluginDescriptor -> new DefaultArtifactPlugin(artifactPluginDescriptor, applicationClassLoader.getArtifactPluginsClassLoaders().get(artifactPluginDescriptor.getName()))).collect(toList());
+        return plugins.stream().map(artifactPluginDescriptor ->
+                                            new DefaultArtifactPlugin(artifactPluginDescriptor,
+                                                                      applicationClassLoader.getArtifactPluginClassLoaders()
+                                                                              .stream()
+                                                                              .filter(artifactClassLoader -> artifactClassLoader.getArtifactName().endsWith(artifactPluginDescriptor.getName()))
+                                                                              .findFirst()
+                                                                              .get()))
+                .collect(toList());
     }
 
 

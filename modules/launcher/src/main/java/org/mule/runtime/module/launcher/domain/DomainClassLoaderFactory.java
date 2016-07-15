@@ -72,7 +72,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     }
 
     @Override
-    public ArtifactClassLoader create(ArtifactClassLoader parent, DomainDescriptor descriptor, Map<String, ArtifactClassLoader> artifactClassLoaderMap)
+    public ArtifactClassLoader create(ArtifactClassLoader parent, DomainDescriptor descriptor, List<ArtifactClassLoader> artifactClassLoaders)
     {
         String domain = descriptor.getName();
         Preconditions.checkArgument(domain != null, "Domain name cannot be null");

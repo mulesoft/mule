@@ -21,7 +21,7 @@ public class MuleFoldersUtil
     public static final String EXECUTION_FOLDER = ".mule";
     public static final String LIB_FOLDER = "lib";
     public static final String APPS_FOLDER = "apps";
-    public static final String PLUGINS_FOLDER = "server-plugins";
+    public static final String PLUGINS_FOLDER = "plugins";
     public static final String CLASSES_FOLDER = "classes";
     public static final String PER_APP_LIB_FOLDER = "per-app";
     public static final String DOMAINS_FOLDER = "domains";

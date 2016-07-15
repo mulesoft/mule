@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.launcher;
 
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -16,7 +16,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.MediumTest;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +38,7 @@ public class SynchronizedClassLoaderTestCase extends AbstractMuleTestCase
     @Test
     public void synchronizesLoadClassInMuleApplicationClassLoader() throws Exception
     {
-        doLoadClassSynchronizationTest(new MuleApplicationClassLoader("test", new TestClassLoader(), null, Collections.emptyList(), lookupPolicy, emptyMap()));
+        doLoadClassSynchronizationTest(new MuleApplicationClassLoader("test", new TestClassLoader(), null, emptyList(), lookupPolicy, emptyList()));
     }
 
     private void doLoadClassSynchronizationTest(ClassLoader classLoader) throws InterruptedException

@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.classloader;
 
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,13 +20,13 @@ public interface DeployableArtifactClassLoaderFactory<T extends ArtifactDescript
 {
 
     /**
-     * Creates a classLoader from a given descriptor
+     * Creates a {@link ClassLoader} from a given descriptor
      *
      * @param parent parent for the new artifact classloader.
      * @param descriptor descriptor of the artifact owner of the created classloader
-     * @param artifactPluginClassLoaders map with entries containing the plugin name and its class loader
+     * @param artifactPluginClassLoaders {@link List} with the artifact plugin class loaders
      * @return a new classLoader for described artifact
      */
-    ArtifactClassLoader create(ArtifactClassLoader parent, T descriptor, Map<String, ArtifactClassLoader> artifactPluginClassLoaders);
+    ArtifactClassLoader create(ArtifactClassLoader parent, T descriptor, List<ArtifactClassLoader> artifactPluginClassLoaders);
 
 }
