@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.file;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
@@ -16,7 +17,9 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class FilePredicateBuilderContractTestCase<T extends FilePredicateBuilder, Attributes extends FileAttributes> extends AbstractMuleTestCase
@@ -28,6 +31,9 @@ public class FilePredicateBuilderContractTestCase<T extends FilePredicateBuilder
 
     protected T builder = createPredicateBuilder();
     protected Attributes attributes;
+
+    @Rule
+    public ExpectedException expectedException = none();
 
     @Before
     public void before()
@@ -267,6 +273,22 @@ public class FilePredicateBuilderContractTestCase<T extends FilePredicateBuilder
         when(attributes.isSymbolicLink()).thenReturn(true);
         builder.setSymbolicLink(false);
         assertReject();
+    }
+
+    @Test
+    public void failOnInvalidMinSize()
+    {
+        expectedException.expect(IllegalArgumentException.class);
+        builder.setMinSize(-1L);
+        builder.build();
+    }
+
+    @Test
+    public void failOnInvalidMaxSize()
+    {
+        expectedException.expect(IllegalArgumentException.class);
+        builder.setMaxSize(-1L);
+        builder.build();
     }
 
     protected void assertMatch()
