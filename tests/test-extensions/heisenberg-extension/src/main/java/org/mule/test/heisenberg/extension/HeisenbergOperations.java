@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.tck.message.IntegerAttributes;
@@ -52,8 +53,11 @@ public class HeisenbergOperations
     public static final String KILL_WITH_GROUP = "KillGroup";
 
     public static final String OPERATION_WITH_DISPLAY_NAME_PARAMETER = "literalEcho";
+    public static final String OPERATION_WITH_SUMMARY = "knockMany";
     public static final String OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "literalExpression";
     public static final String OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME = "Custom overrided display name";
+    public static final String KNOCKEABLE_DOORS_SUMMARY = "List of Knockeable Doors";
+    public static final String DOOR_PARAMETER = "doors";
 
     @Inject
     private ExtensionManager extensionManager;
@@ -163,7 +167,7 @@ public class HeisenbergOperations
         config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
     }
 
-    public List<String> knockMany(List<KnockeableDoor> doors)
+    public List<String> knockMany(@Summary(KNOCKEABLE_DOORS_SUMMARY) List<KnockeableDoor> doors)
     {
         return doors.stream().map(KnockeableDoor::knock).collect(toList());
     }

@@ -33,15 +33,9 @@ import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SA
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.PARAMETER_OVERRIDED_DISPLAY_NAME;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.PERSONAL_INFORMATION_GROUP_NAME;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
-import static org.mule.test.heisenberg.extension.HeisenbergOperations.KILL_WITH_GROUP;
-import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
-import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+
 import org.mule.api.MuleVersion;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
@@ -50,7 +44,6 @@ import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.config.MuleManifest;
-import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -73,7 +66,6 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Parameter
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
@@ -155,8 +147,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String IGNORED_OPERATION = "ignoredOperation";
 
     private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
-    private static final String PARAMETER_GROUP_DISPLAY_NAME = "Date of decease";
-    private static final String PARAMETER_GROUP_ORIGINAL_DISPLAY_NAME = "dateOfDeath";
 
     @Before
     public void setUp()
@@ -267,71 +257,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameterType(findParameter(locationKey, "country"), toMetadataType(String.class), false);
         assertParameterType(findParameter(locationKey, "city"), toMetadataType(String.class), false);
 
-    }
-
-
-    @Test
-    public void parseDisplayAnnotationsOnParameter()
-    {
-        ExtensionDeclarer declarer = describeExtension();
-        ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
-        List<ParameterDeclaration> parameters = extensionDeclaration.getConfigurations().get(0).getParameters();
-
-        assertParameterPlacement(findParameter(parameters, "labeledRicin"), RICIN_GROUP_NAME, 1);
-        assertParameterPlacement(findParameter(parameters, "ricinPacks"), RICIN_GROUP_NAME, 2);
-
-        assertParameterPlacement(findParameter(parameters, "ricinPacks"), RICIN_GROUP_NAME, 2);
-        assertParameterDisplayName(findParameter(parameters, PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME), PARAMETER_OVERRIDED_DISPLAY_NAME);
-    }
-
-    @Test
-    public void parseDisplayAnnotationsOnParameterGroup()
-    {
-        ExtensionDeclarer declarer = describeExtension();
-        ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
-        List<ParameterDeclaration> parameters = extensionDeclaration.getConfigurations().get(0).getParameters();
-
-        assertParameterPlacement(findParameter(parameters, "dateOfBirth"), PERSONAL_INFORMATION_GROUP_NAME, null);
-        assertParameterPlacement(findParameter(parameters, "dateOfDeath"), PERSONAL_INFORMATION_GROUP_NAME, null);
-        assertParameterPlacement(findParameter(parameters, "age"), PERSONAL_INFORMATION_GROUP_NAME, null);
-        assertParameterPlacement(findParameter(parameters, "myName"), PERSONAL_INFORMATION_GROUP_NAME, null);
-    }
-
-    @Test
-    public void parseDisplayNameAnnotationOnParameterGroup()
-    {
-        ExtensionDeclarer declarer = describeExtension();
-        ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
-        List<ParameterDeclaration> parameters = extensionDeclaration.getConfigurations().get(0).getParameters();
-
-        assertParameterDisplayName(findParameter(parameters, PARAMETER_GROUP_ORIGINAL_DISPLAY_NAME), PARAMETER_GROUP_DISPLAY_NAME);
-    }
-
-    @Test
-    public void parseDisplayNameAnnotationOnOperationParameter()
-    {
-        ExtensionDeclarer declarer = describeExtension();
-        ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
-        OperationDeclaration operation = getOperation(extensionDeclaration, HeisenbergOperations.OPERATION_WITH_DISPLAY_NAME_PARAMETER);
-
-        assertThat(operation, is(notNullValue()));
-        List<ParameterDeclaration> parameters = operation.getParameters();
-
-        assertParameterDisplayName(findParameter(parameters, OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME), OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME);
-    }
-
-    @Test
-    public void parseDisplayAnnotationsOnOperationParameter()
-    {
-        ExtensionDeclarer declarer = describeExtension();
-        ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
-        OperationDeclaration operation = getOperation(extensionDeclaration, KILL_CUSTOM_OPERATION);
-
-        assertThat(operation, is(notNullValue()));
-        List<ParameterDeclaration> parameters = operation.getParameters();
-
-        assertParameterPlacement(findParameter(parameters, "victim"), KILL_WITH_GROUP, 1);
-        assertParameterPlacement(findParameter(parameters, "goodbyeMessage"), KILL_WITH_GROUP, 2);
     }
 
     @Test
@@ -711,26 +636,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(param.getDefaultValue(), equalTo(defaultValue));
     }
 
-    private void assertParameterPlacement(ParameterDeclaration param, String groupName, Integer order)
-    {
-        DisplayModelProperty display = param.getModelProperty(DisplayModelProperty.class).get();
-
-        if (groupName != null)
-        {
-            assertThat(display.getGroupName(), is(groupName));
-        }
-        if (order != null)
-        {
-            assertThat(display.getOrder(), is(order));
-        }
-    }
-
-    private void assertParameterDisplayName(ParameterDeclaration param, String displayName)
-    {
-        DisplayModelProperty display = param.getModelProperty(DisplayModelProperty.class).get();
-        assertThat(display.getDisplayName(), is(displayName));
-    }
-
     private void assertParameterType(ParameterDeclaration param, MetadataType type, boolean isDynamic)
     {
         assertThat(param.getType(), equalTo(type));
@@ -753,11 +658,6 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     {
         MetadataContentModelProperty metadata = param.getModelProperty(MetadataContentModelProperty.class).get();
         assertThat(metadata, is(not(nullValue())));
-    }
-
-    private ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name)
-    {
-        return (ParameterDeclaration) CollectionUtils.find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
     }
 
     private MetadataType listOfString()
@@ -899,5 +799,4 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
             this.extendedProperty = extendedProperty;
         }
     }
-
 }

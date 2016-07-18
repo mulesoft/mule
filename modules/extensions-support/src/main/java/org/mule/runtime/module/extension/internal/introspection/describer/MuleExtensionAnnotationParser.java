@@ -14,9 +14,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodArgumentTypes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.ClassUtils;
@@ -31,15 +31,14 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasModelProperties;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
-import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
-import org.mule.runtime.extension.api.introspection.property.DisplayModelPropertyBuilder;
+import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
+import org.mule.runtime.extension.api.introspection.property.LayoutModelPropertyBuilder;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ConfigTypeModelProperty;
@@ -120,6 +119,7 @@ public final class MuleExtensionAnnotationParser
             else
             {
                 ParsedParameter parsedParameter = doParseParameter(paramNames.get(i), parameterTypes[i], annotations, typeLoader.getClassLoader());
+                parsedParameter.setImplementingParameter(method.getParameters()[i]);
                 parsedParameters.add(parsedParameter);
             }
         }
@@ -237,7 +237,7 @@ public final class MuleExtensionAnnotationParser
         return map;
     }
 
-    private static void parseDisplayAnnotations(AnnotatedElement annotatedElement, DisplayModelPropertyBuilder builder)
+    private static void parseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelPropertyBuilder builder)
     {
         Password passwordAnnotation = annotatedElement.getAnnotation(Password.class);
         if (passwordAnnotation != null)
@@ -251,7 +251,7 @@ public final class MuleExtensionAnnotationParser
         }
     }
 
-    private static void parsePlacementAnnotation(AnnotatedElement annotatedElement, DisplayModelPropertyBuilder builder)
+    private static void parsePlacementAnnotation(AnnotatedElement annotatedElement, LayoutModelPropertyBuilder builder)
     {
         Placement placementAnnotation = annotatedElement.getAnnotation(Placement.class);
         if (placementAnnotation != null)
@@ -262,30 +262,22 @@ public final class MuleExtensionAnnotationParser
         }
     }
 
-    private static void parseDisplayNameAnnotation(AnnotatedElement annotatedElement, String fieldName, DisplayModelPropertyBuilder builder)
-    {
-        DisplayName displayNameAnnotation = annotatedElement.getAnnotation(DisplayName.class);
-        String displayName = (displayNameAnnotation != null) ? displayNameAnnotation.value() : getFormattedDisplayName(fieldName);
-        builder.displayName(displayName);
-    }
-
     private static String getFormattedDisplayName(String fieldName)
     {
         return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(StringUtils.capitalize(fieldName)), ' ');
     }
 
-    static DisplayModelProperty parseDisplayAnnotations(AnnotatedElement annotatedElement, String name)
+    static LayoutModelProperty parseLayoutAnnotations(AnnotatedElement annotatedElement, String name)
     {
-        return parseDisplayAnnotations(annotatedElement, name, DisplayModelPropertyBuilder.create());
+        return parseLayoutAnnotations(annotatedElement, name, LayoutModelPropertyBuilder.create());
     }
 
-    static DisplayModelProperty parseDisplayAnnotations(AnnotatedElement annotatedElement, String name, DisplayModelPropertyBuilder builder)
+    static LayoutModelProperty parseLayoutAnnotations(AnnotatedElement annotatedElement, String name, LayoutModelPropertyBuilder builder)
     {
         if (isDisplayAnnotationPresent(annotatedElement))
         {
-            parseDisplayAnnotations(annotatedElement, builder);
+            parseLayoutAnnotations(annotatedElement, builder);
             parsePlacementAnnotation(annotatedElement, builder);
-            parseDisplayNameAnnotation(annotatedElement, name, builder);
             return builder.build();
         }
         return null;
@@ -293,7 +285,7 @@ public final class MuleExtensionAnnotationParser
 
     private static boolean isDisplayAnnotationPresent(AnnotatedElement annotatedElement)
     {
-        List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, DisplayName.class, Placement.class);
+        List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class);
         return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
     }
 
@@ -321,11 +313,6 @@ public final class MuleExtensionAnnotationParser
             MetadataKeyPart metadataKeyPart = element.getAnnotation(MetadataKeyPart.class);
             elementWithModelProperties.withModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.order()));
         }
-    }
-
-    private static boolean isParameterFieldContainer(Set<Class<? extends Annotation>> annotations, MetadataType parameterType)
-    {
-        return (annotations.contains(ParameterGroup.class) || annotations.contains(MetadataKeyId.class)) && parameterType instanceof ObjectType;
     }
 
     static void addConnectionTypeModelProperty(MetadataType annotatedFieldClass, HasModelProperties parameter)
