@@ -22,8 +22,8 @@
             -->
         </fileSet>
         <fileSet>
-            <directory>target/ce-distribution/${communityArtifact}-${version}/app-plugins</directory>
-            <outputDirectory>app-plugins</outputDirectory>
+            <directory>target/ce-distribution/${communityArtifact}-${version}/plugins</directory>
+            <outputDirectory>plugins</outputDirectory>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
             <includes>
