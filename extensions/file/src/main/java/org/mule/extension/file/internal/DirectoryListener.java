@@ -242,7 +242,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
                                                                            {
                                                                                try
                                                                                {
-                                                                                   DirectoryListener.this.start();
+                                                                                   start();
                                                                                }
                                                                                catch (Exception e)
                                                                                {
