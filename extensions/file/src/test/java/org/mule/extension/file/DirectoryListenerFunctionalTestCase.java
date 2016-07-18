@@ -84,8 +84,9 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     @Test
     public void onFileCreated() throws Exception
     {
-        write(new File(listenerFolder, WATCH_FILE), WATCH_CONTENT);
-        assertEvent(listen(CREATE, WATCH_FILE), WATCH_CONTENT);
+        final File file = new File(listenerFolder, WATCH_FILE);
+        write(file, WATCH_CONTENT);
+        assertEvent(listen(CREATE, file), WATCH_CONTENT);
     }
 
     @Test
@@ -112,8 +113,10 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
         onFileCreated();
 
         final String appendedContent = "\nNOBODY";
-        write(new File(listenerFolder, WATCH_FILE), appendedContent, true);
-        assertEvent(listen(UPDATE, WATCH_FILE), WATCH_CONTENT + appendedContent);
+        final File file = new File(listenerFolder, WATCH_FILE);
+
+        write(file, appendedContent, true);
+        assertEvent(listen(UPDATE, file), WATCH_CONTENT + appendedContent);
     }
 
     @Test
@@ -121,15 +124,16 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     {
         onFileCreated();
 
-        new File(listenerFolder, WATCH_FILE).delete();
-        assertEvent(listen(DELETE, WATCH_FILE), NullPayload.getInstance());
+        final File file = new File(listenerFolder, WATCH_FILE);
+        file.delete();
+        assertEvent(listen(DELETE, file), NullPayload.getInstance());
     }
 
     @Test
     public void onDirectoryCreated() throws Exception
     {
         matcherLessFolder.mkdir();
-        assertEvent(listen(CREATE, CREATED_FOLDER_NAME), NullPayload.getInstance());
+        assertEvent(listen(CREATE, matcherLessFolder), NullPayload.getInstance());
     }
 
     @Test
@@ -137,7 +141,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     {
         onDirectoryCreated();
         deleteTree(matcherLessFolder);
-        assertEvent(listen(DELETE, CREATED_FOLDER_NAME), NullPayload.getInstance());
+        assertEvent(listen(DELETE, matcherLessFolder), NullPayload.getInstance());
     }
 
     @Test
@@ -146,9 +150,11 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
         onDirectoryCreated();
         final String updatedName = CREATED_FOLDER_NAME + "twist";
 
-        Files.move(matcherLessFolder.toPath(), new File(listenerFolder, updatedName).toPath());
-        assertEvent(listen(DELETE, CREATED_FOLDER_NAME), NullPayload.getInstance());
-        assertEvent(listen(CREATE, updatedName), NullPayload.getInstance());
+        final File renamedDirectory = new File(listenerFolder, updatedName);
+        Files.move(matcherLessFolder.toPath(), renamedDirectory.toPath());
+
+        assertEvent(listen(DELETE, matcherLessFolder), NullPayload.getInstance());
+        assertEvent(listen(CREATE, renamedDirectory), NullPayload.getInstance());
     }
 
     @Test
@@ -156,14 +162,15 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     {
         onDirectoryCreated();
         deleteTree(matcherLessFolder);
-        assertEvent(listen(DELETE, CREATED_FOLDER_NAME), NullPayload.getInstance());
+        assertEvent(listen(DELETE, matcherLessFolder), NullPayload.getInstance());
     }
 
     @Test
     public void matcher() throws Exception
     {
-        write(new File(withMatcherFolder, MATCH_FILE), "");
-        MuleMessage message = listen(CREATE, MATCH_FILE);
+        final File file = new File(withMatcherFolder, MATCH_FILE);
+        write(file, "");
+        MuleMessage message = listen(CREATE, file);
 
         assertThat(message.getPayload(), equalTo(DR_MANHATTAN));
     }
@@ -208,7 +215,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
         assertThat(payload, equalTo(expectedContent));
     }
 
-    private MuleMessage listen(FileEventType type, String fileName)
+    private MuleMessage listen(FileEventType type, File file)
     {
         PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
         ValueHolder<MuleMessage> messageHolder = new ValueHolder<>();
@@ -216,7 +223,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
             for (MuleMessage message : receivedMessages)
             {
                 ListenerFileAttributes attributes = (ListenerFileAttributes) message.getAttributes();
-                if (attributes.getPath().endsWith("/" + fileName) && attributes.getEventType().equals(type.name()))
+                if (attributes.getPath().equals(file.getAbsolutePath()) && attributes.getEventType().equals(type.name()))
                 {
                     messageHolder.set(message);
                     return true;

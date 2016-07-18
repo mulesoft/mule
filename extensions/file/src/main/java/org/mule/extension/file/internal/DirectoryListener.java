@@ -20,7 +20,6 @@ import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
@@ -239,16 +238,17 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     {
         if (clusterListener == null)
         {
-            clusterListener = new PrimaryNodeLifecycleNotificationListener(() -> {
-                try
-                {
-                    DirectoryListener.this.start();
-                }
-                catch (Exception e)
-                {
-                    throw new MuleRuntimeException(e);
-                }
-            }, muleContext);
+            clusterListener = new PrimaryNodeLifecycleNotificationListener(() ->
+                                                                           {
+                                                                               try
+                                                                               {
+                                                                                   start();
+                                                                               }
+                                                                               catch (Exception e)
+                                                                               {
+                                                                                   throw new MuleRuntimeException(e);
+                                                                               }
+                                                                           }, muleContext);
 
             clusterListener.register();
         }
@@ -277,7 +277,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
                 try
                 {
-                    key.pollEvents().forEach(this::processEvent);
+                    key.pollEvents().forEach(event -> processEvent(event, key));
                 }
                 finally
                 {
@@ -291,9 +291,23 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
         }
     }
 
-    private void processEvent(WatchEvent<?> event)
+    private void processEvent(WatchEvent<?> watchEvent, WatchKey key)
     {
-        final Path path = directoryPath.resolve(((WatchEvent<Path>) event).context()).toAbsolutePath();
+        WatchEvent<Path> event = (WatchEvent<Path>) watchEvent;
+
+        Path watchPath = keyPaths.get(key);
+
+        if (watchPath == null)
+        {
+            if (LOGGER.isDebugEnabled())
+            {
+                LOGGER.debug(String.format("Got an unregistered path for key %s. Event context was: ", key, event.context()));
+            }
+
+            return;
+        }
+
+        final Path path = watchPath.resolve(event.context()).toAbsolutePath();
         final Kind<?> kind = event.kind();
 
         if (kind == OVERFLOW)
