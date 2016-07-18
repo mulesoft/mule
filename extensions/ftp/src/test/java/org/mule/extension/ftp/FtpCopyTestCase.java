@@ -115,7 +115,7 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
     }
 
     @Test
-    public void overwrite() throws Exception
+    public void overwriteInSameDirectory() throws Exception
     {
         final String existingFileName = "existing";
         testHarness.write(existingFileName, EXISTING_CONTENT);
@@ -124,6 +124,19 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
 
         doExecute(target, true, false);
         assertCopy(target);
+    }
+
+    @Test
+    public void overwriteInDifferentDirectory() throws Exception
+    {
+        final String existingDir = "existingDir";
+        testHarness.makeDir(existingDir);
+
+        final String existingPath = existingDir + "/existing.txt";
+        testHarness.write(existingPath, EXISTING_CONTENT);
+
+        doExecute(existingPath, true, false);
+        assertCopy(existingPath);
     }
 
     @Test

@@ -72,11 +72,7 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand
                     targetPath = targetPath.resolve(source.getFileName());
                 }
             }
-            else if (overwrite)
-            {
-                copyOption = StandardCopyOption.REPLACE_EXISTING;
-            }
-            else
+            else if (!overwrite)
             {
                 throw alreadyExistsException(targetPath);
             }
@@ -101,6 +97,11 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand
                                                               source.toAbsolutePath(), targetPath.toAbsolutePath()));
                 }
             }
+        }
+
+        if (Files.exists(targetPath) && overwrite)
+        {
+            copyOption = StandardCopyOption.REPLACE_EXISTING;
         }
 
         try
