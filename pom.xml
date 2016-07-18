@@ -258,6 +258,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
+        <depgraph.maven.plugin.version>1.0.4</depgraph.maven.plugin.version>
     </properties>
 
     <dependencies>
@@ -1441,6 +1442,25 @@
                         </compilerArgs>
                         <testCompilerArgument>-parameters</testCompilerArgument>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.ferstl</groupId>
+                    <artifactId>depgraph-maven-plugin</artifactId>
+                    <version>${depgraph.maven.plugin.version}</version>
+                    <configuration>
+                        <showDuplicates>true</showDuplicates>
+                        <showConflicts>true</showConflicts>
+                        <outputFile>${project.build.testOutputDirectory}/dependency-graph.dot</outputFile>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>depgraph-dependencies-graph</id>
+                            <goals>
+                                <goal>graph</goal>
+                            </goals>
+                            <phase>none</phase>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
