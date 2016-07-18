@@ -170,8 +170,8 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
      * Whether to react to deletion notifications. Defaults to {@code true}
      */
     @Parameter
-    @Optional(defaultValue = "true")
-    private boolean notifyOnDelete = true;
+    @Optional(defaultValue = "false")
+    private boolean notifyOnDelete = false;
 
     /**
      * Whether or not to also listen for notification which happen on

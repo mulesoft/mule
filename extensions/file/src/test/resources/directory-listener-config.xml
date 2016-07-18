@@ -9,12 +9,12 @@
     <file:matcher name="matcher" filenamePattern="matchme.txt" />
 
     <flow name="listenWithoutMatcher">
-        <file:directory-listener directory="matcherless" recursive="true" />
+        <file:directory-listener directory="matcherless" recursive="true" notifyOnDelete="true" />
         <flow-ref name="onEvent"/>
     </flow>
 
     <flow name="listenTxtOnly">
-        <file:directory-listener directory="withMatcher" recursive="true" matchWith="matcher" />
+        <file:directory-listener directory="withMatcher" recursive="true" matchWith="matcher" notifyOnDelete="true" />
         <set-payload value="Dr. Manhattan" />
         <flow-ref name="onEvent"/>
     </flow>
