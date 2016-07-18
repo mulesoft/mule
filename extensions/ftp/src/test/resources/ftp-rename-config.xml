@@ -12,7 +12,7 @@
     </spring:beans>
 
     <flow name="rename">
-        <ftp:rename path="#[path]" to="#[to]"/>
+        <ftp:rename path="#[path]" to="#[to]" overwrite="#[overwrite]"/>
     </flow>
 
     <flow name="readAndRename">

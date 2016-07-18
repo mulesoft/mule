@@ -6,9 +6,12 @@
  */
 package org.mule.extension.ftp.internal.ftp.command;
 
+import static java.lang.String.format;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 import org.mule.runtime.module.extension.file.api.command.FileCommand;
@@ -183,7 +186,11 @@ abstract class ClassicFtpCommand extends FtpCommand<ClassicFtpFileSystem>
     @Override
     protected void doRename(String filePath, String newName) throws Exception
     {
-        client.rename(filePath, newName);
+        boolean result = client.rename(filePath, newName);
+        if (!result)
+        {
+            throw new MuleRuntimeException(createStaticMessage(format("Could not rename path '%s' to '%s'", filePath, newName)));
+        }
     }
 
 
@@ -209,6 +216,6 @@ abstract class ClassicFtpCommand extends FtpCommand<ClassicFtpFileSystem>
 
     private String enrichExceptionMessage(String message)
     {
-        return String.format("%s. Ftp reply code: %d", message, client.getReplyCode());
+        return format("%s. Ftp reply code: %d", message, client.getReplyCode());
     }
 }
