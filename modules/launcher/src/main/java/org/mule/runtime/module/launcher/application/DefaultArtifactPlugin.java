@@ -8,17 +8,17 @@
 package org.mule.runtime.module.launcher.application;
 
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
 
 import java.io.File;
 
 /**
  * Defines an application plugin artifact
  */
-public class DefaultApplicationPlugin implements ApplicationPlugin
+public class DefaultArtifactPlugin implements ArtifactPlugin
 {
 
-    private final ApplicationPluginDescriptor descriptor;
+    private final ArtifactPluginDescriptor descriptor;
     private final ArtifactClassLoader classLoader;
 
     /**
@@ -27,14 +27,14 @@ public class DefaultApplicationPlugin implements ApplicationPlugin
      * @param descriptor describes the plugin to create. Non null.
      * @param classLoader classloader to use on this plugin. Non null.
      */
-    public DefaultApplicationPlugin(ApplicationPluginDescriptor descriptor, ArtifactClassLoader classLoader)
+    public DefaultArtifactPlugin(ArtifactPluginDescriptor descriptor, ArtifactClassLoader classLoader)
     {
         this.descriptor = descriptor;
         this.classLoader = classLoader;
     }
 
     @Override
-    public ApplicationPluginDescriptor getDescriptor()
+    public ArtifactPluginDescriptor getDescriptor()
     {
         return descriptor;
     }
