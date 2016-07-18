@@ -25,7 +25,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
-public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactory<ArtifactPluginDescriptor>
+public class ApplicationPluginDescriptorFactory implements ArtifactDescriptorFactory<ApplicationPluginDescriptor>
 {
 
     public static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
@@ -37,7 +37,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
      * Creates a new instance
      *  @param classLoaderFilterFactory creates classloader filters for the created descriptors. Not null.
      */
-    public ArtifactPluginDescriptorFactory(ArtifactClassLoaderFilterFactory classLoaderFilterFactory)
+    public ApplicationPluginDescriptorFactory(ArtifactClassLoaderFilterFactory classLoaderFilterFactory)
     {
         checkArgument(classLoaderFilterFactory != null, "ClassLoaderFilterFactory cannot be null");
 
@@ -45,10 +45,10 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     }
 
     @Override
-    public ArtifactPluginDescriptor create(File pluginFolder) throws ArtifactDescriptorCreateException
+    public ApplicationPluginDescriptor create(File pluginFolder) throws ArtifactDescriptorCreateException
     {
         final String pluginName = pluginFolder.getName();
-        final ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor();
+        final ApplicationPluginDescriptor descriptor = new ApplicationPluginDescriptor();
         descriptor.setRootFolder(pluginFolder);
         descriptor.setName(pluginName);
 

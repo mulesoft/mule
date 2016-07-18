@@ -44,10 +44,10 @@ public class ApplicationExtensionsManagerConfigurationBuilderTestCase extends Ab
     private MuleContext muleContext;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    private ArtifactPlugin extensionPlugin;
+    private ApplicationPlugin extensionPlugin;
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    private ArtifactPlugin notExtensionPlugin;
+    private ApplicationPlugin notExtensionPlugin;
 
     @Mock
     private ExtensionManagerAdapterFactory extensionManagerAdapterFactory;

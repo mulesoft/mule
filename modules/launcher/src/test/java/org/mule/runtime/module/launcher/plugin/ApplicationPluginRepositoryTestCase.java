@@ -29,7 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase
+public class ApplicationPluginRepositoryTestCase extends AbstractMuleTestCase
 {
 
     private static final String PLUGIN_NAME = "testPlugin";
@@ -40,8 +40,8 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase
     @Rule
     public TemporaryFolder muleHomeFolder = new TemporaryFolder();
 
-    private final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory = mock(ArtifactPluginDescriptorFactory.class);
-    private final ArtifactPluginRepository applicationPluginRepository = new DefaultArtifactPluginRepository(artifactPluginDescriptorFactory);
+    private final ApplicationPluginDescriptorFactory applicationPluginDescriptorFactory = mock(ApplicationPluginDescriptorFactory.class);
+    private final ApplicationPluginRepository applicationPluginRepository = new DefaultApplicationPluginRepository(applicationPluginDescriptorFactory);
 
     private File pluginsLibFolder;
 
@@ -49,8 +49,8 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase
     public void setUp() throws IOException
     {
         System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getCanonicalPath());
-        when(artifactPluginDescriptorFactory.create(anyObject())).thenAnswer(invocation -> {
-            ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor();
+        when(applicationPluginDescriptorFactory.create(anyObject())).thenAnswer(invocation -> {
+            ApplicationPluginDescriptor descriptor = new ApplicationPluginDescriptor();
             descriptor.setName(((File) invocation.getArguments()[0]).getName());
             return descriptor;
         });
@@ -61,7 +61,7 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase
     @Test
     public void emptyListOfPlugins() throws Exception
     {
-        final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
+        final List<ApplicationPluginDescriptor> descriptorList = applicationPluginRepository.getContainerApplicationPluginDescriptors();
         assertThat(descriptorList.size(), is(0));
     }
 
@@ -70,10 +70,10 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase
     {
         File zipPlugin = createPluginZipFile(pluginsLibFolder, PLUGIN_NAME);
 
-        final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
+        final List<ApplicationPluginDescriptor> descriptorList = applicationPluginRepository.getContainerApplicationPluginDescriptors();
 
         assertThat(descriptorList.size(), is(1));
-        ArtifactPluginDescriptor descriptor = descriptorList.get(0);
+        ApplicationPluginDescriptor descriptor = descriptorList.get(0);
         assertThat(descriptor.getName(), is(PLUGIN_NAME));
 
         assertThat(zipPlugin.exists(), is(false));
@@ -85,10 +85,10 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase
     {
         File pluginFolder = createPluginFolder(pluginsLibFolder, PLUGIN_NAME);
 
-        final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
+        final List<ApplicationPluginDescriptor> descriptorList = applicationPluginRepository.getContainerApplicationPluginDescriptors();
 
         assertThat(descriptorList.size(), is(1));
-        ArtifactPluginDescriptor descriptor = descriptorList.get(0);
+        ApplicationPluginDescriptor descriptor = descriptorList.get(0);
         assertThat(descriptor.getName(), is(PLUGIN_NAME));
 
         assertThat(pluginFolder.exists(), is(true));

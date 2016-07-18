@@ -10,23 +10,23 @@ package org.mule.runtime.module.launcher.application;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 
 import java.net.URL;
 
 /**
- * Creates {@link ArtifactClassLoader} for application or domain plugin descriptors.
+ * Creates {@link ArtifactClassLoader} for application plugin descriptors.
  */
-public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFactory<ArtifactPluginDescriptor>
+public class ApplicationPluginClassLoaderFactory implements ArtifactClassLoaderFactory<ApplicationPluginDescriptor>
 {
 
     /**
      * @param parent parent for the new artifact classloader.
      * @param descriptor descriptor of the artifact owner of the created classloader
-     * @return an {@link ArtifactClassLoader} for the given {@link ArtifactPluginDescriptor}
+     * @return an {@link ArtifactClassLoader} for the given {@link ApplicationPluginDescriptor}
      */
     @Override
-    public ArtifactClassLoader create(ArtifactClassLoader parent, ArtifactPluginDescriptor descriptor)
+    public ArtifactClassLoader create(ArtifactClassLoader parent, ApplicationPluginDescriptor descriptor)
     {
         URL[] urls = new URL[descriptor.getRuntimeLibs().length + 1];
         urls[0] = descriptor.getRuntimeClassesDir();

@@ -9,7 +9,7 @@ package org.mule.runtime.module.launcher.application;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppLibFolder;
 import org.mule.runtime.module.launcher.artifact.ArtifactStartedSplashScreen;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 
 import java.util.Set;
 
@@ -32,11 +32,11 @@ public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<
 
     private void listPlugins(ApplicationDescriptor descriptor)
     {
-        Set<ArtifactPluginDescriptor> plugins = descriptor.getPlugins();
+        Set<ApplicationPluginDescriptor> plugins = descriptor.getPlugins();
         if (!plugins.isEmpty())
         {
             doBody("Application plugins:");
-            for (ArtifactPluginDescriptor plugin : plugins)
+            for (ApplicationPluginDescriptor plugin : plugins)
             {
                 doBody(String.format(VALUE_FORMAT, plugin.getName()));
             }

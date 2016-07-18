@@ -12,7 +12,6 @@ import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.getMulePerAppLibFolder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.launcher.MuleApplicationClassLoader;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.nativelib.NativeLibraryFinderFactory;
@@ -25,7 +24,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * Creates {@link MuleApplicationClassLoader} instances based on the
  * application descriptor.
  */
-public class MuleApplicationClassLoaderFactory implements DeployableArtifactClassLoaderFactory<ApplicationDescriptor>
+public class MuleApplicationClassLoaderFactory implements ArtifactClassLoaderFactory<ApplicationDescriptor>
 {
 
     public static final String CLASS_EXTENSION = ".class";
@@ -48,11 +46,11 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
     }
 
     @Override
-    public ArtifactClassLoader create(ArtifactClassLoader parent, ApplicationDescriptor descriptor, List<ArtifactClassLoader> artifactPluginClassLoders)
+    public ArtifactClassLoader create(ArtifactClassLoader parent, ApplicationDescriptor descriptor)
     {
         List<URL> urls = getApplicationResourceUrls(descriptor);
 
-        return new MuleApplicationClassLoader(descriptor.getName(), parent.getClassLoader(), nativeLibraryFinderFactory.create(descriptor.getName()), urls, parent.getClassLoaderLookupPolicy(), artifactPluginClassLoders);
+        return new MuleApplicationClassLoader(descriptor.getName(), parent.getClassLoader(), nativeLibraryFinderFactory.create(descriptor.getName()), urls, parent.getClassLoaderLookupPolicy());
     }
 
     private List<URL> getApplicationResourceUrls(ApplicationDescriptor descriptor)

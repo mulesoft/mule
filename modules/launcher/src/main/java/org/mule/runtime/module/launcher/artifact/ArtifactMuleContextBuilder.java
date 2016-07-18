@@ -24,7 +24,7 @@ import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.module.launcher.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.launcher.application.ApplicationMuleContextBuilder;
-import org.mule.runtime.module.launcher.application.ArtifactPlugin;
+import org.mule.runtime.module.launcher.application.ApplicationPlugin;
 import org.mule.runtime.module.launcher.domain.DomainMuleContextBuilder;
 
 import java.io.File;
@@ -47,7 +47,7 @@ public class ArtifactMuleContextBuilder
     protected static final String INSTALLATION_DIRECTORY_MUST_BE_A_DIRECTORY = "installation directory must be a directory";
     protected static final String ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT = "Only applications are allowed to have a parent context";
 
-    private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
+    private List<ApplicationPlugin> applicationPlugins = new ArrayList<>();
     private ArtifactType artifactType = APP;
     private String[] configurationFiles = new String[0];
     private Map<String, String> artifactProperties = new HashMap<>();
@@ -178,15 +178,15 @@ public class ArtifactMuleContextBuilder
     }
 
     /**
-     * Provides a list of {@link ArtifactPlugin} that describe all the extensions that need to be accessible by
+     * Provides a list of {@link ApplicationPlugin} that describe all the extensions that need to be accessible by
      * the {@code MuleContext} to be created. It may also be that the configuration files make use of this extensions.
      *
-     * @param artifactPlugins collection of artifact extensions that define resources as part of the {@code MuleContext} to be created.
+     * @param applicationPlugins collection of artifact extensions that define resources as part of the {@code MuleContext} to be created.
      * @return
      */
-    public ArtifactMuleContextBuilder setArtifactPlugins(List<ArtifactPlugin> artifactPlugins)
+    public ArtifactMuleContextBuilder setApplicationPlugins(List<ApplicationPlugin> applicationPlugins)
     {
-        this.artifactPlugins = artifactPlugins;
+        this.applicationPlugins = applicationPlugins;
         return this;
     }
 
@@ -199,7 +199,7 @@ public class ArtifactMuleContextBuilder
         checkState(executionClassLoader != null, EXECUTION_CLASSLOADER_WAS_NOT_SET);
         checkState(APP.equals(artifactType) || parentContext == null, ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT);
         List<ConfigurationBuilder> builders = new LinkedList<>();
-        builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
+        builders.add(new ApplicationExtensionsManagerConfigurationBuilder(applicationPlugins));
         builders.add(createConfigurationBuilderFromApplicationProperties());
         SpringXmlConfigurationBuilder mainBuilder = new SpringXmlConfigurationBuilder(configurationFiles, artifactProperties, artifactType);
         if (parentContext != null)
