@@ -14,6 +14,11 @@
         </email:send>
     </flow>
 
+    <!--TODO(gfernandes) MULE-10117 remove this when support for accessing resources is added to runner -->
+    <spring:bean id="jsonAttachmentResource" class="org.springframework.core.io.UrlResource">
+        <spring:constructor-arg value="classpath:attachment.json" type="java.net.URL" />
+    </spring:bean>
+
     <flow name="sendEmailWithAttachment">
         <email:send config-ref="config" subject="Email Subject" content="emailContent" >
             <email:to-addresses>
@@ -27,7 +32,7 @@
                 <email:bcc-address value="alejandro.g.marra@mulesoft.com"/>
             </email:bcc-addresses>
             <email:attachments>
-                <email:email-attachment content="#[Thread.currentThread().getContextClassLoader().getResource('attachment.json')]" id="json-attachment"/>
+                <email:email-attachment content="#[app.registry.jsonAttachmentResource.getURL()]" id="json-attachment"/>
                 <email:email-attachment content="#['This is the email text attachment']" id="text-attachment" contentType="text/plain"/>
             </email:attachments>
         </email:send>

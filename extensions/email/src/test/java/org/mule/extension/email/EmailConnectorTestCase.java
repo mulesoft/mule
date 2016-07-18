@@ -15,8 +15,7 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.setUpServer;
-import org.mule.extension.email.internal.EmailConnector;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import com.icegreen.greenmail.user.GreenMailUser;
@@ -26,7 +25,7 @@ import com.icegreen.greenmail.util.ServerSetup;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
-public abstract class EmailConnectorTestCase extends ExtensionFunctionalTestCase
+public abstract class EmailConnectorTestCase extends MuleArtifactFunctionalTestCase
 {
     @Rule
     public DynamicPort PORT = new DynamicPort("port");
@@ -36,12 +35,6 @@ public abstract class EmailConnectorTestCase extends ExtensionFunctionalTestCase
 
     protected GreenMail server;
     protected GreenMailUser user;
-
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
-    {
-        return new Class<?>[] {EmailConnector.class};
-    }
 
     @Override
     protected void doSetUpBeforeMuleContextCreation() throws Exception

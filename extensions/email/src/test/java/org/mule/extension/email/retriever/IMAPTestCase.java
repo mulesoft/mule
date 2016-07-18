@@ -22,6 +22,7 @@ import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.extension.email.internal.commands.EmailIdConsumerExecutor.NO_ID_ERROR;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.Arrays;
@@ -31,11 +32,10 @@ import java.util.List;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
-@RunWith(Parameterized.class)
+@RunnerDelegateTo(Parameterized.class)
 public class IMAPTestCase extends AbstractEmailRetrieverTestCase
 {
 
