@@ -7,11 +7,11 @@
 package org.mule.extension.file;
 
 import static java.lang.String.format;
+import static org.apache.commons.io.FileUtils.write;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class FileCopyTestCase extends FileConnectorTestCase
     {
         super.doSetUp();
         File sourceFile = temporaryFolder.newFile(SOURCE_FILE_NAME);
-        FileUtils.write(sourceFile, HELLO_WORLD);
+        write(sourceFile, HELLO_WORLD);
         sourcePath = sourceFile.getAbsolutePath();
     }
 
@@ -101,10 +101,10 @@ public class FileCopyTestCase extends FileConnectorTestCase
     }
 
     @Test
-    public void overwrite() throws Exception
+    public void overwriteInSameDirectory() throws Exception
     {
         File existingFile = temporaryFolder.newFile();
-        FileUtils.write(existingFile, EXISTING_CONTENT);
+        write(existingFile, EXISTING_CONTENT);
 
         final String target = existingFile.getAbsolutePath();
 
@@ -113,10 +113,20 @@ public class FileCopyTestCase extends FileConnectorTestCase
     }
 
     @Test
+    public void overwriteInDifferentDirectory() throws Exception
+    {
+        String target = temporaryFolder.newFolder().getAbsolutePath();
+        write(new File(target, SOURCE_FILE_NAME), HELLO_WORLD);
+        doExecute(target, true, false);
+
+        assertCopy(format("%s/%s", target, SOURCE_FILE_NAME));
+    }
+
+    @Test
     public void withoutOverwrite() throws Exception
     {
         File existingFile = temporaryFolder.newFile();
-        FileUtils.write(existingFile, EXISTING_CONTENT);
+        write(existingFile, EXISTING_CONTENT);
 
         expectedException.expectCause(instanceOf(IllegalArgumentException.class));
         doExecute(existingFile.getAbsolutePath(), false, false);
@@ -156,7 +166,7 @@ public class FileCopyTestCase extends FileConnectorTestCase
         File existingDirectory = new File(targetDirectory, SOURCE_DIRECTORY_NAME);
         existingDirectory.mkdir();
         File existingFile = new File(existingDirectory, SOURCE_FILE_NAME);
-        FileUtils.write(existingFile, EXISTING_CONTENT);
+        write(existingFile, EXISTING_CONTENT);
 
         doExecute(targetDirectory.getAbsolutePath(), true, false);
         assertCopy(format("%s/%s/%s", targetDirectory.getAbsolutePath(), SOURCE_DIRECTORY_NAME, SOURCE_FILE_NAME));
@@ -171,7 +181,7 @@ public class FileCopyTestCase extends FileConnectorTestCase
         File existingDirectory = new File(targetDirectory, SOURCE_DIRECTORY_NAME);
         existingDirectory.mkdir();
         File existingFile = new File(existingDirectory, SOURCE_FILE_NAME);
-        FileUtils.write(existingFile, EXISTING_CONTENT);
+        write(existingFile, EXISTING_CONTENT);
 
         expectedException.expectCause(instanceOf(IllegalArgumentException.class));
         doExecute(format("%s/%s", targetDirectory.getAbsolutePath(), SOURCE_DIRECTORY_NAME), false, false);
@@ -190,7 +200,7 @@ public class FileCopyTestCase extends FileConnectorTestCase
     {
         File sourceFolder = temporaryFolder.newFolder(SOURCE_DIRECTORY_NAME);
         File file = new File(sourceFolder, SOURCE_FILE_NAME);
-        FileUtils.write(file, HELLO_WORLD);
+        write(file, HELLO_WORLD);
         return sourceFolder;
     }
 
