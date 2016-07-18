@@ -17,7 +17,7 @@ import static org.mule.runtime.module.extension.internal.introspection.describer
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.addConnectionTypeModelProperty;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getMemberName;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseDisplayAnnotations;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseMetadataAnnotations;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseParameters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
@@ -34,6 +34,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSuperClassGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isMultiLevelMetadataKeyId;
+
 import org.mule.api.MuleVersion;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -85,8 +86,8 @@ import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
-import org.mule.runtime.extension.api.introspection.property.DisplayModelPropertyBuilder;
+import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
+import org.mule.runtime.extension.api.introspection.property.LayoutModelPropertyBuilder;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -99,6 +100,7 @@ import org.mule.runtime.module.extension.internal.introspection.version.VersionR
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.NoReferencesModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
@@ -330,7 +332,6 @@ public final class AnnotationsBasedDescriber implements Describer
         {
             declareMetadataKeyId(sourceType, source);
         }
-
         sourceDeclarers.put(sourceType, source);
         declareMetadataKeyId(sourceType, source);
         declareSingleParameters(getParameterFields(sourceType)
@@ -348,14 +349,12 @@ public final class AnnotationsBasedDescriber implements Describer
 
     private void declareSourceConfig(Class<? extends Source> sourceType, SourceDeclarer source)
     {
-        getAnnotatedFields(sourceType, UseConfig.class).stream()
-                .forEach(f -> addConfigTypeModelProperty(typeLoader.load(f.getDeclaringClass()), source));
+        getAnnotatedFields(sourceType, UseConfig.class).forEach(f -> addConfigTypeModelProperty(typeLoader.load(f.getDeclaringClass()), source));
     }
 
     private void declareSourceConnection(Class<? extends Source> sourceType, SourceDeclarer source)
     {
-        getAnnotatedFields(sourceType, Connection.class).stream()
-                .forEach(f -> addConnectionTypeModelProperty(typeLoader.load(f.getDeclaringClass()), source));
+        getAnnotatedFields(sourceType, Connection.class).forEach(f -> addConnectionTypeModelProperty(typeLoader.load(f.getDeclaringClass()), source));
     }
 
     private void declareMetadataKeyId(Class<?> sourceType, SourceDeclarer source)
@@ -442,15 +441,15 @@ public final class AnnotationsBasedDescriber implements Describer
     private ParameterDeclaration inheritGroupParentDisplayProperties(ParameterGroup parent, Field field, ParameterGroup group, ParameterDeclarer parameterDeclarer)
     {
         ParameterDeclaration parameter = parameterDeclarer.getDeclaration();
-        Optional<DisplayModelProperty> parameterDisplayProperty = parameterDeclarer.getDeclaration().getModelProperty(DisplayModelProperty.class);
+        Optional<LayoutModelProperty> parameterDisplayProperty = parameterDeclarer.getDeclaration().getModelProperty(LayoutModelProperty.class);
 
-        DisplayModelPropertyBuilder builder = parameterDisplayProperty.isPresent()
-                                              ? DisplayModelPropertyBuilder.create(parameterDisplayProperty.get())
-                                              : DisplayModelPropertyBuilder.create();
+        LayoutModelPropertyBuilder builder = parameterDisplayProperty.isPresent()
+                                             ? LayoutModelPropertyBuilder.create(parameterDisplayProperty.get())
+                                             : LayoutModelPropertyBuilder.create();
 
         // Inherit parent placement model properties
-        DisplayModelProperty groupDisplay;
-        DisplayModelProperty parentDisplay = parent != null ? parent.getModelProperty(DisplayModelProperty.class).orElse(null) : null;
+        LayoutModelProperty groupDisplay;
+        LayoutModelProperty parentDisplay = parent != null ? parent.getModelProperty(LayoutModelProperty.class).orElse(null) : null;
         if (parentDisplay != null)
         {
             builder.groupName(parentDisplay.getGroupName())
@@ -461,7 +460,7 @@ public final class AnnotationsBasedDescriber implements Describer
         }
         else
         {
-            groupDisplay = parseDisplayAnnotations(field, field.getName(), builder);
+            groupDisplay = parseLayoutAnnotations(field, field.getName(), builder);
         }
 
         if (groupDisplay != null)
@@ -686,12 +685,13 @@ public final class AnnotationsBasedDescriber implements Describer
                 parameter.describedAs(EMPTY);
 
                 addTypeRestrictions(parameter, parsedParameter);
-                DisplayModelProperty displayModelProperty = parseDisplayAnnotations(parsedParameter, parsedParameter.getName());
-                if (displayModelProperty != null)
+                LayoutModelProperty layoutModelProperty = parseLayoutAnnotations(parsedParameter, parsedParameter.getName());
+                if (layoutModelProperty != null)
                 {
-                    parameter.withModelProperty(displayModelProperty);
+                    parameter.withModelProperty(layoutModelProperty);
                 }
 
+                enrichWithImplementingParameterProperty(parsedParameter, parameter);
                 parseMetadataAnnotations(parsedParameter, parameter);
 
                 if (parsedParameter.isAnnotationPresent(NoRef.class))
@@ -755,6 +755,15 @@ public final class AnnotationsBasedDescriber implements Describer
         if (restriction != null)
         {
             parameter.withModelProperty(new TypeRestrictionModelProperty<>(restriction));
+        }
+    }
+
+    private void enrichWithImplementingParameterProperty(ParsedParameter parsedParameter, ParameterDeclarer parameter)
+    {
+        final Optional<java.lang.reflect.Parameter> implementingParameter = parsedParameter.getImplementingParameter();
+        if (implementingParameter.isPresent())
+        {
+            parameter.withModelProperty(new ImplementingParameterModelProperty(implementingParameter.get()));
         }
     }
 

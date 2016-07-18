@@ -10,8 +10,10 @@ import org.mule.metadata.api.model.MetadataType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Intermediate representation of a parameter used to decouple
@@ -30,6 +32,7 @@ final class ParsedParameter implements AnnotatedElement
     private Class<?> typeRestriction = null;
     private boolean advertised = true;
     private Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
+    private Optional<Parameter> implementingParameter = Optional.empty();
 
     ParsedParameter(Map<Class<? extends Annotation>, Annotation> annotations)
     {
@@ -99,6 +102,16 @@ final class ParsedParameter implements AnnotatedElement
     public <T extends Annotation> T getAnnotation(Class<T> annotationType)
     {
         return (T) annotations.get(annotationType);
+    }
+
+    public void setImplementingParameter(Parameter implementingParameter)
+    {
+        this.implementingParameter = Optional.of(implementingParameter);
+    }
+
+    public Optional<Parameter> getImplementingParameter()
+    {
+        return this.implementingParameter;
     }
 
     @Override

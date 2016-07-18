@@ -33,6 +33,7 @@ import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
@@ -66,6 +67,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public static final String AGE = "50";
     public static final String EXTENSION_DESCRIPTION = "My Test Extension just to unit test";
     public static final String RICIN_GROUP_NAME = "Dangerous-Ricin";
+    public static final String RICIN_PACKS_SUMMARY = "A set of ricin packs";
     public static final String PERSONAL_INFORMATION_GROUP_NAME = "Personal Information";
     public static final String PARAMETER_OVERRIDED_DISPLAY_NAME = "Parameter Custom Display Name";
     public static final String PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "literalExpressionWithoutDefault";
@@ -118,6 +120,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @Parameter
     @Optional
     @Placement(order = 2, group = RICIN_GROUP_NAME)
+    @Summary(RICIN_PACKS_SUMMARY)
     private Set<Ricin> ricinPacks;
 
     @Parameter

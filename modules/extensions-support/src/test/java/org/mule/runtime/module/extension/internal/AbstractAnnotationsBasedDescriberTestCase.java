@@ -7,14 +7,18 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.List;
 
 public abstract class AbstractAnnotationsBasedDescriberTestCase extends AbstractMuleTestCase
 {
@@ -44,5 +48,10 @@ public abstract class AbstractAnnotationsBasedDescriberTestCase extends Abstract
     protected OperationDeclaration getOperation(ExtensionDeclaration extensionDeclaration, final String operationName)
     {
         return (OperationDeclaration) CollectionUtils.find(extensionDeclaration.getOperations(), object -> ((OperationDeclaration) object).getName().equals(operationName));
+    }
+
+    protected ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name)
+    {
+        return (ParameterDeclaration) CollectionUtils.find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
     }
 }
