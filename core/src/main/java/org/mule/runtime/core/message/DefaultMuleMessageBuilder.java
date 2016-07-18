@@ -25,7 +25,6 @@ import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.MuleMessageCorrelation;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -417,7 +416,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
          */
         private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
-        private MuleMessageCorrelation correlation;
+        private Correlation correlation;
 
         // these are transient because serialisation generates a new instance
         // so we allow mutation again (and we can't serialize threads anyway)
@@ -444,7 +443,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             this.properties.outboundMap.putAll(outboundProperties);
             this.inboundAttachments = inboundAttachments;
             this.outboundAttachments = outboundAttachments;
-            this.correlation = new MuleMessageCorrelation(correlationId, correlationGroupSize, correlationSequence);
+            this.correlation = new Correlation(correlationId, correlationGroupSize, correlationSequence);
             setReplyTo(replyTo);
             this.exceptionPayload = exceptionPayload;
         }
@@ -465,7 +464,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         }
 
         @Override
-        public MuleMessageCorrelation getCorrelation()
+        public Correlation getCorrelation()
         {
             return correlation;
         }

@@ -6,7 +6,22 @@
  */
 package org.mule.runtime.core.routing;
 
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.message.Correlation;
+
 public enum CorrelationMode
 {
-    IF_NOT_SET, ALWAYS, NEVER
+    IF_NOT_SET, ALWAYS, NEVER;
+
+    /**
+     * @param message the message to check for its correlation attributes.
+     * @return whether correlation has to be handled for the message that has this {@link Correlation}.
+     */
+    public boolean doCorrelation(MuleMessage message)
+    {
+        return this != NEVER
+               && ((!message.getCorrelation().getId().isPresent() && this == IF_NOT_SET)
+                   || this == ALWAYS);
+    }
+
 }

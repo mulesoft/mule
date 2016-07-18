@@ -23,10 +23,10 @@ import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.MuleMessageCorrelation;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.message.Correlation;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class MessageContextTestCase extends AbstractELTestCase
     {
         event = mock(MuleEvent.class);
         message = spy(MuleMessage.builder().payload(NullPayload.getInstance()).build());
-        when(message.getCorrelation()).thenReturn(mock(MuleMessageCorrelation.class));
+        when(message.getCorrelation()).thenReturn(mock(Correlation.class));
         doAnswer(invocation -> {
             message = (MuleMessage) invocation.getArguments()[0];
             return null;

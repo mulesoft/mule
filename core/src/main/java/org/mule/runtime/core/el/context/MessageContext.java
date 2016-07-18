@@ -9,11 +9,11 @@ package org.mule.runtime.core.el.context;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.MuleMessageCorrelation;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.Correlation;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -58,7 +58,7 @@ public class MessageContext
         return event.getMessage().getMessageRootId();
     }
 
-    public MuleMessageCorrelation getCorrelation()
+    public Correlation getCorrelation()
     {
         return event.getMessage().getCorrelation();
     }

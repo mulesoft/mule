@@ -48,7 +48,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         List<Object> recipients = getRecipients(event);
         List<MuleEvent> results = new ArrayList<>();
 
-        if (message.getCorrelation().doCorrelation(enableCorrelation))
+        if (enableCorrelation.doCorrelation(message))
         {
             event.setMessage(MuleMessage.builder(event.getMessage()).correlationGroupSize(recipients.size()).build());
         }

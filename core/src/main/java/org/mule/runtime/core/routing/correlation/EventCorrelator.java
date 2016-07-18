@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
-import static org.mule.runtime.core.MuleMessageCorrelation.NOT_SET;
+import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;

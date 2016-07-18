@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.MuleMessageCorrelation.NOT_SET;
+import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;

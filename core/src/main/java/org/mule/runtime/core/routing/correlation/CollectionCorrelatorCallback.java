@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
-import org.mule.runtime.core.MuleMessageCorrelation;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -68,7 +68,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
 
     /**
      * Creates a new EventGroup that will expect the number of events as returned by
-     * {@link MuleMessageCorrelation#getGroupSize()}.
+     * {@link Correlation#getGroupSize()}.
      */
     @Override
     public EventGroup createEventGroup(MuleEvent event, Object groupId)

@@ -9,8 +9,8 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.MuleMessageCorrelation;
 import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
+import org.mule.runtime.core.message.Correlation;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -68,11 +68,11 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     String getMessageRootId();
 
     /**
-     * Returns the correlation metadata of this message. See {@link MuleMessageCorrelation}.
+     * Returns the correlation metadata of this message. See {@link Correlation}.
      * 
      * @return the correlation metadata of this message.
      */
-    MuleMessageCorrelation getCorrelation();
+    Correlation getCorrelation();
 
     /**
      * Returns a replyTo address for this message. This is useful in an asynchronous environment where the caller

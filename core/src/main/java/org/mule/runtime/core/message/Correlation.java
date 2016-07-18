@@ -4,15 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core;
+package org.mule.runtime.core.message;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.routing.CorrelationMode.ALWAYS;
-import static org.mule.runtime.core.routing.CorrelationMode.IF_NOT_SET;
-import static org.mule.runtime.core.routing.CorrelationMode.NEVER;
 
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.routing.CorrelationMode;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -22,7 +18,7 @@ import java.util.Optional;
  * 
  * @since 4.0
  */
-public class MuleMessageCorrelation implements Serializable
+public class Correlation implements Serializable
 {
     private static final long serialVersionUID = -5687080761804624442L;
 
@@ -33,13 +29,13 @@ public class MuleMessageCorrelation implements Serializable
     private final Integer sequence;
 
     /**
-     * Builds a new {@link MuleMessageCorrelation} with the given parameters.
+     * Builds a new {@link Correlation} with the given parameters.
      * 
      * @param id see {@link #getId()}.
      * @param groupSize see {@link #getGroupSize()}.
      * @param sequence see {@link #getSequence()}.
      */
-    public MuleMessageCorrelation(String id, Integer groupSize, Integer sequence)
+    Correlation(String id, Integer groupSize, Integer sequence)
     {
         this.id = id;
         this.groupSize = groupSize;
@@ -80,17 +76,6 @@ public class MuleMessageCorrelation implements Serializable
     public Optional<Integer> getGroupSize()
     {
         return ofNullable(groupSize);
-    }
-
-    /**
-     * @param enableCorrelation the correlation mode of the calling component.
-     * @return whether correlation has to be handled for the message that has this {@link MuleMessageCorrelation}.
-     */
-    public boolean doCorrelation(CorrelationMode enableCorrelation)
-    {
-        return enableCorrelation != NEVER
-               && ((!getId().isPresent() && enableCorrelation == IF_NOT_SET)
-                   || enableCorrelation == ALWAYS);
     }
 
     @Override
