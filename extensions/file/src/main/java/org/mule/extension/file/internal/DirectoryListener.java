@@ -14,7 +14,6 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
@@ -23,6 +22,7 @@ import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
+import org.mule.extension.file.internal.command.DirectoryListenerCommand;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -41,7 +41,6 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
 import org.mule.runtime.module.extension.file.api.FileSystem;
-import org.mule.runtime.module.extension.file.api.TreeNode;
 import org.mule.runtime.module.extension.file.api.lock.NullPathLock;
 import org.mule.runtime.module.extension.file.api.matcher.NullFilePayloadPredicate;
 
@@ -200,7 +199,6 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     @Connection
     private FileSystem fileSystem;
 
-    private Path directoryPath;
     private FlowConstruct flowConstruct;
     private WatchService watcher;
     private Predicate<FileAttributes> matcher;
@@ -223,8 +221,6 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
         }
 
         calculateEnabledEventTypes();
-        directoryPath = resolveDirectory();
-
         createWatcherService();
 
         matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate();
@@ -366,7 +362,6 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     {
         Object payload = NullPayload.getInstance();
         MediaType mediaType = MediaType.ANY;
-        MuleMessage message;
 
         if (attributes.getEventType().equals(DELETE.name()))
         {
@@ -476,9 +471,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
             throw new MuleRuntimeException(createStaticMessage("Could not create watcher service"), e);
         }
 
-        TreeNode directoryNode = fileSystem.list(config, directoryPath.toString(), false, MuleMessage.builder().payload
-                (EMPTY).build(), new NullFilePayloadPredicate());
-        final Path rootPath = Paths.get(directoryNode.getAttributes().getPath());
+        final Path rootPath = resolveRootPath();
         registerPath(rootPath);
 
         if (recursive)
@@ -502,6 +495,11 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     {
         WatchKey key = path.register(watcher, getEnabledEventKinds(), HIGH);
         keyPaths.put(key, path);
+    }
+
+    private Path resolveRootPath()
+    {
+        return new DirectoryListenerCommand((LocalFileSystem) fileSystem).resolveRootPath(config, directory);
     }
 
     private void calculateEnabledEventTypes() throws ConfigurationException
@@ -534,14 +532,6 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
             types.add(supplier.get());
         }
     }
-
-    private Path resolveDirectory()
-    {
-        return directory == null
-               ? Paths.get(config.getBaseDir())
-               : Paths.get(config.getBaseDir()).resolve(directory).toAbsolutePath();
-    }
-
 
     @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
