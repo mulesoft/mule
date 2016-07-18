@@ -13,6 +13,7 @@ import org.mule.runtime.module.extension.file.api.FileAttributes;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
@@ -94,7 +95,7 @@ public class LocalFileAttributes extends AbstractFileAttributes
     @Override
     public boolean isSymbolicLink()
     {
-        return getAttributes().isSymbolicLink();
+        return Files.isSymbolicLink(Paths.get(getPath()));
     }
 
     private synchronized BasicFileAttributes getAttributes()
