@@ -15,7 +15,6 @@ import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
-
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.runtime.api.message.MuleMessage;
@@ -92,17 +91,18 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     @Test
     public void stopAndRestart() throws Exception
     {
-        muleContext.getRegistry().lookupObjects(Flow.class).forEach(flow -> {
-            try
-            {
-                flow.stop();
-                flow.start();
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        });
+        muleContext.getRegistry().lookupObjects(Flow.class).forEach(flow ->
+                                                                    {
+                                                                        try
+                                                                        {
+                                                                            flow.stop();
+                                                                            flow.start();
+                                                                        }
+                                                                        catch (Exception e)
+                                                                        {
+                                                                            throw new RuntimeException(e);
+                                                                        }
+                                                                    });
 
         onFileCreated();
     }
@@ -134,6 +134,10 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     {
         matcherLessFolder.mkdir();
         assertEvent(listen(CREATE, matcherLessFolder), NullPayload.getInstance());
+
+        final File file = new File(matcherLessFolder, WATCH_FILE);
+        write(file, WATCH_CONTENT);
+        assertEvent(listen(CREATE, file), WATCH_CONTENT);
     }
 
     @Test
@@ -178,29 +182,31 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     @Test
     public void stop() throws Exception
     {
-        muleContext.getRegistry().lookupObjects(ExtensionMessageSource.class).forEach(source -> {
-            try
-            {
-                source.stop();
-            }
-            catch (MuleException e)
-            {
-                throw new RuntimeException(e);
-            }
-        });
+        muleContext.getRegistry().lookupObjects(ExtensionMessageSource.class).forEach(source ->
+                                                                                      {
+                                                                                          try
+                                                                                          {
+                                                                                              source.stop();
+                                                                                          }
+                                                                                          catch (MuleException e)
+                                                                                          {
+                                                                                              throw new RuntimeException(e);
+                                                                                          }
+                                                                                      });
 
         PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-        prober.check(new JUnitLambdaProbe(() -> {
-            try
-            {
-                onFileCreated();
-                return false;
-            }
-            catch (Throwable e)
-            {
-                return true;
-            }
-        }, "source did not stop"));
+        prober.check(new JUnitLambdaProbe(() ->
+                                          {
+                                              try
+                                              {
+                                                  onFileCreated();
+                                                  return false;
+                                              }
+                                              catch (Throwable e)
+                                              {
+                                                  return true;
+                                              }
+                                          }, "source did not stop"));
     }
 
     private void assertEvent(MuleMessage message, Object expectedContent) throws Exception
@@ -219,19 +225,20 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     {
         PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
         ValueHolder<MuleMessage> messageHolder = new ValueHolder<>();
-        prober.check(new JUnitLambdaProbe(() -> {
-            for (MuleMessage message : receivedMessages)
-            {
-                ListenerFileAttributes attributes = (ListenerFileAttributes) message.getAttributes();
-                if (attributes.getPath().equals(file.getAbsolutePath()) && attributes.getEventType().equals(type.name()))
-                {
-                    messageHolder.set(message);
-                    return true;
-                }
-            }
+        prober.check(new JUnitLambdaProbe(() ->
+                                          {
+                                              for (MuleMessage message : receivedMessages)
+                                              {
+                                                  ListenerFileAttributes attributes = (ListenerFileAttributes) message.getAttributes();
+                                                  if (attributes.getPath().equals(file.getAbsolutePath()) && attributes.getEventType().equals(type.name()))
+                                                  {
+                                                      messageHolder.set(message);
+                                                      return true;
+                                                  }
+                                              }
 
-            return false;
-        }));
+                                              return false;
+                                          }));
 
         return messageHolder.get();
     }
@@ -240,9 +247,9 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     {
         Object payload = messageContext.getPayload() != null ? messageContext.getPayload() : NullPayload.getInstance();
         MuleMessage message = MuleMessage.builder().payload(payload)
-                                                   .mediaType(messageContext.getDataType().getMediaType())
-                                                   .attributes(messageContext.getAttributes())
-                                                   .build();
+                .mediaType(messageContext.getDataType().getMediaType())
+                .attributes(messageContext.getAttributes())
+                .build();
         receivedMessages.add(message);
     }
 }
