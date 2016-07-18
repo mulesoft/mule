@@ -301,7 +301,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
         {
             if (LOGGER.isDebugEnabled())
             {
-                LOGGER.debug(String.format("Got an unregistered path for key %s. Event context was: ", key, event.context()));
+                LOGGER.debug(format("Got an unregistered path for key %s. Event context was: ", key, event.context()));
             }
 
             return;
@@ -336,8 +336,26 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
         }
 
         sourceContext.getMessageHandler().handle(createMessage(path, attributes));
+        createAdditionalWatchers(attributes);
     }
 
+    private void createAdditionalWatchers(ListenerFileAttributes attributes)
+    {
+        if (recursive && attributes.getEventType().equals(FileEventType.CREATE.name()) && attributes.isDirectory())
+        {
+            try
+            {
+                registerPath(Paths.get(attributes.getPath()));
+            }
+            catch (Exception e)
+            {
+                if (LOGGER.isDebugEnabled())
+                {
+                    LOGGER.debug(format("Directory '%s' was created but failed to place a new listener on it", attributes.getPath()), e);
+                }
+            }
+        }
+    }
 
     private boolean isRequestedToStop()
     {
