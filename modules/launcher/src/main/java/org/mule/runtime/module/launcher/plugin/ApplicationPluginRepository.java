@@ -8,19 +8,18 @@
 package org.mule.runtime.module.launcher.plugin;
 
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.launcher.application.ArtifactPlugin;
 
 import java.util.List;
 
 /**
- * Repository that defines {@link ArtifactPlugin} bundled with the container
+ * Repository that defines {@link org.mule.runtime.module.launcher.application.ApplicationPlugin} bundled with the container
  * @since 4.0
  */
-public interface ArtifactPluginRepository
+public interface ApplicationPluginRepository
 {
     /**
-     * @return a non null List of {@link ArtifactPluginDescriptor} corresponding to application plugins already bundled with the container.
+     * @return a non null List of {@link ApplicationPluginDescriptor} corresponding to application plugins already bundled with the container.
      * @throws ArtifactDescriptorCreateException if an error happens while building the descriptors from application plugins file.
      */
-    List<ArtifactPluginDescriptor> getContainerArtifactPluginDescriptors();
+    List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors();
 }

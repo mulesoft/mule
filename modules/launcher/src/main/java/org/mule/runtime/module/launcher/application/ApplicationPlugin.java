@@ -8,13 +8,13 @@
 package org.mule.runtime.module.launcher.application;
 
 import org.mule.runtime.module.artifact.Artifact;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 
 /**
- * Represents an application or domain plugin artifact.
+ * Represents an application plugin artifact.
  *
  * @since 4.0
  */
-public interface ArtifactPlugin extends Artifact<ArtifactPluginDescriptor>
+public interface ApplicationPlugin extends Artifact<ApplicationPluginDescriptor>
 {
 }

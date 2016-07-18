@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.FileUtils.newFile;
 import org.mule.runtime.module.launcher.AbstractSplashScreenTestCase;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
 
 import com.google.common.collect.Sets;
 
@@ -35,8 +35,8 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
     private static final String MY_ZIP = "myZip.zip";
 
     private ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
-    private ArtifactPluginDescriptor pluginDescriptor = mock(ArtifactPluginDescriptor.class);
-    private Set<ArtifactPluginDescriptor> plugins = Sets.newHashSet(pluginDescriptor);
+    private ApplicationPluginDescriptor pluginDescriptor = mock(ApplicationPluginDescriptor.class);
+    private Set<ApplicationPluginDescriptor> plugins = Sets.newHashSet(pluginDescriptor);
 
     @BeforeClass
     public static void setUpLibrary() throws IOException

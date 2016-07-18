@@ -34,16 +34,16 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
     private static Logger LOGGER = LoggerFactory.getLogger(ApplicationExtensionsManagerConfigurationBuilder.class);
 
     private final ExtensionManagerAdapterFactory extensionManagerAdapterFactory;
-    private final List<ArtifactPlugin> artifactPlugins;
+    private final List<ApplicationPlugin> applicationPlugins;
 
-    public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins)
+    public ApplicationExtensionsManagerConfigurationBuilder(List<ApplicationPlugin> applicationPlugins)
     {
-        this(artifactPlugins, new DefaultExtensionManagerAdapterFactory());
+        this(applicationPlugins, new DefaultExtensionManagerAdapterFactory());
     }
 
-    public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins, ExtensionManagerAdapterFactory extensionManagerAdapterFactory)
+    public ApplicationExtensionsManagerConfigurationBuilder(List<ApplicationPlugin> applicationPlugins, ExtensionManagerAdapterFactory extensionManagerAdapterFactory)
     {
-        this.artifactPlugins = artifactPlugins;
+        this.applicationPlugins = applicationPlugins;
         this.extensionManagerAdapterFactory = extensionManagerAdapterFactory;
     }
 
@@ -52,9 +52,9 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
     {
         final ExtensionManagerAdapter extensionManager = createExtensionManager(muleContext);
 
-        for (ArtifactPlugin artifactPlugin : artifactPlugins)
+        for (ApplicationPlugin applicationPlugin : applicationPlugins)
         {
-            URL manifestUrl = artifactPlugin.getArtifactClassLoader().findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
+            URL manifestUrl = applicationPlugin.getArtifactClassLoader().findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
             if (manifestUrl == null)
             {
                 continue;
@@ -62,10 +62,10 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
 
             if (LOGGER.isDebugEnabled())
             {
-                LOGGER.debug("Discovered extension " + artifactPlugin.getArtifactName());
+                LOGGER.debug("Discovered extension " + applicationPlugin.getArtifactName());
             }
             ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
-            extensionManager.registerExtension(extensionManifest, artifactPlugin.getArtifactClassLoader().getClassLoader());
+            extensionManager.registerExtension(extensionManifest, applicationPlugin.getArtifactClassLoader().getClassLoader());
         }
     }
 

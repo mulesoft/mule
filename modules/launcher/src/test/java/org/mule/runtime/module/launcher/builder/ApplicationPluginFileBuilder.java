@@ -9,7 +9,7 @@ package org.mule.runtime.module.launcher.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import org.mule.tck.ZipUtils.ZipResource;
-import static org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
+import static org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor.PLUGIN_PROPERTIES;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * Creates Mule Application Plugin files.
  */
-public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<ArtifactPluginFileBuilder>
+public class ApplicationPluginFileBuilder extends AbstractArtifactFileBuilder<ApplicationPluginFileBuilder>
 {
 
     private Properties properties = new Properties();
@@ -30,7 +30,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
      *
      * @param id artifact identifier. Non empty.
      */
-    public ArtifactPluginFileBuilder(String id)
+    public ApplicationPluginFileBuilder(String id)
     {
         super(id);
     }
@@ -40,7 +40,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
      *
      * @param source instance used as template to build the new one. Non null.
      */
-    public ArtifactPluginFileBuilder(ArtifactPluginFileBuilder source)
+    public ApplicationPluginFileBuilder(ApplicationPluginFileBuilder source)
     {
         super(source);
     }
@@ -51,14 +51,14 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
      * @param id artifact identifier. Non empty.
      * @param source instance used as template to build the new one. Non null.
      */
-    public ArtifactPluginFileBuilder(String id, ArtifactPluginFileBuilder source)
+    public ApplicationPluginFileBuilder(String id, ApplicationPluginFileBuilder source)
     {
         super(id, source);
         this.properties.putAll(source.properties);
     }
 
     @Override
-    protected ArtifactPluginFileBuilder getThis()
+    protected ApplicationPluginFileBuilder getThis()
     {
         return this;
     }
@@ -70,7 +70,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
      * @param propertyValue value of the property to add. Non null.
      * @return the same builder instance
      */
-    public ArtifactPluginFileBuilder configuredWith(String propertyName, String propertyValue)
+    public ApplicationPluginFileBuilder configuredWith(String propertyName, String propertyValue)
     {
         checkImmutable();
         checkArgument(!StringUtils.isEmpty(propertyName), "Property name cannot be empty");
@@ -85,7 +85,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
      * @param classFile class file from a external file or test resource.
      * @return the same builder instance
      */
-    public ArtifactPluginFileBuilder containingClass(String classFile)
+    public ApplicationPluginFileBuilder containingClass(String classFile)
     {
         checkImmutable();
         checkArgument(!StringUtils.isEmpty(classFile), "Class file cannot be empty");
@@ -100,7 +100,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
      * @param resourceFile resource file from a external file or test resource.
      * @return the same builder instance
      */
-    public ArtifactPluginFileBuilder containingResource(String resourceFile, String alias)
+    public ApplicationPluginFileBuilder containingResource(String resourceFile, String alias)
     {
         checkImmutable();
         checkArgument(!StringUtils.isEmpty(resourceFile), "Resource file cannot be empty");

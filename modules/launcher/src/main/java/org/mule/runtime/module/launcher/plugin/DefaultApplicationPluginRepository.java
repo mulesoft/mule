@@ -29,37 +29,38 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 /**
- * Default implementation of an {@link ArtifactPluginRepository} that holds in memory the list
+ * Default implementation of an {@link ApplicationPluginRepository} that holds in memory the list
  * of artifact plugin descriptors bundled with the container.
  *
  * @since 4.0
  */
-public class DefaultArtifactPluginRepository implements ArtifactPluginRepository
+public class DefaultApplicationPluginRepository implements ApplicationPluginRepository
 {
-    private volatile List<ArtifactPluginDescriptor> containerArtifactPluginDescriptors;
+    private volatile List<ApplicationPluginDescriptor> containerApplicationPluginDescriptors;
 
-    private final ArtifactPluginDescriptorFactory pluginDescriptorFactory;
+    private final ApplicationPluginDescriptorFactory pluginDescriptorFactory;
 
     /**
-     * @param pluginDescriptorFactory a {@link ArtifactPluginDescriptorFactory} for creating from the container applications plugins folder the list of {@link ArtifactPluginDescriptor}'s
+     * @param pluginDescriptorFactory a {@link ApplicationPluginDescriptorFactory} for creating from the container applications plugins folder the list of {@link ApplicationPluginDescriptor}'s
      */
-    public DefaultArtifactPluginRepository(ArtifactPluginDescriptorFactory pluginDescriptorFactory)
+    public DefaultApplicationPluginRepository(ApplicationPluginDescriptorFactory pluginDescriptorFactory)
     {
         checkArgument(pluginDescriptorFactory != null, "Application plugin descriptor factory cannot be null");
         this.pluginDescriptorFactory = pluginDescriptorFactory;
     }
 
-    public List<ArtifactPluginDescriptor> getContainerArtifactPluginDescriptors()
+    @Override
+    public List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors()
     {
-        if (containerArtifactPluginDescriptors == null)
+        if (containerApplicationPluginDescriptors == null)
         {
             synchronized (this)
             {
-                if (containerArtifactPluginDescriptors == null)
+                if (containerApplicationPluginDescriptors == null)
                 {
                     try
                     {
-                        containerArtifactPluginDescriptors = unmodifiableList(collectContainerApplicationPluginDescriptors());
+                        containerApplicationPluginDescriptors = unmodifiableList(collectContainerApplicationPluginDescriptors());
                     }
                     catch (IOException e)
                     {
@@ -68,14 +69,14 @@ public class DefaultArtifactPluginRepository implements ArtifactPluginRepository
                 }
             }
         }
-        return containerArtifactPluginDescriptors;
+        return containerApplicationPluginDescriptors;
     }
 
     /**
-     * @return collects and initializes a {@link List} of {@link ArtifactPluginDescriptor} by loading the container application plugins
+     * @return collects and initializes a {@link List} of {@link ApplicationPluginDescriptor} by loading the container application plugins
      * @throws IOException
      */
-    private List<ArtifactPluginDescriptor> collectContainerApplicationPluginDescriptors() throws IOException
+    private List<ApplicationPluginDescriptor> collectContainerApplicationPluginDescriptors() throws IOException
     {
         File[] containerPlugins = getContainerAppPluginsFolder().listFiles();
         if (containerPlugins != null)
@@ -110,18 +111,18 @@ public class DefaultArtifactPluginRepository implements ArtifactPluginRepository
     }
 
     /**
-     * For each plugin expanded in container application plugins folder it creates an {@link ArtifactPluginDescriptor} for it and
+     * For each plugin expanded in container application plugins folder it creates an {@link ApplicationPluginDescriptor} for it and
      * adds the descriptor the given list.
      *
-     * @return a non null {@link List} of {@link ArtifactPluginDescriptor}
+     * @return a non null {@link List} of {@link ApplicationPluginDescriptor}
      */
-    private List<ArtifactPluginDescriptor> createApplicationPluginDescriptors()
+    private List<ApplicationPluginDescriptor> createApplicationPluginDescriptors()
     {
-        List<ArtifactPluginDescriptor> pluginDescriptors = new LinkedList<>();
+        List<ApplicationPluginDescriptor> pluginDescriptors = new LinkedList<>();
 
         for (File pluginExpandedFolder : getContainerAppPluginsFolder().listFiles((FileFilter) DirectoryFileFilter.DIRECTORY))
         {
-            final ArtifactPluginDescriptor appPluginDescriptor = pluginDescriptorFactory.create(pluginExpandedFolder);
+            final ApplicationPluginDescriptor appPluginDescriptor = pluginDescriptorFactory.create(pluginExpandedFolder);
             pluginDescriptors.add(appPluginDescriptor);
         }
 

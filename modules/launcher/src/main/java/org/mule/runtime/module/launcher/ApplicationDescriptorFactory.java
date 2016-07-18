@@ -10,23 +10,27 @@ import static java.io.File.separator;
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.MuleFoldersUtil.PLUGINS_FOLDER;
-import static org.mule.runtime.module.launcher.MuleFoldersUtil.getAppSharedPluginLibsFolder;
 import static org.mule.runtime.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
+import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.descriptor.EmptyApplicationDescriptor;
 import org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -47,15 +51,15 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
 
     public static final String SYSTEM_PROPERTY_OVERRIDE = "-O";
 
-    private final ArtifactPluginRepository applicationPluginRepository;
-    private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
+    private final ApplicationPluginDescriptorFactory pluginDescriptorFactory;
+    private final ApplicationPluginRepository applicationPluginRepository;
 
-    public ApplicationDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader, ArtifactPluginRepository applicationPluginRepository)
+    public ApplicationDescriptorFactory(ApplicationPluginDescriptorFactory applicationPluginDescriptorFactory, ApplicationPluginRepository applicationPluginRepository)
     {
-        checkArgument(artifactPluginDescriptorLoader != null, "ApplicationPluginDescriptorFactory cannot be null");
+        checkArgument(applicationPluginDescriptorFactory != null, "ApplicationPluginDescriptorFactory cannot be null");
         checkArgument(applicationPluginRepository  != null, "ApplicationPluginRepository cannot be null");
         this.applicationPluginRepository = applicationPluginRepository;
-        this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
+        this.pluginDescriptorFactory = applicationPluginDescriptorFactory;
     }
 
     public ApplicationDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException
@@ -86,11 +90,11 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
             final File appPropsFile = new File(artifactFolder, DEFAULT_APP_PROPERTIES_RESOURCE);
             setApplicationProperties(desc, appPropsFile);
 
-            final Set<ArtifactPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
+            final Set<ApplicationPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
             verifyPluginExportedPackages(getAllApplicationPlugins(plugins));
             desc.setPlugins(plugins);
 
-            desc.setSharedPluginFolder(getAppSharedPluginLibsFolder(appName));
+            desc.setSharedPluginLibs(findSharedPluginLibs(appName));
         }
         catch (IOException e)
         {
@@ -100,16 +104,16 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
         return desc;
     }
 
-    private List<ArtifactPluginDescriptor> getAllApplicationPlugins(Set<ArtifactPluginDescriptor> plugins)
+    private List<ApplicationPluginDescriptor> getAllApplicationPlugins(Set<ApplicationPluginDescriptor> plugins)
     {
-        final List<ArtifactPluginDescriptor> result = new LinkedList<>(applicationPluginRepository.getContainerArtifactPluginDescriptors());
+        final List<ApplicationPluginDescriptor> result = new LinkedList<>(applicationPluginRepository.getContainerApplicationPluginDescriptors());
         result.addAll(plugins);
 
         // Sorts plugins by name to ensure consistent deployment
-        result.sort(new Comparator<ArtifactPluginDescriptor>()
+        result.sort(new Comparator<ApplicationPluginDescriptor>()
         {
             @Override
-            public int compare(ArtifactPluginDescriptor descriptor1, ArtifactPluginDescriptor descriptor2)
+            public int compare(ApplicationPluginDescriptor descriptor1, ApplicationPluginDescriptor descriptor2)
             {
                 return descriptor1.getName().compareTo(descriptor2.getName());
             }
@@ -118,12 +122,12 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
         return result;
     }
 
-    private void verifyPluginExportedPackages(List<ArtifactPluginDescriptor> plugins)
+    private void verifyPluginExportedPackages(List<ApplicationPluginDescriptor> plugins)
     {
         final Map<String, List<String>> exportedPackages = new HashMap<>();
 
         boolean error = false;
-        for (ArtifactPluginDescriptor plugin : plugins)
+        for (ApplicationPluginDescriptor plugin : plugins)
         {
             for (String packageName : plugin.getClassLoaderFilter().getExportedClassPackages())
             {
@@ -145,7 +149,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
         //TODO(pablo.kraan): MULE-9649 - de add validation when a decision is made about how to, in a plugin,
     }
 
-    private Set<ArtifactPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor) throws IOException
+    private Set<ApplicationPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor) throws IOException
     {
         final File pluginsDir = new File(appDir, PLUGINS_FOLDER);
         String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
@@ -155,16 +159,39 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
         }
 
         Arrays.sort(pluginZips);
-        Set<ArtifactPluginDescriptor> pds = new HashSet<>(pluginZips.length);
+        Set<ApplicationPluginDescriptor> pds = new HashSet<>(pluginZips.length);
 
         for (String pluginZip : pluginZips)
         {
-            String unpackDestinationFolder = appDescriptor.getName() + separator + PLUGINS_FOLDER + separator;
-            File pluginZipFile = new File(pluginsDir, pluginZip);
-            pds.add(artifactPluginDescriptorLoader.load(pluginZipFile, new File(MuleContainerBootstrapUtils.getMuleTmpDir(),
-                                                                                unpackDestinationFolder)));
+            final String pluginName = StringUtils.removeEnd(pluginZip, ".zip");
+            // must unpack as there's no straightforward way for a ClassLoader to use a jar within another jar/zip
+            final File tmpDir = new File(MuleContainerBootstrapUtils.getMuleTmpDir(),
+                                         appDescriptor.getName() + separator + PLUGINS_FOLDER + separator + pluginName);
+            FileUtils.unzip(new File(pluginsDir, pluginZip), tmpDir);
+            final ApplicationPluginDescriptor pd = pluginDescriptorFactory.create(tmpDir);
+
+            pds.add(pd);
         }
+
         return pds;
+    }
+
+    private URL[] findSharedPluginLibs(String appName) throws MalformedURLException
+    {
+        Set<URL> urls = new HashSet<>();
+
+        final File sharedPluginLibs = MuleFoldersUtil.getAppSharedPluginLibsFolder(appName);
+        if (sharedPluginLibs.exists())
+        {
+            Collection<File> jars = FileUtils.listFiles(sharedPluginLibs, new String[] {"jar"}, false);
+
+            for (File jar : jars)
+            {
+                urls.add(jar.toURI().toURL());
+            }
+        }
+
+        return urls.toArray(new URL[0]);
     }
 
     public void setApplicationProperties(ApplicationDescriptor desc, File appPropsFile)

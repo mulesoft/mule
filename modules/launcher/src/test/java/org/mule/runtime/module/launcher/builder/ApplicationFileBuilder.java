@@ -25,7 +25,7 @@ import java.util.Properties;
 public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<ApplicationFileBuilder>
 {
 
-    private List<ArtifactPluginFileBuilder> plugins = new LinkedList<>();
+    private List<ApplicationPluginFileBuilder> plugins = new LinkedList<>();
     private Properties properties = new Properties();
     private Properties deployProperties = new Properties();
 
@@ -137,7 +137,7 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
      * @param plugin builder defining the plugin. Non null.
      * @return the same builder instance
      */
-    public ApplicationFileBuilder containingPlugin(ArtifactPluginFileBuilder plugin)
+    public ApplicationFileBuilder containingPlugin(ApplicationPluginFileBuilder plugin)
     {
         checkImmutable();
         checkArgument(plugin != null, "Plugin cannot be null");
@@ -172,7 +172,7 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
     {
         final List<ZipResource> customResources = new LinkedList<>();
 
-        for (ArtifactPluginFileBuilder plugin : plugins)
+        for (ApplicationPluginFileBuilder plugin : plugins)
         {
             customResources.add(new ZipResource(plugin.getArtifactFile().getAbsolutePath(), "plugins/" + plugin.getArtifactFile().getName()));
         }

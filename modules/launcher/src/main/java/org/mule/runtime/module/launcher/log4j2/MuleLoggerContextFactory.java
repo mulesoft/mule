@@ -17,10 +17,9 @@ import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
-import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory;
+import org.mule.runtime.module.launcher.plugin.ApplicationPluginRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
@@ -188,9 +187,10 @@ public class MuleLoggerContextFactory
     public ApplicationDescriptor fetchApplicationDescriptor(ArtifactClassLoader muleCL) throws IOException
     {
         //TODO(pablo.kraan): MULE-9778 - MuleLoggerContextFactory should not create artifact descriptors
-        ArtifactDescriptorFactory<ApplicationDescriptor> applicationDescriptorFactory = new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory())), new ArtifactPluginRepository()
+        ArtifactDescriptorFactory<ApplicationDescriptor> applicationDescriptorFactory = new ApplicationDescriptorFactory(new ApplicationPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory()), new ApplicationPluginRepository()
         {
-            public List<ArtifactPluginDescriptor> getContainerArtifactPluginDescriptors()
+            @Override
+            public List<ApplicationPluginDescriptor> getContainerApplicationPluginDescriptors()
             {
                 // Don't need plugins, just need to get the descriptor to access log configuration
                 return emptyList();

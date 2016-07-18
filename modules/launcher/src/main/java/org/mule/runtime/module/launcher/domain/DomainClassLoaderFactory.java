@@ -20,7 +20,6 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
-import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.launcher.DeploymentException;
 import org.mule.runtime.module.launcher.MuleFoldersUtil;
@@ -48,7 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Creates {@link ArtifactClassLoader} for domain artifacts.
  */
-public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFactory<DomainDescriptor>
+public class DomainClassLoaderFactory implements ArtifactClassLoaderFactory<DomainDescriptor>
 {
     protected static final Logger logger = LoggerFactory.getLogger(DomainClassLoaderFactory.class);
     private final ClassLoader parentClassLoader;
@@ -72,7 +71,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     }
 
     @Override
-    public ArtifactClassLoader create(ArtifactClassLoader parent, DomainDescriptor descriptor, List<ArtifactClassLoader> artifactClassLoaders)
+    public ArtifactClassLoader create(ArtifactClassLoader parent, DomainDescriptor descriptor)
     {
         String domain = descriptor.getName();
         Preconditions.checkArgument(domain != null, "Domain name cannot be null");
