@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getAliasName;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
@@ -76,7 +77,7 @@ final class DefaultFieldDescriber implements FieldDescriber
                 .withExpressionSupport(getExpressionSupport(field))
                 .withModelProperty(new DeclaringMemberModelProperty(field));
 
-        LayoutModelProperty layoutModelProperty = MuleExtensionAnnotationParser.parseLayoutAnnotations(field, field.getName());
+        LayoutModelProperty layoutModelProperty = parseLayoutAnnotations(field, field.getName());
         if (layoutModelProperty != null)
         {
             parameterDeclarer.withModelProperty(layoutModelProperty);

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
+
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
@@ -26,7 +28,6 @@ import org.mule.runtime.module.extension.internal.model.property.ImplementingMet
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
@@ -49,35 +50,30 @@ public final class DisplayModelEnricher extends AbstractAnnotatedModelEnricher
             public void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration)
             {
                 enrichTypes(declaration);
-                super.onSource(owner, declaration);
             }
 
             @Override
             public void onParameter(ParameterizedInterceptableDeclaration owner, ParameterDeclaration declaration)
             {
                 enrichParameter(declaration);
-                super.onParameter(owner, declaration);
             }
 
             @Override
             public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration)
             {
                 enrichOperation(declaration);
-                super.onOperation(owner, declaration);
             }
 
             @Override
             public void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration)
             {
                 enrichTypes(declaration);
-                super.onConnectionProvider(owner, declaration);
             }
 
             @Override
             public void onConfiguration(ConfigurationDeclaration declaration)
             {
                 enrichTypes(declaration);
-                super.onConfiguration(declaration);
             }
         }.walk(describingContext.getExtensionDeclarer().getDeclaration());
     }
@@ -107,8 +103,8 @@ public final class DisplayModelEnricher extends AbstractAnnotatedModelEnricher
         if (modelProperty.isPresent())
         {
             final Class<?> annotatedType = modelProperty.get().getType();
-            final Summary summaryAnnotation = IntrospectionUtils.getAnnotation(annotatedType, Summary.class);
-            final DisplayName displayNameAnnotation = IntrospectionUtils.getAnnotation(annotatedType, DisplayName.class);
+            final Summary summaryAnnotation = getAnnotation(annotatedType, Summary.class);
+            final DisplayName displayNameAnnotation = getAnnotation(annotatedType, DisplayName.class);
 
             createDisplayModelProperty(declaration, summaryAnnotation, displayNameAnnotation);
         }
