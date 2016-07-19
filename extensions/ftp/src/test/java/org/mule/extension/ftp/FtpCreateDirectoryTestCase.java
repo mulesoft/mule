@@ -12,12 +12,15 @@ import static org.junit.Assert.assertThat;
 import org.mule.extension.FtpTestHarness;
 import org.mule.functional.junit4.FlowRunner;
 
+import java.io.File;
+
 import org.junit.Test;
 
 public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
 {
 
-    private static final String DIRECTORY = "a/b/c";
+    private static final String DIRECTORY = "validDirectory";
+    private static final String DIRECTORY_WITH_PARTS = "invalid/directory/name";
 
     public FtpCreateDirectoryTestCase(String name, FtpTestHarness testHarness)
     {
@@ -54,6 +57,13 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
         doCreateDirectory(base, DIRECTORY);
 
         assertThat(testHarness.dirExists(DIRECTORY), is(true));
+    }
+
+    @Test
+    public void createDirectoryWithPathContainingParts() throws Exception
+    {
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+        doCreateDirectory(null, DIRECTORY_WITH_PARTS);
     }
 
     private void doCreateDirectory(String basePath, String directory) throws Exception

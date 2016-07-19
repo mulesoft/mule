@@ -321,7 +321,7 @@ public class StandardFileSystemOperations
      * instance of {@link FileAttributes}, in which case {@link FileAttributes#getPath()}
      * will be used. If that's not the case, then an {@link IllegalArgumentException} will
      * be thrown.
-     *
+     * <p>
      * {@code to} argument should not contain any path separator. {@link IllegalArgumentException} will
      * be thrown if this precondition is not honored.
      *
@@ -356,6 +356,7 @@ public class StandardFileSystemOperations
      */
     public void createDirectory(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String basePath, String directoryName)
     {
+        checkArgument(get(directoryName).getNameCount() == 1, format("'directoryName' parameter of create directory operation should not contain any file separator character but '%s' was received", directoryName));
         fileSystem.changeToBaseDir(config);
         fileSystem.createDirectory(config, basePath, directoryName);
     }
