@@ -16,7 +16,8 @@ import org.junit.Test;
 public class FileCreateDirectoryTestCase extends FileConnectorTestCase
 {
 
-    private static final String DIRECTORY = "a/b/c";
+    private static final String DIRECTORY = "validDirectory";
+    private static final String DIRECTORY_WITH_PARTS = "invalid/directory/name";
 
     @Override
     protected String getConfigFile()
@@ -48,6 +49,14 @@ public class FileCreateDirectoryTestCase extends FileConnectorTestCase
         doCreateDirectory(base.getAbsolutePath(), DIRECTORY);
 
         assertExists(true, new File(base, DIRECTORY));
+    }
+
+    @Test
+    public void createDirectoryWithPathContainingParts() throws Exception
+    {
+        File base = temporaryFolder.getRoot();
+        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        doCreateDirectory(base.getAbsolutePath(), DIRECTORY_WITH_PARTS);
     }
 
     private void doCreateDirectory(String basePath, String directory) throws Exception
