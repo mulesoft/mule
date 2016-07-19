@@ -15,6 +15,7 @@ import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
 import static org.mule.extension.email.api.EmailContentProcessor.process;
+
 import org.mule.extension.email.api.exception.EmailException;
 
 import java.time.LocalDateTime;
@@ -63,6 +64,65 @@ public final class EmailAttributesBuilder
      */
     private EmailAttributesBuilder()
     {
+    }
+
+    /**
+     * builds the new {@link EmailAttributes} instance from a given
+     * {@link Message} extracting all its attributes.
+     *
+     * @param msg             the {@link Message} to extract attributes from.
+     * @param withAttachments if true, the message content will be opened to getPropertiesInstance the attachments.
+     * @return a new {@link EmailAttributes} instance.
+     */
+    public static EmailAttributes fromMessage(Message msg, boolean withAttachments)
+    {
+        try
+        {
+            Flags flags = msg.getFlags();
+
+            EmailAttributesBuilder builder = EmailAttributesBuilder.newAttributes()
+                    .withId(msg.getMessageNumber())
+                    .withSubject(msg.getSubject())
+                    .fromAddresses(msg.getFrom())
+                    .toAddresses(msg.getRecipients(TO))
+                    .ccAddresses(msg.getRecipients(CC))
+                    .bccAddresses(msg.getRecipients(BCC))
+                    .seen(flags.contains(SEEN))
+                    .replyToAddress(msg.getReplyTo())
+                    .recent(flags.contains(RECENT))
+                    .sentDate(msg.getSentDate())
+                    .receivedDate(msg.getReceivedDate())
+                    .draft(flags.contains(DRAFT))
+                    .answered(flags.contains(ANSWERED))
+                    .deleted(flags.contains(DELETED));
+
+            return withAttachments ? builder.withAttachments(process(msg).getAttachments()).build()
+                                   : builder.build();
+        }
+        catch (MessagingException mse)
+        {
+            throw new EmailException(mse.getMessage(), mse);
+        }
+    }
+
+    /**
+     * builds the new {@link EmailAttributes} instance from a given
+     * {@link Message} extracting all its attributes including the attachments.
+     *
+     * @param msg the {@link Message} to extract attributes from.
+     * @return a new {@link EmailAttributes} instance.
+     */
+    public static EmailAttributes fromMessage(Message msg)
+    {
+        return fromMessage(msg, true);
+    }
+
+    /**
+     * @return an instance of this {@link EmailAttributesBuilder}.
+     */
+    public static EmailAttributesBuilder newAttributes()
+    {
+        return new EmailAttributesBuilder();
     }
 
     /**
@@ -200,7 +260,7 @@ public final class EmailAttributesBuilder
     /**
      * adds the ANSWERED flag to the email attributes.
      *
-     * @param answered  if the email is marked as ANSWERED or not
+     * @param answered if the email is marked as ANSWERED or not
      * @return this {@link EmailAttributesBuilder}
      */
     public EmailAttributesBuilder answered(boolean answered)
@@ -212,7 +272,7 @@ public final class EmailAttributesBuilder
     /**
      * adds the DELETED flag to the email attributes.
      *
-     * @param deleted  if the email is marked as DELETED or not
+     * @param deleted if the email is marked as DELETED or not
      * @return this {@link EmailAttributesBuilder}
      */
     public EmailAttributesBuilder deleted(boolean deleted)
@@ -224,7 +284,7 @@ public final class EmailAttributesBuilder
     /**
      * adds the DRAFT flag to the email attributes.
      *
-     * @param draft  if the email is marked as DRAFT or not
+     * @param draft if the email is marked as DRAFT or not
      * @return this {@link EmailAttributesBuilder}
      */
     public EmailAttributesBuilder draft(boolean draft)
@@ -276,65 +336,6 @@ public final class EmailAttributesBuilder
                                    receivedDate,
                                    sentDate,
                                    new EmailFlags(answered, deleted, draft, recent, seen));
-    }
-
-    /**
-     * builds the new {@link EmailAttributes} instance from a given
-     * {@link Message} extracting all its attributes.
-     *
-     * @param msg the {@link Message} to extract attributes from.
-     * @param withAttachments if true, the message content will be opened to getPropertiesInstance the attachments.
-     * @return a new {@link EmailAttributes} instance.
-     */
-    public static EmailAttributes fromMessage(Message msg, boolean withAttachments)
-    {
-        try
-        {
-            Flags flags = msg.getFlags();
-
-            EmailAttributesBuilder builder = EmailAttributesBuilder.newAttributes()
-                    .withId(msg.getMessageNumber())
-                    .withSubject(msg.getSubject())
-                    .fromAddresses(msg.getFrom())
-                    .toAddresses(msg.getRecipients(TO))
-                    .ccAddresses(msg.getRecipients(CC))
-                    .bccAddresses(msg.getRecipients(BCC))
-                    .seen(flags.contains(SEEN))
-                    .replyToAddress(msg.getReplyTo())
-                    .recent(flags.contains(RECENT))
-                    .sentDate(msg.getSentDate())
-                    .receivedDate(msg.getReceivedDate())
-                    .draft(flags.contains(DRAFT))
-                    .answered(flags.contains(ANSWERED))
-                    .deleted(flags.contains(DELETED));
-
-            return withAttachments ? builder.withAttachments(process(msg).getAttachments()).build()
-                                   : builder.build();
-        }
-        catch (MessagingException mse)
-        {
-            throw new EmailException(mse.getMessage(), mse);
-        }
-    }
-
-    /**
-     * builds the new {@link EmailAttributes} instance from a given
-     * {@link Message} extracting all its attributes including the attachments.
-     *
-     * @param msg the {@link Message} to extract attributes from.
-     * @return a new {@link EmailAttributes} instance.
-     */
-    public static EmailAttributes fromMessage(Message msg)
-    {
-        return fromMessage(msg, true);
-    }
-
-    /**
-     * @return an instance of this {@link EmailAttributesBuilder}.
-     */
-    public static EmailAttributesBuilder newAttributes()
-    {
-        return new EmailAttributesBuilder();
     }
 
     private void addArrayAddresses(Address[] toAddresses, List<String> addresses)

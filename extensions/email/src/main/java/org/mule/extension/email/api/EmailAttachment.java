@@ -20,6 +20,24 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 public class EmailAttachment
 {
 
+    /**
+     * the name of the attachment.
+     */
+    @Parameter
+    private String id;
+    /**
+     * the content of the attachment.
+     */
+    @Parameter
+    @NoRef
+    private Object content;
+    /**
+     * the content type of the attachment content.
+     */
+    @Parameter
+    @Optional
+    private String contentType;
+
     public EmailAttachment()
     {
     }
@@ -30,26 +48,6 @@ public class EmailAttachment
         this.content = content;
         this.contentType = contentType.toString();
     }
-
-    /**
-     * the name of the attachment.
-     */
-    @Parameter
-    private String id;
-
-    /**
-     * the content of the attachment.
-     */
-    @Parameter
-    @NoRef
-    private Object content;
-
-    /**
-     * the content type of the attachment content.
-     */
-    @Parameter
-    @Optional
-    private String contentType;
 
     /**
      * @return the name of the attachment.

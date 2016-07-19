@@ -31,7 +31,7 @@ public class EmailRetrieverException extends EmailException
     /**
      * Creates a new instance with the {@code cause}.
      *
-     * @param cause   the exception's cause
+     * @param cause the exception's cause
      */
     public EmailRetrieverException(Throwable cause)
     {

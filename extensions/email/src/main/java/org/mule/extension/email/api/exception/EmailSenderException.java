@@ -31,7 +31,7 @@ public class EmailSenderException extends EmailException
     /**
      * Creates a new instance with the {@code cause}.
      *
-     * @param cause   the exception's cause
+     * @param cause the exception's cause
      */
     public EmailSenderException(Throwable cause)
     {

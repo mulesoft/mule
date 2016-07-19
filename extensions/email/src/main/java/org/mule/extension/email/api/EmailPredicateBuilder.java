@@ -7,6 +7,7 @@
 package org.mule.extension.email.api;
 
 import static java.util.regex.Pattern.compile;
+
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -43,74 +44,70 @@ public class EmailPredicateBuilder
     private static final TimeSinceFunction TIME_SINCE = new TimeSinceFunction();
 
     /**
-     * Emails received before this date are rejected.
+     * Indicates since which date the received emails must be retrieved
      */
     @Parameter
     @Optional
     private LocalDateTime receivedSince;
 
     /**
-     * Emails received after this date are rejected.
+     * Indicates until which date the received emails must be retrieved
      */
     @Parameter
     @Optional
     private LocalDateTime receivedUntil;
 
     /**
-     * Emails sent before this date are rejected.
+     * Indicates since which date the sent emails must be retrieved
      */
     @Parameter
     @Optional
     private LocalDateTime sentSince;
 
     /**
-     * Emails sent after this date are rejected.
+     * Indicates until which date the sent emails must be retrieved
      */
     @Parameter
     @Optional
     private LocalDateTime sentUntil;
 
     /**
-     * If {@code true}, the predicate will only accept emails that has been seen.
-     * If {@code false}, the predicate will only accept emails that has not been seen..
+     * Indicates if should retrieve 'seen' or 'not seen' emails
      */
     @Parameter
     @Optional
     private Boolean seen;
 
     /**
-     * If {@code true}, the predicate will only accept emails that has been answered.
-     * If {@code false}, the predicate will only accept emails that has not been answered..
+     * Indicates if should retrieve 'answered' or 'not answered' emails
      */
     @Parameter
     @Optional
     private Boolean answered;
 
     /**
-     * If {@code true}, the predicate will only accept emails that has been marked as deleted.
-     * If {@code false}, the predicate will only accept emails that has not been marked as deleted.
+     * Indicates if should retrieve 'marked as deleted' or 'not marked as deleted' emails
      */
     @Parameter
     @Optional
     private Boolean deleted;
 
     /**
-     * If {@code true}, the predicate will only accept emails that are recent.
-     * If {@code false}, the predicate will only accept emails that are not recent.
+     * "Indicates if should retrieve 'recent' or 'not recent' emails
      */
     @Parameter
     @Optional
     private Boolean recent;
 
     /**
-     * If the email subject does not match the regex the email is rejected.
+     * Subject Regex to match with the wanted emails
      */
     @Parameter
     @Optional
     private String subjectRegex;
 
     /**
-     * If none email from address match the regex the email is rejected.
+     * From Email Address Regex to match with the wanted emails
      */
     @Parameter
     @Optional

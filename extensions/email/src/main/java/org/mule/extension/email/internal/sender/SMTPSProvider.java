@@ -6,9 +6,12 @@
  */
 package org.mule.extension.email.internal.sender;
 
+import static org.mule.extension.email.internal.EmailConnector.TLS_CONFIGURATION;
 import static org.mule.extension.email.internal.EmailProtocol.SMTPS;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.SMTPS_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
+
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -18,6 +21,9 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * A {@link ConnectionProvider} that returns instances of smtps based {@link RetrieverConnection}s.
@@ -27,13 +33,16 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("smtps")
+@DisplayName("SMTPS Connection")
 public class SMTPSProvider extends AbstractSenderProvider implements Initialisable
 {
+
     /**
-     * The port number of the mail server.
+     * The port number of the mail server. '465' by default.
      */
     @Parameter
     @Optional(defaultValue = SMTPS_PORT)
+    @Placement(group = CONNECTION, order = 2)
     private String port;
 
     /**
@@ -41,6 +50,9 @@ public class SMTPSProvider extends AbstractSenderProvider implements Initialisab
      * Allows to create a TLS secured connections.
      */
     @Parameter
+    @Summary("TLS Configuration for the secure connection of the SMTPS protocol")
+    @Placement(group = CONNECTION, order = 5)
+    @DisplayName(TLS_CONFIGURATION)
     private TlsContextFactory tlsContextFactory;
 
     /**

@@ -6,20 +6,21 @@
  */
 package org.mule.extension.email.internal.commands;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEmailAttachments;
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
-import org.mule.extension.email.internal.sender.SenderConnection;
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.internal.sender.SenderConnection;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEmailAttachments;
 
 /**
  * Represents the reply operation.
@@ -41,20 +42,21 @@ public final class ReplyCommand
      * <p>
      * If no email message is found in the incoming {@link MuleMessage} this operation will fail.
      *
-     * @param connection  the connection associated to the operation
-     * @param muleMessage the incoming {@link MuleMessage} from which the email is going to getPropertiesInstance the content.
-     * @param content     the content of the reply message.
-     * @param subject     the subject of the email. is none is set then one will be created using the subject from the replying email.
-     * @param from        the person who sends the email.
-     * @param headers     a custom set of headers.
-     * @param replyToAll  if this reply should be sent to all recipients of this message, or only the sender of the received email.
+     * @param connection     the connection associated to the operation
+     * @param muleMessage    the incoming {@link MuleMessage} from which the email is going to getPropertiesInstance the content.
+     * @param content        the content of the reply message.
+     * @param subject        the subject of the email. is none is set then one will be created using the subject from the replying email.
+     * @param from           the person who sends the email.
+     * @param defaultCharset the default charset of the email message to be used if the {@param content} don't specify it.
+     * @param headers        a custom set of headers.
+     * @param replyToAll     if this reply should be sent to all recipients of this message, or only the sender of the received email.
      */
     public void reply(SenderConnection connection,
                       MuleMessage muleMessage,
                       EmailContent content,
                       String subject,
                       String from,
-                      String defaultEncoding,
+                      String defaultCharset,
                       Map<String, String> headers,
                       Boolean replyToAll)
     {
@@ -81,6 +83,6 @@ public final class ReplyCommand
         headers.putAll(attributes.getHeaders());
         List<String> ccAddresses = replyToAll ? attributes.getCcAddresses() : new ArrayList<>();
         List<EmailAttachment> emailAttachments = mapToEmailAttachments(attributes.getAttachments());
-        sendCommand.send(connection, content, subject, replyTo, from, defaultEncoding, ccAddresses, new ArrayList<>(), headers, emailAttachments);
+        sendCommand.send(connection, content, subject, replyTo, from, defaultCharset, ccAddresses, new ArrayList<>(), headers, emailAttachments);
     }
 }

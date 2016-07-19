@@ -8,10 +8,13 @@ package org.mule.extension.email.api;
 
 
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT_PLAIN;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 /**
  * Represents and enables the construction of the content of an email
@@ -22,10 +25,32 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 public class EmailContent
 {
 
+    /**
+     * Text body of the message content
+     */
+    @Parameter
+    @Optional(defaultValue = "#[payload]")
+    @Placement(order = 1)
+    private String body;
+    /**
+     * ContentType of the body text. Example: "text/html" or "text/plain".
+     */
+    @Parameter
+    @Optional(defaultValue = TEXT_PLAIN)
+    @DisplayName("ContentType")
+    @Placement(order = 2)
+    private String contentType;
+    /**
+     * The character encoding of the body. If not specified, it defaults to the default charset in the mule configuration
+     */
+    @Parameter
+    @Optional
+    @Placement(order = 3)
+    private String charset;
+
     public EmailContent()
     {
     }
-
 
     public EmailContent(String body, String charset)
     {
@@ -40,31 +65,6 @@ public class EmailContent
         this.contentType = contentType.toString();
         this.charset = charset;
     }
-
-    /**
-     * The text body of the message content.
-     */
-    @Parameter
-    @Optional(defaultValue = "#[payload]")
-    private String body;
-
-    /**
-     * The contentType of the body. One of "text/html" or "text/plain"
-     * <p>
-     * The default value is "text/plain"
-     */
-    @Parameter
-    @Optional(defaultValue = TEXT_PLAIN)
-    private String contentType;
-
-    /**
-     * The character encoding of the body.
-     * <p>
-     * If is not specified
-     */
-    @Parameter
-    @Optional
-    private String charset;
 
     /**
      * @return the body of the message content. The body
