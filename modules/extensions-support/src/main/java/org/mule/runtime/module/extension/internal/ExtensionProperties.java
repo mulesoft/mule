@@ -74,7 +74,10 @@ public class ExtensionProperties
      */
     public static final String TRANSACTIONAL_ACTION_PARAMETER_NAME = "transactionalAction";
 
-    public static final String TRANSACTIONA_ACTION_PARAMETER_DESCRIPTION = "The type of joining action that operations can take regarding transactions.";
+    /**
+     * The description of the parameter for configuring transactional actions
+     */
+    public static final String TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION = "The type of joining action that operations can take regarding transactions.";
 
     private ExtensionProperties()
     {

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.MuleException;
@@ -33,6 +34,7 @@ final class TransactionalConnectionHandler<T extends TransactionalConnection> im
      */
     public TransactionalConnectionHandler(ExtensionTransactionalResource<T> resource)
     {
+        checkArgument(resource != null, "resource cannot be null");
         this.resource = resource;
     }
 
@@ -70,7 +72,7 @@ final class TransactionalConnectionHandler<T extends TransactionalConnection> im
             return;
         }
 
-        if (!resource.isResolved())
+        if (!resource.isTransactionResolved())
         {
             try
             {

@@ -45,8 +45,8 @@ public class TransactionalConnectorTestCase extends ExtensionFunctionalTestCase
     public void executeTransactionless() throws Exception
     {
         TestTransactionalConnection connection = (TestTransactionalConnection) flowRunner("executeTransactionless").withPayload("").run().getMessage().getPayload();
-        assertThat(connection.isBegun(), is(false));
-        assertThat(connection.isCommited(), is(false));
-        assertThat(connection.isRolledback(), is(false));
+        assertThat(connection.isTransactionBegun(), is(false));
+        assertThat(connection.isTransactionCommited(), is(false));
+        assertThat(connection.isTransactionRolledback(), is(false));
     }
 }

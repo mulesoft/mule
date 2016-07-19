@@ -111,7 +111,6 @@ public final class DefaultExecutionMediator implements ExecutionMediator
 
         ExecutionTemplate<RetryContext> executionTemplate = getExecutionTemplate(context);
 
-
         final OperationRetryCallBack connectionRetry = new OperationRetryCallBack(executor, context, interceptors);
 
         //TODO - MULE-9336 - Add support for non blocking retry policies

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -115,12 +116,13 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
         when(configurationInstance.getModel()).thenReturn(configurationModel);
         when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
         when(extensionModel.getName()).thenReturn(DUMMY_NAME);
-        when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
-        when(operationModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
+        when(extensionModel.getExceptionEnricherFactory()).thenReturn(empty());
+        when(operationModel.getExceptionEnricherFactory()).thenReturn(empty());
         when(operationExecutor.execute(operationContext)).thenReturn(result);
         when(operationExceptionExecutor.execute(operationContext)).thenThrow(exception);
         when(operationContext.getConfiguration()).thenReturn(configurationInstance);
         when(operationContext.getConfiguration().getModel().getExtensionModel().getName()).thenReturn(DUMMY_NAME);
+        when(operationContext.getTransactionConfig()).thenReturn(empty());
 
         mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext));
 

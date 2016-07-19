@@ -24,8 +24,8 @@ public class PetStoreClient implements TransactionalConnection
     private String configName;
     private ThreadingProfile threadingProfile;
     private boolean begun, commited, rolledback = false;
-
     private int disconnectCount;
+
     public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile, String configName)
     {
         this.username = username;
@@ -39,12 +39,6 @@ public class PetStoreClient implements TransactionalConnection
     {
         checkArgument(ownerName.equals(username), "config doesn't match");
         return config.getPets();
-    }
-
-    @Override
-    public boolean isXA()
-    {
-        return false;
     }
 
     @Override

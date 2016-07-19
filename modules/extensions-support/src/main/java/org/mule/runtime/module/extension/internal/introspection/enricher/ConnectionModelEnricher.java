@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.enricher;
 import static org.mule.runtime.extension.api.connectivity.OperationTransactionalAction.JOIN_IF_POSSIBLE;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONA_ACTION_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
@@ -70,7 +70,7 @@ public class ConnectionModelEnricher implements ModelEnricher
         transactionParameter.setExpressionSupport(NOT_SUPPORTED);
         transactionParameter.setRequired(false);
         transactionParameter.setDefaultValue(JOIN_IF_POSSIBLE);
-        transactionParameter.setDescription(TRANSACTIONA_ACTION_PARAMETER_DESCRIPTION);
+        transactionParameter.setDescription(TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION);
 
         declaration.addParameter(transactionParameter);
     }

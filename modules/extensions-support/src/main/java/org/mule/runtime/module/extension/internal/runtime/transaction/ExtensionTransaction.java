@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.transaction.AbstractSingleResourceTransaction;
 import org.mule.runtime.core.transaction.IllegalTransactionStateException;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -50,8 +51,8 @@ public class ExtensionTransaction extends AbstractSingleResourceTransaction
         ExtensionTransactionalResource txResource = (ExtensionTransactionalResource) resource;
 
         boundResource = Optional.of(txResource);
-        doBegin();
         super.bindResource(key, resource);
+        doBegin();
     }
 
     /**
@@ -69,7 +70,7 @@ public class ExtensionTransaction extends AbstractSingleResourceTransaction
     @Override
     public Object getResource(Object key)
     {
-        return this.key.equals(key) ? this.resource : null;
+        return Objects.equals(this.key, key) ? this.resource : null;
     }
 
     /**
@@ -143,7 +144,6 @@ public class ExtensionTransaction extends AbstractSingleResourceTransaction
         }
         catch (Exception e)
         {
-
             throw new TransactionException(e);
         }
     }

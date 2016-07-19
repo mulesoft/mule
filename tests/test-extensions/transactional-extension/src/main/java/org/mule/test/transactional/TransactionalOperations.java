@@ -19,22 +19,22 @@ public class TransactionalOperations
 
     public void verifyNoTransaction(@Connection TestTransactionalConnection connection)
     {
-        checkState(!connection.isBegun(), "transaction begun with no reason");
+        checkState(!connection.isTransactionBegun(), "transaction begun with no reason");
     }
 
     public void verifyTransactionBegun(@Connection TestTransactionalConnection connection)
     {
-        checkState(connection.isBegun(), "transaction not begun");
+        checkState(connection.isTransactionBegun(), "transaction not begun");
     }
 
     public void verifyTransactionCommited(@Connection TestTransactionalConnection connection)
     {
-        checkState(connection.isCommited(), "transaction not committed");
+        checkState(connection.isTransactionCommited(), "transaction not committed");
     }
 
     public void verifyTransactionRolledback(@Connection TestTransactionalConnection connection)
     {
-        checkState(connection.isRolledback(), "transaction not rolled back");
+        checkState(connection.isTransactionRolledback(), "transaction not rolled back");
     }
 
     public void fail()
