@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.module.socket.api.SocketsExtension;
+import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.util.IOUtils;

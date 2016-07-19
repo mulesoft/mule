@@ -9,7 +9,7 @@ package org.mule.extension.http.internal.request.client;
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
-import org.mule.module.socket.api.socket.tcp.TcpClientSocketProperties;
+import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
 /**

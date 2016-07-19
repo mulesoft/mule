@@ -15,7 +15,7 @@ import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.extension.http.internal.request.DefaultHttpRequest;
 import org.mule.extension.http.internal.request.client.HttpClientConfiguration;
-import org.mule.module.socket.api.socket.tcp.TcpClientSocketProperties;
+import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.api.MuleRuntimeException;

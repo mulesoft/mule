@@ -10,7 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import org.mule.module.socket.api.socket.tcp.TcpProtocol;
+import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 
 import org.junit.Test;
 

@@ -8,7 +8,7 @@ package org.mule.extension.socket.protocol;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.module.socket.api.connection.tcp.protocol.XmlMessageProtocol;
+import org.mule.extension.socket.api.connection.tcp.protocol.XmlMessageProtocol;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

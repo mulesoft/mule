@@ -10,7 +10,7 @@ package org.mule.extension.http.api.server;
 import org.mule.extension.http.internal.listener.grizzly.GrizzlyServerManager;
 import org.mule.extension.http.internal.listener.server.HttpServerConfiguration;
 import org.mule.extension.http.internal.listener.server.HttpServerFactory;
-import org.mule.module.socket.api.socket.tcp.TcpServerSocketProperties;
+import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;

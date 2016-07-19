@@ -8,7 +8,7 @@ package org.mule.extension.socket;
 
 
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
-import org.mule.module.socket.api.connection.tcp.protocol.StreamingProtocol;
+import org.mule.extension.socket.api.connection.tcp.protocol.StreamingProtocol;
 
 import java.io.IOException;
 import java.io.InputStream;
