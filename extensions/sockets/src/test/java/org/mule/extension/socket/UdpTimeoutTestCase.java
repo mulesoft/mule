@@ -7,7 +7,7 @@
 package org.mule.extension.socket;
 
 import static org.hamcrest.Matchers.instanceOf;
-import org.mule.module.socket.api.exceptions.ReadingTimeoutException;
+import org.mule.extension.socket.api.exceptions.ReadingTimeoutException;
 import org.mule.runtime.core.api.MessagingException;
 
 import org.junit.Test;
