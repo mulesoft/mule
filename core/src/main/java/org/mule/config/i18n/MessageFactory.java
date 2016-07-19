@@ -6,7 +6,10 @@
  */
 package org.mule.config.i18n;
 
+import static org.apache.commons.collections.CollectionUtils.union;
+
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -38,11 +41,13 @@ public abstract class MessageFactory
      */
     protected static final ResourceBundle.Control reloadControl = new ResourceBundle.Control()
     {
+        // Avoid trying to load the java class.
+        private List<String> formats = new ArrayList<>(union(FORMAT_PROPERTIES, FORMAT_CLASS));
+
         @Override
         public List<String> getFormats(String baseName)
         {
-            // Avoid trying to load the java class.
-            return ResourceBundle.Control.FORMAT_PROPERTIES;
+            return formats;
         };
     };
 
