@@ -6,9 +6,12 @@
  */
 package org.mule.extension.file;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import org.mule.runtime.core.api.MuleRuntimeException;
 
 import java.io.File;
 
@@ -18,6 +21,7 @@ public class FileRenameTestCase extends FileConnectorTestCase
 {
 
     private static final String RENAME_TO = "renamed";
+    private static final String RENAME_TO_DIRECTORY = "directoryToBeOverwritten";
 
     @Override
     protected String getConfigFile()
@@ -54,7 +58,31 @@ public class FileRenameTestCase extends FileConnectorTestCase
         assertExists(false, origin);
         assertExists(true, expected);
 
-        assertThat(readPathAsString(String.format("%s/%s", expected.getAbsolutePath(), HELLO_FILE_NAME)), is(HELLO_WORLD));
+        assertThat(readPathAsString(format("%s/%s", expected.getAbsolutePath(), HELLO_FILE_NAME)), is(HELLO_WORLD));
+    }
+
+    @Test
+    public void renameDirectoryAndOverwriteANonEmptyDirectory() throws Exception
+    {
+        File origin = createHelloWorldFile().getParentFile();
+        File nonEmptyTargetDirectory = temporaryFolder.newFolder(RENAME_TO_DIRECTORY);
+        File nonEmptyTargetDirectoryFile = new File(nonEmptyTargetDirectory, RENAME_TO);
+        nonEmptyTargetDirectoryFile.createNewFile();
+        doRename("rename", origin.getAbsolutePath(), RENAME_TO_DIRECTORY, true);
+
+        assertExists(false, origin);
+        assertThat(readPathAsString(format("%s/%s", nonEmptyTargetDirectory.getAbsolutePath(), HELLO_FILE_NAME)), is(HELLO_WORLD));
+    }
+
+    @Test
+    public void failOnOverwriteANonReadableDirectory() throws Exception
+    {
+        File origin = createHelloWorldFile().getParentFile();
+        File nonReadableTargetDirectory = temporaryFolder.newFolder(RENAME_TO_DIRECTORY);
+        nonReadableTargetDirectory.setReadable(false);
+
+        expectedException.expectCause(instanceOf(MuleRuntimeException.class));
+        doRename("rename", origin.getAbsolutePath(), RENAME_TO_DIRECTORY, true);
     }
 
     @Test
@@ -86,7 +114,8 @@ public class FileRenameTestCase extends FileConnectorTestCase
     public void targetAlreadyExistsWithOverwrite() throws Exception
     {
         File origin = createHelloWorldFile();
-        temporaryFolder.newFile(RENAME_TO);
+        File targetFile = new File(origin.getParent(), RENAME_TO);
+        targetFile.createNewFile();
 
         doRename(origin.getAbsolutePath(), true);
         assertRenamedFile(origin);

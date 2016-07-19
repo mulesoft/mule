@@ -8,9 +8,9 @@ package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
 import org.mule.extension.ftp.internal.FtpCopyDelegate;
+import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
@@ -50,8 +50,7 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
      * an {@link IllegalArgumentException} if the {@code filePath}
      * doesn't exists
      *
-     *
-     * @param config the config that is parameterizing this operation
+     * @param config   the config that is parameterizing this operation
      * @param filePath the path to the file you want
      * @return a {@link FtpFileAttributes}
      * @throws IllegalArgumentException if the {@code filePath} doesn't exists
@@ -65,7 +64,7 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
      * Obtains a {@link FtpFileAttributes} for the given {@code filePath}
      * by using the {@link FTPClient#mlistFile(String)} FTP command
      *
-     * @param config the config that is parameterizing this operation
+     * @param config   the config that is parameterizing this operation
      * @param filePath the path to the file you want
      * @return a {@link FtpFileAttributes} or {@code null} if it doesn't exists
      */
@@ -136,7 +135,7 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
      * into {@link #doRename(String, String)}, in which the actual renaming implementation
      * is.
      *
-     * @param config the config that is parameterizing this operation
+     * @param config    the config that is parameterizing this operation
      * @param filePath  the path of the file to be renamed
      * @param newName   the new name
      * @param overwrite whether to overwrite the target file if it already exists
@@ -146,9 +145,21 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
         Path source = resolveExistingPath(config, filePath);
         Path target = source.getParent().resolve(newName);
 
-        if (exists(config, target) && !overwrite)
+        if (exists(config, target))
         {
-            throw new IllegalArgumentException(format("'%s' cannot be renamed because '%s' already exists", source, target));
+            if (!overwrite)
+            {
+                throw new IllegalArgumentException(format("'%s' cannot be renamed because '%s' already exists", source, target));
+            }
+
+            try
+            {
+                fileSystem.delete(config, target.toString());
+            }
+            catch (Exception e)
+            {
+                throw exception(format("Exception was found deleting '%s' as part of renaming '%s'", target, source), e);
+            }
         }
 
         try
@@ -198,7 +209,7 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
      * Performs the base logic and delegates into {@link AbstractFtpCopyDelegate#doCopy(FileConnectorConfig, FileAttributes, Path, boolean, MuleEvent)}
      * to perform the actual copying logic
      *
-     * @param config the config that is parameterizing this operation
+     * @param config                the config that is parameterizing this operation
      * @param sourcePath            the path to be copied
      * @param target                the path to the target destination
      * @param overwrite             whether to overwrite existing target paths

@@ -41,9 +41,21 @@ public final class LocalRenameCommand extends LocalFileCommand implements Rename
         Path source = resolveExistingPath(config, filePath);
         Path target = source.getParent().resolve(newName);
 
-        if (Files.exists(target) && !overwrite)
+        if (Files.exists(target))
         {
-            throw new IllegalArgumentException(format("'%s' cannot be renamed because '%s' already exists", source, target));
+            if (!overwrite)
+            {
+                throw new IllegalArgumentException(format("'%s' cannot be renamed because '%s' already exists", source, target));
+            }
+
+            try
+            {
+                fileSystem.delete(config, target.toString());
+            }
+            catch (Exception e)
+            {
+                throw exception(format("Exception was found deleting '%s' as part of renaming '%s'", target, source), e);
+            }
         }
 
         try

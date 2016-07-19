@@ -94,7 +94,8 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     public void targetAlreadyExistsWithOverwrite() throws Exception
     {
         testHarness.createHelloWorldFile();
-        testHarness.write(RENAME_TO, "I was here first");
+        final String sourcePath = Paths.get(HELLO_PATH).getParent().resolve(RENAME_TO).toString();
+        testHarness.write(sourcePath, "I was here first");
 
         doRename(HELLO_PATH, true);
         assertRenamedFile();
