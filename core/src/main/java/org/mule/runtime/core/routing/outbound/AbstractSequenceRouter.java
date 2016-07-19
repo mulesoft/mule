@@ -41,7 +41,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }
 
-        if (enableCorrelation.doCorrelation(message))
+        if (enableCorrelation.doCorrelation(message.getCorrelation()))
         {
             // the correlationId will be set by the AbstractOutboundRouter
             event.setMessage(MuleMessage.builder(message).correlationGroupSize(routes.size()).build());

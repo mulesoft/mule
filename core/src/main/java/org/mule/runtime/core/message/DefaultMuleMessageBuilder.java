@@ -743,25 +743,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             }
         }
 
-        /**
-         * Find property by searching outbound and then inbound scopes in order.
-         * @param name name of the property to find
-         * @return value of the property or null if property is not found in either scope
-         */
-        @SuppressWarnings("unchecked")
-        private Serializable findProperty(String name)
-        {
-            Serializable result = getOutboundProperty(name);
-            if (result != null)
-            {
-                return result;
-            }
-            else
-            {
-                return getInboundProperty(name);
-            }
-        }
-
         @Override
         public Attributes getAttributes()
         {

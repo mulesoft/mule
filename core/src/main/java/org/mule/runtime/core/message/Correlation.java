@@ -15,6 +15,8 @@ import java.util.Optional;
 
 /**
  * Immutable container for correlation properties relative to a {@link MuleMessage}.
+ * <p>
+ * TODO MULE-10115 Review how correlation is implemented/achieved
  * 
  * @since 4.0
  */
