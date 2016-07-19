@@ -8,6 +8,7 @@
 package org.mule.module.launcher;
 
 import static org.junit.Assert.assertFalse;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.MediumTest;
 
@@ -15,9 +16,11 @@ import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 @MediumTest
+@Ignore("Synchronization is not a concern since java 7 (MULE-10107)")
 public class SynchronizedClassLoaderTestCase extends AbstractMuleTestCase
 {
 
@@ -71,6 +74,7 @@ public class SynchronizedClassLoaderTestCase extends AbstractMuleTestCase
             this.classLoader = classLoader;
         }
 
+        @Override
         public void run()
         {
             try
