@@ -6,9 +6,11 @@
  */
 package org.mule.extension.email.internal.retriever.pop3;
 
+import static org.mule.extension.email.internal.EmailConnector.TLS_CONFIGURATION;
 import static org.mule.extension.email.internal.EmailProtocol.POP3S;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.POP3S_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 import org.mule.extension.email.internal.retriever.AbstractRetrieverProvider;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
@@ -41,8 +43,7 @@ public class POP3SProvider extends AbstractRetrieverProvider<RetrieverConnection
      */
     @Parameter
     @Optional(defaultValue = POP3S_PORT)
-    @Summary("The port number of the mail server")
-    @Placement(tab = "General", group = "Connection", order = 2)
+    @Placement(group = CONNECTION, order = 2)
     private String port;
 
     /**
@@ -50,9 +51,9 @@ public class POP3SProvider extends AbstractRetrieverProvider<RetrieverConnection
      * Allows to create a TLS secured connections.
      */
     @Parameter
-    @Summary("TLS Context for the secure connection of SMTPS protocol")
-    @Placement(tab = "General", group = "Connection", order = 5)
-    @DisplayName("TLS Context Factory")
+    @Summary("TLS Configuration for the secure connection of the POP3S protocol")
+    @Placement(group = CONNECTION, order = 5)
+    @DisplayName(TLS_CONFIGURATION)
     private TlsContextFactory tlsContextFactory;
 
     /**

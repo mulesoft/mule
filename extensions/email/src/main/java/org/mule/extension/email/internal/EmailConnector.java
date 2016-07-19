@@ -29,4 +29,5 @@ import org.mule.runtime.extension.api.annotation.Extension;
 public class EmailConnector
 {
 
+    public static final String TLS_CONFIGURATION = "TLS Configuration";
 }

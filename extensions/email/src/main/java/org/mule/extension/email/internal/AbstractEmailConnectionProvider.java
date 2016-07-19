@@ -6,6 +6,9 @@
  */
 package org.mule.extension.email.internal;
 
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.GENERAL;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -23,17 +26,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractEmailConnectionProvider<T> implements ConnectionProvider<T>
 {
 
-    /**
-     * The socket connection timeout value. This attribute works in tandem with {@link #timeoutUnit}.
-     * <p>
-     * Defaults to {@code 5}
-     */
-    @Parameter
-    @Optional(defaultValue = "5")
-    @Placement(tab = "Advance", group = "Timeout Configuration", order = 2)
-    @Summary("Socket connection timeout value")
-    private int connectionTimeout;
-
+    private static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
     /**
      * The socket read timeout value. This attribute works in tandem with {@link #timeoutUnit}.
      * <p>
@@ -41,10 +34,9 @@ public abstract class AbstractEmailConnectionProvider<T> implements ConnectionPr
      */
     @Parameter
     @Optional(defaultValue = "5")
-    @Placement(tab = "Advance", group = "Timeout Configuration", order = 3)
+    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 3)
     @Summary("Socket read timeout")
     protected int readTimeout;
-
     /**
      * The socket write timeout value. This attribute works in tandem with {@link #timeoutUnit}.
      * <p>
@@ -52,9 +44,9 @@ public abstract class AbstractEmailConnectionProvider<T> implements ConnectionPr
      */
     @Parameter
     @Optional(defaultValue = "5")
-    @Placement(tab = "Advance", group = "Timeout Configuration", order = 4)
+    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 4)
+    @Summary("The socket write timeout value")
     protected int writeTimeout;
-
     /**
      * A {@link TimeUnit} which qualifies the {@link #connectionTimeout}, {@link #writeTimeout} and {@link #readTimeout}
      * attributes.
@@ -63,16 +55,26 @@ public abstract class AbstractEmailConnectionProvider<T> implements ConnectionPr
      */
     @Parameter
     @Optional(defaultValue = "SECONDS")
-    @Placement(tab = "Advance", group = "Timeout Configuration", order = 1)
+    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 1)
+    @Summary("Time unit to be used in the Timeout configurations")
     private TimeUnit timeoutUnit;
-
+    /**
+     * The socket connection timeout value. This attribute works in tandem with {@link #timeoutUnit}.
+     * <p>
+     * Defaults to {@code 5}
+     */
+    @Parameter
+    @Optional(defaultValue = "5")
+    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 2)
+    @Summary("Socket connection timeout value")
+    private int connectionTimeout;
     /**
      * An additional custom set of properties to configure the connection
      * session.
      */
     @Parameter
     @Optional
-    @Placement(tab = "Advance", group = "General")
+    @Placement(tab = ADVANCED, group = GENERAL)
     private Map<String, String> properties;
 
     /**

@@ -15,6 +15,7 @@ import org.mule.runtime.api.connection.ConnectionException;
  */
 public class EmailConnectionException extends ConnectionException
 {
+
     /**
      * Creates a new instance with the specified detail {@code message}
      *

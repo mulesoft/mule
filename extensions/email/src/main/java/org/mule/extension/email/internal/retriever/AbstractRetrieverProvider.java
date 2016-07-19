@@ -6,9 +6,9 @@
  */
 package org.mule.extension.email.internal.retriever;
 
+import org.mule.extension.email.api.EmailConnectionSettings;
 import org.mule.extension.email.internal.AbstractEmailConnection;
 import org.mule.extension.email.internal.AbstractEmailConnectionProvider;
-import org.mule.extension.email.api.EmailConnectionSettings;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionValidationResult;

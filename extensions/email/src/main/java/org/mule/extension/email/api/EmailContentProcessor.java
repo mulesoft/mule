@@ -9,6 +9,7 @@ package org.mule.extension.email.api;
 import static javax.mail.Part.ATTACHMENT;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT;
 import static org.mule.runtime.core.util.IOUtils.toByteArray;
+
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -36,18 +37,6 @@ public class EmailContentProcessor
     private final StringJoiner body = new StringJoiner("\n");
 
     /**
-     * Factory method to get a new instance of {@link EmailContentProcessor}
-     * and process a {@link Message}.
-     *
-     * @param message the {@link Message} to be processed.
-     * @return a new {@link EmailContentProcessor} instance.
-     */
-    public static EmailContentProcessor process(Message message)
-    {
-        return new EmailContentProcessor(message);
-    }
-
-    /**
      * Creates an instance and process the message content.
      * <p>
      * Hided constructor, can only get a new instance out of this class
@@ -58,6 +47,18 @@ public class EmailContentProcessor
     private EmailContentProcessor(Message message)
     {
         processPart(message);
+    }
+
+    /**
+     * Factory method to get a new instance of {@link EmailContentProcessor}
+     * and process a {@link Message}.
+     *
+     * @param message the {@link Message} to be processed.
+     * @return a new {@link EmailContentProcessor} instance.
+     */
+    public static EmailContentProcessor process(Message message)
+    {
+        return new EmailContentProcessor(message);
     }
 
     /**

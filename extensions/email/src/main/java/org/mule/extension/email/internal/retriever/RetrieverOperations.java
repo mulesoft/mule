@@ -40,18 +40,18 @@ public class RetrieverOperations
     /**
      * List all the emails in the configured mailBoxFolder that match with the specified {@code matchWith} criteria.
      *
-     * @param config        the {@link RetrieverConfiguration} associated to this operation.
-     * @param connection    the corresponding {@link RetrieverConnection} instance.
-     * @param mailboxFolder the mailbox folder where the emails are going to be fetched
-     * @param matcher       a {@link EmailPredicateBuilder} used to filter the output emails.
+     * @param config        The {@link RetrieverConfiguration} associated to this operation.
+     * @param connection    The corresponding {@link RetrieverConnection} instance.
+     * @param mailboxFolder Mailbox folder where the emails are going to be fetched
+     * @param matcher       Email Matcher which gives the capability of filter the retrieved emails
      * @return a {@link List} of {@link MuleMessage} carrying all the emails and it's corresponding attributes.
      */
     //TODO: ADD PAGINATION SUPPORT WHEN AVAILABLE
     @Summary("List all the emails in the given Mailbox Folder")
     public List<MuleMessage> list(@UseConfig RetrieverConfiguration config,
                                   @Connection RetrieverConnection connection,
-                                  @Optional(defaultValue = INBOX_FOLDER) @Summary("Mailbox folder where the emails are going to be fetched") String mailboxFolder,
-                                  @Optional @Summary("Email Matcher which gives the capability of filter the retrieved emails") @DisplayName("Email Matcher") EmailPredicateBuilder matcher)
+                                  @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
+                                  @Optional EmailPredicateBuilder matcher)
     {
         return listCommand.list(connection, mailboxFolder, config.isEagerlyFetchContent(), buildMatcher(matcher));
     }
@@ -69,23 +69,23 @@ public class RetrieverOperations
      * <p>
      * The name of the email file is composed by the subject and the received date of the email.
      *
-     * @param connection     the associated {@link RetrieverConnection}.
-     * @param muleMessage    the incoming {@link MuleMessage}.
-     * @param mailboxFolder  the name of the folder where the email(s) is going to be stored.
-     * @param localDirectory the localDirectory where the emails are going to be stored.
-     * @param fileName       the name of the file that is going to be stored. The operation will append the email number and received date in the end.
-     * @param emailId        the optional number of the email to be stored. By default the email is taken from the incoming {@link MuleMessage}.
-     * @param overwrite      if should overwrite a file that already exist or not.
+     * @param connection     The associated {@link RetrieverConnection}.
+     * @param muleMessage    The incoming {@link MuleMessage}.
+     * @param mailboxFolder  Name of the folder where the email(s) is going to be stored.
+     * @param localDirectory Local directory where the emails are going to be stored.
+     * @param fileName       Name of the file that is going to be stored. The operation will append the email number and received date in the end.
+     * @param emailId        Email ID Number of the email to store. By default the email is taken from the incoming {@link MuleMessage}.
+     * @param overwrite      Whether to overwrite a file that already exist
      */
     // TODO: annotated the parameter localDirectory with @Path when available
-    @Summary("Stores an specified email")
+    @Summary("Stores an specified email into a local directory")
     public void store(@Connection RetrieverConnection connection,
                       MuleMessage muleMessage,
-                      @Summary("Local directory to storage the emails") String localDirectory,
-                      @Optional(defaultValue = INBOX_FOLDER) @Summary("Mailbox folder where the emails are going to be fetched") String mailboxFolder,
-                      @Optional @Summary("Name of the file that is going to be stored. The operation will append the email number and received date in the end.") String fileName,
-                      @Optional @Summary("Number of the email to be stored. If not provided it will be taken from the incoming Mule Message") @DisplayName("Email ID") Integer emailId,
-                      @Optional(defaultValue = "false") @Summary("Indicates if should overwrite a file that already exist or not") @DisplayName("Should Overwrite") boolean overwrite)
+                      String localDirectory,
+                      @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
+                      @Optional String fileName,
+                      @Optional @Summary("Email ID Number of the email to delete") @DisplayName("Email ID") Integer emailId,
+                      @Optional(defaultValue = "false") @DisplayName("Should Overwrite") boolean overwrite)
     {
         storeCommand.store(connection, muleMessage, mailboxFolder, localDirectory, fileName, emailId, overwrite);
     }
@@ -105,16 +105,16 @@ public class RetrieverOperations
      * If no {@code emailId} is provided and no emails are found in the incoming {@link MuleMessage} this operation will
      * fail and no email is going to be erased from the folder, not even the ones marked as DELETED previously.
      *
-     * @param message       the incoming {@link MuleMessage}.
-     * @param connection    the corresponding {@link RetrieverConnection} instance.
-     * @param mailboxFolder the folder where the emails are going to be deleted
-     * @param emailId       an optional email number to look up in the folder, if there is no email in the incoming {@link MuleMessage}.
+     * @param message       The incoming {@link MuleMessage}.
+     * @param connection    The corresponding {@link RetrieverConnection} instance.
+     * @param mailboxFolder Mailbox folder where the emails are going to be deleted
+     * @param emailId       Email ID Number of the email to delete, if there is no email in the incoming {@link MuleMessage}.
      */
     @Summary("Deletes an email from the given Mailbox Folder")
     public void delete(MuleMessage message,
                        @Connection RetrieverConnection connection,
-                       @Optional(defaultValue = INBOX_FOLDER) @Summary("Mailbox folder where the emails are going to be deleted") String mailboxFolder,
-                       @Optional @Summary("Email ID Number of the email to deleted. If not provided it will be taken from the incoming Mule Message") @DisplayName("Email ID") Integer emailId)
+                       @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
+                       @Optional @Summary("Email ID Number of the email to delete") @DisplayName("Email ID") Integer emailId)
     {
         deleteCommand.delete(message, connection, mailboxFolder, emailId);
     }

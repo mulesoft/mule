@@ -8,6 +8,7 @@ package org.mule.extension.email.internal.retriever.imap;
 
 import static org.mule.extension.email.internal.EmailProtocol.IMAP;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.IMAP_PORT;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 import org.mule.extension.email.internal.retriever.AbstractRetrieverProvider;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
@@ -18,7 +19,6 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * A {@link ConnectionProvider} that returns instances of imap based {@link RetrieverConnection}s.
@@ -35,8 +35,7 @@ public class IMAPProvider extends AbstractRetrieverProvider<RetrieverConnection>
      */
     @Parameter
     @Optional(defaultValue = IMAP_PORT)
-    @Summary("The port number of the mail server")
-    @Placement(tab = "General", group = "Connection", order = 2)
+    @Placement(group = CONNECTION, order = 2)
     private String port;
 
     /**

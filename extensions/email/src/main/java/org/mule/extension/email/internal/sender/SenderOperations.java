@@ -33,12 +33,11 @@ import java.util.Map;
 public class SenderOperations
 {
 
+    // TODO: REMOVE WHEN THERE IS DEFAULT PAYLOAD IN THE OPTIONAL ANNOTATION - MULE-9918
+    private static final String PAYLOAD = "#[payload]";
     private final SendCommand sendOperation = new SendCommand();
     private final ForwardCommand forwardCommand = new ForwardCommand();
     private final ReplyCommand replyOperation = new ReplyCommand();
-
-    // TODO: REMOVE WHEN THERE IS DEFAULT PAYLOAD IN THE OPTIONAL ANNOTATION - MULE-9918
-    private static final String PAYLOAD = "#[payload]";
 
     /**
      * Sends an email message. The message will be sent to all recipient {@code toAddresses}, {@code ccAddresses},
@@ -48,26 +47,26 @@ public class SenderOperations
      * it's content type. If no content is specified then the incoming payload it's going to be converted into plain
      * text if possible.
      *
-     * @param connection    the connection used to send the message
-     * @param configuration the configuration of the connector
-     * @param content       the content of the message
-     * @param subject       the subject of the message, if none {@code "[No Subject]"} is the default value
-     * @param toAddresses   the "To" (primary) recipients.
-     * @param ccAddresses   the "Cc" (carbon copy) recipients.
-     * @param bccAddresses  the "Bcc" (blind carbon copy) recipients.
-     * @param headers       custom headers of the message.
-     * @param attachments   the attachments bounded to the message.
+     * @param connection    Connection to use to send the message
+     * @param configuration Configuration of the connector
+     * @param content       Content of the message
+     * @param subject       Subject of the email message to send. If not set, "[No Subject]" will be used
+     * @param toAddresses   List of "To" (primary) email message recipients
+     * @param ccAddresses   List of "Cc" (carbon copy) email message recipients
+     * @param bccAddresses  List of "Bcc" (blind carbon copy) email message recipients
+     * @param headers       Map of custom headers that are bounded with the email message
+     * @param attachments   Attachments that are bounded with the email message
      */
     @Summary("Sends an email message")
     public void send(@Connection SenderConnection connection,
                      @UseConfig SMTPConfiguration configuration,
                      EmailContent content, // TODO: create a transformer from string to EmailContent when the sdk have support for it - MULE-9181.
-                     @Summary("Subject of the email message to send. If not set, \"[No Subject]\" will be used") @Optional(defaultValue = "[No Subject]") String subject,
-                     @Summary("List of primary email message recipients") List<String> toAddresses,
-                     @Summary("List of \"Cc\" (carbon copy) email message recipients") @Optional List<String> ccAddresses,
-                     @Summary("List of \"Bcc\" (blind carbon copy) email message recipients") @Optional List<String> bccAddresses,
-                     @Summary("List of \"Cc\" (carbon copy) email message recipients") @DisplayName("Additional Headers") @Optional Map<String, String> headers,
-                     @Summary("Map of headers that are bounded with the email message") @Optional List<EmailAttachment> attachments)
+                     @Optional(defaultValue = "[No Subject]") String subject,
+                     List<String> toAddresses,
+                     @Optional List<String> ccAddresses,
+                     @Optional List<String> bccAddresses,
+                     @DisplayName("Additional Headers") @Optional Map<String, String> headers,
+                     @Optional List<EmailAttachment> attachments)
     {
         sendOperation.send(connection,
                            content,
@@ -87,27 +86,27 @@ public class SenderOperations
      * This operation expects an email in the incoming {@code muleMessage}
      * to take the content in order forward, if no email message is found this operation will fail.
      *
-     * @param connection    the connection used to send the message.
-     * @param configuration the configuration of the connector.
-     * @param muleMessage   the incoming {@link MuleMessage}.
-     * @param content       the content of the message to be forwarded
-     * @param subject       the subject of the email message, if not set, the subject of the forwarded email message
+     * @param connection    Connection to use to forward the message.
+     * @param configuration Configuration of the connector.
+     * @param muleMessage   The incoming {@link MuleMessage}.
+     * @param content       Content of the message to be forwarded
+     * @param subject       Subject of the email message to forward. If not set, the subject of the forwarded message
      *                      will be used
-     * @param toAddresses   the "To" (primary) recipients.
-     * @param ccAddresses   the "Cc" (carbon copy) recipients.
-     * @param bccAddresses  the "Bcc" (blind carbon copy) recipients.
-     * @param headers       custom headers of the message.
+     * @param toAddresses   List of "To" (primary) email message recipients
+     * @param ccAddresses   List of "Cc" (carbon copy) email message recipients
+     * @param bccAddresses  List of "Bcc" (blind carbon copy) email message recipients
+     * @param headers       Map of custom headers that are bounded with the email message
      */
     @Summary("Forwards an email message")
     public void forward(@Connection SenderConnection connection,
                         @UseConfig SMTPConfiguration configuration,
                         MuleMessage muleMessage,
-                        @Optional @Summary("Optional content of the message to be forwarded") @DisplayName("Email Content") EmailContent content,
-                        @Optional @Summary("Subject of the email message to forward. If not set, the subject of the forwarded message will be used") String subject,
-                        @Summary("List of primary email message recipients") List<String> toAddresses,
-                        @Summary("List of \"Cc\" (carbon copy) email message recipients") @Optional List<String> ccAddresses,
-                        @Summary("List of \"Bcc\" (blind carbon copy) email message recipients") @Optional List<String> bccAddresses,
-                        @Summary("Map of headers that are bounded with the email message") @DisplayName("Additional Headers") @Optional Map<String, String> headers)
+                        @Optional @DisplayName("Email Content") EmailContent content,
+                        @Optional String subject,
+                        List<String> toAddresses,
+                        @Optional List<String> ccAddresses,
+                        @Optional List<String> bccAddresses,
+                        @DisplayName("Additional Headers") @Optional Map<String, String> headers)
     {
         forwardCommand.forward(connection,
                                muleMessage,
@@ -128,23 +127,23 @@ public class SenderOperations
      * This operation expects an email in the incoming {@code muleMessage} to reply to, if no email message is found
      * this operation will fail.
      *
-     * @param connection    the connection used to send the message.
-     * @param configuration the configuration of the connector.
-     * @param muleMessage   the incoming {@link MuleMessage}.
-     * @param content       the content of the reply message
-     * @param subject       the subject of the email message, if not set, the subject of the replied email message
+     * @param connection    Connection to use to reply the message.
+     * @param configuration Configuration of the connector.
+     * @param muleMessage   The incoming {@link MuleMessage}.
+     * @param content       Content of the reply message
+     * @param subject       Subject of the email message, if not set, the subject of the replied email message
      *                      will be used
-     * @param replyToAll    if this reply should be sent to all recipients of this message
-     * @param headers       custom headers of the message.
+     * @param headers       Map of custom headers that are bounded with the email message
+     * @param replyToAll    Whether this reply should be sent to all recipients of this message
      */
     @Summary("Replies an email message")
     public void reply(@Connection SenderConnection connection,
                       @UseConfig SMTPConfiguration configuration,
                       MuleMessage muleMessage,
-                      @Summary("Content of the message to be forwarded") @DisplayName("Email Content") EmailContent content,
-                      @Optional @Summary("Subject of the email message to reply. If not set, the subject of the replied message will be used") String subject,
-                      @Optional @Summary("Map of headers that are bounded with the email message") Map<String, String> headers,
-                      @Optional(defaultValue = "false") @Summary("Indicates if the message must be send to all the recipients of the email message") Boolean replyToAll)
+                      @DisplayName("Email Content") EmailContent content,
+                      @Optional String subject,
+                      @Optional @DisplayName("Additional Headers") Map<String, String> headers,
+                      @Optional(defaultValue = "false") Boolean replyToAll)
     {
         replyOperation.reply(connection,
                              muleMessage,

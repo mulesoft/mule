@@ -14,7 +14,6 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * Configuration for operations that are performed through the IMAP (Internet Message Access Protocol) protocol.
@@ -25,16 +24,14 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 @Providers({IMAPProvider.class, IMAPSProvider.class})
 @Configuration(name = "imap")
 @DisplayName("IMAP")
-@Summary("Configuration for operations that are performed through the IMAP protocol")
 public class IMAPConfiguration implements RetrieverConfiguration
 {
 
     /**
-     * Indicates whether the retrieved emails should be opened and read. The default value is {@code true}.
+     * Indicates whether the retrieved emails should be opened and read. The default value is "true".
      */
     @Parameter
     @Optional(defaultValue = "true")
-    @Summary("Indicates whether the retrieved emails should be opened and read")
     private boolean eagerlyFetchContent;
 
     /**

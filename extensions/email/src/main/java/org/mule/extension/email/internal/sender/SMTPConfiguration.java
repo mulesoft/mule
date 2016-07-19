@@ -6,6 +6,9 @@
  */
 package org.mule.extension.email.internal.sender;
 
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.GENERAL;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -16,7 +19,6 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import javax.inject.Inject;
 
@@ -29,7 +31,6 @@ import javax.inject.Inject;
 @Providers({SMTPProvider.class, SMTPSProvider.class})
 @Configuration(name = "smtp")
 @DisplayName("SMTP")
-@Summary("Configuration for operations that are performed through the SMTP protocol")
 public class SMTPConfiguration implements Initialisable
 {
 
@@ -37,12 +38,11 @@ public class SMTPConfiguration implements Initialisable
     private MuleContext muleContext;
 
     /**
-     * The from address. The person that is going to send the messages.
+     * The "From" sender address. The person that is going to send the messages.
      */
     @Parameter
     @Optional
-    @Summary("The \"From\" sender address.")
-    @Placement(group = "General")
+    @Placement(group = GENERAL)
     private String from;
 
     /**
@@ -51,9 +51,7 @@ public class SMTPConfiguration implements Initialisable
      */
     @Parameter
     @Optional
-    @Summary("Default character encoding to be used in all the messages. If not specified, the default charset in " +
-             "the mule configuration will be used")
-    @Placement(group = "Advance")
+    @Placement(group = ADVANCED)
     private String defaultCharset;
 
     /**
