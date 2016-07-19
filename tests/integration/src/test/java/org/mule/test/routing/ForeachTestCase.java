@@ -6,16 +6,20 @@
  */
 package org.mule.test.routing;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
-
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MessagingException;
@@ -38,11 +42,9 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-
 public class ForeachTestCase extends FunctionalTestCase
 {
+
     @Rule
     public SystemProperty systemProperty = new SystemProperty("batch.size", "3");
 
@@ -113,12 +115,12 @@ public class ForeachTestCase extends FunctionalTestCase
 
         MuleMessage message = MuleMessage.builder().payload("message payload").addOutboundProperty("names", names).build();
         MuleMessage result = flowRunner("minimal-config-expression").withPayload("message payload")
-                                                                    .withInboundProperty("names", names)
-                                                                    .run()
-                                                                    .getMessage();
+                .withInboundProperty("names", names)
+                .run()
+                .getMessage();
 
         assertThat(result.getPayload(), instanceOf(String.class));
-        assertThat(((Collection<?>) message.getOutboundProperty("names")), hasSize(names.size()));
+        assertThat((message.getOutboundProperty("names")), hasSize(names.size()));
 
         MuleMessage out = client.request("test://out", getTestTimeoutSecs());
         assertThat(out.getPayload(), instanceOf(String.class));
@@ -243,9 +245,9 @@ public class ForeachTestCase extends FunctionalTestCase
 
         MuleMessage message = MuleMessage.builder().payload("message payload").addOutboundProperty("names", names).build();
         MuleMessage result = flowRunner("map-expression-config").withPayload("message payload")
-                                                                .withInboundProperty("names", names)
-                                                                .run()
-                                                                .getMessage();
+                .withInboundProperty("names", names)
+                .run()
+                .getMessage();
 
         assertThat(result.getPayload(), instanceOf(String.class));
         assertThat(((Collection<?>) message.getOutboundProperty("names")), hasSize(names.size()));
@@ -254,7 +256,7 @@ public class ForeachTestCase extends FunctionalTestCase
 
     static String sampleXml = "<PurchaseOrder>" + "<Address><Name>Ellen Adams</Name></Address>" + "<Items>"
                               + "<Item PartNumber=\"872-AA\"><Price>140</Price></Item>"
-                        + "<Item PartNumber=\"926-AA\"><Price>35</Price></Item>" + "</Items>" + "</PurchaseOrder>";
+                              + "<Item PartNumber=\"926-AA\"><Price>35</Price></Item>" + "</Items>" + "</PurchaseOrder>";
 
     @Test
     public void xmlUpdate() throws Exception
@@ -262,7 +264,8 @@ public class ForeachTestCase extends FunctionalTestCase
         xpath(sampleXml);
     }
 
-    private void xpath(Object payload) throws Exception {
+    private void xpath(Object payload) throws Exception
+    {
         MuleEvent result = flowRunner("process-order-update").withPayload(payload).run();
         int total = result.getFlowVariable("total");
         assertThat(total, is(greaterThan(0)));
@@ -338,9 +341,9 @@ public class ForeachTestCase extends FunctionalTestCase
         assertSame(payload, resultPayload);
 
         MuleMessage out;
-        for(int i = 0; i < payload.size(); i++)
+        for (int i = 0; i < payload.size(); i++)
         {
-            for(int j = 0; j < payload.get(i).size(); j++)
+            for (int j = 0; j < payload.get(i).size(); j++)
             {
                 out = client.request("test://out", getTestTimeoutSecs());
                 assertThat(out.getPayload(), instanceOf(String.class));
@@ -361,9 +364,9 @@ public class ForeachTestCase extends FunctionalTestCase
         assertSame(payload, resultPayload);
 
         MuleMessage out;
-        for(int i = 0; i < payload.size(); i++)
+        for (int i = 0; i < payload.size(); i++)
         {
-            for(int j = 0; j < payload.get(i).size(); j++)
+            for (int j = 0; j < payload.get(i).size(); j++)
             {
                 out = client.request("test://out", getTestTimeoutSecs());
                 assertThat("The nested counters are not consistent.", out.getOutboundProperty("j"), is(j + 1));
@@ -426,7 +429,7 @@ public class ForeachTestCase extends FunctionalTestCase
     {
         runFlow("mvel-map");
 
-        Map<String,String> m = new HashMap<>();
+        Map<String, String> m = new HashMap<>();
         m.put("key1", "val1");
         m.put("key2", "val2");
 
@@ -446,7 +449,7 @@ public class ForeachTestCase extends FunctionalTestCase
     {
         runFlow("mvel-collection");
 
-        Map<String,String> m = new HashMap<>();
+        Map<String, String> m = new HashMap<>();
         m.put("key1", "val1");
         m.put("key2", "val2");
 
@@ -464,19 +467,35 @@ public class ForeachTestCase extends FunctionalTestCase
     @Test
     public void mvelArray() throws Exception
     {
-        runFlow("mvel-array");
+        final String flowName = "mvel-array";
+        runFlow(flowName);
+        assertIterable(flowName);
+    }
 
+    private void assertIterable(String flowName) throws Exception
+    {
         MuleMessage out = client.request("test://out", getTestTimeoutSecs());
         assertThat(out.getPayload(), instanceOf(String.class));
         String outPayload = (String) out.getPayload();
 
         assertThat(outPayload, is("foo"));
-        FlowAssert.verify("mvel-array");
+        FlowAssert.verify(flowName);
 
         out = client.request("test://out", getTestTimeoutSecs());
         assertThat(out.getPayload(), instanceOf(String.class));
         outPayload = (String) out.getPayload();
         assertThat(outPayload, is("bar"));
+    }
+
+    @Test
+    public void expressionIterable() throws Exception
+    {
+        Iterable<String> iterable = mock(Iterable.class);
+        when(iterable.iterator()).thenReturn(asList("foo", "bar").iterator());
+        final String flowName = "expression-iterable";
+        flowRunner(flowName).withFlowVariable("iterable", iterable).run();
+
+        assertIterable(flowName);
     }
 
     @Test

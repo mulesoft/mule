@@ -16,7 +16,6 @@ import org.mule.runtime.core.expression.ExpressionConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,13 +65,10 @@ public class ExpressionSplitter extends AbstractSplitter
         {
             result = Arrays.asList((Object[]) result);
         }
-        if (result instanceof Collection<?>)
+        if (result instanceof Iterable<?>)
         {
             List<MuleEvent> messages = new ArrayList<>();
-            for (Object object : (Collection<?>) result)
-            {
-                messages.add(new DefaultMuleEvent(MuleMessage.builder().payload(object).build(), event));
-            }
+            ((Iterable<?>) result).iterator().forEachRemaining(value -> messages.add(new DefaultMuleEvent(MuleMessage.builder().payload(value).build(), event)));
             return messages;
         }
         else if (result instanceof Map<?, ?>)

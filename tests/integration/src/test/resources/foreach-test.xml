@@ -212,12 +212,22 @@
 
     <flow name="mvel-array">
         <foreach collection="#[{'foo', 'bar'}]">
-            <test:component/>
-            <test:assert expression="#[payload instanceof String]"  message="hoal"/>
-            <logger level="ERROR" message="message-#[counter]: #[payload]"/>
-            <test:queue name="out"/>
+            <flow-ref name="assertIterable" />
         </foreach>
     </flow>
+
+    <flow name="expression-iterable">
+        <foreach collection="#[iterable]">
+            <flow-ref name="assertIterable" />
+        </foreach>
+    </flow>
+    
+    <sub-flow name="assertIterable">
+        <test:component/>
+        <test:assert expression="#[payload instanceof String]"  message="hoal"/>
+        <logger level="ERROR" message="message-#[counter]: #[payload]"/>
+        <test:queue name="out"/>
+    </sub-flow>
     
     <flow name="mvel-error">
         <foreach collection="#[invalid]">
