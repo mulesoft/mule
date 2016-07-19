@@ -24,6 +24,10 @@ import java.util.Set;
  */
 public class MuleSharedDomainClassLoader extends AbstractArtifactClassLoader implements ArtifactClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     public static final String DOMAIN_LIBRARY_FOLDER = "lib";
     public static final String OLD_DOMAIN_LIBRARY_FOLDER = DOMAIN_LIBRARY_FOLDER + File.separator + "shared";
