@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -102,7 +103,7 @@ public class HttpResponseToMuleEvent
                     throw new MessagingException(muleEvent, e);
                 }
             }
-            else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toString()))
+            else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()))
             {
                 payload = HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding);
             }
@@ -112,9 +113,23 @@ public class HttpResponseToMuleEvent
         String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
 
         // Setting uniqueId and rootId in order to correlate messages from request to response generated.
-        MuleMessage message = MuleMessage.builder().payload(muleEvent.getMessage().getPayload()).id(requestMessageId)
-                .rootId(requestMessageRootId).inboundProperties(inboundProperties).inboundAttachments
-                        (inboundAttachments).mediaType(muleEvent.getMessage().getDataType().getMediaType()).build();
+        final Builder builder = MuleMessage.builder()
+                                         .payload(muleEvent.getMessage().getPayload())
+                                         .id(requestMessageId)
+                                         .rootId(requestMessageRootId)
+                                         .inboundProperties(inboundProperties)
+                                         .inboundAttachments(inboundAttachments);
+        
+        if (StringUtils.isEmpty(responseContentType))
+        {
+            builder.mediaType(muleEvent.getMessage().getDataType().getMediaType());
+        }
+        else
+        {
+            builder.mediaType(MediaType.parse(responseContentType));
+        }
+        
+        MuleMessage message = builder.build();
 
         muleEvent.setMessage(message);
         setResponsePayload(payload, muleEvent);
@@ -132,7 +147,11 @@ public class HttpResponseToMuleEvent
 
         for (String headerName : response.getHeaderNames())
         {
-            properties.put(headerName, getHeaderValueToProperty(response, headerName));
+            // Content-Type was already processed
+            if (!CONTENT_TYPE.equalsIgnoreCase(headerName))
+            {
+                properties.put(headerName, getHeaderValueToProperty(response, headerName));
+            }
         }
 
         properties.put(HTTP_STATUS_PROPERTY, response.getStatusCode());

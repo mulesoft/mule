@@ -69,7 +69,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
         event.removeFlowVariable(MULE_REMOTE_SYNC_PROPERTY);
 
         event.setMessage(MuleMessage.builder(event.getMessage())
-                                    .removeOutboundProperty(MULE_REPLY_TO_PROPERTY)
+                                    .replyTo(null)
                                     .removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY)
                                     .build());
 

@@ -19,7 +19,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.routing.AbstractRoutingStrategy;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 
 import java.util.HashMap;
@@ -56,8 +55,6 @@ public final class EndpointMulticastingRouter extends MulticastingRouter
             logger.debug("Uri before parsing is: " + uri);
         }
 
-        message = AbstractRoutingStrategy.propagateMagicProperties(message);
-
         if (!parser.isContainsTemplate(uri))
         {
             logger.debug("Uri does not contain template(s)");
@@ -65,7 +62,7 @@ public final class EndpointMulticastingRouter extends MulticastingRouter
         }
         else
         {
-            Map<String, Object> props = new HashMap<String, Object>();
+            Map<String, Object> props = new HashMap<>();
             // Also add the endpoint properties so that users can set fallback values
             // when the property is not set on the event
             props.putAll(ep.getProperties());

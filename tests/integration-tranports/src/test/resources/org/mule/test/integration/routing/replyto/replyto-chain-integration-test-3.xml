@@ -28,7 +28,7 @@
         <jms:inbound-endpoint queue="pojo3" exchange-pattern="one-way"/>
         <echo-component/>
         <jms:outbound-endpoint queue="pojo4" exchange-pattern="one-way">
-            <set-property propertyName="MULE_REPLYTO" value="jms://response"/>
+            <custom-transformer class="org.mule.test.integration.routing.replyto.ReplyToChainIntegration3TestCase$SetReplyTo"/>
         </jms:outbound-endpoint>
     </flow>
 

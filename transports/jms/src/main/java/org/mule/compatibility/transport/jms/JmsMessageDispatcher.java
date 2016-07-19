@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.jms;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.util.NumberUtils.toInt;
+
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -19,7 +20,6 @@ import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -567,7 +567,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             if (tempReplyTo == null)
             {
                 //It may be a Mule URI or global endpoint Ref
-                tempReplyTo = event.getMessage().getOutboundProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+                tempReplyTo = event.getMessage().getReplyTo();
                 if (tempReplyTo != null)
                 {
                     int i = tempReplyTo.toString().indexOf("://");

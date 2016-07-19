@@ -23,7 +23,7 @@
     <flow name="requesterContentTypeServer" >
         <http:inbound-endpoint address="http://localhost:${httpPort}/requestServer"/>
 
-        <set-payload value="#[message.inboundProperties['Content-Type']]"/>
+        <set-payload value="#[message.dataType.mediaType.toRfcString()]"/>
     </flow>
 
 </mule>

@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.cxf;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
+import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -45,11 +47,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
@@ -213,11 +217,11 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        String ct = null;
+        MediaType ct = null;
 
         if (wsdlQueryHandler.isRecognizedQuery(wsdlUri, ctxUri, ei))
         {
-            ct = wsdlQueryHandler.getResponseContentType(wsdlUri, ctxUri);
+            ct = parse(wsdlQueryHandler.getResponseContentType(wsdlUri, ctxUri));
             wsdlQueryHandler.writeResponse(wsdlUri, ctxUri, ei, out);
             out.flush();
         }
@@ -225,16 +229,14 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         String message;
         if (ct == null)
         {
-            ct = "text/plain";
+            ct = TEXT;
             message = "No query handler found for URL.";
         }
         else
         {
             message = out.toString();
         }
-        final String finalCt = ct;
-        MuleMessage resultMessage = MuleMessage.builder(event.getMessage()).payload(message).mediaType(XML)
-                .addOutboundProperty(CONTENT_TYPE, finalCt).build();
+        MuleMessage resultMessage = MuleMessage.builder(event.getMessage()).payload(message).mediaType(ct).build();
         event.setMessage(resultMessage);
 
         return event;
@@ -322,10 +324,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         final MuleMessage muleReqMsg = event.getMessage();
         String method = muleReqMsg.getInboundProperty(HTTP_METHOD_PROPERTY);
 
-        String ct = muleReqMsg.getInboundProperty(CONTENT_TYPE);
-        if (ct != null)
+        MediaType ct = muleReqMsg.getDataType().getMediaType();
+        if (!ct.matches(ANY))
         {
-            m.put(Message.CONTENT_TYPE, ct);
+            m.put(Message.CONTENT_TYPE, ct.toRfcString());
         }
 
         String path = requestPropertyManager.getRequestPath(event.getMessage());
@@ -449,7 +451,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             return null;
         }
 
-        MuleMessage.Builder builder = MuleMessage.builder(responseEvent.getMessage());
+        final MuleMessage message = responseEvent.getMessage();
+        MuleMessage.Builder builder = MuleMessage.builder(message);
 
         BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
         if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
@@ -461,7 +464,15 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
         else
         {
-            builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
+            final Optional<Charset> charset = message.getDataType().getMediaType().getCharset();
+            if (charset.isPresent())
+            {
+                builder.payload(getResponseOutputHandler(exchange)).mediaType(XML.withCharset(charset.get()));
+            }
+            else
+            {
+                builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
+            }
         }
 
         // Handle a fault if there is one.
@@ -470,7 +481,15 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         {
             if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay())
             {
-                builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
+                final Optional<Charset> charset = message.getDataType().getMediaType().getCharset();
+                if (charset.isPresent())
+                {
+                    builder.payload(getResponseOutputHandler(exchange)).mediaType(XML.withCharset(charset.get()));
+                }
+                else
+                {
+                    builder.payload(getResponseOutputHandler(exchange)).mediaType(XML);
+                }
             }
             Exception ex = faultMsg.getContent(Exception.class);
             if (ex != null)

@@ -11,9 +11,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -74,7 +74,7 @@ public class HttpListenerLaxContentTypeTestCase extends AbstractHttpTestCase
 
     private void assertInvalidContentTypeHeader(HttpResponse response)
     {
-        Header contentTypeHeader = response.getFirstHeader(CONTENT_TYPE_PROPERTY);
+        Header contentTypeHeader = response.getFirstHeader(CONTENT_TYPE);
         assertThat(contentTypeHeader, is(notNullValue()));
         assertThat(contentTypeHeader.getValue(), is("invalidMimeType"));
     }

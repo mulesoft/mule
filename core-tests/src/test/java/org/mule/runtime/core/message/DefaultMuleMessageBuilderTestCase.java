@@ -425,9 +425,9 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
         assertThat(message.getDataType(), is(TEXT_STRING));
         assertThat(message.getAttributes(), is(TEST_ATTR));
         assertThat(message.getMessageRootId(), equalTo("1"));
-        assertThat(message.getCorrelationId(), equalTo("2"));
-        assertThat(message.getCorrelationGroupSize(), equalTo(3));
-        assertThat(message.getCorrelationSequence(), equalTo(4));
+        assertThat(message.getCorrelation().getId().get(), equalTo("2"));
+        assertThat(message.getCorrelation().getGroupSize().get(), equalTo(3));
+        assertThat(message.getCorrelation().getSequence().get(), equalTo(4));
         assertThat(message.getReplyTo(), is(REPLY_TO));
     }
 

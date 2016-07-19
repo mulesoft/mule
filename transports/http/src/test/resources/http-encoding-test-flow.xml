@@ -30,7 +30,7 @@
     <flow name="testComponent">
         <http:inbound-endpoint ref="clientEndpoint">
             <transports:response>
-                <set-property propertyName="content-type" value="text/baz;charset=UTF-16BE"/>
+                <custom-transformer class="org.mule.compatibility.transport.http.functional.HttpEncodingFunctionalTestCase$SetMediaTypeBazUtf16BE"/>
             </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
@@ -39,7 +39,7 @@
     <flow name="testComponent.US-ASCII">
         <http:inbound-endpoint ref="clientEndpoint.US-ASCII">
             <transports:response>
-                <set-property propertyName="Content-Type" value="text/plain;charset=US-ASCII"/>
+                <custom-transformer class="org.mule.compatibility.transport.http.functional.HttpEncodingFunctionalTestCase$SetMediaTypePlainAscii"/>
             </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
@@ -48,7 +48,7 @@
     <flow name="testComponent.UTF-8">
         <http:inbound-endpoint ref="clientEndpoint.UTF-8">
             <transports:response>
-                <set-property propertyName="Content-Type" value="text/plain;charset=UTF-8"/>
+                <custom-transformer class="org.mule.compatibility.transport.http.functional.HttpEncodingFunctionalTestCase$SetMediaTypePlainUtf8"/>
             </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
@@ -57,7 +57,7 @@
     <flow name="testComponent.Shift_JIS">
         <http:inbound-endpoint ref="clientEndpoint.Shift_JIS">
             <transports:response>
-                <set-property propertyName="Content-Type" value="text/plain;charset=Shift_JIS"/>
+                <custom-transformer class="org.mule.compatibility.transport.http.functional.HttpEncodingFunctionalTestCase$SetMediaTypePlainShiftJis"/>
             </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
@@ -66,7 +66,7 @@
     <flow name="testComponent.Windows-31J">
         <http:inbound-endpoint ref="clientEndpoint.Windows-31J">
             <transports:response>
-                <set-property propertyName="Content-Type" value="text/plain;charset=Windows-31J"/>
+                <custom-transformer class="org.mule.compatibility.transport.http.functional.HttpEncodingFunctionalTestCase$SetMediaTypePlainWindows31J"/>
             </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>
@@ -75,7 +75,7 @@
     <flow name="testComponent.EUC-JP">
         <http:inbound-endpoint ref="clientEndpoint.EUC-JP">
             <transports:response>
-                <set-property propertyName="Content-Type" value="text/plain;charset=EUC-JP"/>
+                <custom-transformer class="org.mule.compatibility.transport.http.functional.HttpEncodingFunctionalTestCase$SetMediaTypePlainEucJp"/>
             </transports:response>
         </http:inbound-endpoint>
         <test:component appendString=" Received"/>

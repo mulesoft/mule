@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.cxf;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -24,9 +24,6 @@ import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
@@ -70,12 +67,11 @@ public class CxfBackToBlockingTestCase extends FunctionalTestCase
     public void backToBlocking() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Serializable> props = new HashMap<>();
-        props.put("Content-Type", "application/soap+xml");
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo", MuleMessage.builder().payload(xml).inboundProperties(props).build(), HTTP_REQUEST_OPTIONS);
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
+                MuleMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(), HTTP_REQUEST_OPTIONS);
         assertTrue(getPayloadAsString(result).contains("Hello!"));
-        String ct = result.getInboundProperty(CONTENT_TYPE, "");
+        String ct = result.getDataType().getMediaType().toRfcString();
         assertEquals("text/xml; charset=UTF-8", ct);
         muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
     }

@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.routing.CorrelationMode;
 import org.mule.runtime.core.routing.outbound.FilteringOutboundRouter;
 
 import java.util.ArrayList;
@@ -49,18 +48,14 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         List<Object> recipients = getRecipients(event);
         List<MuleEvent> results = new ArrayList<>();
 
-        if (enableCorrelation != CorrelationMode.NEVER)
+        if (enableCorrelation.doCorrelation(message.getCorrelation()))
         {
-            boolean correlationSet = message.getCorrelationGroupSize() != null;
-            if (correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
-            {
-                logger.debug("CorrelationId is already set, not setting Correlation group size");
-            }
-            else
-            {
-                // the correlationId will be set by the AbstractOutboundRouter
-                event.setMessage(MuleMessage.builder(event.getMessage()).correlationGroupSize(recipients.size()).build());
-            }
+            event.setMessage(MuleMessage.builder(event.getMessage()).correlationGroupSize(recipients.size()).build());
+        }
+        else
+        {
+            logger.debug("Correlation is " + message.getCorrelation().toString());
+            logger.debug("CorrelationId is already set, not setting Correlation group size");
         }
 
         OutboundEndpoint endpoint = null;

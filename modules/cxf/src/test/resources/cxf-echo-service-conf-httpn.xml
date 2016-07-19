@@ -19,7 +19,7 @@
     <flow name="helloServiceClient" processingStrategy="synchronous">
         <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <http:request config-ref="requestConfig" path="/hello" method="POST" />
-        <set-property propertyName="contentType" value="#[message.inboundProperties['content-type']]"/>
+        <set-property propertyName="contentType" value="#[message.getDataType().getMediaType().toRfcString()]"/>
     </flow>
 
 </mule>

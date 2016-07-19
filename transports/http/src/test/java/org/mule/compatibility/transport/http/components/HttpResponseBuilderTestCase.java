@@ -16,22 +16,24 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.compatibility.transport.http.CacheControlHeader;
 import org.mule.compatibility.transport.http.CookieHelper;
 import org.mule.compatibility.transport.http.CookieWrapper;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,8 +49,6 @@ import org.apache.commons.httpclient.Header;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
@@ -149,7 +149,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("Cache-Control", HEADER_CACHE_CONTROL);
         headers.put("Expires", HEADER_EXPIRES);
         headers.put("Location", HEADER_LOCATION);
@@ -173,7 +173,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseBuilderHeaders() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("Cache-Control", "max-age=3600");
         headers.put("Expires", "Thu, 01 Dec 1994 16:00:00 GMT");
         headers.put("Location", "http://localhost:8080");
@@ -191,7 +191,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         headers.put(HEADER_LOCATION, "http://localhost:9090");
         httpResponseBuilder.setHeaders(headers);
 
@@ -208,7 +208,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseBuilderCookies() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        List<CookieWrapper> cookies = new ArrayList<CookieWrapper>();
+        List<CookieWrapper> cookies = new ArrayList<>();
 
         cookies.add(createCookie("userName", "John_Galt", "localhost", "/", "Thu, 15 Dec 2013 16:00:00 GMT", "true", "1"));
         cookies.add(createCookie("userId", "1", "localhost", "/", "Thu, 01 Dec 2013 16:00:00 GMT", "true", "1"));
@@ -231,7 +231,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
 
-        List<CookieWrapper> cookies = new ArrayList<CookieWrapper>();
+        List<CookieWrapper> cookies = new ArrayList<>();
         cookies.add(createCookie(HEADER_NAME, HEADER_VALUE, HEADER_DOMAIN, HEADER_PATH, HEADER_EXPIRY_DATE, HEADER_SECURE, HEADER_VERSION));
         httpResponseBuilder.setCookies(cookies);
 
@@ -267,7 +267,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseDefaultContentType() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        when(mockMuleMessage.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE)).thenReturn("text/html");
+        when(mockMuleMessage.getDataType()).thenReturn(DataType.HTML_STRING);
 
         when(mockEvent.getMessage()).thenReturn(mockMuleMessage);
 
@@ -337,7 +337,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         CacheControlHeader cacheControl = new CacheControlHeader();
         cacheControl.setMaxAge("3600");
         httpResponseBuilder.setCacheControl(cacheControl);
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         headers.put(HttpConstants.HEADER_CACHE_CONTROL, "smax-age=3600");
         httpResponseBuilder.setHeaders(headers);
         mockParse();
@@ -354,10 +354,9 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseCopyOutboundProperties() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        Map<String, Object> outboundProperties = new HashMap<String, Object>();
+        Map<String, Object> outboundProperties = new HashMap<>();
         outboundProperties.put(HttpConstants.HEADER_AGE, "12");
         outboundProperties.put(HttpConstants.HEADER_CACHE_CONTROL, "max-age=3600");
-        outboundProperties.put(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
         Cookie[] cookies = new Cookie[2];
         cookies[0] = new Cookie(null, "clientId", "2");
         cookies[1] = new Cookie(null, "category", "premium");
@@ -368,6 +367,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         for(String propertyName : propertyNames)
         {
             when(mockMuleMessage.getOutboundProperty(propertyName)).thenReturn(outboundProperties.get(propertyName));
+            when(mockMuleMessage.getDataType()).thenReturn(DataType.builder(DataType.OBJECT).charset(StandardCharsets.UTF_8).build());
         }
 
         HttpResponse response = new HttpResponse();
@@ -407,7 +407,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
         cacheControl.setMaxAge("3600");
         httpResponseBuilder.setCacheControl(cacheControl);
 
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         headers.put(HttpConstants.HEADER_CACHE_CONTROL, "public");
         headers.put(HttpConstants.HEADER_AGE, "12");
         httpResponseBuilder.setHeaders(headers);
@@ -431,7 +431,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     public void testHttpResponseWithDateExpression() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         headers.put(HttpConstants.HEADER_EXPIRES, "#[now]");
         httpResponseBuilder.setHeaders(headers);
 
@@ -456,7 +456,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     {
         HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
         Date now = new Date();
-        List<CookieWrapper> cookies = new ArrayList<CookieWrapper>();
+        List<CookieWrapper> cookies = new ArrayList<>();
         cookies.add(createCookie("test", "test", null, null, "#[now]", null, null));
         httpResponseBuilder.setCookies(cookies);
 
@@ -515,7 +515,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
 
     private Map<String, String> getHeaderCookie(Header[] headers)
     {
-        Map<String, String> cookies = new HashMap<String, String>();
+        Map<String, String> cookies = new HashMap<>();
         for(Header header : headers)
         {
             if("Set-Cookie".equals(header.getName()))
@@ -557,14 +557,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase
     private void mockParse()
     {
         when(mockExpressionManager.parse(anyString(), Mockito.any(MuleEvent.class))).thenAnswer(
-                 new Answer<Object>()
-                 {
-                     @Override
-                     public Object answer(InvocationOnMock invocation) throws Throwable
-                     {
-                         return invocation.getArguments()[0];
-                     }
-                 }
+                 invocation -> invocation.getArguments()[0]
          );
     }
 }

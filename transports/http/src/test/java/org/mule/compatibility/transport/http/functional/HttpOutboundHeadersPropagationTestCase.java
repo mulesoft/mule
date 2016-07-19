@@ -14,8 +14,6 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
@@ -45,9 +43,7 @@ public class HttpOutboundHeadersPropagationTestCase extends HttpFunctionalTestCa
     public void outboundHttpContentTypeTest() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String,Serializable> msgProps = new HashMap<>();
-        msgProps.put("custom-header", "value-custom-header");
-        client.dispatch("vm://in", "HelloWorld!", msgProps);
+        client.dispatch("vm://in", MuleMessage.builder().payload("HelloWorld!").addOutboundProperty("custom-header", "value-custom-header").build());
 
         MuleMessage reply = client.request("vm://out", RECEIVE_TIMEOUT);
         Map<String, Object> headers = (Map<String, Object>) reply.getPayload();

@@ -10,8 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
@@ -33,5 +38,16 @@ public class ReplyToChainIntegration3TestCase extends FunctionalTestCase
         MuleMessage result = client.request("jms://response", 10000);
         assertNotNull(result);
         assertEquals("Received: " + message, result.getPayload());
+    }
+
+    public static class SetReplyTo extends AbstractMessageTransformer
+    {
+        @Override
+        public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException
+        {
+            final MuleMessage message = MuleMessage.builder(event.getMessage()).replyTo("jms://response").build();
+            event.setMessage(message);
+            return message;
+        }
     }
 }

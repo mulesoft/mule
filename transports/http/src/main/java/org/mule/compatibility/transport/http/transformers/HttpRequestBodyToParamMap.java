@@ -7,10 +7,10 @@
 package org.mule.compatibility.transport.http.transformers;
 
 import static org.mule.compatibility.transport.http.HttpConstants.FORM_URLENCODED_CONTENT_TYPE;
-import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -41,14 +41,10 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
         try
         {
             String httpMethod = event.getMessage().getInboundProperty("http.method");
-            String contentType = event.getMessage().getInboundProperty(HEADER_CONTENT_TYPE);
+            MediaType contentType = event.getMessage().getDataType().getMediaType();
 
             boolean isGet = METHOD_GET.equalsIgnoreCase(httpMethod);
-            boolean isFormUrlEncoded = false;
-            if (contentType != null)
-            {
-                isFormUrlEncoded = contentType.startsWith(FORM_URLENCODED_CONTENT_TYPE);
-            }
+            boolean isFormUrlEncoded = MediaType.parse(FORM_URLENCODED_CONTENT_TYPE).matches(contentType);
 
             if (!(isGet || isFormUrlEncoded))
             {

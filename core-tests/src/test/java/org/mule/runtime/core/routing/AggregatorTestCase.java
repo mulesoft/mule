@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Optional.of;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -96,7 +97,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase
                 @Override
                 public EventGroup createEventGroup(MuleEvent event, Object groupId)
                 {
-                    return new EventGroup(groupId, muleContext, eventThreshold, storePrefix);
+                    return new EventGroup(groupId, muleContext, of(eventThreshold), storePrefix);
                 }
 
                 @Override

@@ -6,19 +6,17 @@
  */
 package org.mule.test.issues;
 
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -38,14 +36,12 @@ public class Mule5415TestCase extends FunctionalTestCase
     public void testFirstRequestDoesntFail() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Serializable> properties = new HashMap<>();
-        properties.put("Content-Type","application/x-www-form-urlencoded");
         MuleMessage message = client.send(String.format("http://localhost:%s?param1=1&param2=3", port1.getNumber()),
-                                          MuleMessage.builder()
-                                                  .payload("message")
-                                                  .outboundProperties(properties)
-                                                  .build(),
-                                          newOptions().method(POST.name()).build());
-        assertThat(message.getExceptionPayload(), IsNull.<Object>nullValue());
+                MuleMessage.builder()
+                           .payload("message")
+                           .mediaType(APPLICATION_X_WWW_FORM_URLENCODED)
+                           .build(),
+                newOptions().method(POST.name()).build());
+        assertThat(message.getExceptionPayload(), nullValue());
     }
 }

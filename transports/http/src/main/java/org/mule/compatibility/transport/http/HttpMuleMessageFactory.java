@@ -7,11 +7,13 @@
 package org.mule.compatibility.transport.http;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
@@ -33,10 +35,8 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HeaderElement;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
-import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.MalformedCookieException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,7 +157,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 
         httpHeaders.put(HttpConnector.HTTP_HEADERS, new HashMap<String, Object>(headers));
 
-        Charset encoding = getEncoding(headers);
+        Charset encoding = getEncoding(messageBuilder, headers);
         
         queryParameters.put(HttpConnector.HTTP_QUERY_PARAMS, processQueryParams(uri, encoding));
 
@@ -180,10 +180,6 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         headers.forEach((k, v) -> messageBuilder.addInboundProperty(k, v));
         httpHeaders.forEach((k, v) -> messageBuilder.addInboundProperty(k, v));
         queryParameters.forEach((k, v) -> messageBuilder.addInboundProperty(k, v));
-
-        // The encoding is stored as message property. To avoid overriding it from the message
-        // properties, it must be initialized last
-        initEncoding(messageBuilder, encoding);
     }
 
     protected Map<String, Serializable> processIncomingHeaders(Map<String, Serializable> headers) throws Exception
@@ -281,39 +277,19 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
-    private String getContentType(Map<String, Serializable> headers)
-    {
-        return (String) headers.get(HttpConstants.HEADER_CONTENT_TYPE);
-    }
-
-    private Charset getEncoding(Map<String, Serializable> headers)
+    private Charset getEncoding(Builder messageBuilder, Map<String, Serializable> headers)
     {
         Charset encoding = DEFAULT_ENCODING;
-        Object contentType = headers.get(HttpConstants.HEADER_CONTENT_TYPE);
+        Object contentType = headers.remove(HttpConstants.HEADER_CONTENT_TYPE);
         if (contentType != null)
         {
-            // use HttpClient classes to parse the charset part from the Content-Type
-            // header (e.g. "text/html; charset=UTF-16BE")
-            Header contentTypeHeader = new Header(HttpConstants.HEADER_CONTENT_TYPE,
-                                                  contentType.toString());
-            HeaderElement values[] = contentTypeHeader.getElements();
-            if (values.length == 1)
-            {
-                NameValuePair param = values[0].getParameterByName("charset");
-                if (param != null)
-                {
-                    encoding = Charset.forName(param.getValue());
-                }
-            }
+            final MediaType mediaType = MediaType.parse(contentType.toString());
+            encoding = mediaType.getCharset().orElse(encoding);
+            messageBuilder.mediaType(mediaType);
         }
         return encoding;
     }
     
-    private MuleMessage.Builder initEncoding(MuleMessage.Builder messageBuilder, Charset encoding)
-    {
-        return messageBuilder.mediaType(MediaType.ANY.withCharset(encoding));
-    }
-
     private void rewriteConnectionAndKeepAliveHeaders(Map<String, Serializable> headers)
     {
         // rewrite Connection and Keep-Alive headers based on HTTP version

@@ -129,7 +129,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
                 .put(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE).build();
 
 
-        wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+        wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
                                                                                 .withBody(HttpParser.encodeString(UTF_8, tokenUrlResponseParameters))));
 
         final ImmutableMap<Object, Object> redirectUrlQueryParams = ImmutableMap.builder()

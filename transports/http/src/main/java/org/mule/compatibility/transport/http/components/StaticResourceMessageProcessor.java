@@ -18,6 +18,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -134,8 +135,8 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
 
             MuleMessage message = MuleMessage.builder()
                     .payload(buffer)
+                    .mediaType(MediaType.parse(mimetype))
                     .addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_OK))
-                    .addOutboundProperty(HEADER_CONTENT_TYPE, mimetype)
                     .addOutboundProperty(HEADER_CONTENT_LENGTH, buffer.length)
                     .build();
             resultEvent = new DefaultMuleEvent(message, event);

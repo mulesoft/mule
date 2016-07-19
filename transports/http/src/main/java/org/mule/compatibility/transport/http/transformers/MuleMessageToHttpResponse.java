@@ -206,7 +206,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             version = HttpConstants.HTTP11;
         }
 
-        String contentType = msg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        String contentType = msg.getDataType().getMediaType().toRfcString();
         if (contentType == null)
         {
             DataType dataType = msg.getDataType();
@@ -234,6 +234,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         Collection<String> headerNames = new LinkedList<>();
         headerNames.addAll(HttpConstants.RESPONSE_HEADER_NAMES.values());
         headerNames.addAll(HttpConstants.GENERAL_AND_ENTITY_HEADER_NAMES.values());
+        headerNames.remove(HttpConstants.HEADER_CONTENT_TYPE);
 
         for (String headerName : headerNames)
         {
@@ -300,18 +301,12 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             }
         }
 
-        if (msg.getCorrelationId() != null)
+        msg.getCorrelation().getId().ifPresent(v ->
         {
-            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, msg.getCorrelationId()));
-            if (msg.getCorrelationGroupSize() != null)
-            {
-                response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_GROUP_SIZE_PROPERTY, valueOf(msg.getCorrelationGroupSize())));
-            }
-            if (msg.getCorrelationSequence() != null)
-            {
-                response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_SEQUENCE_PROPERTY, valueOf(msg.getCorrelationSequence())));
-            }
-        }
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, v));
+            msg.getCorrelation().getGroupSize().ifPresent(s -> response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_GROUP_SIZE_PROPERTY, valueOf(s))));
+            msg.getCorrelation().getSequence().ifPresent(s -> response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_SEQUENCE_PROPERTY, valueOf(s))));
+        });
         if (msg.getReplyTo() != null)
         {
             response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_REPLY_TO_PROPERTY,

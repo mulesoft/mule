@@ -8,8 +8,8 @@ package org.mule.runtime.core.routing.correlation;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -68,12 +68,12 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
 
     /**
      * Creates a new EventGroup that will expect the number of events as returned by
-     * {@link MuleMessage#getCorrelationGroupSize()}.
+     * {@link Correlation#getGroupSize()}.
      */
     @Override
     public EventGroup createEventGroup(MuleEvent event, Object groupId)
     {
-        return new EventGroup(groupId, muleContext, event.getMessage().getCorrelationGroupSize(), storePrefix);
+        return new EventGroup(groupId, muleContext, event.getMessage().getCorrelation().getGroupSize(), storePrefix);
     }
 
     /**
@@ -84,15 +84,15 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback
     @Override
     public boolean shouldAggregateEvents(EventGroup events)
     {
-        Integer size = events.expectedSize();
 
-        if (size == null)
+        if (!events.expectedSize().isPresent())
         {
             logger.warn("Correlation Group Size not set, but correlation aggregator is being used."
                         + " Message is being forwarded as is");
             return true;
         }
 
+        Integer size = events.expectedSize().get();
         if (logger.isDebugEnabled())
         {
             logger.debug(MessageFormat.format(

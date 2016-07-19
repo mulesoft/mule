@@ -8,13 +8,13 @@ package org.mule.test.transformers;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.Base64;
 
-import java.io.Serializable;
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
@@ -37,15 +37,9 @@ public class TransformerEncodingTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void encodingFromSetProperty() throws Exception
-    {
-        testEncoding("base64decode2");
-    }
-
-    @Test
     public void encodingFromMessage() throws Exception
     {
-        testEncoding("base64decode", MULE_ENCODING_PROPERTY, UTF_16_LE);
+        testEncoding("base64decode", UTF_16_LE);
     }
 
     private void testEncoding(String flowName) throws Exception
@@ -53,9 +47,11 @@ public class TransformerEncodingTestCase extends FunctionalTestCase
         assertPayload(flowRunner(flowName).withPayload(Base64.encodeBytes(PAYLOAD.getBytes(UTF_16_LE))).run());
     }
 
-    private void testEncoding(String flowName, String outboundKey, Serializable outboundValue) throws Exception
+    private void testEncoding(String flowName, String charset) throws Exception
     {
-        assertPayload(flowRunner(flowName).withPayload(Base64.encodeBytes(PAYLOAD.getBytes(UTF_16_LE))).withOutboundProperty(outboundKey, outboundValue).run());
+        assertPayload(flowRunner(flowName).withPayload(Base64.encodeBytes(PAYLOAD.getBytes(UTF_16_LE)))
+                                          .withMediaType(MediaType.ANY.withCharset(Charset.forName(charset)))
+                                          .run());
     }
 
     protected void assertPayload(final MuleEvent muleEvent) throws Exception

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el.context;
 
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -15,6 +16,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
@@ -24,6 +26,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.message.Correlation;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +46,8 @@ public class MessageContextTestCase extends AbstractELTestCase
     public void setup()
     {
         event = mock(MuleEvent.class);
-        message = mock(MuleMessage.class);
+        message = spy(MuleMessage.builder().payload(NullPayload.getInstance()).build());
+        when(message.getCorrelation()).thenReturn(mock(Correlation.class));
         doAnswer(invocation -> {
             message = (MuleMessage) invocation.getArguments()[0];
             return null;
@@ -85,25 +89,25 @@ public class MessageContextTestCase extends AbstractELTestCase
     @Test
     public void correlationId() throws Exception
     {
-        when(message.getCorrelationId()).thenReturn("3");
-        assertEquals("3", evaluate("message.correlationId", event));
-        assertFinalProperty("message.correlationId=2", event);
+        when(message.getCorrelation().getId()).thenReturn(of("3"));
+        assertEquals("3", evaluate("message.correlation.id.get()", event));
+        assertFinalProperty("message.correlation.id.get()=2", event);
     }
 
     @Test
     public void correlationSequence() throws Exception
     {
-        when(message.getCorrelationSequence()).thenReturn(4);
-        assertEquals(4, evaluate("message.correlationSequence", event));
-        assertFinalProperty("message.correlationSequence=2", event);
+        when(message.getCorrelation().getSequence()).thenReturn(of(4));
+        assertEquals(4, evaluate("message.correlation.sequence.get()", event));
+        assertFinalProperty("message.correlation.sequence.get()=2", event);
     }
 
     @Test
     public void correlationGroupSize() throws Exception
     {
-        when(message.getCorrelationGroupSize()).thenReturn(4);
-        assertEquals(4, evaluate("message.correlationGroupSize", event));
-        assertFinalProperty("message.correlationGroupSize=2", event);
+        when(message.getCorrelation().getGroupSize()).thenReturn(of(4));
+        assertEquals(4, evaluate("message.correlation.groupSize.get()", event));
+        assertFinalProperty("message.correlation.groupSize.get()=2", event);
     }
 
     @Test

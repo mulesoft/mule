@@ -26,6 +26,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.http.HttpRequest;
 import org.mule.compatibility.transport.http.RequestLine;
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -193,7 +194,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
         final String contentType = "text/plain";
         MuleMessage message = MuleMessage.builder(setupRequestContext("http://localhost:8080/services", METHOD_POST))
                 .payload("I'm a payload")
-                .addOutboundProperty(HEADER_CONTENT_TYPE, contentType)
+                .mediaType(MediaType.parse(contentType))
                 .build();
 
         final ObjectToHttpClientMethodRequest transformer = createTransformer();
@@ -231,7 +232,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
         String payload = "I'm a payload";
         MuleMessage message = MuleMessage.builder(setupRequestContext("http://localhost:8080/services", METHOD_POST))
                 .payload(payload)
-                .addOutboundProperty(HEADER_CONTENT_TYPE, contentType)
+                .mediaType(MediaType.parse(contentType))
                 .addOutboundProperty(HTTP_VERSION_PROPERTY, HTTP10)
                 .build();
 
@@ -257,7 +258,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
 
         final MuleMessage message = MuleMessage.builder(setupRequestContextForCollection("http://localhost:8080/services",
                                                                                          METHOD_POST, singletonList(messageOne)))
-                .addOutboundProperty(HEADER_CONTENT_TYPE, contentType)
+                .mediaType(MediaType.parse(contentType))
                 .addOutboundProperty(HTTP_VERSION_PROPERTY, HTTP10)
                 .build();
 

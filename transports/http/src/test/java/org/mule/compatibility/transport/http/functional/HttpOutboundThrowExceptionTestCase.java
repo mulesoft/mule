@@ -10,16 +10,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
-import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpRequest;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -56,9 +52,7 @@ public class HttpOutboundThrowExceptionTestCase extends AbstractMockHttpServerTe
     public void errorStatusPropagation() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Serializable> props = new HashMap<>();
-        props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
-        MuleMessage result = client.send("errorPropagationEndpoint", TEST_MESSAGE, props);
+        MuleMessage result = client.send("errorPropagationEndpoint", MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build());
         assertThat((String) result.getInboundProperty("http.status"), is("400"));
     }
 
@@ -66,9 +60,7 @@ public class HttpOutboundThrowExceptionTestCase extends AbstractMockHttpServerTe
     public void errorStatusThrowException() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Map<String, Serializable> props = new HashMap<>();
-        props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
-        MuleMessage result = client.send("exceptionOnErrorStatusEndpoint", TEST_MESSAGE, props);
+        MuleMessage result = client.send("exceptionOnErrorStatusEndpoint", MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build());
         assertThat((String) result.getInboundProperty("http.status"), is("500"));
     }
 

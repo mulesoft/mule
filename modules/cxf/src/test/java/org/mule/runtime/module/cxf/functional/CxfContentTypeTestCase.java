@@ -46,7 +46,7 @@ public class CxfContentTypeTestCase extends FunctionalTestCase
         MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
         MuleClient client = muleContext.getClient();
         MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request, newOptions().method(POST.name()).disableStatusCodeValidation().build());
-        String contentType = received.getInboundProperty("content-type");
+        String contentType = received.getDataType().getMediaType().toRfcString();
         assertNotNull(contentType);
         assertTrue(contentType.contains("charset"));
     }

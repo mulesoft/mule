@@ -23,7 +23,6 @@
     </flow>
 
     <sub-flow name="setProperties">
-        <set-property propertyName="encoding" value="#[message.dataType.mediaType.charset.get().name()]"/>
-        <set-property propertyName="mimeType" value="#[message.dataType.mediaType.toString()]"/>
+        <custom-transformer class="org.mule.compatibility.transport.http.functional.HttpOutboundDataTypeTestCase$SetMediaTypeTransformer"/>
     </sub-flow>
 </mule>

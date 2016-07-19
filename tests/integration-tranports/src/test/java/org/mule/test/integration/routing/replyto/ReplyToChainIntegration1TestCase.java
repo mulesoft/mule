@@ -9,13 +9,10 @@ package org.mule.test.integration.routing.replyto;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -32,11 +29,8 @@ public class ReplyToChainIntegration1TestCase extends FunctionalTestCase
     {
         String message = "test";
 
-        Map<String, Serializable> props = new HashMap<>();
-        props.put(MULE_REMOTE_SYNC_PROPERTY, "false");
-
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://pojo1", message, props);
+        MuleMessage result = client.send("vm://pojo1", MuleMessage.builder().payload(message).addOutboundProperty(MULE_REMOTE_SYNC_PROPERTY, "false").build());
         assertNotNull(result);
         assertEquals("Received: " + message, getPayloadAsString(result));
     }
@@ -47,7 +41,7 @@ public class ReplyToChainIntegration1TestCase extends FunctionalTestCase
         String message = "test";
 
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("vm://pojo1", message, null);
+        MuleMessage result = client.send("vm://pojo1", MuleMessage.builder().payload(message).build());
         assertNotNull(result);
         assertEquals("Received: " + message, getPayloadAsString(result));
     }

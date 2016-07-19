@@ -16,6 +16,7 @@ import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_0_9
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
+
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -56,14 +57,18 @@ public class HttpRequestToMuleEvent
         Map<String, Serializable> outboundProperties = new HashMap<>();
         for (String headerName : headerNames)
         {
-            final Collection<String> values = request.getHeaderValues(headerName);
-            if (values.size() == 1)
+            // Content-Type was already processed
+            if (!CONTENT_TYPE.equalsIgnoreCase(headerName))
             {
-                inboundProperties.put(headerName, values.iterator().next());
-            }
-            else
-            {
-                inboundProperties.put(headerName, new ArrayList<>(values));
+                final Collection<String> values = request.getHeaderValues(headerName);
+                if (values.size() == 1)
+                {
+                    inboundProperties.put(headerName, values.iterator().next());
+                }
+                else
+                {
+                    inboundProperties.put(headerName, new ArrayList<>(values));
+                }
             }
         }
 
@@ -125,9 +130,13 @@ public class HttpRequestToMuleEvent
             }
         }
 
-        final MuleMessage message = MuleMessage.builder().payload(payload).mediaType(mediaType).inboundProperties
-                (inboundProperties).outboundProperties(outboundProperties).inboundAttachments(inboundAttachments)
-                .build();
+        final MuleMessage message = MuleMessage.builder()
+                                               .payload(payload)
+                                               .mediaType(mediaType)
+                                               .inboundProperties(inboundProperties)
+                                               .outboundProperties(outboundProperties)
+                                               .inboundAttachments(inboundAttachments)
+                                               .build();
         return new DefaultMuleEvent(
                 message,
                 resolveUri(requestContext),

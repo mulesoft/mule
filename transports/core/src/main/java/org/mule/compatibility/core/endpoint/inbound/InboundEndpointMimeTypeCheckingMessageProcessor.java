@@ -6,10 +6,9 @@
  */
 package org.mule.compatibility.core.endpoint.inbound;
 
-import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -32,26 +31,21 @@ public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageP
     @Override
     public MuleEvent process(MuleEvent event) throws MessagingException
     {
-        org.mule.runtime.api.metadata.MediaType endpointMimeType = endpoint.getMimeType();
+        MediaType endpointMimeType = endpoint.getMimeType();
         if (endpointMimeType != null)
         {
             MuleMessage message = event.getMessage();
-            String contentType = message.getInboundProperty(CONTENT_TYPE_PROPERTY);
-            if (contentType == null)
+            final DataType dataType = message.getDataType();
+            if (DataType.OBJECT.getMediaType().matches(dataType.getMediaType()))
             {
-                contentType = message.getOutboundProperty(CONTENT_TYPE_PROPERTY);
-            }
-            if (contentType == null)
-            {
-                event.setMessage(MuleMessage.builder(event.getMessage()).addInboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType.toRfcString()).build());
+                event.setMessage(MuleMessage.builder(event.getMessage()).mediaType(endpointMimeType).build());
             }
             else
             {
-                String messageMimeType = DataType.builder().mediaType(contentType).build().getMediaType().toRfcString();
-                if (!messageMimeType.equals(endpointMimeType.toRfcString()))
+                if (!dataType.getMediaType().matches(endpointMimeType))
                 {
                     throw new MessagingException(
-                            CoreMessages.unexpectedMIMEType(messageMimeType, endpointMimeType.toRfcString()), event, this);
+                            CoreMessages.unexpectedMIMEType(dataType.getMediaType().toRfcString(), endpointMimeType.toRfcString()), event, this);
                 }
             }
         }

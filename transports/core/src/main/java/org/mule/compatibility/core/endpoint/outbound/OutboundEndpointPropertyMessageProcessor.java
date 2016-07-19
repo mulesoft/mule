@@ -7,7 +7,9 @@
 package org.mule.compatibility.core.endpoint.outbound;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENDPOINT_PROPERTY;
+
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -17,7 +19,6 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 /**
  * Sets the outbound endpoint uri on as a property of the message using the following key:
@@ -26,7 +27,7 @@ import java.util.Iterator;
 public class OutboundEndpointPropertyMessageProcessor implements MessageProcessor
 {
 
-    private String[] ignoredPropertyOverrides = new String[]{MuleProperties.MULE_METHOD_PROPERTY};
+    private String[] ignoredPropertyOverrides = new String[] {MuleProperties.MULE_METHOD_PROPERTY, "Content-Type"};
 
     private OutboundEndpoint endpoint;
 
@@ -43,15 +44,22 @@ public class OutboundEndpointPropertyMessageProcessor implements MessageProcesso
 
         if (endpoint.getProperties() != null)
         {
-            for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
+            for (String prop : endpoint.getProperties().keySet())
             {
-                String prop = (String) iterator.next();
                 Serializable value = endpoint.getProperties().get(prop);
-                // don't overwrite property on the message
-                if (!ignoreProperty(event.getMessage(), prop))
+
+                if ("Content-Type".equalsIgnoreCase(prop))
                 {
-                    // inbound endpoint properties are in the invocation scope
-                    messageBuilder.addOutboundProperty(prop, value);
+                    messageBuilder.mediaType(MediaType.parse(value.toString()));
+                }
+                else
+                {
+                    // don't overwrite property on the message
+                    if (!ignoreProperty(event.getMessage(), prop))
+                    {
+                        // inbound endpoint properties are in the invocation scope
+                        messageBuilder.addOutboundProperty(prop, value);
+                    }
                 }
             }
         }
@@ -67,9 +75,9 @@ public class OutboundEndpointPropertyMessageProcessor implements MessageProcesso
             return true;
         }
 
-        for (int i = 0; i < ignoredPropertyOverrides.length; i++)
+        for (String ignoredPropertyOverride : ignoredPropertyOverrides)
         {
-            if (key.equals(ignoredPropertyOverrides[i]))
+            if (key.equals(ignoredPropertyOverride))
             {
                 return false;
             }

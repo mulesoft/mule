@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.functional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR;
-import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -23,7 +23,7 @@ public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTes
     public void testSend() throws Exception
     {
         GetMethod request = new GetMethod("http://localhost:" + dynamicPort.getValue());
-        request.addRequestHeader(CONTENT_TYPE_PROPERTY, "text/bar; charset=UTFF-912");
+        request.addRequestHeader(CONTENT_TYPE, "text/bar; charset=UTFF-912");
         HttpClient httpClient = new HttpClient();
 
         int responseCode = httpClient.executeMethod(request);

@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.exception;
 
+import static java.text.MessageFormat.format;
+import static org.apache.commons.lang.StringUtils.defaultString;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MessagingException;
@@ -30,10 +33,8 @@ import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -301,14 +302,10 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         }
 
         MuleMessage logMessage = event.getMessage();
-        String logUniqueId = StringUtils.defaultString(logMessage.getUniqueId(), NOT_SET);
-        String correlationId = StringUtils.defaultString(logMessage.getCorrelationId(), NOT_SET);
-        Integer correlationGroupSize = logMessage.getCorrelationGroupSize();
-        Integer correlationGroupSeq = logMessage.getCorrelationSequence();
+        String logUniqueId = defaultString(logMessage.getUniqueId(), NOT_SET);
 
-        String printableLogMessage = MessageFormat.format("Message identification summary here: " +
-                "id={0} correlationId={1}, correlationGroup={2}, correlationSeq={3}",
-                logUniqueId, correlationId, correlationGroupSize, correlationGroupSeq);
+        String printableLogMessage = format("Message identification summary here: id={0}, correlation={1}",
+                logUniqueId, logMessage.getCorrelation());
 
         logger.error(
             "Failed to dispatch message to error queue after it failed to process.  This may cause message loss. "

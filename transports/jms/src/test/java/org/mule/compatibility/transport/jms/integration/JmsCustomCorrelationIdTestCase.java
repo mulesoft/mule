@@ -12,10 +12,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Test;
 
 public class JmsCustomCorrelationIdTestCase extends AbstractJmsFunctionalTestCase
@@ -30,11 +26,7 @@ public class JmsCustomCorrelationIdTestCase extends AbstractJmsFunctionalTestCas
     public void testExplicitReplyToAsyncSet() throws MuleException
     {
         MuleClient client = muleContext.getClient();
-
-        Map<String, Serializable> props = new HashMap<>();
-        props.put("customCorrelation", "abcdefghij");
-
-        MuleMessage response = client.send("vm://in4", TEST_MESSAGE, props);
+        MuleMessage response = client.send("vm://in4", MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("customCorrelation", "abcdefghij").build());
         // We get the original message back, not the result from the remote component
         assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
     }

@@ -6,13 +6,14 @@
  */
 package org.mule.compatibility.core.routing.outbound;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
@@ -27,6 +28,7 @@ import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.mockito.stubbing.Answer;
@@ -162,7 +164,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
         router.setRoutes(endpoints);
         router.setEnableCorrelation(CorrelationMode.NEVER);
 
-        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty(MULE_CORRELATION_ID_PROPERTY, "MyCustomCorrelationId").build();
+        MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).correlationId("MyCustomCorrelationId").build();
 
         assertTrue(router.isMatch(getTestEvent(message)));
 
@@ -173,9 +175,9 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
             assertTrue(arguments[0] instanceof MuleEvent);
 
             MuleEvent event = (MuleEvent) arguments[0];
-            String correlationId = event.getMessage().getOutboundProperty(MULE_CORRELATION_ID_PROPERTY);
-            assertNotNull(correlationId);
-            assertEquals("MyCustomCorrelationId", correlationId);
+            Optional<String> correlationId = event.getMessage().getCorrelation().getId();
+            assertThat(correlationId.isPresent(), is(true));
+            assertThat(correlationId.get(), is("MyCustomCorrelationId"));
 
             return event;
         };

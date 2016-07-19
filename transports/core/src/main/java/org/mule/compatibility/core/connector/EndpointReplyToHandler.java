@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
@@ -28,7 +29,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class EndpointReplyToHandler extends DefaultReplyToHandler
 {
@@ -65,15 +65,18 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler
         OutboundEndpoint endpoint = getEndpoint(event, replyToEndpoint);
 
         // carry over properties
-        List<String> responseProperties = endpoint.getResponseProperties();
-        for (String propertyName : responseProperties)
+        final MuleMessage message = event.getMessage();
+        final Builder builder = MuleMessage.builder(message);
+
+        for (String propertyName : endpoint.getResponseProperties())
         {
-            Serializable propertyValue = event.getMessage().getInboundProperty(propertyName);
+            Serializable propertyValue = message.getInboundProperty(propertyName);
             if (propertyValue != null)
             {
-                event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, propertyValue).build());
+                builder.addOutboundProperty(propertyName, propertyValue);
             }
         }
+        event.setMessage(builder.build());
 
         // dispatch the event
         try

@@ -14,6 +14,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODI
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
+
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
@@ -239,12 +240,12 @@ public class MuleEventToHttpRequest
         {
             String contentType = requestBuilder.getHeaders().get(CONTENT_TYPE);
 
-            if (contentType == null || contentType.equals(APPLICATION_X_WWW_FORM_URLENCODED.toString()))
+            if (contentType == null || contentType.equals(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()))
             {
                 if (muleEvent.getMessage().getPayload() instanceof Map)
                 {
                     String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleEvent.getMuleContext())), (Map) payload);
-                    requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toString());
+                    requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
                     return new ByteArrayHttpEntity(body.getBytes());
                 }
             }

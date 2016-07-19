@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http.components;
 
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_METHOD_PROPERTY;
-import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
+import static org.mule.compatibility.transport.http.HttpConstants.FORM_URLENCODED_CONTENT_TYPE;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -15,6 +15,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -46,7 +47,7 @@ public class RestServiceWrapper extends AbstractComponent
 {
     public static final String DELETE = HttpConstants.METHOD_DELETE;
     public static final String GET = HttpConstants.METHOD_GET;
-    public static final String CONTENT_TYPE_VALUE = "application/x-www-form-urlencoded";
+    public static final String CONTENT_TYPE_VALUE = FORM_URLENCODED_CONTENT_TYPE;
     public static final String HTTP_METHOD = "http.method";
 
     /**
@@ -187,9 +188,9 @@ public class RestServiceWrapper extends AbstractComponent
         // if post
         else
         {
-            if (event.getMessage().getOutboundProperty(HEADER_CONTENT_TYPE) == null)
+            if (MediaType.ANY.matches(event.getMessage().getDataType().getMediaType()))
             {
-                event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HEADER_CONTENT_TYPE, CONTENT_TYPE_VALUE).build());
+                event.setMessage(MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse(CONTENT_TYPE_VALUE)).build());
             }
 
             StringBuilder requestBodyBuffer = new StringBuilder();

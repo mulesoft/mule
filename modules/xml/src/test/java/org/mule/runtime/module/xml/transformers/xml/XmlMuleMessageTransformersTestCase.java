@@ -8,6 +8,7 @@ package org.mule.runtime.module.xml.transformers.xml;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,9 +16,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
 import org.mule.runtime.module.xml.transformer.XmlToObject;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -68,16 +69,12 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
         assertNull(msg.getInboundProperty("number"));
         assertNull(msg.getOutboundProperty("number"));
 
-        assertThat(msg.getCorrelationId(), is("1234"));
+        assertThat(msg.getCorrelation().getId().get(), is("1234"));
         assertThat(msg.getDataType().getMediaType().getCharset().get(), is(UTF_8));
 
 
         Set<String> outboundProps = msg.getOutboundPropertyNames();
-        assertEquals(3, outboundProps.size());
-
-        //Remove Mule properties
-        outboundProps.remove(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-        outboundProps.remove(MuleProperties.MULE_ENCODING_PROPERTY);
+        assertThat(outboundProps, hasSize(2));
 
         for (String key : outboundProps)
         {

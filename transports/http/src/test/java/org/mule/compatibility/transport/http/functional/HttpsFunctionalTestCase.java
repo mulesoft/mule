@@ -10,19 +10,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpsConnector;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Rule;
@@ -52,23 +48,17 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
         assertNotNull(testComponent);
 
         final AtomicBoolean callbackMade = new AtomicBoolean(false);
-        EventCallback callback = new EventCallback()
+        EventCallback callback = (context, component) ->
         {
-            @Override
-            public void eventReceived(final MuleEventContext context, final Object component) throws Exception
-            {
-                MuleMessage msg = context.getMessage();
-                assertTrue(callbackMade.compareAndSet(false, true));
-                assertNotNull(msg.getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
-            }
+            MuleMessage msg = context.getMessage();
+            assertTrue(callbackMade.compareAndSet(false, true));
+            assertNotNull(msg.getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
         };
         testComponent.setEventCallback(callback);
 
         MuleClient client = muleContext.getClient();
 
-        Map<String, Serializable> props = new HashMap<>();
-        props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
-        MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
+        MuleMessage result = client.send("clientEndpoint", MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build());
 
         assertNotNull(result);
         assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));

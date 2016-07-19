@@ -15,17 +15,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.StringMessageUtils;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,17 +30,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractRoutingStrategy implements RoutingStrategy
 {
-
-    /**
-     * These properties are automatically propagated by Mule from inbound to outbound
-     * 
-     * TODO MULE-9858
-     */
-    @Deprecated
-    protected static List<String> magicProperties = Arrays.asList(
-            MuleProperties.MULE_CORRELATION_ID_PROPERTY, MuleProperties.MULE_CORRELATION_ID_PROPERTY,
-            MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-            MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, MuleProperties.MULE_SESSION_PROPERTY);
 
     /**
      * logger used by this class
@@ -149,31 +133,6 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy
     protected MuleContext getMuleContext()
     {
         return muleContext;
-    }
-
-    /**
-     * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and out
-     * params can be the same message object when not dealing with replies.
-     *
-     * @see #magicProperties
-     *
-     *      This method is mostly used by routers that dispatch the same message to several routes
-     * 
-     * @deprecated TODO MULE-9858
-     */
-    @Deprecated
-    public static MuleMessage propagateMagicProperties(MuleMessage in)
-    {
-        final Builder builder = MuleMessage.builder(in);
-        for (String name : magicProperties)
-        {
-            Serializable value = in.getInboundProperty(name);
-            if (value != null)
-            {
-                builder.addOutboundProperty(name, value);
-            }
-        }
-        return builder.build();
     }
 
     /**

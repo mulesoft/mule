@@ -191,46 +191,18 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         }
         if (enableCorrelation != CorrelationMode.NEVER)
         {
-            boolean correlationSet = message.getCorrelationId() != null;
-            if (correlationSet && (enableCorrelation == CorrelationMode.IF_NOT_SET))
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("CorrelationId is already set to '" + message.getCorrelationId()
-                                 + "' , not setting it again");
-                }
-                return;
-            }
-            else if (correlationSet)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("CorrelationId is already set to '" + message.getCorrelationId()
-                                 + "', but router is configured to overwrite it");
-                }
-            }
-            else
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("No CorrelationId is set on the message, will set a new Id");
-                }
-            }
-
-            String correlation;
-            correlation = service.getMessageInfoMapping().getCorrelationId(event);
+            String correlation = service.getMessageInfoMapping().getCorrelationId(event);
             if (logger.isDebugEnabled())
             {
+                logger.debug("Correlation is " + message.getCorrelation().toString());
                 logger.debug("Extracted correlation Id as: " + correlation);
-            }
 
-            if (logger.isDebugEnabled())
-            {
                 StringBuilder buf = new StringBuilder();
                 buf.append("Setting Correlation info on Outbound router");
                 buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
                 logger.debug(buf.toString());
             }
+
             event.setMessage(MuleMessage.builder(message).correlationId(correlation).build());
         }
     }
@@ -434,18 +406,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     protected MuleMessage cloneMessage(MuleEvent event, MuleMessage message) throws MessagingException
     {
         return AbstractRoutingStrategy.cloneMessage(event, message);
-    }
-
-    /**
-     * Propagates a number of internal system properties to handle correlation, session, etc. Note that in and out
-     * params can be the same message object when not dealing with replies.
-     * 
-     * @deprecated TODO MULE-9858
-     */
-    @Deprecated
-    protected MuleMessage propagateMagicProperties(MuleMessage in)
-    {
-        return AbstractRoutingStrategy.propagateMagicProperties(in);
     }
 
     @Override

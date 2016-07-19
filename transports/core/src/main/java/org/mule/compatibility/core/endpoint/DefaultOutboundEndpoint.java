@@ -6,6 +6,8 @@
  */
 package org.mule.compatibility.core.endpoint;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
+
 import org.mule.compatibility.core.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -17,7 +19,6 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -74,10 +75,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         }
         responseProperties = new ArrayList<>();
         // Propagate the Correlation-related properties from the previous message by default (see EE-1613).
-        responseProperties.add(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-        responseProperties.add(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-        responseProperties.add(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
-        responseProperties.add(MuleProperties.MULE_SESSION_PROPERTY);
+        responseProperties.add(MULE_SESSION_PROPERTY);
         // Add any additional properties specified by the user.
         String[] props = StringUtils.splitAndTrim(responsePropertiesList, ",");
         if (props != null)

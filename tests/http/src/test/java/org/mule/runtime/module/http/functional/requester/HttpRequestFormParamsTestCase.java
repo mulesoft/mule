@@ -43,7 +43,7 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase
 
         assertThat(uri, equalTo("/testPath"));
         assertThat(body, equalTo("testName1=testValue1&testName2=testValue2"));
-        assertThat(getFirstReceivedHeader(HttpHeaders.Names.CONTENT_TYPE), equalTo(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toString()));
+        assertThat(getFirstReceivedHeader(HttpHeaders.Names.CONTENT_TYPE), equalTo(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()));
     }
 
 
@@ -64,7 +64,7 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase
     @Override
     protected void writeResponse(HttpServletResponse response) throws IOException
     {
-        response.setContentType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toString());
+        response.setContentType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().print(URL_ENCODED_STRING);
     }

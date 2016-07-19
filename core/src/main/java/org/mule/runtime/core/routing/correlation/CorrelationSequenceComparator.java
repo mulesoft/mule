@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing.correlation;
 import org.mule.runtime.core.api.MuleEvent;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 /**
  * <code>CorrelationSequenceComparator</code> is a {@link Comparator} for
@@ -19,20 +20,24 @@ public final class CorrelationSequenceComparator implements Comparator<MuleEvent
     @Override
     public int compare(MuleEvent event1, MuleEvent event2)
     {
-        Integer val1 = event1.getMessage().getCorrelationSequence();
-        Integer val2 = event2.getMessage().getCorrelationSequence();
+        Optional<Integer> val1 = event1.getMessage().getCorrelation().getSequence();
+        Optional<Integer> val2 = event2.getMessage().getCorrelation().getSequence();
 
         if (val1 == val2)
         {
             return 0;
         }
-        else if (val2 == null || val1 > val2)
+        else if (val1.isPresent() && !val2.isPresent())
         {
             return 1;
         }
-        else
+        else if (!val1.isPresent() && val2.isPresent())
         {
             return -1;
+        }
+        else
+        {
+            return val1.get().compareTo(val2.get());
         }
     }
 }

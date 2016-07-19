@@ -6,8 +6,6 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
-import static org.mule.runtime.core.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MessagingException;
@@ -37,20 +35,19 @@ public class OutboundEndpointMimeTypeCheckingMessageProcessor implements Message
         if (endpointMimeType != null)
         {
             MuleMessage message = event.getMessage();
-            String contentType = message.getOutboundProperty(CONTENT_TYPE_PROPERTY);
-            if (contentType == null)
+            final DataType dataType = message.getDataType();
+            if (DataType.OBJECT.getMediaType().matches(dataType.getMediaType()))
             {
                 event.setMessage(MuleMessage.builder(event.getMessage())
-                                         .addOutboundProperty(CONTENT_TYPE_PROPERTY, endpointMimeType.toRfcString())
-                                         .build());
+                                            .mediaType(dataType.getMediaType())
+                                            .build());
             }
             else
             {
-                String messageMimeType = DataType.builder().mediaType(contentType).build().getMediaType().toRfcString();
-                if (!messageMimeType.equals(endpointMimeType.toRfcString()))
+                if (!dataType.getMediaType().matches(endpointMimeType))
                 {
                     throw new MessagingException(
-                            CoreMessages.unexpectedMIMEType(messageMimeType, endpointMimeType.toRfcString()), event, this);
+                            CoreMessages.unexpectedMIMEType(dataType.getMediaType().toRfcString(), endpointMimeType.toRfcString()), event, this);
                 }
             }
         }

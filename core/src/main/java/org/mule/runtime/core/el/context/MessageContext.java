@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.message.Correlation;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -57,19 +58,9 @@ public class MessageContext
         return event.getMessage().getMessageRootId();
     }
 
-    public String getCorrelationId()
+    public Correlation getCorrelation()
     {
-        return event.getMessage().getCorrelationId();
-    }
-
-    public Integer getCorrelationSequence()
-    {
-        return event.getMessage().getCorrelationSequence();
-    }
-
-    public Integer getCorrelationGroupSize()
-    {
-        return event.getMessage().getCorrelationGroupSize();
+        return event.getMessage().getCorrelation();
     }
 
     public Object getReplyTo()

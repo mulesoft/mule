@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.collections.IteratorUtils;
 
@@ -52,7 +54,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     private final String storePrefix;
     private final String eventsPartitionKey;
     private final long created;
-    private final Integer expectedSize;
+    private final Optional<Integer> expectedSize;
     transient private MuleContext muleContext;
     private String commonRootId = null;
     private static boolean hasNoCommonRootId = false;
@@ -63,12 +65,12 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     public EventGroup(Object groupId, MuleContext muleContext)
     {
-        this(groupId, muleContext, -1, DEFAULT_STORE_PREFIX);
+        this(groupId, muleContext, Optional.empty(), DEFAULT_STORE_PREFIX);
     }
 
     public EventGroup(Object groupId,
             MuleContext muleContext,
-            Integer expectedSize,
+            Optional<Integer> expectedSize,
             String storePrefix)
     {
         super();
@@ -276,7 +278,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     private String getEventKey(MuleEvent event)
     {
-        return event.getId() + event.getMessage().getCorrelationSequence();
+        return event.getId() + event.getMessage().getCorrelation().getSequence().map(v -> v.toString()).orElse(NOT_SET);
     }
 
     /**
@@ -329,7 +331,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      *
      * @return expected number of events or null if no expected size was specified.
      */
-    public Integer expectedSize()
+    public Optional<Integer> expectedSize()
     {
         return expectedSize;
     }
@@ -355,7 +357,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         buf.append(ClassUtils.getSimpleName(this.getClass()));
         buf.append(" {");
         buf.append("id=").append(groupId);
-        buf.append(", expected size=").append(expectedSize);
+        buf.append(", expected size=").append(expectedSize.map(v -> v.toString()).orElse(NOT_SET));
 
         try
         {

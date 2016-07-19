@@ -10,18 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -48,25 +43,19 @@ public class HttpFunctionalTestCase extends FunctionalTestCase
 
         if (checkPathProperties)
         {
-            EventCallback callback = new EventCallback()
+            EventCallback callback = (context, component) ->
             {
-                @Override
-                public void eventReceived(final MuleEventContext context, final Object component) throws Exception
-                {
-                    MuleMessage msg = context.getMessage();
-                    assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
-                    assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
-                    assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
-                }
+                MuleMessage msg = context.getMessage();
+                assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+                assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
+                assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
             };
 
             testComponent.setEventCallback(callback);
         }
 
         MuleClient client = muleContext.getClient();
-        Map<String, Serializable> props = new HashMap<>();
-        props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
-        MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
+        MuleMessage result = client.send("clientEndpoint", MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build());
         assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 }
