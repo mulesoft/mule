@@ -15,6 +15,10 @@ import java.util.Set;
 
 public class MulePluginsClassLoader extends FineGrainedControlClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     public MulePluginsClassLoader(ClassLoader parent, PluginDescriptor... plugins)
     {
