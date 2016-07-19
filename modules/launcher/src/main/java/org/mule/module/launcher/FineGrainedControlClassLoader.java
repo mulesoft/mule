@@ -19,6 +19,11 @@ import java.util.Set;
 public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
 {
 
+    static
+    {
+        registerAsParallelCapable();
+    }
+
     protected String appName;
 
     // Finished with '.' so that we can use startsWith to verify
@@ -30,8 +35,8 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
             "com.mulesource."
     };
 
-    protected Set<String> overrides = new HashSet<String>();
-    protected Set<String> blocked = new HashSet<String>();
+    protected final Set<String> overrides = new HashSet<>();
+    protected final Set<String> blocked = new HashSet<>();
 
     public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent)
     {
@@ -71,7 +76,7 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
     }
 
     @Override
-    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
     {
         Class<?> result = findLoadedClass(name);
 
@@ -79,14 +84,9 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
         {
             return result;
         }
-        boolean overrideMatch = isOverridden(name);
-
-
-        if (overrideMatch)
+        if (isOverridden(name))
         {
-            boolean blockedMatch = isBlocked(name);
-
-            if (blockedMatch)
+            if (isBlocked(name))
             {
                 // load this class from the child ONLY, don't attempt parent, let CNFE exception propagate
                 result = findClass(name);
@@ -104,8 +104,6 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
                     result = findParentClass(name);
                 }
             }
-
-
         }
         else
         {
@@ -172,7 +170,10 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException
     {
-        return super.findClass(name);
+        synchronized (getClassLoadingLock(name))
+        {
+            return super.findClass(name);
+        }
     }
 
 }

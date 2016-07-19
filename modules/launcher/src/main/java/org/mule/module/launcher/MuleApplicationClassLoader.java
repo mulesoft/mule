@@ -23,6 +23,10 @@ import java.util.Set;
 
 public class MuleApplicationClassLoader extends AbstractArtifactClassLoader implements ApplicationClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     /**
      * Library directory in Mule application.
@@ -146,6 +150,7 @@ public class MuleApplicationClassLoader extends AbstractArtifactClassLoader impl
         return super.getResources(name);
     }
 
+    @Override
     public String getAppName()
     {
         return appName;

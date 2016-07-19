@@ -18,6 +18,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleSystemClassLoader extends URLClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
