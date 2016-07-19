@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.extension.email.internal.EmailContentProcessor.process;
+import static org.mule.extension.email.api.EmailContentProcessor.process;
 import static org.mule.extension.email.internal.commands.ReplyCommand.IN_REPLY_TO_HEADER;
 import static org.mule.extension.email.internal.commands.ReplyCommand.NO_EMAIL_FOUND;
 import static org.mule.extension.email.util.EmailTestUtils.ALE_EMAIL;
@@ -29,7 +29,7 @@ import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.MG_EMAIL;
 import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.extension.email.api.EmailAttributes;
-import org.mule.extension.email.internal.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;

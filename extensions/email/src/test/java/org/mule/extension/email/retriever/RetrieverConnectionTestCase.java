@@ -23,8 +23,8 @@ import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
-import org.mule.extension.email.internal.exception.EmailConnectionException;
-import org.mule.extension.email.internal.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailConnectionException;
+import org.mule.extension.email.api.exception.EmailException;
 
 import javax.mail.Flags;
 import javax.mail.Folder;

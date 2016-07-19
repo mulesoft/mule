@@ -12,8 +12,8 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.email.internal.AbstractEmailConnection;
 import org.mule.extension.email.internal.EmailProtocol;
-import org.mule.extension.email.internal.exception.EmailConnectionException;
-import org.mule.extension.email.internal.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailConnectionException;
+import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 

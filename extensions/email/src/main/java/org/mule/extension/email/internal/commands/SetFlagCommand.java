@@ -9,7 +9,7 @@ package org.mule.extension.email.internal.commands;
 import static java.lang.String.format;
 import static javax.mail.Folder.READ_WRITE;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
-import org.mule.extension.email.internal.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.List;

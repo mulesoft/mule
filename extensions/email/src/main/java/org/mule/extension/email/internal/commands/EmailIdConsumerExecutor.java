@@ -8,7 +8,7 @@ package org.mule.extension.email.internal.commands;
 
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
 import org.mule.extension.email.api.EmailAttributes;
-import org.mule.extension.email.internal.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.List;
