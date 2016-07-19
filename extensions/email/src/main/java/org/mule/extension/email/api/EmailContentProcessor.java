@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.internal;
+package org.mule.extension.email.api;
 
 import static javax.mail.Part.ATTACHMENT;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT;
 import static org.mule.runtime.core.util.IOUtils.toByteArray;
-import org.mule.extension.email.internal.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.core.util.IOUtils;
 
 import com.google.common.collect.ImmutableMap;

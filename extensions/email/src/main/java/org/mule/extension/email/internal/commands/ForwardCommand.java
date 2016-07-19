@@ -13,7 +13,7 @@ import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
 import org.mule.extension.email.internal.sender.SenderConnection;
-import org.mule.extension.email.internal.exception.EmailSenderException;
+import org.mule.extension.email.api.exception.EmailSenderException;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.List;

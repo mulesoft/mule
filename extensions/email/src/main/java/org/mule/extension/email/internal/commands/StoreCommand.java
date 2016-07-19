@@ -11,8 +11,8 @@ import static java.nio.file.Paths.get;
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.runtime.core.util.FileUtils.write;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
-import org.mule.extension.email.internal.exception.EmailException;
-import org.mule.extension.email.internal.exception.EmailRetrieverException;
+import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailRetrieverException;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.io.ByteArrayOutputStream;

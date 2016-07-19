@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.internal.builder;
+package org.mule.extension.email.api;
 
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
@@ -15,8 +15,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorUtils.MULTIPA
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.toAddressArray;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
-import org.mule.extension.email.api.EmailAttachment;
-import org.mule.extension.email.internal.exception.EmailException;
+import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.util.EmailConnectorUtils;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;

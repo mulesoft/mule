@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.internal.builder;
+package org.mule.extension.email.api;
 
 import static javax.mail.Flags.Flag.ANSWERED;
 import static javax.mail.Flags.Flag.DELETED;
@@ -14,10 +14,8 @@ import static javax.mail.Flags.Flag.SEEN;
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
-import static org.mule.extension.email.internal.EmailContentProcessor.process;
-import org.mule.extension.email.api.EmailAttributes;
-import org.mule.extension.email.api.EmailFlags;
-import org.mule.extension.email.internal.exception.EmailException;
+import static org.mule.extension.email.api.EmailContentProcessor.process;
+import org.mule.extension.email.api.exception.EmailException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
