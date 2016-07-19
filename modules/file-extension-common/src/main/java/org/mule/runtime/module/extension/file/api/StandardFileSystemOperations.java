@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.file.api;
 
+import static java.lang.String.format;
+import static java.nio.file.Paths.get;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleContext;
@@ -319,6 +322,9 @@ public class StandardFileSystemOperations
      * will be used. If that's not the case, then an {@link IllegalArgumentException} will
      * be thrown.
      *
+     * {@code to} argument should not contain any path separator. {@link IllegalArgumentException} will
+     * be thrown if this precondition is not honored.
+     *
      * @param config     the config that is parameterizing this operation
      * @param fileSystem a reference to the host {@link FileSystem}
      * @param path       the path to the file to be renamed
@@ -333,6 +339,7 @@ public class StandardFileSystemOperations
                        String to,
                        @Optional(defaultValue = "false") boolean overwrite, MuleEvent event)
     {
+        checkArgument(get(to).getNameCount() == 1, format("'to' parameter of rename operation should not contain any file separator character but '%s' was received", to));
         fileSystem.changeToBaseDir(config);
         path = resolvePath(path, event, "path");
         fileSystem.rename(config, path, to, overwrite);
@@ -366,7 +373,7 @@ public class StandardFileSystemOperations
             return ((FileAttributes) message.getAttributes()).getPath();
         }
 
-        throw new IllegalArgumentException(String.format("A %s was not specified and a default one could not be obtained from the current message attributes", attributeName));
+        throw new IllegalArgumentException(format("A %s was not specified and a default one could not be obtained from the current message attributes", attributeName));
     }
 
     private Predicate<FileAttributes> getPredicate(FilePredicateBuilder builder)
