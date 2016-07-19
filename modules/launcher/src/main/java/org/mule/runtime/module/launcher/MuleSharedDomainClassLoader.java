@@ -24,6 +24,11 @@ import java.util.List;
 public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader implements ArtifactClassLoader
 {
 
+    static
+    {
+        registerAsParallelCapable();
+    }
+
     public MuleSharedDomainClassLoader(String domain, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy, List<URL> urls)
     {
         super(domain, urls.toArray(new URL[0]), parent, lookupPolicy);

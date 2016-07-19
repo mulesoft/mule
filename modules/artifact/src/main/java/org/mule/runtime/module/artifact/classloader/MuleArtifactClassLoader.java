@@ -27,6 +27,10 @@ import org.slf4j.LoggerFactory;
  */
 public class MuleArtifactClassLoader extends FineGrainedControlClassLoader implements ArtifactClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION = "/org/mule/runtime/module/artifact/classloader/DefaultResourceReleaser.class";
     private final String name;

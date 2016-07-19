@@ -31,6 +31,10 @@ import org.slf4j.LoggerFactory;
  */
 public class FilteringArtifactClassLoader extends ClassLoader implements ArtifactClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     protected static final Logger logger = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
 

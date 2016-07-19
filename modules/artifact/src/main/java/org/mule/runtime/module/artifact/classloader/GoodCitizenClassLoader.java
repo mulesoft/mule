@@ -31,6 +31,11 @@ import sun.net.www.protocol.jar.Handler;
 public class GoodCitizenClassLoader extends URLClassLoader implements DisposableClassLoader
 {
 
+    static
+    {
+        registerAsParallelCapable();
+    }
+
     public GoodCitizenClassLoader(URL[] urls, ClassLoader parent)
     {
         super(urls, parent, new NonCachingURLStreamHandlerFactory());
@@ -89,6 +94,7 @@ public class GoodCitizenClassLoader extends URLClassLoader implements Disposable
 
     protected static class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactory
     {
+        @Override
         public URLStreamHandler createURLStreamHandler(String protocol)
         {
             return new NonCachingJarResourceURLStreamHandler();

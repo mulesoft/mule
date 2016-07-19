@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.core.config.i18n;
 
+import static org.apache.commons.collections.CollectionUtils.union;
+
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -35,7 +39,17 @@ public abstract class MessageFactory
      * Do not use the default reload control to avoid loading the resource bundle upon each request.
      * Subclasses can override to provide a different default.
      */
-    protected ResourceBundle.Control reloadControl = null;
+    protected static final ResourceBundle.Control reloadControl = new ResourceBundle.Control()
+    {
+        // Avoid trying to load the java class.
+        private List<String> formats = new ArrayList<>(union(FORMAT_PROPERTIES, FORMAT_CLASS));
+
+        @Override
+        public List<String> getFormats(String baseName)
+        {
+            return formats;
+        };
+    };
 
     /**
      * Computes the bundle's full path 
@@ -225,12 +239,7 @@ public abstract class MessageFactory
         {
             logger.trace("Loading resource bundle: " + bundlePath + " for locale " + locale);
         }
-        final ResourceBundle.Control control = getReloadControl();
-        ResourceBundle bundle = control != null
-                                            ? ResourceBundle.getBundle(bundlePath, locale, getClassLoader(), control)
-                                            : ResourceBundle.getBundle(bundlePath, locale, getClassLoader());
-
-        return bundle;
+        return ResourceBundle.getBundle(bundlePath, locale, getClassLoader(), getReloadControl());
     }
 
     /**

@@ -36,6 +36,33 @@ import java.util.Set;
 public class ContainerClassLoaderFactory
 {
 
+    private static final class MuleContainerClassLoader extends MuleArtifactClassLoader
+    {
+        static
+        {
+            registerAsParallelCapable();
+        }
+
+        private MuleContainerClassLoader(String name, URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy)
+        {
+            super(name, urls, parent, lookupPolicy);
+        }
+
+        @Override
+        public URL findResource(String name)
+        {
+            // Container classLoader is just an adapter, it does not owns any resource
+            return null;
+        }
+
+        @Override
+        public Enumeration<URL> findResources(String name) throws IOException
+        {
+            // Container classLoader is just an adapter, it does not owns any resource
+            return new EnumerationAdapter<>(Collections.emptyList());
+        }
+    }
+
     //TODO(pablo.kraan): MULE-9524: Add a way to configure system and boot packages used on class loading lookup
     /**
      * System package define all the prefixes that must be loaded only from the container
@@ -130,25 +157,7 @@ public class ContainerClassLoaderFactory
      */
     protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader, List<MuleModule> muleModules, final ClassLoaderLookupPolicy containerLookupPolicy)
     {
-        final ArtifactClassLoader containerClassLoader = new MuleArtifactClassLoader("mule", new URL[0], parentClassLoader, containerLookupPolicy)
-        {
-
-             @Override
-            public URL findResource(String name)
-            {
-                // Container classLoader is just an adapter, it does not owns any resource
-                return null;
-            }
-
-            @Override
-            public Enumeration<URL> findResources(String name) throws IOException
-            {
-                // Container classLoader is just an adapter, it does not owns any resource
-                return new EnumerationAdapter<>(Collections.emptyList());
-            }
-        };
-
-        return createContainerFilteringClassLoader(muleModules, containerClassLoader);
+        return createContainerFilteringClassLoader(muleModules, new MuleContainerClassLoader("mule", new URL[0], parentClassLoader, containerLookupPolicy));
     }
 
     public void setModuleDiscoverer(ModuleDiscoverer moduleDiscoverer)

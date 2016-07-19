@@ -34,6 +34,10 @@ import org.slf4j.LoggerFactory;
  */
 public class CompositeArtifactClassLoader extends CompositeClassLoader implements ArtifactClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     protected static final Logger logger = LoggerFactory.getLogger(CompositeApplicationClassLoader.class);
     private final String artifactName;

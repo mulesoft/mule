@@ -24,6 +24,11 @@ import java.net.URL;
  */
 public class FineGrainedControlClassLoader extends GoodCitizenClassLoader implements ClassLoaderLookupPolicyProvider
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
+
     private final ClassLoaderLookupPolicy lookupPolicy;
 
     public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy)
@@ -34,7 +39,7 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader implem
     }
 
     @Override
-    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
     {
         Class<?> result = findLoadedClass(name);
 
@@ -108,7 +113,10 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader implem
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException
     {
-        return super.findClass(name);
+        synchronized (getClassLoadingLock(name))
+        {
+            return super.findClass(name);
+        }
     }
 
     @Override

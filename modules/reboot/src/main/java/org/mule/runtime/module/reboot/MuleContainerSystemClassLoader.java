@@ -15,6 +15,11 @@ import java.util.List;
  */
 public class MuleContainerSystemClassLoader extends URLClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
+
     //protected transient Log logger = LogFactory.getLog(getClass());
 
     public MuleContainerSystemClassLoader(DefaultMuleClassPathConfig classPath)

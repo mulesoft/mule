@@ -38,6 +38,10 @@ import org.slf4j.LoggerFactory;
  */
 public class CompositeClassLoader extends ClassLoader implements ClassLoaderLookupPolicyProvider
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     protected static final Logger logger = LoggerFactory.getLogger(CompositeClassLoader.class);
 
@@ -73,7 +77,7 @@ public class CompositeClassLoader extends ClassLoader implements ClassLoaderLook
     }
 
     @Override
-    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
     {
         final ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
         Class<?> result;

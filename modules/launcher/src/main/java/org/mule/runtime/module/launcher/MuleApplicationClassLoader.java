@@ -16,6 +16,10 @@ import java.util.List;
 
 public class MuleApplicationClassLoader extends MuleArtifactClassLoader implements ApplicationClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     private NativeLibraryFinder nativeLibraryFinder;
 

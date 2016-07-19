@@ -24,6 +24,10 @@ import java.util.Enumeration;
  */
 public class FilteringContainerClassLoader extends FilteringArtifactClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     /**
      * Creates a new instance

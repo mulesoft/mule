@@ -16,6 +16,10 @@ import java.util.List;
  */
 public class CompositeApplicationClassLoader extends CompositeArtifactClassLoader implements ApplicationClassLoader
 {
+    static
+    {
+        registerAsParallelCapable();
+    }
 
     /**
      * Creates a new instance
