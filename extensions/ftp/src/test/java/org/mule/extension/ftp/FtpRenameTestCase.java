@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_FILE_NAME;
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
-
 import org.mule.extension.FtpTestHarness;
 
 import java.nio.file.Paths;
@@ -47,7 +46,7 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     public void renameReadFile() throws Exception
     {
         testHarness.createHelloWorldFile();
-        doRename("readAndRename", HELLO_PATH, false);
+        doRename("readAndRename", HELLO_PATH, RENAME_TO, false);
         assertRenamedFile();
     }
 
@@ -69,6 +68,15 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
     {
         testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
         doRename("not-there.txt");
+    }
+
+    @Test
+    public void targetPathContainsParts() throws Exception
+    {
+        testHarness.createHelloWorldFile();
+        final String sourcePath = Paths.get(HELLO_PATH).getParent().toString();
+        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
+        doRename("rename", sourcePath, "path/with/parts", true);
     }
 
     @Test
@@ -103,19 +111,19 @@ public class FtpRenameTestCase extends FtpConnectorTestCase
 
     private void doRename(String source) throws Exception
     {
-        doRename("rename", source, false);
+        doRename("rename", source, RENAME_TO, false);
     }
 
     private void doRename(String source, boolean overwrite) throws Exception
     {
-        doRename("rename", source, overwrite);
+        doRename("rename", source, RENAME_TO, overwrite);
     }
 
-    private void doRename(String flow, String source, boolean overwrite) throws Exception
+    private void doRename(String flow, String source, String to, boolean overwrite) throws Exception
     {
         flowRunner(flow)
                 .withFlowVariable("path", source)
-                .withFlowVariable("to", RENAME_TO)
+                .withFlowVariable("to", to)
                 .withFlowVariable("overwrite", overwrite)
                 .run();
     }
