@@ -6,13 +6,18 @@
  */
 package org.mule.test.heisenberg.extension.model;
 
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
 public class LifetimeInfo
 {
+
+    @Optional
+    private LocalDateTime dateOfConception;
 
     private Date dateOfBirth;
 
@@ -37,5 +42,15 @@ public class LifetimeInfo
     public void setDateOfDeath(Calendar dateOfDeath)
     {
         this.dateOfDeath = dateOfDeath;
+    }
+
+    public LocalDateTime getDateOfConception()
+    {
+        return dateOfConception;
+    }
+
+    public void setDateOfConception(LocalDateTime dateOfConception)
+    {
+        this.dateOfConception = dateOfConception;
     }
 }

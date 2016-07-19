@@ -186,19 +186,19 @@
                             </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="weapon-value-maps">
-                          <xs:complexType>
-                            <xs:sequence>
-                              <xs:element minOccurs="0" maxOccurs="unbounded" name="weapon-value-map">
-                                <xs:complexType>
-                                  <xs:sequence maxOccurs="1">
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                  </xs:sequence>
-                                  <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                  <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                                </xs:complexType>
-                              </xs:element>
-                            </xs:sequence>
-                          </xs:complexType>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="weapon-value-map">
+                                        <xs:complexType>
+                                            <xs:sequence maxOccurs="1">
+                                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                                            </xs:sequence>
+                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                                            <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="candidate-doors">
                             <xs:complexType>
@@ -231,7 +231,7 @@
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardList"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="wildCardWeaponMap"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="weaponValueMap"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="weaponValueMap"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors"></xs:attribute>
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="required" name="finalHealth"></xs:attribute>
@@ -243,6 +243,7 @@
                     <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
                     <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfDeath"></xs:attribute>
                     <xs:attribute type="mule:expressionDateTime" use="required" name="dateOfBirth"></xs:attribute>
+                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -263,7 +264,7 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="ListenPaymentsType" substitutionGroup="mule:abstract-message-source" name="listen-payments"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ListenPaymentsType" substitutionGroup="mule:abstract-message-source" name="listen-payments"></xs:element>
     <xs:complexType name="ListenPaymentsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">

@@ -81,6 +81,8 @@ import com.google.common.collect.ImmutableList;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -510,7 +512,7 @@ public abstract class ExtensionDefinitionParser
                 @Override
                 public void visitDateTime(DateTimeType dateTimeType)
                 {
-                    resolverValueHolder.set(parseCalendar(value, dateTimeType, defaultValue));
+                    resolverValueHolder.set(parseDateTime(value, dateTimeType, defaultValue));
                 }
 
                 @Override
@@ -741,18 +743,26 @@ public abstract class ExtensionDefinitionParser
         }
     }
 
-    private ValueResolver parseCalendar(Object value, DateTimeType dataType, Object defaultValue)
+    private ValueResolver parseDateTime(Object value, DateTimeType dataType, Object defaultValue)
     {
+        Class<?> type = getType(dataType);
         if (isExpression(value, parser))
         {
-            return new TypeSafeExpressionValueResolver((String) value, getType(dataType));
+            return new TypeSafeExpressionValueResolver((String) value, type);
         }
 
-        Date date = doParseDate(value, CALENDAR_FORMAT, defaultValue);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-
-        return new StaticValueResolver(calendar);
+        if (type.equals(LocalDateTime.class))
+        {
+            Date date = doParseDate(value, DATE_FORMAT, defaultValue);
+            return new StaticValueResolver(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
+        }
+        else
+        {
+            Date date = doParseDate(value, CALENDAR_FORMAT, defaultValue);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            return new StaticValueResolver(calendar);
+        }
     }
 
     private ValueResolver parseDate(Object value, DateType dateType, Object defaultValue)
