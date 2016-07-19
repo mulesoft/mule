@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.Arrays;
@@ -18,11 +19,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
-@RunWith(Parameterized.class)
+@RunnerDelegateTo(Parameterized.class)
 public class POP3TestCase extends AbstractEmailRetrieverTestCase
 {
     @Parameter
