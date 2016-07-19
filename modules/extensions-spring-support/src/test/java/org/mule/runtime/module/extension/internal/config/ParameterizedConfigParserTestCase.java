@@ -30,6 +30,7 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -237,8 +238,8 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         assertThat(dayOfBirth.get(YEAR), equalTo(getDateOfBirth().get(YEAR)));
         assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfDeath().get(YEAR), equalTo(getDateOfDeath().get(YEAR)));
 
-        assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfConception().getYear(), is(getDateOfBirth().get(YEAR)));
-        assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfConception().getMonth(), is(Month.JANUARY));
+        assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfConception().getYear(), is(getDateOfConception().getYear()));
+        assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfConception().getMonth(), is(getDateOfConception().getMonth()));
 
         assertThat(heisenberg.getMoney(), equalTo(new BigDecimal(MONEY)));
     }
@@ -279,6 +280,11 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         calendar.set(Calendar.MILLISECOND, 0);
 
         return calendar;
+    }
+
+    public static LocalDateTime getDateOfConception()
+    {
+        return LocalDateTime.of(1959, Month.JANUARY, 7,0,0);
     }
 
     public static Calendar getDateOfDeath()

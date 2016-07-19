@@ -36,6 +36,7 @@ import org.mule.test.heisenberg.extension.model.LifetimeInfo;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -110,9 +111,10 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase
     {
         Collection<Field> exposedFields = IntrospectionUtils.getExposedFields(LifetimeInfo.class);
         assertThat(exposedFields, is(not(empty())));
-        assertThat(exposedFields.size(), is(2));
+        assertThat(exposedFields.size(), is(3));
         assertField("dateOfBirth", TYPE_LOADER.load(Date.class), exposedFields);
         assertField("dateOfDeath", TYPE_LOADER.load(Calendar.class), exposedFields);
+        assertField("dateOfConception", TYPE_LOADER.load(LocalDateTime.class), exposedFields);
     }
 
     @Test

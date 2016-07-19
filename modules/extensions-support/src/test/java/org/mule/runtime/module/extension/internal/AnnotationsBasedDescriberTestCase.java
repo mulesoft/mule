@@ -98,6 +98,7 @@ import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -279,7 +280,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ConfigurationDeclaration configuration = extensionDeclaration.getConfigurations().get(1);
         assertThat(configuration, is(notNullValue()));
         assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-        assertThat(configuration.getParameters(), hasSize(27));
+        assertThat(configuration.getParameters(), hasSize(28));
         assertParameter(configuration.getParameters(), "extendedProperty", "", toMetadataType(String.class), true, SUPPORTED, null);
     }
 
@@ -396,7 +397,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
         List<ParameterDeclaration> parameters = conf.getParameters();
-        assertThat(parameters, hasSize(26));
+        assertThat(parameters, hasSize(27));
 
         assertParameter(parameters, "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
         assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
@@ -406,6 +407,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertParameter(parameters, "cancer", "", toMetadataType(boolean.class), true, SUPPORTED, null);
         assertParameter(parameters, "dateOfBirth", "", toMetadataType(Date.class), true, SUPPORTED, null);
         assertParameter(parameters, "dateOfDeath", "", toMetadataType(Calendar.class), true, SUPPORTED, null);
+        assertParameter(parameters, "dateOfConception", "", toMetadataType(LocalDateTime.class), false, SUPPORTED, null);
 
         assertParameter(parameters, "recipe", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
                                 .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
