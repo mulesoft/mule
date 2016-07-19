@@ -30,6 +30,7 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 
 import java.math.BigDecimal;
+import java.time.Month;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -236,8 +237,12 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
         assertThat(dayOfBirth.get(YEAR), equalTo(getDateOfBirth().get(YEAR)));
         assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfDeath().get(YEAR), equalTo(getDateOfDeath().get(YEAR)));
 
+        assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfConception().getYear(), is(getDateOfBirth().get(YEAR)));
+        assertThat(heisenberg.getPersonalInfo().getLifetimeInfo().getDateOfConception().getMonth(), is(Month.JANUARY));
+
         assertThat(heisenberg.getMoney(), equalTo(new BigDecimal(MONEY)));
     }
+
 
     private void assertCandidateDoors(HeisenbergExtension heisenberg)
     {
