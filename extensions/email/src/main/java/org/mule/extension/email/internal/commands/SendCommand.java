@@ -8,18 +8,17 @@ package org.mule.extension.email.internal.commands;
 
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailContent;
-import org.mule.extension.email.internal.sender.SenderConnection;
 import org.mule.extension.email.api.MessageBuilder;
 import org.mule.extension.email.api.exception.EmailSenderException;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import org.mule.extension.email.internal.sender.SenderConnection;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Transport;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents the send operation.
@@ -34,22 +33,23 @@ public final class SendCommand
      * {@code toAddresses}, {@code ccAddresses}, {@code bccAddresses}
      * specified in the message.
      *
-     * @param connection   the connection associated to the operation.
-     * @param content      the text content of the email.
-     * @param subject      the subject of the email.
-     * @param toAddresses  the "to" (primary) addresses to deliver the email.
-     * @param fromAddress  the person(s) that are sending the email.
-     * @param ccAddresses  the carbon copy addresses to deliver the email.
-     * @param bccAddresses the blind carbon copy addresses to deliver the email.
-     * @param headers      a set of custom headers that are bounded with the email.
-     * @param attachments  the attachments that are bounded in the content of the email.
+     * @param connection     the connection associated to the operation.
+     * @param content        the text content of the email.
+     * @param subject        the subject of the email.
+     * @param toAddresses    the "to" (primary) addresses to deliver the email.
+     * @param fromAddress    the person(s) that are sending the email.
+     * @param defaultCharset the default charset of the email message to be used if the {@param content} don't specify it.
+     * @param ccAddresses    the carbon copy addresses to deliver the email.
+     * @param bccAddresses   the blind carbon copy addresses to deliver the email.
+     * @param headers        a map of custom headers that are bounded with the email.
+     * @param attachments    the attachments that are bounded in the content of the email.
      */
     public void send(SenderConnection connection,
                      EmailContent content,
                      String subject,
                      List<String> toAddresses,
                      String fromAddress,
-                     String defaultEncoding,
+                     String defaultCharset,
                      List<String> ccAddresses,
                      List<String> bccAddresses,
                      Map<String, String> headers,
@@ -65,7 +65,7 @@ public final class SendCommand
                     .bcc(bccAddresses)
                     .withSubject(subject)
                     .withAttachments(attachments != null ? attachments : new ArrayList<>())
-                    .withContent(content.getBody(), content.getContentType(), content.getCharset() == null ? defaultEncoding : content.getCharset())
+                    .withContent(content.getBody(), content.getContentType(), content.getCharset() == null ? defaultCharset : content.getCharset())
                     .withHeaders(headers)
                     .build();
 

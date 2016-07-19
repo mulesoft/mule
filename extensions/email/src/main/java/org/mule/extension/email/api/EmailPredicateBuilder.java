@@ -6,15 +6,17 @@
  */
 package org.mule.extension.email.api;
 
-import static java.util.regex.Pattern.compile;
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
+
+import static java.util.regex.Pattern.compile;
 
 /**
  * Builds a {@link Predicate} which verifies that a {@link EmailAttributes} instance
@@ -47,6 +49,7 @@ public class EmailPredicateBuilder
      */
     @Parameter
     @Optional
+    @Summary("Indicates since which date the received emails must be retrieved")
     private LocalDateTime receivedSince;
 
     /**
@@ -54,6 +57,7 @@ public class EmailPredicateBuilder
      */
     @Parameter
     @Optional
+    @Summary("Indicates until which date the received emails must be retrieved")
     private LocalDateTime receivedUntil;
 
     /**
@@ -61,6 +65,7 @@ public class EmailPredicateBuilder
      */
     @Parameter
     @Optional
+    @Summary("Indicates since which date the sent emails must be retrieved")
     private LocalDateTime sentSince;
 
     /**
@@ -68,6 +73,7 @@ public class EmailPredicateBuilder
      */
     @Parameter
     @Optional
+    @Summary("Indicates until which date the sent emails must be retrieved")
     private LocalDateTime sentUntil;
 
     /**
@@ -76,6 +82,7 @@ public class EmailPredicateBuilder
      */
     @Parameter
     @Optional
+    @Summary("Indicates if should retrieve 'seen' or 'not seen' emails")
     private Boolean seen;
 
     /**
@@ -84,6 +91,7 @@ public class EmailPredicateBuilder
      */
     @Parameter
     @Optional
+    @Summary("Indicates if should retrieve 'answered' or 'not answered' emails")
     private Boolean answered;
 
     /**
@@ -92,6 +100,7 @@ public class EmailPredicateBuilder
      */
     @Parameter
     @Optional
+    @Summary("Indicates if should retrieve 'marked as deleted' or 'not marked as deleted' emails")
     private Boolean deleted;
 
     /**
@@ -100,6 +109,7 @@ public class EmailPredicateBuilder
      */
     @Parameter
     @Optional
+    @Summary("Indicates if should retrieve 'recent' or 'not recent' emails")
     private Boolean recent;
 
     /**
@@ -107,6 +117,7 @@ public class EmailPredicateBuilder
      */
     @Parameter
     @Optional
+    @Summary("Subject Regex to match with the wanted emails")
     private String subjectRegex;
 
     /**
@@ -114,6 +125,7 @@ public class EmailPredicateBuilder
      */
     @Parameter
     @Optional
+    @Summary("From Email Address Regex to match with the wanted emails")
     private String fromRegex;
 
     /**

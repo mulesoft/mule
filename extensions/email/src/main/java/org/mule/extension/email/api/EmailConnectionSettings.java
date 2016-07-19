@@ -9,6 +9,8 @@ package org.mule.extension.email.api;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * A simple POJO with a basic set of parameters required by every
@@ -23,21 +25,27 @@ public class EmailConnectionSettings
      * The host name of the mail server.
      */
     @Parameter
+    @Placement(tab = "General", group = "Connection", order = 1)
+    @Summary("Host name of the mail server")
     protected String host;
 
     /**
-     * the username used to connect with the mail server.
+     * The username used to connect with the mail server.
      */
     @Parameter
     @Optional
+    @Placement(tab = "General", group = "Connection", order = 3)
+    @Summary("Username to be used to connect with the mail server")
     protected String user;
 
     /**
-     * the password corresponding to the {@code username}.
+     * The password corresponding to the {@code username}.
      */
     @Parameter
     @Password
     @Optional
+    @Placement(tab = "General", group = "Connection", order = 4)
+    @Summary("Username password")
     protected String password;
 
     /**

@@ -9,6 +9,7 @@ package org.mule.extension.email.internal.sender;
 import static org.mule.extension.email.internal.EmailProtocol.SMTPS;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.SMTPS_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -18,6 +19,9 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * A {@link ConnectionProvider} that returns instances of smtps based {@link RetrieverConnection}s.
@@ -27,13 +31,16 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("smtps")
+@DisplayName("SMTPS Connection")
 public class SMTPSProvider extends AbstractSenderProvider implements Initialisable
 {
     /**
-     * The port number of the mail server.
+     * The port number of the mail server. By default is '465'.
      */
     @Parameter
     @Optional(defaultValue = SMTPS_PORT)
+    @Summary("The port number of the mail server")
+    @Placement(tab = "General", group = "Connection", order = 2)
     private String port;
 
     /**
@@ -41,6 +48,9 @@ public class SMTPSProvider extends AbstractSenderProvider implements Initialisab
      * Allows to create a TLS secured connections.
      */
     @Parameter
+    @Summary("TLS Context for the secure connection of SMTPS protocol")
+    @Placement(tab = "General", group = "Connection", order = 5)
+    @DisplayName("TLS Context Factory")
     private TlsContextFactory tlsContextFactory;
 
     /**

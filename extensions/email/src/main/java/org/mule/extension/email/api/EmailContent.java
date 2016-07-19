@@ -7,11 +7,15 @@
 package org.mule.extension.email.api;
 
 
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT_PLAIN;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
+
+import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT_PLAIN;
 
 /**
  * Represents and enables the construction of the content of an email
@@ -42,28 +46,35 @@ public class EmailContent
     }
 
     /**
-     * The text body of the message content.
+     * The body text of the message content.
      */
     @Parameter
     @Optional(defaultValue = "#[payload]")
+    @Summary("Text body of the message content")
+    @Placement(order = 1)
     private String body;
 
     /**
-     * The contentType of the body. One of "text/html" or "text/plain"
+     * The contentType of the body text. Example: "text/html" or "text/plain".
      * <p>
      * The default value is "text/plain"
      */
     @Parameter
     @Optional(defaultValue = TEXT_PLAIN)
+    @Summary("ContentType of the body text. Example: \"text/html\" or \"text/plain\"")
+    @DisplayName("ContentType")
+    @Placement(order = 2)
     private String contentType;
 
     /**
      * The character encoding of the body.
      * <p>
-     * If is not specified
+     * If not specified, it defaults to the default charset in the mule configuration
      */
     @Parameter
     @Optional
+    @Summary("Character encoding of the body")
+    @Placement(order = 3)
     private String charset;
 
     /**

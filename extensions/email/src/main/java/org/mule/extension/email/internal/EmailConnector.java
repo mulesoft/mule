@@ -24,7 +24,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
  * @since 4.0
  */
 @Configurations({SMTPConfiguration.class, POP3Configuration.class, IMAPConfiguration.class})
-@Extension(name = "Email Connector", description = "Connector to send and list email messages to and from mailboxes")
+@Extension(name = "Email", description = "Connector to send and list email messages to and from mailboxes")
 @Export(classes = EmailException.class)
 public class EmailConnector
 {

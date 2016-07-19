@@ -11,16 +11,19 @@ import org.mule.extension.email.internal.retriever.RetrieverOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
- * Configuration for operations that are performed through the POP3
- * protocol.
+ * Configuration for operations that are performed through the POP3 (Post Office Protocol 3) protocol.
  *
  * @since 4.0
  */
 @Operations(RetrieverOperations.class)
 @Providers({POP3Provider.class, POP3SProvider.class})
 @Configuration(name = "pop3")
+@DisplayName("POP3")
+@Summary("Configuration for operations that are performed through the POP3 protocol")
 public class POP3Configuration implements RetrieverConfiguration
 {
 

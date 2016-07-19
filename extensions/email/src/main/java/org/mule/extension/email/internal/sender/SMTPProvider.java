@@ -8,11 +8,15 @@ package org.mule.extension.email.internal.sender;
 
 import static org.mule.extension.email.internal.EmailProtocol.SMTP;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.SMTP_PORT;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * A {@link ConnectionProvider} that returns instances of smtp based {@link SenderConnection}s.
@@ -20,13 +24,17 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("smtp")
+@DisplayName("SMTP Connection")
 public class SMTPProvider extends AbstractSenderProvider
 {
+
     /**
      * The port number of the mail server.
      */
     @Parameter
     @Optional(defaultValue = SMTP_PORT)
+    @Summary("The port number of the mail server")
+    @Placement(tab = "General", group = "Connection", order = 2)
     private String port;
 
     /**
