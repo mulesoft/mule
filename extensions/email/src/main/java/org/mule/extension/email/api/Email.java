@@ -9,7 +9,9 @@ package org.mule.extension.email.api;
 import org.mule.runtime.extension.api.annotation.Parameter;
 
 /**
- * //TODO
+ * Email message representation, holding its {@link EmailContent} and {@link EmailAttributes}
+ *
+ * @since 4.0
  */
 public class Email
 {
