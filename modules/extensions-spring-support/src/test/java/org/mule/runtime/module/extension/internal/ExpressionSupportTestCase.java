@@ -16,6 +16,8 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,6 +29,15 @@ import org.junit.runners.Parameterized.Parameters;
 public class ExpressionSupportTestCase extends ExtensionFunctionalTestCase
 {
 
+    private final String config;
+    @Rule
+    public ExpectedException expectedException = none();
+
+    public ExpressionSupportTestCase(String config)
+    {
+        this.config = config;
+    }
+
     @Parameters(name = "{0}")
     public static Collection<Object[]> data()
     {
@@ -35,16 +46,6 @@ public class ExpressionSupportTestCase extends ExtensionFunctionalTestCase
                 {"heisenberg-fixed-parameter-with-expression.xml"}
         });
     }
-
-    private final String config;
-
-    public ExpressionSupportTestCase(String config)
-    {
-        this.config = config;
-    }
-
-    @Rule
-    public ExpectedException expectedException = none();
 
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
@@ -63,6 +64,21 @@ public class ExpressionSupportTestCase extends ExtensionFunctionalTestCase
     {
         expectedException.expect(InitialisationException.class);
         expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        expectedException.expectCause(new BaseMatcher<Throwable>()
+        {
+            @Override
+            public boolean matches(Object item)
+            {
+                Throwable exception = (Throwable) item;
+                return exception.getMessage().contains("expressions");
+            }
+
+            @Override
+            public void describeTo(Description description)
+            {
+                description.appendText("exception cause was expected to have the word expressions");
+            }
+        });
     }
 
     @Test
