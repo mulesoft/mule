@@ -6,10 +6,10 @@
  */
 package org.mule.extension.ftp.internal;
 
-import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFilePredicateBuilder;
-import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpConnectionProvider;
+import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
+import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpConnectionProvider;
 import org.mule.extension.ftp.internal.sftp.connection.SftpConnectionProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.annotation.Export;
@@ -17,8 +17,11 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
+import org.mule.runtime.extension.api.annotation.capability.Xml;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
 import org.mule.runtime.module.extension.file.api.StandardFileSystemOperations;
@@ -30,11 +33,12 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-@Extension(name = "Ftp Connector", description = "Connector to manipulate Files on a FTP/SFTP server")
+@Extension(name = "FTP", description = "Connector to manipulate Files on a FTP/SFTP server")
 @Operations({StandardFileSystemOperations.class})
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = FtpFilePredicateBuilder.class)
 @Providers({ClassicFtpConnectionProvider.class, SftpConnectionProvider.class})
 @Export(classes = {SftpFileAttributes.class, ClassicFtpFileAttributes.class})
+@Xml(namespace = "ftp")
 public class FtpConnector extends FileConnectorConfig
 {
 
@@ -50,6 +54,8 @@ public class FtpConnector extends FileConnectorConfig
      */
     @Parameter
     @Optional
+    @Summary("The directory to be considered as the root of every relative path used with this connector")
+    @DisplayName("Base Directory")
     private String baseDir = null;
 
 

@@ -34,6 +34,9 @@ public class FtpFilePredicateBuilder extends FilePredicateBuilder<FtpFilePredica
     @Optional
     private LocalDateTime timestampSince;
 
+    /**
+     * Files created after this date are rejected.
+     */
     @Parameter
     @Optional
     private LocalDateTime timestampUntil;
@@ -65,5 +68,4 @@ public class FtpFilePredicateBuilder extends FilePredicateBuilder<FtpFilePredica
         this.timestampUntil = timestampUntil;
         return this;
     }
-
 }

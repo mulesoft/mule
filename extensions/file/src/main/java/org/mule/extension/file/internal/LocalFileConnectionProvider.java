@@ -11,6 +11,7 @@ import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 
 import javax.inject.Inject;
@@ -21,12 +22,11 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
+@DisplayName("Local FileSystem Connection")
 public final class LocalFileConnectionProvider implements ConnectionProvider<FileSystem>
 {
     @Inject
     private MuleContext muleContext;
-
-
 
     /**
      * Creates and returns a new instance of {@link LocalFileSystem}

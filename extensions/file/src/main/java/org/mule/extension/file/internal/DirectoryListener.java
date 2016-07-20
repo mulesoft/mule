@@ -19,6 +19,9 @@ import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.module.extension.file.api.FileDisplayConstants.MATCHER;
+import static org.mule.runtime.module.extension.file.api.FileDisplayConstants.MATCH_WITH;
+
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
@@ -37,6 +40,9 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
@@ -151,21 +157,21 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     private String directory;
 
     /**
-     * Whether to react to creation notifications. Defaults to {@code true}
+     * Whether to react to creation notifications. Defaults to true
      */
     @Parameter
     @Optional(defaultValue = "true")
     private boolean notifyOnCreate = true;
 
     /**
-     * Whether to react to update notifications. Defaults to {@code true}
+     * Whether to react to update notifications. Defaults to true
      */
     @Parameter
     @Optional(defaultValue = "true")
     private boolean notifyOnUpdate = true;
 
     /**
-     * Whether to react to deletion notifications. Defaults to {@code true}
+     * Whether to react to deletion notifications. Defaults to true
      */
     @Parameter
     @Optional(defaultValue = "false")
@@ -182,6 +188,8 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
      */
     @Parameter
     @Optional(defaultValue = "false")
+    @Summary("Whether or not to also listen for notification which happen on sub directories which are also contained " +
+             "on the main one.")
     private boolean recursive = false;
 
     /**
@@ -191,6 +199,8 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     @Parameter
     @Optional
     @Alias("matchWith")
+    @Placement(group = MATCHER)
+    @DisplayName(MATCH_WITH)
     private FilePredicateBuilder<FilePredicateBuilder, FileAttributes> predicateBuilder;
 
     @Inject

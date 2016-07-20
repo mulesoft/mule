@@ -8,10 +8,12 @@ package org.mule.runtime.module.extension.file.api;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.module.extension.file.api.matcher.PathMatcherPredicate;
 
 import java.util.function.Predicate;
@@ -50,6 +52,7 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
      */
     @Parameter
     @Optional
+    @Summary("A matching pattern to be applied on the file name.")
     private String filenamePattern;
 
     /**
@@ -58,6 +61,7 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
      */
     @Parameter
     @Optional
+    @Summary("A matching pattern to be applied on the file path")
     private String pathPattern;
 
     /**
@@ -67,15 +71,18 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
      */
     @Parameter
     @Optional
+    @Summary("Indicates whether accept only directories or non directories files")
     private Boolean directory;
 
     /**
      * If {@code true}, the predicate will only accept files which are not directories nor symbolic links.
-     * If {@code false}, the predicate will only accept files which are not directories nor symbolic links.
+     * If {@code false}, the predicate will only accept files which are directories or symbolic links.
      * If not set, then the criteria doesn't apply.
      */
     @Parameter
     @Optional
+    @Summary("Indicates whether accept only regular files (files which are not directories, nor symbolic links) " +
+             "or only not regular files")
     private Boolean regularFile;
 
     /**
@@ -85,6 +92,7 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
      */
     @Parameter
     @Optional
+    @Summary("Indicates whether accept only symbolic links files or accept only not symbolic links files")
     private Boolean symbolicLink;
 
     /**

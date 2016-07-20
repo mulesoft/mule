@@ -23,6 +23,8 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
 import org.mule.runtime.module.extension.file.api.StandardFileSystemOperations;
@@ -43,7 +45,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-@Extension(name = "File Connector", description = "Connector to manipulate files on a locally mounted file system")
+@Extension(name = "File", description = "Connector to manipulate files on a locally mounted file system")
 @Operations({StandardFileSystemOperations.class})
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = LocalFilePredicateBuilder.class)
 @Providers(LocalFileConnectionProvider.class)
@@ -62,6 +64,8 @@ public class FileConnector extends FileConnectorConfig
      */
     @Parameter
     @Optional
+    @DisplayName("Base Directory")
+    @Summary("Directory to be considered as the root of every relative path used with this connector")
     private String baseDir;
 
     @Override

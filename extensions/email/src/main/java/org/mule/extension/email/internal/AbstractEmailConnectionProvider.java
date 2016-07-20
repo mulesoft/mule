@@ -37,6 +37,7 @@ public abstract class AbstractEmailConnectionProvider<T> implements ConnectionPr
     @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 3)
     @Summary("Socket read timeout")
     protected int readTimeout;
+
     /**
      * The socket write timeout value. This attribute works in tandem with {@link #timeoutUnit}.
      * <p>
@@ -47,6 +48,7 @@ public abstract class AbstractEmailConnectionProvider<T> implements ConnectionPr
     @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 4)
     @Summary("The socket write timeout value")
     protected int writeTimeout;
+
     /**
      * A {@link TimeUnit} which qualifies the {@link #connectionTimeout}, {@link #writeTimeout} and {@link #readTimeout}
      * attributes.
@@ -58,6 +60,7 @@ public abstract class AbstractEmailConnectionProvider<T> implements ConnectionPr
     @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 1)
     @Summary("Time unit to be used in the Timeout configurations")
     private TimeUnit timeoutUnit;
+
     /**
      * The socket connection timeout value. This attribute works in tandem with {@link #timeoutUnit}.
      * <p>
@@ -68,6 +71,7 @@ public abstract class AbstractEmailConnectionProvider<T> implements ConnectionPr
     @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 2)
     @Summary("Socket connection timeout value")
     private int connectionTimeout;
+
     /**
      * An additional custom set of properties to configure the connection
      * session.

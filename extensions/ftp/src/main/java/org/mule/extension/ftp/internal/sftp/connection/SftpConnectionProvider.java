@@ -6,9 +6,11 @@
  */
 package org.mule.extension.ftp.internal.sftp.connection;
 
-import org.mule.extension.ftp.internal.FtpConnector;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
+
 import org.mule.extension.ftp.api.sftp.SftpAuthenticationMethod;
 import org.mule.extension.ftp.internal.AbstractFtpConnectionProvider;
+import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
@@ -16,7 +18,10 @@ import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import com.google.common.base.Joiner;
 
@@ -29,28 +34,33 @@ import java.util.Set;
  * @since 4.0
  */
 @Alias("sftp")
+@DisplayName("SFTP Connection")
 public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFileSystem>
 {
 
     /**
-     * The port number to connect on
+     * The port number of the SFTP server to connect on
      */
     @Parameter
     @Optional(defaultValue = "22")
+    @Placement(group = CONNECTION, order = 2)
     private int port = 22;
 
     /**
-     * If the FTP server is authenticated, this is the username used for authentication
+     * Username for the FTP Server. Required if the server is authenticated.
      */
     @Parameter
+    @Optional
+    @Placement(group = CONNECTION, order = 3)
     protected String username;
 
     /**
-     * The password for the user being authenticated.
+     * Password for the FTP Server. Required if the server is authenticated.
      */
     @Parameter
     @Optional
     @Password
+    @Placement(group = CONNECTION, order = 4)
     private String password;
 
     /**
@@ -61,6 +71,8 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFi
     @Parameter
     @Optional
     @Password
+    @Placement(group = CONNECTION, order = 6)
+    @Summary("The passphrase (password) for the identityFile, if configured")
     private String passphrase;
 
     /**
@@ -68,10 +80,11 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFi
      */
     @Parameter
     @Optional
+    @Placement(group = CONNECTION, order = 5)
     private String identityFile;
 
     /**
-     * Comma separated list of authentication methods used by the SFTP client.
+     * Set of authentication methods used by the SFTP client.
      * Valid values are: gssapi-with-mic, publickey, keyboard-interactive and password.
      */
     @Parameter
