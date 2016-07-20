@@ -54,7 +54,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     private final String storePrefix;
     private final String eventsPartitionKey;
     private final long created;
-    private final Optional<Integer> expectedSize;
+    private final Integer expectedSize;
     transient private MuleContext muleContext;
     private String commonRootId = null;
     private static boolean hasNoCommonRootId = false;
@@ -80,7 +80,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         this.storePrefix = storePrefix;
         this.eventsPartitionKey = storePrefix + ".eventGroups." + groupId;
 
-        this.expectedSize = expectedSize;
+        this.expectedSize = expectedSize.orElse(null);
         this.groupId = groupId;
     }
 
@@ -333,7 +333,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      */
     public Optional<Integer> expectedSize()
     {
-        return expectedSize;
+        return Optional.ofNullable(expectedSize);
     }
 
     /**
@@ -357,7 +357,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         buf.append(ClassUtils.getSimpleName(this.getClass()));
         buf.append(" {");
         buf.append("id=").append(groupId);
-        buf.append(", expected size=").append(expectedSize.map(v -> v.toString()).orElse(NOT_SET));
+        buf.append(", expected size=").append(expectedSize().map(v -> v.toString()).orElse(NOT_SET));
 
         try
         {
