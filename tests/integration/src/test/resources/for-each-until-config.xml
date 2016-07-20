@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <spring:beans>
+        <spring:bean id="objectStore" class="org.mule.runtime.core.util.store.SimpleMemoryObjectStore"/>
+    </spring:beans>
+
+    <flow name="flowVarSync">
+        <set-variable variableName="count" value="#[0]"/>
+        <foreach collection="#[payload]">
+            <set-variable variableName="current" value="#[payload]"/>
+            <until-successful synchronous="true">
+                <processor-chain>
+                    <set-payload value="#[payload]"/>
+                    <set-variable variableName="until" value="#[payload]"/>
+                </processor-chain>
+            </until-successful>
+            <set-variable variableName="count" value="#[flowVars.count + payload]"/>
+        </foreach>
+    </flow>
+
+    <flow name="flowVarSyncNoForEach">
+        <set-variable variableName="count" value="#[3]"/>
+        <set-variable variableName="current" value="#[payload]"/>
+        <until-successful synchronous="true">
+            <processor-chain>
+                <set-payload value="#[payload]"/>
+                <set-variable variableName="until" value="#[payload]"/>
+            </processor-chain>
+        </until-successful>
+        <set-variable variableName="count" value="#[flowVars.count + payload]"/>
+    </flow>
+
+    <flow name="flowVarAsync">
+        <set-variable variableName="count" value="#[0]"/>
+        <foreach collection="#[payload]">
+            <set-variable variableName="current" value="#[payload]"/>
+            <until-successful synchronous="false" objectStore-ref="objectStore">
+                <set-payload value="#[payload]"/>
+            </until-successful>
+            <set-variable variableName="count" value="#[flowVars.count + payload]"/>
+        </foreach>
+    </flow>
+
+</mule>

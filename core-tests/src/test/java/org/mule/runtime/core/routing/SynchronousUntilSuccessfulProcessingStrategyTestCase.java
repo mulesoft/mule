@@ -177,7 +177,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     {
         when(mockRoute.process(event)).thenReturn(null);
         SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-        assertThat((VoidMuleEvent) processingStrategy.route(event), is(VoidMuleEvent.getInstance()));
+        assertThat(processingStrategy.route(event), is(event));
     }
 
     @Test
@@ -185,7 +185,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     {
         when(mockRoute.process(event)).thenReturn(VoidMuleEvent.getInstance());
         SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-        assertThat((VoidMuleEvent) processingStrategy.route(event), is(VoidMuleEvent.getInstance()));
+        assertThat(processingStrategy.route(event), is(event));
     }
 
     private SynchronousUntilSuccessfulProcessingStrategy createProcessingStrategy() throws InitialisationException
