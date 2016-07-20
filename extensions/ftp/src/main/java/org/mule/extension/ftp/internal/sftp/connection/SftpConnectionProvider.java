@@ -72,7 +72,7 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFi
     @Optional
     @Password
     @Placement(group = CONNECTION, order = 6)
-    @Summary("The passphrase (password) for the identityFile, if is configured")
+    @Summary("The passphrase (password) for the identityFile, if configured")
     private String passphrase;
 
     /**
