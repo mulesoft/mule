@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -27,7 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class TargetParameterModelValidatorTestCase extends AbstractMuleTestCase
+public class OperationParametersModelValidatorTestCase extends AbstractMuleTestCase
 {
 
     public static final String EXTENSION_NAME = "extension";
@@ -41,7 +42,7 @@ public class TargetParameterModelValidatorTestCase extends AbstractMuleTestCase
     @Mock
     private ParameterModel goodParameter;
 
-    private ModelValidator validator = new TargetParameterModelValidator();
+    private ModelValidator validator = new OperationParametersModelValidator();
 
     @Before
     public void before()
@@ -60,10 +61,20 @@ public class TargetParameterModelValidatorTestCase extends AbstractMuleTestCase
     }
 
     @Test(expected = IllegalOperationModelDefinitionException.class)
-    public void invalid()
+    public void targetParameter()
     {
         ParameterModel offending = mock(ParameterModel.class);
         when(offending.getName()).thenReturn(TARGET_ATTRIBUTE);
+
+        when(operationModel.getParameterModels()).thenReturn(asList(goodParameter, offending));
+        validator.validate(extensionModel);
+    }
+
+    @Test(expected = IllegalOperationModelDefinitionException.class)
+    public void transactionalActionParameter()
+    {
+        ParameterModel offending = mock(ParameterModel.class);
+        when(offending.getName()).thenReturn(TRANSACTIONAL_ACTION_PARAMETER_NAME);
 
         when(operationModel.getParameterModels()).thenReturn(asList(goodParameter, offending));
         validator.validate(extensionModel);

@@ -75,7 +75,7 @@ public final class MuleExtensionAnnotationParser
     private static final Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
             .add(MuleEvent.class)
             .add(MuleMessage.class)
-            .add(MuleMessage.class)
+            .add(org.mule.runtime.core.api.MuleMessage.class)
             .build();
 
     static String getAliasName(Field field)

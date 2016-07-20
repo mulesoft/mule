@@ -66,7 +66,7 @@ import org.mule.runtime.module.extension.internal.introspection.validation.NameC
 import org.mule.runtime.module.extension.internal.introspection.validation.OperationReturnTypeModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.ParameterModelValidator;
 import org.mule.runtime.module.extension.internal.introspection.validation.SubtypesModelValidator;
-import org.mule.runtime.module.extension.internal.introspection.validation.TargetParameterModelValidator;
+import org.mule.runtime.module.extension.internal.introspection.validation.OperationParametersModelValidator;
 import org.mule.runtime.module.extension.internal.runtime.executor.OperationExecutorFactoryWrapper;
 
 import com.google.common.cache.Cache;
@@ -117,7 +117,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                 .add(new ConnectionProviderModelValidator())
                 .add(new ConfigurationModelValidator())
                 .add(new OperationReturnTypeModelValidator())
-                .add(new TargetParameterModelValidator())
+                .add(new OperationParametersModelValidator())
                 .add(new MetadataComponentModelValidator())
                 .build();
     }
@@ -133,6 +133,28 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         modelValidators.forEach(v -> v.validate(extensionModel));
 
         return extensionModel;
+    }
+
+    private void validateMuleVersion(ExtensionDeclaration extensionDeclaration)
+    {
+        try
+        {
+            new MuleVersion(extensionDeclaration.getVersion());
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new IllegalArgumentException(String.format("Invalid version %s for extension '%s'", extensionDeclaration.getVersion(), extensionDeclaration.getName()));
+        }
+    }
+
+    private void enrichModel(DescribingContext describingContext)
+    {
+        modelEnrichers.forEach(enricher -> enricher.enrich(describingContext));
+    }
+
+    private boolean isExpression(String value)
+    {
+        return value.startsWith(DEFAULT_EXPRESSION_PREFIX) && value.endsWith(DEFAULT_EXPRESSION_POSTFIX);
     }
 
     private class FactoryDelegate
@@ -337,27 +359,5 @@ public final class DefaultExtensionFactory implements ExtensionFactory
                                                parameter.getModelProperties());
 
         }
-    }
-
-    private void validateMuleVersion(ExtensionDeclaration extensionDeclaration)
-    {
-        try
-        {
-            new MuleVersion(extensionDeclaration.getVersion());
-        }
-        catch (IllegalArgumentException e)
-        {
-            throw new IllegalArgumentException(String.format("Invalid version %s for extension '%s'", extensionDeclaration.getVersion(), extensionDeclaration.getName()));
-        }
-    }
-
-    private void enrichModel(DescribingContext describingContext)
-    {
-        modelEnrichers.forEach(enricher -> enricher.enrich(describingContext));
-    }
-
-    private boolean isExpression(String value)
-    {
-        return value.startsWith(DEFAULT_EXPRESSION_PREFIX) && value.endsWith(DEFAULT_EXPRESSION_POSTFIX);
     }
 }
