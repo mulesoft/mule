@@ -37,7 +37,6 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
         }
         catch(ComponentException e)
         {
-            assertNotNull(e.getEvent().getMessage().getPayload());
             assertThat(e.getEvent().getMessage().getPayload(), is(nullValue()));
         }
     }
