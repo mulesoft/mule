@@ -77,9 +77,9 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
 
     private boolean checkIfAllAreNull(Object[] objects)
     {
-        for (int i = 0; i < objects.length; i++)
+        for (Object object : objects)
         {
-            if (objects[i] != null && objects[i] != null)
+            if (object != null)
             {
                 return false;
             }

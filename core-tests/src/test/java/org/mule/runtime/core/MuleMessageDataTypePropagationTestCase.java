@@ -107,7 +107,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     {
         MuleMessage muleMessage = MuleMessage.builder().payload(TEST).build();
 
-        assertDataType(MuleMessage.builder().nullPayload().build(), Object.class, ANY, null);
+        assertDataType(MuleMessage.builder(muleMessage).nullPayload().build(), Object.class, ANY, null);
     }
 
     @Test

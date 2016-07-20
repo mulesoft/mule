@@ -7,6 +7,8 @@
 
 package org.mule.compatibility.transport.jms;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -44,7 +46,7 @@ public class JmsTransactionalCachingTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null);
         assertThat(TEST_MESSAGE_1, equalTo(getPayloadAsString(response)));
         response = client.send("vm://testInput", TEST_MESSAGE_2, null);
-        assertThat(null, equalTo(response.getPayload()));
+        assertThat(response.getPayload(), is(nullValue()));
         response = client.send("vm://testInput", TEST_MESSAGE_3, null);
         assertThat(TEST_MESSAGE_3, equalTo(getPayloadAsString(response)));
 

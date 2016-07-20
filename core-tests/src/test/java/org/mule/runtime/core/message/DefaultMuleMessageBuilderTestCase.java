@@ -350,14 +350,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void nullPayloadDoesNotFail()
-    {
-        DefaultMuleMessageBuilder builder = new DefaultMuleMessageBuilder();
-        builder.payload(null);
-    }
-
-    @Test
-    public void nullPayloadPayload()
+    public void nullPayload()
     {
         MuleMessage message = MuleMessage.builder().nullPayload().build();
         assertThat(message.getDataType().getType(), equalTo(Object.class));

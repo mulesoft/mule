@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.ClassUtils;
@@ -87,7 +86,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
     public ServerNotification(Object message, int action, String resourceIdentifier)
     {
-        super((message == null ? MuleMessage.builder().nullPayload().build() : message));
+        super((message == null ? NULL_MESSAGE : message));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
         timestamp = System.currentTimeMillis();

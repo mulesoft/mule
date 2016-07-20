@@ -161,7 +161,6 @@ public class MessagingException extends MuleException
                         try
                         {
                             addInfo(PAYLOAD_INFO_KEY, muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload());
-
                         }
                         catch (Exception e)
                         {
