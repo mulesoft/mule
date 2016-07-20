@@ -6,12 +6,12 @@
  */
 package org.mule.compatibility.core.endpoint.inbound;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
-import org.mule.compatibility.core.endpoint.inbound.InboundNotificationMessageProcessor;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -39,7 +39,6 @@ public class InboundNotificationMessageProcessorTestCase extends AbstractMessage
         assertEquals(endpoint.getEndpointURI().getUri().toString(),
             listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
-        assertEquals(event.getMessage().getPayload(),
-            listener.messageNotification.getSource().getPayload());
+        assertThat(listener.messageNotification.getSource().getPayload(), equalTo(event.getMessage().getPayload()));
     }
 }

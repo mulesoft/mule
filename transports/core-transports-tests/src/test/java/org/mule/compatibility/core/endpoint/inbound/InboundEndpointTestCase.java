@@ -6,10 +6,12 @@
  */
 package org.mule.compatibility.core.endpoint.inbound;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -303,7 +305,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(endpoint.getEndpointURI().getUri().toString(),
             listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
-        assertEquals(inMessage.getPayload(), listener.messageNotification.getSource().getPayload());
+        assertThat(listener.messageNotification.getSource().getPayload(), equalTo(inMessage.getPayload()));
     }
 
     @Test

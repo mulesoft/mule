@@ -6,19 +6,20 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.functional.exceptions.FunctionalTestException;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
-import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.tck.probe.PollingProber;
@@ -81,7 +82,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         assertExceptionMessage(out2);
         assertExceptionMessage(out3);
         assertNotSame(out2, out3);
-        assertEquals(out2.getPayload(), out3.getPayload());
+        assertThat(out3.getPayload(), equalTo(out2.getPayload()));
     }
 
     @Test
