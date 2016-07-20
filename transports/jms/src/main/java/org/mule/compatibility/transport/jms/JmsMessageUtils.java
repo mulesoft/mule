@@ -107,7 +107,11 @@ public class JmsMessageUtils
 
     public static Message toMessage(Object object, Session session) throws JMSException
     {
-        if (object instanceof Message)
+        if (object == null)
+        {
+            return session.createObjectMessage();
+        }
+        else if (object instanceof Message)
         {
             return (Message) object;
         }
