@@ -8,14 +8,12 @@
 package org.mule.runtime.module.db.integration;
 
 import static junit.framework.TestCase.fail;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
@@ -56,7 +54,7 @@ public abstract class AbstractQueryTimeoutTestCase extends AbstractDbIntegration
 
         MuleMessage response = responseEvent.getMessage();
         assertThat(response.getExceptionPayload(), is(Matchers.nullValue()));
-        assertThat(response.getPayload(), is(not(instanceOf(NullPayload.class))));
+        assertThat(response.getPayload(), is(notNullValue()));
 
         try
         {

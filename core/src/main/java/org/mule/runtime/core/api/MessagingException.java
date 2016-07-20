@@ -10,8 +10,6 @@ package org.mule.runtime.core.api;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -25,6 +23,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * <code>MessagingException</code> is a general message exception thrown when errors
@@ -149,25 +148,30 @@ public class MessagingException extends MuleException
             if (DefaultMuleConfiguration.isVerboseExceptions())
             {
                 Object payload = muleMessage.getPayload();
-                if (payload == null)
-                {
-                    payload = NullPayload.getInstance();
-                }
 
-                if (isConsumable(muleMessage.getPayload().getClass()))
+                if (isConsumable(muleMessage.getDataType().getType()))
                 {
                     addInfo(PAYLOAD_INFO_KEY, abbreviate(payload.toString(), 1000));
                 }
                 else
                 {
-                    addInfo(PAYLOAD_TYPE_INFO_KEY, muleMessage.getPayload().getClass().getName());
-                    try
+                    if (payload != null)
                     {
-                        addInfo(PAYLOAD_INFO_KEY, muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload());
+                        addInfo(PAYLOAD_TYPE_INFO_KEY, muleMessage.getDataType().getType().getName());
+                        try
+                        {
+                            addInfo(PAYLOAD_INFO_KEY, muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload());
+
+                        }
+                        catch (Exception e)
+                        {
+                            addInfo(PAYLOAD_INFO_KEY, format("%s while getting payload: %s", e.getClass().getName(), e.getMessage()));
+                        }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        addInfo(PAYLOAD_INFO_KEY, format("%s while getting payload: %s", e.getClass().getName(), e.getMessage()));
+                        addInfo(PAYLOAD_TYPE_INFO_KEY, Objects.toString(null));
+                        addInfo(PAYLOAD_INFO_KEY, Objects.toString(null));
                     }
                 }
             }
@@ -175,7 +179,7 @@ public class MessagingException extends MuleException
         else
         {
             buf.append("The current MuleMessage is null!");
-            addInfo(PAYLOAD_INFO_KEY, NullPayload.getInstance().toString());
+            addInfo(PAYLOAD_INFO_KEY, Objects.toString(null));
         }
 
         return buf.toString();

@@ -8,8 +8,6 @@ package org.mule.runtime.module.cxf.transport;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import static org.mule.runtime.api.metadata.MediaType.XML;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -312,8 +310,7 @@ public class MuleUniversalConduit extends AbstractConduit
     protected InputStream getResponseBody(Message m, MuleEvent result) throws TransformerException, IOException
     {
         boolean response = result != null
-                           && !NullPayload.getInstance().equals(result.getMessage().getPayload())
-                           && !isOneway(m.getExchange());
+                           && result.getMessage().getPayload() != null && !isOneway(m.getExchange());
 
         if (response)
         {

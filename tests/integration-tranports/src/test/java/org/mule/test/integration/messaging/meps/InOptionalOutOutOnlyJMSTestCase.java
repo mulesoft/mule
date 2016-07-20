@@ -6,11 +6,12 @@
  */
 package org.mule.test.integration.messaging.meps;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -63,7 +64,7 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
 
         MuleMessage result = client.send("inboundEndpoint", "some data", null);
         assertNotNull(result);
-        assertEquals(NullPayload.getInstance(), result.getPayload());
+        assertThat(result.getPayload(), is(nullValue()));
 
         Map<String, Serializable> props = new HashMap<>();
         props.put("foo", "bar");

@@ -38,7 +38,7 @@ public class PayloadTypeFilter implements Filter
 
     public boolean accept(MuleMessage message)
     {
-        return (expectedType != null ? expectedType.isAssignableFrom(message.getPayload().getClass()) : false);
+        return (expectedType != null ? expectedType.isAssignableFrom(message.getDataType().getType()) : false);
     }
 
     public Class getExpectedType()

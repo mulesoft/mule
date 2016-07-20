@@ -24,7 +24,6 @@ import org.mule.extension.validation.internal.validator.NullValidator;
 import org.mule.extension.validation.internal.validator.SizeValidator;
 import org.mule.extension.validation.internal.validator.TimeValidator;
 import org.mule.extension.validation.internal.validator.UrlValidator;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.util.Collection;
 import java.util.Map;
@@ -159,8 +158,7 @@ public final class CommonValidationOperations extends ValidationSupport
     }
 
     /**
-     * Validates that the given {@code value} is not {@code null} nor
-     * an instance of {@link NullPayload}
+     * Validates that the given {@code value} is not {@code null}.
      *
      * @param value   the value to test
      * @param options the {@link ValidationOptions}
@@ -174,8 +172,7 @@ public final class CommonValidationOperations extends ValidationSupport
     }
 
     /**
-     * Validates that the given {@code value} is {@code null} or
-     * an instance of {@link NullPayload}
+     * Validates that the given {@code value} is {@code null}.
      *
      * @param value   the value to test
      * @param options the {@link ValidationOptions}

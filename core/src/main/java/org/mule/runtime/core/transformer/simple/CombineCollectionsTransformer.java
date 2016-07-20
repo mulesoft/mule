@@ -59,7 +59,7 @@ public class CombineCollectionsTransformer implements MessageProcessor
         }
         else
         {
-            itemType = msg.getPayload().getClass();
+            itemType = msg.getDataType().getType();
             payload.add(msg.getPayload());
         }
 

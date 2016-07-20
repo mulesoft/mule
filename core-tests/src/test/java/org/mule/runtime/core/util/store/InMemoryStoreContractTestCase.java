@@ -7,7 +7,6 @@
 package org.mule.runtime.core.util.store;
 
 import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.io.Serializable;
 
@@ -22,6 +21,6 @@ public class InMemoryStoreContractTestCase extends AbstractObjectStoreContractTe
     @Override
     public Serializable getStorableValue()
     {
-        return NullPayload.getInstance();
+        return null;
     }
 }

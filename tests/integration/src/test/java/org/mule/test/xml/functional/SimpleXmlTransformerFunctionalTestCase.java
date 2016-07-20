@@ -11,11 +11,10 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
@@ -59,7 +58,7 @@ public class SimpleXmlTransformerFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = client.request(endpoint, RECEIVE_TIMEOUT);
         assertNotNull(message);
         assertNotNull(message.getPayload());
-        assertThat(message.getPayload().getClass().getName(), message.getPayload(), instanceOf(clazz));
+        assertThat(message.getDataType().getType().getName(), message.getPayload(), instanceOf(clazz));
         return message.getPayload();
     }
 

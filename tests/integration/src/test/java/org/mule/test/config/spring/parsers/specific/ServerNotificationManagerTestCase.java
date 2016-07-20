@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -224,7 +223,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         {
             super(
                 new UnauthorisedException(CoreMessages.createStaticMessage("dummy"), new DefaultMuleEvent(
-                            MuleMessage.builder().payload(NullPayload.getInstance()).build(), REQUEST_RESPONSE,
+                        MuleMessage.builder().nullPayload().build(), REQUEST_RESPONSE,
                     getTestFlow(), getTestSession(null, muleContext))), 0);
         }
 

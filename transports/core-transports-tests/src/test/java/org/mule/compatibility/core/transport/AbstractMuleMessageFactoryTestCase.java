@@ -10,10 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -51,7 +49,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
         
         MuleMessage message = factory.create(null, encoding);
         assertNotNull(message);
-        assertEquals(NullPayload.getInstance(), message.getPayload());
+        assertEquals(null, message.getPayload());
     }
 
     @Test

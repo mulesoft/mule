@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
@@ -123,8 +122,7 @@ public class StandardFileSystemOperations
      * <li>{@link Iterator}</li>
      * </ul>
      * <p>
-     * {@code null} or {@link NullPayload} contents are not allowed and will result
-     * in an {@link IllegalArgumentException}.
+     * {@code null} contents are not allowed and will result in an {@link IllegalArgumentException}.
      * <p>
      * To support pass-through scenarios, the {@code path} attribute is optional. If not provided,
      * then the current {@link MuleMessage#getAttributes()} value will be tested to be an
@@ -166,7 +164,7 @@ public class StandardFileSystemOperations
                       @Optional String encoding,
                       MuleEvent event)
     {
-        if (content == null || content instanceof NullPayload)
+        if (content == null)
         {
             throw new IllegalArgumentException("Cannot write a null content");
         }

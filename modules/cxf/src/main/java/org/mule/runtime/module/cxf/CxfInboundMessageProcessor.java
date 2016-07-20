@@ -14,7 +14,6 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -460,7 +459,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             // For one-way operations, no envelope should be returned
             // (http://www.w3.org/TR/soap12-part2/#http-reqbindwaitstate)
             builder.addOutboundProperty(HTTP_STATUS_PROPERTY, ACCEPTED.getStatusCode());
-            builder.payload(NullPayload.getInstance());
+            builder.nullPayload();
         }
         else
         {

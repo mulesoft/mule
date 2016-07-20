@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.HTML_STRING;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -22,9 +23,7 @@ import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
-
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
@@ -38,11 +37,7 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 /**
  *
@@ -354,21 +349,17 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase
         assertThat(message.getOutboundAttachmentNames(), hasItem(ATTACHMENT_KEY));
     }
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
-    public void nullPayload()
+    public void nullPayloadDoesNotFail()
     {
         DefaultMuleMessageBuilder builder = new DefaultMuleMessageBuilder();
-        thrown.expect(NullPointerException.class);
         builder.payload(null);
     }
 
     @Test
     public void nullPayloadPayload()
     {
-        MuleMessage message = new DefaultMuleMessageBuilder().payload(NullPayload.getInstance()).build();
+        MuleMessage message = MuleMessage.builder().nullPayload().build();
         assertThat(message.getDataType().getType(), equalTo(Object.class));
     }
 

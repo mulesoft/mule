@@ -8,7 +8,6 @@ package org.mule.compatibility.transport.http.transformers;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.ReleasingInputStream;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -55,7 +54,7 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
         
         if (is == null)
         {
-            msg = NullPayload.getInstance();
+            msg = null;
         }
         else
         {

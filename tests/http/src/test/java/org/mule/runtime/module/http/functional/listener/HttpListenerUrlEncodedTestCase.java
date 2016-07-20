@@ -8,6 +8,7 @@ package org.mule.runtime.module.http.functional.listener;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -16,8 +17,6 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.functional.matcher.ParamMapMatcher.isEqual;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
@@ -132,7 +131,7 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase
     private void assertNullPayloadAndEmptyResponse(Response response) throws Exception
     {
         final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000);
-        assertThat(receivedMessage.getPayload(), instanceOf(NullPayload.class));
+        assertThat(receivedMessage.getPayload(), is(nullValue()));
 
         final HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), Is.is("0"));

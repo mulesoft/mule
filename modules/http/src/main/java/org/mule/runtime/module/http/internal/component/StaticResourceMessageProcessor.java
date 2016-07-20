@@ -16,7 +16,6 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
@@ -98,7 +97,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         else if (file.isDirectory())
         {
             // Return a 302 with the new location
-            MuleMessage message = MuleMessage.builder().payload(NullPayload.getInstance())
+            MuleMessage message = MuleMessage.builder().nullPayload()
                     .addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(MOVED_TEMPORARILY.getStatusCode()))
                     .addOutboundProperty(CONTENT_LENGTH, 0)
                     .addOutboundProperty(LOCATION, event.getMessage().getInboundProperty(HTTP_REQUEST_PATH_PROPERTY)
@@ -123,7 +122,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
             }
 
             MuleMessage message = MuleMessage.builder()
-                                             .payload(NullPayload.getInstance())
+                                             .nullPayload()
                                              .mediaType(MediaType.parse(mimetype))
                                              .addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(OK.getStatusCode()))
                                              .addOutboundProperty(CONTENT_LENGTH, buffer.length)

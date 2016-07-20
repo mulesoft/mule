@@ -8,8 +8,6 @@ package org.mule.runtime.core.mule.model;
 
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.api.message.NullPayload.getInstance;
-
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -48,7 +46,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
     @Test
     public void testMethodSetWithNoArgsPass() throws Exception
     {
-        MuleEventContext ctx = createMuleEventContext(getInstance(), singletonMap("method", "wash"));
+        MuleEventContext ctx = createMuleEventContext(null, singletonMap("method", "wash"));
 
         InvocationResult result = resolver.invoke(new Apple(), ctx);
         assertInvocationWasSuccessful(result);

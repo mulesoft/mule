@@ -9,8 +9,6 @@ package org.mule.runtime.core.client;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -125,7 +123,7 @@ public class DefaultLocalMuleClient implements MuleClient
 
     protected MuleMessage createMessage(Object payload, Map<String, Serializable> messageProperties)
     {
-        final Builder builder = MuleMessage.builder().payload(payload != null ? payload : NullPayload.getInstance());
+        final Builder builder = MuleMessage.builder().payload(payload);
         if (messageProperties != null)
         {
             builder.outboundProperties(messageProperties);
@@ -174,7 +172,7 @@ public class DefaultLocalMuleClient implements MuleClient
         final MessageProcessor connectorMessageProcessor = getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, MessageExchangePattern.ONE_WAY);
         if (connectorMessageProcessor != null)
         {
-            final MuleEvent event = connectorMessageProcessor.process(createOneWayMuleEvent(MuleMessage.builder().payload(NullPayload.getInstance()).build()));
+            final MuleEvent event = connectorMessageProcessor.process(createOneWayMuleEvent(MuleMessage.builder().nullPayload().build()));
 
             return event == null || event instanceof VoidMuleEvent ? null : event.getMessage();
         }

@@ -31,7 +31,7 @@ public class MuleEventLogger
      */
     public void logContent(MuleEvent muleEvent)
     {
-        logger.error("Message content type is " + muleEvent.getMessage().getPayload().getClass());
+        logger.error("Message content type is " + muleEvent.getMessage().getDataType().getType());
         logger.error("Message content is " + muleEvent.getMessage());
         try
         {

@@ -10,8 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -173,7 +171,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
                 }
                 else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0)
                 {
-                    msg = MuleMessage.builder().payload(NullPayload.getInstance()).exceptionPayload(new DefaultExceptionPayload(new Exception())).build();
+                    msg = MuleMessage.builder().nullPayload().exceptionPayload(new DefaultExceptionPayload(new Exception())).build();
                 }
                 else
                 {

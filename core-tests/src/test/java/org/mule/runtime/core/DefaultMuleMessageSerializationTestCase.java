@@ -61,7 +61,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         RequestContext.setEvent(new DefaultMuleEvent(message, getTestFlow()));
         MuleMessage deserializedMessage = serializationRoundtrip(message);
 
-        assertEquals(byte[].class, deserializedMessage.getPayload().getClass());
+        assertEquals(byte[].class, deserializedMessage.getDataType().getType());
         byte[] payload = (byte[]) deserializedMessage.getPayload();
         assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
     }

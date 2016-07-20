@@ -29,7 +29,6 @@ import org.mule.mvel2.compiler.ExpressionCompiler;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.mvel2.util.CompilerTools;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
@@ -274,7 +273,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         // Mule
         parserConfiguration.addImport(DataType.class);
         parserConfiguration.addImport(AbstractDataTypeBuilderFactory.class);
-        parserConfiguration.addImport(NullPayload.class);
 
         // Global imports
         for (Entry<String, Class<?>> importEntry : imports.entrySet())

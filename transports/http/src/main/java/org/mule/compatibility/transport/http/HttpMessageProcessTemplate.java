@@ -35,7 +35,6 @@ import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.OptimizedRequestContext;
 import org.mule.runtime.core.RequestContext;
@@ -104,7 +103,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
             }
             else
             {
-                tempResponse = NullPayload.getInstance();
+                tempResponse = null;
             }
             // This removes the need for users to explicitly adding the response transformer
             // ObjectToHttpResponse in their config

@@ -10,9 +10,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +63,7 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendsUriParamsIfNull() throws Exception
     {
-        MessagingException expectedException = flowRunner("uriParamNull").withPayload(NullPayload.getInstance()).runExpectingException();
+        MessagingException expectedException = flowRunner("uriParamNull").runExpectingException();
         assertThat(expectedException.getCause(), instanceOf(NullPointerException.class));
         assertThat(expectedException.getMessage(), containsString("Expression {testParam2} evaluated to null."));
     }

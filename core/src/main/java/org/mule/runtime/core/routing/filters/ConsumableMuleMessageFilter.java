@@ -23,6 +23,6 @@ public class ConsumableMuleMessageFilter implements Filter
     @Override
     public boolean accept(MuleMessage message)
     {
-        return !isConsumable(message.getPayload().getClass());
+        return !isConsumable(message.getDataType().getType());
     }
 }

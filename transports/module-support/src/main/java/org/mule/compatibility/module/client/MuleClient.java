@@ -21,7 +21,6 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -46,7 +45,6 @@ import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -454,7 +452,7 @@ public class MuleClient implements Disposable
         }
         else
         {
-            return MuleMessage.builder().payload(NullPayload.getInstance()).build();
+            return MuleMessage.builder().nullPayload().build();
         }
     }
 

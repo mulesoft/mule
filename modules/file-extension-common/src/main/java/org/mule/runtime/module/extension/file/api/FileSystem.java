@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.file.api;
 
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.OutputHandler;
@@ -96,8 +95,7 @@ public interface FileSystem
      * <li>{@link Iterator}</li>
      * </ul>
      * <p>
-     * {@code null} or {@link NullPayload} contents are not allowed and will result
-     * in an {@link IllegalArgumentException}.
+     * {@code null} contents are not allowed and will result in an {@link IllegalArgumentException}.
      * <p>
      * If the directory on which the file is attempting to be written doesn't
      * exist, then the operation will either throw {@link IllegalArgumentException}

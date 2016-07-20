@@ -25,7 +25,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENDPOINT_PROP
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.http.HttpRequest;
 import org.mule.compatibility.transport.http.RequestLine;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -102,7 +101,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     {
         // transforming NullPayload will make sure that no body=xxx query is added
         MuleMessage message = MuleMessage.builder(setupRequestContext("http://localhost:8080/services", METHOD_GET))
-                .payload(NullPayload.getInstance())
+                .nullPayload()
                 .build();
 
         ObjectToHttpClientMethodRequest transformer = createTransformer();
@@ -119,7 +118,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     {
         // transforming NullPayload will make sure that no body=xxx query is added
         MuleMessage message = MuleMessage.builder(setupRequestContext("http://localhost:8080/services?method=echo", METHOD_GET))
-                .payload(NullPayload.getInstance())
+                .nullPayload()
                 .build();
 
         ObjectToHttpClientMethodRequest transformer = createTransformer();
@@ -136,7 +135,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     {
         // transforming NullPayload will make sure that no body=xxx query is added
         MuleMessage message = MuleMessage.builder(setupRequestContext("http://mycompany.com/test?fruits=apple%20orange", METHOD_GET))
-                .payload(NullPayload.getInstance())
+                .nullPayload()
                 .build();
 
         ObjectToHttpClientMethodRequest transformer = createTransformer();

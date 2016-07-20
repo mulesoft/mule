@@ -7,7 +7,6 @@
 
 package org.mule.runtime.core.transformer.simple;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.AbstractAnnotatedObject;
@@ -42,13 +41,13 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
         if (dataType == null)
         {
             final TypedValue typedValue = resolveTypedValue(event);
-            builder.payload(typedValue.getValue() != null ? typedValue.getValue() : NullPayload.getInstance()).mediaType(typedValue.getDataType().getMediaType());
+            builder.payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType());
         }
         else
         {
             Object value = resolveValue(event);
-            final DataTypeParamsBuilder dataTypeBuilder = DataType.builder(dataType).type((value == null || value instanceof NullPayload) ? Object.class : value.getClass());
-            builder.payload(value != null ? value : NullPayload.getInstance()).mediaType(dataTypeBuilder.build().getMediaType());
+            final DataTypeParamsBuilder dataTypeBuilder = DataType.builder(dataType).type(value == null ? Object.class : value.getClass());
+            builder.payload(value).mediaType(dataTypeBuilder.build().getMediaType());
         }
 
         event.setMessage(builder.build());
@@ -60,7 +59,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
         Object value;
         if (valueEvaluator.getRawValue() == null)
         {
-            value = NullPayload.getInstance();
+            value = null;
         }
         else
         {
@@ -73,7 +72,7 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject implemen
     {
         if (valueEvaluator.getRawValue() == null)
         {
-            return new TypedValue(NullPayload.getInstance(), DataType.OBJECT);
+            return new TypedValue(null, DataType.OBJECT);
         }
         else
         {

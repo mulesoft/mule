@@ -7,7 +7,6 @@
 package org.mule.runtime.module.cxf;
 
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -466,7 +465,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         }
 
         Class payloadClass = payload != null ? payload.getClass() : Object.class;
-        builder.payload(payload !=null ? payload : NullPayload.getInstance()).mediaType(getMimeType());
+        builder.payload(payload).mediaType(getMimeType());
 
         transportResponse.setMessage(builder.build());
         return transportResponse;

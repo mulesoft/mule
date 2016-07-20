@@ -7,15 +7,12 @@
 package org.mule.test.construct;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 
 import org.junit.Test;
 
@@ -35,6 +32,6 @@ public class DynamicSubFlowTestCase extends FunctionalTestCase
         MuleMessage result = muleEvent.getMessage();
         assertThat(result, is(notNullValue()));
         assertThat(result.getExceptionPayload(), is(nullValue()));
-        assertThat(result.getPayload(), not(instanceOf(NullPayload.class)));
+        assertThat(result.getPayload(), is(notNullValue()));
     }
 }

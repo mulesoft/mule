@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.exception;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
@@ -63,7 +62,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
                 RequestContext.setExceptionPayload(exceptionPayload);
             }
             event.setMessage(MuleMessage.builder(event.getMessage())
-                                        .payload(NullPayload.getInstance())
+                                        .nullPayload()
                                         .exceptionPayload(exceptionPayload)
                                         .build());
             return event;

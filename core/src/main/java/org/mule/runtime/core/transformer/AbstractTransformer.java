@@ -8,7 +8,6 @@ package org.mule.runtime.core.transformer;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
@@ -274,7 +273,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
             }
         }
 
-        DataType sourceType = DataType.fromType(payload.getClass());
+        DataType sourceType = DataType.fromObject(payload);
         if (!isSourceDataTypeSupported(sourceType))
         {
             Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(),
@@ -290,11 +289,6 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
         }
 
         Object result = doTransform(payload, enc);
-
-        if (result == null)
-        {
-            result = NullPayload.getInstance();
-        }
 
         if (logger.isDebugEnabled())
         {

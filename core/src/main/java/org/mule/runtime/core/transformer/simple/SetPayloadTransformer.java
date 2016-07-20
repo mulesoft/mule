@@ -7,7 +7,6 @@
 package org.mule.runtime.core.transformer.simple;
 
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -42,7 +41,7 @@ public class SetPayloadTransformer extends AbstractMessageTransformer
     {
         if(valueEvaluator.getRawValue() == null)
         {
-            return NullPayload.getInstance();
+            return null;
         }
 
         return valueEvaluator.resolveValue(event);

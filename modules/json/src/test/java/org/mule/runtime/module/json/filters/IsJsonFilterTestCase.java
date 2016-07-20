@@ -9,7 +9,6 @@ package org.mule.runtime.module.json.filters;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -57,7 +56,7 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase
     @Test
     public void testFilterNull() throws Exception
     {
-        assertFalse(filter.accept(MuleMessage.builder().payload(NullPayload.getInstance())));
+        assertFalse(filter.accept(MuleMessage.builder().nullPayload()));
     }
 
     @Test

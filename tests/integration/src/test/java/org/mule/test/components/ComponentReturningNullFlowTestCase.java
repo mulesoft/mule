@@ -6,12 +6,13 @@
  */
 package org.mule.test.components;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleMessage;
+import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class ComponentReturningNullFlowTestCase extends FunctionalTestCase
         final String payload = getPayloadAsString(msg);
         assertNotNull(payload);
         assertFalse("ERROR".equals(payload));
-        assertTrue(msg.getPayload() instanceof NullPayload);
+        assertThat(msg.getPayload(), is(nullValue()));
     }
 
     public static final class ComponentReturningNull

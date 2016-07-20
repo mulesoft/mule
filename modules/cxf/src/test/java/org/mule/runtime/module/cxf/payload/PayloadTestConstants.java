@@ -6,11 +6,8 @@
  */
 package org.mule.runtime.module.cxf.payload;
 
-import org.mule.runtime.api.message.NullPayload;
-
 public interface PayloadTestConstants
 {
-    public static final NullPayload nullPayload = NullPayload.getInstance();
     public static final Object objectPayload = new Object();
     public static final String strPayload = "some message";
     public static final String[] strArrayPayload = new String[]{"some message"};

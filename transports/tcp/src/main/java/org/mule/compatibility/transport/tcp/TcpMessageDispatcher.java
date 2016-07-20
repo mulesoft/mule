@@ -9,7 +9,6 @@ package org.mule.compatibility.transport.tcp;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
@@ -77,7 +76,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
                     if (result == null)
                     {
-                        return MuleMessage.builder().payload(NullPayload.getInstance()).build();
+                        return MuleMessage.builder().nullPayload().build();
                     }
                     
                     if (result instanceof MuleMessage)
@@ -92,12 +91,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     // we don't necessarily expect to receive a response here
                     logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
                         + endpoint.getEndpointURI());
-                    return MuleMessage.builder().payload(NullPayload.getInstance()).build();
+                    return MuleMessage.builder().nullPayload().build();
                 }
             }
             else
             {
-                return MuleMessage.builder().payload(NullPayload.getInstance()).build();
+                return MuleMessage.builder().nullPayload().build();
             }
         }
         finally

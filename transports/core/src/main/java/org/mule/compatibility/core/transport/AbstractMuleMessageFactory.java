@@ -8,7 +8,6 @@ package org.mule.compatibility.core.transport;
 
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
@@ -45,7 +44,7 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
     {
         if (transportMessage == null)
         {
-            return MuleMessage.builder().payload(NullPayload.getInstance()).build();
+            return MuleMessage.builder().nullPayload().build();
         }
 
         if (!isTransportMessageTypeSupported(transportMessage))
@@ -72,7 +71,7 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
         }
         else if(payload == null)
         {
-            messageBuilder = MuleMessage.builder().payload(NullPayload.getInstance());
+            messageBuilder = MuleMessage.builder().nullPayload();
         }
         else
         {

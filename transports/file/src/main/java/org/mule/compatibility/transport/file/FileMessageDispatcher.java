@@ -8,11 +8,9 @@ package org.mule.compatibility.transport.file;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_FILENAME;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -164,7 +162,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return MuleMessage.builder().payload(NullPayload.getInstance()).build();
+        return MuleMessage.builder().nullPayload().build();
     }
 
     @Override

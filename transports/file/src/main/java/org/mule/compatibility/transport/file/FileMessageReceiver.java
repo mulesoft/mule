@@ -18,7 +18,6 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessagingException;
@@ -298,7 +297,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
         MuleMessage fileParserMessasge = MuleMessage.builder()
-                .payload(NullPayload.getInstance())
+                .nullPayload()
                 .addInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName)
                 .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory)
                 .build();

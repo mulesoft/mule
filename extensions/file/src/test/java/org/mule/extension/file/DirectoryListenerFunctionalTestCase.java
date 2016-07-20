@@ -18,7 +18,6 @@ import static org.mule.runtime.core.util.FileUtils.deleteTree;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.context.MessageContext;
@@ -126,14 +125,14 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
 
         final File file = new File(listenerFolder, WATCH_FILE);
         file.delete();
-        assertEvent(listen(DELETE, file), NullPayload.getInstance());
+        assertEvent(listen(DELETE, file), null);
     }
 
     @Test
     public void onDirectoryCreated() throws Exception
     {
         matcherLessFolder.mkdir();
-        assertEvent(listen(CREATE, matcherLessFolder), NullPayload.getInstance());
+        assertEvent(listen(CREATE, matcherLessFolder), null);
 
         final File file = new File(matcherLessFolder, WATCH_FILE);
         write(file, WATCH_CONTENT);
@@ -145,7 +144,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     {
         onDirectoryCreated();
         deleteTree(matcherLessFolder);
-        assertEvent(listen(DELETE, matcherLessFolder), NullPayload.getInstance());
+        assertEvent(listen(DELETE, matcherLessFolder), null);
     }
 
     @Test
@@ -157,8 +156,8 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
         final File renamedDirectory = new File(listenerFolder, updatedName);
         Files.move(matcherLessFolder.toPath(), renamedDirectory.toPath());
 
-        assertEvent(listen(DELETE, matcherLessFolder), NullPayload.getInstance());
-        assertEvent(listen(CREATE, renamedDirectory), NullPayload.getInstance());
+        assertEvent(listen(DELETE, matcherLessFolder), null);
+        assertEvent(listen(CREATE, renamedDirectory), null);
     }
 
     @Test
@@ -166,7 +165,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
     {
         onDirectoryCreated();
         deleteTree(matcherLessFolder);
-        assertEvent(listen(DELETE, matcherLessFolder), NullPayload.getInstance());
+        assertEvent(listen(DELETE, matcherLessFolder), null);
     }
 
     @Test
@@ -245,7 +244,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase
 
     public static void onMessage(MessageContext messageContext)
     {
-        Object payload = messageContext.getPayload() != null ? messageContext.getPayload() : NullPayload.getInstance();
+        Object payload = messageContext.getPayload() != null ? messageContext.getPayload() : null;
         MuleMessage message = MuleMessage.builder().payload(payload)
                 .mediaType(messageContext.getDataType().getMediaType())
                 .attributes(messageContext.getAttributes())

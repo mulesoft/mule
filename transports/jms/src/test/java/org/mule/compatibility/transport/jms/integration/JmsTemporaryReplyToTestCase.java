@@ -11,8 +11,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -20,7 +18,6 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -93,7 +90,7 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     public void testTemporaryReplyEnabledNonBlockingTimeout() throws Exception
     {
         MuleMessage response = flowRunner("JMSService1NonBlockingTimeout").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
-        assertEquals(NullPayload.getInstance(), response.getPayload());
+        assertThat(response.getPayload(), is(nullValue()));
     }
 
     @Test
@@ -126,7 +123,7 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
 
     private void assertNullPayloadResponse(MuleMessage response)
     {
-        assertThat(response.getPayload(), CoreMatchers.<Object> is(NullPayload.getInstance()));
+        assertThat(response.getPayload(), is(nullValue()));
     }
 
     public static class SetReplyTo extends AbstractMessageTransformer

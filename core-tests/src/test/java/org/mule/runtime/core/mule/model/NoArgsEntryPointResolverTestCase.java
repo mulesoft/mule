@@ -8,8 +8,6 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.AbstractArgumentEntryPointResolver;
 import org.mule.runtime.core.model.resolvers.NoArgumentsEntryPointResolver;
@@ -73,7 +71,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     {
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
         resolver.addMethod("wash");
-        InvocationResult result = resolver.invoke(new Apple(), getTestEventContext(NullPayload.getInstance()));
+        InvocationResult result = resolver.invoke(new Apple(), getTestEventContext(null));
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 }

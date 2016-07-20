@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.transformer.simple;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -15,8 +15,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -84,7 +82,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
         setPayloadMessageProcessor.process(muleEvent);
 
-        assertThat(muleEvent.getMessage().getPayload(), is(instanceOf(NullPayload.class)));
+        assertThat(muleEvent.getMessage().getPayload(), is(nullValue()));
     }
 
     @Test

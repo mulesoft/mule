@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.transformer;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -116,14 +115,14 @@ public class TransformerUtils
      */
     public static void checkTransformerReturnClass(Transformer transformer, Object value) throws TransformerException
     {
-        if (value == null || value instanceof NullPayload && (transformer instanceof AbstractTransformer &&((AbstractTransformer) transformer).isAllowNullReturn()))
+        if (value == null && (transformer instanceof AbstractTransformer &&((AbstractTransformer) transformer).isAllowNullReturn()))
         {
             return;
         }
 
         if (transformer.getReturnDataType() != null)
         {
-            DataType dt = DataType.fromType(value.getClass());
+            DataType dt = DataType.fromObject(value);
             if (!transformer.getReturnDataType().isCompatibleWith(dt))
             {
                 throw new TransformerException(

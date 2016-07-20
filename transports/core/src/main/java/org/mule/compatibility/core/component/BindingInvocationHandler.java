@@ -8,7 +8,6 @@ package org.mule.compatibility.core.component;
 
 import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -108,7 +107,7 @@ public class BindingInvocationHandler implements InvocationHandler
     {
         if (args == null)
         {
-            return MuleMessage.builder().payload(NullPayload.getInstance()).build();
+            return MuleMessage.builder().nullPayload().build();
         }
         else if (args.length == 1)
         {
@@ -151,7 +150,7 @@ public class BindingInvocationHandler implements InvocationHandler
         {
             return reply;
         }
-        else if (reply.getPayload() == NullPayload.getInstance() && !bindingMethod.getReturnType().isInstance(reply.getPayload()))
+        else if (reply.getPayload() == null && !bindingMethod.getReturnType().isInstance(reply.getPayload()))
         {
             return null;
         }

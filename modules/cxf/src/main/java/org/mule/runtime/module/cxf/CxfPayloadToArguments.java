@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.cxf;
 
-import org.mule.runtime.api.message.NullPayload;
+
+import org.mule.runtime.core.api.MuleMessage;
 
 /**
  * This enum defines the strategies to convert a Payload to an array of arguments
@@ -17,15 +18,15 @@ import org.mule.runtime.api.message.NullPayload;
 public enum CxfPayloadToArguments
 {
     /**
-     * In this strategy, if the payload is of type {@link NullPayload} it will be
-     * send as a parameter just like any other object.
+     * In this strategy, if the payload is {code null} it will be
+     * sent as a parameter just like any other object.
      */
     NULL_PAYLOAD_AS_PARAMETER(CxfConstants.PAYLOAD_TO_ARGUMENTS_NULL_PAYLOAD_AS_PARAMETER)
     {
 
     },
     /**
-     * In this strategy, if the payload is of type {@link NullPayload} it will not be
+     * In this strategy, if the payload is {@code null} it will not be
      * send as a parameter. The array of arguments in this case will be empty. For
      * the rest of the objects it behaves just like
      * {@link #NULL_PAYLOAD_AS_PARAMETER} (it will delegate to
@@ -36,7 +37,7 @@ public enum CxfPayloadToArguments
         @Override
         public Object[] payloadToArrayOfArguments(Object payload)
         {
-            if (payload instanceof NullPayload)
+            if (payload == null)
             {
                 return new Object[]{};
             }

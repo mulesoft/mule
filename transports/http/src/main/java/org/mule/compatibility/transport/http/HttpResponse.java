@@ -7,6 +7,11 @@
 package org.mule.compatibility.transport.http;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.RequestContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.message.OutputHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,12 +28,6 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.StatusLine;
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.RequestContext;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.message.OutputHandler;
 
 /**
  * A generic HTTP response wrapper.
@@ -278,7 +277,7 @@ public class HttpResponse
         {
             setBody(payload.toString());
         }
-        else if (payload instanceof NullPayload) 
+        else if (payload == null)
         {
             return;
         }

@@ -12,7 +12,6 @@ import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.metadata.SocketMetadataResolver;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NoRef;
@@ -34,8 +33,7 @@ public class SocketOperations
      * Sends the data using the client associated to the {@link RequesterConnection}.
      *
      * If {@code hasResponse} is set, the operation blocks until  a response is received or the timeout is met,
-     * in which case the operation will return a {@link MuleMessage}
-     * with {@link NullPayload} as payload.
+     * in which case the operation will return a {@link MuleMessage} with {@code null} payload.
      *
      * @param content        that will be serialized and sent through the socket.
      * @param hasResponse whether the operation should await for a response or not

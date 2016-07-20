@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -59,7 +58,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
         builder.setStatusCode(200);
         builder.setReasonPhrase("OK");
         httpResponse = builder.build();
-        event = getTestEvent(NullPayload.getInstance());
+        event = getTestEvent(MuleMessage.builder().nullPayload().build());
     }
 
     @Test
@@ -73,7 +72,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     @Test
     public void previousInboundPropertiesAreRemoved() throws Exception
     {
-        event = getTestEvent(MuleMessage.builder().payload(NullPayload.getInstance()).addInboundProperty("TestInboundProperty", TEST_VALUE).build());
+        event = getTestEvent(MuleMessage.builder().nullPayload().addInboundProperty("TestInboundProperty", TEST_VALUE).build());
         httpResponseToMuleEvent.convert(event, httpResponse, null);
         assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
     }

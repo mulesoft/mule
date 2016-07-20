@@ -8,13 +8,11 @@ package org.mule.extension.http.internal.request.validator;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -40,7 +38,7 @@ public class HttpMetadataResolver implements Initialisable, MetadataKeysResolver
     private static final ClassTypeLoader  TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
     private static final String ANY = "ANY";
 
-    private Class[] classes = new Class[]{InputStream.class, NullPayload.class, ParameterMap.class};
+    private Class[] classes = new Class[]{InputStream.class, ParameterMap.class};
     private Map<String, MetadataType> types;
     private Set<MetadataKey> keys;
 

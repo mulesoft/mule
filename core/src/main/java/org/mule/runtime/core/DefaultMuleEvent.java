@@ -613,7 +613,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
         }
 
         MuleMessage transformedMessage = getMuleContext().getTransformationService().transform(message, outputType);
-        if (isConsumable(message.getPayload().getClass()))
+        if (isConsumable(message.getDataType().getType()))
         {
             setMessage(transformedMessage);
         }
@@ -655,7 +655,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
         {
             MuleMessage transformedMessage = getMuleContext().getTransformationService().transform(message,
                     DataType.builder().type(String.class).charset(encoding).build());
-            if (isConsumable(message.getPayload().getClass()))
+            if (isConsumable(message.getDataType().getType()))
             {
                 setMessage(transformedMessage);
             }

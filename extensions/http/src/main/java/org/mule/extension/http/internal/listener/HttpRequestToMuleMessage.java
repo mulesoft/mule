@@ -13,7 +13,6 @@ import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.IOUtils;
@@ -51,7 +50,7 @@ public class HttpRequestToMuleMessage
         final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
 
         final Map<String, DataHandler> parts = new HashMap<>();
-        Object payload = NullPayload.getInstance();
+        Object payload = null;
         if (parseRequest)
         {
             final HttpEntity entity = request.getEntity();

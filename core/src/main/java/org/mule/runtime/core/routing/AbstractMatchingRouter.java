@@ -76,9 +76,9 @@ public class AbstractMatchingRouter extends AbstractAnnotatedObject implements M
 
             if (copyEvent)
             {
-                if (isConsumable(message.getPayload().getClass()))
+                if (isConsumable(message.getDataType().getType()))
                 {
-                    throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()), event, this);
+                    throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getDataType().getType().getName()), event, this);
                 }
                 eventToRoute = OptimizedRequestContext.criticalSetEvent(event);
             }

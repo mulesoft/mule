@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.OptimizedRequestContext;
@@ -347,7 +346,7 @@ public class PollingMessageSource implements MessageSource, FlowConstructAware, 
         if (event != null && !VoidMuleEvent.getInstance().equals(event) && event.getMessage() != null)
         {
             MuleMessage message = event.getMessage();
-            return !message.getPayload().equals(NullPayload.getInstance());
+            return message.getPayload() != null;
         }
         return false;
     }

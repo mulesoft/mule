@@ -16,8 +16,6 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
@@ -96,7 +94,7 @@ public class HttpResponseToMuleEvent
                 try
                 {
                     inboundAttachments = getInboundAttachments(responseInputStream, responseContentType);
-                    payload = NullPayload.getInstance();
+                    payload = null;
                 }
                 catch (IOException e)
                 {

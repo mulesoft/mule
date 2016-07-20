@@ -19,9 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
-
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleEvent;
@@ -46,7 +44,7 @@ public class MessageContextTestCase extends AbstractELTestCase
     public void setup()
     {
         event = mock(MuleEvent.class);
-        message = spy(MuleMessage.builder().payload(NullPayload.getInstance()).build());
+        message = spy(MuleMessage.builder().nullPayload().build());
         when(message.getCorrelation()).thenReturn(mock(Correlation.class));
         doAnswer(invocation -> {
             message = (MuleMessage) invocation.getArguments()[0];
@@ -179,10 +177,9 @@ public class MessageContextTestCase extends AbstractELTestCase
     @Test
     public void nullPayloadTest() throws Exception
     {
-        when(message.getPayload()).thenReturn(NullPayload.getInstance());
+        when(message.getPayload()).thenReturn(null);
         assertEquals(true, evaluate("message.payload == null", event));
         assertEquals(true, evaluate("payload == null", event));
-        assertEquals(false, evaluate("message.payload is NullPayload", event));
         assertEquals(true, evaluate("message.payload == empty", event));
     }
 

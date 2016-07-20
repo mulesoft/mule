@@ -9,7 +9,6 @@ package org.mule.runtime.module.xml.filters;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.util.XMLTestUtils;
@@ -60,7 +59,7 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testFilterNull() throws Exception
     {
-        assertFalse(filter.accept(MuleMessage.builder().payload(NullPayload.getInstance()).build()));
+        assertFalse(filter.accept(MuleMessage.builder().nullPayload().build()));
     }
 
     @Test

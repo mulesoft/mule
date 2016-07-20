@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.transport.jms.JmsConstants;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.StringUtils;
@@ -58,7 +57,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
 
         MuleMessage response = client.send("out3", "TEST_MESSAGE", null);
         assertNotNull(response);
-        assertFalse("Response should not be NullPayload", response.getPayload() instanceof NullPayload);
+        assertFalse("Response should not be NullPayload", response.getPayload() == null);
     }
 
     private void assertJmsMessageIdPresent(MuleMessage message)

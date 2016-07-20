@@ -10,12 +10,12 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.extension.http.internal.HttpConnector;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.internal.HttpConnector;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -177,7 +177,7 @@ public class BasicHttpTestCase extends ExtensionFunctionalTestCase
         {
             MuleMessage message = event.getMessage();
             Object payload = message.getPayload();
-            assertThat(payload, instanceOf(NullPayload.class));
+            assertThat(payload, is(nullValue()));
             assertThat(message.getAttributes(), instanceOf(HttpRequestAttributes.class));
             HttpRequestAttributes requestAttributes = (HttpRequestAttributes) message.getAttributes();
             assertThat(requestAttributes.getMethod(), is("GET"));

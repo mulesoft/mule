@@ -10,7 +10,6 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.cannotLoadFromClass
 import static org.mule.runtime.core.config.i18n.CoreMessages.propertiesNotSet;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsStream;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -237,7 +236,7 @@ public class Scriptable implements Initialisable, MuleContextAware
         bindings.put(BINDING_LOG, logger);
         // A place holder for a returned result if the script doesn't return a result.
         // The script can overwrite this binding
-        bindings.put(BINDING_RESULT, NullPayload.getInstance());
+        bindings.put(BINDING_RESULT, null);
         bindings.put(BINDING_MULE_CONTEXT, muleContext);
         bindings.put(BINDING_REGISTRY, muleContext.getRegistry());
     }
@@ -256,10 +255,6 @@ public class Scriptable implements Initialisable, MuleContextAware
     protected void populateMessageBindings(Bindings bindings, MuleEvent event)
     {
         MuleMessage message = event.getMessage();
-        if (message == null)
-        {
-            message = MuleMessage.builder().payload(NullPayload.getInstance()).build();
-        }
 
         populateVariablesInOrder(bindings, event);
 

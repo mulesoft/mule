@@ -129,7 +129,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         }
 
         final MuleMessage message = event.getMessage();
-        if (consumablePayloadWarned.compareAndSet(false, true) && isConsumable(message.getPayload().getClass()))
+        if (consumablePayloadWarned.compareAndSet(false, true) && isConsumable(message.getDataType().getType()))
         {
             logger.warn(String.format("Using 'async' router with consumable payload (%s) may lead to unexpected results." +
                                       " Please ensure that only one of the branches actually consumes the payload, or transform it by using an <object-to-byte-array-transformer>.",
