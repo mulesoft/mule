@@ -7,8 +7,8 @@
 package org.mule.extension.socket.api;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.core.util.StringUtils.EMPTY;
+import static org.mule.runtime.core.util.StringUtils.isBlank;
 import org.mule.runtime.extension.api.annotation.Parameter;
 
 import java.net.InetSocketAddress;

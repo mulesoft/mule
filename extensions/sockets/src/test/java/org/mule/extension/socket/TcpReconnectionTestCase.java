@@ -10,15 +10,14 @@ import static java.lang.String.format;
 import static org.mockito.Mockito.when;
 import static org.mule.extension.socket.SocketExtensionTestCase.POLL_DELAY_MILLIS;
 import static org.mule.extension.socket.SocketExtensionTestCase.TIMEOUT_MILLIS;
-
 import org.mule.extension.socket.api.ConnectionSettings;
 import org.mule.extension.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.extension.socket.api.connection.tcp.TcpRequesterConnection;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
-import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
-import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.extension.socket.api.socket.factory.TcpServerSocketFactory;
 import org.mule.extension.socket.api.socket.factory.TcpSocketFactory;
+import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
+import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.extension.socket.api.worker.SocketWorker;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.MuleContext;

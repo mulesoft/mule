@@ -11,11 +11,11 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
-
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.el.context.MessageContext;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -37,7 +37,7 @@ import org.junit.rules.ExpectedException;
 /**
  * Base class with common behaviour for all the {@link SocketsExtension} test cases
  */
-public abstract class SocketExtensionTestCase extends ExtensionFunctionalTestCase
+public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTestCase
 {
 
     protected static final int TIMEOUT_MILLIS = 5000;
@@ -99,17 +99,20 @@ public abstract class SocketExtensionTestCase extends ExtensionFunctionalTestCas
         receivedMessages = null;
     }
 
-    @Override
-    protected Class<?>[] getAnnotatedExtensionClasses()
+    //TODO(gfernandes) MULE-10117 remove this when support for accessing resources is added to runner
+    public static class OnIncomingConnectionBean implements Callable
     {
-        return new Class<?>[] {SocketsExtension.class};
-    }
 
-    public static void onIncomingConnection(MessageContext messageContext)
-    {
-        MuleMessage message = MuleMessage.builder().payload(messageContext.getPayload()).mediaType(messageContext
-                                                                                                           .getDataType().getMediaType()).attributes(messageContext.getAttributes()).build();
-        receivedMessages.add(message);
+        @Override
+        public Object onCall(MuleEventContext eventContext) throws Exception
+        {
+            MuleMessage originalMessage = eventContext.getEvent().getMessage();
+            MuleMessage message = MuleMessage.builder().payload(originalMessage.getPayload()).mediaType(originalMessage
+                                                                                                               .getDataType().getMediaType()).attributes(originalMessage.getAttributes()).build();
+            receivedMessages.add(message);
+
+            return eventContext.getEvent();
+        }
     }
 
     protected void assertEvent(MuleMessage message, Object expectedContent) throws Exception
