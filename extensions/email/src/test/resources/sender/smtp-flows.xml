@@ -43,6 +43,7 @@
     </flow>
 
     <flow name="forwardEmail">
+        <logger level="ERROR" message="#[payload]"/>
         <email:forward config-ref="config" subject="Email Subject">
             <email:to-addresses>
                 <email:to-address value="pablo.musumeci@mulesoft.com"/>
@@ -51,6 +52,7 @@
     </flow>
 
     <flow name="forwardEmailWithContent">
+        <logger level="ERROR" message="#[payload]"/>
         <email:forward config-ref="config" subject="Email Subject">
             <email:content body="More Content To Forward"/>
             <email:to-addresses>

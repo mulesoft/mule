@@ -8,9 +8,11 @@ package org.mule.extension.email.internal.commands;
 
 import static java.lang.String.format;
 import static javax.mail.Folder.READ_WRITE;
+import org.mule.extension.email.api.Email;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.util.List;
 
@@ -46,10 +48,15 @@ public class SetFlagCommand
      * @param emailId     the optional number of the email to be marked. for default the email is taken from the incoming {@link MuleMessage}.
      * @param flag        the flag to be set.
      */
-    public void set(MuleMessage muleMessage, RetrieverConnection connection, String folderName, Integer emailId, Flag flag)
+    public void set(//MuleMessage muleMessage,
+                    List<Integer> emailIds,
+                    RetrieverConnection connection,
+                    String folderName,
+                    //Integer emailId,
+                    Flag flag)
     {
         Folder folder = connection.getFolder(folderName, READ_WRITE);
-        executor.execute(muleMessage, emailId, id ->
+        executor.execute(emailIds, id ->
         {
             try
             {

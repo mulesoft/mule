@@ -7,6 +7,7 @@
 package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Flags.Flag.DELETED;
+import org.mule.extension.email.api.Email;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.message.MuleMessage;
 
@@ -39,9 +40,14 @@ public final class DeleteCommand
      * @param folderName the folder where the emails are going to be fetched
      * @param emailId    an optional email number to look up in the folder.
      */
-    public void delete(MuleMessage message, RetrieverConnection connection, String folderName, Integer emailId)
+    public void delete(//MuleMessage message,
+                       //List<Email> emails,
+                       List<Integer> emailIds,
+                       RetrieverConnection connection,
+                       String folderName)
+                       //Integer emailId)
     {
-        setFlagCommand.set(message, connection, folderName, emailId, DELETED);
+        setFlagCommand.set(emailIds, connection, folderName, DELETED);
         connection.closeFolder(true);
     }
 }

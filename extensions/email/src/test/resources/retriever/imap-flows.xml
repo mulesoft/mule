@@ -15,17 +15,20 @@
 
     <flow name="retrieveAndMarkRead">
         <email:list config-ref="config"/>
-        <email:mark-as-read config-ref="config"/>
+        <flow-ref name="email-to-id"/>
+        <email:mark-as-read config-ref="config" emailIds="#[payload]"/>
     </flow>
 
     <flow name="retrieveAndThenExpungeDelete">
         <email:list config-ref="config"/>
+        <flow-ref name="email-to-id"/>
         <email:mark-as-deleted config-ref="config"/>
         <email:expunge-folder config-ref="config"/>
     </flow>
 
     <flow name="retrieveAndMarkDelete">
         <email:list config-ref="config"/>
+        <flow-ref name="email-to-id"/>
         <email:mark-as-deleted config-ref="config"/>
     </flow>
 

@@ -14,14 +14,16 @@ import static org.mockito.Mockito.when;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.EmailAttributes;
-import org.mule.extension.email.api.EmailPredicateBuilder;
 import org.mule.extension.email.api.EmailFlags;
+import org.mule.extension.email.api.EmailPredicateBuilder;
+import org.mule.tck.size.SmallTest;
 
 import java.time.LocalDateTime;
 
 import org.junit.Before;
 import org.junit.Test;
 
+@SmallTest
 public class EmailPredicateTestCase
 {
     private static final LocalDateTime RECEIVED_DATE = LocalDateTime.of(2015, 4, 20, 00, 00);

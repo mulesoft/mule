@@ -37,7 +37,7 @@ import java.util.function.Predicate;
  * @since 4.0
  */
 @Alias("matcher")
-public class EmailPredicateBuilder
+public class  EmailPredicateBuilder
 {
 
     private static final TimeUntilFunction TIME_UNTIL = new TimeUntilFunction();

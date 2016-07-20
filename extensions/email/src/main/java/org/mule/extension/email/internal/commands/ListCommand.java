@@ -7,9 +7,11 @@
 package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Folder.READ_ONLY;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.extension.email.api.EmailAttributesBuilder.fromMessage;
-
+import org.mule.extension.email.api.Email;
 import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.EmailContent;
 import org.mule.extension.email.api.EmailContentProcessor;
 import org.mule.extension.email.api.exception.EmailRetrieverException;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
@@ -41,32 +43,38 @@ public final class ListCommand
      * For folder implementations (like IMAP) that support fetching without reading the content, if the content
      * should NOT be read ({@code readContent} = false) the SEEN flag is not going to be set.
      *
-     * @param connection  the associated {@link RetrieverConnection}.
-     * @param folderName  the name of the folder where the emails are stored.
-     * @param readContent if should read the email content or not.
-     * @param matcher     a {@link Predicate} of {@link EmailAttributes} used to filter the output list  @return a {@link List} of {@link MuleMessage} carrying all the emails and it's corresponding attributes.
+     * @param connection      the associated {@link RetrieverConnection}.
+     * @param folderName      the name of the folder where the emails are stored.
+     * @param contentEncoding the encoding to be used while reading the emails content
+     * @param readContent     if should read the email content or not.
+     * @param matcher         a {@link Predicate} of {@link EmailAttributes} used to filter the output list  @return a {@link List} of {@link MuleMessage} carrying all the emails and it's corresponding attributes.
      */
-    public List<MuleMessage> list(RetrieverConnection connection,
-                                  String folderName,
-                                  boolean readContent,
-                                  Predicate<EmailAttributes> matcher)
+    public List<Email> list(RetrieverConnection connection,
+                            String folderName,
+                            String contentEncoding,
+                            boolean readContent,
+                            String defaultEncoding,
+                            Predicate<EmailAttributes> matcher)
     {
         try
         {
             Folder folder = connection.getFolder(folderName, READ_ONLY);
-            List<MuleMessage> list = new LinkedList<>();
+            List<Email> list = new LinkedList<>();
             for (Message m : folder.getMessages())
             {
                 String body = "";
+                String charset = "";
                 EmailAttributes attributes = fromMessage(m, false);
                 if (matcher.test(attributes))
                 {
                     if (readContent)
                     {
                         body = EmailContentProcessor.process(m).getBody();
+                        charset = isBlank(contentEncoding) ? defaultEncoding : contentEncoding;
                         attributes = fromMessage(m);
                     }
-                    list.add(MuleMessage.builder().payload(body).attributes(attributes).build());
+
+                    list.add(new Email(new EmailContent(body, charset), attributes));
                 }
             }
             return list;

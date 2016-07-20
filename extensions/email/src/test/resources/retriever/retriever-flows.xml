@@ -21,21 +21,40 @@
 
     <flow name="storeMessages">
         <email:list config-ref="config"/>
+        <flow-ref name="email-to-id"/>
         <email:store config-ref="config" localDirectory="${storePath}"/>
     </flow>
 
     <flow name="storeSingleMessage">
-        <email:store config-ref="config" localDirectory="${storePath}" emailId="1"/>
+        <email:store config-ref="config" localDirectory="${storePath}">
+            <email:email-ids>
+                <email:email-id value="1"/>
+            </email:email-ids>
+        </email:store>
     </flow>
 
     <flow name="retrieveAndDelete">
         <email:list config-ref="config"/>
+        <flow-ref name="email-to-id"/>
         <email:delete config-ref="config"/>
     </flow>
 
     <flow name="retrieveAndDeleteIncomingAndScheduled">
         <email:list config-ref="config"/>
-        <email:delete config-ref="config" emailId="6"/>
+        <flow-ref name="email-to-id"/>
+        <email:delete config-ref="config">
+            <email:email-ids>
+                <email:email-id value="6"/>
+            </email:email-ids>
+        </email:delete>
     </flow>
+
+    <sub-flow name="email-to-id">
+        <set-variable variableName="ids" value="#[[]]"/>
+        <foreach collection="#[payload]" counterVariableName="email">
+            <expression-transformer expression="#[flowVars.ids.add(payload.attributes.id)]"/>
+        </foreach>
+        <set-payload value="#[flowVars.ids]"/>
+    </sub-flow>
 
 </mule>

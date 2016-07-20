@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
+import org.mule.extension.email.api.Email;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.api.message.MuleMessage;
 
@@ -50,8 +51,8 @@ public class POP3TestCase extends AbstractEmailRetrieverTestCase
     @Test
     public void retrieveAndRead() throws Exception
     {
-        List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
-        assertThat(messages, hasSize(10));
-        messages.forEach(m -> assertBodyContent((String) m.getPayload()));
+        List<Email> emails = runFlowAndGetEmails(RETRIEVE_AND_READ);
+        assertThat(emails, hasSize(10));
+        emails.forEach(e -> assertBodyContent(e.getContent().getBody()));
     }
 }

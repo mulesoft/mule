@@ -19,6 +19,8 @@ import static org.mule.extension.email.util.EmailTestUtils.assertAttachmentConte
 import static org.mule.extension.email.util.EmailTestUtils.getSinglePartTestMessage;
 import static org.mule.extension.email.util.EmailTestUtils.getMultipartTestMessage;
 
+import org.mule.tck.size.SmallTest;
+
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -26,6 +28,7 @@ import javax.mail.Message;
 
 import org.junit.Test;
 
+@SmallTest
 public class EmailContentProcessorTestCase
 {
     @Test

@@ -28,6 +28,8 @@ import java.util.Map;
 public final class SendCommand
 {
 
+    public static final String NO_EMAIL_FOUND = "Cannot perform the send operation if no email content is provided";
+
     /**
      * Send an email message. The message will be sent to all recipient
      * {@code toAddresses}, {@code ccAddresses}, {@code bccAddresses}

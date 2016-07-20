@@ -6,7 +6,9 @@
  */
 package org.mule.extension.email.internal.commands;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
+import org.mule.extension.email.api.Email;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
@@ -42,40 +44,15 @@ public class EmailIdConsumerExecutor
      * @param emailId
      * @param consumer
      */
-    public void execute(MuleMessage muleMessage, Integer emailId, Consumer<Integer> consumer)
+    public void execute(List<Integer> emailIds, Consumer<Integer> consumer)
     {
-        if (emailId == null)
+
+        if (isEmpty(emailIds))
         {
-            Object payload = muleMessage.getPayload();
-            if (payload instanceof List)
-            {
-                for (Object o : (List) payload)
-                {
-                    if (o instanceof MuleMessage)
-                    {
-                        emailId = getIdOrFail(((MuleMessage) o));
-                        consumer.accept(emailId);
-                    }
-                    else
-                    {
-                        throw new EmailException(NO_ID_ERROR);
-                    }
-                }
-                return;
-            }
-            emailId = getIdOrFail(muleMessage);
+            throw new EmailException(NO_ID_ERROR);
         }
-        consumer.accept(emailId);
+
+        emailIds.forEach(consumer);
     }
 
-    /**
-     * Gets an emailId from a MuleMessage of fails if the MuleMessage does
-     * not contains attributes of {@link EmailAttributes} type.
-     */
-    private int getIdOrFail(MuleMessage muleMessage)
-    {
-        return getAttributesFromMessage(muleMessage)
-                .orElseThrow(() -> new EmailException(NO_ID_ERROR))
-                .getId();
-    }
 }

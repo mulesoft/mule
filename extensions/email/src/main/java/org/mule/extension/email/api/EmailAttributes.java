@@ -8,6 +8,8 @@ package org.mule.extension.email.api;
 
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.message.BaseAttributes;
+import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -45,7 +47,8 @@ public class EmailAttributes extends BaseAttributes
      * to any folder (like newly composed or derived messages) have 0
      * as their message id.
      */
-    private final int id;
+    @Parameter
+    private int id;
 
     /**
      * The address(es) of the person(s) which sent the email.
@@ -53,37 +56,49 @@ public class EmailAttributes extends BaseAttributes
      * This will usually be the sender of the email, but
      * some emails may direct replies to a different address
      */
-    private final List<String> fromAddresses;
+    @Parameter
+    private List<String> fromAddresses;
 
     /**
      * The recipient addresses of "To" (primary) type.
      */
-    private final List<String> toAddresses;
+    @Parameter
+    private List<String> toAddresses;
 
     /**
      * The recipient addresses of "Cc" (carbon copy) type
      */
-    private final List<String> ccAddresses;
+    @Parameter
+    @Optional
+    private List<String> ccAddresses;
 
     /**
      * The recipient addresses of "Bcc" (blind carbon copy) type
      */
-    private final List<String> bccAddresses;
+    @Parameter
+    @Optional
+    private List<String> bccAddresses;
 
     /**
      * The email addresses to which this email should reply.
      */
-    private final List<String> replyToAddresses;
+    @Parameter
+    @Optional
+    private List<String> replyToAddresses;
 
     /**
      * The headers that this email carry.
      */
-    private final Map<String, String> headers;
+    @Parameter
+    @Optional
+    private Map<String, String> headers;
 
     /**
      * The subject of the email.
      */
-    private final String subject;
+    @Parameter
+    @Optional
+    private String subject;
 
     /**
      * The time where the email was received.
@@ -93,7 +108,9 @@ public class EmailAttributes extends BaseAttributes
      * <p>
      * If this is a sent email this will be null.
      */
-    private final LocalDateTime receivedDate;
+    @Parameter
+    @Optional
+    private LocalDateTime receivedDate;
 
     /**
      * The time where the email was sent.
@@ -101,20 +118,29 @@ public class EmailAttributes extends BaseAttributes
      * Different {@link Folder} implementations
      * may assign this value or not.
      */
-    private final LocalDateTime sentDate;
+    @Parameter
+    @Optional
+    private LocalDateTime sentDate;
 
     /**
      * The flags setted in the email.
      */
-    private final EmailFlags flags;
+    @Parameter
+    @Optional
+    private EmailFlags flags;
 
     /**
      * The attachments that the email carries.
      * <p>
      * Each attachment contains a fileName which is the key of the attachment.
      */
+    @Parameter
+    @Optional
     private Map<String, DataHandler> attachments;
 
+    public EmailAttributes()
+    {
+    }
     /**
      * Creates a new instance.
      *

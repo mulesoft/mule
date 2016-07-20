@@ -10,10 +10,10 @@ import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.runtime.core.util.FileUtils.write;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import org.mule.extension.email.api.Email;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.api.exception.EmailRetrieverException;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.extension.email.internal.retriever.RetrieverConnection;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -38,13 +38,9 @@ public final class StoreCommand
     private final EmailIdConsumerExecutor executor = new EmailIdConsumerExecutor();
 
     /**
-     * Stores the specified email of id {@code emailId} into the configured {@code localDirectory}.
+     * Stores all the emails specified by id into the configured {@code localDirectory}.
      * <p>
-     * if no emailId is specified, the operation will try to find an email or {@link List} of emails
-     * in the incoming {@link MuleMessage}.
-     * <p>
-     * If no email(s) are found in the {@link MuleMessage} and no {@code emailId} is specified.
-     * the operation will fail.
+     * If no email(s) are found the operation will fail.
      * <p>
      * The emails are stored as mime message in a ".txt" format.
      * <p>
@@ -52,23 +48,21 @@ public final class StoreCommand
      * the received date of the email.
      *
      * @param connection     the associated {@link RetrieverConnection}.
-     * @param muleMessage    the incoming {@link MuleMessage}.
+     * @param emailIds         the incoming {@link Email} ids.
      * @param folderName     the name of the folder where the email(s) is going to be fetched.
      * @param localDirectory the localDirectory where the emails are going to be stored.
      * @param fileName       the name of the file that is going to be stored. The operation will append the email number and received date in the end.
-     * @param emailId        the optional number of the email to be marked. for default the email is taken from the incoming {@link MuleMessage}.
      * @param overwrite      if should overwrite a file that already exist or not.
      */
     public void store(RetrieverConnection connection,
-                      MuleMessage muleMessage,
+                      List<Integer> emailIds,
                       String folderName,
                       String localDirectory,
                       final String fileName,
-                      Integer emailId,
                       boolean overwrite)
     {
         Folder folder = connection.getFolder(folderName, READ_ONLY);
-        executor.execute(muleMessage, emailId, id ->
+        executor.execute(emailIds, id ->
         {
             try
             {
