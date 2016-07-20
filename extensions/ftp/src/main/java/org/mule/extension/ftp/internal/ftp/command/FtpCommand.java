@@ -248,24 +248,16 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
         }
         else
         {
-            targetFile = getFile(config, targetPath.getParent().toString());
-            if (targetFile != null)
+            if (createParentDirectory)
             {
-                targetPath = targetPath.getParent().resolve(targetPath.getFileName());
+                mkdirs(config, targetPath);
+                targetPath = targetPath.resolve(sourceFile.getName());
             }
             else
             {
-                if (createParentDirectory)
-                {
-                    mkdirs(config, targetPath);
-                    targetPath = targetPath.resolve(sourceFile.getName());
-                }
-                else
-                {
-                    throw new IllegalArgumentException(String.format("Can't copy '%s' to '%s' because the destination path " +
-                                                                     "doesn't exists",
-                                                                     sourceFile.getPath(), targetPath.toAbsolutePath()));
-                }
+                throw new IllegalArgumentException(String.format("Can't copy '%s' to '%s' because the destination path " +
+                                                                 "doesn't exists",
+                                                                 sourceFile.getPath(), targetPath.toAbsolutePath()));
             }
         }
 

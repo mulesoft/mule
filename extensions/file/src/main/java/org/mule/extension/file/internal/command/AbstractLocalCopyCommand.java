@@ -79,23 +79,16 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand
         }
         else
         {
-            if (Files.exists(targetPath.getParent()))
+            if (createParentDirectory)
             {
-                targetPath = targetPath.getParent().resolve(targetPath.getFileName());
+                targetPath.toFile().mkdirs();
+                targetPath = targetPath.resolve(source.getFileName());
             }
             else
             {
-                if (createParentDirectory)
-                {
-                    targetPath.toFile().mkdirs();
-                    targetPath = targetPath.resolve(source.getFileName());
-                }
-                else
-                {
-                    throw new IllegalArgumentException(format("Can't copy '%s' to '%s' because the destination path " +
-                                                              "doesn't exists",
-                                                              source.toAbsolutePath(), targetPath.toAbsolutePath()));
-                }
+                throw new IllegalArgumentException(format("Can't copy '%s' to '%s' because the destination path " +
+                                                          "doesn't exists",
+                                                          source.toAbsolutePath(), targetPath.toAbsolutePath()));
             }
         }
 

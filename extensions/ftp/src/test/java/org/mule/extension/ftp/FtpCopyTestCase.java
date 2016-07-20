@@ -204,16 +204,6 @@ public class FtpCopyTestCase extends FtpConnectorTestCase
         doExecute(format("%s/%s", target, SOURCE_DIRECTORY_NAME), false, false);
     }
 
-    @Test
-    public void copyWithDifferentName() throws Exception
-    {
-        testHarness.makeDir(TARGET_DIRECTORY);
-        String target = getPath(TARGET_DIRECTORY) + "/test.json";
-        doExecute(target, false, false);
-
-        assertCopy(target);
-    }
-
     private String buildSourceDirectory() throws Exception
     {
         testHarness.makeDir(SOURCE_DIRECTORY_NAME);
