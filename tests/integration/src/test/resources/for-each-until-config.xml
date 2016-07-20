@@ -26,14 +26,14 @@
 
     <flow name="flowVarSyncNoForEach">
         <set-variable variableName="count" value="#[3]"/>
-            <set-variable variableName="current" value="#[payload]"/>
-            <until-successful synchronous="true">
-                <processor-chain>
-                    <set-payload value="#[payload]"/>
-                    <set-variable variableName="until" value="#[payload]"/>
-                </processor-chain>
-            </until-successful>
-            <set-variable variableName="count" value="#[flowVars.count + payload]"/>
+        <set-variable variableName="current" value="#[payload]"/>
+        <until-successful synchronous="true">
+            <processor-chain>
+                <set-payload value="#[payload]"/>
+                <set-variable variableName="until" value="#[payload]"/>
+            </processor-chain>
+        </until-successful>
+        <set-variable variableName="count" value="#[flowVars.count + payload]"/>
     </flow>
 
     <flow name="flowVarAsync">
