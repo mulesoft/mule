@@ -48,7 +48,7 @@ public final class StoreCommand
      * the received date of the email.
      *
      * @param connection     the associated {@link RetrieverConnection}.
-     * @param emailIds         the incoming {@link Email} ids.
+     * @param emailIds       the incoming {@link Email} ids.
      * @param folderName     the name of the folder where the email(s) is going to be fetched.
      * @param localDirectory the localDirectory where the emails are going to be stored.
      * @param fileName       the name of the file that is going to be stored. The operation will append the email number and received date in the end.

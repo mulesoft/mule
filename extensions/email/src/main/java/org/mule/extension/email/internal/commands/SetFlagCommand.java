@@ -8,11 +8,9 @@ package org.mule.extension.email.internal.commands;
 
 import static java.lang.String.format;
 import static javax.mail.Folder.READ_WRITE;
-import org.mule.extension.email.api.Email;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.util.List;
 
@@ -29,9 +27,9 @@ import javax.mail.MessagingException;
  */
 public class SetFlagCommand
 {
-    private final EmailIdConsumerExecutor executor = new EmailIdConsumerExecutor();
 
     private static final String SET_FLAG_ERROR_MESSAGE_MASK = "Error while setting [%s] flag in email of id [%s]";
+    private final EmailIdConsumerExecutor executor = new EmailIdConsumerExecutor();
 
     /**
      * Sets the specified {@code flag} into the email of number {@code emailId}

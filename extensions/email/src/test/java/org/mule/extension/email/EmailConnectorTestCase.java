@@ -27,6 +27,7 @@ import org.junit.rules.ExpectedException;
 
 public abstract class EmailConnectorTestCase extends MuleArtifactFunctionalTestCase
 {
+
     @Rule
     public DynamicPort PORT = new DynamicPort("port");
 

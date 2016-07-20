@@ -12,16 +12,11 @@ import org.mule.extension.email.api.Email;
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
-import org.mule.extension.email.api.exception.EmailSenderException;
 import org.mule.extension.email.internal.sender.SenderConnection;
 import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.List;
 import java.util.Map;
-
-import static java.lang.String.format;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEmailAttachments;
 
 /**
  * Represents the forward operation.
@@ -30,6 +25,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorUtils.mapToEm
  */
 public final class ForwardCommand
 {
+
     public static final String NO_EMAIL_FOUND = "Cannot perform the forward operation if no email is provided";
 
     private final SendCommand sendCommand = new SendCommand();

@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameters;
 import org.mule.extension.email.api.Email;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.runtime.api.message.MuleMessage;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,11 +25,13 @@ import org.junit.runners.Parameterized.Parameter;
 @RunnerDelegateTo(Parameterized.class)
 public class POP3TestCase extends AbstractEmailRetrieverTestCase
 {
+
     @Parameter
     public String protocol;
 
     @Parameters
-    public static Collection<Object[]> data() {
+    public static Collection<Object[]> data()
+    {
         return Arrays.asList(new Object[][] {
                 {"pop3"}, {"pop3s"}
         });

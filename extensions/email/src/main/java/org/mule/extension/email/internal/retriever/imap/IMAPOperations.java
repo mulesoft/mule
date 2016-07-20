@@ -16,7 +16,6 @@ import org.mule.extension.email.internal.retriever.RetrieverOperations;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.List;
@@ -48,7 +47,7 @@ public class IMAPOperations
      * @param mailboxFolder The folder where the emails are going to be fetched
      */
     public void markAsRead(@Optional(defaultValue = "#[payload]")
-                           @Summary("Email ID Number of the emails to mark as read")List<Integer> emailIds,
+                           @Summary("Email ID Number of the emails to mark as read") List<Integer> emailIds,
                            @Connection RetrieverConnection connection,
                            @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder)
     {
@@ -68,7 +67,7 @@ public class IMAPOperations
      * @param mailboxFolder The folder where the emails are going to be fetched
      */
     public void markAsDeleted(@Optional(defaultValue = "#[payload]")
-                              @Summary("Email ID Number of the emails to mark as read")List<Integer> emailIds,
+                              @Summary("Email ID Number of the emails to mark as read") List<Integer> emailIds,
                               @Connection RetrieverConnection connection,
                               @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder)
     {

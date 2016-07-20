@@ -7,7 +7,7 @@
 package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Folder.READ_ONLY;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.email.api.EmailAttributesBuilder.fromMessage;
 import org.mule.extension.email.api.Email;
 import org.mule.extension.email.api.EmailAttributes;

@@ -120,7 +120,7 @@ public final class EmailConnectorUtils
     /**
      * Extracts the incoming {@link MuleMessage} attributes of {@link EmailAttributes} type.
      *
-     * @param muleMessage      the incoming {@link MuleMessage}.
+     * @param muleMessage the incoming {@link MuleMessage}.
      * @return an {@link Optional} value with the {@link EmailAttributes}.
      */
     public static Optional<EmailAttributes> getAttributesFromMessage(MuleMessage muleMessage)
@@ -141,8 +141,8 @@ public final class EmailConnectorUtils
     public static List<EmailAttachment> mapToEmailAttachments(Map<String, DataHandler> attachments)
     {
         return attachments.entrySet().stream()
-                          .map(e -> new EmailAttachment(e.getKey(), e.getValue(),
-                                  DataType.builder().mediaType(e.getValue().getContentType()).build().getMediaType()))
-                          .collect(toList());
+                .map(e -> new EmailAttachment(e.getKey(), e.getValue(),
+                                              DataType.builder().mediaType(e.getValue().getContentType()).build().getMediaType()))
+                .collect(toList());
     }
 }

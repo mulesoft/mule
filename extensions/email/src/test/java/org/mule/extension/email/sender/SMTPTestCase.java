@@ -31,9 +31,9 @@ import static org.mule.extension.email.util.EmailTestUtils.MG_EMAIL;
 import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.extension.email.api.Email;
 import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.EmailContent;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.extension.email.api.EmailContent;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;

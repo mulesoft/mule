@@ -65,11 +65,9 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     protected static final String RETRIEVE_WITH_ATTACHMENTS = "retrieveWithAttachments";
     protected static final String STORE_MESSAGES = "storeMessages";
     protected static final String STORE_SINGLE_MESSAGE = "storeSingleMessage";
-    protected final List<Integer> deliveredEmails = new LinkedList<>();
-
     @ClassRule
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
-
+    protected final List<Integer> deliveredEmails = new LinkedList<>();
     @Rule
     public SystemProperty temporaryFolderProperty = new SystemProperty("storePath", temporaryFolder.getRoot().getAbsolutePath());
 

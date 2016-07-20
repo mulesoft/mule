@@ -8,7 +8,6 @@ package org.mule.extension.email.api;
 
 
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT_PLAIN;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.Parameter;

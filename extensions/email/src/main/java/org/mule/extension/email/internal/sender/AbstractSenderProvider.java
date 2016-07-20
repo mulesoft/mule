@@ -6,8 +6,8 @@
  */
 package org.mule.extension.email.internal.sender;
 
-import org.mule.extension.email.internal.AbstractEmailConnectionProvider;
 import org.mule.extension.email.api.EmailConnectionSettings;
+import org.mule.extension.email.internal.AbstractEmailConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.ConnectionValidationResult;

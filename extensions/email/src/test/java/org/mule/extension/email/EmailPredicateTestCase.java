@@ -26,6 +26,7 @@ import org.junit.Test;
 @SmallTest
 public class EmailPredicateTestCase
 {
+
     private static final LocalDateTime RECEIVED_DATE = LocalDateTime.of(2015, 4, 20, 00, 00);
     private static final LocalDateTime SENT_DATE = LocalDateTime.of(2014, 4, 10, 00, 00);
 

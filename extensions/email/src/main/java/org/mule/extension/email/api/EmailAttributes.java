@@ -141,6 +141,7 @@ public class EmailAttributes extends BaseAttributes
     public EmailAttributes()
     {
     }
+
     /**
      * Creates a new instance.
      *

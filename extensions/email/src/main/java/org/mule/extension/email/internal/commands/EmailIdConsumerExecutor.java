@@ -7,9 +7,6 @@
 package org.mule.extension.email.internal.commands;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
-import org.mule.extension.email.api.Email;
-import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.MuleMessage;
 

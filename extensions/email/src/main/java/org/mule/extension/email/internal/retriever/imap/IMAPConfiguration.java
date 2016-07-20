@@ -37,18 +37,17 @@ public class IMAPConfiguration implements RetrieverConfiguration
     @Optional
     @Placement(group = ADVANCED)
     private String defaultCharset;
-
-    public String getDefaultCharset()
-    {
-        return defaultCharset;
-    }
-
     /**
      * Indicates whether the retrieved emails should be opened and read. The default value is "true".
      */
     @Parameter
     @Optional(defaultValue = "true")
     private boolean eagerlyFetchContent;
+
+    public String getDefaultCharset()
+    {
+        return defaultCharset;
+    }
 
     /**
      * {@inheritDoc}

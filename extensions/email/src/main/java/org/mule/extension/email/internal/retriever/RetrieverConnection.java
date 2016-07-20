@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.DISCONNECTED;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-
 import org.mule.extension.email.api.exception.EmailConnectionException;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.AbstractEmailConnection;

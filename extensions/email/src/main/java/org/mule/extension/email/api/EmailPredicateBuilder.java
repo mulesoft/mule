@@ -7,7 +7,6 @@
 package org.mule.extension.email.api;
 
 import static java.util.regex.Pattern.compile;
-
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -37,7 +36,7 @@ import java.util.function.Predicate;
  * @since 4.0
  */
 @Alias("matcher")
-public class  EmailPredicateBuilder
+public class EmailPredicateBuilder
 {
 
     private static final TimeUntilFunction TIME_UNTIL = new TimeUntilFunction();

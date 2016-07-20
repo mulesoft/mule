@@ -12,13 +12,14 @@ import org.mule.extension.email.api.MessageBuilder;
 import org.mule.extension.email.api.exception.EmailSenderException;
 import org.mule.extension.email.internal.sender.SenderConnection;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Transport;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Transport;
 
 /**
  * Represents the send operation.
