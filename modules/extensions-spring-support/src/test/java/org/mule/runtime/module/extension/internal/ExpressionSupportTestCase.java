@@ -16,8 +16,8 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -64,12 +64,11 @@ public class ExpressionSupportTestCase extends ExtensionFunctionalTestCase
     {
         expectedException.expect(InitialisationException.class);
         expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-        expectedException.expectCause(new BaseMatcher<Throwable>()
+        expectedException.expectCause(new TypeSafeMatcher<Throwable>()
         {
             @Override
-            public boolean matches(Object item)
+            protected boolean matchesSafely(Throwable exception)
             {
-                Throwable exception = (Throwable) item;
                 return exception.getMessage().contains("expressions");
             }
 
