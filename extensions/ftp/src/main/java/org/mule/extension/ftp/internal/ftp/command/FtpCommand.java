@@ -19,7 +19,6 @@ import org.mule.runtime.module.extension.file.api.command.FileCommand;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,25 +183,17 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
      */
     protected abstract void doRename(String filePath, String newName) throws Exception;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected void createDirectory(FileConnectorConfig config, String basePath, String directoryName)
+    protected void createDirectory(FileConnectorConfig config, String directoryPath)
     {
-        if (!StringUtils.isBlank(basePath))
-        {
-            changeWorkingDirectory(basePath);
-        }
-
-        FileAttributes targetFile = getFile(config, directoryName);
+        final Path path = Paths.get(config.getBaseDir()).resolve(directoryPath);
+        FileAttributes targetFile = getFile(config, directoryPath);
 
         if (targetFile != null)
         {
-            throw new IllegalArgumentException(format("Directory '%s' already exists", directoryName));
+            throw new IllegalArgumentException(format("Directory '%s' already exists", directoryPath));
         }
 
-        final Path directoryPath = Paths.get(config.getBaseDir()).resolve(directoryName);
-        mkdirs(config, directoryPath);
+        mkdirs(config, path);
     }
 
     /**

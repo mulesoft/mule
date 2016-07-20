@@ -11,13 +11,8 @@
         <spring:import resource="ftp-read-config.xml"/>
     </spring:beans>
 
-    <flow name="rename">
-        <ftp:create-directory directoryName="#[directory]"/>
-    </flow>
-
-
-    <flow name="renameWithBasePath">
-        <ftp:create-directory basePath="#[basePath]" directoryName="#[directory]"/>
+    <flow name="createDirectory">
+        <ftp:create-directory directoryPath="#[directory]"/>
     </flow>
 
 </mule>

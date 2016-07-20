@@ -18,7 +18,7 @@ public interface MoveCommand
 {
 
     /**
-     * Moves files under the considerations of {@link FileSystem#move(String, String, boolean, boolean)}
+     * Moves files under the considerations of {@link FileSystem#move(FileConnectorConfig, String, String, boolean, boolean)}
      *
      * @param config                  the config that is parameterizing this operation
      * @param sourcePath              the path to the file to be copied

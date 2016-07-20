@@ -14,8 +14,6 @@ import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * A {@link LocalFileCommand} which implements the {@link CreateDirectoryCommand} contract
  *
@@ -36,15 +34,9 @@ public final class LocalCreateDirectoryCommand extends LocalFileCommand implemen
      * {@inheritDoc}
      */
     @Override
-    public void createDirectory(FileConnectorConfig config, String basePath, String directoryName)
+    public void createDirectory(FileConnectorConfig config, String directoryPath)
     {
-        if (StringUtils.isBlank(basePath))
-        {
-            basePath = config.getBaseDir();
-        }
-
-        Path base = resolveExistingPath(config, basePath);
-        Path target = base.resolve(directoryName).toAbsolutePath();
+        Path target = resolvePath(config, directoryPath);
 
         if (Files.exists(target))
         {

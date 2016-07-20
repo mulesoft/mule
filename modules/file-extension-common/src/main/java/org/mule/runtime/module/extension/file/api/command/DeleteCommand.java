@@ -18,7 +18,7 @@ public interface DeleteCommand
 {
 
     /**
-     * Deletes a file under the considerations of {@link FileSystem#delete(String)}
+     * Deletes a file under the considerations of {@link FileSystem#delete(FileConnectorConfig, String)}
      *
      * @param config the config that is parameterizing this operation
      * @param filePath the path to the file to be deleted

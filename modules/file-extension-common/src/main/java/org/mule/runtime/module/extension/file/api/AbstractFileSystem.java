@@ -158,9 +158,9 @@ public abstract class AbstractFileSystem implements FileSystem
      * {@inheritDoc}
      */
     @Override
-    public void createDirectory(FileConnectorConfig config, String basePath, String directoryName)
+    public void createDirectory(FileConnectorConfig config, String directoryName)
     {
-        getCreateDirectoryCommand().createDirectory(config, basePath, directoryName);
+        getCreateDirectoryCommand().createDirectory(config, directoryName);
     }
 
     /**

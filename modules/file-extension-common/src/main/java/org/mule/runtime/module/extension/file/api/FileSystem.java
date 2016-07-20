@@ -212,14 +212,12 @@ public interface FileSystem
     void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite);
 
     /**
-     * Creates a new directory of the given {@code directoryName} as a child
-     * of the provided {@code basePath}
+     * Creates a new directory
      *
      * @param config        the config that is parameterizing this operation
-     * @param basePath      the directory which contains the directory to be created
-     * @param directoryName the new directory's new name
+     * @param directoryPath the new directory's path
      */
-    void createDirectory(FileConnectorConfig config, String basePath, String directoryName);
+    void createDirectory(FileConnectorConfig config, String directoryPath);
 
     /**
      * Acquires and returns lock over the given {@code path}.

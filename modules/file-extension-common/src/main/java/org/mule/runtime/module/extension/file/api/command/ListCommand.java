@@ -23,7 +23,7 @@ public interface ListCommand
 {
 
     /**
-     * Lists files under the considerations of {@link FileSystem#list(String, boolean, MuleMessage, Predicate)}
+     * Lists files under the considerations of {@link FileSystem#list(FileConnectorConfig, String, boolean, MuleMessage, Predicate)}
      *
      * @param config        the config that is parameterizing this operation
      * @param directoryPath the path to the directory to be listed
