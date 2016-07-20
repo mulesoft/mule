@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.extension.file.api.AbstractFileSystem;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
 import org.mule.runtime.module.extension.file.api.command.CopyCommand;
 import org.mule.runtime.module.extension.file.api.command.CreateDirectoryCommand;
@@ -170,6 +171,12 @@ public class ConcurrentLockTestCase
         @Override
         public void changeToBaseDir(FileConnectorConfig config)
         {
+        }
+
+        @Override
+        public Class<? extends FileAttributes> getAttributesType()
+        {
+            return FileAttributes.class;
         }
     }
 }

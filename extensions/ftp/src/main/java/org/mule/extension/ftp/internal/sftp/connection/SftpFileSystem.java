@@ -9,6 +9,7 @@ package org.mule.extension.ftp.internal.sftp.connection;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.extension.ftp.internal.sftp.command.SftpCopyCommand;
 import org.mule.extension.ftp.internal.sftp.command.SftpCreateDirectoryCommand;
@@ -214,5 +215,14 @@ public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem
     public WriteCommand getWriteCommand()
     {
         return writeCommand;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Class<? extends FileAttributes> getAttributesType()
+    {
+        return SftpFileAttributes.class;
     }
 }

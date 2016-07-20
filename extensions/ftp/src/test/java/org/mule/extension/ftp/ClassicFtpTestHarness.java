@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.extension.AbstractFtpTestHarness;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.ftp.api.FtpFileAttributes;
+import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.infrastructure.client.ftp.FTPTestClient;
 import org.mule.test.infrastructure.process.rules.FtpServer;
@@ -206,5 +207,14 @@ public class ClassicFtpTestHarness extends AbstractFtpTestHarness
     public void assertDeleted(String path) throws Exception
     {
         assertThat(fileExists(path), is(false));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Class getAttributesType()
+    {
+        return ClassicFtpFileAttributes.class;
     }
 }

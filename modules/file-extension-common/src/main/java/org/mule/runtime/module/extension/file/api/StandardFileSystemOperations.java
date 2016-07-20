@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -25,6 +26,8 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.file.api.matcher.NullFilePayloadPredicate;
+import org.mule.runtime.module.extension.file.api.metadata.FileAttributesMetadataResolver;
+import org.mule.runtime.module.extension.file.api.metadata.FileTreeNodeMetadataResolver;
 
 import java.io.InputStream;
 import java.util.Iterator;
@@ -64,6 +67,7 @@ public class StandardFileSystemOperations
      * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
      */
     @Summary("List all the files from given directory")
+    @MetadataScope(outputResolver = FileTreeNodeMetadataResolver.class)
     public TreeNode list(@UseConfig FileConnectorConfig config,
                          @Connection FileSystem fileSystem,
                          @Optional String directoryPath,
@@ -104,6 +108,7 @@ public class StandardFileSystemOperations
      */
     @DataTypeParameters
     @Summary("Obtains the content and metadata of a file at a given path")
+    @MetadataScope(attributesResolver = FileAttributesMetadataResolver.class)
     public OperationResult<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
                                                              @Connection FileSystem fileSystem,
                                                              MuleMessage message,
