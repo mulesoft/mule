@@ -6,17 +6,45 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
-import org.junit.Test;
+import java.util.Arrays;
+import java.util.Collection;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+@RunWith(Parameterized.class)
 public class ExpressionSupportTestCase extends ExtensionFunctionalTestCase
 {
+
+    @Parameters(name = "{0}")
+    public static Collection<Object[]> data()
+    {
+        return Arrays.asList(new Object[][] {
+                {"heisenberg-invalid-expression-parameter.xml"},
+                {"heisenberg-fixed-parameter-with-expression.xml"}
+        });
+    }
+
+    private final String config;
+
+    public ExpressionSupportTestCase(String config)
+    {
+        this.config = config;
+    }
+
+    @Rule
+    public ExpectedException expectedException = none();
 
     @Override
     protected Class<?>[] getAnnotatedExtensionClasses()
@@ -27,25 +55,19 @@ public class ExpressionSupportTestCase extends ExtensionFunctionalTestCase
     @Override
     protected String[] getConfigFiles()
     {
-        return new String[] {};
+        return new String[] {config};
     }
 
-    @Test(expected = ConfigurationException.class)
-    public void expressionRequiredButFixedValueInstead() throws Exception
+    @Override
+    protected void doSetUpBeforeMuleContextCreation() throws Exception
     {
-        tryConfigure("heisenberg-invalid-expression-parameter.xml");
+        expectedException.expect(InitialisationException.class);
+        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
     }
 
-    @Test(expected = ConfigurationException.class)
-    public void fixedValueRequiredButExpressionInstead() throws Exception
+    @Test
+    public void invalidConfig() throws Exception
     {
-        tryConfigure("heisenberg-fixed-parameter-with-expression.xml.xml");
-    }
-
-    private void tryConfigure(String configResource) throws Exception
-    {
-        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
-        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configResource);
-        builder.configure(context);
+        fail("Configuration should have been invalid");
     }
 }
