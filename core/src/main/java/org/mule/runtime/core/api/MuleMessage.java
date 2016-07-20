@@ -51,6 +51,17 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     }
 
     /**
+     * Create a new {@link MuleMessage instance} with the given payload.
+     *
+     * @param payload the message payload
+     * @return new message instance
+     */
+    static MuleMessage of(Object payload)
+    {
+        return builder().payload(payload).build();
+    }
+
+    /**
      * gets the unique identifier for the message. It's up to the implementation to
      * ensure a unique id
      *

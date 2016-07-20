@@ -54,7 +54,7 @@ public class WildcardFilter implements Filter, ObjectFilter, MuleContextAware
     {
         try
         {
-            return accept(muleContext.getTransformationService().transform(message, DataType.STRING).getPayload());
+            return accept((Object) muleContext.getTransformationService().transform(message, DataType.STRING).getPayload());
         }
         catch (Exception e)
         {

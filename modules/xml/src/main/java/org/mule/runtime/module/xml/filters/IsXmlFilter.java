@@ -33,7 +33,7 @@ public class IsXmlFilter implements Filter
 
     public boolean accept(MuleMessage obj)
     {
-        return accept(obj.getPayload());
+        return accept((Object) obj.getPayload());
     }
 
     private boolean accept(Object obj)

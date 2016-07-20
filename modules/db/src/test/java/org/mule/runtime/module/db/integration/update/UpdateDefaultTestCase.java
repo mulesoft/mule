@@ -7,10 +7,10 @@
 
 package org.mule.runtime.module.db.integration.update;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
 import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
-
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -53,7 +53,7 @@ public class UpdateDefaultTestCase extends AbstractDbIntegrationTestCase
         final MuleEvent responseEvent = flowRunner("jdbcUpdate").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
-        assertEquals(1, response.getPayload());
+        assertThat(response.getPayload(), equalTo(1));
         verifyUpdatedRecord();
     }
 
@@ -65,7 +65,7 @@ public class UpdateDefaultTestCase extends AbstractDbIntegrationTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
-        assertEquals(1, response.getPayload());
+        assertThat(response.getPayload(), equalTo(1));
 
         verifyUpdatedRecord();
     }

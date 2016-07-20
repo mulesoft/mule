@@ -203,7 +203,7 @@ public class ForeachTestCase extends FunctionalTestCase
         MuleMessage msgCollection = MuleMessage.builder().payload(list).build();
         MuleMessage result = flowRunner("message-collection-config").withPayload(list).run().getMessage();
         assertThat(result.getOutboundProperty("totalMessages"), is(10));
-        assertThat(result.getPayload(), is(msgCollection.getPayload()));
+        assertThat(result.getPayload(), is((Object) msgCollection.getPayload()));
         FlowAssert.verify("message-collection-config");
     }
 

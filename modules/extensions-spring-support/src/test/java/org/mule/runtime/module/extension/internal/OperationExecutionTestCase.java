@@ -78,7 +78,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void operationWithReturnValueAndWithoutParameters() throws Exception
     {
-        assertThat(HEISENBERG, is(runFlow("sayMyName").getMessage().getPayload()));
+        assertThat(HEISENBERG, is((Object) runFlow("sayMyName").getMessage().getPayload()));
     }
 
     @Test
@@ -109,13 +109,13 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     @Test
     public void operationWithFixedParameter() throws Exception
     {
-        assertThat(GUSTAVO_FRING, is(runFlow("getFixedEnemy").getMessage().getPayload()));
+        assertThat(GUSTAVO_FRING, is((Object) runFlow("getFixedEnemy").getMessage().getPayload()));
     }
 
     @Test
     public void operationWithDefaulValueParameter() throws Exception
     {
-        assertThat(GUSTAVO_FRING, is(runFlow("getDefaultEnemy").getMessage().getPayload()));
+        assertThat(GUSTAVO_FRING, is((Object) runFlow("getDefaultEnemy").getMessage().getPayload()));
     }
 
     @Test

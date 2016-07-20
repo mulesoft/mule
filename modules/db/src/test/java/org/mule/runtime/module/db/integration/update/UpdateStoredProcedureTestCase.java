@@ -7,7 +7,8 @@
 
 package org.mule.runtime.module.db.integration.update;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
 import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
@@ -55,7 +56,7 @@ public class UpdateStoredProcedureTestCase extends AbstractDbIntegrationTestCase
 
         final MuleMessage response = responseEvent.getMessage();
         int expectedUpdateCount = testDatabase instanceof DerbyTestDatabase ? 0 : 1;
-        assertEquals(expectedUpdateCount, response.getPayload());
+        assertThat(response.getPayload(), equalTo(expectedUpdateCount));
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
     }
