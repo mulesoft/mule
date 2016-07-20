@@ -6,18 +6,16 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 
 public class WireTapTestCase extends AbstractMuleContextTestCase
 {
@@ -44,19 +42,13 @@ public class WireTapTestCase extends AbstractMuleContextTestCase
         assertSame(event, primaryOutput);
 
         assertNotNull(tapListener.event);
-        assertEquals(event.getMessage().getPayload(), tapListener.event.getMessage().getPayload());
+        assertThat(tapListener.event.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
     }
 
     @Test
     public void testWireTapFilterAccepted() throws Exception
     {
-        wireTap.setFilter(new Filter()
-        {
-            public boolean accept(MuleMessage message)
-            {
-                return true;
-            }
-        });
+        wireTap.setFilter(message -> true);
 
         MuleEvent event = getTestEvent("data");
         MuleEvent primaryOutput = wireTap.process(event);
@@ -64,19 +56,13 @@ public class WireTapTestCase extends AbstractMuleContextTestCase
         assertSame(event, primaryOutput);
 
         assertNotNull(tapListener.event);
-        assertEquals(event.getMessage().getPayload(), tapListener.event.getMessage().getPayload());
+        assertThat(tapListener.event.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
     }
 
     @Test
     public void testWireTapFilterUnaccepted() throws Exception
     {
-        wireTap.setFilter(new Filter()
-        {
-            public boolean accept(MuleMessage message)
-            {
-                return false;
-            }
-        });
+        wireTap.setFilter(message -> false);
 
         MuleEvent event = getTestEvent("data");
         MuleEvent primaryOutput = wireTap.process(event);

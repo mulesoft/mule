@@ -244,8 +244,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
             listener.messageNotificationList.get(1).getEndpoint());
         assertTrue(listener.messageNotificationList.get(0).getSource() instanceof MuleMessage);
         assertTrue(listener.messageNotificationList.get(1).getSource() instanceof MuleMessage);
-        assertEquals(outboundEvent.getMessage().getPayload(),
-            listener.messageNotificationList.get(0).getSource().getPayload());
+        assertThat(listener.messageNotificationList.get(0).getSource().getPayload(), equalTo(outboundEvent.getMessage().getPayload()));
         assertEquals(RESPONSE_MESSAGE,
             listener.messageNotificationList.get(1).getSource().getPayload());
     }
@@ -271,10 +270,8 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
             listener.messageNotificationList.get(1).getEndpoint());
         assertTrue(listener.messageNotificationList.get(0).getSource() instanceof MuleMessage);
         assertTrue(listener.messageNotificationList.get(1).getSource() instanceof MuleMessage);
-        assertEquals(outboundEvent.getMessage().getPayload(),
-            listener.messageNotificationList.get(0).getSource().getPayload());
-        assertEquals(outboundEvent.getMessage().getPayload(),
-            listener.messageNotificationList.get(1).getSource().getPayload());
+        assertThat(listener.messageNotificationList.get(0).getSource().getPayload(), equalTo(outboundEvent.getMessage().getPayload()));
+        assertThat(listener.messageNotificationList.get(1).getSource().getPayload(), equalTo(outboundEvent.getMessage().getPayload()));
     }
 
     @Test
@@ -386,7 +383,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
     protected void assertEqualMessages(MuleMessage expect, MuleMessage actual)
     {
-        assertEquals(expect.getPayload(), actual.getPayload());
+        assertThat(actual.getPayload(), equalTo(expect.getPayload()));
         assertEquals(expect.getDataType(), actual.getDataType());
         assertEquals(expect.getUniqueId(), actual.getUniqueId());
         assertEquals(expect.getExceptionPayload(), actual.getExceptionPayload());

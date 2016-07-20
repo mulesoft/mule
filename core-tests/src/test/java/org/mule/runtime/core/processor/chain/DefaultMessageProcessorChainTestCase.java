@@ -202,7 +202,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
         // mp3
         assertNotSame(mp3.event, mp2.resultEvent);
-        assertEquals(mp2.resultEvent.getMessage().getPayload(), mp3.event.getMessage().getPayload());
+        assertThat(mp3.event.getMessage().getPayload(), equalTo(mp2.resultEvent.getMessage().getPayload()));
         assertEquals(mp3.event.getMessage().getPayload(), "012");
 
         assertEquals(isMultipleThreadsUsed() ? 4 : 1, threads);

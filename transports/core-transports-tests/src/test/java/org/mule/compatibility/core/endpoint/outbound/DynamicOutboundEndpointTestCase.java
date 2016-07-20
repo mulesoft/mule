@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -313,7 +314,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
     protected void assertEqualMessages(MuleMessage expect, MuleMessage actual)
     {
-        assertEquals(expect.getPayload(), actual.getPayload());
+        assertThat(actual.getPayload(), equalTo(expect.getPayload()));
         assertEquals(expect.getDataType(), actual.getDataType());
         assertEquals(expect.getUniqueId(), actual.getUniqueId());
         assertEquals(expect.getExceptionPayload(), actual.getExceptionPayload());

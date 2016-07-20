@@ -8,6 +8,7 @@ package org.mule.runtime.core.mule.enricher;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static junit.framework.Assert.assertSame;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -168,7 +169,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         assertEquals(in.getMessage().getUniqueId(), out.getMessage().getUniqueId());
         assertEquals(in.getMessage().getOutboundPropertyNames(), out.getMessage().getOutboundPropertyNames());
         assertEquals("bar", out.getMessage().getOutboundProperty("foo"));
-        assertEquals(in.getMessage().getPayload(), out.getMessage().getPayload());
+        assertThat(out.getMessage().getPayload(), equalTo(in.getMessage().getPayload()));
     }
 
     @Test
