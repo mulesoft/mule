@@ -184,7 +184,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
             assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_SEND_BEGIN));
             assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
             assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-                    is(outboundEvent.getMessage().getPayload()));
+                    is((Object) outboundEvent.getMessage().getPayload()));
         };
 
         endpoint.process(outboundEvent);
@@ -197,7 +197,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
         assertThat(listener.messageNotificationList.get(1).getSource(), instanceOf(MuleMessage.class));
         assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-                is(outboundEvent.getMessage().getPayload()));
+                is((Object) outboundEvent.getMessage().getPayload()));
         assertThat(listener.messageNotificationList.get(1).getSource().getPayload(),
                 is((Object) RESPONSE_MESSAGE));
     }
@@ -225,7 +225,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
             assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_DISPATCH_BEGIN));
             assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
             assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-                    is(outboundEvent.getMessage().getPayload()));
+                    is((Object) outboundEvent.getMessage().getPayload()));
         };
 
         endpoint.process(outboundEvent);
@@ -238,9 +238,9 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(MuleMessage.class));
         assertThat(listener.messageNotificationList.get(1).getSource(), instanceOf(MuleMessage.class));
         assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-                is(outboundEvent.getMessage().getPayload()));
+                is((Object) outboundEvent.getMessage().getPayload()));
         assertThat(listener.messageNotificationList.get(1).getSource().getPayload(),
-                is(outboundEvent.getMessage().getPayload()));
+                is((Object) outboundEvent.getMessage().getPayload()));
     }
 
     @Test

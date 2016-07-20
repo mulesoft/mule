@@ -7,7 +7,8 @@
 
 package org.mule.runtime.module.db.integration.vendor.oracle;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.db.integration.TestDbConfig;
@@ -66,7 +67,7 @@ public class OracleUpdateXmlTypeTestCase extends AbstractOracleXmlTypeTestCase
         final MuleEvent responseEvent = flowRunner("updateWithXmlTypeParam").withPayload(xmlType).run();
 
         final MuleMessage response = responseEvent.getMessage();
-        assertEquals(2, response.getPayload());
+        assertThat(response.getPayload(), equalTo(2));
 
         assertUpdatedAlienDscription();
     }

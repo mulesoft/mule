@@ -255,7 +255,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
             StringBuilder sb = new StringBuilder();
 
             sb.append("Full Message payload: ").append(SystemUtils.LINE_SEPARATOR);
-            sb.append(message.getPayload()).append(SystemUtils.LINE_SEPARATOR);
+            sb.append((Object) message.getPayload()).append(SystemUtils.LINE_SEPARATOR);
             sb.append(StringMessageUtils.headersToString(message));
             logger.info(sb.toString());
         }

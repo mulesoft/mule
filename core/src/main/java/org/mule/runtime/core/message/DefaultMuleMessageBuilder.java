@@ -19,7 +19,6 @@ import static org.mule.runtime.core.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.util.ObjectUtils.getString;
-
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -159,6 +158,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     @Override
     public MuleMessage.CollectionBuilder collectionPayload(Collection payload, Class<?> clazz)
     {
+        requireNonNull(payload);
         this.payload = payload;
         this.dataType = DataType.builder().collectionType(payload.getClass()).itemType(clazz).build();
         return this;

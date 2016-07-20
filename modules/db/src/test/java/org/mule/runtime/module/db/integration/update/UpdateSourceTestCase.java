@@ -7,7 +7,8 @@
 
 package org.mule.runtime.module.db.integration.update;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
@@ -51,7 +52,7 @@ public class UpdateSourceTestCase extends AbstractDbIntegrationTestCase
 
     private void assertUpdate(MuleMessage response) throws SQLException
     {
-        assertEquals(1, response.getPayload());
+        assertThat(response.getPayload(), equalTo(1));
 
         assertPlanetRecordsFromQuery("Pluto");
     }

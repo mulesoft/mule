@@ -30,7 +30,7 @@ public class EqualsFilter implements Filter, ObjectFilter
 
     public boolean accept(MuleMessage message)
     {
-        return accept(message.getPayload());
+        return accept((Object) message.getPayload());
     }
 
     public boolean accept(Object object)

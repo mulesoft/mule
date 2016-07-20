@@ -7,22 +7,21 @@
 
 package org.mule.runtime.module.db.integration.xa;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
 import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.runtime.module.db.integration.model.Planet.MARS;
-
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.transaction.XaTransactionFactory;
 import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.module.db.integration.model.DerbyTestDatabase;
 import org.mule.runtime.module.db.integration.model.Field;
 import org.mule.runtime.module.db.integration.model.Record;
-import org.mule.runtime.core.transaction.XaTransactionFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +59,7 @@ public abstract class AbstractXaTransactionalTestCase extends AbstractDbIntegrat
                                                        .run()
                                                        .getMessage();
 
-        assertEquals(1, response.getPayload());
+        assertThat(response.getPayload(), equalTo(1));
 
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));

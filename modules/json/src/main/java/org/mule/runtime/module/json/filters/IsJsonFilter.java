@@ -48,7 +48,7 @@ public class IsJsonFilter implements Filter, MuleContextAware
         }
         try
         {
-            return accept(muleContext.getTransformationService().transform(obj, DataType.STRING).getPayload());
+            return accept((Object) muleContext.getTransformationService().transform(obj, DataType.STRING).getPayload());
         }
         catch (Exception e)
         {

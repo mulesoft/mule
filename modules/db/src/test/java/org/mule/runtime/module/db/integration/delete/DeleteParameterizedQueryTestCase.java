@@ -7,7 +7,8 @@
 
 package org.mule.runtime.module.db.integration.delete;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.db.integration.model.Planet.VENUS;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -46,7 +47,7 @@ public class DeleteParameterizedQueryTestCase extends AbstractDbIntegrationTestC
         final MuleEvent responseEvent = flowRunner("deleteParameterizedQuery").withPayload(VENUS.getName()).run();
 
         final MuleMessage response = responseEvent.getMessage();
-        assertEquals(1, response.getPayload());
+        assertThat(response.getPayload(), equalTo(1));
         assertDeletedPlanetRecords(VENUS.getName());
     }
 }

@@ -7,7 +7,8 @@
 
 package org.mule.runtime.module.db.integration.update;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
 import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
 import org.mule.runtime.core.api.MuleEvent;
@@ -50,7 +51,7 @@ public class UpdateDynamicQueryTestCase extends AbstractDbIntegrationTestCase
         final MuleEvent responseEvent = flowRunner("updateDynamicQuery").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
-        assertEquals(1, response.getPayload());
+        assertThat(response.getPayload(), equalTo(1));
         List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
         assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
     }

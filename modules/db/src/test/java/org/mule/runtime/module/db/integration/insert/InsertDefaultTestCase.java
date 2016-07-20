@@ -7,8 +7,8 @@
 
 package org.mule.runtime.module.db.integration.insert;
 
-import static org.junit.Assert.assertEquals;
-
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -47,7 +47,7 @@ public class InsertDefaultTestCase extends AbstractDbIntegrationTestCase
         final MuleEvent responseEvent = flowRunner("jdbcInsertUpdateCountRequestResponse").withPayload(TEST_MESSAGE).run();
 
         final MuleMessage response = responseEvent.getMessage();
-        assertEquals(1, response.getPayload());
+        assertThat(response.getPayload(), equalTo(1));
     }
 
     @Test
@@ -58,6 +58,6 @@ public class InsertDefaultTestCase extends AbstractDbIntegrationTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT);
 
-        assertEquals(1, response.getPayload());
+        assertThat(response.getPayload(), equalTo(1));
     }
 }
