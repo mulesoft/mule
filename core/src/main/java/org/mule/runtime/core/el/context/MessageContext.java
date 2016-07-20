@@ -7,7 +7,6 @@
 package org.mule.runtime.core.el.context;
 
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -80,16 +79,7 @@ public class MessageContext
 
     public Object getPayload()
     {
-        if (NullPayload.getInstance().equals(event.getMessage().getPayload()))
-        {
-            // Return null for NullPayload because MEL user doesn't not know what NullPayload is and to allow
-            // them to use null check (#[payload == null])
-            return null;
-        }
-        else
-        {
-            return event.getMessage().getPayload();
-        }
+        return event.getMessage().getPayload();
     }
 
     /**

@@ -167,7 +167,7 @@ public class XPath3Function implements ExpressionLanguageFunction
             Object result = xpathEvaluatorSupplier.get().evaluate(xpathExpression, node, returnType, event);
 
             MuleMessage message = event.getMessage();
-            if (input == message.getPayload() && isConsumable(message.getPayload().getClass()))
+            if (input == message.getPayload() && isConsumable(message.getDataType().getType()))
             {
                 ctx.setPayload(node);
             }

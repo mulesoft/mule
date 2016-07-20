@@ -17,7 +17,6 @@ import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
@@ -323,7 +322,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
         {
             sensedException = exception;
             event.setMessage(MuleMessage.builder(event.getMessage())
-                                     .payload(NullPayload.getInstance())
+                                     .nullPayload()
                                      .exceptionPayload(new DefaultExceptionPayload(exception))
                                      .build());
             return event;

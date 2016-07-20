@@ -8,17 +8,14 @@ package org.mule.extension.socket.internal;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.connection.AbstractSocketConnection;
 import org.mule.extension.socket.api.exceptions.UnresolvableHostException;
-import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.extension.socket.api.socket.tcp.TcpSocketProperties;
+import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 
 import java.io.IOException;
@@ -92,16 +89,7 @@ public final class SocketUtils
 
     public static MuleMessage createMuleMessage(InputStream content, SocketAttributes attributes)
     {
-        DataType dataType = DataType.INPUT_STREAM;
-        Object payload = NullPayload.getInstance();
-        MuleMessage message;
-
-        if (content != null)
-        {
-            payload = content;
-        }
-
-        return MuleMessage.builder().payload(payload).attributes(attributes).build();
+        return MuleMessage.builder().payload(content).attributes(attributes).build();
     }
 
     /**

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.cxf.support;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleMessage;
@@ -21,6 +20,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.sax.SAXResult;
 
+import javanet.staxutils.ContentHandlerToXMLStreamWriter;
 import org.apache.cxf.databinding.stax.XMLStreamWriterCallback;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -31,8 +31,6 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.xml.sax.SAXException;
-
-import javanet.staxutils.ContentHandlerToXMLStreamWriter;
 
 public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
 {
@@ -82,7 +80,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                             xsr.close();
                         };
                     } 
-                    else if (payload instanceof NullPayload)
+                    else if (payload == null)
                     {
                         break;
                     }

@@ -7,12 +7,11 @@
 package org.mule.runtime.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEvent;
 
 import java.io.IOException;
@@ -41,7 +40,7 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
     {
         MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
 
-        assertThat(event.getMessage().getPayload(), is(instanceOf(NullPayload.class)));
+        assertThat(event.getMessage().getPayload(), is(nullValue()));
 
         Map<String, DataHandler> parts = ((HttpResponseAttributes) event.getMessage().getAttributes()).getParts();
         assertThat(parts.size(), is(2));

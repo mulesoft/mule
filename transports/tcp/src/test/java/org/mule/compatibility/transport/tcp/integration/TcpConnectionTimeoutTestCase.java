@@ -7,13 +7,13 @@
 
 package org.mule.compatibility.transport.tcp.integration;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.FutureMessageResult;
 import org.mule.runtime.core.api.MuleMessage;
 
@@ -46,7 +46,7 @@ public class TcpConnectionTimeoutTestCase extends FunctionalTestCase
             fail("Connection timeout not honored.");
         }
 
-        assertEquals(NullPayload.getInstance(), message.getPayload());
+        assertThat(message.getPayload(), is(nullValue()));
         assertNotNull(message.getExceptionPayload());
     }
 }

@@ -11,9 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -66,7 +64,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
         assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
 
-        assertEquals(NullPayload.getInstance(), resultEvent.getMessage().getPayload());
+        assertEquals(null, resultEvent.getMessage().getPayload());
         assertNotNull(exceptionListener.sensedException);
     }
 
@@ -85,7 +83,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
         assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
 
-        assertEquals(NullPayload.getInstance(), resultEvent.getMessage().getPayload());
+        assertEquals(null, resultEvent.getMessage().getPayload());
         assertNotNull(exceptionListener.sensedException);
     }
 
@@ -103,7 +101,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
         assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
 
-        assertEquals(NullPayload.getInstance(), resultEvent.getMessage().getPayload());
+        assertEquals(null, resultEvent.getMessage().getPayload());
         assertNotNull(exceptionListener.sensedException);
     }
 
@@ -122,7 +120,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
         assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof IllegalStateException);
 
-        assertEquals(NullPayload.getInstance(), resultEvent.getMessage().getPayload());
+        assertEquals(null, resultEvent.getMessage().getPayload());
         assertNotNull(exceptionListener.sensedException);
     }
 }

@@ -18,8 +18,6 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
@@ -176,7 +174,7 @@ public class MuleEventToHttpRequest
 
         boolean emptyBody;
 
-        if (event.getMessage().getPayload() instanceof NullPayload && event.getMessage().getOutboundAttachmentNames().isEmpty())
+        if (event.getMessage().getPayload() == null && event.getMessage().getOutboundAttachmentNames().isEmpty())
         {
             emptyBody = true;
         }

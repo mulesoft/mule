@@ -8,9 +8,7 @@ package org.mule.compatibility.transport.http.components;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -70,7 +68,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
         props.put("bar-optional-header", "bar");
 
         MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", MuleMessage.builder()
-                                                                                             .payload(NullPayload.getInstance())
+                                                                                             .nullPayload()
                                                                                              .outboundProperties(props)
                                                                                              .build());
         assertEquals("foo=boo&faz=baz&far=bar",getPayloadAsString(result));
@@ -79,14 +77,14 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
     @Test
     public void testOptionalParametersMissing() throws Exception
     {
-        MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", MuleMessage.builder().payload(NullPayload.getInstance()).addOutboundProperty("baz-header", "baz").build());
+        MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", MuleMessage.builder().nullPayload().addOutboundProperty("baz-header", "baz").build());
         assertEquals("foo=boo&faz=baz",getPayloadAsString(result));
     }
 
     @Test
     public void testRequiredParametersMissing() throws Exception
     {
-        MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", MuleMessage.builder().payload(NullPayload.getInstance()).build());
+        MuleMessage result = muleContext.getClient().send("restServiceEndpoint3", MuleMessage.builder().nullPayload().build());
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         assertEquals(ComponentException.class, result.getExceptionPayload().getException().getClass());

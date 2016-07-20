@@ -43,7 +43,7 @@
         
         <mule:message-filter>
             <mule:not-filter>
-                <mule:payload-type-filter expectedType="org.mule.runtime.api.message.NullPayload"></mule:payload-type-filter>
+                <mule:expression-filter expression="#[payload == null]"/>
             </mule:not-filter>
         </mule:message-filter>
                 

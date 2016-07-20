@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -50,7 +49,7 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
         else
         {
             TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
-            if (typedValue.getValue() == null || typedValue.getValue() instanceof NullPayload)
+            if (typedValue.getValue() == null)
             {
                 removeProperty(event, key);
 

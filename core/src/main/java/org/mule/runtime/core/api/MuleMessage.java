@@ -96,6 +96,9 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     {
 
         @Override
+        Builder nullPayload();
+
+        @Override
         Builder payload(Object payload);
 
         @Override

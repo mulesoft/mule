@@ -11,20 +11,17 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_FORBIDDEN;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import org.hamcrest.core.IsInstanceOf;
-import org.hamcrest.core.IsNot;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -47,7 +44,7 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase
         String url = String.format("http://localhost:%d/flowWithoutExceptionStrategySync", port1.getNumber());
         MuleMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT);
         assertThat(response, notNullValue());
-        assertThat(response.getPayload(), IsNot.not(IsInstanceOf.instanceOf(NullPayload.class)));
+        assertThat(response.getPayload(), not(nullValue()));
         assertThat(getPayloadAsString(response), not(TEST_MESSAGE));
         assertThat(response.getExceptionPayload(), notNullValue()); //to be fixed
         assertThat(response.getExceptionPayload(), instanceOf(ExceptionPayload.class)); //to be review/fixed

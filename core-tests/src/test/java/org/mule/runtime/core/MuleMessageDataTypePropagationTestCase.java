@@ -27,8 +27,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RET
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.MuleTestUtils.getTestEvent;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
@@ -109,7 +107,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     {
         MuleMessage muleMessage = MuleMessage.builder().payload(TEST).build();
 
-        assertDataType(MuleMessage.builder(muleMessage).payload(NullPayload.getInstance()).build(), Object.class, ANY, null);
+        assertDataType(MuleMessage.builder(muleMessage).nullPayload().build(), Object.class, ANY, null);
     }
 
     @Test
@@ -117,7 +115,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     {
         MuleMessage muleMessage = MuleMessage.builder().payload(TEST).build();
 
-        assertDataType(MuleMessage.builder(muleMessage).payload(NullPayload.getInstance()).mediaType
+        assertDataType(MuleMessage.builder(muleMessage).nullPayload().mediaType
                 (APPLICATION_XML_CUSTOM).build(), Object.class, APPLICATION_XML, CUSTOM_ENCODING);
     }
 

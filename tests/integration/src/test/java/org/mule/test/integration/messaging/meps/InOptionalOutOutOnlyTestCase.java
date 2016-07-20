@@ -7,13 +7,12 @@
 package org.mule.test.integration.messaging.meps;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Test;
 
@@ -32,7 +31,7 @@ public class InOptionalOutOutOnlyTestCase extends FunctionalTestCase
         MuleMessage result = baseRunner.run().getMessage();
 
         assertNotNull(result);
-        assertThat(result.getPayload(), is(NullPayload.getInstance()));
+        assertThat(result.getPayload(), is(nullValue()));
 
         baseRunner.reset();
         result = baseRunner.withInboundProperty("foo", "bar")

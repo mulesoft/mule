@@ -126,7 +126,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
             final MuleMessage message = event.getMessage();
             if (message instanceof MuleMessage)
             {
-                if (isConsumable(message.getPayload().getClass()))
+                if (isConsumable(message.getDataType().getType()))
                 {
                     event.getMessageAsBytes();
                 }
@@ -150,7 +150,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
     {
         if (!(message.getPayload() instanceof Serializable))
         {
-            throw new NotSerializableException(message.getPayload().getClass().getCanonicalName());
+            throw new NotSerializableException(message.getDataType().getType().getCanonicalName());
         }
     }
 

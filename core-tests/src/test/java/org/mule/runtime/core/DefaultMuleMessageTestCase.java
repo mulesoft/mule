@@ -9,14 +9,15 @@ package org.mule.runtime.core;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
-
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
@@ -35,9 +36,6 @@ import java.util.Map;
 import javax.activation.DataHandler;
 
 import org.junit.Test;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 {
@@ -254,9 +252,9 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     @Test
     public void usesNullPayloadAsNull() throws Exception
     {
-        MuleMessage message = MuleMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, NullPayload.getInstance()).build();
+        MuleMessage message = MuleMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, null).build();
 
-        assertThat(message.getOutboundProperty(FOO_PROPERTY), is(NullPayload.getInstance()));
+        assertThat(message.getOutboundProperty(FOO_PROPERTY), is(nullValue()));
     }
 
 }

@@ -62,7 +62,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Source object is " + ClassUtils.getSimpleName(message.getPayload().getClass()));
+                logger.debug("Source object is " + ClassUtils.getSimpleName(message.getDataType().getType()));
             }
 
             Object result = transformFromMessage((Message) message.getPayload(), outputEncoding);

@@ -6,17 +6,12 @@
  */
 package org.mule.runtime.module.json.transformers;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import org.mule.runtime.api.message.NullPayload;
-import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -116,6 +111,6 @@ public class JsonXsltTestCase extends AbstractMuleContextTestCase
     @Test(expected = TransformerMessagingException.class)
     public void invalidInputShouldThrow() throws Exception
     {
-        transformer.transform(new Object(), getTestEvent(NullPayload.getInstance()));
+        transformer.transform(new Object(), getTestEvent(MuleMessage.builder().nullPayload().build()));
     }
 }

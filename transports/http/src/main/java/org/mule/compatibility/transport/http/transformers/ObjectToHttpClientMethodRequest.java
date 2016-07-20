@@ -9,7 +9,6 @@ package org.mule.compatibility.transport.http.transformers;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_PARAMS_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
-
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
 import org.mule.compatibility.transport.http.HttpConnector;
@@ -19,7 +18,6 @@ import org.mule.compatibility.transport.http.StreamPayloadRequestEntity;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.compatibility.transport.http.multipart.MultiPartInputStream;
 import org.mule.compatibility.transport.http.multipart.PartDataSource;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.RequestContext;
@@ -81,7 +79,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         registerSourceType(DataType.STRING);
         registerSourceType(DataType.INPUT_STREAM);
         registerSourceType(DataType.fromType(OutputHandler.class));
-        registerSourceType(DataType.fromType(NullPayload.class));
         registerSourceType(DataType.fromType(Map.class));
     }
 
@@ -195,7 +192,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
                 paramValue = src.toString();
             }
 
-            if (!(src instanceof NullPayload) && !StringUtils.EMPTY.equals(src))
+            if (src != null && !StringUtils.EMPTY.equals(src))
             {
                 if (query == null)
                 {
@@ -329,7 +326,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         final MuleMessage msg = event.getMessage();
         // Dont set a POST payload if the body is a Null Payload.
         // This way client calls can control if a POST body is posted explicitly
-        if (!(msg.getPayload() instanceof NullPayload))
+        if (msg.getPayload() != null)
         {
             String outboundMimeType = msg.getDataType().getMediaType().toRfcString();
             if (outboundMimeType == null)
@@ -454,7 +451,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         final MuleMessage msg = event.getMessage();
         Part[] parts;
         int i = 0;
-        if (msg.getPayload() instanceof NullPayload)
+        if (msg.getPayload() == null)
         {
             parts = new Part[msg.getOutboundAttachmentNames().size()];
         }

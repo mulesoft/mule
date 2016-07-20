@@ -27,7 +27,6 @@ import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.extension.file.internal.command.DirectoryListenerCommand;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -93,13 +92,13 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <ul>
  * <li>If the file has been deleted, then it's not possible to obtain its content
- * so the message payload will be {@link NullPayload}</li>
+ * so the message payload will be {@code null}</li>
  * <li>Also in the case of file deletion, all its attributes are also not available.
  * Thus, the message attributes will actually be an instance of {@link DeletedFileAttributes}
  * which throws {@link IllegalStateException} whenever a non available attribute
  * is requested
  * </li>
- * <li>When the event references a directory, then the payload is also a {@link NullPayload}</li>
+ * <li>When the event references a directory, then the payload is also a {@code null}</li>
  * </ul>
  * <p>
  * <b>When to use it</b>
@@ -370,7 +369,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
     private MuleMessage createMessage(Path path, ListenerFileAttributes attributes)
     {
-        Object payload = NullPayload.getInstance();
+        Object payload = null;
         MediaType mediaType = MediaType.ANY;
 
         if (attributes.getEventType().equals(DELETE.name()))

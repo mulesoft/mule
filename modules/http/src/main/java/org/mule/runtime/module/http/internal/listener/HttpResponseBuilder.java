@@ -18,8 +18,6 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODI
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.ALWAYS;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.AUTO;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
@@ -149,7 +147,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         else
         {
             final Object payload = event.getMessage().getPayload();
-            if (payload == NullPayload.getInstance())
+            if (payload == null)
             {
                 setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
                 httpEntity = new EmptyHttpEntity();

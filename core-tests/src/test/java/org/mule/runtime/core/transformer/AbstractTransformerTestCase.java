@@ -54,10 +54,8 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
     {
         Transformer trans = this.getTransformer();
         Object result = trans.transform(getTestData());
-        assertNotNull("The result of the transform shouldn't be null", result);
 
         Object expectedResult = this.getResultData();
-        assertNotNull("The expected result data must not be null", expectedResult);
 
         final boolean match = this.compareResults(expectedResult, result);
         if (!match)

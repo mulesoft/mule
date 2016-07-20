@@ -10,8 +10,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.ClassUtils.isConsumable;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
@@ -134,7 +132,7 @@ public class TransformationService
      */
     public String getPayloadForLogging(MuleMessage message, Charset encoding)
     {
-        Class type = message.getPayload().getClass();
+        Class type = message.getDataType().getType();
         if (!isConsumable(type))
         {
             try
@@ -158,7 +156,7 @@ public class TransformationService
             {
                 Transformer transformer = transformers.get(index);
 
-                Class<?> srcCls = result.getPayload().getClass();
+                Class<?> srcCls = result.getDataType().getType();
                 DataType originalSourceType = DataType.fromType(srcCls);
 
                 if (transformer.isSourceDataTypeSupported(originalSourceType))
@@ -257,7 +255,7 @@ public class TransformationService
         else
         {
             return MuleMessage.builder(message)
-                              .payload(result != null ? result : NullPayload.getInstance())
+                              .payload(result)
                               .mediaType(mergeMediaType(message, transformer.getReturnDataType()))
                               .build();
         }
@@ -296,7 +294,9 @@ public class TransformationService
             throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());
         }
 
-        DataType dataType = DataType.builder(resultType).type(message.getPayload().getClass()).build();
+        DataType dataType = DataType.builder(resultType)
+                .type(message.getDataType().getType())
+                .build();
 
         // If no conversion is necessary, just return the payload as-is
         if (resultType.isCompatibleWith(dataType))

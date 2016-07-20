@@ -7,13 +7,13 @@
 package org.mule.runtime.core.transformer.simple;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -62,7 +62,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase
         setPayloadTransformer.initialise();
 
         Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
-        assertTrue(response instanceof NullPayload);
+        assertThat(response, is(nullValue()));
     }
 
     @Test

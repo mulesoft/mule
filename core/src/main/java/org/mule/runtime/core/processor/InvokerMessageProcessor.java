@@ -7,8 +7,6 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -312,7 +310,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
         }
         else
         {
-            return new DefaultMuleEvent(MuleMessage.builder().payload(NullPayload.getInstance()).build(), event);
+            return new DefaultMuleEvent(MuleMessage.builder().nullPayload().build(), event);
         }
     }
 

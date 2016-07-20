@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.transformer;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -157,11 +156,6 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
             throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
         }
 
-        if (result == null)
-        {
-            result = NullPayload.getInstance();
-        }
-
         if (logger.isDebugEnabled())
         {
             logger.debug(String.format("Object after transform: %s", StringMessageUtils.toString(result)));
@@ -178,14 +172,14 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     {
 
         //Null is a valid return type
-        if(object==null || object instanceof NullPayload && isAllowNullReturn())
+        if(object == null && isAllowNullReturn())
         {
             return object;
         }
 
         if (getReturnDataType() != null)
         {
-            DataType dt = DataType.fromType(object.getClass());
+            DataType dt = DataType.fromObject(object);
             if (!getReturnDataType().isCompatibleWith(dt))
             {
                 throw new TransformerMessagingException(

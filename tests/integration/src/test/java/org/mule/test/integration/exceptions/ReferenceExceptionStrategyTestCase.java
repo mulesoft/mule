@@ -9,10 +9,9 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -55,7 +54,7 @@ public class ReferenceExceptionStrategyTestCase extends FunctionalTestCase
         MessagingException e = flowRunner("configuredExceptionStrategyFlow").withPayload(JSON_REQUEST).runExpectingException();
         assertThat(e, instanceOf(ComponentException.class));
         assertThat(e.getEvent().getMessage(), notNullValue());
-        assertThat(e.getEvent().getMessage().getPayload(), is(NullPayload.getInstance()));
+        assertThat(e.getEvent().getMessage().getPayload(), is(nullValue()));
         assertThat(e.getEvent().getMessage().getExceptionPayload(), notNullValue());
     }
 

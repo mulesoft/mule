@@ -18,9 +18,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -31,6 +30,7 @@ import org.mule.runtime.module.oauth2.internal.OAuthConstants;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
@@ -42,8 +42,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 
 @RunWith(Parameterized.class)
 public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizationTestCase
@@ -101,7 +99,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
                 .tlsContextFactory(createClientTlsContextFactory())
                 .build();
 
-        muleContext.getClient().send(localAuthorizationUrl.getValue(), getTestMuleMessage(NullPayload.getInstance()), options);
+        muleContext.getClient().send(localAuthorizationUrl.getValue(), MuleMessage.builder().nullPayload().build(), options);
 
         final List<LoggedRequest> requests = findAll(getRequestedFor(urlMatching(AUTHORIZE_PATH + ".*")));
         assertThat(requests.size(), is(1));
@@ -137,7 +135,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
                 .put(OAuthConstants.STATE_PARAMETER, state.getValue()).build();
 
         muleContext.getClient().send(redirectUrl.getValue() + "?" + HttpParser.encodeQueryString(redirectUrlQueryParams),
-                getTestMuleMessage(NullPayload.getInstance()), newOptions().tlsContextFactory(createClientTlsContextFactory()).build());
+                MuleMessage.builder().nullPayload().build(), newOptions().tlsContextFactory(createClientTlsContextFactory()).build());
 
         verifyRequestDoneToTokenUrlForAuthorizationCode();
 

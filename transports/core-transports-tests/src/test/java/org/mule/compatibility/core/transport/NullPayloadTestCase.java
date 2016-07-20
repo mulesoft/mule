@@ -6,14 +6,15 @@
  */
 package org.mule.compatibility.core.transport;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import org.mule.runtime.api.message.NullPayload;
+import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.apache.commons.lang.SerializationUtils;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 @SmallTest
@@ -23,14 +24,11 @@ public class NullPayloadTestCase extends AbstractMuleTestCase
     @Test
     public void testUniqueDeserialization()
     {
-        NullPayload result = NullPayload.getInstance();
-
-        byte[] serialized = SerializationUtils.serialize(result);
+        byte[] serialized = SerializationUtils.serialize(null);
         assertNotNull(serialized);
 
         Object deserialized = SerializationUtils.deserialize(serialized);
-        assertSame(deserialized, result);
-        assertEquals(deserialized, result);
+        assertThat(deserialized, is(nullValue()));
     }
 
 }

@@ -11,8 +11,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.api.message.NullPayload;
-
 import org.junit.Test;
 
 public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase
@@ -39,7 +37,7 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendBodyAutoIgnoresNullPayloadPost() throws Exception
     {
-        assertEmptyBody("sendBodyAuto", NullPayload.getInstance(), "POST");
+        assertEmptyBody("sendBodyAuto", null, "POST");
     }
 
     @Test
@@ -50,7 +48,7 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendBodyNeverIgnoresNullPayloadPost() throws Exception
     {
-        assertEmptyBody("sendBodyNever", NullPayload.getInstance(), "POST");
+        assertEmptyBody("sendBodyNever", null, "POST");
     }
 
     @Test
@@ -62,7 +60,7 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase
     @Test
     public void sendBodyAlwaysIgnoresNullPayloadGet() throws Exception
     {
-        assertEmptyBody("sendBodyAlways", NullPayload.getInstance(), "GET");
+        assertEmptyBody("sendBodyAlways", null, "GET");
     }
 
     private void assertEmptyBody(String flowName, Object payload, String method) throws Exception

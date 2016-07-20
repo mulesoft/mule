@@ -10,14 +10,13 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.functional.junit4.ApplicationContextBuilder;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.functional.junit4.ApplicationContextBuilder;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.io.StringReader;
 import java.util.Arrays;
@@ -74,7 +73,7 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase
     public void testProxyWSDLRewriteAllSchemaLocations() throws Exception
     {
         String proxyAddress = "http://localhost:" + httpPortProxy.getNumber() + "/localServicePath";
-        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", getTestMuleMessage(NullPayload.getInstance()), HTTP_REQUEST_OPTIONS);
+        MuleMessage response = muleContext.getClient().send(proxyAddress + "?wsdl", MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS);
 
         Set<String> expectedParametersValues = new HashSet<String>();
         expectedParametersValues.addAll(Arrays.asList("xsd=xsd0"));

@@ -101,7 +101,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         HttpRequest request = createPostHttpRequest();
         MuleMessage message = factory.create(request, encoding);
         assertNotNull(message);
-        assertEquals(byte[].class, message.getPayload().getClass());
+        assertEquals(byte[].class, message.getDataType().getType());
         byte[] payload = (byte[]) message.getPayload();
         assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
     }
@@ -123,7 +123,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         HttpRequest request = createMultiPartHttpRequest();
         MuleMessage message = factory.create(request, encoding);
         assertNotNull(message);
-        assertEquals(byte[].class, message.getPayload().getClass());
+        assertEquals(byte[].class, message.getDataType().getType());
         byte[] payload = (byte[]) message.getPayload();
         assertTrue(Arrays.equals(MULTIPART_MESSAGE.getBytes(), payload));
     }

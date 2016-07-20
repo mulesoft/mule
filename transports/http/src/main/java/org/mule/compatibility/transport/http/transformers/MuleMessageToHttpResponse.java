@@ -12,13 +12,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_G
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
-
 import org.mule.compatibility.transport.http.CookieHelper;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
@@ -91,7 +89,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         // Note this transformer excepts Null as we must always return a result
         // from the Http
         // connector if a response transformer is present
-        if (src instanceof NullPayload)
+        if (src == null)
         {
             src = StringUtils.EMPTY;
         }

@@ -9,7 +9,6 @@ package org.mule.runtime.core.component;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -165,7 +164,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
         {
             return event;
         }
-        else if (result != null)
+        else
         {
             final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
             template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
@@ -173,14 +172,6 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject implemen
                     muleContext.getTransformationService()
                                .applyTransformers(event.getMessage(), event, singletonList(template)));
             return event;
-        }
-        else
-        {
-            final MuleMessage emptyMessage = MuleMessage.builder()
-                                                        .payload(NullPayload.getInstance())
-                                                        .rootId(event.getMessage().getMessageRootId())
-                                                        .build();
-            return new DefaultMuleEvent(emptyMessage, event);
         }
     }
 

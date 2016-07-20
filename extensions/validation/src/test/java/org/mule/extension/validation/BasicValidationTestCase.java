@@ -11,15 +11,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import static org.mule.extension.validation.api.ValidationExtension.DEFAULT_LOCALE;
+import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEvent;
 
 import com.google.common.base.Joiner;
@@ -156,7 +155,7 @@ public class BasicValidationTestCase extends ValidationTestCase
         assertValid(flowRunner(flow).withPayload(Arrays.asList("a")));
         assertValid(flowRunner(flow).withPayload(new String[] {"a"}));
         assertValid(flowRunner(flow).withPayload(ImmutableMap.of("a", "A")));
-        assertInvalid(flowRunner(flow).withPayload(NullPayload.getInstance()), messages.valueIsNull());
+        assertInvalid(flowRunner(flow).withPayload(null), messages.valueIsNull());
         assertInvalid(flowRunner(flow).withPayload(""), messages.stringIsBlank());
         assertInvalid(flowRunner(flow).withPayload(ImmutableList.of()), messages.collectionIsEmpty());
         assertInvalid(flowRunner(flow).withPayload(new String[] {}), messages.arrayIsEmpty());

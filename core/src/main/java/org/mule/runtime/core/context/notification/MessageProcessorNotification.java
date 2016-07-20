@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -99,7 +98,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
         else if (rootId != null && flowConstruct != null)
         {
             final MuleMessage msg = MuleMessage.builder()
-                                               .payload(NullPayload.getInstance())
+                                               .nullPayload()
                                                .rootId(rootId)
                                                .build();
 

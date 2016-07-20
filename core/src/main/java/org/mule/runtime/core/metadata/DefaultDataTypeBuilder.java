@@ -11,8 +11,6 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionType;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -308,11 +306,9 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
     @Override
     public DataTypeParamsBuilder fromObject(Object value)
     {
-        requireNonNull(value);
         validateAlreadyBuilt();
 
-        // TODO MULE-9985 Remove use of NullPayload
-        if(value == NullPayload.getInstance())
+        if(value == null)
         {
             return type(Object.class);
         }

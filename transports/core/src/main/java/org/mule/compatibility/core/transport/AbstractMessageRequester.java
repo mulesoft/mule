@@ -13,7 +13,6 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -87,8 +86,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
             EndpointMessageNotification beginNotification = null;
             if (connector.isEnableMessageEvents())
             {
-                MuleMessage dummyMessage = MuleMessage.builder().payload(NullPayload.getInstance()).build();
-                beginNotification = new EndpointMessageNotification(dummyMessage, endpoint, null, MESSAGE_REQUEST_BEGIN);
+                beginNotification = new EndpointMessageNotification(MuleMessage.builder().nullPayload().build(), endpoint, null, MESSAGE_REQUEST_BEGIN);
             }
             // Make sure we are connected
             connect();
@@ -100,7 +98,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
             }
             else
             {
-                builder = MuleMessage.builder().payload(NullPayload.getInstance());
+                builder = MuleMessage.builder().nullPayload();
             }
             if (result != null)
             {

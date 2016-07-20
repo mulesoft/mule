@@ -9,7 +9,6 @@ package org.mule.compatibility.transport.file;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
@@ -205,7 +204,7 @@ public class FileMessageRequester extends AbstractMessageRequester
     {
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
-        MuleMessage fileParserMessasge = MuleMessage.builder().payload(NullPayload.getInstance())
+        MuleMessage fileParserMessasge = MuleMessage.builder().nullPayload()
                 .addInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalFileName)
                 .addInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalDirectory)
                 .build();

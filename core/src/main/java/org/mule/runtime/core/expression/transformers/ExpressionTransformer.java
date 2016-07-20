@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.expression.transformers;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -78,9 +77,9 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
 
     private boolean checkIfAllAreNull(Object[] objects)
     {
-        for (int i = 0; i < objects.length; i++)
+        for (Object object : objects)
         {
-            if (objects[i] != null && !(objects[i] instanceof NullPayload))
+            if (object != null)
             {
                 return false;
             }

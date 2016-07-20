@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.NEVER;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -32,6 +31,7 @@ import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayInputStream;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 import org.hamcrest.core.Is;
@@ -68,7 +68,7 @@ public class HttpRequestWithMuleClientTestCase extends AbstractHttpTestCase
     {
         muleContext.getClient().dispatch(getUrl(), getTestMuleMessage());
         final MuleMessage receivedMessage = getMessageReceivedByFlow();
-        assertThat(receivedMessage.getPayload(), Is.<Object>is(NullPayload.getInstance().toString()));
+        assertThat(receivedMessage.getPayload(), Is.<Object>is(Objects.toString(null)));
     }
 
     @Ignore("See MULE-8049")
@@ -106,15 +106,15 @@ public class HttpRequestWithMuleClientTestCase extends AbstractHttpTestCase
     @Test
     public void sendDisableRedirect() throws Exception
     {
-        final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), getTestMuleMessage(NullPayload.class), newOptions().method(PUT_HTTP_METHOD).disableFollowsRedirect().build());
+        final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), MuleMessage.builder().nullPayload().build(), newOptions().method(PUT_HTTP_METHOD).disableFollowsRedirect().build());
         assertThat(getPayloadAsString(response), is("test-response"));
     }
 
     @Test
     public void sendEnableRedirect() throws Exception
     {
-        final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), getTestMuleMessage(NullPayload.class), newOptions().enableFollowsRedirect().build());
-        assertThat(getPayloadAsString(response), is(NullPayload.getInstance().toString()));
+        final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), MuleMessage.builder().nullPayload().build(), newOptions().enableFollowsRedirect().build());
+        assertThat(getPayloadAsString(response), is(Objects.toString(null)));
     }
 
     @Test
@@ -123,7 +123,7 @@ public class HttpRequestWithMuleClientTestCase extends AbstractHttpTestCase
         expectedException.expectCause(IsInstanceOf.<Throwable>instanceOf(TimeoutException.class));
         try
         {
-            muleContext.getClient().send(getTimeoutUrl(), getTestMuleMessage(NullPayload.class), newOptions().responseTimeout(RESPONSE_TIMEOUT).build());
+            muleContext.getClient().send(getTimeoutUrl(), MuleMessage.builder().nullPayload().build(), newOptions().responseTimeout(RESPONSE_TIMEOUT).build());
         }
         finally
         {
@@ -134,28 +134,25 @@ public class HttpRequestWithMuleClientTestCase extends AbstractHttpTestCase
     @Test
     public void sendDisableRedirectByRequestConfig() throws Exception
     {
-        final MuleMessage message = getTestMuleMessage(NullPayload.class);
         final HttpRequestOptions options = newOptions().method(PUT_HTTP_METHOD).requestConfig(getRequestConfig()).build();
-        final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), message, options);
+        final MuleMessage response = muleContext.getClient().send(getRedirectUrl(), MuleMessage.builder().nullPayload().build(), options);
         assertThat(getPayloadAsString(response), is(TEST_RESPONSE));
     }
 
     @Test
     public void disableStatusCodeValidation() throws Exception
     {
-        final MuleMessage message = getTestMuleMessage(NullPayload.class);
         final HttpRequestOptions options = newOptions().disableStatusCodeValidation().build();
-        final MuleMessage response = muleContext.getClient().send(getFailureUrl(), message, options);
+        final MuleMessage response = muleContext.getClient().send(getFailureUrl(), MuleMessage.builder().nullPayload().build(), options);
         assertThat(response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), Is.<Object>is(500));
     }
 
     @Test
     public void customRequestConfig() throws Exception
     {
-        final MuleMessage message = getTestMuleMessage(NullPayload.class);
         final HttpRequesterConfig requestConfig = new HttpRequesterConfigBuilder(muleContext).setProtocol(HTTPS).setTlsContext(muleContext.getRegistry().<TlsContextFactory>get("tlsContext")).build();
         final HttpRequestOptions options = newOptions().disableStatusCodeValidation().requestConfig(requestConfig).build();
-        final MuleMessage response = muleContext.getClient().send(format("https://localhost:%s/", httpsPort.getNumber()), message, options);
+        final MuleMessage response = muleContext.getClient().send(format("https://localhost:%s/", httpsPort.getNumber()), MuleMessage.builder().nullPayload().build(), options);
         assertThat(response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), Is.<Object>is(200));
         assertThat(getPayloadAsString(response), is(TEST_RESPONSE));
     }

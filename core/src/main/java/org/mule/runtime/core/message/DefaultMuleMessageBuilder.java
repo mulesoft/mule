@@ -21,7 +21,6 @@ import static org.mule.runtime.core.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.util.ObjectUtils.getString;
 
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
@@ -32,7 +31,6 @@ import org.mule.runtime.core.api.MessageProperties;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.MuleMessage.CollectionBuilder;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -145,9 +143,15 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     }
 
     @Override
-    public Builder payload(Object payload)
+    public MuleMessage.Builder nullPayload()
     {
-        requireNonNull(payload);
+        this.payload = null;
+        return this;
+    }
+
+    @Override
+    public MuleMessage.Builder payload(Object payload)
+    {
         this.payload = payload;
         return this;
     }
@@ -175,7 +179,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     }
 
     @Override
-    public Builder mediaType(MediaType mediaType)
+    public MuleMessage.Builder mediaType(MediaType mediaType)
     {
         this.dataType = DataType.builder().mediaType(mediaType).build();
         return this;
@@ -189,140 +193,140 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     }
 
     @Override
-    public Builder correlationId(String correlationId)
+    public MuleMessage.Builder correlationId(String correlationId)
     {
         this.correlationId = correlationId;
         return this;
     }
 
     @Override
-    public Builder correlationSequence(Integer correlationSequence)
+    public MuleMessage.Builder correlationSequence(Integer correlationSequence)
     {
         this.correlationSequence = correlationSequence;
         return this;
     }
 
     @Override
-    public Builder correlationGroupSize(Integer correlationGroupSize)
+    public MuleMessage.Builder correlationGroupSize(Integer correlationGroupSize)
     {
         this.correlationGroupSize = correlationGroupSize;
         return this;
     }
 
     @Override
-    public Builder exceptionPayload(ExceptionPayload exceptionPayload)
+    public MuleMessage.Builder exceptionPayload(ExceptionPayload exceptionPayload)
     {
         this.exceptionPayload = exceptionPayload;
         return this;
     }
 
     @Override
-    public Builder replyTo(Object replyTo)
+    public MuleMessage.Builder replyTo(Object replyTo)
     {
         this.replyTo = replyTo;
         return this;
     }
 
     @Override
-    public Builder id(String id)
+    public MuleMessage.Builder id(String id)
     {
         this.id = id;
         return this;
     }
 
     @Override
-    public Builder rootId(String rootId)
+    public MuleMessage.Builder rootId(String rootId)
     {
         this.rootId = rootId;
         return this;
     }
 
     @Override
-    public Builder addInboundProperty(String key, Serializable value)
+    public MuleMessage.Builder addInboundProperty(String key, Serializable value)
     {
         inboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
         return this;
     }
 
     @Override
-    public Builder addInboundProperty(String key, Serializable value, MediaType mediaType)
+    public MuleMessage.Builder addInboundProperty(String key, Serializable value, MediaType mediaType)
     {
         inboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
         return this;
     }
 
     @Override
-    public Builder addInboundProperty(String key, Serializable value, DataType dataType)
+    public MuleMessage.Builder addInboundProperty(String key, Serializable value, DataType dataType)
     {
         inboundProperties.put(key, new TypedValue(value, dataType));
         return this;
     }
 
     @Override
-    public Builder addOutboundProperty(String key, Serializable value)
+    public MuleMessage.Builder addOutboundProperty(String key, Serializable value)
     {
         outboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
         return this;
     }
 
     @Override
-    public Builder addOutboundProperty(String key, Serializable value, MediaType mediaType)
+    public MuleMessage.Builder addOutboundProperty(String key, Serializable value, MediaType mediaType)
     {
         outboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
         return this;
     }
 
     @Override
-    public Builder addOutboundProperty(String key, Serializable value, DataType dataType)
+    public MuleMessage.Builder addOutboundProperty(String key, Serializable value, DataType dataType)
     {
         outboundProperties.put(key, new TypedValue(value, dataType));
         return this;
     }
 
     @Override
-    public Builder removeInboundProperty(String key)
+    public MuleMessage.Builder removeInboundProperty(String key)
     {
         inboundProperties.remove(key);
         return this;
     }
 
     @Override
-    public Builder removeOutboundProperty(String key)
+    public MuleMessage.Builder removeOutboundProperty(String key)
     {
         outboundProperties.remove(key);
         return this;
     }
 
     @Override
-    public Builder addInboundAttachment(String key, DataHandler value)
+    public MuleMessage.Builder addInboundAttachment(String key, DataHandler value)
     {
         inboundAttachments.put(key, value);
         return this;
     }
 
     @Override
-    public Builder addOutboundAttachment(String key, DataHandler value)
+    public MuleMessage.Builder addOutboundAttachment(String key, DataHandler value)
     {
         outboundAttachments.put(key, value);
         return this;
     }
 
     @Override
-    public Builder removeInboundAttachment(String key)
+    public MuleMessage.Builder removeInboundAttachment(String key)
     {
         inboundAttachments.remove(key);
         return this;
     }
 
     @Override
-    public Builder removeOutboundAttachment(String key)
+    public MuleMessage.Builder removeOutboundAttachment(String key)
     {
         outboundAttachments.remove(key);
         return this;
     }
 
     @Override
-    public Builder inboundProperties(Map<String, Serializable> inboundProperties)
+    public MuleMessage.Builder inboundProperties(Map<String, Serializable> inboundProperties)
     {
         requireNonNull(inboundProperties);
         this.inboundProperties.clear();
@@ -331,7 +335,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     }
 
     @Override
-    public Builder outboundProperties(Map<String, Serializable> outboundProperties)
+    public MuleMessage.Builder outboundProperties(Map<String, Serializable> outboundProperties)
     {
         requireNonNull(outboundProperties);
         this.outboundProperties.clear();
@@ -340,7 +344,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     }
 
     @Override
-    public Builder inboundAttachments(Map<String, DataHandler> inboundAttachments)
+    public MuleMessage.Builder inboundAttachments(Map<String, DataHandler> inboundAttachments)
     {
         requireNonNull(inboundAttachments);
         this.inboundAttachments = new HashMap<>(inboundAttachments);
@@ -348,7 +352,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     }
 
     @Override
-    public Builder outboundAttachments(Map<String, DataHandler> outbundAttachments)
+    public MuleMessage.Builder outboundAttachments(Map<String, DataHandler> outbundAttachments)
     {
         requireNonNull(outbundAttachments);
         this.outboundAttachments = new HashMap<>(outbundAttachments);
@@ -519,7 +523,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             buf.append(LINE_SEPARATOR);
             buf.append("  id=").append(getUniqueId());
             buf.append(LINE_SEPARATOR);
-            buf.append("  payload=").append(getPayload().getClass().getName());
+            buf.append("  payload=").append(getDataType().getType().getName());
             buf.append(LINE_SEPARATOR);
             buf.append("  correlation=").append(getCorrelation().toString());
             buf.append(LINE_SEPARATOR);
@@ -633,7 +637,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         {
             out.defaultWriteObject();
             serializeValue(out);
-            out.writeObject(typedValue.getDataType());
             out.writeObject(serializeAttachments(inboundAttachments));
             out.writeObject(serializeAttachments(outboundAttachments));
         }
@@ -665,6 +668,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             {
                 out.writeBoolean(true);
                 out.writeObject(typedValue.getValue());
+                out.writeObject(typedValue.getDataType());
             }
             else
             {
@@ -673,13 +677,13 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
                 byte[] valueAsByteArray = (byte[]) RequestContext.getEvent().getMuleContext().getTransformationService().transform(this, DataType.BYTE_ARRAY).getPayload();
                 out.writeInt(valueAsByteArray.length);
                 new DataOutputStream(out).write(valueAsByteArray);
+                out.writeObject(DataType.BYTE_ARRAY);
             }
         }
 
         protected Object deserializeValue(ObjectInputStream in) throws Exception
         {
-            boolean valueSerialized = in.readBoolean();
-            if (valueSerialized)
+            if (in.readBoolean())
             {
                 return in.readObject();
             }
@@ -897,7 +901,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             {
                 if (key != null)
                 {
-                    if (value == null || value instanceof NullPayload)
+                    if (value == null)
                     {
                         if (logger.isDebugEnabled())
                         {
@@ -928,7 +932,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             {
                 if (key != null)
                 {
-                    if (value == null || value instanceof NullPayload)
+                    if (value == null)
                     {
                         if (logger.isDebugEnabled())
                         {

@@ -132,7 +132,7 @@ public class JmsPropertyFilter implements Filter
         else
         {
             logger.warn("Expected a payload of javax.jms.Message but instead received " +
-                        ClassUtils.getSimpleName(message.getPayload().getClass()));
+                        ClassUtils.getSimpleName(message.getDataType().getType()));
         }
 
             return false;

@@ -6,19 +6,17 @@
  */
 package org.mule.runtime.module.cxf;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.api.message.NullPayload;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleContextTestCase
 {
@@ -61,7 +59,7 @@ public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleCont
     @Test
     public void testGetArgs_withNullPayloadAsPayload() throws Exception
     {
-        Object payload = NullPayload.getInstance();
+        Object payload = null;
 
         Object[] args = callGetArgsWithPayload(payload);
 

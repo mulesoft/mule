@@ -50,7 +50,7 @@ public class MapSplitter extends AbstractSplitter
         else
         {
             throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(
-                message.getPayload().getClass(), Map.class).getMessage());
+                message.getDataType().getType(), Map.class).getMessage());
         }
     }
 }

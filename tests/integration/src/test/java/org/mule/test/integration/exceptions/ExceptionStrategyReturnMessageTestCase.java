@@ -6,12 +6,12 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -37,8 +37,7 @@ public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
         }
         catch(ComponentException e)
         {
-            assertNotNull(e.getEvent().getMessage().getPayload());
-            assertTrue(e.getEvent().getMessage().getPayload() instanceof NullPayload);
+            assertThat(e.getEvent().getMessage().getPayload(), is(nullValue()));
         }
     }
 

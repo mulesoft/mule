@@ -19,17 +19,15 @@ public class TypedValue<T> implements Serializable
 
     private static final long serialVersionUID = -2533879516750283994L;
 
-    private T value;
-
-    // TODO MULE-9279 Make 'final' once MuleMessage is immutable
-    private DataType dataType;
+    private final T value;
+    private final DataType dataType;
 
     public TypedValue(T value, DataType dataType)
     {
         this.value = value;
         if (dataType == null)
         {
-            this.dataType = DataType.builder(dataType).type(value.getClass()).build();
+            this.dataType = DataType.fromObject(value);
         }
         else
         {
@@ -47,15 +45,4 @@ public class TypedValue<T> implements Serializable
         return value;
     }
 
-    // TODO MULE-9279 Remove method once MuleMessage is immutable
-    protected void setDataType(DataType dataType)
-    {
-        this.dataType = dataType;
-    }
-
-    // TODO MULE-9279 Remove method once MuleMessage is immutable
-    protected void setValue(T value)
-    {
-        this.value = value;
-    }
 }

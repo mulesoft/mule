@@ -12,8 +12,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -47,8 +45,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase
     public void nullPayloadResponseFromNestedMP() throws Exception
     {
 
-        PollingMessageSource pollingMessageSource = createMessageSource(event -> new DefaultMuleEvent(
-                MuleMessage.builder().payload(NullPayload.getInstance()).build(), event));
+        PollingMessageSource pollingMessageSource = createMessageSource(event -> new DefaultMuleEvent(MuleMessage.builder().nullPayload().build(), event));
 
         SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
         pollingMessageSource.setListener(flow);

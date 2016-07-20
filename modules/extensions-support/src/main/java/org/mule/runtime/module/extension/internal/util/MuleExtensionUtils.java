@@ -16,7 +16,6 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -45,8 +44,8 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
-import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
+import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
@@ -296,7 +295,7 @@ public class MuleExtensionUtils
 
     public static MuleEvent getInitialiserEvent(MuleContext muleContext)
     {
-        return new DefaultMuleEvent(MuleMessage.builder().payload(NullPayload.getInstance()).build(), REQUEST_RESPONSE, new FlowConstruct()
+        return new DefaultMuleEvent(MuleMessage.builder().nullPayload().build(), REQUEST_RESPONSE, new FlowConstruct()
         {
             // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
 

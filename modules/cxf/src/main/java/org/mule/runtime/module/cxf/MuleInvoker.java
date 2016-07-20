@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.cxf;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
@@ -156,7 +155,7 @@ public class MuleInvoker implements Invoker
 
                 throw new Fault(cause);
             }
-            else if (resMessage.getPayload() instanceof NullPayload)
+            else if (resMessage.getPayload() == null)
             {
                 return new MessageContentsList((Object)null);
             }

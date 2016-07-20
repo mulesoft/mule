@@ -26,7 +26,6 @@ import org.mule.extension.validation.internal.validator.NumberValidator;
 import org.mule.extension.validation.internal.validator.SizeValidator;
 import org.mule.extension.validation.internal.validator.TimeValidator;
 import org.mule.extension.validation.internal.validator.UrlValidator;
-import org.mule.runtime.api.message.NullPayload;
 
 import java.util.Locale;
 
@@ -161,8 +160,7 @@ public final class ValidatorElContext
     }
 
     /**
-     * Validates that {@code value} is not {@code null} or
-     * {@link NullPayload} by using a {@link NotNullValidator}
+     * Validates that {@code value} is not {@code null} by using a {@link NotNullValidator}
      *
      * @param value the value to test
      * @return {@code true} if the validation succeeded. {@code false} otherwise
@@ -173,8 +171,7 @@ public final class ValidatorElContext
     }
 
     /**
-     * Validates that {@code value} is {@code null} or
-     * {@link NullPayload} by using a {@link NullValidator}
+     * Validates that {@code value} is {@code null} by using a {@link NullValidator}
      *
      * @param value the value to test
      * @return {@code true} if the validation succeeded. {@code false} otherwise

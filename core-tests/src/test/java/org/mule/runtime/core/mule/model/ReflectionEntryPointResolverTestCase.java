@@ -8,8 +8,6 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
@@ -106,11 +104,11 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
         //This should fail because the Kiwi.bite() method has a void return type, and by default
         //void methods are ignorred
-        InvocationResult result = resolver.invoke(new Kiwi(), getTestEventContext(NullPayload.getInstance()));
+        InvocationResult result = resolver.invoke(new Kiwi(), getTestEventContext(null));
         assertEquals(result.getState(), InvocationResult.State.FAILED);
 
         resolver.setAcceptVoidMethods(true);
-        result = resolver.invoke(new Kiwi(), getTestEventContext(NullPayload.getInstance()));
+        result = resolver.invoke(new Kiwi(), getTestEventContext(null));
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertEquals("bite", result.getMethodCalled());
     }

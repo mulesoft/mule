@@ -20,7 +20,6 @@ import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
@@ -183,7 +182,8 @@ public class MuleEventToHttpRequest
     {
         boolean emptyBody;
 
-        if (event.getMessage().getPayload() instanceof NullPayload && parts.isEmpty())
+        // TODO MULE-9986 Use multi-part payload
+        if (event.getMessage().getPayload() == null && parts.isEmpty())
         {
             emptyBody = true;
         }

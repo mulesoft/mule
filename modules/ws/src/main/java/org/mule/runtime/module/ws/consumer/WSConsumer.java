@@ -9,7 +9,6 @@ package org.mule.runtime.module.ws.consumer;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -197,8 +196,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
                         event.setMessage(MuleMessage.builder(event.getMessage()).payload(soapFault.getDetail() !=
                                                                                          null ? soapFault.getDetail()
-                                                                                              : NullPayload
-                                                                                                 .getInstance())
+                                                                                              : null)
                                                  .build());
 
                         throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(),

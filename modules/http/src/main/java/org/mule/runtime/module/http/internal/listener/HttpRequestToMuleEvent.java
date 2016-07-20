@@ -16,8 +16,6 @@ import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_0_9
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.createDataHandlerFrom;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
-
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -82,7 +80,7 @@ public class HttpRequestToMuleEvent
                                            .addPropertiesTo(inboundProperties);
 
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();
-        Object payload = NullPayload.getInstance();
+        Object payload = null;
 
         final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
         if (parseRequest)

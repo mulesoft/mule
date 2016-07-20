@@ -179,7 +179,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
         invoker.setArguments(Collections.singletonList(new String[]{"#['1']", "#['2']"}));
         invoker.initialise();
         MuleEvent result = invoker.process(getTestEvent(""));
-        assertEquals(String[].class, result.getMessage().getPayload().getClass());
+        assertEquals(String[].class, result.getMessage().getDataType().getType());
         assertEquals("1", ((String[]) result.getMessage().getPayload())[0]);
         assertEquals("2", ((String[]) result.getMessage().getPayload())[1]);
     }
@@ -191,7 +191,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
         invoker.setArguments(Collections.singletonList(Collections.singletonList("#['1']")));
         invoker.initialise();
         MuleEvent result = invoker.process(getTestEvent(""));
-        assertTrue(List.class.isAssignableFrom(result.getMessage().getPayload().getClass()));
+        assertTrue(List.class.isAssignableFrom(result.getMessage().getDataType().getType()));
         assertEquals("1", ((List) result.getMessage().getPayload()).get(0));
     }
 
@@ -203,7 +203,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
             "#['key']", "#['val']"))));
         invoker.initialise();
         MuleEvent result = invoker.process(getTestEvent(""));
-        assertTrue(List.class.isAssignableFrom(result.getMessage().getPayload().getClass()));
+        assertTrue(List.class.isAssignableFrom(result.getMessage().getDataType().getType()));
         assertEquals("val", ((Map) ((List) result.getMessage().getPayload()).get(0)).get("key"));
     }
 
@@ -215,7 +215,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
             "#['val']")));
         invoker.initialise();
         MuleEvent result = invoker.process(getTestEvent(""));
-        assertTrue(Map.class.isAssignableFrom(result.getMessage().getPayload().getClass()));
+        assertTrue(Map.class.isAssignableFrom(result.getMessage().getDataType().getType()));
         assertEquals("val", ((Map) result.getMessage().getPayload()).get("key"));
     }
 

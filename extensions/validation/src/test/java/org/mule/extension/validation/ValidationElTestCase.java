@@ -13,7 +13,6 @@ import static org.mule.extension.validation.ValidationTestCase.INVALID_URL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
 import org.mule.extension.validation.api.NumberType;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
@@ -143,14 +142,14 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase
         final String expression = "#[validator.isNotNull(payload)]";
         assertValid(expression, getTestEvent(""));
 
-        assertInvalid(expression, getTestEvent(NullPayload.getInstance()));
+        assertInvalid(expression, getTestEvent((MuleMessage.builder().nullPayload().build())));
     }
 
     @Test
     public void isNull() throws Exception
     {
         final String expression = "#[validator.isNull(payload)]";
-        assertValid(expression, getTestEvent(NullPayload.getInstance()));
+        assertValid(expression, getTestEvent(MuleMessage.builder().nullPayload().build()));
 
         assertInvalid(expression, getTestEvent(""));
     }

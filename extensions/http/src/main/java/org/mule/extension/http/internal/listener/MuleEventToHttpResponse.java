@@ -17,7 +17,6 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessagingException;
@@ -133,7 +132,7 @@ public class MuleEventToHttpResponse
         else
         {
             final Object payload = event.getMessage().getPayload();
-            if (payload == NullPayload.getInstance())
+            if (payload == null)
             {
                 setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
                 httpEntity = new EmptyHttpEntity();

@@ -11,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -148,7 +147,7 @@ public class InboundMessageLossTestCase extends FunctionalTestCase
         {
             doHandleException(ex, event);
             MuleMessage message = MuleMessage.builder()
-                    .payload(NullPayload.getInstance())
+                    .nullPayload()
                     .exceptionPayload(new DefaultExceptionPayload(new MessagingException(event, new RuntimeException("Bad news!"))))
                     .build();
             return new DefaultMuleEvent(message, event);

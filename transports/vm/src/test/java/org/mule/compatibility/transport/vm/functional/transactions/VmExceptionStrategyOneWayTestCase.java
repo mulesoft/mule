@@ -6,11 +6,11 @@
  */
 package org.mule.compatibility.transport.vm.functional.transactions;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -63,7 +63,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
         }
         assertThat(outboundComponentReached, Is.is(false));
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
+        assertThat(response.getPayload(), is(nullValue()));
         assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
     }
@@ -78,7 +78,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
             fail("dead letter queue must be reached");
         }*/
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
+        assertThat(response.getPayload(), is(nullValue()));
         assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
         if (!outboundComponentLatch.await(TIMEOUT, TimeUnit.MILLISECONDS))
@@ -97,7 +97,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
         }
         assertThat(outboundComponentReached, Is.is(false));
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
+        assertThat(response.getPayload(), is(nullValue()));
         assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
     }
@@ -112,7 +112,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase
         }
         assertThat(outboundComponentReached, Is.is(false));
         assertThat(response, IsNull.<Object>notNullValue());
-        assertThat(response.getPayload(),IsInstanceOf.instanceOf(NullPayload.class));
+        assertThat(response.getPayload(), is(nullValue()));
         assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
         assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
     }

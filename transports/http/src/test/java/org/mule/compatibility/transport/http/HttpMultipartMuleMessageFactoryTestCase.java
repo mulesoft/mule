@@ -6,16 +6,13 @@
  */
 package org.mule.compatibility.transport.http;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactoryTestCase;
-import org.mule.compatibility.transport.http.HttpMuleMessageFactory;
-import org.mule.compatibility.transport.http.HttpMultipartMuleMessageFactory;
-import org.mule.compatibility.transport.http.HttpRequest;
-import org.mule.compatibility.transport.http.RequestLine;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleMessage;
 
@@ -88,7 +85,7 @@ public class HttpMultipartMuleMessageFactoryTestCase extends AbstractMuleMessage
         HttpRequest request = createMultiPartHttpRequest(MULTIPART_MESSAGE_NO_PAYLOAD);
         MuleMessage message = factory.create(request, encoding);
         assertNotNull(message);
-        assertTrue(message.getPayload() instanceof NullPayload);
+        assertThat(message.getPayload(), is(nullValue()));
     }
 
     private HttpRequest createMultiPartHttpRequest(String message) throws Exception

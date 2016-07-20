@@ -10,9 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -40,7 +38,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        MuleMessage result = client.send("clientEndpoint1", getTestMuleMessage(NullPayload.getInstance()));
+        MuleMessage result = client.send("clientEndpoint1", MuleMessage.builder().nullPayload().build());
         assertEquals("boobar", getPayloadAsString(result));
     }
 

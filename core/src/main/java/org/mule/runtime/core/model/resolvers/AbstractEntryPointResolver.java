@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.model.resolvers;
 
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.EntryPointResolver;
@@ -112,7 +111,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
         {
             return (Object[]) temp;
         }
-        else if (temp instanceof NullPayload)
+        else if (temp == null)
         {
             return ClassUtils.NO_ARGS;
         }

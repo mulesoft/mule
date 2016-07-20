@@ -9,15 +9,12 @@ package org.mule.compatibility.transport.http.components;
 import static java.lang.String.valueOf;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PATH_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_LENGTH;
-import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_LOCATION;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_MOVED_TEMPORARILY;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_OK;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
@@ -108,7 +105,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
             // Return a 302 with the new location
             // Return a 302 with the new location
             MuleMessage message = MuleMessage.builder()
-                    .payload(NullPayload.getInstance())
+                    .nullPayload()
                     .addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_MOVED_TEMPORARILY))
                     .addOutboundProperty(HEADER_CONTENT_LENGTH, 0)
                     .addOutboundProperty(HEADER_LOCATION, event.getMessage().getInboundProperty(HTTP_REQUEST_PATH_PROPERTY) + "/")

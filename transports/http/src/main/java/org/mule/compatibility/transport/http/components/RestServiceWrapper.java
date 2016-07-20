@@ -9,12 +9,10 @@ package org.mule.compatibility.transport.http.components;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_METHOD_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConstants.FORM_URLENCODED_CONTENT_TYPE;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -180,7 +178,7 @@ public class RestServiceWrapper extends AbstractComponent
 
         if (GET.equalsIgnoreCase(this.httpMethod) || DELETE.equalsIgnoreCase(this.httpMethod))
         {
-            requestBody = NullPayload.getInstance();
+            requestBody = null;
 
             setRESTParams(urlBuffer, event, request, requiredParams, false, null);
             setRESTParams(urlBuffer, event, request, optionalParams, true, null);

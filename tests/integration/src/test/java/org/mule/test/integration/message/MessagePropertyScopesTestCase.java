@@ -6,13 +6,13 @@
  */
 package org.mule.test.integration.message;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import org.mule.runtime.core.api.MuleMessage;
+import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.NullPayload;
+import org.mule.runtime.core.api.MuleMessage;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -42,6 +42,6 @@ public class MessagePropertyScopesTestCase extends FunctionalTestCase
     {
         MuleMessage response = flowRunner("InService2").withPayload("Hello World").run().getMessage();
         // scope = "invocation" should not propagate the property on to the next service
-        assertTrue(response.getPayload() instanceof NullPayload);
+        assertThat(response.getPayload(), is(nullValue()));
     }
 }
