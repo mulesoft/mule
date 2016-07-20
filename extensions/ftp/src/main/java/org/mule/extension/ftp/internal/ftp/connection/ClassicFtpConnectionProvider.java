@@ -6,16 +6,21 @@
  */
 package org.mule.extension.ftp.internal.ftp.connection;
 
-import org.mule.extension.ftp.internal.FtpConnector;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
+
 import org.mule.extension.ftp.api.ftp.FtpTransferMode;
 import org.mule.extension.ftp.internal.AbstractFtpConnectionProvider;
+import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.io.IOException;
 
@@ -28,47 +33,54 @@ import org.apache.commons.net.ftp.FTPReply;
  *
  * @since 4.0
  */
+@DisplayName("FTP Connection")
+@Summary("Connection to connect against an FTP server")
 public class ClassicFtpConnectionProvider extends AbstractFtpConnectionProvider<ClassicFtpFileSystem>
 {
 
     /**
-     * The port number to connect on
+     * The port number of the FTP server to connect
      */
     @Parameter
     @Optional(defaultValue = "21")
+    @Placement(group = CONNECTION, order = 2)
     private int port = 21;
 
     /**
-     * If the FTP server is authenticated, this is the username used for authentication
+     * Username for the FTP Server. Required if the server is authenticated.
      */
     @Parameter
+    @Optional
+    @Placement(group = CONNECTION, order = 3)
     private String username;
 
     /**
-     * The password for the user being authenticated.
+     * Password for the FTP Server. Required if the server is authenticated.
      */
     @Parameter
     @Password
+    @Optional
+    @Placement(group = CONNECTION, order = 4)
     private String password;
 
     /**
-     * The transfer mode to be used. Currently {@code BINARY}
-     * and {@code ASCII} are supported.
+     * The transfer mode to be used. Currently {@code BINARY} and {@code ASCII} are supported.
      * <p>
      * Defaults to {@code BINARY}
      */
     @Parameter
     @Optional(defaultValue = "BINARY")
+    @Summary("Transfer mode to be used")
     private FtpTransferMode transferMode;
 
     /**
-     * Whether to use passive mode. Set to {@code false} to
-     * switch to active mode.
+     * Whether to use passive mode. Set to {@code false} to switch to active mode.
      * <p>
      * Defaults to {@code true}.
      */
     @Parameter
     @Optional(defaultValue = "true")
+    @Summary("Whether to use passive mode. Set to \"false\" to switch to active mode")
     private boolean passive = true;
 
     /**

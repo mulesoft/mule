@@ -15,6 +15,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Text;
 
 /**
  * Represents and enables the construction of the content of an email
@@ -31,6 +32,7 @@ public class EmailContent
     @Parameter
     @Optional(defaultValue = "#[payload]")
     @Placement(order = 1)
+    @Text
     private String body;
     /**
      * ContentType of the body text. Example: "text/html" or "text/plain".

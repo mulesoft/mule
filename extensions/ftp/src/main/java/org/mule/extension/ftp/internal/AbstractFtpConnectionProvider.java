@@ -6,13 +6,18 @@
  */
 package org.mule.extension.ftp.internal;
 
-import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
+
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
+import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.concurrent.TimeUnit;
 
@@ -27,6 +32,9 @@ import javax.inject.Inject;
  */
 public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSystem> implements ConnectionProvider<Connection>
 {
+
+    private static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
+
     @Inject
     protected MuleContext muleContext;
 
@@ -34,6 +42,7 @@ public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSy
      * The FTP server host, such as www.mulesoft.com, localhost, or 192.168.0.1, etc
      */
     @Parameter
+    @Placement(group = CONNECTION, order = 1)
     private String host;
 
     /**
@@ -45,6 +54,8 @@ public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSy
      */
     @Parameter
     @Optional(defaultValue = "10")
+    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 2)
+    @Summary("Connection timeout value")
     private Integer connectionTimeout;
 
     /**
@@ -55,6 +66,8 @@ public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSy
      */
     @Parameter
     @Optional(defaultValue = "SECONDS")
+    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 1)
+    @Summary("Time unit to be used in the Connection Timeout")
     private TimeUnit connectionTimeoutUnit;
 
     /**
@@ -66,6 +79,8 @@ public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSy
      */
     @Parameter
     @Optional(defaultValue = "10")
+    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 4)
+    @Summary("Response timeout value")
     private Integer responseTimeout;
 
     /**
@@ -76,6 +91,8 @@ public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSy
      */
     @Parameter
     @Optional(defaultValue = "SECONDS")
+    @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 3)
+    @Summary("Time unit to be used in the Response Timeout")
     private TimeUnit responseTimeoutUnit;
 
     /**

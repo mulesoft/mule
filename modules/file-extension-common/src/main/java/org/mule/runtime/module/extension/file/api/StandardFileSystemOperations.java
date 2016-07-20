@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.file.api;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.file.api.FileDisplayConstants.MATCHER;
+
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleContext;
@@ -20,6 +22,9 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NoRef;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.file.api.matcher.NullFilePayloadPredicate;
 
@@ -54,18 +59,19 @@ public class StandardFileSystemOperations
      *
      * @param config        the config that is parameterizing this operation
      * @param directoryPath the path to the directory to be listed
-     * @param recursive     whether to include the contents of sub-directories. Defaults to {@code false}
+     * @param recursive     whether to include the contents of sub-directories. Defaults to false.
      * @param message       the {@link MuleMessage} on which this operation was triggered
      * @param matchWith     a matcher used to filter the output list
      * @return a {@link TreeNode} object representing the listed directory
      * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
      */
+    @Summary("List all the files from given directory")
     public TreeNode list(@UseConfig FileConnectorConfig config,
                          @Connection FileSystem fileSystem,
                          @Optional String directoryPath,
                          @Optional(defaultValue = "false") boolean recursive,
                          MuleMessage message,
-                         @Optional FilePredicateBuilder matchWith)
+                         @Optional @Summary("Matcher to filter the listed files") @Placement(group = MATCHER) FilePredicateBuilder matchWith)
     {
         fileSystem.changeToBaseDir(config);
         return fileSystem.list(config, directoryPath, recursive, message, getPredicate(matchWith));
@@ -94,15 +100,16 @@ public class StandardFileSystemOperations
      * @param fileSystem a reference to the host {@link FileSystem}
      * @param message    the incoming {@link MuleMessage}
      * @param path       the path to the file to be read
-     * @param lock       whether or not to lock the file. Defaults to {@code false}
+     * @param lock       whether or not to lock the file. Defaults to false.
      * @return the file's content and metadata on a {@link FileAttributes} instance
      * @throws IllegalArgumentException if the file at the given path doesn't exists
      */
     @DataTypeParameters
+    @Summary("Obtains the content and metadata of a file at a given path")
     public OperationResult<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
                                                              @Connection FileSystem fileSystem,
                                                              MuleMessage message,
-                                                             String path,
+                                                             @DisplayName("File Path") String path,
                                                              @Optional(defaultValue = "false") boolean lock)
     {
         fileSystem.changeToBaseDir(config);
@@ -148,22 +155,23 @@ public class StandardFileSystemOperations
      * @param path                    the path of the file to be written
      * @param content                 the content to be written into the file. Defaults to the current {@link MuleMessage} payload
      * @param mode                    a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
-     * @param lock                    whether or not to lock the file. Defaults to {@code false}
+     * @param lock                    whether or not to lock the file. Defaults to false
      * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
-     * @param encoding                when {@@code content} is a {@link String}, this attribute specifies the encoding
+     * @param encoding                when {@code content} is a {@link String}, this attribute specifies the encoding
      *                                to be used when writing. If not set, then it defaults to
      *                                {@link FileConnectorConfig#getDefaultWriteEncoding()}
      * @param event                   The current {@link MuleEvent}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
+    @Summary("Writes the given \"Content\" in the file pointed by \"Path\"")
     public void write(@UseConfig FileConnectorConfig config,
                       @Connection FileSystem fileSystem,
                       @Optional String path,
-                      @Optional(defaultValue = "#[payload]") @NoRef Object content,
-                      @Optional(defaultValue = "OVERWRITE") FileWriteMode mode,
+                      @Optional(defaultValue = "#[payload]") @Summary("Content to be written into the file") @NoRef Object content,
+                      @Optional(defaultValue = "OVERWRITE") @Summary("How the file is going to be written") @DisplayName("Write Mode") FileWriteMode mode,
                       @Optional(defaultValue = "false") boolean lock,
                       @Optional(defaultValue = "true") boolean createParentDirectories,
-                      @Optional String encoding,
+                      @Optional @Summary("Encoding when trying to write a String file. If not set, defaults to the configuration one or the Mule default") String encoding,
                       MuleEvent event)
     {
         if (content == null || content instanceof NullPayload)
@@ -212,12 +220,13 @@ public class StandardFileSystemOperations
      * @param config                  the config that is parameterizing this operation
      * @param fileSystem              a reference to the host {@link FileSystem}
      * @param sourcePath              the path to the file to be copied
-     * @param targetPath              the target directory
+     * @param targetPath              the target directory where the file is going to be copied
      * @param overwrite               whether or not overwrite the file if the target destination already exists.
      * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
      * @param event                   the {@link MuleEvent} which triggered this operation
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
+    @Summary("Copies a file in another directory")
     public void copy(@UseConfig FileConnectorConfig config,
                      @Connection FileSystem fileSystem,
                      @Optional String sourcePath,
@@ -251,7 +260,7 @@ public class StandardFileSystemOperations
      * <p>
      * If {@code targetPath} doesn't exists, and neither does its parent,
      * then an attempt will be made to create depending on the value of the
-     * {@code createParentFolder} argument. If such argument is {@false},
+     * {@code createParentFolder} argument. If such argument is {@code false},
      * then an {@link IllegalArgumentException} will be thrown.
      * <p>
      * If the target file already exists, then it will be overwritten if the
@@ -276,6 +285,7 @@ public class StandardFileSystemOperations
      * @param event                   The current {@link MuleEvent}
      * @throws IllegalArgumentException if an illegal combination of arguments is supplied
      */
+    @Summary("Moves a file to another directory")
     public void move(@UseConfig FileConnectorConfig config,
                      @Connection FileSystem fileSystem,
                      @Optional String sourcePath,
@@ -305,6 +315,7 @@ public class StandardFileSystemOperations
      * @param event      The current {@link MuleEvent}
      * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
      */
+    @Summary("Deletes a file")
     public void delete(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path, MuleEvent event)
     {
         fileSystem.changeToBaseDir(config);
@@ -333,10 +344,11 @@ public class StandardFileSystemOperations
      * @param event      The current {@link MuleEvent}
      */
     //TODO: MULE-9715
+    @Summary("Renames a file")
     public void rename(@UseConfig FileConnectorConfig config,
                        @Connection FileSystem fileSystem,
                        @Optional String path,
-                       String to,
+                       @DisplayName("New Name") String to,
                        @Optional(defaultValue = "false") boolean overwrite, MuleEvent event)
     {
         checkArgument(get(to).getNameCount() == 1, format("'to' parameter of rename operation should not contain any file separator character but '%s' was received", to));
@@ -352,8 +364,9 @@ public class StandardFileSystemOperations
      * @param config        the config that is parameterizing this operation
      * @param fileSystem    a reference to the host {@link FileSystem}
      * @param basePath      the directory which contains the directory to be created
-     * @param directoryName the new directory's new name
+     * @param directoryName the new directory's name
      */
+    @Summary("Creates a new directory")
     public void createDirectory(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String basePath, String directoryName)
     {
         checkArgument(get(directoryName).getNameCount() == 1, format("'directoryName' parameter of create directory operation should not contain any file separator character but '%s' was received", directoryName));
