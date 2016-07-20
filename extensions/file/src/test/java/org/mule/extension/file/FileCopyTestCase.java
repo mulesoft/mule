@@ -187,15 +187,6 @@ public class FileCopyTestCase extends FileConnectorTestCase
         doExecute(format("%s/%s", targetDirectory.getAbsolutePath(), SOURCE_DIRECTORY_NAME), false, false);
     }
 
-    @Test
-    public void copyWithDifferentName() throws Exception
-    {
-        String target = temporaryFolder.newFolder().getAbsolutePath() + "/test.json";
-        doExecute(target, false, false);
-
-        assertCopy(target);
-    }
-
     private File buildSourceDirectory() throws IOException
     {
         File sourceFolder = temporaryFolder.newFolder(SOURCE_DIRECTORY_NAME);
