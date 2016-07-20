@@ -23,7 +23,7 @@
         <transports:inbound-endpoint ref="inboundEndpoint"/>
         <script:component>
             <script:script engine="groovy">
-                message.setOutboundProperty("foo", "bar");
+                message = org.mule.runtime.core.api.MuleMessage.builder(message).addOutboundProperty('foo', 'bar').build()
                 return "got it!"
             </script:script>
         </script:component>

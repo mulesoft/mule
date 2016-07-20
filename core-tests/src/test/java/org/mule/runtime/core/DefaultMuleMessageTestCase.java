@@ -226,27 +226,11 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
         message.getOutboundPropertyNames().add("other");
     }
 
-    public void testInboundPropertyNamesRemoveMmutable() throws Exception
-    {
-        MuleMessage message = createMuleMessage();
-        // message.setOutboundProperty(FOO_PROPERTY, "bar");
-        // message.getOutboundPropertyNames().remove(FOO_PROPERTY);
-        assertNull(message.getInboundProperty(FOO_PROPERTY));
-    }
-    
     @Test(expected=UnsupportedOperationException.class)
     public void testOutboundPropertyNamesImmutable() throws Exception
     {
         MuleMessage message = createMuleMessage();
         message.getOutboundPropertyNames().add("other");
-    }
-
-    public void testOutboundPropertyNamesRemoveMmutable() throws Exception
-    {
-        MuleMessage message = createMuleMessage();
-        // message.setOutboundProperty(FOO_PROPERTY, "bar");
-        // message.getOutboundPropertyNames().remove(FOO_PROPERTY);
-        assertNull(message.getOutboundProperty(FOO_PROPERTY));
     }
 
     @Test
