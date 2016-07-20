@@ -10,17 +10,17 @@ import org.mule.extension.socket.api.connection.tcp.protocol.DirectProtocol;
 import org.mule.extension.socket.api.connection.tcp.protocol.LengthProtocol;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 /**
  * Base clase for common tests across all the {@link TcpProtocol} implementations
  */
-@RunWith(Parameterized.class)
+@RunnerDelegateTo(Parameterized.class)
 public abstract class ParameterizedProtocolTestCase extends SocketExtensionTestCase
 {
 
