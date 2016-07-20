@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.scripting.component;
 
+import static org.mule.runtime.module.scripting.component.Scriptable.BINDING_MESSAGE;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.component.AbstractComponent;
@@ -55,7 +57,10 @@ public class ScriptComponent extends AbstractComponent
         {
             // leave this catch block in place to help debug classloading issues
             throw e;
-        } finally {
+        }
+        finally
+        {
+            event.setMessage((MuleMessage) bindings.get(BINDING_MESSAGE));
             bindings.clear();
         }
     }

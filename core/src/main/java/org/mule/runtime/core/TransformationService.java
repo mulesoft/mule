@@ -254,9 +254,10 @@ public class TransformationService
         }
         else
         {
-            return MuleMessage.builder(message)
+            MuleMessage messagePostTransform = (event != null && event.getMessage() != null) ? event.getMessage() : message;
+            return MuleMessage.builder(messagePostTransform)
                               .payload(result)
-                              .mediaType(mergeMediaType(message, transformer.getReturnDataType()))
+                              .mediaType(mergeMediaType(messagePostTransform, transformer.getReturnDataType()))
                               .build();
         }
     }

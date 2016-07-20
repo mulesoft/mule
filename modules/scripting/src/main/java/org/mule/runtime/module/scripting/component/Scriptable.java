@@ -54,14 +54,13 @@ public class Scriptable implements Initialisable, MuleContextAware
     private static final String BINDING_REGISTRY = "registry";
     private static final String BINDING_PAYLOAD = "payload";
     private static final String BINDING_SRC = "src";
-    private static final String BINDING_MESSAGE = "message";
     private static final String BINDING_EVENT_CONTEXT = "eventContext";
     private static final String BINDING_ID = "id";
     private static final String BINDING_FLOW_CONSTRUCT = "flowConstruct";
-    private static final String BINDING_SERVICE = "service";
     private static final String BINDING_FLOW_VARS = "flowVars";
     private static final String BINDING_SESSION_VARS = "sessionVars";
     private static final String BINDING_EXCEPTION = "exception";
+    public static final String BINDING_MESSAGE = "message";
 
     /** The actual body of the script */
     private String scriptText;

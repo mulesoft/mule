@@ -64,7 +64,7 @@
      <flow name="transformByAssigningProperty">
         <script:transformer>
             <script:script engine="groovy">
-                message.setOutboundProperty('foo','bar')
+                message = org.mule.runtime.core.api.MuleMessage.builder(message).addOutboundProperty('foo', 'bar').build()
                 return payload
             </script:script>
         </script:transformer>

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.scripting.filter;
 
+import static org.mule.runtime.module.scripting.component.Scriptable.BINDING_MESSAGE;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
@@ -59,6 +60,10 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
         {
             // TODO MULE-9356 ScriptFilter should rethrow exceptions, or at least log, not ignore them
             return false;
+        }
+        finally
+        {
+            event.setMessage((MuleMessage) bindings.get(BINDING_MESSAGE));
         }
     }
     
