@@ -12,7 +12,7 @@
     </flow>
 
     <flow name="readWithLock">
-        <file:read path="files/hello.json" lock="true" />
+        <file:read path="#[path]" lock="true" />
     </flow>
 
     <flow name="readWithForcedMimeType">

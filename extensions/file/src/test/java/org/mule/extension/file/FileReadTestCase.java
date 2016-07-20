@@ -97,6 +97,16 @@ public class FileReadTestCase extends FileConnectorTestCase
     }
 
     @Test
+    public void readWithLockAndWithoutEnoughPermissions() throws Exception
+    {
+        expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+        File forbiddenFile = temporaryFolder.newFile("forbiddenFile");
+        forbiddenFile.createNewFile();
+        forbiddenFile.setWritable(false);
+        readWithLock(forbiddenFile.getAbsolutePath());
+    }
+
+    @Test
     public void readDirectory() throws Exception
     {
         expectedException.expectCause(instanceOf(IllegalArgumentException.class));
@@ -142,7 +152,12 @@ public class FileReadTestCase extends FileConnectorTestCase
 
     private MuleMessage readWithLock() throws Exception
     {
-        MuleMessage message = flowRunner("readWithLock").run().getMessage();
+        return readWithLock(HELLO_PATH);
+    }
+
+    private MuleMessage readWithLock(String path) throws Exception
+    {
+        MuleMessage message = flowRunner("readWithLock").withFlowVariable("path", path).run().getMessage();
         assertThat(((AbstractFileInputStream) message.getPayload()).isLocked(), is(true));
 
         return message;

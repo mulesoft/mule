@@ -6,12 +6,14 @@
  */
 package org.mule.extension.file.internal.lock;
 
+import static java.lang.String.format;
 import org.mule.runtime.module.extension.file.api.lock.PathLock;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 
@@ -63,12 +65,17 @@ public final class LocalPathLock implements PathLock
             lock = channel.tryLock();
             return isLocked();
         }
+        catch (AccessDeniedException e)
+        {
+            release();
+            throw new IllegalArgumentException(format("Could not obtain lock on path ''%s'' because access was denied by the operating system", path));
+        }
         catch (Exception e)
         {
             release();
             if (LOGGER.isInfoEnabled())
             {
-                LOGGER.info(String.format("Could not obtain lock on path ''%s'' due to the following exception", path), e);
+                LOGGER.info(format("Could not obtain lock on path ''%s'' due to the following exception", path), e);
             }
 
             return false;
@@ -100,7 +107,7 @@ public final class LocalPathLock implements PathLock
             {
                 if (LOGGER.isInfoEnabled())
                 {
-                    LOGGER.info(String.format("Found exception attempting to release lock on path '%s'", path), e);
+                    LOGGER.info(format("Found exception attempting to release lock on path '%s'", path), e);
                 }
             }
             finally
