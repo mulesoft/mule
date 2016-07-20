@@ -10,9 +10,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.FtpTestHarness;
-import org.mule.functional.junit4.FlowRunner;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 import org.junit.Test;
 
@@ -20,7 +19,6 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
 {
 
     private static final String DIRECTORY = "validDirectory";
-    private static final String DIRECTORY_WITH_PARTS = "invalid/directory/name";
 
     public FtpCreateDirectoryTestCase(String name, FtpTestHarness testHarness)
     {
@@ -36,7 +34,7 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
     @Test
     public void createDirectory() throws Exception
     {
-        doCreateDirectory(null, DIRECTORY);
+        doCreateDirectory(DIRECTORY);
         assertThat(testHarness.dirExists(DIRECTORY), is(true));
     }
 
@@ -47,37 +45,20 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase
         testHarness.makeDir(directory);
         testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
 
-        doCreateDirectory(null, directory);
+        doCreateDirectory(directory);
     }
 
     @Test
-    public void createDirectoryWithCustomBasePath() throws Exception
+    public void createDirectoryWithComplexPath() throws Exception
     {
         final String base = testHarness.getWorkingDirectory();
-        doCreateDirectory(base, DIRECTORY);
+        doCreateDirectory(Paths.get(base).resolve(DIRECTORY).toAbsolutePath().toString());
 
         assertThat(testHarness.dirExists(DIRECTORY), is(true));
     }
 
-    @Test
-    public void createDirectoryWithPathContainingParts() throws Exception
+    private void doCreateDirectory(String directory) throws Exception
     {
-        testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
-        doCreateDirectory(null, DIRECTORY_WITH_PARTS);
-    }
-
-    private void doCreateDirectory(String basePath, String directory) throws Exception
-    {
-        FlowRunner runner;
-        if (basePath != null)
-        {
-            runner = flowRunner("renameWithBasePath").withFlowVariable("basePath", basePath);
-        }
-        else
-        {
-            runner = flowRunner("rename");
-        }
-
-        runner.withFlowVariable("directory", directory).run();
+        flowRunner("createDirectory").withFlowVariable("directory", directory).run();
     }
 }

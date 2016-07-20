@@ -20,7 +20,7 @@ public interface WriteCommand
 {
 
     /**
-     * Writes a file under the considerations of {@link FileSystem#write(String, Object, FileWriteMode, MuleEvent, boolean, boolean, String)}
+     * Writes a file under the considerations of {@link FileSystem#write(FileConnectorConfig, String, Object, FileWriteMode, MuleEvent, boolean, boolean, String)}
      *
      * @param config                the config on which is parameterizing this operation
      * @param filePath              the path of the file to be written

@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.file.api.FileDisplayConstants.MATCHER;
-
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.NullPayload;
 import org.mule.runtime.core.api.MuleContext;
@@ -358,20 +357,17 @@ public class StandardFileSystemOperations
     }
 
     /**
-     * Creates a new directory of the given {@code directoryName} as a child
-     * of the provided {@code basePath}
+     * Creates a new directory on {@code directoryPath}
      *
      * @param config        the config that is parameterizing this operation
      * @param fileSystem    a reference to the host {@link FileSystem}
-     * @param basePath      the directory which contains the directory to be created
-     * @param directoryName the new directory's name
+     * @param directoryPath the new directory's name
      */
     @Summary("Creates a new directory")
-    public void createDirectory(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String basePath, String directoryName)
+    public void createDirectory(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String directoryPath)
     {
-        checkArgument(get(directoryName).getNameCount() == 1, format("'directoryName' parameter of create directory operation should not contain any file separator character but '%s' was received", directoryName));
         fileSystem.changeToBaseDir(config);
-        fileSystem.createDirectory(config, basePath, directoryName);
+        fileSystem.createDirectory(config, directoryPath);
     }
 
     private String resolvePath(String path, MuleEvent event, String attributeName)

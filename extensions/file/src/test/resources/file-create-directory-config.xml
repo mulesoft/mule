@@ -11,13 +11,8 @@
         <spring:import resource="file-read-config.xml"/>
     </spring:beans>
 
-    <flow name="rename">
-        <file:create-directory directoryName="#[directory]"/>
-    </flow>
-
-
-    <flow name="renameWithBasePath">
-        <file:create-directory basePath="#[basePath]" directoryName="#[directory]"/>
+    <flow name="createDirectory">
+        <file:create-directory directoryPath="#[directory]"/>
     </flow>
 
 </mule>

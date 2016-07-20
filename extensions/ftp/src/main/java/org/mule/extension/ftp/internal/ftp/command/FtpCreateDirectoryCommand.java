@@ -32,8 +32,8 @@ public final class FtpCreateDirectoryCommand extends ClassicFtpCommand implement
      * {@inheritDoc}
      */
     @Override
-    public void createDirectory(FileConnectorConfig config, String basePath, String directoryName)
+    public void createDirectory(FileConnectorConfig config, String directoryPath)
     {
-        super.createDirectory(config, basePath, directoryName);
+        super.createDirectory(config, directoryPath);
     }
 }

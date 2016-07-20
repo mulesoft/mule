@@ -31,8 +31,8 @@ public final class SftpCreateDirectoryCommand extends SftpCommand implements Cre
      * {@inheritDoc}
      */
     @Override
-    public void createDirectory(FileConnectorConfig config, String basePath, String directoryName)
+    public void createDirectory(FileConnectorConfig config, String directoryName)
     {
-        super.createDirectory(config, basePath, directoryName);
+        super.createDirectory(config, directoryName);
     }
 }

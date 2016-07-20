@@ -24,8 +24,8 @@ import java.nio.file.StandardCopyOption;
  * <p>
  * This class contains the logic to determine the actual target path
  * in a way which provides bash semantics, as described in the
- * {@link FileSystem#copy(String, String, boolean, boolean, MuleEvent)}
- * and {@link FileSystem#move(String, String, boolean, boolean)} methods.
+ * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean, MuleEvent)}
+ * and {@link FileSystem#move(FileConnectorConfig, String, String, boolean, boolean)} methods.
  * <p>
  * This command also handles the concern of the target path already
  * existing and whether or not overwrite it.

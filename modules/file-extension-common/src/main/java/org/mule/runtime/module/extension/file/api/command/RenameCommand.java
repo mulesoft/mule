@@ -18,7 +18,7 @@ public interface RenameCommand
 {
 
     /**
-     * Renames a file under the considerations of {@link FileSystem#rename(String, String, boolean)}
+     * Renames a file under the considerations of {@link FileSystem#rename(FileConnectorConfig, String, String, boolean)}
      *
      * @param config    the config that is parameterizing this operation
      * @param filePath  the path to the file to be renamed
