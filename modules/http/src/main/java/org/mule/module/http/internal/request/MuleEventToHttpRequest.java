@@ -18,7 +18,6 @@ import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -61,8 +60,10 @@ import org.slf4j.LoggerFactory;
 
 public class MuleEventToHttpRequest
 {
+
     private static final Logger logger = LoggerFactory.getLogger(MuleEventToHttpRequest.class);
     private static final List<String> ignoredProperties = Arrays.asList(CONNECTION, HOST, TRANSFER_ENCODING);
+    private static final String APPLICATION_JAVA = "application/java";
 
     private DefaultHttpRequester requester;
     private MuleContext muleContext;
@@ -245,7 +246,7 @@ public class MuleEventToHttpRequest
         {
             String contentType = requestBuilder.getHeaders().get(CONTENT_TYPE);
 
-            if (contentType == null || contentType.equals(APPLICATION_X_WWW_FORM_URLENCODED))
+            if (contentType == null || contentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED) || contentType.startsWith(APPLICATION_JAVA))
             {
                 if (muleEvent.getMessage().getPayload() instanceof Map)
                 {
