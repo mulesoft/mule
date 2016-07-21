@@ -10,9 +10,9 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.context.WorkManager;
 import org.mule.execution.EndPhaseTemplate;
 import org.mule.transport.AbstractMessageReceiver;
+import org.mule.util.concurrent.Latch;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +23,7 @@ public class JettyContinuationsMessageProcessTemplate extends JettyMessageProces
 {
 
     private final Continuation continuation;
+    private final Latch suspendLatch;
     private MuleEvent responseForClient;
     private MessagingException failureResponseForClient;
     private boolean emptyResponseReceived;
@@ -32,6 +33,7 @@ public class JettyContinuationsMessageProcessTemplate extends JettyMessageProces
     {
         super(request, response, messageReceiver, muleContext);
         this.continuation = continuation;
+        this.suspendLatch = new Latch();
     }
 
     @Override
@@ -86,9 +88,22 @@ public class JettyContinuationsMessageProcessTemplate extends JettyMessageProces
         this.discardMessage = true;
     }
 
+    public void suspended()
+    {
+        this.suspendLatch.countDown();
+    }
+
     @Override
     public void messageProcessingEnded()
     {
+        try
+        {
+            this.suspendLatch.await();
+        }
+        catch (InterruptedException e)
+        {
+            Thread.interrupted();
+        }
         this.continuation.resume();
     }
 }
