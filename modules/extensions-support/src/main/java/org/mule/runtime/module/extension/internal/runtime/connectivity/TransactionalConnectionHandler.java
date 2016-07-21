@@ -67,10 +67,7 @@ final class TransactionalConnectionHandler<T extends TransactionalConnection> im
     public synchronized void close() throws MuleException
     {
         ConnectionHandler<T> connectionHandler = resource.getConnectionHandler();
-        if (!(connectionHandler instanceof ConnectionHandlerAdapter))
-        {
-            return;
-        }
+        checkArgument(connectionHandler instanceof ConnectionHandlerAdapter, "connectionHandlerAdapter was expected");
 
         if (!resource.isTransactionResolved())
         {

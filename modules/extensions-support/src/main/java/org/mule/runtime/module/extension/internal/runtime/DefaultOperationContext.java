@@ -201,7 +201,7 @@ public class DefaultOperationContext implements OperationContextAdapter
     /**
      * {@inheritDoc}
      */
-    public synchronized Optional<TransactionConfig> getTransactionConfig()
+    public Optional<TransactionConfig> getTransactionConfig()
     {
         return transactionConfigSupplier.get();
     }
