@@ -26,7 +26,9 @@ import org.junit.Test;
 
 public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase
 {
+
     private static final String URL_ENCODED_STRING = "testName1=testValue1&testName2=testValue2";
+    private static final String APPLICATION_JAVA = "application/java";
 
     @Override
     protected String getConfigFile()
@@ -46,7 +48,7 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase
     public void sendsJavaMapAsUrlEncodedBody() throws Exception
     {
         MuleEvent event = getTestEvent(getTestMap());
-        event.getMessage().getDataType().setMimeType("application/java");
+        event.getMessage().getDataType().setMimeType(APPLICATION_JAVA);
 
         runAndAssert(event);
     }
@@ -76,7 +78,7 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase
 
         assertThat(uri, equalTo("/testPath"));
         assertThat(body, equalTo("testName1=testValue1&testName2=testValue2"));
-        assertThat(getFirstReceivedHeader("Content-Type"), startsWith("application/x-www-form-urlencoded"));
+        assertThat(getFirstReceivedHeader("Content-Type"), startsWith(APPLICATION_X_WWW_FORM_URLENCODED));
     }
 
     @Test
