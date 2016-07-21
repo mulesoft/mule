@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Default implementation of {@link OperationContextAdapter} which
@@ -46,6 +47,7 @@ public class DefaultOperationContext implements OperationContextAdapter
     private final MuleEvent event;
     private final MuleContext muleContext;
     private Optional<TransactionConfig> transactionConfig = null;
+    private Supplier<Optional<TransactionConfig>> transactionConfigSupplier;
 
     /**
      * Creates a new instance with the given state
@@ -66,6 +68,21 @@ public class DefaultOperationContext implements OperationContextAdapter
         this.operationModel = operationModel;
         this.parameters = new HashMap<>(parameters.asMap());
         this.muleContext = muleContext;
+        transactionConfigSupplier = () ->
+        {
+            synchronized (this)
+            {
+                if (transactionConfig == null)
+                {
+                    transactionConfig = isTransactional(operationModel)
+                                        ? Optional.of(buildTransactionConfig())
+                                        : empty();
+
+                    transactionConfigSupplier = () -> transactionConfig;
+                }
+                return transactionConfig;
+            }
+        };
     }
 
     /**
@@ -186,14 +203,7 @@ public class DefaultOperationContext implements OperationContextAdapter
      */
     public synchronized Optional<TransactionConfig> getTransactionConfig()
     {
-        if (transactionConfig == null)
-        {
-            transactionConfig = isTransactional(operationModel)
-                                ? Optional.of(buildTransactionConfig())
-                                : empty();
-        }
-
-        return transactionConfig;
+        return transactionConfigSupplier.get();
     }
 
     private TransactionConfig buildTransactionConfig()

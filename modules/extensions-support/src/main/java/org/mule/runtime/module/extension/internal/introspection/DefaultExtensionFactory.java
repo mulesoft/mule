@@ -143,7 +143,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory
         }
         catch (IllegalArgumentException e)
         {
-            throw new IllegalArgumentException(String.format("Invalid version %s for extension '%s'", extensionDeclaration.getVersion(), extensionDeclaration.getName()));
+            throw new IllegalArgumentException(String.format("Invalid version '%s' for extension '%s'", extensionDeclaration.getVersion(), extensionDeclaration.getName()));
         }
     }
 
