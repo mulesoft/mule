@@ -6,25 +6,40 @@
  */
 package org.mule.runtime.module.extension.file.api.metadata;
 
-import static org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.module.extension.file.api.FileAttributes;
 import org.mule.runtime.module.extension.file.api.FileSystem;
 
 import java.nio.file.FileSystemNotFoundException;
 import java.util.Optional;
 
-public class FileAttributesMetadataResolver implements MetadataAttributesResolver
+/**
+ * Resolves the {@link MetadataType} of the {@link FileAttributes} for the
+ * specific connection that is being used.
+ *
+ * @since 1.0
+ */
+public final class FileAttributesMetadataResolver implements MetadataAttributesResolver
 {
+
+    private ClassTypeLoader typeLoader;
+
+    public FileAttributesMetadataResolver()
+    {
+       typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+    }
 
     @Override
     public MetadataType getAttributesMetadata(MetadataContext context, Object key) throws MetadataResolvingException, ConnectionException
     {
         Optional<FileSystem> connection = context.getConnection();
         FileSystem fileSystem = connection.orElseThrow(() -> new FileSystemNotFoundException("Could not found file system to retrieve metadata from"));
-        return getDefault().createTypeLoader().load(fileSystem.getAttributesType());
+        return typeLoader.load(fileSystem.getAttributesType());
     }
 }

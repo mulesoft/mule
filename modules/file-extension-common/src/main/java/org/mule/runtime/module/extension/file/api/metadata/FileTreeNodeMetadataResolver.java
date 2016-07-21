@@ -14,7 +14,14 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.module.extension.file.api.TreeNode;
 
+/**
+ * Resolves the output {@link MetadataType} for an operation that returns an
+ * {@link TreeNode}.
+ *
+ * @since 1.0
+ */
 public class FileTreeNodeMetadataResolver implements MetadataOutputResolver
 {
     private FileAttributesMetadataResolver attributesResolver = new FileAttributesMetadataResolver();
