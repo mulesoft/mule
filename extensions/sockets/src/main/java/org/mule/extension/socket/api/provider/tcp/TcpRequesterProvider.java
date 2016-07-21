@@ -6,17 +6,21 @@
  */
 package org.mule.extension.socket.api.provider.tcp;
 
+import static org.mule.extension.socket.api.SocketsExtension.TLS;
+import static org.mule.extension.socket.api.SocketsExtension.TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.extension.socket.api.SocketOperations;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
+
 import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketOperations;
 import org.mule.extension.socket.api.connection.tcp.TcpRequesterConnection;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
-import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
-import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
-import org.mule.extension.socket.internal.SocketUtils;
 import org.mule.extension.socket.api.socket.factory.SimpleSocketFactory;
 import org.mule.extension.socket.api.socket.factory.SslSocketFactory;
 import org.mule.extension.socket.api.socket.factory.TcpSocketFactory;
+import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
+import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
+import org.mule.extension.socket.internal.SocketUtils;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategy;
 import org.mule.runtime.api.connection.ConnectionHandlingStrategyFactory;
@@ -30,6 +34,9 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.net.Socket;
 
@@ -51,6 +58,8 @@ public final class TcpRequesterProvider implements ConnectionProvider<TcpRequest
      */
     @Parameter
     @Optional
+    @Placement(group = TLS_CONFIGURATION, tab = TLS)
+    @DisplayName(TLS_CONFIGURATION)
     private TlsContextFactory tlsContext;
 
     /**
@@ -70,6 +79,7 @@ public final class TcpRequesterProvider implements ConnectionProvider<TcpRequest
      */
     @Parameter
     @Optional
+    @Placement(group = "Local Address Settings")
     ConnectionSettings localAddressSettings = new ConnectionSettings();
 
 
@@ -79,6 +89,8 @@ public final class TcpRequesterProvider implements ConnectionProvider<TcpRequest
      */
     @Parameter
     @Optional
+    @Summary("TCP Protocol to use when doing requests")
+    @Placement(group = CONNECTION, order = 3)
     private TcpProtocol protocol = new SafeProtocol();
 
     /**

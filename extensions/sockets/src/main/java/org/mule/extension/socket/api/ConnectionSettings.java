@@ -9,7 +9,10 @@ package org.mule.extension.socket.api;
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.StringUtils.EMPTY;
 import static org.mule.runtime.core.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
+
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.net.InetSocketAddress;
 
@@ -40,12 +43,14 @@ public class ConnectionSettings
      * Connection's port number
      */
     @Parameter
+    @Placement(group = CONNECTION, order = 2)
     private Integer port;
 
     /**
      * Connection's host name
      */
     @Parameter
+    @Placement(group = CONNECTION, order = 1)
     private String host;
 
     public Integer getPort()

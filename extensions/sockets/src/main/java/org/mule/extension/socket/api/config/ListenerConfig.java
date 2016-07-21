@@ -16,6 +16,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * Implementation of {@link AbstractSocketConfig} for listener sockets
@@ -33,6 +34,7 @@ public class ListenerConfig extends AbstractSocketConfig
      */
     @Parameter
     @Optional
+    @Summary("Defines a threading profile configuration")
     private ThreadingProfile threadingProfile;
 
     public ThreadingProfile getThreadingProfile()

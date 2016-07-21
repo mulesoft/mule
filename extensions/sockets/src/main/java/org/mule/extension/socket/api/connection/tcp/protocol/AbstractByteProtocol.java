@@ -51,7 +51,7 @@ public abstract class AbstractByteProtocol implements TcpProtocol
     protected ObjectSerializer objectSerializer;
 
     /**
-     * Rethrow the exception if read fails
+     * Indicates if the exception should be rethrown if there is a failure while reading
      */
     @Parameter
     @Optional(defaultValue = "false")

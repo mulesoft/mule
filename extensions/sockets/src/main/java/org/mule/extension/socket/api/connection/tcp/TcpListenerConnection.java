@@ -9,14 +9,14 @@ package org.mule.extension.socket.api.connection.tcp;
 import static java.lang.String.format;
 import static org.mule.extension.socket.internal.SocketUtils.configureConnection;
 
-import org.mule.extension.socket.api.socket.factory.SimpleServerSocketFactory;
 import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.connection.ListenerConnection;
 import org.mule.extension.socket.api.connection.udp.UdpListenerConnection;
+import org.mule.extension.socket.api.socket.factory.SimpleServerSocketFactory;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.extension.socket.api.socket.tcp.TcpSocketProperties;
-import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.worker.SocketWorker;
 import org.mule.extension.socket.api.worker.TcpWorker;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -46,7 +46,8 @@ public final class TcpListenerConnection extends AbstractTcpConnection implement
     private final SimpleServerSocketFactory serverSocketFactory;
     private ServerSocket serverSocket;
 
-    public TcpListenerConnection(ConnectionSettings connectionSettings, TcpProtocol protocol,
+    public TcpListenerConnection(ConnectionSettings connectionSettings,
+                                 TcpProtocol protocol,
                                  TcpServerSocketProperties socketProperties,
                                  SimpleServerSocketFactory serverSocketFactory) throws ConnectionException
     {
@@ -125,7 +126,6 @@ public final class TcpListenerConnection extends AbstractTcpConnection implement
         {
             throw new ConnectionException(format("Could not bind socket to host '%s' and port '%d'", connectionSettings.getHost(), connectionSettings.getPort()), e);
         }
-
     }
 
     /**

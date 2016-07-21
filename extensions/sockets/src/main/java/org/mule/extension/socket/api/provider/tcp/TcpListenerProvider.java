@@ -6,7 +6,10 @@
  */
 package org.mule.extension.socket.api.provider.tcp;
 
+import static org.mule.extension.socket.api.SocketsExtension.TLS;
+import static org.mule.extension.socket.api.SocketsExtension.TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.extension.socket.api.ConnectionSettings;
 import org.mule.extension.socket.api.connection.tcp.TcpListenerConnection;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
@@ -31,6 +34,9 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.net.ServerSocket;
 
@@ -53,6 +59,8 @@ public final class TcpListenerProvider implements ConnectionProvider<TcpListener
      */
     @Parameter
     @Optional
+    @DisplayName(TLS_CONFIGURATION)
+    @Placement(tab = TLS, group = TLS_CONFIGURATION)
     private TlsContextFactory tlsContext;
 
     /**
@@ -73,6 +81,7 @@ public final class TcpListenerProvider implements ConnectionProvider<TcpListener
      */
     @Parameter
     @Optional
+    @Summary("TCP Protocol to use to receive external request")
     private TcpProtocol protocol = new SafeProtocol();
 
     @Override

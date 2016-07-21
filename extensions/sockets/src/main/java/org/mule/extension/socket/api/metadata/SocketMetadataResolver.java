@@ -9,16 +9,16 @@ package org.mule.extension.socket.api.metadata;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.valueOf;
-import static java.util.Arrays.asList;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+
 import org.mule.extension.socket.api.ImmutableSocketAttributes;
+import org.mule.extension.socket.api.SocketOperations;
 import org.mule.extension.socket.api.config.RequesterConfig;
 import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.extension.socket.api.SocketOperations;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -31,9 +31,10 @@ import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsT
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * The output metadata only depends on whether {@link SocketOperations#send(RequesterConnection, RequesterConfig, String, Object, String, MuleMessage)}
+ * The output metadata only depends on whether {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, MuleMessage)}
  * should await a response or not. If no response is needed, the operation metadata should behave like a void operation.
  */
 public class SocketMetadataResolver implements MetadataOutputResolver<String>, MetadataAttributesResolver<String>, MetadataKeysResolver
@@ -44,7 +45,7 @@ public class SocketMetadataResolver implements MetadataOutputResolver<String>, M
     @Override
     public MetadataType getOutputMetadata(MetadataContext metadataContext, String key) throws MetadataResolvingException, ConnectionException
     {
-        return valueOf(key) ? BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of().build()
+        return valueOf(key) ? BaseTypeBuilder.create(MetadataFormat.JAVA).binaryType().build()
                             : BaseTypeBuilder.create(MetadataFormat.JAVA).anyType().build();
     }
 
@@ -59,7 +60,7 @@ public class SocketMetadataResolver implements MetadataOutputResolver<String>, M
     @Override
     public Set<MetadataKey> getMetadataKeys(MetadataContext metadataContext) throws MetadataResolvingException, ConnectionException
     {
-        return asList(TRUE, FALSE).stream()
+        return Stream.of(TRUE, FALSE)
                 .map(b -> newKey(b.toString()).build())
                 .collect(Collectors.toSet());
     }

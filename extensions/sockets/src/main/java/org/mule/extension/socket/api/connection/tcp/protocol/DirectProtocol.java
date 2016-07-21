@@ -7,6 +7,7 @@
 package org.mule.extension.socket.api.connection.tcp.protocol;
 
 import static org.mule.extension.socket.internal.SocketUtils.getByteArray;
+
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -38,6 +39,9 @@ public class DirectProtocol extends AbstractByteProtocol
     private static final Log LOGGER = LogFactory.getLog(DirectProtocol.class);
     private static final int DEFAULT_BUFFER_SIZE = 8192;
 
+    /**
+     * Indicates if the data to transfer is just the Payload or the entire Mule Message
+     */
     @Parameter
     @Optional(defaultValue = "true")
     private boolean payloadOnly = true;

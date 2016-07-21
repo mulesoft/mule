@@ -9,6 +9,8 @@ package org.mule.extension.socket.api.socket;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * Configuration fields common to all socket implementations
@@ -17,6 +19,9 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  */
 public abstract class AbstractSocketProperties implements SocketProperties
 {
+
+    private static final String BUFFER_CONFIGURATION = "Buffer Configuration";
+    protected static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
 
     /**
      * The name of this config object, so that it can be referenced by config elements.
@@ -29,6 +34,7 @@ public abstract class AbstractSocketProperties implements SocketProperties
      */
     @Parameter
     @Optional
+    @Placement(group = BUFFER_CONFIGURATION)
     protected Integer sendBufferSize;
 
     /**
@@ -36,6 +42,7 @@ public abstract class AbstractSocketProperties implements SocketProperties
      */
     @Parameter
     @Optional
+    @Placement(group = BUFFER_CONFIGURATION)
     protected Integer receiveBufferSize;
 
     /**
@@ -46,6 +53,8 @@ public abstract class AbstractSocketProperties implements SocketProperties
      */
     @Parameter
     @Optional
+    @Summary("Time, in milliseconds, that the socket will wait in a blocking operation before failing")
+    @Placement(group = TIMEOUT_CONFIGURATION)
     protected Integer clientTimeout;
 
     /**
@@ -54,6 +63,7 @@ public abstract class AbstractSocketProperties implements SocketProperties
      */
     @Parameter
     @Optional(defaultValue = "true")
+    @Summary("Indicates whether if the configured socket could be reused or fail at when trying to bind it")
     private boolean reuseAddress = true;
 
     public String getName()

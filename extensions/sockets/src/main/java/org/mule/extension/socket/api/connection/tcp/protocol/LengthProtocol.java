@@ -40,6 +40,9 @@ public class LengthProtocol extends DirectProtocol
     private static final int SIZE_INT = Integer.BYTES;
     public static final String LENGTH_EXCEEDED = "Message length is '%d' and exceeds the limit '%d";
 
+    /**
+     * Indicates the maximum length of the message
+     */
     @Parameter
     @Optional(defaultValue = "-1")
     private int maxMessageLength = NO_MAX_LENGTH;

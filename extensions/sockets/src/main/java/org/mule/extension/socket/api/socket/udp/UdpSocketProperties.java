@@ -9,6 +9,7 @@ package org.mule.extension.socket.api.socket.udp;
 import org.mule.extension.socket.api.socket.AbstractSocketProperties;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.net.DatagramSocket;
 
@@ -22,11 +23,13 @@ public class UdpSocketProperties extends AbstractSocketProperties
 
     // TODO UDP needs to specify a default value for the receiving buffer size but TCP doesn't
     private static final Integer DEFAULT_UDP_RECEIVE_BUFFER_SIZE = 1024 * 16;
+
     /**
      * Enable/disable SO_BROADCAST into the {@link DatagramSocket}
      */
     @Parameter
     @Optional(defaultValue = "false")
+    @Summary("Whether to enable the socket to send broadcast data")
     protected boolean broadcast = false;
 
     /**
