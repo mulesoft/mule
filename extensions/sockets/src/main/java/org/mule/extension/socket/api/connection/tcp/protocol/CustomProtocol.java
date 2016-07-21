@@ -40,8 +40,7 @@ public class CustomProtocol implements TcpProtocol, Initialisable
      */
     @Parameter
     @Alias("class")
-    @Summary("Reference to full qualifier class name that must implement " +
-             "'org.mule.extension.socket.api.connection.tcp.protocol.TcpProtocol' that will be used as a custom protocol")
+    @Summary("Full qualifier class name that must implement 'TcpProtocol' that will be used as a custom protocol")
     @DisplayName("Protocol Class Name")
     public String clazz;
 
