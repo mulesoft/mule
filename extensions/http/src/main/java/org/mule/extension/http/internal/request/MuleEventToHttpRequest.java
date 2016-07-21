@@ -61,6 +61,7 @@ public class MuleEventToHttpRequest
 {
     private static final Logger logger = LoggerFactory.getLogger(MuleEventToHttpRequest.class);
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
+    private static final String APPLICATION_JAVA = "application/java";
 
     private final String uri;
     private final String method;
@@ -240,7 +241,7 @@ public class MuleEventToHttpRequest
         {
             String contentType = requestBuilder.getHeaders().get(CONTENT_TYPE);
 
-            if (contentType == null || contentType.equals(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()))
+            if (contentType == null || contentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()) || contentType.startsWith(APPLICATION_JAVA))
             {
                 if (muleEvent.getMessage().getPayload() instanceof Map)
                 {
