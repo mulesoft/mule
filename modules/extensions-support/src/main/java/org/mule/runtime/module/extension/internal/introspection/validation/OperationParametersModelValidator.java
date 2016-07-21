@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
@@ -31,7 +30,7 @@ import java.util.List;
 public final class OperationParametersModelValidator implements ModelValidator
 {
 
-    private final List<String> reservedWords = ImmutableList.of(TARGET_ATTRIBUTE, TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    private final List<String> reservedWords = ImmutableList.of(TARGET_ATTRIBUTE);
 
     @Override
     public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException
