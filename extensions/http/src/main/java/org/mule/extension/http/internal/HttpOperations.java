@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import javax.inject.Inject;
 
@@ -21,6 +22,7 @@ import javax.inject.Inject;
  */
 public class HttpOperations
 {
+
     @Inject
     private MuleContext muleContext;
 
@@ -28,17 +30,17 @@ public class HttpOperations
      * Authenticates received HTTP requests. Must be used after a listener component, setup with an error-response-builder
      * that takes flow variables as statusCode and headersRef.
      *
-     * @param realm Authentication realm.
+     * @param realm             Authentication realm.
      * @param securityProviders The delegate-security-provider to use for authenticating. Use this in case you have multiple security managers defined in your configuration.
      * @param statusCodeFlowVar Reference to the flow variable name used for the statusCode attribute of the error-response-builder.
-     * @param headersFlowVar Reference to the flow variable name used for the headersRef attribute of the error-response-builder.
+     * @param headersFlowVar    Reference to the flow variable name used for the headersRef attribute of the error-response-builder.
      * @throws MuleException if unauthenticated.
      */
     public void basicSecurityFilter(String realm,
-                                           @Optional String securityProviders,
-                                           MuleEvent event,
-                                           @Optional(defaultValue = "statusCode") String statusCodeFlowVar,
-                                           @Optional(defaultValue = "headers") String headersFlowVar) throws MuleException
+                                    @Optional String securityProviders,
+                                    MuleEvent event,
+                                    @Optional(defaultValue = "statusCode") @DisplayName("Status Code - Flow Var Ref") String statusCodeFlowVar,
+                                    @Optional(defaultValue = "headers") @DisplayName("Headers - Flow Var Ref") String headersFlowVar) throws MuleException
     {
         HttpBasicAuthenticationFilter filter = createFilter(realm, securityProviders, statusCodeFlowVar, headersFlowVar);
 

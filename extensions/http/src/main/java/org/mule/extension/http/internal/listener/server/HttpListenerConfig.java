@@ -6,8 +6,11 @@
  */
 package org.mule.extension.http.internal.listener.server;
 
+import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+
 import org.mule.extension.http.internal.listener.HttpListener;
 import org.mule.extension.http.internal.listener.HttpListenerProvider;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -18,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 
@@ -31,6 +35,7 @@ import org.mule.runtime.module.http.internal.listener.ListenerPath;
 @Sources(HttpListener.class)
 public class HttpListenerConfig implements Initialisable
 {
+
     /**
      * Base path to use for all requests that reference this config.
      */
@@ -47,6 +52,7 @@ public class HttpListenerConfig implements Initialisable
     @Parameter
     @Optional(defaultValue = "true")
     @Expression(NOT_SUPPORTED)
+    @Placement(tab = ADVANCED, group = OTHER_SETTINGS)
     private Boolean parseRequest;
 
 

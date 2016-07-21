@@ -6,11 +6,16 @@
  */
 package org.mule.extension.http.internal.request.validator;
 
+import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnector.TLS;
+import static org.mule.extension.http.internal.HttpConnector.TLS_CONFIGURATION;
+import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
@@ -35,6 +40,9 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
 
@@ -50,6 +58,7 @@ import javax.inject.Inject;
 @Alias("request")
 public class HttpRequesterProvider implements ConnectionProvider<HttpClient>, Initialisable
 {
+
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final String OBJECT_HTTP_CLIENT_FACTORY = "_httpClientFactory";
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
@@ -65,14 +74,16 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpClient>, In
      */
     @Parameter
     @Optional
+    @Placement(group = URL_CONFIGURATION, order = 2)
     private Function<MuleEvent, String> host;
 
     /**
-     * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the protocol
-     * attribute is HTTPS then the default value is 443.
+     * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80,
+     * if the protocol attribute is HTTPS then the default value is 443.
      */
     @Parameter
     @Optional
+    @Placement(group = URL_CONFIGURATION, order = 3)
     private Function<MuleEvent, Integer> port;
 
     /**
@@ -84,6 +95,8 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpClient>, In
     @Parameter
     @Optional(defaultValue = "HTTP")
     @Expression(NOT_SUPPORTED)
+    @Summary("Protocol to use for communication. Valid values are HTTP and HTTPS")
+    @Placement(group = URL_CONFIGURATION, order = 1)
     private HttpConstants.Protocols protocol;
 
     /**
@@ -91,6 +104,8 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpClient>, In
      */
     @Parameter
     @Optional
+    @DisplayName(TLS_CONFIGURATION)
+    @Placement(tab = TLS, group = TLS_CONFIGURATION)
     private TlsContextFactory tlsContextFactory;
 
     /**
@@ -100,6 +115,8 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpClient>, In
      */
     @Parameter
     @Optional
+    @Summary("Reusable configuration element for outbound connections through a proxy")
+    @Placement(tab = "Proxy")
     private ProxyConfig proxyConfig;
 
     /**
@@ -118,6 +135,7 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpClient>, In
     @Parameter
     @Optional(defaultValue = "30000")
     @Expression(NOT_SUPPORTED)
+    @Placement(group = OTHER_SETTINGS)
     private Integer connectionIdleTimeout;
 
     /**
@@ -126,11 +144,13 @@ public class HttpRequesterProvider implements ConnectionProvider<HttpClient>, In
     @Parameter
     @Optional(defaultValue = "true")
     @Expression(NOT_SUPPORTED)
+    @Placement(group = OTHER_SETTINGS)
     private Boolean usePersistentConnections;
 
     @Parameter
     @Optional
     @Expression(NOT_SUPPORTED)
+    @Placement(tab = "Sockets")
     private TcpClientSocketProperties clientSocketProperties;
 
     @Inject

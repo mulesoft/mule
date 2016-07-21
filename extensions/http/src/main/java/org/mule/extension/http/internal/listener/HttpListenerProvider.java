@@ -7,6 +7,10 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
+import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnector.TLS;
+import static org.mule.extension.http.internal.HttpConnector.TLS_CONFIGURATION;
+import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
@@ -16,6 +20,7 @@ import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.extension.http.api.server.HttpListenerConnectionManager;
 import org.mule.extension.http.internal.listener.server.HttpServerConfiguration;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -41,6 +46,8 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.listener.Server;
 import org.mule.runtime.module.http.internal.listener.ServerAddress;
@@ -57,6 +64,7 @@ import javax.inject.Inject;
 @Alias("listener")
 public class HttpListenerProvider implements ConnectionProvider<Server>, Initialisable, Startable, Stoppable
 {
+
     private static final int DEFAULT_MAX_THREADS = 128;
 
     @ConfigName
@@ -67,6 +75,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
      */
     @Parameter
     @Expression(NOT_SUPPORTED)
+    @Placement(group = URL_CONFIGURATION, order = 2)
     private String host;
 
     /**
@@ -75,6 +84,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
      */
     @Parameter
     @Expression(NOT_SUPPORTED)
+    @Placement(group = URL_CONFIGURATION, order = 3)
     private Integer port;
 
     /**
@@ -85,6 +95,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
     @Parameter
     @Optional(defaultValue = "HTTP")
     @Expression(NOT_SUPPORTED)
+    @Placement(group = URL_CONFIGURATION, order = 1)
     private HttpConstants.Protocols protocol;
 
     /**
@@ -93,6 +104,8 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
     @Parameter
     @Optional
     @Expression(NOT_SUPPORTED)
+    @DisplayName(TLS_CONFIGURATION)
+    @Placement(group = TLS_CONFIGURATION, tab = TLS)
     private TlsContextFactory tlsContext;
 
     /**
@@ -102,6 +115,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
     @Parameter
     @Optional(defaultValue = "30000")
     @Expression(NOT_SUPPORTED)
+    @Placement(group = OTHER_SETTINGS)
     private Integer connectionIdleTimeout;
 
     /**
@@ -110,6 +124,7 @@ public class HttpListenerProvider implements ConnectionProvider<Server>, Initial
     @Parameter
     @Optional(defaultValue = "true")
     @Expression(NOT_SUPPORTED)
+    @Placement(group = OTHER_SETTINGS)
     private Boolean usePersistentConnections;
 
     @Inject
