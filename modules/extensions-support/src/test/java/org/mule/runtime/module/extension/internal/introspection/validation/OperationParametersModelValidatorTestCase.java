@@ -10,7 +10,6 @@ import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -65,16 +64,6 @@ public class OperationParametersModelValidatorTestCase extends AbstractMuleTestC
     {
         ParameterModel offending = mock(ParameterModel.class);
         when(offending.getName()).thenReturn(TARGET_ATTRIBUTE);
-
-        when(operationModel.getParameterModels()).thenReturn(asList(goodParameter, offending));
-        validator.validate(extensionModel);
-    }
-
-    @Test(expected = IllegalOperationModelDefinitionException.class)
-    public void transactionalActionParameter()
-    {
-        ParameterModel offending = mock(ParameterModel.class);
-        when(offending.getName()).thenReturn(TRANSACTIONAL_ACTION_PARAMETER_NAME);
 
         when(operationModel.getParameterModels()).thenReturn(asList(goodParameter, offending));
         validator.validate(extensionModel);
