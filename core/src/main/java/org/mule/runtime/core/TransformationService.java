@@ -254,9 +254,13 @@ public class TransformationService
         }
         else
         {
-            return MuleMessage.builder(message)
+            // We need to use message from event if it's available in case the transformer mutated the message by creating
+            // a new message instance.  This issue goes away once transformers are cleaned up and always return event or
+            // message. See MULE-9342
+            MuleMessage messagePostTransform = (event != null && event.getMessage() != null) ? event.getMessage() : message;
+            return MuleMessage.builder(messagePostTransform)
                               .payload(result)
-                              .mediaType(mergeMediaType(message, transformer.getReturnDataType()))
+                              .mediaType(mergeMediaType(messagePostTransform, transformer.getReturnDataType()))
                               .build();
         }
     }

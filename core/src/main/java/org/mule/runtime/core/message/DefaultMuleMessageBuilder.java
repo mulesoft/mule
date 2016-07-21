@@ -23,10 +23,8 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.RequestContext;
 import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MessageProperties;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -37,8 +35,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
-import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
-import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.UUID;
@@ -54,8 +50,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.activation.DataHandler;
 
@@ -131,6 +125,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
     public DefaultMuleMessageBuilder(org.mule.runtime.api.message.MuleMessage message)
     {
+        requireNonNull(message);
         this.payload = message.getPayload();
         this.dataType = message.getDataType();
         this.attributes = message.getAttributes();
@@ -406,11 +401,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         private ExceptionPayload exceptionPayload;
 
         /**
-         * Scoped properties for this message
-         */
-        private MessagePropertiesContext properties = new MessagePropertiesContext();
-
-        /**
          * Collection of attachments that were attached to the incoming message
          */
         private transient Map<String, DataHandler> inboundAttachments = new HashMap<>();
@@ -421,16 +411,12 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
         private Correlation correlation;
-
-        // these are transient because serialisation generates a new instance
-        // so we allow mutation again (and we can't serialize threads anyway)
-        private transient AtomicReference<Thread> ownerThread = null;
-        private transient AtomicBoolean mutable = null;
-
         private transient TypedValue typedValue;
         private Attributes attributes;
-
         private Serializable replyTo;
+
+        private Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
+        private Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
 
         private MuleMessageImplementation(String id, String rootId, TypedValue typedValue, Attributes attributes,
                                   Map<String, TypedValue<Serializable>> inboundProperties,
@@ -443,8 +429,8 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
             this.rootId = rootId != null ? rootId : id;
             this.typedValue = typedValue;
             this.attributes = attributes;
-            this.properties.inboundMap.putAll(inboundProperties);
-            this.properties.outboundMap.putAll(outboundProperties);
+            this.inboundMap.putAll(inboundProperties);
+            this.outboundMap.putAll(outboundProperties);
             this.inboundAttachments = inboundAttachments;
             this.outboundAttachments = outboundAttachments;
             this.correlation = new Correlation(correlationId, correlationGroupSize, correlationSequence);
@@ -566,19 +552,6 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         public Object getPayload()
         {
             return typedValue.getValue();
-        }
-
-        private void setDataType(DataType dt)
-        {
-            typedValue = new TypedValue(typedValue.getValue(), dt);
-        }
-
-
-        private IllegalStateException newException(String message)
-        {
-            IllegalStateException exception = new IllegalStateException(message);
-            logger.warn("Message access violation", exception);
-            return exception;
         }
 
         public static class SerializedDataHandler implements Serializable
@@ -725,7 +698,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
         /**
          * Invoked after deserialization. This is called when the marker interface
-         * {@link org.mule.runtime.core.util.store.DeserializationPostInitialisable} is used. This will get invoked after
+         * {@link DeserializationPostInitialisable} is used. This will get invoked after
          * the object has been deserialized passing in the current mulecontext when using either
          * {@link org.mule.runtime.core.transformer.wire.SerializationWireFormat},
          * {@link org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat} or the
@@ -778,297 +751,114 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         @Override
         public Serializable getInboundProperty(String name)
         {
-            return properties.getInboundProperty(name);
+            return getInboundProperty(name, null);
         }
 
         @Override
-        public Serializable getInboundProperty(String name, Serializable defaultValue)
+        public <T extends Serializable> T getInboundProperty(String name, T defaultValue)
         {
-            return properties.getInboundProperty(name, defaultValue);
+            return getValueOrDefault((TypedValue<T>) inboundMap.get(name), defaultValue);
         }
 
         @Override
         public Serializable getOutboundProperty(String name)
         {
-            return properties.getOutboundProperty(name);
+            return getOutboundProperty(name, null);
         }
 
         @Override
-        public Serializable getOutboundProperty(String name, Serializable defaultValue)
+        public <T extends Serializable> T getOutboundProperty(String name, T defaultValue)
         {
-            return properties.getOutboundProperty(name, defaultValue);
-        }
-
-        public void setInboundProperty(String key, Serializable value, DataType dataType)
-        {
-            properties.setInboundProperty(key, value, dataType);
-        }
-
-        public void setOutboundProperty(String key, Serializable value)
-        {
-            properties.setOutboundProperty(key, value);
-        }
-
-        public void setOutboundProperty(String key, Serializable value, DataType dataType)
-        {
-            properties.setOutboundProperty(key, value, dataType);
-        }
-
-        public Serializable removeOutboundProperty(String key)
-        {
-            return properties.removeOutboundProperty(key);
+            return getValueOrDefault((TypedValue<T>) outboundMap.get(name), defaultValue);
         }
 
         @Override
         public Set<String> getInboundPropertyNames()
         {
-            return unmodifiableSet(properties.getInboundPropertyNames());
+            return unmodifiableSet(inboundMap.keySet());
         }
 
         @Override
         public Set<String> getOutboundPropertyNames()
         {
-            return properties.getOutboundPropertyNames();
+            return unmodifiableSet(outboundMap.keySet());
         }
 
         @Override
         public DataType getInboundPropertyDataType(String name)
         {
-            return properties.getInboundPropertyDataType(name);
+            TypedValue typedValue = inboundMap.get(name);
+            return typedValue == null ? null : typedValue.getDataType();
         }
 
         @Override
         public DataType getOutboundPropertyDataType(String name)
         {
-            return properties.getOutboundPropertyDataType(name);
+            TypedValue typedValue = outboundMap.get(name);
+            return typedValue == null ? null : typedValue.getDataType();
         }
 
-        /**
-         * This object maintains case-sensitive inbound and outbound scoped messages properties.
-         * <ol>
-         * <li> {@link PropertyScope#INBOUND} Contains properties that were on the message when
-         * it was received by Mule. This scope is read-only.</li>
-         * <li>{@link PropertyScope#OUTBOUND} Any properties set in this scope will be attached
-         * to any outbound messages resulting from this message. This is the default scope.</li>
-         * </ol>
-         */
-        public static class MessagePropertiesContext implements MessageProperties, Serializable
+        private <T extends Serializable> T getValueOrDefault(TypedValue<T> typedValue, T defaultValue)
         {
-            private static final long serialVersionUID = -5230693402768953742L;
-            private static final Logger logger = LoggerFactory.getLogger(MessagePropertiesContext.class);
-
-
-            protected CopyOnWriteCaseInsensitiveMap<String, TypedValue<? extends Serializable>> inboundMap;
-            protected CopyOnWriteCaseInsensitiveMap<String, TypedValue<? extends Serializable>> outboundMap;
-
-            public MessagePropertiesContext()
+            if (typedValue == null)
             {
-                inboundMap = new CopyOnWriteCaseInsensitiveMap<>();
-                outboundMap = new CopyOnWriteCaseInsensitiveMap<>();
+                return defaultValue;
             }
-
-            public MessagePropertiesContext(MessagePropertiesContext previous)
+            T value = typedValue.getValue();
+            //Note that we need to keep the (redundant) casts in here because the compiler compiler complains
+            //about primitive types being cast to a generic type
+            if (defaultValue == null)
             {
-                inboundMap = previous.inboundMap.clone();
-                outboundMap = previous.outboundMap.clone();
+                return value;
             }
-
-            @Override
-            public <T extends Serializable> T getInboundProperty(String name)
+            else if (defaultValue instanceof Boolean)
             {
-                return getInboundProperty(name, null);
+                return  (T) (Boolean) getBoolean(value, (Boolean) defaultValue);
             }
-
-            @Override
-            public <T extends Serializable> T getInboundProperty(String name, T defaultValue)
+            else if (defaultValue instanceof Byte)
             {
-                return getValueOrDefault((TypedValue<T>) inboundMap.get(name), defaultValue);
+                return (T) (Byte) getByte(value, (Byte) defaultValue);
             }
-
-            @Override
-            public <T extends Serializable> T getOutboundProperty(String name)
+            else if (defaultValue instanceof Integer)
             {
-                return getOutboundProperty(name, null);
+                return (T) (Integer) getInt(value, (Integer) defaultValue);
             }
-
-            @Override
-            public <T extends Serializable> T getOutboundProperty(String name, T defaultValue)
+            else if (defaultValue instanceof Short)
             {
-                return getValueOrDefault((TypedValue<T>) outboundMap.get(name), defaultValue);
+                return (T) (Short) getShort(value, (Short) defaultValue);
             }
-
-            public <T extends Serializable> void setInboundProperty(String key, T value, DataType dataType)
+            else if (defaultValue instanceof Long)
             {
-                if (key != null)
-                {
-                    if (value == null)
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("setProperty(key, value) called with null value; removing key: " + key);
-                        }
-                        removeInboundProperty(key);
-                    }
-                    else
-                    {
-                        inboundMap.put(key, new TypedValue(value, dataType));
-                    }
-                }
-                else
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("setProperty(key, value) invoked with null key. Ignoring this entry");
-                    }
-                }
+                return (T) (Long) getLong(value, (Long) defaultValue);
             }
-
-            public void setOutboundProperty(String key, Serializable value)
+            else if (defaultValue instanceof Float)
             {
-                setOutboundProperty(key, value, DataType.fromObject(value));
+                return (T) (Float) getFloat(value, (Float) defaultValue);
             }
-
-            public <T extends Serializable> void setOutboundProperty(String key, T value, DataType dataType)
+            else if (defaultValue instanceof Double)
             {
-                if (key != null)
-                {
-                    if (value == null)
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("setProperty(key, value) called with null value; removing key: " + key);
-                        }
-                        removeOutboundProperty(key);
-                    }
-                    else
-                    {
-                        outboundMap.put(key, new TypedValue(value, dataType));
-                    }
-                }
-                else
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("setProperty(key, value) invoked with null key. Ignoring this entry");
-                    }
-                }
+                return (T) (Double) getDouble(value, (Double) defaultValue);
             }
-
-            public <T extends Serializable> T removeInboundProperty(String key)
+            else if (defaultValue instanceof String)
             {
-                TypedValue value = inboundMap.remove(key);
-                return value == null ? null : (T) value.getValue();
+                return (T) getString(value, (String) defaultValue);
             }
-
-            public <T extends Serializable> T removeOutboundProperty(String key)
+            else
             {
-                TypedValue value = outboundMap.remove(key);
-                return value == null ? null : (T) value.getValue();
-            }
-
-            @Override
-            public DataType getInboundPropertyDataType(String name)
-            {
-                TypedValue typedValue = inboundMap.get(name);
-                return typedValue == null ? null : typedValue.getDataType();
-            }
-
-            @Override
-            public DataType getOutboundPropertyDataType(String name)
-            {
-                TypedValue typedValue = outboundMap.get(name);
-                return typedValue == null ? null : typedValue.getDataType();
-            }
-
-            @Override
-            public Set<String> getInboundPropertyNames()
-            {
-                return inboundMap.keySet();
-            }
-
-            @Override
-            public Set<String> getOutboundPropertyNames()
-            {
-                return outboundMap.keySet();
-            }
-
-            @Override
-            public String toString()
-            {
-                StringBuilder buf = new StringBuilder(128);
-                buf.append("Properties{");
-                buf.append(PropertyScope.INBOUND_NAME).append(":");
-                buf.append(MapUtils.toString(inboundMap, false));
-                buf.append(", ");
-                buf.append(PropertyScope.OUTBOUND_NAME).append(":");
-                buf.append(MapUtils.toString(inboundMap, false));
-                buf.append("}");
-                return buf.toString();
-            }
-
-            private <T extends Serializable> T getValueOrDefault(TypedValue<T> typedValue, T defaultValue)
-            {
-                if (typedValue == null)
+                if (value == null)
                 {
                     return defaultValue;
                 }
-                T value = typedValue.getValue();
-                //Note that we need to keep the (redundant) casts in here because the compiler compiler complains
-                //about primitive types being cast to a generic type
-                if (defaultValue == null)
+                //If defaultValue is set and the result is not null, then validate that they are assignable
+                else if (defaultValue.getClass().isAssignableFrom(value.getClass()))
                 {
                     return value;
                 }
-                else if (defaultValue instanceof Boolean)
-                {
-                    return  (T) (Boolean) getBoolean(value, (Boolean) defaultValue);
-                }
-                else if (defaultValue instanceof Byte)
-                {
-                    return (T) (Byte) getByte(value, (Byte) defaultValue);
-                }
-                else if (defaultValue instanceof Integer)
-                {
-                    return (T) (Integer) getInt(value, (Integer) defaultValue);
-                }
-                else if (defaultValue instanceof Short)
-                {
-                    return (T) (Short) getShort(value, (Short) defaultValue);
-                }
-                else if (defaultValue instanceof Long)
-                {
-                    return (T) (Long) getLong(value, (Long) defaultValue);
-                }
-                else if (defaultValue instanceof Float)
-                {
-                    return (T) (Float) getFloat(value, (Float) defaultValue);
-                }
-                else if (defaultValue instanceof Double)
-                {
-                    return (T) (Double) getDouble(value, (Double) defaultValue);
-                }
-                else if (defaultValue instanceof String)
-                {
-                    return (T) getString(value, (String) defaultValue);
-                }
                 else
                 {
-                    if (value == null)
-                    {
-                        return defaultValue;
-                    }
-                    //If defaultValue is set and the result is not null, then validate that they are assignable
-                    else if (defaultValue.getClass().isAssignableFrom(value.getClass()))
-                    {
-                        return value;
-                    }
-                    else
-                    {
-                        throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(value.getClass(), defaultValue.getClass()).getMessage());
-                    }
+                    throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(value.getClass(), defaultValue.getClass()).getMessage());
                 }
             }
-
         }
     }
 }
