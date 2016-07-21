@@ -43,6 +43,7 @@ public class JettyContinuationsReceiverServlet extends JettyReceiverServlet
                 continuation.setAttribute(RESPONSE_HANDLER_KEY, continuationsResponseHandler);
                 // suspend indefinitely
                 continuation.suspend();
+                continuationsResponseHandler.suspended();
             }
             else
             {

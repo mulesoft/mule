@@ -6,7 +6,6 @@
  */
 package org.mule.transport.servlet.jetty;
 
-import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -58,6 +57,11 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         public ContinuationsResponseHandler(JettyContinuationsMessageProcessTemplate jettyMessageProcessTemplateAndContext)
         {
             this.jettyMessageProcessTemplateAndContext = jettyMessageProcessTemplateAndContext;
+        }
+
+        void suspended()
+        {
+            this.jettyMessageProcessTemplateAndContext.suspended();
         }
 
         void complete()
