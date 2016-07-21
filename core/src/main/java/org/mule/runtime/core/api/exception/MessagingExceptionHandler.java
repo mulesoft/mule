@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.exception;
 
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 
 /**
@@ -20,7 +21,7 @@ public interface MessagingExceptionHandler extends ExceptionHandler {
    * @param event which was being processed when the exception occurred
    * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
    */
-  MuleEvent handleException(Exception exception, MuleEvent event);
+  MuleEvent handleException(MessagingException exception, MuleEvent event);
 }
 
 

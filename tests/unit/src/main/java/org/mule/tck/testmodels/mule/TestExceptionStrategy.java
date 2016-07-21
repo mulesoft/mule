@@ -6,6 +6,7 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
@@ -20,9 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct replacement of the
- * {@link org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy}. This is used to test that overriding the default
- * Exception strategy works.
+ * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct
+ * replacement of the {@link org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy}.
+ * This is used to test that overriding the default Exception strategy works.
  */
 public class TestExceptionStrategy extends AbstractExceptionListener
     implements MessagingExceptionHandler, SystemExceptionHandler {
@@ -33,7 +34,8 @@ public class TestExceptionStrategy extends AbstractExceptionListener
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
-   * This is the lock that protect both the storage of {@link #callback} and modifications of {@link #unhandled}.
+   * This is the lock that protect both the storage of {@link #callback} and
+   * modifications of {@link #unhandled}.
    */
   private Object callbackLock = new Object();
 
@@ -76,7 +78,7 @@ public class TestExceptionStrategy extends AbstractExceptionListener
     return event;
   }
 
-  public MuleEvent handleException(Exception exception, MuleEvent event) {
+  public MuleEvent handleException(MessagingException exception, MuleEvent event) {
     return handleException(exception, event, null);
   }
 

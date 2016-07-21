@@ -34,8 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This phase routes the message through the flow.
  * <p>
- * To participate of this phase, {@link org.mule.runtime.core.execution.MessageProcessTemplate} must implement
- * {@link org.mule.runtime.core.execution.FlowProcessingPhaseTemplate}
+ * To participate of this phase, {@link org.mule.runtime.core.execution.MessageProcessTemplate} must implement {@link org.mule.runtime.core.execution.FlowProcessingPhaseTemplate}
  */
 public class AsyncResponseFlowProcessingPhase
     extends NotificationFiringProcessingPhase<AsyncResponseFlowProcessingPhaseTemplate> {
@@ -123,7 +122,7 @@ public class AsyncResponseFlowProcessingPhase
       }
 
       @Override
-      public MuleEvent responseSentWithFailure(Exception e, MuleEvent event) {
+      public MuleEvent responseSentWithFailure(MessagingException e, MuleEvent event) {
         phaseResultNotifier.phaseFailure(e);
         return event;
       }
@@ -140,7 +139,7 @@ public class AsyncResponseFlowProcessingPhase
       }
 
       @Override
-      public MuleEvent responseSentWithFailure(final Exception e, final MuleEvent event) {
+      public MuleEvent responseSentWithFailure(final MessagingException e, final MuleEvent event) {
         return executeCallback(() -> {
           final MuleEvent exceptionStrategyResult = exceptionListener.handleException(e, event);
           phaseResultNotifier.phaseSuccessfully();

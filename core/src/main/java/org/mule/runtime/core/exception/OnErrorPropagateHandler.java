@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.exception;
 
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -55,7 +56,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected MuleEvent beforeRouting(Exception exception, MuleEvent event) {
+  protected MuleEvent beforeRouting(MessagingException exception, MuleEvent event) {
     if (!isRedeliveryExhausted(exception)) {
       rollback(exception);
     }
@@ -87,7 +88,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected MuleEvent route(MuleEvent event, Exception t) {
+  protected MuleEvent route(MuleEvent event, MessagingException t) {
     MuleEvent resultEvent = event;
     if (isRedeliveryExhausted(t)) {
       if (redeliveryExceeded != null) {

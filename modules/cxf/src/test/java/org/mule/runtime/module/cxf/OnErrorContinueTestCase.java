@@ -18,6 +18,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -40,13 +41,25 @@ import org.junit.Test;
 
 public class OnErrorContinueTestCase extends FunctionalTestCase {
 
-  private static final String requestPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
-      + "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
-      + "    <arg0>Hello</arg0>\n" + "</hi:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
+  private static final String requestPayload =
+      "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
+          "           xmlns:hi=\"http://example.cxf.module.runtime.mule.org/\">\n" +
+          "<soap:Body>\n" +
+          "<hi:sayHi>\n" +
+          "    <arg0>Hello</arg0>\n" +
+          "</hi:sayHi>\n" +
+          "</soap:Body>\n" +
+          "</soap:Envelope>";
 
-  private static final String requestFaultPayload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
-      + "           xmlns:hi=\"http://cxf.module.runtime.mule.org/\">\n" + "<soap:Body>\n" + "<hi:sayHi>\n"
-      + "    <arg0>Hello</arg0>\n" + "</hi:sayHi>\n" + "</soap:Body>\n" + "</soap:Envelope>";
+  private static final String requestFaultPayload =
+      "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
+          "           xmlns:hi=\"http://cxf.module.runtime.mule.org/\">\n" +
+          "<soap:Body>\n" +
+          "<hi:sayHi>\n" +
+          "    <arg0>Hello</arg0>\n" +
+          "</hi:sayHi>\n" +
+          "</soap:Body>\n" +
+          "</soap:Envelope>";
 
   public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions()
       .method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
@@ -160,12 +173,12 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     }
 
     @Override
-    protected MuleEvent afterRouting(Exception exception, MuleEvent event) {
+    protected MuleEvent afterRouting(MessagingException exception, MuleEvent event) {
       return event;
     }
 
     @Override
-    protected MuleEvent beforeRouting(Exception exception, MuleEvent event) {
+    protected MuleEvent beforeRouting(MessagingException exception, MuleEvent event) {
       return event;
     }
   }

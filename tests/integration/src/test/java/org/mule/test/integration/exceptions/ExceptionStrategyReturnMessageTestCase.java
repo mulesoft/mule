@@ -52,13 +52,10 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
   public static class TestExceptionStrategy extends AbstractMessagingExceptionStrategy {
 
     @Override
-    public MuleEvent handleException(Exception exception, MuleEvent event) {
+    public MuleEvent handleException(MessagingException exception, MuleEvent event) {
       MuleEvent result = super.handleException(exception, event);
       event.setMessage(MuleMessage.builder(event.getMessage()).payload("Ka-boom!").build());
-      if (exception instanceof MessagingException) {
-        ((MessagingException) exception).setHandled(true);
-      }
-
+      exception.setHandled(true);
       return result;
     }
   }

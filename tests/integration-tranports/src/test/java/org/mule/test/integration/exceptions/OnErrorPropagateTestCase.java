@@ -6,15 +6,15 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
+import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -27,6 +27,7 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -303,6 +304,33 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     client.dispatch("vm://in7", "some message", null);
     if (!CallMessageProcessor.latch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("custom message processor wasn't call");
+    }
+  }
+
+  @Test
+  public void typeMatch() throws Exception {
+    verifyFlow("onErrorPropagateTypeMatch");
+    Optional<MuleMessage> customPath = muleContext.getClient().request("queue://custom1", TIMEOUT).getRight();
+    assertThat(customPath.isPresent(), is(false));
+    Optional<MuleMessage> anyPath = muleContext.getClient().request("queue://any1", TIMEOUT).getRight();
+    assertThat(anyPath.isPresent(), is(false));
+  }
+
+  @Test
+  public void typeMatchAny() throws Exception {
+    verifyFlow("onErrorPropagateTypeMatchAny");
+    Optional<MuleMessage> customPath = muleContext.getClient().request("queue://custom2", TIMEOUT).getRight();
+    assertThat(customPath.isPresent(), is(false));
+  }
+
+  private void verifyFlow(String flowName) throws InterruptedException {
+    try {
+      flowRunner(flowName).withPayload(MESSAGE).asynchronously().run().getMessage();
+    } catch (Exception e) {
+      assertThat(e.getCause(), is(instanceOf(FunctionalTestException.class)));
+      if (!CallMessageProcessor.latch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
+        fail("custom message processor wasn't call");
+      }
     }
   }
 

@@ -10,6 +10,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -27,6 +29,7 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -85,7 +88,13 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
     template.sendResponseToClient(event, responseCompletionCallback);
 
     verify(completionHandler, never()).onFailure(any(Exception.class));
-    verify(responseCompletionCallback).responseSentWithFailure(runtimeException, event);
+    verify(responseCompletionCallback).responseSentWithFailure(argThat(new ArgumentMatcher<MessagingException>() {
+
+      @Override
+      public boolean matches(Object o) {
+        return o instanceof MessagingException && ((MessagingException) o).getCauseException().equals(runtimeException);
+      }
+    }), eq(event));
   }
 
   @Test
@@ -99,6 +108,12 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
   public void failedToSendFailureResponseToClient() throws Exception {
     doThrow(runtimeException).when(completionHandler).onFailure(messagingException);
     template.sendFailureResponseToClient(messagingException, responseCompletionCallback);
-    verify(responseCompletionCallback).responseSentWithFailure(runtimeException, event);
+    verify(responseCompletionCallback).responseSentWithFailure(argThat(new ArgumentMatcher<MessagingException>() {
+
+      @Override
+      public boolean matches(Object o) {
+        return o instanceof MessagingException && ((MessagingException) o).getCauseException().equals(runtimeException);
+      }
+    }), eq(event));
   }
 }

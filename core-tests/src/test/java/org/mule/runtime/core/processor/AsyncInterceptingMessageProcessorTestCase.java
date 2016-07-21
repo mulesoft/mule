@@ -38,7 +38,8 @@ import java.beans.ExceptionListener;
 
 import org.junit.Test;
 
-public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleContextTestCase implements ExceptionListener {
+public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleContextTestCase
+    implements ExceptionListener {
 
   public static final String EXPECTING_SYNCHRONOUS_EVENT_ERROR =
       "Exception expected: '" + SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE + "'";
@@ -158,7 +159,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     assertSame(Thread.currentThread(), target.thread);
   }
 
-  protected void assertAsync(MessageProcessor processor, MuleEvent event) throws MuleException, InterruptedException {
+  protected void assertAsync(MessageProcessor processor, MuleEvent event)
+      throws MuleException, InterruptedException {
     MuleEvent result = processor.process(event);
 
     latch.await(10000, MILLISECONDS);
@@ -175,7 +177,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
       throws Exception {
-    AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(new TestWorkManagerSource());
+    AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(
+                                                                                 new TestWorkManagerSource());
     mp.setMuleContext(muleContext);
     mp.setFlowConstruct(getTestFlow());
     mp.setListener(listener);
@@ -222,7 +225,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     }
 
     @Override
-    public MuleEvent handleException(Exception exception, MuleEvent event) {
+    public MuleEvent handleException(MessagingException exception, MuleEvent event) {
       latch.countDown();
       return null;
     }

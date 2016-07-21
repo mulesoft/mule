@@ -9,7 +9,6 @@ package org.mule.runtime.core.api;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;

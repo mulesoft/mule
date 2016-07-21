@@ -14,6 +14,7 @@ import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -27,14 +28,13 @@ import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 
 /**
- * Fire a notification, log exception, increment statistics, route the problematic message to a destination if one is configured
- * (DLQ pattern), commit or rollback transaction if one exists, close any open streams.
+ * Fire a notification, log exception, increment statistics, route the problematic message to a destination 
+ * if one is configured (DLQ pattern), commit or rollback transaction if one exists, close any open streams.
  */
 public abstract class AbstractMessagingExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandler {
 
-  /**
-   * Stop the flow/service when an exception occurs. You will need to restart the flow/service manually after this (e.g, using
-   * JMX).
+  /** 
+   * Stop the flow/service when an exception occurs.  You will need to restart the flow/service manually after this (e.g, using JMX). 
    */
   private boolean stopMessageProcessing;
 
@@ -45,16 +45,16 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
   }
 
   @Override
-  public MuleEvent handleException(Exception ex, MuleEvent event) {
+  public MuleEvent handleException(MessagingException ex, MuleEvent event) {
     try {
       muleContext.getNotificationManager()
           .fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_START));
 
-      // keep legacy notifications
+      //keep legacy notifications
       fireNotification(ex);
 
       // Work with the root exception, not anything that wraps it
-      // Throwable t = ExceptionHelper.getRootException(ex);
+      //Throwable t = ExceptionHelper.getRootException(ex);
 
       logException(ex, event);
       doHandleException(ex, event);

@@ -6,6 +6,8 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
@@ -111,6 +113,20 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
     MuleMessage result = flowRunner("fullyDefinedCatchExceptionStrategyWithComponent").withPayload(MESSAGE).run().getMessage();
     assertThat(result, IsNull.<Object>notNullValue());
     assertThat(getPayloadAsString(result), Is.is(MESSAGE + " apt1 apt2 groovified"));
+  }
+
+  @Test
+  public void onErrorTypeMatch() throws Exception {
+    MuleMessage result = flowRunner("onErrorTypeMatch").withPayload(MESSAGE).run().getMessage();
+    assertThat(result, is(notNullValue()));
+    assertThat(getPayloadAsString(result), is(MESSAGE + " apt1 apt2"));
+  }
+
+  @Test
+  public void onErrorTypeMatchAny() throws Exception {
+    MuleMessage result = flowRunner("onErrorTypeMatchAny").withPayload(MESSAGE).run().getMessage();
+    assertThat(result, is(notNullValue()));
+    assertThat(getPayloadAsString(result), is(MESSAGE + " apt1 apt2"));
   }
 
   public static class LoadNewsProcessor implements MessageProcessor {

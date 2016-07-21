@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.ExceptionHelper;
@@ -18,7 +19,7 @@ public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessa
       return processNext(event);
     } catch (Exception e) {
       e = (Exception) ExceptionHelper.sanitizeIfNeeded(e);
-      return flowConstruct.getExceptionListener().handleException(e, event);
+      return flowConstruct.getExceptionListener().handleException(new MessagingException(event, e, this), event);
     }
   }
 }

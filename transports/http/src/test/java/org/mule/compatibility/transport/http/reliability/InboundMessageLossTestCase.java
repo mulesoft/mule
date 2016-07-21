@@ -30,11 +30,12 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Verify that no inbound messages are lost when exceptions occur. The message must either make it all the way to the SEDA queue
- * (in the case of an asynchronous inbound endpoint), or be restored/rolled back at the source.
+ * Verify that no inbound messages are lost when exceptions occur.
+ * The message must either make it all the way to the SEDA queue (in the case of
+ * an asynchronous inbound endpoint), or be restored/rolled back at the source.
  * 
- * In the case of the HTTP transport, there is no way to restore the source message so an exception is simply returned to the
- * client.
+ * In the case of the HTTP transport, there is no way to restore the source message
+ * so an exception is simply returned to the client.
  */
 public class InboundMessageLossTestCase extends FunctionalTestCase {
 
@@ -120,9 +121,9 @@ public class InboundMessageLossTestCase extends FunctionalTestCase {
   public static class Handler extends AbstractMessagingExceptionStrategy {
 
     @Override
-    public MuleEvent handleException(Exception ex, MuleEvent event) {
+    public MuleEvent handleException(MessagingException ex, MuleEvent event) {
       doHandleException(ex, event);
-      ((MessagingException) ex).setHandled(true);
+      ex.setHandled(true);
       return new DefaultMuleEvent(MuleMessage.builder().payload("Success!").build(), event);
     }
   }
@@ -133,10 +134,11 @@ public class InboundMessageLossTestCase extends FunctionalTestCase {
   public static class BadHandler extends AbstractMessagingExceptionStrategy {
 
     @Override
-    public MuleEvent handleException(Exception ex, MuleEvent event) {
+    public MuleEvent handleException(MessagingException ex, MuleEvent event) {
       doHandleException(ex, event);
       MessagingException exception = new MessagingException(event, new RuntimeException("Bad news!"));
-      MuleMessage message = MuleMessage.builder().nullPayload()
+      MuleMessage message = MuleMessage.builder()
+          .nullPayload()
           .exceptionPayload(new DefaultExceptionPayload(exception))
           .build();
       DefaultMuleEvent resultEvent = new DefaultMuleEvent(message, event);

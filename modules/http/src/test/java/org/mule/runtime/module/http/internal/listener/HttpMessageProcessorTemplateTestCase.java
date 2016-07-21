@@ -12,6 +12,7 @@ import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -40,6 +41,7 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatcher;
 
 @SmallTest
 public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
@@ -86,7 +88,7 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
     ResponseCompletionCallback responseCompletionCallback = mock(ResponseCompletionCallback.class);
     httpMessageProcessorTemplate.sendResponseToClient(testEvent, responseCompletionCallback);
 
-    verify(responseCompletionCallback).responseSentWithFailure(isA(NullPointerException.class), eq(testEvent));
+    verify(responseCompletionCallback).responseSentWithFailure(isA(MessagingException.class), eq(testEvent));
     assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
   }
 
@@ -112,7 +114,13 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
       assertThat(e, sameInstance(expected));
     }
 
-    verify(responseCompletionCallback, never()).responseSentWithFailure(expected, testEvent);
+    verify(responseCompletionCallback, never()).responseSentWithFailure(argThat(new ArgumentMatcher<MessagingException>() {
+
+      @Override
+      public boolean matches(Object o) {
+        return o instanceof MessagingException && ((MessagingException) o).getCauseException().equals(expected);
+      }
+    }), eq(testEvent));
     assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
   }
 

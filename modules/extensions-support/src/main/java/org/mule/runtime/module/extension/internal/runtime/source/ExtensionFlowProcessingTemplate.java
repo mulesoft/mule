@@ -20,7 +20,8 @@ final class ExtensionFlowProcessingTemplate implements AsyncResponseFlowProcessi
   private final MessageProcessor messageProcessor;
   private final CompletionHandler<MuleEvent, MessagingException, MuleEvent> completionHandler;
 
-  ExtensionFlowProcessingTemplate(MuleEvent event, MessageProcessor messageProcessor,
+  ExtensionFlowProcessingTemplate(MuleEvent event,
+                                  MessageProcessor messageProcessor,
                                   CompletionHandler<MuleEvent, MessagingException, MuleEvent> completionHandler) {
     this.event = event;
     this.messageProcessor = messageProcessor;
@@ -58,7 +59,8 @@ final class ExtensionFlowProcessingTemplate implements AsyncResponseFlowProcessi
       runnable.run();
       responseCompletionCallback.responseSentSuccessfully();
     } catch (Exception e) {
-      responseCompletionCallback.responseSentWithFailure(e, (org.mule.runtime.core.api.MuleEvent) event);
+      responseCompletionCallback.responseSentWithFailure(new MessagingException((org.mule.runtime.core.api.MuleEvent) event, e),
+                                                         (org.mule.runtime.core.api.MuleEvent) event);
     }
   }
 

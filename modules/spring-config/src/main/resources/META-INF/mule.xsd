@@ -1661,6 +1661,26 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+
+    <xsd:complexType name="abstractOnErrorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Base type for every on error handler.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="abstractNotificationExceptionStrategyType">
+                <xsd:attribute name="type" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The full name of the error type to match against.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="referenceExceptionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
@@ -4063,7 +4083,7 @@
 
     <xsd:complexType name="onErrorContinueType">
         <xsd:complexContent>
-            <xsd:extension base="abstractNotificationExceptionStrategyType">
+            <xsd:extension base="abstractOnErrorType">
                 <xsd:sequence>
                     <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
@@ -4096,7 +4116,7 @@
 
     <xsd:complexType name="onErrorPropagateType">
         <xsd:complexContent>
-            <xsd:extension base="abstractNotificationExceptionStrategyType">
+            <xsd:extension base="abstractOnErrorType">
                 <xsd:sequence>
                     <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
