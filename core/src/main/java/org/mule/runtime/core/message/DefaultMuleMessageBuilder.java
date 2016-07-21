@@ -19,6 +19,7 @@ import static org.mule.runtime.core.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.util.ObjectUtils.getString;
+
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -46,7 +47,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -56,9 +56,6 @@ import javax.activation.DataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * // TODO MULE-9855 MOVE TO org.mule.runtime.core.message
- */
 public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessage.PayloadBuilder, MuleMessage.CollectionBuilder
 {
 
@@ -151,7 +148,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     }
 
     @Override
-    public MuleMessage.CollectionBuilder collectionPayload(Collection payload, Class<?> clazz)
+    public MuleMessage.CollectionBuilder collectionPayload(Iterable payload, Class<?> clazz)
     {
         requireNonNull(payload);
         this.payload = payload;

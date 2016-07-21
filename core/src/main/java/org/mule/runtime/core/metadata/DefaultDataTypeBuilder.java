@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionType;
+
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -24,7 +25,6 @@ import com.google.common.cache.LoadingCache;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -165,16 +165,15 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
      * 
      * @param collectionType the java collection type to set.
      * @return this builder.
-     * @throws IllegalArgumentException if the given collectionType is not a descendant of
-     *             {@link Collection}.
+     * @throws IllegalArgumentException if the given collectionType is not a descendant of {@link Iterable}.
      */
     @Override
-    public DataTypeCollectionTypeBuilder collectionType(Class<? extends Collection> collectionType)
+    public DataTypeCollectionTypeBuilder collectionType(Class<? extends Iterable> collectionType)
     {
         validateAlreadyBuilt();
 
         checkNotNull(collectionType, "'collectionType' cannot be null.");
-        if (!Collection.class.isAssignableFrom(collectionType))
+        if (!Iterable.class.isAssignableFrom(collectionType))
         {
             throw new IllegalArgumentException("collectionType " + collectionType.getName() + " is not a Collection type");
         }
@@ -185,7 +184,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
         {
             this.itemTypeBuilder = DataType.builder();
         }
-        final Class<?> itemType = getCollectionType((Class<? extends Collection<?>>) type);
+        final Class<?> itemType = getCollectionType((Class<? extends Iterable<?>>) type);
         if (itemType != null)
         {
             this.itemTypeBuilder.type(itemType);
@@ -206,7 +205,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
      * 
      * @param itemType the java type to set.
      * @return this builder.
-     * @throws IllegalArgumentException if the given collectionType is not a descendant of {@link Collection}.
+     * @throws IllegalArgumentException if the given collectionType is not a descendant of {@link Iterable}.
      */
     @Override
     public DataTypeCollectionTypeBuilder itemType(Class<?> itemType)
@@ -354,9 +353,9 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
 
     protected DataType doBuild()
     {
-        if (Collection.class.isAssignableFrom(type))
+        if (Iterable.class.isAssignableFrom(type))
         {
-            return new DefaultCollectionDataType((Class<? extends Collection>) type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType);
+            return new DefaultCollectionDataType((Class<? extends Iterable>) type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType);
         }
         else
         {
