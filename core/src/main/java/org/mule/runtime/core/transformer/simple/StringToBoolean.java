@@ -6,13 +6,20 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+
 import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * <code>ByteArrayToSerializable</code> converts a serialized object to its object
@@ -20,6 +27,15 @@ import java.nio.charset.Charset;
  */
 public class StringToBoolean extends AbstractTransformer implements DiscoverableTransformer
 {
+
+    private static Map<String, Boolean> MAPPING = ImmutableMap.<String, Boolean>builder()
+            .put("true", TRUE)
+            .put("false", FALSE)
+            .put("yes", TRUE)
+            .put("no", FALSE)
+            .put("1", TRUE)
+            .put("0", FALSE)
+            .build();
 
     /**
      * Give core transformers a slightly higher priority
@@ -43,13 +59,23 @@ public class StringToBoolean extends AbstractTransformer implements Discoverable
             }
             else
             {
-                throw new TransformerException(
-                    CoreMessages.createStaticMessage("Unable to transform null to a primitive"));
+                throw new TransformerException(createStaticMessage("Unable to transform null to a primitive"));
             }
         }
         else
         {
-            return Boolean.valueOf((String) src);
+            String value = ((String) src).toLowerCase().trim();
+            Boolean transformed = MAPPING.get(value);
+            if (transformed != null)
+            {
+                return transformed;
+            }
+            else
+            {
+                throw new TransformerException(createStaticMessage(
+                        format("Cannot transform String '%s' to boolean. Valid types are: [%s]",
+                               value, Joiner.on(", ").join(MAPPING.keySet()))));
+            }
         }
     }
 
