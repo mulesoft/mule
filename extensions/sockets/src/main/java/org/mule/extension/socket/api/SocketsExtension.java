@@ -33,7 +33,7 @@ import org.mule.runtime.extension.api.annotation.SubTypeMapping;
  *
  * @since 4.0
  */
-@Extension(name = "sockets")
+@Extension(name = "Sockets")
 @Configurations({ListenerConfig.class, RequesterConfig.class})
 @SubTypeMapping(baseType = TcpProtocol.class, subTypes = {SafeProtocol.class, DirectProtocol.class, LengthProtocol.class,
         StreamingProtocol.class, XmlMessageProtocol.class, XmlMessageEOFProtocol.class, CustomProtocol.class, EOFProtocol.class})
@@ -42,4 +42,6 @@ import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 public class SocketsExtension
 {
 
+    public static final String TLS_CONFIGURATION = "TLS Configuration";
+    public static final String TLS = "TLS";
 }

@@ -205,7 +205,6 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
         }
     }
 
-
     private void listen()
     {
 
@@ -244,5 +243,4 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
             }
         }
     }
-
 }

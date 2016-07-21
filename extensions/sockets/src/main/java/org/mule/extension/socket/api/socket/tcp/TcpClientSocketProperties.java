@@ -9,6 +9,7 @@ package org.mule.extension.socket.api.socket.tcp;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 /**
  * Default immutable implementation of the {@code TcpClientSocketProperties} interface.
@@ -25,6 +26,7 @@ public class TcpClientSocketProperties extends AbstractTcpSocketProperties
      */
     @Parameter
     @Optional(defaultValue = "30000")
+    @Placement(group = TIMEOUT_CONFIGURATION)
     private int connectionTimeout = 30000;
 
     /**

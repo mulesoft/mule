@@ -9,6 +9,8 @@ package org.mule.extension.socket.api.socket.tcp;
 import org.mule.extension.socket.api.socket.AbstractSocketProperties;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.net.Socket;
 
@@ -28,6 +30,8 @@ public abstract class AbstractTcpSocketProperties extends AbstractSocketProperti
      */
     @Parameter
     @Optional(defaultValue = "true")
+    @Summary("Indicates whether the transmitted data should not be collected together for greater efficiency, and sent immediately")
+    @DisplayName("Send TCP With No Delay")
     protected boolean sendTcpNoDelay = true;
 
 
@@ -37,6 +41,8 @@ public abstract class AbstractTcpSocketProperties extends AbstractSocketProperti
      */
     @Parameter
     @Optional
+    @Summary("This indicates for how long, in milliseconds, the socket will take to close so any remaining data is" +
+             "transmitted correctly")
     protected Integer linger;
 
     /**
@@ -47,8 +53,10 @@ public abstract class AbstractTcpSocketProperties extends AbstractSocketProperti
      * server are kept alive before they are recycled.
      */
     @Parameter
-    @Optional
-    protected Boolean keepAlive;
+    @Optional(defaultValue = "false")
+    @Summary("Indicates whether the open socket connections unused for a long period and with an unavailable connection " +
+             "should be closed")
+    protected boolean keepAlive = false;
 
 
     /**
@@ -57,6 +65,7 @@ public abstract class AbstractTcpSocketProperties extends AbstractSocketProperti
      */
     @Parameter
     @Optional(defaultValue = "true")
+    @Summary("Whether the socket should fail during its creation if the host set on the endpoint cannot be resolved")
     protected boolean failOnUnresolvedHost = true;
 
     /**

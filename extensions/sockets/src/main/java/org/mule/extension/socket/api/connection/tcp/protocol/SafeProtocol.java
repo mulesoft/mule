@@ -34,10 +34,16 @@ public class SafeProtocol extends AbstractByteProtocol
     private final TcpProtocol cookieProtocol = new LengthProtocol(COOKIE.length());
     private TcpProtocol delegate;
 
+    /**
+     * Indicates the maximum length of the message
+     */
     @Parameter
     @Optional(defaultValue = "-1")
     private int maxMessageLeght = NO_MAX_LENGTH;
 
+    /**
+     * Indicates if the data to transfer is just the Payload or the entire Mule Message
+     */
     @Parameter
     @Optional(defaultValue = "true")
     private boolean payloadOnly = true;
@@ -52,6 +58,7 @@ public class SafeProtocol extends AbstractByteProtocol
 
     /**
      * Reads the actual data only after assuring that the cookie was preceding the message.
+     *
      * @param inputStream
      * @return {@code null} if the cookie could not be successfully received.
      * @throws IOException

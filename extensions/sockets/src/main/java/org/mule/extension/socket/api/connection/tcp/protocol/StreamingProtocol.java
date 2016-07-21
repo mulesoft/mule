@@ -8,9 +8,11 @@ package org.mule.extension.socket.api.connection.tcp.protocol;
 
 import static org.mule.extension.socket.internal.SocketUtils.getByteArray;
 import static org.mule.runtime.core.util.IOUtils.copyLarge;
+
+import org.mule.extension.socket.api.SocketOperations;
+import org.mule.extension.socket.api.config.RequesterConfig;
 import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
-import org.mule.extension.socket.api.SocketOperations;
 import org.mule.extension.socket.internal.TcpInputStream;
 import org.mule.runtime.api.message.MuleMessage;
 
@@ -20,7 +22,7 @@ import java.io.OutputStream;
 
 /**
  * This protocol is an application level {@link TcpProtocol} that wraps an {@link InputStream} and does not consume it.
- * This allows the {@link SocketOperations#send(RequesterConnection, Object, String, String, MuleMessage)} to return
+ * This allows the {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, MuleMessage)} to return
  * a {@link MuleMessage} with the original {@link InputStream} as payload.
  *
  * @since 4.0
