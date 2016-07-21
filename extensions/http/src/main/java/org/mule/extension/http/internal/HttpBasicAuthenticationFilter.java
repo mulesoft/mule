@@ -12,6 +12,7 @@ import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -40,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
 {
+
     protected static final Log logger = LogFactory.getLog(HttpBasicAuthenticationFilter.class);
 
     private String realm;
@@ -52,7 +54,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter
      * Creates a filter based on the HTTP listener error response builder status code and headers configuration.
      *
      * @param statusCodeFlowVar The flow variable name used to set the HTTP response status code.
-     * @param headersFlowVar The flow variable name used to set the HTTP response headers.
+     * @param headersFlowVar    The flow variable name used to set the HTTP response headers.
      */
     public HttpBasicAuthenticationFilter(String statusCodeFlowVar, String headersFlowVar)
     {

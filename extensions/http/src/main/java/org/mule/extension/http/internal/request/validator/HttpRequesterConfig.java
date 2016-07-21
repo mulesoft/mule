@@ -6,8 +6,13 @@
  */
 package org.mule.extension.http.internal.request.validator;
 
+import static org.mule.extension.http.internal.HttpConnector.API_CONFIGURATION;
+import static org.mule.extension.http.internal.HttpConnector.AUTHENTICATION;
+import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.RamlApiConfiguration;
@@ -25,6 +30,8 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.connector.Providers;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.net.CookieManager;
 import java.util.function.Function;
@@ -41,9 +48,12 @@ import javax.inject.Inject;
 @Operations({HttpRequestOperations.class})
 public class HttpRequesterConfig implements Initialisable, Stoppable
 {
+
     //TODO: document
     @Parameter
     @Optional
+    @Summary("Authentication method to use for the HTTP request")
+    @Placement(tab = AUTHENTICATION)
     private HttpAuthentication authentication;
 
     /**
@@ -51,6 +61,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
      */
     @Parameter
     @Optional(defaultValue = "/")
+    @Placement(group = URL_CONFIGURATION, order = 1)
     private Function<MuleEvent, String> basePath;
 
     /**
@@ -58,6 +69,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
      */
     @Parameter
     @Optional(defaultValue = "true")
+    @Placement(group = OTHER_SETTINGS)
     private Function<MuleEvent, Boolean> followRedirects;
 
     /**
@@ -67,6 +79,8 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
      */
     @Parameter
     @Optional(defaultValue = "true")
+    @Placement(group = OTHER_SETTINGS)
+    @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
     private Function<MuleEvent, Boolean> parseResponse;
 
     /**
@@ -77,6 +91,9 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
      */
     @Parameter
     @Optional(defaultValue = "AUTO")
+    @Placement(group = OTHER_SETTINGS)
+    @Summary("Defines if the request should be sent using streaming or not. If this attribute is not present, " +
+             "the behavior will depend on the type of the payload (it will stream only for InputStream).")
     private Function<MuleEvent, HttpStreamingType> requestStreamingMode;
 
     /**
@@ -85,6 +102,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
      */
     @Parameter
     @Optional(defaultValue = "AUTO")
+    @Placement(group = OTHER_SETTINGS)
     private Function<MuleEvent, HttpSendBodyMode> sendBodyMode;
 
     /**
@@ -93,6 +111,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
      */
     @Parameter
     @Optional
+    @Placement(group = OTHER_SETTINGS)
     private Function<MuleEvent, Integer> responseTimeout;
 
     /**
@@ -101,6 +120,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
     @Parameter
     @Optional(defaultValue = "true")
     @Expression(NOT_SUPPORTED)
+    @Placement(group = OTHER_SETTINGS)
     private boolean enableCookies;
 
     /**
@@ -109,6 +129,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable
     @Parameter
     @Optional
     @Expression(NOT_SUPPORTED)
+    @Placement(group = API_CONFIGURATION)
     private RamlApiConfiguration apiConfiguration;
 
     @Inject

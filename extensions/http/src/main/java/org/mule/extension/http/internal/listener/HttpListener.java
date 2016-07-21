@@ -6,7 +6,9 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
@@ -35,6 +37,8 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -77,8 +81,11 @@ import org.slf4j.LoggerFactory;
 @MetadataScope(keysResolver = HttpMetadataResolver.class, outputResolver = HttpMetadataResolver.class)
 public class HttpListener extends Source<Object, HttpRequestAttributes> implements Initialisable, Disposable
 {
+
     private static final Logger logger = LoggerFactory.getLogger(HttpListener.class);
     private static final String SERVER_PROBLEM = "Server encountered a problem";
+    private static final String ERROR_RESPONSE_SETTINGS = "Error Response Settings";
+    private static final String RESPONSE_SETTINGS = "Response Settings";
 
     @UseConfig
     private HttpListenerConfig config;
@@ -86,6 +93,9 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
     @Connection
     private Server server;
 
+    /**
+     * Relative path from the path set in the HTTP Listener configuration
+     */
     @Parameter
     private String path;
 
@@ -104,6 +114,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
      */
     @Parameter
     @Optional(defaultValue = "AUTO")
+    @Placement(tab = ADVANCED, group = OTHER_SETTINGS)
     private HttpStreamingType responseStreamingMode;
 
     /**
@@ -113,14 +124,19 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
      */
     @Parameter
     @Optional
+    @Placement(tab = ADVANCED, group = OTHER_SETTINGS)
     private Boolean parseRequest;
 
     @Parameter
     @Optional
+    @DisplayName(RESPONSE_SETTINGS)
+    @Placement(group = RESPONSE_SETTINGS)
     private HttpListenerResponseBuilder responseBuilder;
 
     @Parameter
     @Optional
+    @DisplayName(ERROR_RESPONSE_SETTINGS)
+    @Placement(group = ERROR_RESPONSE_SETTINGS)
     private HttpListenerResponseBuilder errorResponseBuilder;
 
     private MethodRequestMatcher methodRequestMatcher = AcceptsAllMethodsRequestMatcher.instance();
@@ -236,7 +252,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                             }
                             catch (MessagingException e)
                             {
-                                    response = new DefaultHttpResponse(new ResponseStatus(500, "Server error"), new MultiValueMap(), new EmptyHttpEntity());
+                                response = new DefaultHttpResponse(new ResponseStatus(500, "Server error"), new MultiValueMap(), new EmptyHttpEntity());
                             }
                             responseCallback.responseReady(response, getResponseFailureCallback(responseCallback));
                         }
@@ -377,7 +393,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
         }
     }
 
-    private Map<String,String> getThrottlingHeaders()
+    private Map<String, String> getThrottlingHeaders()
     {
         return httpThrottlingHeadersMapBuilder.build();
     }

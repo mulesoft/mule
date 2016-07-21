@@ -7,6 +7,10 @@
 package org.mule.extension.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
+import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnector.URL_OVERRIDE_CONFIGURATION;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -26,6 +30,8 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -46,33 +52,34 @@ public class HttpRequestOperations
     /**
      * Consumes an HTTP service.
      *
-     * @param path Path where the request will be sent.
-     * @param method The HTTP method for the request.
-     * @param host Host where the requests will be sent.
-     * @param port Port where the requests will be sent.
-     * @param source The expression used to obtain the body that will be sent in the request. Default is empty, so the payload will be used as the body.
-     * @param followRedirects Specifies whether to follow redirects or not.
-     * @param parseResponse Defines if the HTTP response should be parsed or it's raw contents should be propagated instead.
+     * @param path                 Path where the request will be sent.
+     * @param method               The HTTP method for the request.
+     * @param host                 Host where the requests will be sent.
+     * @param port                 Port where the requests will be sent.
+     * @param source               The expression used to obtain the body that will be sent in the request. Default is empty, so the payload will be used as the body.
+     * @param followRedirects      Specifies whether to follow redirects or not.
+     * @param parseResponse        Defines if the HTTP response should be parsed or it's raw contents should be propagated instead.
      * @param requestStreamingMode Defines if the request should be sent using streaming or not.
-     * @param sendBodyMode Defines if the request should contain a body or not.
-     * @param responseTimeout Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
-     * @param responseValidator Configures error handling of the response.
-     * @param config the {@link HttpConnector} configuration for this operation. All parameters not configured will be taken from it.
-     * @param muleEvent the current {@link MuleEvent}
+     * @param sendBodyMode         Defines if the request should contain a body or not.
+     * @param responseTimeout      Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
+     * @param responseValidator    Configures error handling of the response.
+     * @param config               the {@link HttpConnector} configuration for this operation. All parameters not configured will be taken from it.
+     * @param muleEvent            the current {@link MuleEvent}
      * @return an {@link OperationResult} with {@link HttpResponseAttributes}
      */
+    @Summary("Executes a HTTP Request")
     @MetadataScope(keysResolver = HttpMetadataResolver.class, outputResolver = HttpMetadataResolver.class)
     public OperationResult<Object, HttpResponseAttributes> request(String path,
                                                                    @Optional(defaultValue = "GET") String method,
-                                                                   @Optional String host,
-                                                                   @Optional Integer port,
+                                                                   @Optional @Placement(tab = ADVANCED, group = URL_OVERRIDE_CONFIGURATION, order = 1) String host,
+                                                                   @Optional @Placement(tab = ADVANCED, group = URL_OVERRIDE_CONFIGURATION, order = 2) Integer port,
                                                                    @Optional String source,
-                                                                   @Optional Boolean followRedirects,
-                                                                   @Optional Boolean parseResponse,
-                                                                   @Optional HttpStreamingType requestStreamingMode,
-                                                                   @Optional HttpSendBodyMode sendBodyMode,
-                                                                   @Optional Integer responseTimeout,
-                                                                   @Optional ResponseValidator responseValidator,
+                                                                   @Optional @Placement(tab = ADVANCED, group = OTHER_SETTINGS) Boolean followRedirects,
+                                                                   @Optional @Placement(tab = ADVANCED, group = OTHER_SETTINGS) Boolean parseResponse,
+                                                                   @Optional @Placement(tab = ADVANCED, group = OTHER_SETTINGS) HttpStreamingType requestStreamingMode,
+                                                                   @Optional @Placement(tab = ADVANCED, group = OTHER_SETTINGS) HttpSendBodyMode sendBodyMode,
+                                                                   @Optional @Placement(tab = ADVANCED, group = OTHER_SETTINGS) Integer responseTimeout,
+                                                                   @Optional @Placement(tab = ADVANCED, group = "Status Code Settings") ResponseValidator responseValidator,
                                                                    @Optional HttpRequesterRequestBuilder requestBuilder,
                                                                    @MetadataKeyId String key,
                                                                    @Connection HttpClient client,

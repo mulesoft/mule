@@ -6,8 +6,6 @@
  */
 package org.mule.extension.http.internal;
 
-import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.http.api.request.authentication.BasicAuthentication;
 import org.mule.extension.http.api.request.authentication.DigestAuthentication;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
@@ -19,6 +17,8 @@ import org.mule.extension.http.api.request.validator.FailureStatusCodeValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.api.server.HttpListenerConnectionManager;
+import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
@@ -38,7 +38,7 @@ import org.mule.runtime.extension.api.annotation.capability.Xml;
  *
  * @since 4.0
  */
-@Extension(name = "Http Connector", description = "Connector to handle and perform HTTP requests")
+@Extension(name = "HTTP", description = "Connector to handle and perform HTTP requests")
 @Configurations({HttpListenerConfig.class, HttpRequesterConfig.class})
 @Operations(HttpOperations.class)
 @SubTypeMapping(baseType = HttpAuthentication.class, subTypes = {BasicAuthentication.class, DigestAuthentication.class, NtlmAuthentication.class})
@@ -51,4 +51,11 @@ import org.mule.runtime.extension.api.annotation.capability.Xml;
 public class HttpConnector
 {
 
+    public static final String URL_CONFIGURATION = "URL Configuration";
+    public static final String URL_OVERRIDE_CONFIGURATION = "URL Override Configuration";
+    public static final String API_CONFIGURATION = "API Configuration";
+    public static final String TLS_CONFIGURATION = "TLS Configuration";
+    public static final String OTHER_SETTINGS = "Other Settings";
+    public static final String AUTHENTICATION = "Authentication";
+    public static final String TLS = "TLS";
 }
