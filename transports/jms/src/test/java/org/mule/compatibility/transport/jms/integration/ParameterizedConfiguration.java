@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.jms.integration;
 
-import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.api.meta.NamedObject;
 
 import java.util.Map;
 

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.execution;
 
-import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.api.meta.AnnotatedObject;
 
 import java.util.Map;
 

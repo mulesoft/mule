@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.counters;
 
-import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.api.meta.NamedObject;
 
 /**
  * This interface is the interface implemented for all counter types. A Counter can

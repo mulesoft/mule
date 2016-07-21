@@ -9,7 +9,7 @@ package org.mule.tck.testmodels.mule;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.transformer;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;

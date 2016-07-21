@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.construct;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.processor.MessageProcessor;

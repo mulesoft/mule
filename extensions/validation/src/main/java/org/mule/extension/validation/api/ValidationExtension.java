@@ -16,7 +16,7 @@ import org.mule.extension.validation.internal.ValidationStrategies;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;

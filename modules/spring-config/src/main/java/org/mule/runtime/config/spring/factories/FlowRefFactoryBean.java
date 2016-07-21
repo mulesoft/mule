@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.factories;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;

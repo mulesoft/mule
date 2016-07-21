@@ -8,7 +8,7 @@
 package org.mule.runtime.module.db.internal.domain.database;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.module.db.internal.domain.connection.ConnectionCreationException;
 import org.mule.runtime.module.db.internal.domain.connection.ConnectionFactory;

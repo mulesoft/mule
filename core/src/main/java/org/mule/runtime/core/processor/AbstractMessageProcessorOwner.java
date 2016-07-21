@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;

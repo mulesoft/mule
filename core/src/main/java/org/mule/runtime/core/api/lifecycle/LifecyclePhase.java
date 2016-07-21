@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.lifecycle.LifecycleObject;
 
 import java.util.Set;

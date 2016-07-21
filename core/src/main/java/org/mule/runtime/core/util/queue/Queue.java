@@ -8,7 +8,7 @@
 package org.mule.runtime.core.util.queue;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 
 import java.io.Serializable;

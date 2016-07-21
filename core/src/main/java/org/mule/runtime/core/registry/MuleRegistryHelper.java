@@ -10,10 +10,9 @@ import static org.mule.runtime.core.api.registry.TransformerResolver.RegistryAct
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -630,8 +629,8 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider
     }
 
     /**
-     * Returns the name for the object passed in.  If the object implements {@link org.mule.runtime.core.api.NameableObject}, then
-     * {@link org.mule.runtime.core.api.NameableObject#getName()} will be returned, otherwise a name is generated using the class name
+     * Returns the name for the object passed in.  If the object implements {@link NameableObject}, then
+     * {@link NameableObject#getName()} will be returned, otherwise a name is generated using the class name
      * and a generated UUID.
      *
      * @param obj the object to inspect
