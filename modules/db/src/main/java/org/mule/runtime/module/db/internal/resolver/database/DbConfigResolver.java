@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.db.internal.resolver.database;
 
-import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.common.Testable;
 import org.mule.common.metadata.ConnectorMetaDataEnabled;

@@ -7,7 +7,7 @@
 
 package org.mule.runtime.config.spring.factories;
 
-import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.api.meta.AnnotatedObject;
 
 import java.util.Collections;
 import java.util.Map;

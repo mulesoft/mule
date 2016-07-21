@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.agent;
 
-import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
 /**

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.transport;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;

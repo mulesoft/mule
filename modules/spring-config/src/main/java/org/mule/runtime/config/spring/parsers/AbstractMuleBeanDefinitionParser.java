@@ -16,7 +16,7 @@ import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssemblerFacto
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Disposable;

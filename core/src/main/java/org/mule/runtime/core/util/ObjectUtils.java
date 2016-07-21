@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
-import org.mule.runtime.core.api.NameableObject;
+import org.mule.runtime.api.meta.NameableObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -15,7 +15,7 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.SinglePrope
 import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
-import org.mule.runtime.core.api.AnnotatedObject;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.MapCombiner;

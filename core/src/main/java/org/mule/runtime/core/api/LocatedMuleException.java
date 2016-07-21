@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.util.ObjectUtils;

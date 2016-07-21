@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.endpoint;
 
-import org.mule.runtime.core.api.NamedObject;
+import org.mule.runtime.api.meta.NamedObject;
 
 import java.io.Serializable;
 
