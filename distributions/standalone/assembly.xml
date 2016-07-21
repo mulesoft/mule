@@ -76,8 +76,8 @@
         </fileSet>
 
         <fileSet>
-            <directory>${project.build.directory}/app-plugins</directory>
-            <outputDirectory>app-plugins</outputDirectory>
+            <directory>${project.build.directory}/plugins</directory>
+            <outputDirectory>plugins</outputDirectory>
         </fileSet>
     </fileSets>
 
@@ -228,7 +228,7 @@
                 <exclude>org.mule.modules:mule-module-xml</exclude>
                 <exclude>org.mule.transports:mule-transport-sockets</exclude>
 
-                <!-- lib/app-plugins (these artifacts are zip type) -->
+                <!-- lib/plugins (these artifacts are zip type) -->
                 <exclude>*:zip:*</exclude>
 
                 <!-- mule-tests-functional dependencies -->

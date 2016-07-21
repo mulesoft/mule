@@ -8,6 +8,7 @@ package org.mule.runtime.module.launcher.application;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.module.launcher.ApplicationClassLoaderBuilderFactory;
@@ -20,12 +21,15 @@ import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainRepository;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Creates default mule applications
@@ -36,16 +40,19 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application>
     private final ApplicationDescriptorFactory applicationDescriptorFactory;
     private final DomainRepository domainRepository;
     private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory;
+    private final ArtifactPluginRepository artifactPluginRepository;
     protected DeploymentListener deploymentListener;
 
-    public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory, ApplicationDescriptorFactory applicationDescriptorFactory, DomainRepository domainRepository)
+    public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory, ApplicationDescriptorFactory applicationDescriptorFactory, ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository)
     {
         checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
         checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
+        checkArgument(artifactPluginRepository != null, "Artifact plugin repository cannot be null");
         checkArgument(domainRepository != null, "Domain repository cannot be null");
 
         this.applicationClassLoaderBuilderFactory = applicationClassLoaderBuilderFactory;
         this.applicationDescriptorFactory = applicationDescriptorFactory;
+        this.artifactPluginRepository = artifactPluginRepository;
         this.domainRepository = domainRepository;
     }
 
@@ -90,7 +97,10 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application>
                 .setArtifactDescriptor(descriptor)
                 .build();
 
-        List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(applicationClassLoader, descriptor.getPlugins());
+        List<ArtifactPluginDescriptor> applicationPluginDescriptors = concat(artifactPluginRepository.getContainerArtifactPluginDescriptors().stream(), descriptor.getPlugins().stream())
+                .collect(toList());
+
+        List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(applicationClassLoader, applicationPluginDescriptors);
 
         DefaultMuleApplication delegate = new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository);
 
@@ -102,7 +112,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application>
         return new ApplicationWrapper(delegate);
     }
 
-    private List<ArtifactPlugin> createArtifactPluginList(MuleApplicationClassLoader applicationClassLoader, Set<ArtifactPluginDescriptor> plugins)
+    private List<ArtifactPlugin> createArtifactPluginList(MuleApplicationClassLoader applicationClassLoader, List<ArtifactPluginDescriptor> plugins)
     {
         return plugins.stream().map(artifactPluginDescriptor ->
                                             new DefaultArtifactPlugin(artifactPluginDescriptor,

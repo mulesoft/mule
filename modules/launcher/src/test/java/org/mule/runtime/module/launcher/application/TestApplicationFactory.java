@@ -31,9 +31,9 @@ public class TestApplicationFactory extends DefaultApplicationFactory
     private boolean failOnStopApplication;
     private boolean failOnDisposeApplication;
 
-    public TestApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory, ApplicationDescriptorFactory applicationDescriptorFactory, DomainRepository domainRepository)
+    public TestApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory, ApplicationDescriptorFactory applicationDescriptorFactory, ArtifactPluginRepository artifactPluginRepository, DomainRepository domainRepository)
     {
-        super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainRepository);
+        super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, artifactPluginRepository, domainRepository);
     }
 
     public static TestApplicationFactory createTestApplicationFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory, DomainManager domainManager)
@@ -46,7 +46,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory
         ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory = new ArtifactPluginClassLoaderFactory();
         DefaultArtifactPluginFactory applicationPluginFactory = new DefaultArtifactPluginFactory(artifactPluginClassLoaderFactory);
         ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository, applicationPluginFactory, artifactPluginDescriptorLoader);
-        return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainManager);
+        return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, applicationPluginRepository, domainManager);
     }
 
     @Override

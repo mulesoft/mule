@@ -34,6 +34,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,13 +48,14 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
 
     private static final String DOMAIN_NAME = "test-domain";
     private static final String APP_NAME = "test-app";
+    private static final String FAKE_ARTIFACT_PLUGIN = "fake-artifact-plugin";
 
     private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory = mock(ApplicationClassLoaderBuilderFactory.class);
     private final DomainRepository domainRepository = mock(DomainRepository.class);
     private final ArtifactPluginRepository applicationPluginRepository = mock(ArtifactPluginRepository.class);
     private final ApplicationDescriptorFactory applicationDescriptorFactory = mock(ApplicationDescriptorFactory.class);
     private final ArtifactPluginFactory artifactPluginFactory = mock(ArtifactPluginFactory.class);
-    private final DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainRepository);
+    private final DefaultApplicationFactory applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, applicationPluginRepository, domainRepository);
 
     @Rule
     public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
@@ -78,8 +80,10 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
         final ArtifactPlugin appPlugin = mock(ArtifactPlugin.class);
         final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
         when(appPlugin.getArtifactClassLoader()).thenReturn(artifactClassLoader);
+        when(artifactClassLoader.getArtifactName()).thenReturn(FAKE_ARTIFACT_PLUGIN);
         final ArtifactClassLoaderFilter classLoaderFilter = mock(ArtifactClassLoaderFilter.class);
         when(coreArtifactPluginDescriptor.getClassLoaderFilter()).thenReturn(classLoaderFilter);
+        when(coreArtifactPluginDescriptor.getName()).thenReturn(FAKE_ARTIFACT_PLUGIN);
         when(appPlugin.getDescriptor()).thenReturn(coreArtifactPluginDescriptor);
         when(artifactPluginFactory.create(same(coreArtifactPluginDescriptor), any())).thenReturn(appPlugin);
 
@@ -98,6 +102,10 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase
         when(applicationClassLoaderBuilderMock.addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]))).thenReturn(applicationClassLoaderBuilderMock);
         when(applicationClassLoaderBuilderMock.build()).thenReturn(applicationArtifactClassLoader);
         when(applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(applicationClassLoaderBuilderMock);
+
+        List<ArtifactClassLoader> pluginClassLoaders = new ArrayList<>();
+        pluginClassLoaders.add(artifactClassLoader);
+        when(applicationArtifactClassLoader.getArtifactPluginClassLoaders()).thenReturn(pluginClassLoaders);
 
         final Application application = applicationFactory.createArtifact(APP_NAME);
 
