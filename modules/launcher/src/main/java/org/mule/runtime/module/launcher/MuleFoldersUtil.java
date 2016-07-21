@@ -25,7 +25,7 @@ public class MuleFoldersUtil
     public static final String CLASSES_FOLDER = "classes";
     public static final String PER_APP_LIB_FOLDER = "per-app";
     public static final String DOMAINS_FOLDER = "domains";
-    public static final String CONTAINER_APP_PLUGINS = "app-plugins";
+    public static final String CONTAINER_APP_PLUGINS = "plugins";
     public static final String USER_FOLDER = "user";
 
     private MuleFoldersUtil()

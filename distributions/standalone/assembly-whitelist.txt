@@ -161,13 +161,13 @@
 #
 # /app-plugins
 #
-/mule-standalone-${productVersion}/app-plugins
-/mule-standalone-${productVersion}/app-plugins/mule-module-email-${productVersion}.zip
-/mule-standalone-${productVersion}/app-plugins/mule-module-file-${productVersion}.zip
-/mule-standalone-${productVersion}/app-plugins/mule-module-ftp-${productVersion}.zip
-/mule-standalone-${productVersion}/app-plugins/mule-module-sockets-${productVersion}.zip
-/mule-standalone-${productVersion}/app-plugins/mule-module-validation-${productVersion}.zip
-/mule-standalone-${productVersion}/app-plugins/mule-module-http-ext-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins
+/mule-standalone-${productVersion}/plugins/mule-module-email-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-module-file-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-module-ftp-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-module-sockets-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-module-validation-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-module-http-ext-${productVersion}.zip
 
 #
 # /lib/opt

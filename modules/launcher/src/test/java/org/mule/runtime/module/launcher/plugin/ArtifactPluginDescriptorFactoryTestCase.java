@@ -15,8 +15,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory.PLUGIN_PROPERTIES;
-import static org.mule.runtime.module.launcher.plugin.ApplicationPluginDescriptorFactory.PROPERTY_LOADER_OVERRIDE;
+import static org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory.PLUGIN_PROPERTIES;
+import static org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory.PROPERTY_LOADER_OVERRIDE;
 import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
@@ -36,7 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTestCase
+public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCase
 {
 
     public static final String PLUGIN_NAME = "testPlugin";
@@ -45,7 +45,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
     public TemporaryFolder pluginsFolder = new TemporaryFolder();
 
     private final ArtifactClassLoaderFilterFactory classLoaderFilterFactory = mock(ArtifactClassLoaderFilterFactory.class);
-    private ApplicationPluginDescriptorFactory descriptorFactory = new ApplicationPluginDescriptorFactory(classLoaderFilterFactory);
+    private ArtifactPluginDescriptorFactory descriptorFactory = new ArtifactPluginDescriptorFactory(classLoaderFilterFactory);
 
     @Before
     public void setUp() throws Exception
@@ -58,7 +58,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
     {
         final File pluginFolder = createPluginFolder();
 
-        final ApplicationPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+        final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
 
         new PluginDescriptorChecker(pluginFolder).assertPluginDescriptor(pluginDescriptor);
     }
@@ -74,7 +74,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
         final ArtifactClassLoaderFilter classLoaderFilter = mock(ArtifactClassLoaderFilter.class);
         when(classLoaderFilterFactory.create(exportedClassPackages, null)).thenReturn(classLoaderFilter);
 
-        final ApplicationPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+        final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
 
         new PluginDescriptorChecker(pluginFolder).limitingAccessWith(classLoaderFilter).assertPluginDescriptor(pluginDescriptor);
     }
@@ -90,7 +90,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
         final ArtifactClassLoaderFilter classLoaderFilter = mock(ArtifactClassLoaderFilter.class);
         when(classLoaderFilterFactory.create(null, exportedResourcePackages)).thenReturn(classLoaderFilter);
 
-        final ApplicationPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+        final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
 
         new PluginDescriptorChecker(pluginFolder).limitingAccessWith(classLoaderFilter).assertPluginDescriptor(pluginDescriptor);
     }
@@ -107,7 +107,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
         final File jar2 = createDummyJarFile(pluginLibFolder, "lib2.jar");
         final URL[] libraries = new URL[] {jar1.toURI().toURL(), jar2.toURI().toURL()};
 
-        final ApplicationPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+        final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
 
         new PluginDescriptorChecker(pluginFolder).containing(libraries).assertPluginDescriptor(pluginDescriptor);
     }
@@ -158,7 +158,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
             return this;
         }
 
-        public void assertPluginDescriptor(ApplicationPluginDescriptor pluginDescriptor)
+        public void assertPluginDescriptor(ArtifactPluginDescriptor pluginDescriptor)
         {
             assertThat(pluginDescriptor.getName(), equalTo(pluginFolder.getName()));
             try
@@ -175,7 +175,7 @@ public class ApplicationPluginDescriptorFactoryTestCase extends AbstractMuleTest
             assertThat(pluginDescriptor.getClassLoaderFilter(), is(classLoaderFilter));
         }
 
-        private void assertRuntimeLibs(ApplicationPluginDescriptor pluginDescriptor)
+        private void assertRuntimeLibs(ArtifactPluginDescriptor pluginDescriptor)
         {
             assertThat(pluginDescriptor.getRuntimeLibs().length, equalTo(runtimeLibs.length));
             for (URL libUrl : pluginDescriptor.getRuntimeLibs())

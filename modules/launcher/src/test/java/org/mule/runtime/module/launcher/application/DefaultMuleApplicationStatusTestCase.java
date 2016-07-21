@@ -15,10 +15,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.launcher.MuleApplicationClassLoader;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
+
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -37,8 +40,8 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     @Override
     protected void doSetUp() throws Exception
     {
-        ArtifactClassLoader parentArtifactClassLoader = mock(ArtifactClassLoader.class);
-        application = new DefaultMuleApplication(null, parentArtifactClassLoader, null, null);
+        MuleApplicationClassLoader parentArtifactClassLoader = mock(MuleApplicationClassLoader.class);
+        application = new DefaultMuleApplication(null, parentArtifactClassLoader, Collections.emptyList(), null);
         application.setMuleContext(muleContext);
     }
 
@@ -85,7 +88,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
         ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
         when(descriptor.getAbsoluteResourcePaths()).thenReturn(new String[] {});
 
-        DefaultMuleApplication application = new DefaultMuleApplication(descriptor, mock(ArtifactClassLoader.class), null, null);
+        DefaultMuleApplication application = new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), Collections.emptyList(), null);
         application.install();
         assertThat(application.deploymentClassLoader, is(notNullValue()));
         application.dispose();

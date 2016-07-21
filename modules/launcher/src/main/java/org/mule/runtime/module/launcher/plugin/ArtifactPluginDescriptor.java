@@ -11,7 +11,7 @@ import org.mule.runtime.module.launcher.descriptor.DeployableArtifactDescriptor;
 
 import java.net.URL;
 
-public class ApplicationPluginDescriptor extends DeployableArtifactDescriptor
+public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor
 {
     public static final String PLUGIN_PROPERTIES = "plugin.properties";
 
