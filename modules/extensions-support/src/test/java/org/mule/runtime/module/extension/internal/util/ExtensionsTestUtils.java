@@ -160,7 +160,7 @@ public abstract class ExtensionsTestUtils
         XMLUnit.setNormalizeWhitespace(true);
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreComments(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
+        XMLUnit.setIgnoreAttributeOrder(false);
 
         Diff diff = XMLUnit.compareXML(expected, actual);
         if (!(diff.similar() && diff.identical()))
