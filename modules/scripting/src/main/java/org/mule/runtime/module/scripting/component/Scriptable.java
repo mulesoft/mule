@@ -257,6 +257,7 @@ public class Scriptable implements Initialisable, MuleContextAware
 
         populateVariablesInOrder(bindings, event);
 
+        // TODO MULE-10121 Provide a MessageBuilder API in scripting components to improve usability
         bindings.put(BINDING_MESSAGE, event.getMessage());
         // This will get overwritten if populateBindings(Bindings bindings, MuleEvent event) is called
         // and not this method directly.
