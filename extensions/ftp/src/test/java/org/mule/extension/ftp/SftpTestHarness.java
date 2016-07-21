@@ -245,4 +245,13 @@ public class SftpTestHarness extends AbstractFtpTestHarness
 
         assertThat(dirExists(directoryPath.toString()), is(false));
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Class getAttributesType()
+    {
+        return SftpFileAttributes.class;
+    }
 }

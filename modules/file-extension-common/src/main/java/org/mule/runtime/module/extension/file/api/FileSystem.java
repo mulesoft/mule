@@ -265,4 +265,12 @@ public interface FileSystem
      * @param config the config which is parameterizing this operation
      */
     void changeToBaseDir(FileConnectorConfig config);
+
+    /**
+     * The concrete class that represents the attributes related to the {@link FileSystem} implementation.
+     * <p>
+     * This method is called when handling the dynamic resolution for the output attributes metadata of an operation.
+     */
+    Class<? extends FileAttributes> getAttributesType();
+
 }

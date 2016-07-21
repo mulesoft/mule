@@ -110,4 +110,9 @@ public interface FtpTestHarness extends TestRule
      * @param path the path to test
      */
     void assertDeleted(String path) throws Exception;
+
+    /**
+     * @return the Class of the attributes that works with the specified file system.
+     */
+    Class getAttributesType();
 }

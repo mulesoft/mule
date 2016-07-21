@@ -140,4 +140,14 @@ public final class LocalFileSystem extends AbstractFileSystem
     public void changeToBaseDir(FileConnectorConfig config)
     {
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Class<? extends FileAttributes> getAttributesType()
+    {
+        return LocalFileAttributes.class;
+    }
+
 }
