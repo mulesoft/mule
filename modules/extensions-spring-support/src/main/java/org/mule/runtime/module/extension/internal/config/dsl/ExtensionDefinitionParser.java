@@ -598,7 +598,7 @@ public abstract class ExtensionDefinitionParser
     {
         AttributeDefinition.Builder definitionBuilder = fromSimpleParameter(name, value -> resolverOf(name, type, value, defaultValue,
                                                                                                       expressionSupport, required,
-                                                                                                      acceptsReferences));
+                                                                                                      acceptsReferences)).withDefaultValue(defaultValue);
         addParameter(key, definitionBuilder);
 
         return definitionBuilder;

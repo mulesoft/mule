@@ -6,19 +6,19 @@
  */
 package org.mule.runtime.core.api;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  */
 public class SingleResourceTransactionFactoryManager
 {
-    private Map<Class,TransactionFactory> transactionFactories = new HashMap<Class, TransactionFactory>();
-    private Map<Class,TransactionFactory> transactionFactoriesCache = new HashMap<Class, TransactionFactory>();
+    private Map<Class,TransactionFactory> transactionFactories = new HashMap<>();
+    private Map<Class,TransactionFactory> transactionFactoriesCache = new HashMap<>();
 
     public void registerTransactionFactory(Class supportedType, TransactionFactory transactionFactory)
     {

@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+
+import java.util.Optional;
 
 /**
  * Adapter interface which expands the contract of {@link OperationContext} which functionality that is
@@ -60,4 +64,13 @@ public interface OperationContextAdapter extends OperationContext
      */
     <T> T removeVariable(String key);
 
+    /**
+     * @return an {@link Optional} {@link TransactionConfig} if the operation is transactional
+     */
+    Optional<TransactionConfig> getTransactionConfig();
+
+    /**
+     * @return The {@link MuleContext} on which the operation is being executed
+     */
+    MuleContext getMuleContext();
 }

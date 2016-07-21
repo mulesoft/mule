@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -68,60 +69,41 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 {
 
     public static final int RETRY_COUNT = 10;
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Mock
-    private OperationContext operationContext;
-
-    @Mock(extraInterfaces = Interceptable.class)
-    private ConfigurationInstance<Object> configurationInstance;
-
-    @Mock
-    private MutableConfigurationStats configurationStats;
-
-    @Mock(extraInterfaces = Interceptable.class)
-    private OperationExecutor operationExecutor;
-
-    @Mock
-    private OperationExecutor operationExceptionExecutor;
-
-    @Mock
-    private Interceptor configurationInterceptor1;
-
-    @Mock
-    private Interceptor configurationInterceptor2;
-
-    @Mock
-    private Interceptor operationInterceptor1;
-
-    @Mock
-    private Interceptor operationInterceptor2;
-
-    @Mock
-    private ExceptionEnricher exceptionEnricher;
-
-    @Mock
-    private RuntimeConfigurationModel configurationModel;
-
-    @Mock
-    private RuntimeExtensionModel extensionModel;
-
-    @Mock
-    private RuntimeOperationModel operationModel;
-
-    @Mock
-    private ConnectionManagerAdapter connectionManagerAdapter;
-
-    private ConnectionException connectionException = new ConnectionException("Connection failure");
-
-    private Exception exception = new Exception();
-
     private static final String DUMMY_NAME = "dummyName";
     private static final String ERROR = "Error";
-
     private final Object result = new Object();
-
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+    @Mock
+    private OperationContextAdapter operationContext;
+    @Mock(extraInterfaces = Interceptable.class)
+    private ConfigurationInstance<Object> configurationInstance;
+    @Mock
+    private MutableConfigurationStats configurationStats;
+    @Mock(extraInterfaces = Interceptable.class)
+    private OperationExecutor operationExecutor;
+    @Mock
+    private OperationExecutor operationExceptionExecutor;
+    @Mock
+    private Interceptor configurationInterceptor1;
+    @Mock
+    private Interceptor configurationInterceptor2;
+    @Mock
+    private Interceptor operationInterceptor1;
+    @Mock
+    private Interceptor operationInterceptor2;
+    @Mock
+    private ExceptionEnricher exceptionEnricher;
+    @Mock
+    private RuntimeConfigurationModel configurationModel;
+    @Mock
+    private RuntimeExtensionModel extensionModel;
+    @Mock
+    private RuntimeOperationModel operationModel;
+    @Mock
+    private ConnectionManagerAdapter connectionManagerAdapter;
+    private ConnectionException connectionException = new ConnectionException("Connection failure");
+    private Exception exception = new Exception();
     private InOrder inOrder;
     private List<Interceptor> orderedInterceptors;
     private ExecutionMediator mediator;
@@ -134,12 +116,13 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
         when(configurationInstance.getModel()).thenReturn(configurationModel);
         when(configurationModel.getExtensionModel()).thenReturn(extensionModel);
         when(extensionModel.getName()).thenReturn(DUMMY_NAME);
-        when(extensionModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
-        when(operationModel.getExceptionEnricherFactory()).thenReturn(Optional.empty());
+        when(extensionModel.getExceptionEnricherFactory()).thenReturn(empty());
+        when(operationModel.getExceptionEnricherFactory()).thenReturn(empty());
         when(operationExecutor.execute(operationContext)).thenReturn(result);
         when(operationExceptionExecutor.execute(operationContext)).thenThrow(exception);
         when(operationContext.getConfiguration()).thenReturn(configurationInstance);
         when(operationContext.getConfiguration().getModel().getExtensionModel().getName()).thenReturn(DUMMY_NAME);
+        when(operationContext.getTransactionConfig()).thenReturn(empty());
 
         mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext));
 
@@ -251,17 +234,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
         new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext)).execute(operationExceptionExecutor, operationContext);
     }
 
-    public class DummyConnectionInterceptor implements Interceptor
-    {
-
-        @Override
-        public Throwable onError(OperationContext operationContext, RetryRequest retryRequest, Throwable exception)
-        {
-            retryRequest.request();
-            return exception;
-        }
-    }
-
     @Test
     public void retry() throws Throwable
     {
@@ -371,6 +343,17 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
         for (Interceptor interceptor : orderedInterceptors)
         {
             consumer.accept(inOrder.verify(interceptor, verificationMode));
+        }
+    }
+
+    public class DummyConnectionInterceptor implements Interceptor
+    {
+
+        @Override
+        public Throwable onError(OperationContext operationContext, RetryRequest retryRequest, Throwable exception)
+        {
+            retryRequest.request();
+            return exception;
         }
     }
 }

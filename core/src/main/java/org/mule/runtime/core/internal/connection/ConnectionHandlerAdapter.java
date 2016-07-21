@@ -17,7 +17,7 @@ import org.mule.runtime.api.connection.ConnectionHandler;
  * @param <T> the generic type of the wrapped connection
  * @since 4.0
  */
-interface ConnectionHandlerAdapter<T> extends ConnectionHandler<T>, Closeable
+public interface ConnectionHandlerAdapter<T> extends ConnectionHandler<T>, Closeable
 {
 
     /**

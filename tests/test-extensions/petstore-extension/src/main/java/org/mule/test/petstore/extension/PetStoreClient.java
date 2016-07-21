@@ -11,10 +11,11 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 
 import java.util.List;
 
-public class PetStoreClient
+public class PetStoreClient implements TransactionalConnection
 {
 
     private String username;
@@ -22,8 +23,9 @@ public class PetStoreClient
     private TlsContextFactory tlsContext;
     private String configName;
     private ThreadingProfile threadingProfile;
-
+    private boolean begun, commited, rolledback = false;
     private int disconnectCount;
+
     public PetStoreClient(String username, String password, TlsContextFactory tlsContextFactory, ThreadingProfile threadingProfile, String configName)
     {
         this.username = username;
@@ -37,6 +39,24 @@ public class PetStoreClient
     {
         checkArgument(ownerName.equals(username), "config doesn't match");
         return config.getPets();
+    }
+
+    @Override
+    public void begin() throws Exception
+    {
+        begun = true;
+    }
+
+    @Override
+    public void commit() throws Exception
+    {
+        commited = true;
+    }
+
+    @Override
+    public void rollback() throws Exception
+    {
+        rolledback = true;
     }
 
     public String getUsername()
@@ -78,5 +98,20 @@ public class PetStoreClient
     public String getConfigName()
     {
         return configName;
+    }
+
+    public boolean isBegun()
+    {
+        return begun;
+    }
+
+    public boolean isCommited()
+    {
+        return commited;
+    }
+
+    public boolean isRolledback()
+    {
+        return rolledback;
     }
 }

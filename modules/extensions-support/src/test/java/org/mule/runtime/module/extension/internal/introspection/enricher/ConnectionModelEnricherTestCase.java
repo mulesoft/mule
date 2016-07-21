@@ -24,8 +24,8 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Extension
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.connector.ConnectionInterceptor;
+import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -66,8 +66,8 @@ public class ConnectionModelEnricherTestCase extends AbstractMuleTestCase
         when(describingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
         when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
         when(extensionDeclaration.getOperations()).thenReturn(asList(connectedOperation, notConnectedOperation));
-        when(connectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(toMetadataType(Object.class))));
-        when(notConnectedOperation.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.empty());
+        when(connectedOperation.getModelProperty(ConnectivityModelProperty.class)).thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Object.class))));
+        when(notConnectedOperation.getModelProperty(ConnectivityModelProperty.class)).thenReturn(Optional.empty());
     }
 
     @Test

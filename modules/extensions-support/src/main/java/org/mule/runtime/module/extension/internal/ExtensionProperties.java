@@ -21,10 +21,6 @@ import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 public class ExtensionProperties
 {
 
-    private ExtensionProperties()
-    {
-    }
-
     /**
      * The key of an operation's variable on which the connection to be used was set
      */
@@ -72,4 +68,18 @@ public class ExtensionProperties
      * The name of a property which points to the {@link ClassLoader} that an extension should use
      */
     public static final String EXTENSION_CLASSLOADER = "extension_classloader";
+
+    /**
+     * The name of the parameter for configuring transactional actions
+     */
+    public static final String TRANSACTIONAL_ACTION_PARAMETER_NAME = "transactionalAction";
+
+    /**
+     * The description of the parameter for configuring transactional actions
+     */
+    public static final String TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION = "The type of joining action that operations can take regarding transactions.";
+
+    private ExtensionProperties()
+    {
+    }
 }

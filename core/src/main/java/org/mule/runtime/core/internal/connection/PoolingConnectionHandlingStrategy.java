@@ -91,7 +91,7 @@ final class PoolingConnectionHandlingStrategy<Connection> extends ConnectionHand
                 throw new ConnectionException(validationResult.getMessage(), validationResult.getException());
             }
 
-            return new PooledConnectionHandler<>(connection, pool, poolingListener);
+            return new PoolingConnectionHandler<>(connection, pool, poolingListener);
         }
         catch (ConnectionException e)
         {
@@ -156,6 +156,11 @@ final class PoolingConnectionHandlingStrategy<Connection> extends ConnectionHand
         return genericPool;
     }
 
+    public PoolingProfile getPoolingProfile()
+    {
+        return poolingProfile;
+    }
+
     private class ObjectFactoryAdapter implements PoolableObjectFactory<Connection>
     {
 
@@ -186,10 +191,5 @@ final class PoolingConnectionHandlingStrategy<Connection> extends ConnectionHand
         public void passivateObject(Connection connection) throws Exception
         {
         }
-    }
-
-    public PoolingProfile getPoolingProfile()
-    {
-        return poolingProfile;
     }
 }

@@ -39,12 +39,12 @@ public class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T>
             transactionConfig = new MuleTransactionConfig();
         }
         final boolean processTransactionOnException = false;
-        ExecutionInterceptor<T> tempExecutionInterceptor = new ExecuteCallbackInterceptor<T>();
-        tempExecutionInterceptor = new BeginAndResolveTransactionInterceptor<T>(tempExecutionInterceptor,transactionConfig,muleContext, processTransactionOnException, false);
-        tempExecutionInterceptor = new ResolvePreviousTransactionInterceptor<T>(tempExecutionInterceptor,transactionConfig);
-        tempExecutionInterceptor = new SuspendXaTransactionInterceptor<T>(tempExecutionInterceptor,transactionConfig,processTransactionOnException);
-        tempExecutionInterceptor = new ValidateTransactionalStateInterceptor<T>(tempExecutionInterceptor,transactionConfig);
-        tempExecutionInterceptor = new IsolateCurrentTransactionInterceptor<T>(tempExecutionInterceptor, transactionConfig);
+        ExecutionInterceptor<T> tempExecutionInterceptor = new ExecuteCallbackInterceptor<>();
+        tempExecutionInterceptor = new BeginAndResolveTransactionInterceptor<>(tempExecutionInterceptor,transactionConfig,muleContext, processTransactionOnException, false);
+        tempExecutionInterceptor = new ResolvePreviousTransactionInterceptor<>(tempExecutionInterceptor,transactionConfig);
+        tempExecutionInterceptor = new SuspendXaTransactionInterceptor<>(tempExecutionInterceptor,transactionConfig,processTransactionOnException);
+        tempExecutionInterceptor = new ValidateTransactionalStateInterceptor<>(tempExecutionInterceptor,transactionConfig);
+        tempExecutionInterceptor = new IsolateCurrentTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig);
         this.executionInterceptor = new ExternalTransactionInterceptor(tempExecutionInterceptor,transactionConfig, muleContext);
     }
 
@@ -56,7 +56,7 @@ public class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T>
      */
     public static <T> TransactionalExecutionTemplate<T> createTransactionalExecutionTemplate(MuleContext muleContext, TransactionConfig transactionConfig)
     {
-        return new TransactionalExecutionTemplate<T>(muleContext, transactionConfig);
+        return new TransactionalExecutionTemplate<>(muleContext, transactionConfig);
     }
 
     @Override

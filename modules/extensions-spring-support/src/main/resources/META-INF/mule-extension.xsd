@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/extension"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns="http://www.mulesoft.org/schema/mule/extension"
             targetNamespace="http://www.mulesoft.org/schema/mule/extension"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -129,5 +129,24 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
+
+    <xsd:simpleType name="operationTransactionalActionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                The type of joining action that operations can take
+                regarding transactions. Possible values are:
+                ALWAYS_JOIN - Always expects a transaction to be in progress when a message is received. If there is no
+                transaction, an exception is thrown.
+                JOIN_IF_POSSIBLE - Join the current transaction if one is available. Otherwise, no transaction is
+                created.
+                NOT_SUPPORTED - Execute outside any existent transaction.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="ALWAYS_JOIN"/>
+            <xsd:enumeration value="JOIN_IF_POSSIBLE"/>
+            <xsd:enumeration value="NOT_SUPPORTED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
 
 </xsd:schema>

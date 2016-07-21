@@ -7,26 +7,28 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
+import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.core.work.SerialWorkManager;
 import org.mule.runtime.extension.api.introspection.Interceptable;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
-import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.RetryRequest;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.RetryRequest;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
-import org.mule.runtime.core.util.ValueHolder;
-import org.mule.runtime.core.work.SerialWorkManager;
 
 import com.google.common.collect.ImmutableList;
 
@@ -66,6 +68,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
     private final ExceptionEnricherManager exceptionEnricherManager;
     private final ConnectionManagerAdapter connectionManager;
+    private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
 
     public DefaultExecutionMediator(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel, ConnectionManagerAdapter connectionManager)
     {
@@ -76,12 +79,12 @@ public final class DefaultExecutionMediator implements ExecutionMediator
     /**
      * Executes the operation per the specification in this classes' javadoc
      *
-     * @param executor a {@link OperationExecutor}
-     * @param context  the {@link OperationContext} for the {@code executor} to use
+     * @param executor an {@link OperationExecutor}
+     * @param context  the {@link OperationContextAdapter} for the {@code executor} to use
      * @return the operation's result
      * @throws Exception if the operation or a {@link Interceptor#before(OperationContext)} invokation fails
      */
-    public Object execute(OperationExecutor executor, OperationContext context) throws Throwable
+    public Object execute(OperationExecutor executor, OperationContextAdapter context) throws Throwable
     {
         final List<Interceptor> interceptors = collectInterceptors(context.getConfiguration(), executor);
         final MutableConfigurationStats mutableStats = getMutableConfigurationStats(context);
@@ -102,13 +105,16 @@ public final class DefaultExecutionMediator implements ExecutionMediator
         }
     }
 
-    private Object executeWithRetryPolicy(OperationExecutor executor, OperationContext context, List<Interceptor> interceptors) throws Throwable
+    private Object executeWithRetryPolicy(OperationExecutor executor, OperationContextAdapter context, List<Interceptor> interceptors) throws Throwable
     {
         RetryPolicyTemplate retryPolicyTemplate = getRetryPolicyTemplate(context.getConfiguration().getConnectionProvider());
 
+        ExecutionTemplate<RetryContext> executionTemplate = getExecutionTemplate(context);
+
         final OperationRetryCallBack connectionRetry = new OperationRetryCallBack(executor, context, interceptors);
+
         //TODO - MULE-9336 - Add support for non blocking retry policies
-        final RetryContext execute = retryPolicyTemplate.execute(connectionRetry, WORK_MANAGER);
+        RetryContext execute = executionTemplate.execute(() -> retryPolicyTemplate.execute(connectionRetry, WORK_MANAGER));
 
         if (execute.isOk())
         {
@@ -121,12 +127,13 @@ public final class DefaultExecutionMediator implements ExecutionMediator
     }
 
     private OperationExecutionResult executeWithInterceptors(OperationExecutor executor,
-                                                             OperationContext context,
+                                                             OperationContextAdapter context,
                                                              List<Interceptor> interceptors,
                                                              ValueHolder<InterceptorsRetryRequest> retryRequestHolder)
     {
         Object result = null;
         Throwable exception = null;
+
 
         InterceptorsExecutionResult beforeExecutionResult = before(context, interceptors);
 
@@ -236,6 +243,13 @@ public final class DefaultExecutionMediator implements ExecutionMediator
         });
     }
 
+    private <T> ExecutionTemplate<T> getExecutionTemplate(OperationContextAdapter context)
+    {
+        return context.getTransactionConfig()
+                .map(txConfig -> (ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(), txConfig))
+                .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
+    }
+
     private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConnectionProvider> optionalConnectionProvider)
     {
         if (optionalConnectionProvider.isPresent())
@@ -275,12 +289,12 @@ public final class DefaultExecutionMediator implements ExecutionMediator
     private class OperationRetryCallBack implements RetryCallback
     {
 
-        private final OperationContext context;
+        private final OperationContextAdapter context;
         private final List<Interceptor> interceptorList;
         private OperationExecutor operationExecutor;
         private OperationExecutionResult operationExecutionResult;
 
-        private OperationRetryCallBack(OperationExecutor operationExecutor, OperationContext context, List<Interceptor> interceptorList)
+        private OperationRetryCallBack(OperationExecutor operationExecutor, OperationContextAdapter context, List<Interceptor> interceptorList)
         {
             this.operationExecutor = operationExecutor;
             this.context = context;
@@ -290,7 +304,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator
         @Override
         public void doWork(RetryContext retryContext) throws Exception
         {
-            operationExecutionResult = executeWithInterceptors(operationExecutor, context, interceptorList, new ValueHolder<>());
+            operationExecutionResult = (OperationExecutionResult) getExecutionTemplate(context).execute(() -> executeWithInterceptors(operationExecutor, context, interceptorList, new ValueHolder<>()));
 
             if (!operationExecutionResult.isOk())
             {

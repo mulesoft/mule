@@ -30,7 +30,7 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase;
 import org.mule.runtime.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase.TestConfig;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -92,8 +92,8 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase
         when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
         when(configurationModel.getExtensionModel().getOperationModels()).thenReturn(asList(operationModel));
         when(configurationModel.getExtensionModel().getSourceModels()).thenReturn(asList(sourceModel));
-        when(operationModel.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(toMetadataType(Banana.class))));
-        when(sourceModel.getModelProperty(ConnectionTypeModelProperty.class)).thenReturn(Optional.of(new ConnectionTypeModelProperty(toMetadataType(Banana.class))));
+        when(operationModel.getModelProperty(ConnectivityModelProperty.class)).thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
+        when(sourceModel.getModelProperty(ConnectivityModelProperty.class)).thenReturn(Optional.of(new ConnectivityModelProperty(toMetadataType(Banana.class))));
 
         resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
         factory = new ConfigurationInstanceFactory<>(configurationModel, resolverSet);

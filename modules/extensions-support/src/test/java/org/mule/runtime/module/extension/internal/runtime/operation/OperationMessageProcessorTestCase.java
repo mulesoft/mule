@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -74,6 +75,7 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -184,6 +186,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(String.class), false, emptySet()));
         when(operationModel.getExecutor()).thenReturn(operationExecutorFactory);
         when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(Optional.of(new MetadataKeyIdModelProperty(ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(String.class))));
+        when(operationModel.getModelProperty(ConnectivityModelProperty.class)).thenReturn(empty());
         when(operationExecutorFactory.createExecutor()).thenReturn(operationExecutor);
 
         when(operationModel.getName()).thenReturn(OPERATION_NAME);
@@ -200,12 +203,12 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         when(keyParamMock.getName()).thenReturn("type");
         when(keyParamMock.getType()).thenReturn(stringType);
         when(keyParamMock.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(Optional.of(new MetadataKeyPartModelProperty(0)));
-        when(keyParamMock.getModelProperty(MetadataContentModelProperty.class)).thenReturn(Optional.empty());
+        when(keyParamMock.getModelProperty(MetadataContentModelProperty.class)).thenReturn(empty());
 
         when(contentMock.getName()).thenReturn("content");
         when(contentMock.getType()).thenReturn(stringType);
         when(contentMock.getModelProperty(MetadataContentModelProperty.class)).thenReturn(Optional.of(new MetadataContentModelProperty()));
-        when(contentMock.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(Optional.empty());
+        when(contentMock.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(empty());
 
         when(operationModel.getParameterModels()).thenReturn(Arrays.asList(keyParamMock, contentMock));
 
@@ -232,7 +235,7 @@ public class OperationMessageProcessorTestCase extends AbstractMuleContextTestCa
         connectionManager.initialise();
         when(connectionProviderWrapper.getRetryPolicyTemplate()).thenReturn(connectionManager.getDefaultRetryPolicyTemplate());
 
-        when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
+        when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(empty());
         mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
         when(extensionManager.getConfiguration(anyString(), anyObject())).thenReturn(configurationInstance);
         when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);

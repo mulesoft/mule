@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.RetryRequest;
+import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 
 /**
  * Executes operations while coordinating the several moving parts that are
@@ -27,10 +26,10 @@ public interface ExecutionMediator
     /**
      * Coordinates the execution of the {@code executor} using the given {@code context}
      *
-     * @param executor a {@link OperationExecutor}
-     * @param context  a {@link OperationContext}
+     * @param executor an {@link OperationExecutor}
+     * @param context  an {@link OperationContextAdapter}
      * @return the operation's result
      * @throws Exception if any exception is encountered
      */
-    Object execute(OperationExecutor executor, OperationContext context) throws Throwable;
+    Object execute(OperationExecutor executor, OperationContextAdapter context) throws Throwable;
 }

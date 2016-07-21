@@ -27,7 +27,6 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionMediator;
@@ -101,7 +100,7 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
                 });
     }
 
-    private Object executeOperation(OperationContext operationContext, MuleEvent event) throws MuleException
+    private Object executeOperation(OperationContextAdapter operationContext, MuleEvent event) throws MuleException
     {
         try
         {
@@ -128,7 +127,7 @@ public final class OperationMessageProcessor extends ExtensionComponent implemen
 
     private OperationContextAdapter createOperationContext(ConfigurationInstance<Object> configuration, MuleEvent event) throws MuleException
     {
-        return new DefaultOperationContext(configuration, resolverSet.resolve(event), operationModel, event);
+        return new DefaultOperationContext(configuration, resolverSet.resolve(event), operationModel, event, muleContext);
     }
 
     @Override
