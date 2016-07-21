@@ -6,6 +6,8 @@
  */
 package org.mule.functional.junit4;
 
+import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
@@ -13,7 +15,6 @@ import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
@@ -146,25 +147,25 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
     private String getEffectiveConfigFile()
     {
         String configFile = getConfigFile();
-        if (configFile != null)
+        if (!isBlank(configFile))
         {
             return configFile;
         }
 
         configFile = getConfigFileFromSplittable(getConfigurationResources());
-        if (configFile != null)
+        if (!isBlank(configFile))
         {
             return configFile;
         }
 
         configFile = getConfigFileFromSplittable(getConfigResources());
-        if (configFile != null)
+        if (!isBlank(configFile))
         {
             return configFile;
         }
 
         String[] configFiles = getConfigFiles();
-        if (!ArrayUtils.isEmpty(configFiles))
+        if (!isEmpty(configFiles))
         {
             return configFiles[0].trim();
         }
@@ -174,7 +175,7 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase
 
     private String getConfigFileFromSplittable(String configFile)
     {
-        if (configFile != null)
+        if (!isBlank(configFile))
         {
             return configFile.split(",")[0].trim();
         }
