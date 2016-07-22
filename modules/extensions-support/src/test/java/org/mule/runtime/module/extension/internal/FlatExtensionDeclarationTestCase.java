@@ -67,7 +67,7 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
-import org.mule.api.MuleVersion;
+import org.mule.runtime.api.MuleVersion;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.BooleanType;
