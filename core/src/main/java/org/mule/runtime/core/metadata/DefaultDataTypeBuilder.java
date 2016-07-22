@@ -163,7 +163,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
 
     // MULE-10147 Encapsulate isConsumable logic within DataType
     @Override
-    public DataTypeCollectionTypeBuilder streamingCollectionType(Class<? extends Iterator> iteratorType)
+    public DataTypeCollectionTypeBuilder streamingType(Class<? extends Iterator> iteratorType)
     {
         validateAlreadyBuilt();
 
