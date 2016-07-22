@@ -156,7 +156,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         requireNonNull(payload);
         // MULE-10147 Encapsulate isConsumable logic within DataType
         this.payload = payload;
-        this.dataType = DataType.builder().streamingType(payload.getClass()).itemType(clazz).build();
+        this.dataType = DataType.builder().streamType(payload.getClass()).itemType(clazz).build();
         return this;
     }
 
