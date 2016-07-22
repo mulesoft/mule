@@ -137,7 +137,7 @@ public class MuleClassPathClassifier implements ClassPathClassifier
         String extensionsBasePackage = extensionBasePackages.stream().filter(v -> !isEmpty(v)).findFirst().get();
         if (extensionsBasePackage != null && extensionsBasePackage.isEmpty())
         {
-            throw new IllegalArgumentException("Base package for discovering extensions should not be empty, it will take too much time to discover all the classes, please set a reasonable package for your extension annotate your tests with its base package");
+            throw new IllegalArgumentException("Base package for discovering extensions cannot be empty, it will take too much time to discover all the classes, please set a reasonable package for your extension annotate your tests with its base package");
         }
         Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents(extensionsBasePackage);
 
@@ -145,7 +145,7 @@ public class MuleClassPathClassifier implements ClassPathClassifier
         if (!extensionsAnnotatedClasses.isEmpty())
         {
             logger.debug("Extensions found, plugin class loaders would be created for each extension");
-            Set<String> extensionsAnnotatedClassesNoDups = extensionsAnnotatedClasses.stream().map(bd -> bd.getBeanClassName()).collect(toSet());
+            Set<String> extensionsAnnotatedClassesNoDups = extensionsAnnotatedClasses.stream().map(beanDefinition -> beanDefinition.getBeanClassName()).collect(toSet());
             for (String extensionClassName : extensionsAnnotatedClassesNoDups)
             {
                 logger.debug("Classifying classpath for extension class: '{}'", extensionClassName);
@@ -167,7 +167,7 @@ public class MuleClassPathClassifier implements ClassPathClassifier
         }
         else
         {
-            logger.debug("There are no extensions in classpath, exportClasses would be ignored");
+            logger.debug("There are no extensions in the classpath, exportClasses would be ignored");
         }
 
         if (!isRootArtifactIdAnExtension && new File(extendedContext.getTargetTestClassesFolder().getParentFile(), CLASSES_FOLDER_NAME).exists())
@@ -307,8 +307,8 @@ public class MuleClassPathClassifier implements ClassPathClassifier
 
         if (extensionURLs.size() == sizeBeforeDepResolver)
         {
-            throw new IllegalStateException("There should be at least one compile dependency found that matched to extension: '" + extension.getName() +
-                                            "'. Be aware that compile scope is what the classification uses for selecting the URLs to be added to plugin class loader");
+            throw new IllegalStateException("At least one compile dependency for extension: '" + extension.getName() +
+                                            "' has to be found. Be aware that compile is the scope used by the classification process for selecting URLs to be added into the plugin class loader");
         }
 
         List<Class> exportClassesForExtension = extendedContext.getClassificationContext().getExportClasses().stream().filter(c -> c.getProtectionDomain().getCodeSource().getLocation().getPath().equals(extension.getProtectionDomain().getCodeSource().getLocation().getPath())).collect(toList());

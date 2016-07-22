@@ -9,6 +9,9 @@ package org.mule.functional.classloading.isolation.classloader;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.function.Function.identity;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.StringMessageUtils.DEFAULT_MESSAGE_WIDTH;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
@@ -32,8 +35,8 @@ public final class TestArtifactClassLoaderFilter implements ClassLoaderFilter
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private ClassLoaderFilter classLoaderFilter;
-    private Map<String, Object> exportedClasses;
+    private final ClassLoaderFilter classLoaderFilter;
+    private final Map<String, Object> exportedClasses;
 
     /**
      * Creates an extended {@link ClassLoaderFilter} to exporte classes that are not exported as packages in the original
@@ -44,6 +47,9 @@ public final class TestArtifactClassLoaderFilter implements ClassLoaderFilter
      */
     public TestArtifactClassLoaderFilter(final ClassLoaderFilter classLoaderFilter, final List<Class> exportedClasses)
     {
+        checkNotNull(classLoaderFilter, "'classLoaderFilter' cannot be null");
+        checkNotNull(exportedClasses, "'exportedClasses' cannot be null");
+
         this.classLoaderFilter = classLoaderFilter;
         this.exportedClasses = exportedClasses.stream().collect(Collectors.toMap(Class::getName, identity()));
     }
@@ -58,6 +64,8 @@ public final class TestArtifactClassLoaderFilter implements ClassLoaderFilter
     @Override
     public boolean exportsClass(final String name)
     {
+        checkArgument(!isEmpty(name), "'name' cannot be empty");
+
         boolean exported = classLoaderFilter.exportsClass(name);
         if (!exported)
         {

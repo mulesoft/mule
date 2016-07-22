@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.functional.classloading.isolation.utils.RunnerModuleUtils.getExcludedProperties;
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFromHierarchy;
+import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import org.mule.functional.classloading.isolation.maven.DependenciesGraph;
 import org.mule.functional.classloading.isolation.maven.MavenArtifact;
 import org.mule.functional.classloading.isolation.maven.MavenArtifactMatcherPredicate;
@@ -55,14 +56,19 @@ public class ClassPathClassifierContext
     /**
      * Creates a context used for doing the classification of the class path.
      *
-     * @param testClass the test {@link Class} being tested
-     * @param classPathURLs the whole set of {@link URL}s that were loaded by IDE/Maven Surefire plugin when running the test
-     * @param dependenciesGraph the maven dependencies graph for the artifact that the test belongs to
-     * @param mavenMultiModuleArtifactMapping a mapper to get multi-module folder for artifactIds
+     * @param testClass test {@link Class} being tested. Not null.
+     * @param classPathURLs the whole set of {@link URL}s that were loaded by IDE/Maven Surefire plugin when running the test. Not null.
+     * @param dependenciesGraph the maven dependencies graph for the artifact that the test belongs to. Not null.
+     * @param mavenMultiModuleArtifactMapping a mapper to get multi-module folder for artifactIds. Not null.
      * @throws IOException if an error happened while reading {@link org.mule.functional.classloading.isolation.utils.RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE} file
      */
     public ClassPathClassifierContext(final Class<?> testClass, final List<URL> classPathURLs, final DependenciesGraph dependenciesGraph, final MavenMultiModuleArtifactMapping mavenMultiModuleArtifactMapping) throws IOException
     {
+        checkNotNull(testClass, "'testClass' cannot be null");
+        checkNotNull(classPathURLs, "'classPathURLs' cannot be null");
+        checkNotNull(dependenciesGraph, "'dependenciesGraph' cannot be null");
+        checkNotNull(mavenMultiModuleArtifactMapping, "'mavenMultiModuleArtifactMapping' cannot be null");
+
         this.testClass = testClass;
         this.classPathURLs = classPathURLs;
         this.dependenciesGraph = dependenciesGraph;

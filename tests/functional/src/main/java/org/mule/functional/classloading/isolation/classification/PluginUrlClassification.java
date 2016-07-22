@@ -13,15 +13,15 @@ import java.util.List;
 /**
  * Defines the result of the classification process for a plugin.
  * It contains a {@link List} of {@link URL}s that should have the plugin {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
- * plus a {@link List} of {@link Classs}es to be exported in addition to the packages exported by the plugin, in order to run the test.
+ * plus a {@link List} of {@link Class}es to be exported in addition to the packages exported by the plugin, in order to run the test.
  *
  * @since 4.0
  */
 public class PluginUrlClassification
 {
-    private List<URL> urls;
-    private String name;
-    private List<Class> exportClasses;
+    private final List<URL> urls;
+    private final String name;
+    private final List<Class> exportClasses;
 
     /**
      * Creates an instance of the classification.
