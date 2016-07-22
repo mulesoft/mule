@@ -3323,22 +3323,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="set-session-variable" type="setVariableType" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that adds session variables.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="remove-session-variable" type="removeVariableType" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that remove session variables by name or regular expression.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
     <xsd:element name="set-attachment" type="setAttachmentType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>

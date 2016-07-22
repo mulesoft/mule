@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <flow name="flow1">
-        <set-session-variable variableName="foo" value="foo" />
+        <transports:set-session-variable variableName="foo" value="foo" />
         <all>
             <flow-ref name="flow2"/>
             <flow-ref name="flow3"/>
@@ -18,13 +17,13 @@
     </flow>
 
     <flow name="flow2">
-        <set-session-variable variableName="bar" value="bar" />
+        <transports:set-session-variable variableName="bar" value="bar" />
         <set-property propertyName="outbar" value="bar"/>
         <echo-component/>
     </flow>
 
     <flow name="flow3">
-        <set-session-variable variableName="baz" value="baz" />
+        <transports:set-session-variable variableName="baz" value="baz" />
         <set-property propertyName="outbaz" value="baz"/>
         <echo-component/>
     </flow>

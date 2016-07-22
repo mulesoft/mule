@@ -6,6 +6,9 @@
  */
 package org.mule.compatibility.config.spring.handlers;
 
+import static org.mule.runtime.config.spring.handlers.MuleNamespaceHandler.IDENTIFIER_PROPERTY;
+import static org.mule.runtime.config.spring.handlers.MuleNamespaceHandler.VARIABLE_NAME_ATTRIBUTE;
+
 import org.mule.compatibility.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.compatibility.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.compatibility.config.spring.parsers.specific.BindingDefinitionParser;
@@ -21,6 +24,8 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.routing.EndpointDlqUntilSuccessful;
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.core.routing.requestreply.SimpleAsyncEndpointRequestReplyRequester;
+import org.mule.compatibility.core.transformer.simple.AddSessionVariableTransformer;
+import org.mule.compatibility.core.transformer.simple.RemoveSessionVariableTransformer;
 import org.mule.compatibility.module.cxf.builder.WebServiceMessageProcessorWithInboundEndpointBuilder;
 import org.mule.compatibility.module.cxf.component.WebServiceWrapperComponent;
 import org.mule.compatibility.module.cxf.config.JaxWsClientWithDecoupledEndpointFactoryBean;
@@ -29,6 +34,7 @@ import org.mule.compatibility.module.cxf.config.SimpleClientWithDecoupledEndpoin
 import org.mule.compatibility.module.management.agent.DefaultTransportJmxSupportAgent;
 import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.handlers.MuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
@@ -38,6 +44,7 @@ import org.mule.runtime.config.spring.parsers.specific.ComponentDelegatingDefini
 import org.mule.runtime.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ExceptionStrategyDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.runtime.config.spring.parsers.specific.MessageProcessorWithDataTypeDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
@@ -56,6 +63,10 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("until-successful", new ChildDefinitionParser("messageProcessor", EndpointDlqUntilSuccessful.class));
         registerBeanDefinitionParser("request-reply", new ChildDefinitionParser("messageProcessor", SimpleAsyncEndpointRequestReplyRequester.class));
         registerBeanDefinitionParser("default-exception-strategy", new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
+
+        registerMuleBeanDefinitionParser("set-session-variable", new MessageProcessorWithDataTypeDefinitionParser(AddSessionVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE,
+                IDENTIFIER_PROPERTY);
+        registerMuleBeanDefinitionParser("remove-session-variable", new MessageProcessorDefinitionParser(RemoveSessionVariableTransformer.class)).addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
 
         // Endpoint elements
         registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));

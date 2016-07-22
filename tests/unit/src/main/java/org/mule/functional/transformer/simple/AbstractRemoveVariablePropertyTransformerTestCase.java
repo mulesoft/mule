@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.simple;
+package org.mule.functional.transformer.simple;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.mockito.Matchers.anyString;
@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.transformer.simple.AbstractRemoveVariablePropertyTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

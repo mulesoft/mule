@@ -3,13 +3,15 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/transport/http"
       xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
+      xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
       xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-        http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd">
-
+        http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
+        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd">
+    
     <spring:bean id="property-test" class="org.mule.tck.property.SessionPropertiesValidatorComponent">
         <spring:property name="expectedProperties">
             <spring:map>
@@ -48,7 +50,7 @@
     </flow>
 
     <flow name="synchronousCollectionAggregatorFlow">
-        <set-session-variable value="#[new java.util.ArrayList()]" variableName="recordsToUpdate" />
+        <transports:set-session-variable value="#[new java.util.ArrayList()]" variableName="recordsToUpdate" />
         <collection-splitter enableCorrelation="ALWAYS"/>
         <expression-component>#[sessionVars.get('recordsToUpdate').add(payload)]</expression-component>
         <collection-aggregator failOnTimeout="true" persistentStores="true"/>

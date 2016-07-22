@@ -11,7 +11,7 @@
         <default-exception-strategy>
             <processor-chain>
                 <set-property propertyName="mainEs" value="yes"/>
-                <set-property propertyName="flowRefEs" value="#[sessionVars.flowRefEs]" />
+                <set-property propertyName="flowRefEs" value="#[flowVars.flowRefEs]" />
                 <test:queue name="dlq"/>
             </processor-chain>
         </default-exception-strategy>
@@ -20,7 +20,7 @@
     <flow name="blockWithOwnExceptionStrategy" processingStrategy="synchronous">
         <test:component throwException="true"/>
         <default-exception-strategy>
-            <set-session-variable variableName="flowRefEs" value="yes"/>
+            <set-variable variableName="flowRefEs" value="yes"/>
         </default-exception-strategy>
     </flow>
 

@@ -8,18 +8,18 @@ package org.mule.test.routing;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
+
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MessagingException;
@@ -41,6 +41,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 public class ForeachTestCase extends FunctionalTestCase
 {
@@ -175,23 +178,6 @@ public class ForeachTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void counterConfiguration() throws Exception
-    {
-        final Collection<String> payload = new ArrayList<>();
-        payload.add("wolfgang");
-        payload.add("amadeus");
-        payload.add("mozart");
-
-        MuleMessage result = flowRunner("counter-config").withPayload(payload).run().getMessage();
-        assertThat(result.getPayload(), instanceOf(Collection.class));
-        Collection<?> resultPayload = (Collection<?>) result.getPayload();
-        assertThat(resultPayload, hasSize(3));
-        assertSame(payload, resultPayload);
-
-        assertThat(result.getOutboundProperty("msg-last-index"), is(3));
-    }
-
-    @Test
     public void messageCollectionConfiguration() throws Exception
     {
         List<MuleMessage> list = new ArrayList<>();
@@ -203,7 +189,7 @@ public class ForeachTestCase extends FunctionalTestCase
         MuleMessage msgCollection = MuleMessage.builder().payload(list).build();
         MuleMessage result = flowRunner("message-collection-config").withPayload(list).run().getMessage();
         assertThat(result.getOutboundProperty("totalMessages"), is(10));
-        assertThat(result.getPayload(), is((Object) msgCollection.getPayload()));
+        assertThat(result.getPayload(), equalTo(msgCollection.getPayload()));
         FlowAssert.verify("message-collection-config");
     }
 

@@ -126,6 +126,22 @@
         </xsd:attribute>
     </xsd:complexType>
 
+    <xsd:element name="set-session-variable" type="mule:setVariableType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that adds session variables.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="remove-session-variable" type="mule:removeVariableType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that remove session variables by name or regular expression.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <!--==============================================================-->
     <!--   Endpoint elements                                          -->
     <!--==============================================================-->

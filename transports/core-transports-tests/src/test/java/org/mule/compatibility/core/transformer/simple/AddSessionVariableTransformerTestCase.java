@@ -4,19 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.simple;
+package org.mule.compatibility.core.transformer.simple;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 
+import org.junit.Ignore;
+import org.mule.functional.transformer.simple.AbstractAddVariablePropertyTransformerTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.size.SmallTest;
-
-import org.junit.Ignore;
-
-import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 @SmallTest
 @Ignore("MULE-9072 - Remove MuleSession")
