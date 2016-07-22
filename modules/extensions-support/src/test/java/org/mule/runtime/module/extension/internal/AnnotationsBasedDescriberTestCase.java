@@ -36,7 +36,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_D
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
-
 import org.mule.api.MuleVersion;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
@@ -146,6 +145,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     private static final String CALL_GUS_FRING = "callGusFring";
     private static final String CURE_CANCER = "cureCancer";
     private static final String GET_SAUL_PHONE = "getSaulPhone";
+    private static final String GET_MEDICAL_HISTORY = "getMedicalHistory";
     private static final String IGNORED_OPERATION = "ignoredOperation";
 
     private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
@@ -280,7 +280,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         ConfigurationDeclaration configuration = extensionDeclaration.getConfigurations().get(1);
         assertThat(configuration, is(notNullValue()));
         assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-        assertThat(configuration.getParameters(), hasSize(28));
+        assertThat(configuration.getParameters(), hasSize(29));
         assertParameter(configuration.getParameters(), "extendedProperty", "", toMetadataType(String.class), true, SUPPORTED, null);
     }
 
@@ -397,7 +397,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
         List<ParameterDeclaration> parameters = conf.getParameters();
-        assertThat(parameters, hasSize(27));
+        assertThat(parameters, hasSize(28));
 
         assertParameter(parameters, "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
         assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
@@ -458,6 +458,10 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
                                 .ofValue(TYPE_LOADER.load(Weapon.class))
                                 .build(),
                         false, SUPPORTED, null);
+        assertParameter(parameters, "healthProgressions", "", TYPE_BUILDER.arrayType().id(List.class.getName())
+                                .of(TYPE_LOADER.load(HealthStatus.class))
+                                .build(),
+                        false, SUPPORTED, null);
     }
 
     private void assertExtensionProperties(ExtensionDeclaration extensionDeclaration)
@@ -471,7 +475,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
 
     private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception
     {
-        assertThat(extensionDeclaration.getOperations(), hasSize(23));
+        assertThat(extensionDeclaration.getOperations(), hasSize(24));
         assertOperation(extensionDeclaration, SAY_MY_NAME_OPERATION, "");
         assertOperation(extensionDeclaration, GET_ENEMY_OPERATION, "");
         assertOperation(extensionDeclaration, KILL_OPERATION, "");
@@ -491,6 +495,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertOperation(extensionDeclaration, CALL_SAUL, "");
         assertOperation(extensionDeclaration, CALL_GUS_FRING, "");
         assertOperation(extensionDeclaration, GET_SAUL_PHONE, "");
+        assertOperation(extensionDeclaration, GET_MEDICAL_HISTORY, "");
 
         OperationDeclaration operation = getOperation(extensionDeclaration, SAY_MY_NAME_OPERATION);
         assertThat(operation, is(notNullValue()));
@@ -578,13 +583,16 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
         assertThat(exceptionEnricherFactory.isPresent(), is(true));
         assertThat(exceptionEnricherFactory.get().createEnricher(), instanceOf(CureCancerExceptionEnricher.class));
 
-        operation = getOperation(extensionDeclaration, CALL_GUS_FRING);
-        assertThat(operation.getParameters(), is(empty()));
-        java.util.Optional<ExceptionEnricherFactory> exceptionEnricherFactory2 = operation.getExceptionEnricherFactory();
-        assertThat(exceptionEnricherFactory2.isPresent(), is(false));
+        operation = getOperation(extensionDeclaration, GET_MEDICAL_HISTORY);
+        assertParameter(operation.getParameters(), "healthByYear", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
+                                .ofKey(TYPE_BUILDER.numberType().id(Integer.class.getName()))
+                                .ofValue(TYPE_LOADER.load(HealthStatus.class))
+                                .build(),
+                        true, SUPPORTED, null);
 
         operation = getOperation(extensionDeclaration, IGNORED_OPERATION);
         assertThat(operation, is(nullValue()));
+
     }
 
     private void assertTestModuleConnectionProviders(ExtensionDeclaration extensionDeclaration) throws Exception

@@ -203,4 +203,14 @@
     <flow name="literalEcho">
         <heisenberg:literal-echo literalExpression="#[money]"/>
     </flow>
+
+    <flow name="getMedicalHistory">
+        <heisenberg:get-medical-history>
+            <heisenberg:health-by-years>
+                <heisenberg:health-by-year key="2013" value="HEALTHY"/>
+                <heisenberg:health-by-year key="2014" value="CANCER"/>
+                <heisenberg:health-by-year key="2015" value="DEAD"/>
+            </heisenberg:health-by-years>
+        </heisenberg:get-medical-history>
+    </flow>
 </mule>

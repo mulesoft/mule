@@ -73,6 +73,11 @@
                 </heisenberg:ricin>
             </heisenberg:weapon-value-map>
         </heisenberg:weapon-value-maps>
+        <heisenberg:health-progressions>
+            <heisenberg:health-progression value="HEALTHY"/>
+            <heisenberg:health-progression value="CANCER"/>
+            <heisenberg:health-progression value="DEAD"/>
+        </heisenberg:health-progressions>
     </heisenberg:config>
 
     <heisenberg:config name="heisenbergWithPlaceHolders"
@@ -187,6 +192,7 @@
                        weapon="#[weapon]"
                        literalExpressionWithoutDefault="#[money]">
     </heisenberg:config>
+
 
     <spring:beans>
         <util:map id="recipes" value-type="java.lang.Long">

@@ -186,6 +186,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     @DisplayName(PARAMETER_OVERRIDED_DISPLAY_NAME)
     private String literalExpressionWithoutDefault;
 
+    @Parameter
+    @Optional
+    private List<HealthStatus> healthProgressions;
+
     @Override
     public void initialise() throws InitialisationException
     {
@@ -208,6 +212,11 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware
     public void dispose()
     {
         dispose++;
+    }
+
+    public List<HealthStatus> getHealthProgression()
+    {
+        return healthProgressions;
     }
 
     public Map<String, Weapon> getWeaponValueMap()

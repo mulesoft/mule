@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -147,5 +148,10 @@ public final class MetadataTypeUtils
     public static boolean isExtensible(MetadataType metadataType)
     {
         return org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation(metadataType, ExtensibleTypeAnnotation.class).isPresent();
+    }
+
+    public static boolean isEnum(MetadataType metadataType)
+    {
+        return org.mule.metadata.utils.MetadataTypeUtils.getSingleAnnotation(metadataType, EnumAnnotation.class).isPresent();
     }
 }

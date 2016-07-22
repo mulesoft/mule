@@ -7,7 +7,6 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
@@ -41,6 +40,7 @@ import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -186,6 +186,11 @@ public class HeisenbergOperations
     public String cureCancer() throws HealthException
     {
         throw new HealthException(CURE_CANCER_MESSAGE);
+    }
+
+    public Map<Integer, HealthStatus> getMedicalHistory(Map<Integer, HealthStatus> healthByYear)
+    {
+        return healthByYear;
     }
 
     public String getSaulPhone(@Connection HeisenbergConnection connection)
