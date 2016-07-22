@@ -13,6 +13,8 @@ import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -112,7 +114,13 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder payload(Object payload);
 
         @Override
-        CollectionBuilder collectionPayload(Iterable payload, Class<?> itemType);
+        CollectionBuilder collectionPayload(Iterator payload, Class<?> itemType);
+
+        @Override
+        CollectionBuilder collectionPayload(Collection payload, Class<?> itemType);
+
+        @Override
+        CollectionBuilder collectionPayload(Object[] payload, Class<?> itemType);
     }
 
     interface Builder extends org.mule.runtime.api.message.MuleMessage.Builder, PayloadBuilder

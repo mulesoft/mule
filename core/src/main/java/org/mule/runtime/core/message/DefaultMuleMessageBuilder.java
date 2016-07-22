@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.message;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
@@ -47,7 +48,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -147,13 +150,32 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         return this;
     }
 
-    @Override
-    public MuleMessage.CollectionBuilder collectionPayload(Iterable payload, Class<?> clazz)
+    private MuleMessage.CollectionBuilder innerCollectionPayload(Iterable payload, Class<?> clazz)
     {
-        requireNonNull(payload);
         this.payload = payload;
         this.dataType = DataType.builder().collectionType(payload.getClass()).itemType(clazz).build();
         return this;
+    }
+
+    @Override
+    public MuleMessage.CollectionBuilder collectionPayload(Iterator payload, Class<?> clazz)
+    {
+        requireNonNull(payload);
+        return innerCollectionPayload(() -> payload, clazz);
+    }
+
+    @Override
+    public MuleMessage.CollectionBuilder collectionPayload(Collection payload, Class<?> clazz)
+    {
+        requireNonNull(payload);
+        return innerCollectionPayload(payload, clazz);
+    }
+
+    @Override
+    public MuleMessage.CollectionBuilder collectionPayload(Object[] payload, Class<?> clazz)
+    {
+        requireNonNull(payload);
+        return innerCollectionPayload(asList(payload), clazz);
     }
 
     @Override
