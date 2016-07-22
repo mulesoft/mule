@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.message;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
@@ -19,6 +20,7 @@ import static org.mule.runtime.core.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.util.ObjectUtils.getString;
+
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -48,6 +50,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,9 +59,6 @@ import javax.activation.DataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * // TODO MULE-9855 MOVE TO org.mule.runtime.core.message
- */
 public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessage.PayloadBuilder, MuleMessage.CollectionBuilder
 {
 
@@ -151,12 +151,29 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     }
 
     @Override
+    public MuleMessage.CollectionBuilder streamPayload(Iterator payload, Class<?> clazz)
+    {
+        requireNonNull(payload);
+        // TODO MULE-10147 Encapsulate isConsumable logic within DataType
+        this.payload = payload;
+        this.dataType = DataType.builder().streamType(payload.getClass()).itemType(clazz).build();
+        return this;
+    }
+
+    @Override
     public MuleMessage.CollectionBuilder collectionPayload(Collection payload, Class<?> clazz)
     {
         requireNonNull(payload);
         this.payload = payload;
         this.dataType = DataType.builder().collectionType(payload.getClass()).itemType(clazz).build();
         return this;
+    }
+
+    @Override
+    public MuleMessage.CollectionBuilder collectionPayload(Object[] payload)
+    {
+        requireNonNull(payload);
+        return collectionPayload(asList(payload), payload.getClass().getComponentType());
     }
 
     @Override

@@ -14,7 +14,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -37,9 +36,9 @@ public class GenericsUtils
      * @param collectionClass the collection class to introspect
      * @return the generic type, or <code>null</code> if none
      */
-    public static Class<?> getCollectionType(Class<? extends Collection<?>> collectionClass)
+    public static Class<?> getCollectionType(Class<? extends Iterable<?>> collectionClass)
     {
-        return extractTypeFromClass(collectionClass, Collection.class, 0);
+        return extractTypeFromClass(collectionClass, Iterable.class, 0);
     }
 
     /**
@@ -74,7 +73,7 @@ public class GenericsUtils
      */
     public static Class<?> getCollectionFieldType(Field collectionField)
     {
-        return getGenericFieldType(collectionField, Collection.class, 0, 1);
+        return getGenericFieldType(collectionField, Iterable.class, 0, 1);
     }
 
     /**
@@ -88,7 +87,7 @@ public class GenericsUtils
      */
     public static Class<?> getCollectionFieldType(Field collectionField, int nestingLevel)
     {
-        return getGenericFieldType(collectionField, Collection.class, 0, nestingLevel);
+        return getGenericFieldType(collectionField, Iterable.class, 0, nestingLevel);
     }
 
     /**
@@ -149,7 +148,7 @@ public class GenericsUtils
      */
     public static Class<?> getCollectionParameterType(MethodParameter methodParam)
     {
-        return getGenericParameterType(methodParam, Collection.class, 0);
+        return getGenericParameterType(methodParam, Iterable.class, 0);
     }
 
     /**
@@ -182,7 +181,7 @@ public class GenericsUtils
      */
     public static Class<?> getCollectionReturnType(Method method)
     {
-        return getGenericReturnType(method, Collection.class, 0, 1);
+        return getGenericReturnType(method, Iterable.class, 0, 1);
     }
 
     /**
@@ -198,7 +197,7 @@ public class GenericsUtils
      */
     public static Class<?> getCollectionReturnType(Method method, int nestingLevel)
     {
-        return getGenericReturnType(method, Collection.class, 0, nestingLevel);
+        return getGenericReturnType(method, Iterable.class, 0, nestingLevel);
     }
 
     /**
@@ -493,7 +492,7 @@ public class GenericsUtils
      */
     private static boolean isIntrospectionCandidate(Class<?> clazz)
     {
-        return (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz));
+        return (Iterable.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz));
     }
 
 }

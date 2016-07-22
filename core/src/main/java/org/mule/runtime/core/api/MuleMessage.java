@@ -9,11 +9,12 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
 import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -113,7 +114,13 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder payload(Object payload);
 
         @Override
+        CollectionBuilder streamPayload(Iterator payload, Class<?> itemType);
+
+        @Override
         CollectionBuilder collectionPayload(Collection payload, Class<?> itemType);
+
+        @Override
+        CollectionBuilder collectionPayload(Object[] payload);
     }
 
     interface Builder extends org.mule.runtime.api.message.MuleMessage.Builder, PayloadBuilder
