@@ -58,17 +58,17 @@ import org.mockito.stubbing.Answer;
 public class XaTransactedJmsMessageReceiverTest extends AbstractMuleTestCase {
 
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Mock
     private JmsSupport jmsSupport;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Mock
     private JmsConnector mockJmsConnector;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Mock
     private FlowConstruct mockFlowConstruct;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private InboundEndpoint mockInboundEndpoint;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Mock
     private MessageConsumer messageConsumer;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Mock
     private Transaction transaction;
 
     private ExecutorService executor;
