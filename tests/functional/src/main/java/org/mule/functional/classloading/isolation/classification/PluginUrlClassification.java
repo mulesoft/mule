@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Defines the result of the classification process for a plugin.
  * It contains a {@link List} of {@link URL}s that should have the plugin {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
- * in order to run the test and a name for it.
+ * plus a {@link List} of {@link Classs}es to be exported in addition to the packages exported by the plugin, in order to run the test.
  *
  * @since 4.0
  */
@@ -21,17 +21,20 @@ public class PluginUrlClassification
 {
     private List<URL> urls;
     private String name;
+    private List<Class> exportClasses;
 
     /**
      * Creates an instance of the classification.
      *
      * @param name a {@link String} representing the name of the plugin
      * @param urls list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}
+     * @param exportClasses list of {@link Class}es that would be used for exporting as extra classes to the plugin
      */
-    public PluginUrlClassification(String name, List<URL> urls)
+    public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses)
     {
         this.name = name;
         this.urls = urls;
+        this.exportClasses = exportClasses;
     }
 
     public List<URL> getUrls()
@@ -42,5 +45,10 @@ public class PluginUrlClassification
     public String getName()
     {
         return name;
+    }
+
+    public List<Class> getExportClasses()
+    {
+        return exportClasses;
     }
 }

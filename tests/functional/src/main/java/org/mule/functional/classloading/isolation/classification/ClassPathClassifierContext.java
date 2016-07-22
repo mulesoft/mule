@@ -8,6 +8,7 @@
 package org.mule.functional.classloading.isolation.classification;
 
 import static java.util.Collections.addAll;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.functional.classloading.isolation.utils.RunnerModuleUtils.getExcludedProperties;
 import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFromHierarchy;
@@ -21,6 +22,7 @@ import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -46,6 +48,7 @@ public class ClassPathClassifierContext
     private final MavenMultiModuleArtifactMapping mavenMultiModuleArtifactMapping;
     private final Predicate<MavenArtifact> exclusions;
     private final Set<String> extraBootPackages;
+    private final Set<Class> exportClasses;
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -68,6 +71,8 @@ public class ClassPathClassifierContext
         Properties excludedProperties = getExcludedProperties();
         this.exclusions = createExclusionsPredicate(testClass, excludedProperties);
         this.extraBootPackages = getExtraBootPackages(testClass, excludedProperties);
+
+        this.exportClasses = getExportClasses(testClass);
     }
 
     /**
@@ -117,6 +122,14 @@ public class ClassPathClassifierContext
     public Set<String> getExtraBootPackages()
     {
         return extraBootPackages;
+    }
+
+    /**
+     * @return {@link Set} of {@link Class}es that are going to be exported in addition to the ones already exported by extensions. For testing purposes only.
+     */
+    public Set<Class> getExportClasses()
+    {
+        return exportClasses;
     }
 
     /**
@@ -198,7 +211,7 @@ public class ClassPathClassifierContext
         Set<String> packages = Sets.newHashSet();
 
         List<String> extraBootPackagesList = getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class, "extraBootPackages");
-        extraBootPackagesList.stream().filter(extraBootPackages -> !isEmpty(extraBootPackages)).forEach(extraBootPackages -> addAll(packages, extraBootPackages.split(",")));
+        extraBootPackagesList.stream().filter(e -> !isEmpty(e)).forEach(e -> addAll(packages, e.split(",")));
 
         String excludedExtraBootPackages = excludedProperties.getProperty("extraBoot.packages");
         if (excludedExtraBootPackages != null)
@@ -215,5 +228,16 @@ public class ClassPathClassifierContext
         return packages;
     }
 
+    /**
+     * Gets the {@link Set} of {@link Class}es to be exported by the plugin in addition to the ones that already exposes.
+     *
+     * @param klass the test {@link Class} being tested
+     * @return a {@link Set} of {@link Class}es with the classes to be exported
+     */
+    private Set<Class> getExportClasses(Class<?> klass)
+    {
+        List<Class[]> exportClassesList = getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class, "exportClasses");
+        return exportClassesList.stream().flatMap(Arrays::stream).collect(toSet());
+    }
 
 }
