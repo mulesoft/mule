@@ -150,32 +150,29 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
         return this;
     }
 
-    private MuleMessage.CollectionBuilder innerCollectionPayload(Iterable payload, Class<?> clazz)
-    {
-        this.payload = payload;
-        this.dataType = DataType.builder().collectionType(payload.getClass()).itemType(clazz).build();
-        return this;
-    }
-
     @Override
-    public MuleMessage.CollectionBuilder collectionPayload(Iterator payload, Class<?> clazz)
+    public MuleMessage.CollectionBuilder streamPayload(Iterator payload, Class<?> clazz)
     {
         requireNonNull(payload);
-        return innerCollectionPayload(() -> payload, clazz);
+        this.payload = (Iterable) () -> payload;
+        this.dataType = DataType.builder().streamingCollectionType(payload.getClass()).itemType(clazz).build();
+        return this;
     }
 
     @Override
     public MuleMessage.CollectionBuilder collectionPayload(Collection payload, Class<?> clazz)
     {
         requireNonNull(payload);
-        return innerCollectionPayload(payload, clazz);
+        this.payload = payload;
+        this.dataType = DataType.builder().collectionType(payload.getClass()).itemType(clazz).build();
+        return this;
     }
 
     @Override
-    public MuleMessage.CollectionBuilder collectionPayload(Object[] payload, Class<?> clazz)
+    public MuleMessage.CollectionBuilder collectionPayload(Object[] payload)
     {
         requireNonNull(payload);
-        return innerCollectionPayload(asList(payload), clazz);
+        return collectionPayload(asList(payload), payload.getClass().getComponentType());
     }
 
     @Override

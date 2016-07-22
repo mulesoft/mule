@@ -114,13 +114,13 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
         Builder payload(Object payload);
 
         @Override
-        CollectionBuilder collectionPayload(Iterator payload, Class<?> itemType);
+        CollectionBuilder streamPayload(Iterator payload, Class<?> itemType);
 
         @Override
         CollectionBuilder collectionPayload(Collection payload, Class<?> itemType);
 
         @Override
-        CollectionBuilder collectionPayload(Object[] payload, Class<?> itemType);
+        CollectionBuilder collectionPayload(Object[] payload);
     }
 
     interface Builder extends org.mule.runtime.api.message.MuleMessage.Builder, PayloadBuilder

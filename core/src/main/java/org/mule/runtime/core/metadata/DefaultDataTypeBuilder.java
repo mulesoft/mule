@@ -25,6 +25,8 @@ import com.google.common.cache.LoadingCache;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -159,21 +161,43 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
         }
     }
 
+    // MULE-10147 Encapsulate isConsumable logic within DataType
+    @Override
+    public DataTypeCollectionTypeBuilder streamingCollectionType(Class<? extends Iterator> iteratorType)
+    {
+        validateAlreadyBuilt();
+
+        checkNotNull(iteratorType, "'iteratorType' cannot be null.");
+        if (!Iterator.class.isAssignableFrom(iteratorType))
+        {
+            throw new IllegalArgumentException("iteratorType " + iteratorType.getName() + " is not an Iterator type");
+        }
+
+        this.type = handleProxy(iteratorType);
+
+        if (this.itemTypeBuilder == null)
+        {
+            this.itemTypeBuilder = DataType.builder();
+        }
+
+        return asCollectionTypeBuilder();
+    }
+
     /**
      * Sets the given type for the {@link DefaultCollectionDataType} to be built. See
      * {@link DefaultCollectionDataType#getType()}.
      * 
      * @param collectionType the java collection type to set.
      * @return this builder.
-     * @throws IllegalArgumentException if the given collectionType is not a descendant of {@link Iterable}.
+     * @throws IllegalArgumentException if the given collectionType is not a descendant of {@link Collection}.
      */
     @Override
-    public DataTypeCollectionTypeBuilder collectionType(Class<? extends Iterable> collectionType)
+    public DataTypeCollectionTypeBuilder collectionType(Class<? extends Collection> collectionType)
     {
         validateAlreadyBuilt();
 
         checkNotNull(collectionType, "'collectionType' cannot be null.");
-        if (!Iterable.class.isAssignableFrom(collectionType))
+        if (!Collection.class.isAssignableFrom(collectionType))
         {
             throw new IllegalArgumentException("collectionType " + collectionType.getName() + " is not a Collection type");
         }
