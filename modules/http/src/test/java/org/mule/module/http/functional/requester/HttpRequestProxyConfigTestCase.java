@@ -21,7 +21,10 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -86,13 +89,12 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
 
         // Give time to the proxy thread to start up completely
         proxyReadyLatch.await();
-        Thread.yield();
     }
 
     @After
     public void stopMockProxy() throws Exception
     {
-        mockProxyAcceptor.join();
+        mockProxyAcceptor.join(LOCK_TIMEOUT);
     }
 
     @Test
@@ -156,9 +158,22 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
             ServerSocket serverSocket = null;
             try
             {
-                serverSocket = new ServerSocket(Integer.parseInt(proxyPort.getValue()));
+                ServerSocketChannel ssc = ServerSocketChannel.open();
+
+                serverSocket = ssc.socket();
+                serverSocket.bind(new InetSocketAddress(Integer.parseInt(proxyPort.getValue())));
+                ssc.configureBlocking(false);
+
                 proxyReadyLatch.countDown();
-                serverSocket.accept().close();
+                SocketChannel sc = null;
+                while (sc == null)
+                {
+                    sc = ssc.accept();
+                    Thread.yield();
+                }
+
+                sc.close();
+
                 latch.release();
             }
             catch (IOException e)
