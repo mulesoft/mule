@@ -17,7 +17,6 @@ import org.mule.runtime.module.http.functional.AbstractHttpExpectHeaderServerTes
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase
@@ -31,7 +30,6 @@ public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderSer
         return "http-request-expect-header-config.xml";
     }
 
-    @Ignore("MULE-9892: Fix flaky")
     @Test
     public void handlesContinueResponse() throws Exception
     {
