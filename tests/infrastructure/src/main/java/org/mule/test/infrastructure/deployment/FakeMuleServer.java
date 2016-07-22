@@ -13,8 +13,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.api.MuleCoreExtension;
+import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -30,6 +30,13 @@ import org.mule.runtime.module.launcher.application.Application;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionDiscoverer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
+import org.mule.runtime.module.launcher.service.MuleServiceManager;
+import org.mule.runtime.module.launcher.service.DefaultServiceDiscoverer;
+import org.mule.runtime.module.launcher.service.FileSystemServiceProviderDiscoverer;
+import org.mule.runtime.module.launcher.service.ReflectionServiceResolver;
+import org.mule.runtime.module.launcher.service.ReflectionServiceProviderResolutionHelper;
+import org.mule.runtime.module.launcher.service.ServiceClassLoaderFactory;
+import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -70,6 +77,7 @@ public class FakeMuleServer
 
     private DefaultMuleCoreExtensionManagerServer coreExtensionManager;
     private final ArtifactClassLoader containerClassLoader;
+    private ServiceManager serviceManager;
 
     public FakeMuleServer(String muleHomePath)
     {
@@ -107,7 +115,8 @@ public class FakeMuleServer
             throw new RuntimeException(e);
         }
 
-        deploymentService = new MuleDeploymentService(containerClassLoader);
+        serviceManager = new MuleServiceManager(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader, new ServiceClassLoaderFactory()), new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
+        deploymentService = new MuleDeploymentService(containerClassLoader, serviceManager);
         deploymentListener = mock(DeploymentListener.class);
         deploymentService.addDeploymentListener(deploymentListener);
 
@@ -127,7 +136,7 @@ public class FakeMuleServer
     public void stop() throws MuleException
     {
         deploymentService.stop();
-
+        serviceManager.stop();
         coreExtensionManager.stop();
         coreExtensionManager.dispose();
     }
@@ -136,7 +145,7 @@ public class FakeMuleServer
     {
         coreExtensionManager.initialise();
         coreExtensionManager.start();
-
+        serviceManager.start();
         deploymentService.start();
     }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.lifecycle.phases;
 
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.component.Component;
@@ -50,7 +51,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
 {
     public MuleContextStopPhase()
     {
-        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class, OutboundRouter.class});
+        this(new Class[]{Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class, OutboundRouter.class, Service.class});
     }
 
     public MuleContextStopPhase(Class<?>[] ignorredObjects)

@@ -45,6 +45,9 @@
         <module>tomcat</module>
         <module>ws</module>
         <module>xml</module>
+        <module>test-services</module>
+        <module>echo-service-default</module>
+        <module>foo-service-default</module>
     </modules>
 
     <build>

@@ -24,8 +24,14 @@ import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionMa
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
+import org.mule.runtime.module.launcher.service.DefaultServiceDiscoverer;
+import org.mule.runtime.module.launcher.service.ReflectionServiceResolver;
+import org.mule.runtime.module.launcher.service.MuleServiceManager;
+import org.mule.runtime.module.launcher.service.FileSystemServiceProviderDiscoverer;
+import org.mule.runtime.module.launcher.service.ReflectionServiceProviderResolutionHelper;
+import org.mule.runtime.module.launcher.service.ServiceClassLoaderFactory;
+import org.mule.runtime.module.launcher.service.ServiceManager;
 import org.mule.runtime.module.repository.api.RepositoryService;
-import org.mule.runtime.module.repository.internal.DefaultRepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 
 import java.io.File;
@@ -82,6 +88,7 @@ public class MuleContainer
         logger = LoggerFactory.getLogger(MuleContainer.class);
     }
 
+    private ServiceManager serviceManager;
 
 
     /**
@@ -100,27 +107,29 @@ public class MuleContainer
         final ContainerClassLoaderFactory containerClassLoaderFactory = new ContainerClassLoaderFactory();
         final ArtifactClassLoader containerClassLoader = containerClassLoaderFactory.createContainerClassLoader(getClass().getClassLoader());
 
-        this.deploymentService = new MuleDeploymentService(containerClassLoader);
+        this.serviceManager = new MuleServiceManager(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader, new ServiceClassLoaderFactory()), new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
+        this.deploymentService = new MuleDeploymentService(containerClassLoader, serviceManager);
         this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
         this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(new ClasspathMuleCoreExtensionDiscoverer(containerClassLoader), new ReflectionMuleCoreExtensionDependencyResolver());
 
         init(args);
     }
 
-    public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, MuleCoreExtensionManagerServer coreExtensionManager)
+    public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager)
     {
-        this(new String[0], deploymentService, repositoryService, coreExtensionManager);
+        this(new String[0], deploymentService, repositoryService, coreExtensionManager, serviceManager);
     }
 
     /**
      * Configure the server with command-line arguments.
      */
-    public MuleContainer(String[] args, DeploymentService deploymentService, RepositoryService repositoryService, MuleCoreExtensionManagerServer coreExtensionManager) throws IllegalArgumentException
+    public MuleContainer(String[] args, DeploymentService deploymentService, RepositoryService repositoryService, MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager) throws IllegalArgumentException
     {
         //TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
         this.deploymentService = deploymentService;
         this.coreExtensionManager = coreExtensionManager;
         this.repositoryService = repositoryService;
+        this.serviceManager = serviceManager;
         init(args);
     }
 
@@ -179,6 +188,8 @@ public class MuleContainer
             coreExtensionManager.setRepositoryService(repositoryService);
             coreExtensionManager.initialise();
             coreExtensionManager.start();
+
+            serviceManager.start();
 
             deploymentService.start();
         }
@@ -250,6 +261,11 @@ public class MuleContainer
         if (deploymentService != null)
         {
             deploymentService.stop();
+        }
+
+        if (serviceManager != null)
+        {
+            serviceManager.stop();
         }
 
         coreExtensionManager.dispose();

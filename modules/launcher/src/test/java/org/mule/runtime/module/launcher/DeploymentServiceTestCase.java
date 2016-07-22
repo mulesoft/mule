@@ -9,7 +9,6 @@ package org.mule.runtime.module.launcher;
 import static java.io.File.separator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
@@ -29,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -46,11 +46,13 @@ import static org.mule.runtime.module.launcher.application.TestApplicationFactor
 import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+import static org.mule.runtime.module.launcher.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -70,6 +72,7 @@ import org.mule.runtime.module.launcher.application.TestApplicationFactory;
 import org.mule.runtime.module.launcher.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.launcher.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.launcher.builder.DomainFileBuilder;
+import org.mule.runtime.module.launcher.builder.ServiceFileBuilder;
 import org.mule.runtime.module.launcher.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 import org.mule.runtime.module.launcher.domain.DefaultDomainManager;
@@ -78,6 +81,14 @@ import org.mule.runtime.module.launcher.domain.Domain;
 import org.mule.runtime.module.launcher.domain.DomainClassLoaderFactory;
 import org.mule.runtime.module.launcher.domain.TestDomainFactory;
 import org.mule.runtime.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.module.launcher.service.MuleServiceManager;
+import org.mule.runtime.module.launcher.service.DefaultServiceDiscoverer;
+import org.mule.runtime.module.launcher.service.FileSystemServiceProviderDiscoverer;
+import org.mule.runtime.module.launcher.service.ReflectionServiceResolver;
+import org.mule.runtime.module.launcher.service.ReflectionServiceProviderResolutionHelper;
+import org.mule.runtime.module.launcher.service.ServiceClassLoaderFactory;
+import org.mule.runtime.module.launcher.service.ServiceManager;
+import org.mule.runtime.module.launcher.service.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -96,7 +107,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,6 +181,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     protected File domainsDir;
     protected File containerAppPluginsDir;
     protected File tmpAppsDir;
+    protected ServiceManager serviceManager;
     protected MuleDeploymentService deploymentService;
     protected DeploymentListener applicationDeploymentListener;
     protected DeploymentListener domainDeploymentListener;
@@ -180,6 +191,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
+    private File services;
 
     @Before
     public void setUp() throws Exception
@@ -199,11 +211,15 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final File domainFolder = getDomainFolder(DEFAULT_DOMAIN_NAME);
         assertThat(domainFolder.mkdirs(), is(true));
 
+        services = new File(muleHome, "services");
+        services.mkdirs();
+
         new File(muleHome, "lib/shared/default").mkdirs();
 
         applicationDeploymentListener = mock(DeploymentListener.class);
         domainDeploymentListener = mock(DeploymentListener.class);
-        deploymentService = new MuleDeploymentService(containerClassLoader);
+        serviceManager = new MuleServiceManager(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader, new ServiceClassLoaderFactory()), new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
+        deploymentService = new MuleDeploymentService(containerClassLoader, serviceManager);
         deploymentService.addDeploymentListener(applicationDeploymentListener);
         deploymentService.addDomainDeploymentListener(domainDeploymentListener);
     }
@@ -215,6 +231,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         {
             deploymentService.stop();
         }
+
+        if (serviceManager != null)
+        {
+            serviceManager.stop();
+        }
+
         FileUtils.deleteTree(muleHome);
 
         // this is a complex classloader setup and we can't reproduce standalone Mule 100%,
@@ -228,7 +250,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
         assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
@@ -247,7 +269,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
 
@@ -260,7 +282,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedAppFromBuilder(springPropertyAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
         assertApplicationDeploymentSuccess(applicationDeploymentListener, springPropertyAppFileBuilder.getId());
 
         final Application app = findApp(springPropertyAppFileBuilder.getId(), 1);
@@ -290,7 +312,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysAppZipAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
@@ -311,7 +333,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(brokenAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, brokenAppFileBuilder.getId());
 
@@ -337,7 +359,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(brokenAppWithFunkyNameAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, brokenAppWithFunkyNameAppFileBuilder.getId());
         assertAppsDir(new String[] {brokenAppWithFunkyNameAppFileBuilder.getDeployedPath()}, NONE, true);
@@ -364,7 +386,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysBrokenAppZipAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedAppFromBuilder(brokenAppFileBuilder);
 
@@ -384,7 +406,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysAppZipDeployedOnStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
@@ -409,7 +431,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
 
@@ -431,7 +453,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedAppFromBuilder(emptyAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
@@ -444,7 +466,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
         addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
         addPackedAppFromBuilder(emptyAppFileBuilder);
@@ -458,7 +480,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysExplodedAppAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedAppFromBuilder(emptyAppFileBuilder);
 
@@ -472,7 +494,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedAppFromBuilder(emptyAppFileBuilder, "app with spaces");
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
 
@@ -490,7 +512,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysInvalidExplodedAppAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedAppFromBuilder(emptyAppFileBuilder, "app with spaces");
 
@@ -510,7 +532,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysInvalidExplodedOnlyOnce() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedAppFromBuilder(emptyAppFileBuilder, "app with spaces");
         assertDeploymentFailure(applicationDeploymentListener, "app with spaces", atLeast(1));
@@ -530,7 +552,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedAppFromBuilder(incompleteAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
@@ -548,7 +570,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysBrokenExplodedAppAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -570,7 +592,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
         assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
@@ -586,7 +608,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysExplodedAppAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedAppFromBuilder(emptyAppFileBuilder);
 
@@ -607,7 +629,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedAppFromBuilder(incompleteAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
@@ -631,7 +653,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysBrokenExplodedAppAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -659,7 +681,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
 
@@ -679,7 +701,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysInvalidExplodedAppAfterSuccessfulDeploymentAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
@@ -703,7 +725,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedAppFromBuilder(incompleteAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
@@ -726,7 +748,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysFixedAppAfterBrokenExplodedAppAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedAppFromBuilder(incompleteAppFileBuilder);
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
@@ -768,7 +790,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         FileUtils.copyInputStreamToFile(new ByteArrayInputStream(wrongDomainFileContext.getBytes()), domainConfigFile);
         long firstFileTimestamp = domainConfigFile.lastModified();
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
         assertDeploymentFailure(applicationDeploymentListener, httpAAppFileBuilder.getId());
@@ -790,7 +812,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
 
@@ -829,7 +851,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder, "app with spaces.zip");
 
-        deploymentService.start();
+        startDeployment();
         assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
 
         // zip stays intact, no app dir created
@@ -846,7 +868,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysInvalidZipAppAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedAppFromBuilder(emptyAppFileBuilder, "app with spaces.zip");
 
@@ -869,7 +891,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("empty-app.zip", emptyAppFileBuilder);
         addPackedAppFromBuilder(applicationFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
         reset(applicationDeploymentListener);
@@ -892,7 +914,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         startupOptions.put("app", "3:1:2");
         StartupContext.get().setStartupOptions(startupOptions);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, "1");
         assertApplicationDeploymentSuccess(applicationDeploymentListener, "2");
@@ -919,7 +941,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         startupOptions.put("app", "3:1:2");
         StartupContext.get().setStartupOptions(startupOptions);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, "1");
         assertApplicationDeploymentSuccess(applicationDeploymentListener, "2");
@@ -945,7 +967,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         startupOptions.put("app", "empty-app:empty-app:empty-app");
         StartupContext.get().setStartupOptions(startupOptions);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
@@ -964,7 +986,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         File configFile = new File(appFolder, MULE_CONFIG_XML_FILE);
         configFile.setLastModified(System.currentTimeMillis() + ONE_HOUR_IN_MILLISECONDS);
 
-        deploymentService.start();
+        startDeployment();
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         reset(applicationDeploymentListener);
 
@@ -981,7 +1003,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         File configFile = new File(appFolder, MULE_CONFIG_XML_FILE);
         FileUtils.writeStringToFile(configFile, "you shall not pass");
 
-        deploymentService.start();
+        startDeployment();
         assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
         reset(applicationDeploymentListener);
 
@@ -998,7 +1020,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         // class cannot be unit tested.
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         assertMuleContextCreated(applicationDeploymentListener, emptyAppFileBuilder.getId());
@@ -1011,7 +1033,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         final Application app = findApp(emptyAppFileBuilder.getId(), 1);
@@ -1026,7 +1048,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         Application app = findApp(emptyAppFileBuilder.getId(), 1);
@@ -1045,11 +1067,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final DefaultDomainManager domainManager = new DefaultDomainManager();
         domainManager.addDomain(createDefaultDomain());
 
-        TestApplicationFactory appFactory = createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()), domainManager);
+        TestApplicationFactory appFactory = createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()), domainManager, mock(ServiceRepository.class, RETURNS_DEEP_STUBS));
         appFactory.setFailOnStopApplication(true);
 
         deploymentService.setAppFactory(appFactory);
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         Application app = findApp(emptyAppFileBuilder.getId(), 1);
@@ -1070,10 +1092,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final DefaultDomainManager domainManager = new DefaultDomainManager();
         domainManager.addDomain(createDefaultDomain());
 
-        TestApplicationFactory appFactory = createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()), domainManager);
+        TestApplicationFactory appFactory = createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()), domainManager, mock(ServiceRepository.class, RETURNS_DEEP_STUBS));
         appFactory.setFailOnDisposeApplication(true);
         deploymentService.setAppFactory(appFactory);
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         Application app = findApp(emptyAppFileBuilder.getId(), 1);
@@ -1090,7 +1112,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(incompleteAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
@@ -1108,7 +1130,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysIncompleteZipAppAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -1128,7 +1150,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void mantainsAppFolderOnExplodedAppDeploymentError() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -1150,7 +1172,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(incompleteAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
@@ -1169,7 +1191,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysZipAppAfterDeploymentErrorAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -1191,7 +1213,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
 
@@ -1206,7 +1228,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysInvalidZipAppAfterSuccessfulDeploymentAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedAppFromBuilder(emptyAppFileBuilder);
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
@@ -1223,7 +1245,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(incompleteAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
@@ -1240,7 +1262,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysInvalidZipAppAfterFailedDeploymentAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedAppFromBuilder(incompleteAppFileBuilder);
         assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
@@ -1257,7 +1279,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysExplodedAppAfterDeploymentError() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -1280,7 +1302,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(echoPluginAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(applicationDeploymentListener, echoPluginAppFileBuilder.getId());
     }
@@ -1295,7 +1317,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("my-app.zip", emptyAppFileBuilder).containingPlugin(echoPluginWithLib1);
         addPackedAppFromBuilder(applicationFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     }
@@ -1310,7 +1332,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("my-app.zip", emptyAppFileBuilder).containingPlugin(echoPlugin);
         addPackedAppFromBuilder(applicationFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     }
@@ -1323,7 +1345,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml");
         addPackedAppFromBuilder(applicationFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
         assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
@@ -1338,7 +1360,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml");
         addPackedAppFromBuilder(applicationFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
         assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
@@ -1350,7 +1372,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(sharedLibPluginAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedLibPluginAppFileBuilder.getId());
         assertAppsDir(NONE, new String[] {sharedLibPluginAppFileBuilder.getId()}, true);
@@ -1365,7 +1387,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         addPackedAppFromBuilder(sharedLibPluginAppPrecedenceFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedLibPluginAppPrecedenceFileBuilder.getId());
         assertAppsDir(NONE, new String[] {sharedLibPluginAppPrecedenceFileBuilder.getId()}, true);
@@ -1381,15 +1403,42 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysAppZipWithExtensionPlugin() throws Exception
     {
+        //TODO(pablo.kraan): MULE-10148 - avoid using pre-compiled jars and classes
+        final ServiceFileBuilder echoService = new ServiceFileBuilder("echoService")
+                .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.echo.EchoServiceProvider")
+                .usingLibrary("lib/mule-module-service-echo-default-4.0-SNAPSHOT.jar");
+        File installedService = new File(services, echoService.getArtifactFile().getName());
+        copyFile(echoService.getArtifactFile(), installedService);
+
+        final ServiceFileBuilder fooService = new ServiceFileBuilder("fooService")
+                .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.foo.FooServiceProvider")
+                .usingLibrary("lib/mule-module-service-foo-default-4.0-SNAPSHOT.jar");
+        installedService = new File(services, fooService.getArtifactFile().getName());
+        copyFile(fooService.getArtifactFile(), installedService);
+
         ArtifactPluginFileBuilder extensionPlugin = new ArtifactPluginFileBuilder("extensionPlugin")
                 .usingLibrary("lib/mule-module-hello-4.0-SNAPSHOT.jar")
                 .configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/, META-INF");
         ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin").definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
         addPackedAppFromBuilder(applicationFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    }
+
+    @Test
+    public void failsToDeployApplicationOnMissingService() throws Exception
+    {
+        ArtifactPluginFileBuilder extensionPlugin = new ArtifactPluginFileBuilder("extensionPlugin")
+                .usingLibrary("lib/mule-module-hello-4.0-SNAPSHOT.jar")
+                .configuredWith(EXPORTED_RESOURCE_PACKAGES_PROPERTY, "/, META-INF");
+        ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin").definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
+        addPackedAppFromBuilder(applicationFileBuilder);
+
+        startDeployment();
+
+        assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     }
 
     @Test
@@ -1400,7 +1449,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final DomainFileBuilder domainFileBuilder = new DomainFileBuilder(domainId).usingLibrary("lib/bar-1.0.jar").containing(applicationFileBuilder);
 
         addPackedDomainFromBuilder(domainFileBuilder);
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
         assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
@@ -1420,7 +1469,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final DomainFileBuilder domainFileBuilder = new DomainFileBuilder(domainId).usingLibrary("lib/bar-1.0.jar").containing(applicationFileBuilder);
 
         addPackedDomainFromBuilder(domainFileBuilder);
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
         assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
@@ -1441,7 +1490,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final DomainFileBuilder domainFileBuilder = new DomainFileBuilder(domainId).usingLibrary("lib/bar-1.0.jar").containing(applicationFileBuilder);
 
         addPackedDomainFromBuilder(domainFileBuilder);
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
         assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
@@ -1458,7 +1507,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(multiLibPluginAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(applicationDeploymentListener, multiLibPluginAppFileBuilder.getId());
 
@@ -1474,7 +1523,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(applicationDeploymentListener, differentLibPluginAppFileBuilder.getId());
 
@@ -1490,7 +1539,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(resourcePluginAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(applicationDeploymentListener, resourcePluginAppFileBuilder.getId());
     }
@@ -1500,7 +1549,17 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(emptyAppFileBuilder);
 
-        Thread deploymentServiceThread = new Thread(() -> deploymentService.start());
+        Thread deploymentServiceThread = new Thread(() ->
+                                                    {
+                                                        try
+                                                        {
+                                                            startDeployment();
+                                                        }
+                                                        catch (MuleException e)
+                                                        {
+                                                            throw new RuntimeException(e);
+                                                        }
+                                                    });
 
         final boolean[] lockedFromClient = new boolean[1];
 
@@ -1549,7 +1608,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
@@ -1580,7 +1639,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedDomainFromBuilder(dummyDomainBundleFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         deploysDomainBundle();
     }
@@ -1588,7 +1647,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysExplodedDomainBundleAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedDomainFromBuilder(dummyDomainBundleFileBuilder);
 
@@ -1600,7 +1659,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(dummyDomainBundleFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         deploysDomainBundle();
     }
@@ -1608,7 +1667,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysDomainBundleZipAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(dummyDomainBundleFileBuilder);
 
@@ -1637,7 +1696,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedDomainFromBuilder(invalidDomainBundleFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         deploysInvalidDomainBundleZip();
     }
@@ -1645,7 +1704,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysInvalidExplodedDomainBundleAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedDomainFromBuilder(invalidDomainBundleFileBuilder);
 
@@ -1657,7 +1716,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(invalidDomainBundleFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         deploysInvalidDomainBundleZip();
     }
@@ -1667,7 +1726,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(invalidDomainBundleFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         deploysInvalidDomainBundleZip();
     }
@@ -1684,7 +1743,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysDomainZipAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
@@ -1703,7 +1762,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(brokenDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(domainDeploymentListener, brokenDomainFileBuilder.getId());
 
@@ -1721,7 +1780,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysBrokenDomainZipAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(brokenDomainFileBuilder);
 
@@ -1741,7 +1800,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysDomainZipDeployedOnStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(emptyAppFileBuilder);
         File dummyDomainFile = new File(emptyAppFileBuilder.getZipPath());
@@ -1766,7 +1825,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeployedDomainsAreDifferent() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(emptyAppFileBuilder);
         File dummyDomainFile = new File(emptyAppFileBuilder.getZipPath());
@@ -1799,7 +1858,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         addPackedAppFromBuilder(dummyDomainApp1FileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
@@ -1823,7 +1882,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         File dummyDomainFile = new File(dummyDomainFileBuilder.getZipPath());
         long firstFileTimestamp = dummyDomainFile.lastModified();
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
 
@@ -1856,7 +1915,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedDomainFromBuilder(emptyDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
         assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyDomainFileBuilder.getId()}, true);
@@ -1869,7 +1928,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         addExplodedDomainFromBuilder(emptyDomainFileBuilder);
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
@@ -1884,7 +1943,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysExplodedDomainAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedDomainFromBuilder(emptyDomainFileBuilder);
 
@@ -1898,7 +1957,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedDomainFromBuilder(emptyDomainFileBuilder, "domain with spaces");
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(domainDeploymentListener, "domain with spaces");
 
@@ -1916,7 +1975,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysInvalidExplodedDomainAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedDomainFromBuilder(emptyDomainFileBuilder, "domain with spaces");
 
@@ -1936,7 +1995,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysInvalidExplodedDomainOnlyOnce() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedDomainFromBuilder(emptyDomainFileBuilder, "domain with spaces");
         assertDeploymentFailure(domainDeploymentListener, "domain with spaces", atLeast(1));
@@ -1956,7 +2015,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedDomainFromBuilder(incompleteDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
@@ -1972,7 +2031,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysBrokenExplodedDomainAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedDomainFromBuilder(incompleteDomainFileBuilder);
 
@@ -1994,7 +2053,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         // class cannot be unit tested.
         addPackedDomainFromBuilder(sharedHttpDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
         assertMuleContextCreated(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
@@ -2007,7 +2066,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(emptyAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
         final Domain domain = findADomain(emptyAppFileBuilder.getId());
@@ -2021,7 +2080,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(emptyAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyAppFileBuilder.getId());
 
@@ -2079,7 +2138,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         testDomainFactory.setFailOnStopApplication();
 
         deploymentService.setDomainFactory(testDomainFactory);
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
@@ -2098,7 +2157,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         TestDomainFactory testDomainFactory = new TestDomainFactory(new DomainClassLoaderFactory(getClass().getClassLoader()), containerClassLoader);
         testDomainFactory.setFailOnDisposeApplication();
         deploymentService.setDomainFactory(testDomainFactory);
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
@@ -2114,7 +2173,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(incompleteDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
@@ -2132,7 +2191,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void deploysIncompleteZipDomainAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(incompleteDomainFileBuilder);
 
@@ -2152,7 +2211,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void mantainsDomainFolderOnExplodedAppDeploymentError() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(incompleteDomainFileBuilder);
 
@@ -2174,7 +2233,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(incompleteDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
@@ -2193,7 +2252,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysZipDomainAfterDeploymentErrorAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(incompleteDomainFileBuilder);
 
@@ -2215,7 +2274,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void refreshDomainClassloaderAfterRedeployment() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         // Deploy domain and apps and wait until success
         addPackedDomainFromBuilder(sharedHttpDomainFileBuilder);
@@ -2269,7 +2328,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
@@ -2284,7 +2343,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysInvalidZipDomainAfterSuccessfulDeploymentAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(emptyDomainFileBuilder);
         assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
@@ -2301,7 +2360,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedDomainFromBuilder(incompleteDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
@@ -2318,7 +2377,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysInvalidZipDomainAfterFailedDeploymentAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(incompleteDomainFileBuilder);
         assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
@@ -2335,7 +2394,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysExplodedDomainAfterDeploymentError() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(incompleteDomainFileBuilder);
 
@@ -2384,7 +2443,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
     private void doDomainUndeployAndVerifyAppsAreUndeployed(Action undeployAction) throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addPackedDomainFromBuilder(dummyDomainFileBuilder);
 
@@ -2408,7 +2467,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addExplodedDomainFromBuilder(incompleteDomainFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         doRedeployFixedDomainAfterBrokenDomain();
     }
@@ -2416,7 +2475,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysFixedDomainAfterBrokenExplodedDomainAfterStartup() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedDomainFromBuilder(incompleteDomainFileBuilder);
 
@@ -2431,7 +2490,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         addExplodedAppFromBuilder(dummyDomainApp1FileBuilder, dummyDomainApp1FileBuilder.getId());
         addExplodedAppFromBuilder(dummyDomainApp2FileBuilder, dummyDomainApp2FileBuilder.getId());
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
 
@@ -2455,7 +2514,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         addExplodedDomainFromBuilder(dummyUndeployableDomainFileBuilder, dummyUndeployableDomainFileBuilder.getId());
         addPackedAppFromBuilder(emptyAppFileBuilder, "empty-app.zip");
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, dummyUndeployableDomainFileBuilder.getId());
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
@@ -2479,7 +2538,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         addExplodedAppFromBuilder(dummyDomainApp1FileBuilder, dummyDomainApp1FileBuilder.getId());
         addExplodedAppFromBuilder(dummyDomainApp2FileBuilder, dummyDomainApp2FileBuilder.getId());
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
 
@@ -2499,7 +2558,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysDomainWithOneApplicationFailedOnFirstDeployment() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedDomainFromBuilder(dummyDomainFileBuilder, dummyDomainFileBuilder.getId());
 
@@ -2537,7 +2596,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     @Test
     public void redeploysDomainWithOneApplicationFailedAfterRedeployment() throws Exception
     {
-        deploymentService.start();
+        startDeployment();
 
         addExplodedDomainFromBuilder(dummyDomainFileBuilder, dummyDomainFileBuilder.getId());
 
@@ -2635,7 +2694,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     {
         addPackedAppFromBuilder(brokenAppFileBuilder);
 
-        deploymentService.start();
+        startDeployment();
 
         assertDeploymentFailure(applicationDeploymentListener, brokenAppFileBuilder.getId());
         reset(applicationDeploymentListener);
@@ -2688,7 +2747,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     ) throws Exception
     {
         WaitComponent.reset();
-        deploymentService.start();
+        startDeployment();
         deployArtifactAction.perform();
         try
         {
@@ -2704,6 +2763,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         }
         verifyDeploymentSuccessfulAction.perform();
         verifyAnchorFileExistsAction.perform();
+    }
+
+    private void startDeployment() throws MuleException
+    {
+        serviceManager.start();
+        deploymentService.start();
     }
 
     private void assertApplicationDeploymentSuccess(DeploymentListener listener, String artifactName)

@@ -27,6 +27,8 @@ public class MuleFoldersUtil
     public static final String DOMAINS_FOLDER = "domains";
     public static final String CONTAINER_APP_PLUGINS = "plugins";
     public static final String USER_FOLDER = "user";
+    public static final String SERVICES_FOLDER = "services";
+
 
     private MuleFoldersUtil()
     {
@@ -37,6 +39,16 @@ public class MuleFoldersUtil
         String muleHome = System.getProperty(MULE_HOME_DIRECTORY_PROPERTY, ".");
 
         return new File(muleHome);
+    }
+
+    public static File getServicesFolder()
+    {
+        return new File(getMuleHomeFolder(), SERVICES_FOLDER);
+    }
+
+    public static File getServiceFolder(String name)
+    {
+        return new File(getServicesFolder(), name);
     }
 
     public static File getDomainsFolder()
@@ -112,5 +124,10 @@ public class MuleFoldersUtil
     public static File getContainerAppPluginsFolder()
     {
         return new File(getMuleHomeFolder(), CONTAINER_APP_PLUGINS);
+    }
+
+    public static File getServicesTempFolder()
+    {
+        return new File(getExecutionFolder(), SERVICES_FOLDER);
     }
 }
