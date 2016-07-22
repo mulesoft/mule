@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
@@ -22,7 +23,6 @@ import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionE
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
-
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -33,6 +33,7 @@ import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -41,6 +42,7 @@ import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
@@ -372,6 +374,18 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase
     {
         MuleEvent event = flowRunner("literalEcho").withPayload(EMPTY).run();
         assertThat(event.getMessage().getPayload(), is("#[money]"));
+    }
+
+    @Test
+    public void getMedicalHistory() throws Exception
+    {
+
+        Map<Integer, HealthStatus> getMedicalHistory = runFlow("getMedicalHistory").getMessage().getPayload();
+        assertThat(getMedicalHistory, is(notNullValue()));
+        assertThat(getMedicalHistory.entrySet().size(), is(3));
+        assertThat(getMedicalHistory.get(2013), is(HealthStatus.HEALTHY));
+        assertThat(getMedicalHistory.get(2014), is(HealthStatus.CANCER));
+        assertThat(getMedicalHistory.get(2015), is(HealthStatus.DEAD));
     }
 
     private void assertDynamicDoor(String flowName) throws Exception

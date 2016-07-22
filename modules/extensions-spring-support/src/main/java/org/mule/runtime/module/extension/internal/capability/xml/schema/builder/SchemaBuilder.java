@@ -30,6 +30,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isEnum;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isExtensible;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
@@ -52,6 +53,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.STRING;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TLS_CONTEXT_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML_NAMESPACE;
@@ -113,7 +115,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
-import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
@@ -147,7 +148,7 @@ public final class SchemaBuilder
     private static final String UNBOUNDED = "unbounded";
     private static final String ABSTRACT_ELEMENT_MASK = "abstract-%s";
 
-    private final Set<Class<? extends Enum>> registeredEnums = new LinkedHashSet<>();
+    private final Set<StringType> registeredEnums = new LinkedHashSet<>();
     private final Map<Class<?>, ComplexTypeHolder> registeredComplexTypesHolders = new LinkedHashMap<>();
     private final Map<String, NamedGroup> substitutionGroups = new LinkedHashMap<>();
     private final ObjectFactory objectFactory = new ObjectFactory();
@@ -465,14 +466,14 @@ public final class SchemaBuilder
 
     public SchemaBuilder registerEnums()
     {
-        registeredEnums.forEach(enumClass -> registerEnum(schema, enumClass));
+        registeredEnums.forEach(enumType -> registerEnum(schema, enumType));
         return this;
     }
 
-    private void registerEnum(Schema schema, Class<? extends Enum> enumType)
+    private void registerEnum(Schema schema, StringType enumType)
     {
         TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
-        enumSimpleType.setName(sanitizeName(enumType.getName()) + SchemaConstants.ENUM_TYPE_SUFFIX);
+        enumSimpleType.setName(sanitizeName(getId(enumType)) + SchemaConstants.ENUM_TYPE_SUFFIX);
 
         Union union = new Union();
         union.getSimpleType().add(createEnumSimpleType(enumType));
@@ -492,18 +493,21 @@ public final class SchemaBuilder
         return expression;
     }
 
-    private LocalSimpleType createEnumSimpleType(Class<? extends Enum> enumClass)
+    private LocalSimpleType createEnumSimpleType(MetadataType enumType)
     {
         LocalSimpleType enumValues = new LocalSimpleType();
         Restriction restriction = new Restriction();
         enumValues.setRestriction(restriction);
-        restriction.setBase(SchemaConstants.STRING);
+        restriction.setBase(STRING);
 
 
-        for (Enum value : enumClass.getEnumConstants())
+        EnumAnnotation<String> enumAnnotation = getSingleAnnotation(enumType, EnumAnnotation.class)
+                .orElseThrow(() -> new IllegalArgumentException("Cannot obtain enum values for the given type"));
+
+        for (String value : enumAnnotation.getValues())
         {
             NoFixedFacet noFixedFacet = objectFactory.createNoFixedFacet();
-            noFixedFacet.setValue(value.name());
+            noFixedFacet.setValue(value);
 
             JAXBElement<NoFixedFacet> enumeration = objectFactory.createEnumeration(noFixedFacet);
             enumValues.getRestriction().getFacets().add(enumeration);
@@ -582,27 +586,18 @@ public final class SchemaBuilder
                 }
             }
 
-            private void visitEnum(StringType stringType)
+            private void visitEnum(StringType enumType)
             {
                 attribute.setName(name);
 
-                Class<? extends Enum> enumType;
-                try
-                {
-                    enumType = getType(stringType);
-                }
-                catch (Exception e)
-                {
-                    throw new IllegalParameterModelDefinitionException(String.format("Parameter '%s' refers to an enum class which couldn't be loaded.", name), e);
-                }
-
-                if (OperationTransactionalAction.class.equals(enumType))
+                String typeName = getId(enumType);
+                if (OperationTransactionalAction.class.getName().equals(typeName))
                 {
                     attribute.setType(MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE);
                 }
                 else
                 {
-                    attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(enumType.getName()) + SchemaConstants.ENUM_TYPE_SUFFIX));
+                    attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(typeName) + SchemaConstants.ENUM_TYPE_SUFFIX));
                     registeredEnums.add(enumType);
                 }
             }
@@ -885,7 +880,7 @@ public final class SchemaBuilder
 
                 forceOptional = !genericType.equals(typeLoader.load(Object.class)) && (supportsChildElement || shouldForceOptional(genericType));
                 defaultVisit(arrayType);
-                if (supportsChildElement)
+                if (supportsChildElement || isEnum(genericType))
                 {
                     generateCollectionElement(all, name, description, arrayType, isRequired(true, required));
                 }

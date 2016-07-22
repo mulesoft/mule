@@ -39,6 +39,7 @@ import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 

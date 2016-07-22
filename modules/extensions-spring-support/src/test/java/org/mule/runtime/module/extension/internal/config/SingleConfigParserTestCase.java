@@ -10,8 +10,12 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.Ricin;
@@ -49,6 +53,15 @@ public class SingleConfigParserTestCase extends AbstractConfigParserTestCase
         HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION_BYREF, event);
         assertThat(config.getWeapon(), is(not(nullValue())));
         assertThat(config.getWeapon(), is(instanceOf(Ricin.class)));
+    }
+
+    @Test
+    public void getHealthProgression() throws Exception
+    {
+        HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, getHeisenbergEvent());
+        assertThat(config.getHealthProgression(), is(not(nullValue())));
+        assertThat(config.getHealthProgression().size(), is(3));
+        assertThat(config.getHealthProgression(), contains(HEALTHY, CANCER, DEAD));
     }
 
 }
