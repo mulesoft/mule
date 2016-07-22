@@ -11,9 +11,10 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
-import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
+
 import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
+import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
 import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -22,7 +23,10 @@ import org.mule.runtime.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -86,13 +90,12 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase
 
         // Give time to the proxy thread to start up completely
         proxyReadyLatch.await();
-        Thread.yield();
     }
 
     @After
     public void stopMockProxy() throws Exception
     {
-        mockProxyAcceptor.join();
+        mockProxyAcceptor.join(LOCK_TIMEOUT);
     }
 
     @Test
@@ -149,9 +152,22 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase
             ServerSocket serverSocket = null;
             try
             {
-                serverSocket = new ServerSocket(Integer.parseInt(proxyPort.getValue()));
+                ServerSocketChannel ssc = ServerSocketChannel.open();
+
+                serverSocket = ssc.socket();
+                serverSocket.bind(new InetSocketAddress(Integer.parseInt(proxyPort.getValue())));
+                ssc.configureBlocking(false);
+
                 proxyReadyLatch.countDown();
-                serverSocket.accept().close();
+                SocketChannel sc = null;
+                while (sc == null)
+                {
+                    sc = ssc.accept();
+                    Thread.yield();
+                }
+
+                sc.close();
+
                 latch.release();
             }
             catch (IOException e)
