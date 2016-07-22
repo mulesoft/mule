@@ -42,13 +42,13 @@ public final class TestArtifactClassLoaderFilter implements ClassLoaderFilter
      * Creates an extended {@link ClassLoaderFilter} to exporte classes that are not exported as packages in the original
      * filter.
      *
-     * @param classLoaderFilter the original filter
-     * @param exportedClasses a {@link List} of {@link Class}es to export in addition to the original filter
+     * @param classLoaderFilter the original filter. Not null.
+     * @param exportedClasses a {@link List} of {@link Class}es to export in addition to the original filter. Not null.
      */
     public TestArtifactClassLoaderFilter(final ClassLoaderFilter classLoaderFilter, final List<Class> exportedClasses)
     {
-        checkNotNull(classLoaderFilter, "'classLoaderFilter' cannot be null");
-        checkNotNull(exportedClasses, "'exportedClasses' cannot be null");
+        checkNotNull(classLoaderFilter, "classLoaderFilter cannot be null");
+        checkNotNull(exportedClasses, "exportedClasses cannot be null");
 
         this.classLoaderFilter = classLoaderFilter;
         this.exportedClasses = exportedClasses.stream().collect(Collectors.toMap(Class::getName, identity()));
@@ -64,7 +64,7 @@ public final class TestArtifactClassLoaderFilter implements ClassLoaderFilter
     @Override
     public boolean exportsClass(final String name)
     {
-        checkArgument(!isEmpty(name), "'name' cannot be empty");
+        checkArgument(!isEmpty(name), "Class name cannot be empty");
 
         boolean exported = classLoaderFilter.exportsClass(name);
         if (!exported)

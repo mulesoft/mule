@@ -64,10 +64,10 @@ public class ClassPathClassifierContext
      */
     public ClassPathClassifierContext(final Class<?> testClass, final List<URL> classPathURLs, final DependenciesGraph dependenciesGraph, final MavenMultiModuleArtifactMapping mavenMultiModuleArtifactMapping) throws IOException
     {
-        checkNotNull(testClass, "'testClass' cannot be null");
-        checkNotNull(classPathURLs, "'classPathURLs' cannot be null");
-        checkNotNull(dependenciesGraph, "'dependenciesGraph' cannot be null");
-        checkNotNull(mavenMultiModuleArtifactMapping, "'mavenMultiModuleArtifactMapping' cannot be null");
+        checkNotNull(testClass, "testClass cannot be null");
+        checkNotNull(classPathURLs, "classPathURLs cannot be null");
+        checkNotNull(dependenciesGraph, "dependenciesGraph cannot be null");
+        checkNotNull(mavenMultiModuleArtifactMapping, "mavenMultiModuleArtifactMapping cannot be null");
 
         this.testClass = testClass;
         this.classPathURLs = classPathURLs;
